@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>main</b>
  * 
  */
-class CEventsMain {
+class _CEventsMain {
 	/**
 	 * <p>Событие OnAdminContextMenuShow вызывается в функции <a href="http://dev.1c-bitrix.ruapi_help/main/general/admin.section/classes/cadmincontextmenu/show.php">CAdminContextMenu::Show()</a> при выводе в административном разделе панели кнопок. Событие позволяет модифицировать или добавить собственные кнопки на панель.</p> <p><b>Примечание</b>: событие добавлено в ядро начиная с версии 9.5.10.</p>
 	 *

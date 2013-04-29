@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>subscribe</b>
  * 
  */
-class CEventsSubscribe {
+class _CEventsSubscribe {
 	/**
 	 * Событие "BeforePostingSendMail" вызывается перед отправкой выпуска из функции <a href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/cposting/cpostingsendmessage.php">CPosting::SendMessage</a>.
 	 *

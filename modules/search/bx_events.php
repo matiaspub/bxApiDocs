@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>search</b>
  * 
  */
-class CEventsSearch {
+class _CEventsSearch {
 	/**
 	 * <p>Событие "BeforeIndex" вызывается перед индексацией элемента функцией <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearch/indexs.php">CSearch::Index</a>.</p>
 	 *

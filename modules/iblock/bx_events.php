@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>iblock</b>
  * 
  */
-class CEventsIblock {
+class _CEventsIblock {
 	/**
 	 * Событие "OnAfterIBlockAdd" вызывается после попытки добавления нового информационного блока методом <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>.
 	 *

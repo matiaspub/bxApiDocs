@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>seo</b>
  * 
  */
-class CEventsSeo {
+class _CEventsSeo {
 	/**
 	 * <p>Событие предназначено для назначения собственных проверок и вывода собственных рекомендаций в инструменте <b>Страница</b> модуля <b>Поисковая оптимизация</b>.</p> <a name="examples"></a>
 	 *
@@ -40,43 +40,7 @@ class CEventsSeo {
 
 	/**
 	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @param  $value = rand(100 
-	 *
-	 *
-	 *
-	 * @param 500); $return  
-	 *
-	 *
-	 *
-	 * @param $valu $e  
-	 *
-	 *
-	 *
-	 * @param  $;  
-	 *
-	 *
-	 *
-	 * @param  $addEventHandler  
-	 *
-	 *
-	 *
-	 * @param se $o  
-	 *
-	 *
-	 *
-	 * @param OnSeoCountersGetLis $t  
-	 *
-	 *
-	 *
-	 * @param MyOnSeoCountersGetLis $t  
-	 *
-	 *
-	 *
-	 * @return function 
+	 * <p>Событие предназначено для подключения собственного программного счетчика.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -97,7 +61,7 @@ class CEventsSeo {
 	 * @link http://dev.1c-bitrix.ru/api_help/seo/events/onseocountersgetlist.php
 	 * @author Bitrix
 	 */
-	public static function OnSeoCountersGetList($value=rand(100, $return, $e, $;, $addEventHandler, $o, $t, $t){}
+	public static function OnSeoCountersGetList(){}
 
 
 }?>

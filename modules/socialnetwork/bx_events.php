@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>socialnetwork</b>
  * 
  */
-class CEventsSocialnetwork {
+class _CEventsSocialnetwork {
 	/**
 	 * <p>Вызывается перед удалением дополнительного функционала.</p>
 	 *

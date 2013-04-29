@@ -4,7 +4,7 @@
  * Класс-контейнер событий модуля <b>catalog</b>
  * 
  */
-class CEventsCatalog {
+class _CEventsCatalog {
 	/**
 	 * OnBeforePriceAdd - событие, вызываемое перед добавлением новой цены товара. На вход получает ссылку на массив полей цены (см. <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/add.php">CPrice::Add </a>). На вход получает ID цены и ссылку на массив полей.
 	 *
