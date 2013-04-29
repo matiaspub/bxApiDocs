@@ -29,8 +29,10 @@ File -> Settings -> Project Settings -> PHP
 
 Брюки превращаются. Брюююки прррревращаются.....
 
-скрин с подсказкой $APPLICATION
-скрин с подсказкой CIBlockElement::GetList
+Основные синглтоны $APPLICATION, $DB, $USER, $USER_FIELD_MANAGER с подсказками
+<img src="http://clip2net.com/clip/m31506/1367219441-clip-75kb.png" alt="Синглтоны"/>
+Максимально полные доки по методам и классам
+<a href="http://clip2net.com/s/4ZwoNw"><img src="http://clip2net.com/clip/m31506/1367219722-clip-80kb.png" alt="Доки по методам и классам"/></a>
 скрин с доком метода CIBlockElement::GetList
 скрин с подсказкой CEventIblock
 скрин с подсказкой CEventIblock::OnAdd
