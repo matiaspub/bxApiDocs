@@ -44,4 +44,4 @@ File -> Settings -> Project Settings -> PHP
 
 ## Контакты
 + [https://twitter.com/matiaspub](https://twitter.com/matiaspub)
-+ [matiaspub@gmail.com](matiaspub@gmail.com)
++ matiaspub@gmail.com
