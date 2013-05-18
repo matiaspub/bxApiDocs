@@ -171,8 +171,32 @@ class CBlogPost extends CAllBlogPost
 							"ENTITY_TYPE_ID" => "BLOG_POST",
 							"ENTITY_ID" => $arPost["ID"],
 						);
+
 						if($arBlog["USE_SOCNET"] == "Y")
-							$arSearchIndex["PERMISSIONS"] = $arFields["SC_PERM"];
+						{
+							if(is_array($arFields["SC_PERM"]))
+							{
+								$arSearchIndex["PERMISSIONS"] = $arFields["SC_PERM"];
+								$sgId = array();
+								foreach($arFields["SC_PERM"] as $perm)
+								{
+									if(strpos($perm, "SG") !== false)
+									{
+										$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+										if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+											$sgId[] = $sgIdTmp;
+									}
+								}
+
+								if(!empty($sgId))
+								{
+									$arSearchIndex["PARAMS"] = array(
+										"socnet_group" => $sgId,
+										"entity" => "socnet_group",
+									);
+								}
+							}
+						}
 
 						CSearch::Index("blog", "P".$ID, $arSearchIndex);
 					}
@@ -400,6 +424,28 @@ class CBlogPost extends CAllBlogPost
 						}
 						else
 							$arSearchIndex["PERMISSIONS"] = CBlogPost::GetSocnetPermsCode($ID);
+
+						if(is_array($arSearchIndex["PERMISSIONS"]))
+						{
+							$sgId = array();
+							foreach($arSearchIndex["PERMISSIONS"] as $perm)
+							{
+								if(strpos($perm, "SG") !== false)
+								{
+									$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+									if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+										$sgId[] = $sgIdTmp;
+								}
+							}
+
+							if(!empty($sgId))
+							{
+								$arSearchIndex["PARAMS"] = array(
+									"socnet_group" => $sgId,
+									"entity" => "socnet_group",
+								);
+							}
+						}
 					}
 
 					CSearch::Index("blog", "P".$ID, $arSearchIndex, True);
@@ -576,6 +622,23 @@ class CBlogPost extends CAllBlogPost
 			"BLOG_SOCNET_GROUP_ID" => array("FIELD" => "B.SOCNET_GROUP_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog B ON (P.BLOG_ID = B.ID)"),
 			"SOCNET_GROUP_ID" => array("FIELD" => "SR1.ENTITY_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog_socnet_rights SR1 ON (P.ID = SR1.POST_ID AND SR1.ENTITY_TYPE = 'SG')"),
 		);
+		foreach ($arFilter as $key => $val)
+		{
+			$key_res = CBlog::GetFilterOperation($key);
+			$k = $key_res["FIELD"];
+			if (strpos($k, "POST_PARAM_") === 0)
+			{
+				$user_id = 0; $ii++; $pref = "BPP".$ii;
+				if (is_array($val)) {
+					$user_id = (isset($val["USER_ID"]) ? intval($val["USER_ID"]) : 0);
+					$arFilter[$key] = $val["VALUE"];
+				}
+				$arSelectFields[] = $k;
+				$arFields[$k] = array("FIELD" => $pref.".VALUE", "TYPE" => "string",
+					"FROM" => "LEFT JOIN b_blog_post_param ".$pref." ON (P.ID = ".$pref.".POST_ID AND ".$pref.".USER_ID".
+						($user_id <= 0 ? " IS NULL" : "=".$user_id)." AND ".$pref.".NAME='".$GLOBALS["DB"]->ForSql(substr($k, 11), 50)."')");
+			}
+		}
 		if(isset($arFilter["GROUP_CHECK_PERMS"]))
 		{
 			if(is_array($arFilter["GROUP_CHECK_PERMS"]))
@@ -778,7 +841,6 @@ class CBlogPost extends CAllBlogPost
 			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 		if (strlen($arSqls["ORDERBY"]) > 0)
 			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
-
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"])<=0)
 		{
 			$strSql_tmp =

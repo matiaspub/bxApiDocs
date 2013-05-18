@@ -66,25 +66,12 @@ class CSocNetLogRights
 		$DB->Query("DELETE FROM b_sonet_log_right WHERE ID = ".$RIGHT_ID);
 	}
 
-	public static function DeleteByLogID($LOG_ID, $bTruncate = false)
+	public static function DeleteByLogID($LOG_ID)
 	{
 		global $DB;
-		static $bTruncated = false;
 
 		$LOG_ID = intval($LOG_ID);
 		$DB->Query("DELETE FROM b_sonet_log_right WHERE LOG_ID = ".$LOG_ID);
-		if (
-			$bTruncate
-			&& !$bTruncated
-			&& (
-				!defined("DisableSonetLogFollow")
-				|| DisableSonetLogFollow !== true
-			)
-		)
-		{
-			$DB->Query("TRUNCATE b_sonet_log_page", true);			
-			$bTruncated = true;
-		}
 	}
 
 	public static function GetList($aSort=array(), $aFilter=array())

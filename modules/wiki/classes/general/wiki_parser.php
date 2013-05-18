@@ -299,8 +299,7 @@ class CWikiParser
 		{
 			if ($bOur)
 			{
-				$tmpName = $_SERVER["DOCUMENT_ROOT"].$sPath;
-				$imageFile = array("name" => $sFileName, "tmp_name" => CBXVirtualIoFileSystem::ConvertCharset($tmpName), "type" => CFile::GetContentType($tmpName));
+				$imageFile = CFile::MakeFileArray($sPath);
 				$checkRes = CFile::CheckImageFile($imageFile);
 
 				if($checkRes != null)

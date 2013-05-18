@@ -642,10 +642,9 @@ class CIMMessenger
 	public static function GetMessageCounter($userId, $arMessages = Array())
 	{
 		$count = 0;
-
 		if (isset($arMessages['unreadMessage']))
 		{
-			foreach ($arMessages['unreadMessage'] as $key => $value)
+			foreach ($arMessages['unreadMessage'] as $value)
 				$count += count($value);
 		}
 		else

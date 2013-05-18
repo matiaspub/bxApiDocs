@@ -589,80 +589,6 @@ class CPHPCache
 	 * @param mixed $vars
 	 * @return void
 	 */
-	
-	/**
-	 * <p>Выводит <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске вместе с заданным массивом переменных в файл кеша.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $vars = false Массив переменных, значения которых необходимо записать в файл
-	 * кэша, вида: <pre>array( "ИМЯ ПЕРЕМЕННОЙ 1" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 1", "ИМЯ
-	 * ПЕРЕМЕННОЙ 2" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 2", ...)</pre>Необязательный. По
-	 * умолчанию - массив переменных предварительно заданный в функции
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a>.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // создаем объект
-	 * $obCache = new CPHPCache; 
-	 * 
-	 * // время кеширования - 30 минут
-	 * $life_time = 30*60; 
-	 * 
-	 * // формируем идентификатор кеша в зависимости от всех параметров 
-	 * // которые могут повлиять на результирующий HTML
-	 * $cache_id = $ELEMENT_ID.$SECTION_ID.$USER-&gt;GetUserGroupString(); 
-	 * 
-	 * // если кэш есть и он ещё не истек то
-	 * if($obCache-&gt;InitCache($life_time, $cache_id, "/") :
-	 *     // получаем закешированные переменные
-	 *     $vars = $obCache-&gt;GetVars();
-	 *     $SECTION_TITLE = $vars["SECTION_TITLE"];
-	 * else :
-	 *     // иначе обращаемся к базе
-	 *     $arSection = GetIBlockSection($SECTION_ID);
-	 *     $SECTION_TITLE = $arSection["NAME"];
-	 * endif;
-	 * 
-	 * // добавляем пункт меню в навигационную цепочку
-	 * $APPLICATION-&gt;AddChainItem($SECTION_TITLE, $SECTION_URL."SECTION_ID=".$SECTION_ID);
-	 * 
-	 * // начинаем буферизирование вывода
-	 * if($obCache-&gt;StartDataCache()):
-	 * 
-	 *     // выбираем из базы параметры элемента инфо-блока
-	 *     if($arIBlockElement = GetIBlockElement($ELEMENT_ID, $IBLOCK_TYPE)):
-	 *         echo "&lt;pre&gt;"; print_r($arIBlockElement); echo "&lt;/pre&gt;";
-	 *     endif;
-	 * 
-	 *     // записываем предварительно буферизированный вывод в файл кеша
-	 *     // вместе с дополнительной переменной
-	 *     <b>$obCache-&gt;EndDataCache</b>(array(
-	 *         "SECTION_TITLE"    =&gt; $SECTION_TITLE
-	 *         )); 
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>[link=89607]Кеширование[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php
-	 * @author Bitrix
-	 */
 	public static function EndDataCache($vars=false)
 	{
 		if(!$this->bStarted)
@@ -1224,6 +1150,13 @@ function BXClearCache($full=false, $initdir="")
 // of the set of variables
 class CCacheManager
 {
+	private $isMySql;
+	static public function __construct()
+	{
+		global $DB;
+		$this->isMySql = ($DB->type == "MYSQL");
+	}
+
 	/** @var CPHPCache[] */
 	var $CACHE = array();
 	var $CACHE_PATH = array();
@@ -1322,7 +1255,7 @@ class CCacheManager
 			$this->ClearByTag(true);
 	}
 	// Use it to flush cache to the files.
-	// Causion: only at the end of all operations!
+	// Caution: only at the end of all operations!
 	function _Finalize()
 	{
 		global $CACHE_MANAGER;
@@ -1341,29 +1274,30 @@ class CCacheManager
 
 	var $comp_cache_stack = array();
 	var $SALT = false;
-	var $DBCacheTags = false;
+	var $DBCacheTags = array();
 	var $bWasTagged = false;
 
-	public static function InitDBCache()
+	public static function InitDBCache($path)
 	{
-		if(!$this->DBCacheTags)
+		global $DB;
+		if (!isset($this->DBCacheTags[$path]))
 		{
-			global $DB;
-
-			$this->DBCacheTags = array();
-			$rs = $DB->Query("
-				SELECT *
-				FROM b_cache_tag
-				WHERE SITE_ID = '".$DB->ForSQL(SITE_ID, 2)."'
-				AND CACHE_SALT = '".$DB->ForSQL($this->SALT, 4)."'
-			");
-			while($ar = $rs->Fetch())
+			$this->DBCacheTags[$path] = array();
+			if (!$this->isMySql)
 			{
-				$path = $ar["RELATIVE_PATH"];
-				$this->DBCacheTags[$path][$ar["TAG"]] = true;
+				$rs = $DB->Query("
+					SELECT TAG
+					FROM b_cache_tag
+					WHERE SITE_ID = '".$DB->ForSQL(SITE_ID, 2)."'
+					AND CACHE_SALT = '".$DB->ForSQL($this->SALT, 4)."'
+					AND RELATIVE_PATH = '".$DB->ForSQL($path, 4)."'
+				");
+				while($ar = $rs->Fetch())
+				{
+					$this->DBCacheTags[$path][$ar["TAG"]] = true;
+				}
 			}
 		}
-
 	}
 
 	public static function InitCompSalt()
@@ -1407,15 +1341,14 @@ class CCacheManager
 
 		if($this->bWasTagged)
 		{
-			$this->InitDBCache();
 			$sqlSITE_ID = $DB->ForSQL(SITE_ID, 2);
 			$sqlCACHE_SALT = $this->SALT;
 
 			$strSqlPrefix = "
-				INSERT INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
+				INSERT ".($this->isMySql? "IGNORE": "")." INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
 				VALUES
 			";
-			$maxValuesLen = $DB->type=="MYSQL"? 2048: 0;
+			$maxValuesLen = $this->isMySql? 2048: 0;
 			$strSqlValues = "";
 
 			foreach($this->comp_cache_stack as $arCompCache)
@@ -1423,13 +1356,9 @@ class CCacheManager
 				$path = $arCompCache[0];
 				if(strlen($path))
 				{
+					$this->InitDBCache($path);
 					$sqlRELATIVE_PATH = $DB->ForSQL($path, 255);
-
 					$sql = ",\n('".$sqlSITE_ID."', '".$sqlCACHE_SALT."', '".$sqlRELATIVE_PATH."',";
-
-					if(!isset($this->DBCacheTags[$path]))
-						$this->DBCacheTags[$path] = array();
-
 					foreach($arCompCache[1] as $tag => $t)
 					{
 						if(!isset($this->DBCacheTags[$path][$tag]))

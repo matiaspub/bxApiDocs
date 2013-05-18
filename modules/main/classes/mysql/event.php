@@ -11,25 +11,6 @@ require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/event.p
 
 class CEvent extends CAllEvent
 {
-	
-	/**
-	 * <p>Собирает неотправленные почтовые события и отправляет их в виде E-Mail сообщений с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/other/bxmail.php">bxmail</a>. Функция автоматически вызывается при загрузке каждой страницы и не требует ручного вызова.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/mailevents.php">Почтовая система</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/other/bxmail.php">bxmail</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cevent/checkevents.php
-	 * @author Bitrix
-	 */
 	public static function CheckEvents()
 	{
 		if((defined("DisableEventsCheck") && DisableEventsCheck===true) || (defined("BX_CRONTAB_SUPPORT") && BX_CRONTAB_SUPPORT===true && BX_CRONTAB!==true))

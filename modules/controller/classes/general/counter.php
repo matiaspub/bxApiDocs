@@ -106,7 +106,6 @@ class CAllControllerCounter
 	public static function Add($arFields)
 	{
 		global $DB;
-		$ID = intval($ID);
 
 		if(!CControllerCounter::CheckFields($arFields))
 			return false;
@@ -319,7 +318,7 @@ class CAllControllerCounter
 			}
 		}
 
-		return $rs;
+		return true;
 	}
 
 	public static function GetFormatArray()

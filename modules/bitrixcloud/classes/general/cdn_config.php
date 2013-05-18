@@ -374,8 +374,10 @@ class CBitrixCloudCDNConfig
 		CBitrixCloudOption::getOption("cdn_config_expire_time")->setStringValue((string)$this->expires);
 		CBitrixCloudOption::getOption("cdn_config_domain")->setStringValue($this->domain);
 		CBitrixCloudOption::getOption("cdn_config_site")->setArrayValue($this->sites);
-		CBitrixCloudOption::getOption("cdn_config_content_rewrite")->setStringValue($this->content_rewrite? "true": "false");
-		CBitrixCloudOption::getOption("cdn_config_rewrite_kernel")->setStringValue($this->kernel_rewrite? "true": "false");
+		if ($this->content_rewrite !== null)
+			CBitrixCloudOption::getOption("cdn_config_content_rewrite")->setStringValue($this->content_rewrite? "true": "false");
+		if ($this->kernel_rewrite !== null)
+			CBitrixCloudOption::getOption("cdn_config_rewrite_kernel")->setStringValue($this->kernel_rewrite? "true": "false");
 		$this->quota->saveOption(CBitrixCloudOption::getOption("cdn_config_quota"));
 		$this->classes->saveOption(CBitrixCloudOption::getOption("cdn_class"));
 		$this->server_groups->saveOption(CBitrixCloudOption::getOption("cdn_server_group"));

@@ -395,7 +395,7 @@ class EventManager
 			elseif (isset($handler["PATH"]) && !empty($handler["PATH"]))
 			{
 				$path = ltrim($handler["PATH"], "/");
-				if ($path = Loader::getLocal($path))
+				if (($path = Loader::getLocal($path)) !== false)
 					$result = include_once($path);
 			}
 			elseif (isset($handler["INCLUDE_FILE"]) && !empty($handler["INCLUDE_FILE"]) && \Bitrix\Main\IO\File::isFileExists($handler["INCLUDE_FILE"]))

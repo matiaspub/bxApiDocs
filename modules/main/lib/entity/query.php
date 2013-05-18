@@ -824,7 +824,16 @@ class Query
 
 						foreach ($sub_chains as $sub_chain)
 						{
-							$this->registerChain('group', $this->global_chains[$sub_chain->getAlias()]);
+							// build real subchain starting from init entity
+							$real_sub_chain = clone $chain;
+
+							foreach (array_slice($sub_chain->getAllElements(), 1) as $sub_chain_elem)
+							{
+								$real_sub_chain->addElement($sub_chain_elem);
+							}
+
+							// add to query
+							$this->registerChain('group', $this->global_chains[$real_sub_chain->getAlias()]);
 						}
 					}
 				}

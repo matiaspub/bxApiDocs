@@ -135,7 +135,7 @@ class CBlogSearch {
 					b_blog_post bp
 					INNER JOIN b_blog b ON (bp.BLOG_ID = b.ID)
 					INNER JOIN b_blog_group bg ON (b.GROUP_ID = bg.ID) ".
-					($bSonet ? "LEFT JOIN b_sonet_log BSL ON (BSL.EVENT_ID in ('blog_post', 'blog_post_micro') AND BSL.SOURCE_ID = bp.ID) " : "").
+					($bSonet ? "LEFT JOIN b_sonet_log BSL ON (BSL.EVENT_ID in ('blog_post', 'blog_post_micro', 'blog_post_important') AND BSL.SOURCE_ID = bp.ID) " : "").
 				" WHERE
 					bp.DATE_PUBLISH <= ".$DB->CurrentTimeFunction()."
 					AND b.ACTIVE = 'Y'
@@ -425,6 +425,28 @@ class CBlogSearch {
 							$arF["SC_PERM"] = CBlogPost::GetSocNetPermsCode($ar["ID"]);
 						$Result["PERMISSIONS"] = $arF["SC_PERM"];
 
+						if(is_array($arF["SC_PERM"]))
+						{
+							$sgId = array();
+							foreach($arF["SC_PERM"] as $perm)
+							{
+								if(strpos($perm, "SG") !== false)
+								{
+									$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+									if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+										$sgId[] = $sgIdTmp;
+								}
+							}
+
+							if(!empty($sgId))
+							{
+								$Result["PARAMS"] = array(
+									"socnet_group" => $sgId,
+									"entity" => "socnet_group",
+								);
+							}
+						}
+
 						if(IntVal($ar["SLID"]) <= 0)
 						{
 							$arAllow = array("HTML" => "N", "ANCHOR" => "N", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "TABLE" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "N", "VIDEO" => "N");
@@ -567,6 +589,28 @@ class CBlogSearch {
 					$arSp = CBlogComment::GetSocNetCommentPerms($ar["POST_ID"]);
 					if(is_array($arSp))
 						$Result["PERMISSIONS"] = $arSp;
+
+					if(is_array($arSp))
+					{
+						$sgId = array();
+						foreach($arSp as $perm)
+						{
+							if(strpos($perm, "SG") !== false)
+							{
+								$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+								if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+									$sgId[] = $sgIdTmp;
+							}
+						}
+
+						if(!empty($sgId))
+						{
+							$Result["PARAMS"] = array(
+								"socnet_group" => $sgId,
+								"entity" => "socnet_group",
+							);
+						}
+					}
 				}
 				
 				if(strlen($ar["TITLE"]) <= 0)

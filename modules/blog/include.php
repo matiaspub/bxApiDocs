@@ -24,18 +24,18 @@ $GLOBALS["AR_BLOG_PERMS_EVERYONE"] = array(
 );
 
 $GLOBALS["AR_BLOG_POST_PERMS"] = array(
-	BLOG_PERMS_DENY,
+	BLOG_PERMS_DENY, 
 	BLOG_PERMS_READ,
 	BLOG_PERMS_PREMODERATE,
-	BLOG_PERMS_WRITE,
+	BLOG_PERMS_WRITE, 
 	BLOG_PERMS_MODERATE,
 	BLOG_PERMS_FULL
 	);
 $GLOBALS["AR_BLOG_COMMENT_PERMS"] = array(
-	BLOG_PERMS_DENY,
-	BLOG_PERMS_READ,
+	BLOG_PERMS_DENY, 
+	BLOG_PERMS_READ, 
 	BLOG_PERMS_PREMODERATE,
-	BLOG_PERMS_WRITE,
+	BLOG_PERMS_WRITE, 
 	BLOG_PERMS_MODERATE,
 	BLOG_PERMS_FULL
 	);
@@ -87,9 +87,10 @@ CModule::AddAutoloadClasses(
 		"blogTextParser" => "general/functions.php",
 		"CBlogTools" => "general/functions.php",
 		"CBlogMetaWeblog" => "general/blog_metaweblog.php",
-
+		
 		"CRatingsComponentsBlog" => $DBType."/ratings_components.php",
 		"CBlogNotifySchema" => "general/blog_notify_schema.php",
+		"CBlogUserOptions" => "general/blog_post_param.php"
 		)
 	);
 ?>

@@ -35,49 +35,6 @@ class CIBlockResult extends CDBResult
 		parent::CDBResult($res);
 	}
 
-	
-	/**
-	 * <p>Устанавливает шаблоны путей для элементов, разделов и списка элементов вместо тех которые указаны в настройках информационного блока. Шаблоны будут использованы функцией  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. </p> <p><b>Примечание</b>: Используется в компонентах для корректного формирования путей, если соответствующие параметры указаны.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $DetailUrl = "" Шаблон для пути к элементу. Если не задан, то путь будет взят из
-	 * настроек инфоблока. <br>
-	 *
-	 *
-	 *
-	 * @param array $SectionUrl = "" Шаблон для пути к разделу. Если не задан, то путь будет взят из
-	 * настроек инфоблока.
-	 *
-	 *
-	 *
-	 * @param array $ListUrl = "" Шаблон для пути к списку элементов. Если не задан, то путь будет
-	 * взят из настроек инфоблока.
-	 *
-	 *
-	 *
-	 * @return void <p>Ничего.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/setsectioncontext.php">CIBlockResult::SetSectionContext</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/seturltemplates.php
-	 * @author Bitrix
-	 */
 	public static function SetUrlTemplates($DetailUrl = "", $SectionUrl = "", $ListUrl = "")
 	{
 		$this->strDetailUrl = $DetailUrl;
@@ -85,39 +42,6 @@ class CIBlockResult extends CDBResult
 		$this->strListUrl = $ListUrl;
 	}
 
-	
-	/**
-	 * <p>Функция устанавливает поля раздела в качестве родителя элемента для подстановки в шаблоны путей функцией <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. Если родительский раздел не определен с помощью вызова этого метода, то для подстановки шаблона будут использованы поля из раздела с минимальным ID к которому привязан элемент. <br></p> <p><b>Примечание</b>: Используется в компонентах для сохранения текущего просматриваемого пользователем раздела в случае множественной привязки элементов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arSection  Массив полей раздела поля которого будут использованы для
-	 * подстановки значений в шаблон пути. <br>
-	 *
-	 *
-	 *
-	 * @return void <p>Функция ничего не возвращает.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$rsElements-&gt;SetSectionContext($arSection);<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/seturltemplates.php">SetUrlTemplates</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/setsectioncontext.php
-	 * @author Bitrix
-	 */
 	public static function SetSectionContext($arSection)
 	{
 		if(is_array($arSection) && array_key_exists("ID", $arSection))

@@ -2,6 +2,19 @@
 
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/index.php
+ * @author Bitrix
+ */
 class CWikiSecurity
 {
 	var $_filters = false;

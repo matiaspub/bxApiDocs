@@ -31,7 +31,7 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL", CSecurityCriticalLevel::HIGHT);
 		}
 		$validErrorReporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE;
-		if (COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting && COption::GetOptionString("main","error_reporting","") != "")
+		if (COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting && COption::GetOptionInt("main","error_reporting","") != 0)
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ERROR_REPORTING", CSecurityCriticalLevel::MIDDLE);
 		}
@@ -61,11 +61,11 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 			}
 			if(strpbrk($password, $sign) === false)
 			{
-				$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_NO_DIT_PASS", CSecurityCriticalLevel::HIGHT);
+				$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_NO_SIGN_PASS", CSecurityCriticalLevel::HIGHT);
 			}
 			if(strpbrk($password, $dit) === false)
 			{
-				$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_NO_SIGN_PASS", CSecurityCriticalLevel::HIGHT);
+				$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_NO_DIT_PASS", CSecurityCriticalLevel::HIGHT);
 			}
 			if (strlen($password)<8)
 			{

@@ -335,7 +335,10 @@ class CSocNetSearch
 		global $USER;
 
 		$SECTION_ID = "";
-		$ELEMENT_ID = intval($_REQUEST["ELEMENT_ID"]);
+		$ELEMENT_ID = intval($_REQUEST["photo_element_id"]);
+		if (empty($ELEMENT_ID))
+			$ELEMENT_ID = intval($_REQUEST["ELEMENT_ID"]);
+
 		if($ELEMENT_ID > 0 && CModule::IncludeModule('iblock'))
 		{
 			$rsSections = CIBlockElement::GetElementGroups($ELEMENT_ID, true);
@@ -410,7 +413,7 @@ class CSocNetSearch
 		$p = strpos($url, "?");
 		if($p !== false)
 		{
-			$ar = explode("&", substr($rl, $p+1));
+			$ar = explode("&", substr($url, $p + 1));
 			foreach($ar as $str)
 			{
 				list($name, $value) = explode("=", $str, 2);
@@ -540,7 +543,6 @@ class CSocNetSearch
 				&& ($arFields["PARAM1"] == "POST" || $arFields["PARAM1"] == "MICROBLOG")
 			)
 			{
-
 				$arFields["PARAMS"] = $this->GetSearchParams(
 					"U",
 					$this->_user_id,

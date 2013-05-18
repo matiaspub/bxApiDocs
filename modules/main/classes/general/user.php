@@ -502,14 +502,18 @@ abstract class CAllUser extends CDBResult
 		return $_SESSION["SESS_AUTH"]["SECOND_NAME"];
 	}
 
-	public static function GetFormattedName($bUseBreaks = true)
+	public static function GetFormattedName($bUseBreaks = true, $bHTMLSpec = true)
 	{
-		return CUser::FormatName(CSite::GetNameFormat($bUseBreaks), array(
-			"NAME" => $this->GetFirstName(),
-			"SECOND_NAME" => $this->GetSecondName(),
-			"LAST_NAME" => $this->GetLastName(),
-			"LOGIN" => $this->GetLogin(),
-		));
+		return CUser::FormatName(CSite::GetNameFormat($bUseBreaks),
+			array(
+				"NAME" => $this->GetFirstName(),
+				"SECOND_NAME" => $this->GetSecondName(),
+				"LAST_NAME" => $this->GetLastName(),
+				"LOGIN" => $this->GetLogin(),
+			),
+			true,
+			$bHTMLSpec
+		);
 	}
 
 	
@@ -1124,8 +1128,8 @@ abstract class CAllUser extends CDBResult
 					LOGIN_ATTEMPTS = 0
 					".$tz."
 				WHERE
-					ID=".$_SESSION["SESS_AUTH"]["USER_ID"]."
-			");
+					ID=".$arUser["ID"]
+			);
 
 			$APPLICATION->set_cookie("LOGIN", $_SESSION["SESS_AUTH"]["LOGIN_COOKIES"], time()+60*60*24*30*60, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y");
 			if($bSave || COption::GetOptionString("main", "auth_multisite", "N")=="Y")
@@ -3145,6 +3149,21 @@ abstract class CAllUser extends CDBResult
 		{
 			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
+
+			static $arNameFields = array("NAME", "LAST_NAME", "SECOND_NAME", "LOGIN", "EMAIL", "PERSONAL_GENDER", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "PERSONAL_BIRTHDAY");
+			foreach($arNameFields as $key => $val)
+			{
+				if(isset($arFields[$val]))
+				{
+					$bClear = true;
+					break;
+				}
+			}
+			if ($bClear)
+			{
+				$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
+				$CACHE_MANAGER->ClearByTag("USER_NAME");
+			}
 		}
 
 		return $Result;
@@ -3408,6 +3427,8 @@ abstract class CAllUser extends CDBResult
 		{
 			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
+			$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
+			$CACHE_MANAGER->ClearByTag("USER_NAME");
 		}
 
 		return $DB->Query("DELETE FROM b_user WHERE ID=".$ID." AND ID<>1", true);
@@ -4864,8 +4885,6 @@ class CAllGroup
 
 class CAllTask
 {
-	var $TASK_OPERATIONS_CACHE = array();
-
 	public static function err_mess()
 	{
 		return "<br>Class: CAllTask<br>File: ".__FILE__;
@@ -5107,42 +5126,50 @@ class CAllTask
 
 	public static function GetOperations($ID, $return_names = false)
 	{
-		global $DB, $USER, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER;
+		static $TASK_OPERATIONS_CACHE = array();
 		$ID = intval($ID);
 
-		if (isset($USER->TASK_OPERATIONS_CACHE[$ID]))
-			return $USER->TASK_OPERATIONS_CACHE[$ID][$return_names ? 'names' : 'ids'];
-
-		if(CACHED_b_task_operation !== false)
+		if (!isset($TASK_OPERATIONS_CACHE[$ID]))
 		{
-			$cacheId = "b_task_operation_".$ID;
-			if($CACHE_MANAGER->Read(CACHED_b_task_operation, $cacheId, "b_task_operation"))
+			if(CACHED_b_task_operation !== false)
 			{
-				$USER->TASK_OPERATIONS_CACHE[$ID] = $CACHE_MANAGER->Get($cacheId);
-				return $USER->TASK_OPERATIONS_CACHE[$ID][$return_names ? 'names' : 'ids'];
+				$cacheId = "b_task_operation_".$ID;
+				if($CACHE_MANAGER->Read(CACHED_b_task_operation, $cacheId, "b_task_operation"))
+				{
+					$TASK_OPERATIONS_CACHE[$ID] = $CACHE_MANAGER->Get($cacheId);
+				}
 			}
 		}
 
-		$sql_str = 'SELECT T_O.OPERATION_ID, O.NAME FROM b_task_operation T_O INNER JOIN b_operation O ON (T_O.OPERATION_ID=O.ID)';
-		$sql_str .= ' WHERE T_O.TASK_ID='.$ID;
-
-		$z = $DB->Query($sql_str, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-		$arResult = array('names'=>array(),'ids'=>array());
-		while($r = $z->Fetch())
+		if (!isset($TASK_OPERATIONS_CACHE[$ID]))
 		{
-			$arResult['names'][] = $r['NAME'];
-			$arResult['ids'][] = $r['OPERATION_ID'];
+			$sql_str = '
+				SELECT T_O.OPERATION_ID, O.NAME
+				FROM b_task_operation T_O
+				INNER JOIN b_operation O ON T_O.OPERATION_ID = O.ID
+				WHERE T_O.TASK_ID = '.$ID.'
+			';
+
+			$TASK_OPERATIONS_CACHE[$ID] = array(
+				'names' => array(),
+				'ids' => array(),
+			);
+			$z = $DB->Query($sql_str, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			while($r = $z->Fetch())
+			{
+				$TASK_OPERATIONS_CACHE[$ID]['names'][] = $r['NAME'];
+				$TASK_OPERATIONS_CACHE[$ID]['ids'][] = $r['OPERATION_ID'];
+			}
+
+			if(CACHED_b_task_operation !== false)
+			{
+				/** @noinspection PhpUndefinedVariableInspection */
+				$CACHE_MANAGER->Set($cacheId, $TASK_OPERATIONS_CACHE[$ID]);
+			}
 		}
 
-		$USER->TASK_OPERATIONS_CACHE[$ID] = $arResult;
-
-		if(CACHED_b_task_operation !== false)
-		{
-			/** @noinspection PhpUndefinedVariableInspection */
-			$CACHE_MANAGER->Set($cacheId, $arResult);
-		}
-
-		return $arResult[$return_names ? 'names' : 'ids'];
+		return $TASK_OPERATIONS_CACHE[$ID][$return_names ? 'names' : 'ids'];
 	}
 
 	public static function SetOperations($ID, $arr, $bOpNames=false)

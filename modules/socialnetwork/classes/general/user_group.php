@@ -2491,17 +2491,6 @@ class CAllSocNetUserToGroup
 
 		if ($CACHE_MANAGER->Read(86400*30, "socnet_cg_".$userID))
 			$CACHE_MANAGER->Clean("socnet_cg_".$userID);
-
-/*
-		$filePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/managed_flags/socnet/c/".IntVal($userID / 1000)."/";
-		$fileName = $userID."_g";
-
-		if (!file_exists($filePath.$fileName))
-		{
-			CheckDirPath($filePath);
-			@fclose(@fopen($filePath.$fileName, "w"));
-		}
-*/
 	}
 
 	function __SpeedFileDelete($userID)
@@ -2514,12 +2503,6 @@ class CAllSocNetUserToGroup
 
 		if (!$CACHE_MANAGER->Read(86400*30, "socnet_cg_".$userID))
 			$CACHE_MANAGER->Set("socnet_cg_".$userID, true);
-
-/*
-		$fileName = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/managed_flags/socnet/c/".IntVal($userID / 1000)."/".$userID."_g";
-		if (file_exists($fileName))
-			@unlink($fileName);
-*/
 	}
 
 	

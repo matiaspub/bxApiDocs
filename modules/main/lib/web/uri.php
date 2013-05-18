@@ -61,6 +61,15 @@ class Uri
 
 		return $dir."/".self::$directoryIndex;
 	}
+
+	public static function isPathTraversalUri($uri)
+	{
+		if (($pos = strpos($uri, "?")) !== false)
+			$uri = substr($uri, 0, $pos);
+
+		$uri = trim($uri);
+		return preg_match("#(?:/|2f|^)(?:(?:%0*(25)*2e)|\.){2,}(?:/|%0*(25)*2f|$)#", $uri) ? true : false;
+	}
 }
 
 class UriType

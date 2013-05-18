@@ -3,6 +3,8 @@ IncludeModuleLangFile(__FILE__);
 
 class CSecurityFilter
 {
+	const DEFAULT_REQUEST_ORDER = "GP";
+
 	private $action = "filter";
 	private $doBlock = false;
 	private $doLog = false;
@@ -21,7 +23,7 @@ class CSecurityFilter
 		}
 		else
 		{
-			$this->setAction(COption::GetOptionString("security", "filter_action"));
+			$this->setAction(COption::getOptionString("security", "filter_action"));
 		}
 
 		if(isset($pCustomOptions["stop"]))
@@ -30,7 +32,7 @@ class CSecurityFilter
 		}
 		else
 		{
-			$this->setStop(COption::GetOptionString("security", "filter_stop"));
+			$this->setStop(COption::getOptionString("security", "filter_stop"));
 		}
 
 		if(isset($pCustomOptions["log"]))
@@ -39,7 +41,7 @@ class CSecurityFilter
 		}
 		else
 		{
-			$this->setLog(COption::GetOptionString("security", "filter_log"));
+			$this->setLog(COption::getOptionString("security", "filter_log"));
 		}
 
 		$this->auditors = array();
@@ -80,28 +82,21 @@ class CSecurityFilter
 		}
 
 		//Do not touch those variables who did not come from REQUEST
-		$this->cleanGlobals();
-		
+		self::cleanGlobals();
 		$originalPostVars = $_POST;
 
-		$_GET = $this->safeizeArray($_GET, '$_GET');
-		$_POST = $this->safeizeArray($_POST, '$_POST', '/^File\d+_\d+$/');
-		$_COOKIE = $this->safeizeArray($_COOKIE, '$_COOKIE');
+		$_GET = $this->safeizeArray($_GET, "\$_GET");
+		$_POST = $this->safeizeArray($_POST, "\$_POST", "/^File\d+_\d+$/");
+		$_COOKIE = $this->safeizeArray($_COOKIE, "\$_COOKIE");
 		$_SERVER = $this->safeizeServerArray($_SERVER);
-
-		$_REQUEST = $_GET;
-		foreach($_POST as $k => $v)
-			$_REQUEST[$k] = $v;
-		foreach($_COOKIE as $k => $v)
-			$_REQUEST[$k] = $v;
 
 		$HTTP_GET_VARS = $_GET;
 		$HTTP_POST_VARS = $_POST;
 		$HTTP_COOKIE_VARS = $_COOKIE;
 		$HTTP_REQUEST_VARS = $_REQUEST;
 
-		
-		$this->restoreGlobals();
+		self::reconstructRequest();
+		self::restoreGlobals();
 
 		$this->doPostProccessActions($originalPostVars);
 	}
@@ -137,18 +132,16 @@ class CSecurityFilter
 		{
 			if(!CSecurityFilter::IsActive())
 			{
-				RegisterModuleDependences("main", "OnBeforeProlog", "security", "CSecurityFilter", "OnBeforeProlog", "5");
-				RegisterModuleDependences("main", "OnEndBufferContent", "security", "CSecurityXSSDetect", "OnEndBufferContent", 9999);
-				// CAgent::AddAgent("CSecurityFilter::ClearTmpFiles();", "security", "N");
+				registerModuleDependences("main", "OnBeforeProlog", "security", "CSecurityFilter", "OnBeforeProlog", "5");
+				registerModuleDependences("main", "OnEndBufferContent", "security", "CSecurityXSSDetect", "OnEndBufferContent", 9999);
 			}
 		}
 		else
 		{
 			if(CSecurityFilter::IsActive())
 			{
-				UnRegisterModuleDependences("main", "OnBeforeProlog", "security", "CSecurityFilter", "OnBeforeProlog");
-				UnRegisterModuleDependences("main", "OnEndBufferContent", "security", "CSecurityXSSDetect", "OnEndBufferContent");
-				// CAgent::RemoveAgent("CSecurityFilter::ClearTmpFiles();", "security");
+				unregisterModuleDependences("main", "OnBeforeProlog", "security", "CSecurityFilter", "OnBeforeProlog");
+				unregisterModuleDependences("main", "OnEndBufferContent", "security", "CSecurityXSSDetect", "OnEndBufferContent");
 			}
 		}
 	}
@@ -160,11 +153,11 @@ class CSecurityFilter
 	public static function GetAuditTypes()
 	{
 		return array(
-			"SECURITY_FILTER_SQL" => "[SECURITY_FILTER_SQL] ".GetMessage("SECURITY_FILTER_SQL"),
-			"SECURITY_FILTER_XSS" => "[SECURITY_FILTER_XSS] ".GetMessage("SECURITY_FILTER_XSS"),
-			"SECURITY_FILTER_XSS2" => "[SECURITY_FILTER_XSS] ".GetMessage("SECURITY_FILTER_XSS"),
-			"SECURITY_FILTER_PHP" => "[SECURITY_FILTER_PHP] ".GetMessage("SECURITY_FILTER_PHP"),
-			"SECURITY_REDIRECT" => "[SECURITY_REDIRECT] ".GetMessage("SECURITY_REDIRECT"),
+			"SECURITY_FILTER_SQL" => "[SECURITY_FILTER_SQL] ".getMessage("SECURITY_FILTER_SQL"),
+			"SECURITY_FILTER_XSS" => "[SECURITY_FILTER_XSS] ".getMessage("SECURITY_FILTER_XSS"),
+			"SECURITY_FILTER_XSS2" => "[SECURITY_FILTER_XSS] ".getMessage("SECURITY_FILTER_XSS"),
+			"SECURITY_FILTER_PHP" => "[SECURITY_FILTER_PHP] ".getMessage("SECURITY_FILTER_PHP"),
+			"SECURITY_REDIRECT" => "[SECURITY_REDIRECT] ".getMessage("SECURITY_REDIRECT"),
 		);
 	}
 
@@ -191,9 +184,9 @@ class CSecurityFilter
 
 		$setupLink = '/bitrix/admin/security_filter.php?lang='.LANGUAGE_ID;
 		$WAFAIParams = array(
-			"TITLE" => GetMessage("SECURITY_FILTER_INFORM_TITLE"),
+			"TITLE" => getMessage("SECURITY_FILTER_INFORM_TITLE"),
 			"COLOR" => "blue",
-			"FOOTER" => '<a href="'.$setupLink.'">'.GetMessage("SECURITY_FILTER_INFORM_LINK_TO_SETUP_ON").'</a>'
+			"FOOTER" => '<a href="'.$setupLink.'">'.getMessage("SECURITY_FILTER_INFORM_LINK_TO_SETUP_ON").'</a>'
 		);
 
 		try
@@ -201,28 +194,28 @@ class CSecurityFilter
 			if (self::IsActive())
 			{
 
-				$days = COption::GetOptionInt("main", "event_log_cleanup_days", 7);
+				$days = COption::getOptionInt("main", "event_log_cleanup_days", 7);
 				if($days > 7)
 					$days = 7;
-				$timestampX = ConvertTimeStamp(time()-$days*24*3600+CTimeZone::GetOffset());
+				$timestampX = ConvertTimeStamp(time()-$days*24*3600+CTimeZone::getOffset());
 				$eventLink = '/bitrix/admin/event_log.php?set_filter=Y&find_type=audit_type_id&find_audit_type[]=SECURITY_FILTER_SQL&find_audit_type[]=SECURITY_FILTER_XSS&find_audit_type[]=SECURITY_FILTER_XSS2&find_audit_type[]=SECURITY_FILTER_PHP&mod=security&find_timestamp_x_1='.$timestampX.'&lang='.LANGUAGE_ID;
 
-				$eventCount = self::GetEventsCount($timestampX);
+				$eventCount = self::getEventsCount($timestampX);
 				if($eventCount > 999)
 					$eventCount = round($eventCount/1000,1).'K';
 
 				if($eventCount > 0)
-					$descriptionText = GetMessage("SECURITY_FILTER_INFORM_EVENT_COUNT").'<a href="'.$eventLink.'">'.$eventCount.'</a>';
+					$descriptionText = getMessage("SECURITY_FILTER_INFORM_EVENT_COUNT").'<a href="'.$eventLink.'">'.$eventCount.'</a>';
 				else
-					$descriptionText = GetMessage("SECURITY_FILTER_INFORM_EVENT_COUNT_EMPTY");
+					$descriptionText = getMessage("SECURITY_FILTER_INFORM_EVENT_COUNT_EMPTY");
 
-				$WAFAIParams["FOOTER"] = '<a href="'.$setupLink.'">'.GetMessage("SECURITY_FILTER_INFORM_LINK_TO_SETUP").'</a>';
+				$WAFAIParams["FOOTER"] = '<a href="'.$setupLink.'">'.getMessage("SECURITY_FILTER_INFORM_LINK_TO_SETUP").'</a>';
 				$WAFAIParams["ALERT"] = false;
 
 				$WAFAIParams["HTML"] = '
 <div class="adm-informer-item-section">
 	<span class="adm-informer-item-l">
-		<span class="adm-informer-strong-text">'.GetMessage("SECURITY_FILTER_INFORM_FILTER_ON").'</span>
+		<span class="adm-informer-strong-text">'.getMessage("SECURITY_FILTER_INFORM_FILTER_ON").'</span>
 		<span>'.$descriptionText.'</span>
 	</span>
 </div>
@@ -235,8 +228,8 @@ class CSecurityFilter
 				$WAFAIParams["HTML"] = '
 <div class="adm-informer-item-section">
 		<span class="adm-informer-item-l">
-			<span class="adm-informer-strong-text">'.GetMessage("SECURITY_FILTER_INFORM_FILTER_OFF").'</span>
-			<span>'.GetMessage("SECURITY_FILTER_INFORM_FILTER_ON_RECOMMENDATION", array("#LINK#" => $setupLink)).'</span>
+			<span class="adm-informer-strong-text">'.getMessage("SECURITY_FILTER_INFORM_FILTER_OFF").'</span>
+			<span>'.getMessage("SECURITY_FILTER_INFORM_FILTER_ON_RECOMMENDATION", array("#LINK#" => $setupLink)).'</span>
 		</span>
 </div>
 ';
@@ -244,7 +237,7 @@ class CSecurityFilter
 		}
 		catch (Exception $e)
 		{
-			$WAFAIParams["TITLE"] .= " - ".GetMessage("top_panel_ai_title_err");
+			$WAFAIParams["TITLE"] .= " - ".getMessage("top_panel_ai_title_err");
 			$WAFAIParams["ALERT"] = true;
 			$WAFAIParams["HTML"] = $e->getMessage();
 		}
@@ -255,6 +248,7 @@ class CSecurityFilter
 
 
 	/**
+	 * @deprecated deprecated agent since version 12.0.8
 	 * @return string
 	 */
 	public static function ClearTmpFiles()
@@ -584,9 +578,9 @@ class CSecurityFilter
 				"RULE_TYPE" => "A",
 				"ACTIVE" => "Y",
 				"ADMIN_SECTION" => "Y",
-				"NAME" => GetMessage("SECURITY_FILTER_IP_RULE", array("#IP#" => $ip)),
+				"NAME" => getMessage("SECURITY_FILTER_IP_RULE", array("#IP#" => $ip)),
 				"ACTIVE_FROM" => ConvertTimeStamp(false, "FULL"),
-				"ACTIVE_TO" => ConvertTimeStamp(time()+COption::GetOptionInt("security", "filter_duration")*60, "FULL"),
+				"ACTIVE_TO" => ConvertTimeStamp(time()+COption::getOptionInt("security", "filter_duration")*60, "FULL"),
 				"INCL_IPS" => array($ip),
 				"INCL_MASKS" => array("*"),
 			));
@@ -639,7 +633,7 @@ class CSecurityFilter
 			"argc" => 1,
 			"argv" => 1,
 			"DOCUMENT_ROOT" => 1,
-			"__SECFILTER_FILES" => 1,
+			"_UNSECURE" => 1
 		);
 
 		return $safetyVars;
@@ -648,7 +642,7 @@ class CSecurityFilter
 	/**
 	 *
 	 */
-	protected function cleanGlobals()
+	protected static function cleanGlobals()
 	{
 		foreach($_REQUEST as $key => $value)
 		{
@@ -659,10 +653,52 @@ class CSecurityFilter
 		}
 	}
 
+	protected static function getSuperGlobalArray($pType)
+	{
+		switch($pType)
+		{
+			case "G":
+				return $_GET;
+			break;
+			case "P":
+				return $_POST;
+			break;
+			case "C":
+				return $_COOKIE;
+			break;
+			case "S":
+				return $_SERVER;
+			break;
+			case "E":
+				return $_ENV;
+			break;
+			default:
+				return array();
+			break;
+		}
+	}
+
+	protected static function reconstructRequest()
+	{
+		$systemOrder = ini_get("request_order");
+		if(empty($systemOrder))
+			$systemOrder = self::DEFAULT_REQUEST_ORDER;
+
+		$_REQUEST = self::getSuperGlobalArray($systemOrder[0]);
+		for($i = 1, $count = strlen($systemOrder); $i < $count; $i ++)
+		{
+			$targetArray = self::getSuperGlobalArray($systemOrder[$i]);
+			foreach($targetArray as $k => $v)
+			{
+				$_REQUEST[$k] = $v;
+			}
+		}
+	}
+
 	/**
 	 *
 	 */
-	protected function restoreGlobals()
+	protected static function restoreGlobals()
 	{
 		foreach($_REQUEST as $key => $value)
 		{
@@ -728,7 +764,7 @@ class CSecurityFilter
 	 */
 	protected function showTextForm()
 	{
-		echo "[WAF] ".GetMessage("SECURITY_FILTER_FORM_SUB_TITLE")." ".GetMessage("SECURITY_FILTER_FORM_TITLE").".";
+		echo "[WAF] ".getMessage("SECURITY_FILTER_FORM_SUB_TITLE")." ".getMessage("SECURITY_FILTER_FORM_TITLE").".";
 	}
 
 	/**
@@ -736,7 +772,7 @@ class CSecurityFilter
 	 */
 	protected function showAjaxForm()
 	{
-		echo '<script>top.BX.closeWait(); top.BX.WindowManager.Get().ShowError(\''.GetMessageJS("SECURITY_FILTER_FORM_SUB_TITLE")." ".GetMessageJS("SECURITY_FILTER_FORM_TITLE").".".'\')</script>';
+		echo '<script>top.BX.closeWait(); top.BX.WindowManager.Get().ShowError(\''.getMessageJS("SECURITY_FILTER_FORM_SUB_TITLE")." ".getMessageJS("SECURITY_FILTER_FORM_TITLE").".".'\')</script>';
 	}
 
 	/**
@@ -749,7 +785,7 @@ class CSecurityFilter
 	<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=<?echo LANG_CHARSET?>" />
-		<title><?echo GetMessage("SECURITY_FILTER_FORM_TITLE")?></title>
+		<title><?echo getMessage("SECURITY_FILTER_FORM_TITLE")?></title>
 		<link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 		<link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />
 	</head>
@@ -775,16 +811,16 @@ class CSecurityFilter
 						<table cellpadding="0" cellspacing="0">
 							<tr>
 								<td><div class="icon"></div></td>
-								<td><?echo GetMessage("SECURITY_FILTER_FORM_SUB_TITLE")?></td>
+								<td><?echo getMessage("SECURITY_FILTER_FORM_SUB_TITLE")?></td>
 							</tr>
 						</table>
 					</div>
 					<div class="description">
-						<?echo GetMessage("SECURITY_FILTER_FORM_MESSAGE")?><br /><br />
+						<?echo getMessage("SECURITY_FILTER_FORM_MESSAGE")?><br /><br />
 						<table cellpadding="0" cellspacing="0" witdh="100%">
 							<tr>
-								<td class="head" align="center"><?echo GetMessage("SECURITY_FILTER_FORM_VARNAME")?></td>
-								<td class="head" align="center"><?echo GetMessage("SECURITY_FILTER_FORM_VARDATA")?></td>
+								<td class="head" align="center"><?echo getMessage("SECURITY_FILTER_FORM_VARNAME")?></td>
+								<td class="head" align="center"><?echo getMessage("SECURITY_FILTER_FORM_VARDATA")?></td>
 							</tr>
 							<?foreach($this->getFoundVars() as $var_name => $str):?>
 							<tr valign="top">
@@ -796,8 +832,8 @@ class CSecurityFilter
 						<form method="POST" <?if(defined('POST_FORM_ACTION_URI')):?> action="<?echo POST_FORM_ACTION_URI?>" <?endif?>>
 							<?echo self::formatHiddenFields($originalPostVars);?>
 							<?echo bitrix_sessid_post();?>
-							<input type="submit" name='____SECFILTER_ACCEPT_JS' value="<?echo GetMessage('SECURITY_FILTER_FORM_ACCEPT')?>" />
-							<input type="submit" name='____SECFILTER_CONVERT_JS' value="<?echo GetMessage('SECURITY_FILTER_FORM_CONVERT')?>" />
+							<input type="submit" name='____SECFILTER_ACCEPT_JS' value="<?echo getMessage('SECURITY_FILTER_FORM_ACCEPT')?>" />
+							<input type="submit" name='____SECFILTER_CONVERT_JS' value="<?echo getMessage('SECURITY_FILTER_FORM_CONVERT')?>" />
 						</form>
 					</div>
 				</td>
@@ -854,129 +890,3 @@ class CSecurityFilter
 
 }
 
-class CSecurityFilterMask
-{
-	public static function Update($arMasks)
-	{
-		global $DB, $CACHE_MANAGER;
-
-		if(is_array($arMasks))
-		{
-			$res = $DB->Query("DELETE FROM b_sec_filter_mask", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if($res)
-			{
-				$arLikeSearch = array("?", "*", ".");
-				$arLikeReplace = array("_",  "%", "\\.");
-				$arPregSearch = array("\\", ".",  "?", "*",   "'");
-				$arPregReplace = array("/",  "\.", ".", ".*?", "\'");
-
-				$added = array();
-				$i = 10;
-				foreach($arMasks as $arMask)
-				{
-					$site_id = trim($arMask["SITE_ID"]);
-					if($site_id == "NOT_REF")
-						$site_id = "";
-
-					$mask = trim($arMask["MASK"]);
-					if($mask && !array_key_exists($mask, $added))
-					{
-						$arMask = array(
-							"SORT" => $i,
-							"FILTER_MASK" => $mask,
-							"LIKE_MASK" => str_replace($arLikeSearch, $arLikeReplace, $mask),
-							"PREG_MASK" => str_replace($arPregSearch, $arPregReplace, $mask),
-						);
-						if($site_id)
-							$arMask["SITE_ID"] = $site_id;
-
-						$DB->Add("b_sec_filter_mask", $arMask);
-						$i += 10;
-						$added[$mask] = true;
-					}
-				}
-
-				if(CACHED_b_sec_filter_mask !== false)
-					$CACHE_MANAGER->CleanDir("b_sec_filter_mask");
-
-			}
-		}
-
-		return true;
-	}
-
-	public static function GetList()
-	{
-		global $DB;
-		$res = $DB->Query("SELECT SITE_ID,FILTER_MASK from b_sec_filter_mask ORDER BY SORT");
-		return $res;
-	}
-
-	public static function Check($site_id, $uri)
-	{
-		global $DB, $CACHE_MANAGER;
-		$bFound = false;
-
-		if(CACHED_b_sec_filter_mask !== false)
-		{
-			$cache_id = "b_sec_filter_mask";
-			if($CACHE_MANAGER->Read(CACHED_b_sec_filter_mask, $cache_id, "b_sec_filter_mask"))
-			{
-				$arMasks = $CACHE_MANAGER->Get($cache_id);
-			}
-			else
-			{
-				$arMasks = array();
-
-				$rs = $DB->Query("SELECT * FROM b_sec_filter_mask ORDER BY SORT");
-				while($ar = $rs->Fetch())
-				{
-					$site_id = $ar["SITE_ID"]? $ar["SITE_ID"]: "-";
-					$arMasks[$site_id][$ar["SORT"]] = $ar["PREG_MASK"];
-				}
-
-				$CACHE_MANAGER->Set($cache_id, $arMasks);
-			}
-
-			if(isset($arMasks["-"]) && is_array($arMasks["-"]))
-			{
-				foreach($arMasks["-"] as $mask)
-				{
-					if(preg_match("#^".$mask."$#", $uri))
-					{
-						$bFound = true;
-						break;
-					}
-				}
-			}
-
-			if(!$bFound && array_key_exists($site_id, $arMasks))
-			{
-				foreach($arMasks[$site_id] as $mask)
-				{
-					if(preg_match("#^".$mask."$#", $uri))
-					{
-						$bFound = true;
-						break;
-					}
-				}
-			}
-
-		}
-		else
-		{
-			$rs = $DB->Query("
-				SELECT m.*
-				FROM
-					b_sec_filter_mask m
-				WHERE
-					(m.SITE_ID IS NULL AND '".$DB->ForSQL($uri)."' like m.LIKE_MASK)
-					OR (m.SITE_ID = '".$DB->ForSQL($site_id)."' AND '".$DB->ForSQL($uri)."' like m.LIKE_MASK)
-			");
-			if($rs->Fetch())
-				$bFound = true;
-		}
-
-		return $bFound;
-	}
-}

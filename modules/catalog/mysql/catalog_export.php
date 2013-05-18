@@ -1,6 +1,19 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/catalog_export.php");
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/index.php
+ * @author Bitrix
+ */
 class CCatalogExport extends CAllCatalogExport
 {
 	

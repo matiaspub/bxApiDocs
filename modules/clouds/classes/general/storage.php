@@ -1,10 +1,6 @@
 <?
 IncludeModuleLangFile(__FILE__);
-/*
-global $DB;
-var_dump($DB->Query("ALTER TABLE b_clouds_file_resize ADD FILE_ID int(11)"));
-var_dump($DB->Query("CREATE INDEX ix_b_file_resize_file ON b_clouds_file_resize (FILE_ID)"));
-*/
+
 class CCloudStorage
 {
 	const FILE_SKIPPED = 0;
@@ -339,7 +335,7 @@ class CCloudStorage
 	public static function ResizeImageFileDelay(&$arDestinationSize, $sourceFile, $destinationFile, $arResizeParams)
 	{
 		global $DB;
-
+		$destinationFile = preg_replace("/^https?:/i", "", $destinationFile);
 		$q = $DB->Query("
 			select
 				ID
@@ -424,7 +420,7 @@ class CCloudStorage
 	public static function ResizeImageFileCheck($obBucket, $path)
 	{
 		global $DB, $APPLICATION;
-
+		$path = preg_replace("/^https?:/i", "", $path);
 		$q = $DB->Query("
 			select
 				ID
@@ -487,7 +483,8 @@ class CCloudStorage
 		}
 
 		$fileToStore = CFile::MakeFileArray($to_path);
-		$pathToStore = substr($task["TO_PATH"], strlen($obBucket->GetFileSRC("/"))-1);
+		$baseURL = preg_replace("/^https?:/i", "", $obBucket->GetFileSRC("/"));
+		$pathToStore = substr($task["TO_PATH"], strlen($baseURL)-1);
 		if (!$obBucket->SaveFile($pathToStore, $fileToStore))
 		{
 			$DB->Query("

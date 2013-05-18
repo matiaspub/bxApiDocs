@@ -1388,7 +1388,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 			{
 				$v = 0;
 			}
-			else $v = '&nbsp;';
+			//else $v = '&nbsp;';
 		}
 
 		// Formatting of monetary fields.
@@ -2018,7 +2018,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 			{
 				$v = 0;
 			}
-			else $v = '&nbsp;';
+			//else $v = '&nbsp;';
 		}
 
 		// Formatting of monetary fields.
@@ -2710,7 +2710,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 			{
 				$v = 0;
 			}
-			else $v = '&nbsp;';
+			//else $v = '&nbsp;';
 		}
 
 		// Formatting of monetary fields.
@@ -3295,7 +3295,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 			{
 				$v = 0;
 			}
-			else $v = '&nbsp;';
+			//else $v = '&nbsp;';
 		}
 
 		// Formatting of monetary fields.

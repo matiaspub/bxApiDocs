@@ -684,7 +684,7 @@ class CAllBlogPost
 			}
 
 			$arSoFields = Array(
-				"EVENT_ID" => "blog_post",
+				"EVENT_ID" => (intval($arPost["UF_BLOG_POST_IMPRTNT"]) > 0 ? "blog_post_important" : "blog_post"),
 				"=LOG_DATE" => (
 					strlen($arPost["DATE_PUBLISH"]) > 0?
 						(MakeTimeStamp($arPost["DATE_PUBLISH"], CSite::GetDateFormat("FULL", $SITE_ID)) > time()+CTimeZone::GetOffset()?
@@ -796,12 +796,13 @@ class CAllBlogPost
 						$DB->CurrentTimeFunction()) :
 					$DB->CurrentTimeFunction()
 			),
+			"EVENT_ID" => (intval($arPost["UF_BLOG_POST_IMPRTNT"]) > 0 ? "blog_post_important" : "blog_post")
 		);
 
 		$dbRes = CSocNetLog::GetList(
 			array("ID" => "DESC"),
 			array(
-				"EVENT_ID" => "blog_post",
+				"EVENT_ID" => array("blog_post", "blog_post_important"),
 				"SOURCE_ID" => $postID
 			),
 			false,
@@ -820,7 +821,7 @@ class CAllBlogPost
 				CSocNetLog::Update($arRes["ID"], array("SITE_ID" => $arSiteID));
 			}
 			$socnetPerms[] = "SA"; // socnet admin
-			CSocNetLogRights::DeleteByLogID($arRes["ID"], true);
+			CSocNetLogRights::DeleteByLogID($arRes["ID"]);
 			CSocNetLogRights::Add($arRes["ID"], $socnetPerms);
 		}
 	}
@@ -859,7 +860,7 @@ class CAllBlogPost
 		$dbRes = CSocNetLog::GetList(
 			array("ID" => "DESC"),
 			array(
-				"EVENT_ID" => array("blog_post_micro", "blog_post"),
+				"EVENT_ID" => array("blog_post_micro", "blog_post", "blog_post_important"),
 				"SOURCE_ID" => $postID
 			),
 			false,
@@ -1416,7 +1417,7 @@ class CAllBlogPost
 			$rsLog = CSocNetLog::GetList(
 				array(),
 				array(
-					"EVENT_ID" => array("blog_post", "blog_post_micro"),
+					"EVENT_ID" => array("blog_post", "blog_post_important", "blog_post_micro"),
 					"SOURCE_ID" => $arParams["ID"]
 				),
 				false,

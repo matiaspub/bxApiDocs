@@ -265,11 +265,13 @@ class CSocNetLog extends CAllSocNetLog
 			"RATING_TOTAL_POSITIVE_VOTES" => Array("FIELD" => $DB->IsNull('RG.TOTAL_POSITIVE_VOTES', '0'), "TYPE" => "int", "FROM" => "LEFT JOIN b_rating_voting RG ON L.RATING_TYPE_ID = RG.ENTITY_TYPE_ID AND L.RATING_ENTITY_ID = RG.ENTITY_ID"),
 			"RATING_TOTAL_NEGATIVE_VOTES" => Array("FIELD" => $DB->IsNull('RG.TOTAL_NEGATIVE_VOTES', '0'), "TYPE" => "int", "FROM" => "LEFT JOIN b_rating_voting RG ON L.RATING_TYPE_ID = RG.ENTITY_TYPE_ID AND L.RATING_ENTITY_ID = RG.ENTITY_ID"),
 		);
+
 		if (isset($USER) && is_object($USER))
 		{
 			$arFields["RATING_USER_VOTE_VALUE"] = Array("FIELD" => $DB->IsNull('RV.VALUE', '0'), "TYPE" => "double", "FROM" => "LEFT JOIN b_rating_vote RV ON L.RATING_TYPE_ID = RV.ENTITY_TYPE_ID AND L.RATING_ENTITY_ID = RV.ENTITY_ID AND RV.USER_ID = ".intval($USER->GetID()));
 			$arFields["FAVORITES_USER_ID"] = Array("FIELD" => $DB->IsNull('SLF.USER_ID', '0'), "TYPE" => "double", "FROM" => "LEFT JOIN b_sonet_log_favorites SLF ON L.ID = SLF.LOG_ID AND SLF.USER_ID = ".intval($USER->GetID()));
 		}
+
 		if (
 			isset($USER) 
 			&& is_object($USER) 
@@ -442,11 +444,23 @@ class CSocNetLog extends CAllSocNetLog
 
 			$arSqls["RIGHTS"] = "EXISTS ( SELECT SLR.ID FROM b_sonet_log_right SLR
 				LEFT JOIN b_user_access UA ON (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".(is_object($USER) ? intval($USER->GetID()) : 0).")
-				WHERE L.ID = SLR.LOG_ID AND (0=1 ".
-				(is_object($USER) && CSocNetUser::IsCurrentUserModuleAdmin() ? " OR SLR.GROUP_CODE = 'SA'" : "").
-				(is_object($USER) && $USER->IsAuthorized() ? " OR (SLR.GROUP_CODE = 'AU')" : "").
-				" OR (SLR.GROUP_CODE = 'G2')".
-				(is_object($USER) && $USER->IsAuthorized() ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($USER->GetID()).")" : "")."))";
+				WHERE L.ID = SLR.LOG_ID ".
+					(
+						is_object($USER) && $USER->IsAuthorized() && $arParams["MY_GROUPS_ONLY"] == "Y" 
+						? 
+							" AND (
+								(SLR.GROUP_CODE LIKE 'SG%' AND (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($USER->GetID()).")) 
+								OR SLR.GROUP_CODE = 'U".intval($USER->GetID())."'
+							)"
+						:
+							" AND (
+								0=1 ".
+								(is_object($USER) && CSocNetUser::IsCurrentUserModuleAdmin() ? " OR SLR.GROUP_CODE = 'SA'" : "").
+								(is_object($USER) && $USER->IsAuthorized() ? " OR (SLR.GROUP_CODE = 'AU')" : "").
+								" OR (SLR.GROUP_CODE = 'G2')".
+								(is_object($USER) && $USER->IsAuthorized() ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($USER->GetID()).")" : "")."
+							)"
+					).")";
 		}
 
 		if (
@@ -622,10 +636,9 @@ class CSocNetLog extends CAllSocNetLog
 		return $DB->Query("DELETE FROM b_sonet_log WHERE ENTITY_TYPE = '".SONET_ENTITY_USER."' AND EVENT_ID = 'system_groups' AND MESSAGE = '".$group_id."'", true);
 	}
 
-	function Delete($ID)
+	public static function Delete($ID)
 	{
 		global $DB;
-		static $bTruncated = false;
 
 		$ID = IntVal($ID);
 		if ($ID <= 0)
@@ -640,19 +653,6 @@ class CSocNetLog extends CAllSocNetLog
 		$DB->Query("DELETE FROM b_sonet_log_favorites WHERE LOG_ID = ".$ID, true);
 
 		$bSuccess = $DB->Query("DELETE FROM b_sonet_log WHERE ID = ".$ID, true);
-		
-		if (
-			$bSuccess
-			&& !$bTruncated
-			&& (
-				!defined("DisableSonetLogFollow")
-				|| DisableSonetLogFollow !== true
-			)
-		)
-		{
-			$DB->Query("TRUNCATE b_sonet_log_page", true);			
-			$bTruncated = true;
-		}
 
 		if(
 			$bSuccess 

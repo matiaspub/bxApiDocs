@@ -329,7 +329,7 @@ class CBitrixComponent
 			return false;
 		}
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 		$this->classOfComponent = self::__getClassForPath($componentPath);
 
 		if($this->classOfComponent === "")

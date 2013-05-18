@@ -2,6 +2,19 @@
 
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/index.php
+ * @author Bitrix
+ */
 class CWikiUtils
 {
 	static function getRightsLinks($arPage)

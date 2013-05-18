@@ -441,7 +441,7 @@ class CAllSocNetGroup
 				$cache = new CPHPCache;
 				$cache_time = 31536000;
 				$cache_id = "group_".$ID."_".LANGUAGE_ID."_".CTimeZone::GetOffset();
-				$cache_path = "/sonet/group/";
+				$cache_path = "/sonet/group/".$ID."/";
 			}
 
 			if (

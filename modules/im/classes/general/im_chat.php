@@ -518,7 +518,7 @@ class CIMChat
 			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
 			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $this->user_id), array('FIELDS' => $arSelect));
 			$arUsers = Array();
-			if ($arUser = $dbUsers->GetNext(true, false))
+			if ($arUser = $dbUsers->Fetch())
 			{
 				$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
 				$arUsers['GENDER'] = $arUser["PERSONAL_GENDER"] == 'F'? 'F': 'M';
@@ -786,7 +786,7 @@ class CIMChat
 			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
 			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => implode('|', $arUsers)), array('FIELDS' => $arSelect));
 			$arUsers = Array();
-			while ($arUser = $dbUsers->GetNext(true, false))
+			while ($arUser = $dbUsers->Fetch())
 			{
 				$arUsers[$arUser['ID']]['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
 				$arUsers[$arUser['ID']]['GENDER'] = $arUser["PERSONAL_GENDER"] == 'F'? 'F': 'M';
@@ -797,35 +797,38 @@ class CIMChat
 			else
 				$message = GetMessage("IM_CHAT_KICK_".$arUsers[$GLOBALS["USER"]->GetId()]['GENDER'], Array('#USER_1_NAME#' => $arUsers[$GLOBALS["USER"]->GetId()]['NAME'], '#USER_2_NAME#' => $arUsers[$userId]['NAME']));
 
+			$arOldRelation = Array();
 			if (CModule::IncludeModule("pull"))
-			{
-				$ar = CIMChat::GetRelationById($chatId);
-				foreach ($ar as $rel)
-				{
-					CPullStack::AddByUser($rel['USER_ID'], Array(
-						'module_id' => 'im',
-						'command' => 'chatUserLeave',
-						'params' => Array(
-							'chatId' => $chatId,
-							'chatTitle' => $chatTitle,
-							'userId' => $userId,
-							'message' => $bSelf? '': $message,
-						),
-					));
-				}
-			}
+				$arOldRelation = CIMChat::GetRelationById($chatId);
 
-			CIMContactList::DeleteRecent($chatId, true, $userId);
 			$strSql = "DELETE FROM b_im_relation WHERE CHAT_ID = ".$chatId." AND USER_ID = ".$userId;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			foreach ($arOldRelation as $rel)
+			{
+				CPullStack::AddByUser($rel['USER_ID'], Array(
+					'module_id' => 'im',
+					'command' => 'chatUserLeave',
+					'params' => Array(
+						'chatId' => $chatId,
+						'chatTitle' => $chatTitle,
+						'userId' => $userId,
+						'message' => $bSelf? '': htmlspecialcharsbx($message),
+					),
+				));
+			}
 
 			self::AddMessage(Array(
 				"TO_CHAT_ID" => $chatId,
 				"MESSAGE" 	 => $message,
 				"SYSTEM"	 => 'Y',
 			));
+
+			CIMContactList::DeleteRecent($chatId, true, $userId);
+
 			return true;
 		}
+
 		$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_USER_NOT_FOUND"), "USER_NOT_FOUND");
 		return false;
 	}

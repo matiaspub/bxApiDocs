@@ -6,9 +6,7 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 
 	protected $tests = array(
 		"phpEntropy" => array(
-			"method" => "checkPhpEntropy",
-			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_ENTROPY",
-			"critical" => CSecurityCriticalLevel::MIDDLE
+			"method" => "checkPhpEntropy"
 		),
 		"phpInclude" => array(
 			"method" => "isPhpIniVarOff",
@@ -41,26 +39,31 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 	 */
 	protected function checkPhpEntropy()
 	{
-		if(!@file_exists("/dev/urandom"))
+		if(self::isRunOnWin() && version_compare(phpversion(),"5.3.3","<"))
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_LOW_PHP_VERSION_ENTROPY", CSecurityCriticalLevel::MIDDLE);
 			return false;
+		}
+		elseif(!self::checkPhpEntropyConfigs())
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_PHP_ENTROPY", CSecurityCriticalLevel::MIDDLE);
+			return false;
+		}
+		return true;
+	}
+
+	protected function checkPhpEntropyConfigs()
+	{
 		$entropyFile = ini_get("session.entropy_file");
 		$entropyLength = ini_get("session.entropy_length");
-		$result = false;
-		if(!self::isRunOnWin() || version_compare(phpversion(),"5.3.3",">="))
+		if(in_array($entropyFile, array("/dev/random", "/dev/urandom"), true))
 		{
-			if($entropyFile == "/dev/random" || $entropyFile == "/dev/urandom")
+			if($entropyLength >= 128 || self::isRunOnWin())
 			{
-				if($entropyLength >= 128)
-				{
-					$result = true;
-				}
-				elseif(self::isRunOnWin() && $entropyLength == 0)
-				{
-					$result = true;
-				}
+				return true;
 			}
 		}
-		return $result;
+		return false;
 	}
 
 	/**

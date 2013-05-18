@@ -6,21 +6,25 @@ class CAllControllerMember
 	/******************************* Public methods ************************************/
 	public static function CheckMember($member_id, $member_url = false)
 	{
-		if($member_url === false)
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		$dbr_member = CControllerMember::GetById($member_id);
+		$ar_member = $dbr_member->Fetch();
+		if (!$ar_member)
 		{
-			$dbr_member = CControllerMember::GetById($member_id);
-			$ar_member = $dbr_member->Fetch();
-			if(!$ar_member)
-			{
-				$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR1")." ".htmlspecialcharsex($member_id));
-				$GLOBALS["APPLICATION"]->ThrowException($e);
-				return false;
-			}
+			$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR1")." ".htmlspecialcharsex($member_id));
+			$APPLICATION->ThrowException($e);
+			return false;
 		}
 
 		$oRequest = new CControllerServerRequestTo($ar_member, "ping");
-		if(($oResponse = $oRequest->Send())!==false)
+		$oResponse = $oRequest->Send();
+		if ($oResponse !== false)
+		{
 			return $oResponse->OK();
+		}
+
 		return false;
 	}
 
@@ -52,6 +56,9 @@ class CAllControllerMember
 
 	public static function RunCommandWithLog($member_id, $command, $arParameters = Array(), $task_id=false, $operation = 'run')
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		$arControllerLog = Array(
 				'NAME'=>'REMOTE_COMMAND',
 				'CONTROLLER_MEMBER_ID'=>$member_id,
@@ -62,7 +69,7 @@ class CAllControllerMember
 		$res = CControllerMember::RunCommand($member_id, $command, $arParameters, $task_id, $operation);
 		if($res === false)
 		{
-			$e = $GLOBALS['APPLICATION']->GetException();
+			$e = $APPLICATION->GetException();
 			$arControllerLog['DESCRIPTION'] = $e->GetString()."\r\n".$arControllerLog['DESCRIPTION'];
 			$arControllerLog['STATUS'] = 'N';
 		}
@@ -73,6 +80,8 @@ class CAllControllerMember
 
 	public static function RunCommand($member_id, $command, $arParameters = Array(), $task_id=false, $operation = 'run')
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
 		global $DB;
 
 		if(!($arMember = CControllerMember::GetMember($member_id)))
@@ -98,7 +107,7 @@ class CAllControllerMember
 				$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR3")." ".$DB->GetErrorMessage());
 			else
 				$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR2"));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -111,7 +120,7 @@ class CAllControllerMember
 		if(!$oResponse->Check())
 		{
 			$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR2"));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -120,25 +129,28 @@ class CAllControllerMember
 
 		$str = strlen($oResponse->text)? $oResponse->text: $oResponse->status;
 		$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR3")." ".$str);
-		$GLOBALS["APPLICATION"]->ThrowException($e);
+		$APPLICATION->ThrowException($e);
 
 		return false;
 	}
 
 	public static function SendFileWithLog($member_id, $file)
 	{
-		$arControllerLog = Array(
-				'NAME'=>'SEND_FILE',
-				'CONTROLLER_MEMBER_ID'=>$member_id,
-				'DESCRIPTION'=>$command,
-				'STATUS'=>'Y'
-			);
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		$arControllerLog = array(
+			'NAME' => 'SEND_FILE',
+			'CONTROLLER_MEMBER_ID' => $member_id,
+			'DESCRIPTION' => "sendfile",
+			'STATUS' => 'Y',
+		);
 
 		$res = CControllerMember::SendFile();
-		if($res === false)
+		if ($res === false)
 		{
-			$e = $GLOBALS['APPLICATION']->GetException();
-			$arControllerLog['DESCRIPTION'] = $e->GetString()."\r\n".$arControllerLog['DESCRIPTION'];
+			$e = $APPLICATION->GetException();
+			$arControllerLog['DESCRIPTION'] = $e->GetString()."\n".$arControllerLog['DESCRIPTION'];
 			$arControllerLog['STATUS'] = 'N';
 		}
 
@@ -149,13 +161,14 @@ class CAllControllerMember
 
 	public static function SendFile()
 	{
-		if(!($arMember = CControllerMember::GetMember($member_id)))
-			return false;
+		return false;
 	}
 
 	public static function UpdateCounters($member_id, $task_id = false)
 	{
-		global $DB, $APPLICATION;
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		global $DB;
 		$member_id = intval($member_id);
 
 		$arMember = CControllerMember::GetMember($member_id);
@@ -191,7 +204,9 @@ class CAllControllerMember
 		$strCommand .= "\n".'foreach($arResult as $k=>$v) echo urlencode($k),"=",urlencode($v),"&";';
 
 		foreach(GetModuleEvents("controller", "OnBeforeUpdateCounters", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($arMember, $ar_group, &$strCommand));
+		}
 
 		$command_result = CControllerMember::RunCommand($member_id, $strCommand, array(), $task_id, 'run_immediate');
 		if($command_result===false)
@@ -241,6 +256,9 @@ class CAllControllerMember
 
 	public static function SetGroupSettings($member_id, $task_id = false)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		if(!($arMember = CControllerMember::GetMember($member_id)))
 			return false;
 
@@ -273,14 +291,14 @@ class CAllControllerMember
 		else
 		{
 			$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR4")." ".$arMember["CONTROLLER_GROUP_ID"]);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 		}
 
 		if($task_id === false)
 		{
 			if($result === false)
 			{
-				$e = $GLOBALS['APPLICATION']->GetException();
+				$e = $APPLICATION->GetException();
 				$arControllerLog['DESCRIPTION'] = $e->GetString();
 				$arControllerLog['STATUS'] = 'N';
 			}
@@ -392,7 +410,10 @@ class CAllControllerMember
 
 	public static function Add($arFields)
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		/** @global CUserTypeManager $USER_FIELD_MANAGER */
+		global $USER_FIELD_MANAGER;
+		/** @global CDatabase $DB */
+		global $DB;
 
 		if(!CControllerMember::CheckFields($arFields))
 			return false;
@@ -415,7 +436,10 @@ class CAllControllerMember
 
 	public static function Update($ID, $arFields, $strNote = "")
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		/** @global CUserTypeManager $USER_FIELD_MANAGER */
+		global $USER_FIELD_MANAGER;
+		/** @global CDatabase $DB */
+		global $DB;
 
 		$dbr_m = CControllerMember::GetByID($ID);
 		$ar_m = $dbr_m->Fetch();
@@ -822,8 +846,11 @@ class CAllControllerMember
 
 	public static function RegisterMemberByPassword($ar_member, $admin_login, $admin_password, $controller_url = false)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		if($controller_url===false)
-			$controller_url = COption::GetOptionString("controller", "controller_url", ($GLOBALS["APPLICATION"]->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST']);
+			$controller_url = COption::GetOptionString("controller", "controller_url", ($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST']);
 
 		if(!isset($ar_member['MEMBER_ID']))
 			$ar_member['MEMBER_ID'] = substr("m".md5(uniqid(rand(), true)), 0, 32);
@@ -867,11 +894,11 @@ class CAllControllerMember
 		if($result === false)
 		{
 			$e = new CApplicationException($oResponse->text);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 		}
 		else
 		{
-			$GLOBALS["APPLICATION"]->ResetException();
+			$APPLICATION->ResetException();
 			if($ID = CControllerMember::Add($ar_member))
 			{
 				$arControllerLog = Array(
@@ -891,6 +918,7 @@ class CAllControllerMember
 
 	public static function CheckUserAuth($member_id, $login, $password, $arRemGroups = false)
 	{
+		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
 		$arMember = CControllerMember::GetMember($member_id);
@@ -958,7 +986,10 @@ class CAllControllerMember
 
 	public static function RegisterMemberByPHP($ar_member)
 	{
-		$controller_url = COption::GetOptionString("controller", "controller_url", ($GLOBALS["APPLICATION"]->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST']);
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		$controller_url = COption::GetOptionString("controller", "controller_url", ($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST']);
 
 		if(!isset($ar_member['MEMBER_ID']))
 			$ar_member['MEMBER_ID'] = substr("m".md5(uniqid(rand(), true)), 0, 32);
@@ -997,6 +1028,9 @@ class CAllControllerMember
 
 	public static function RegisterMemberByTicket($ar_member, $ticket_id, $session_id)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		if($ar_member["ID"]>0)
 			$ID = $ar_member["ID"];
 		else
@@ -1039,7 +1073,7 @@ class CAllControllerMember
 		if($result === false)
 		{
 			$e = new CApplicationException($oResponse->text);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -1073,9 +1107,10 @@ class CAllControllerMember
 
 				if($arFields = $db_res->Fetch())
 				{
-					$events = GetModuleEvents("controller", "OnAfterRegisterMemberByTicket");
-					while($arEvent = $events->Fetch())
+					foreach (GetModuleEvents("controller", "OnAfterRegisterMemberByTicket", true) as $arEvent)
+					{
 						ExecuteModuleEventEx($arEvent, array(&$arFields));
+					}
 
 					CEvent::Send("CONTROLLER_MEMBER_REGISTER", SITE_ID, $arFields);
 				}
@@ -1089,78 +1124,147 @@ class CAllControllerMember
 
 	public static function CheckFields(&$arFields, $ID = false)
 	{
-		$arMsg = Array();
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		/** @global CDatabase $DB */
+		global $DB;
+		/** @global CUser $USER */
+		global $USER;
 
-		if($ID>0)
+		$arMsg = array();
+		if ($ID > 0)
 		{
-			//AddMessage2Log(print_r($arFields, true));
-			//unset($arFields["MEMBER_ID"]);
 			unset($arFields["ID"]);
 		}
 
-		global $DB;
-		if($ID===false)
+		if ($ID === false)
 		{
-			if(!is_set($arFields, "MEMBER_ID"))
-				$arFields["MEMBER_ID"] = substr("m".md5(uniqid(rand(), true)), 0, 32);
-			elseif(is_set($arFields, "MEMBER_ID"))
+			if (!array_key_exists("MEMBER_ID", $arFields))
 			{
-				if(IntVal($arFields["MEMBER_ID"])>0)
-					$arMsg[] = array("id"=>"MEMBER_ID", "text"=> GetMessage("CTRLR_MEM_ERR_MEMBER_ID"));
+				$arFields["MEMBER_ID"] = substr("m".md5(uniqid(rand(), true)), 0, 32);
+			}
+			elseif (array_key_exists("MEMBER_ID", $arFields))
+			{
+				if (intval($arFields["MEMBER_ID"]) > 0)
+				{
+					$arMsg[] = array(
+						"id" => "MEMBER_ID",
+						"text" => GetMessage("CTRLR_MEM_ERR_MEMBER_ID"),
+					);
+				}
 				else
 				{
-					$strSqlCheck =
-							"SELECT 'x' ".
-							"FROM b_controller_member ".
-							"WHERE MEMBER_ID='".$DB->ForSQL($arFields['MEMBER_ID'], 32)."' AND ID<>".IntVal($ID);
+					$strSqlCheck = "
+						SELECT 'x'
+						FROM b_controller_member
+						WHERE MEMBER_ID = '".$DB->ForSQL($arFields['MEMBER_ID'], 32)."'
+						AND ID <> ".intval($ID)."
+					";
 					$dbrCheck = $DB->Query($strSqlCheck);
-					if($dbrCheck->Fetch())
-						$arMsg[] = array("id"=>"MEMBER_ID", "text"=> GetMessage("CTRLR_MEM_ERR_MEMBER_UID"));
+					if ($dbrCheck->Fetch())
+					{
+						$arMsg[] = array(
+							"id" => "MEMBER_ID",
+							"text" => GetMessage("CTRLR_MEM_ERR_MEMBER_UID"),
+						);
+					}
 				}
 			}
 		}
 
-		if(($ID===false || is_set($arFields, "NAME")) && strlen($arFields["NAME"])<=0)
-			$arMsg[] = array("id"=>"NAME", "text"=> GetMessage("CTRLR_MEM_ERR_MEMBER_NAME"));
+		if (($ID === false || array_key_exists("NAME", $arFields)) && strlen($arFields["NAME"]) <= 0)
+		{
+			$arMsg[] = array(
+				"id" => "NAME",
+				"text" => GetMessage("CTRLR_MEM_ERR_MEMBER_NAME"),
+			);
+		}
 
-		if(($ID===false || is_set($arFields, "URL")) && strlen($arFields["URL"])<=0)
-			$arMsg[] = array("id"=>"URL", "text"=> GetMessage("CTRLR_MEM_ERR_MEMBER_URL"));
+		if (($ID === false || array_key_exists("URL", $arFields)) && strlen($arFields["URL"]) <= 0)
+		{
+			$arMsg[] = array(
+				"id" => "URL",
+				"text" => GetMessage("CTRLR_MEM_ERR_MEMBER_URL"),
+			);
+		}
 
-		if($ID===false && !is_set($arFields, "CONTROLLER_GROUP_ID"))
+		if ($ID === false && !array_key_exists("CONTROLLER_GROUP_ID", $arFields))
+		{
 			$arFields["CONTROLLER_GROUP_ID"] = COption::GetOptionInt("controller", "default_group", 1);
+		}
 
-		if(count($arMsg)>0)
+		if ($ID === false)
+		{
+			$dbEvents = GetModuleEvents("controller", "OnBeforeControllerMemberAdd", true);
+		}
+		else
+		{
+			$dbEvents = GetModuleEvents("controller", "OnBeforeControllerMemberUpdate", true);
+		}
+
+		$APPLICATION->ResetException();
+		foreach($dbEvents as $arEvent)
+		{
+			$bEventRes = ExecuteModuleEventEx($arEvent, array($ID, &$arFields));
+			if ($bEventRes === false)
+			{
+				$ex = $APPLICATION->GetException();
+				$arMsg[] = array(
+					"text" => ($ex? $ex->GetString(): "Unknown error."),
+				);
+			}
+		}
+
+		if (!empty($arMsg))
 		{
 			$e = new CAdminException($arMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
-		if(isset($arFields["URL"]))
+		if (isset($arFields["URL"]))
+		{
 			$arFields["URL"] = CControllerMember::_GoodURL($arFields["URL"]);
+		}
 
-		if(is_set($arFields, "ACTIVE") && $arFields["ACTIVE"]!="Y")
-			$arFields["ACTIVE"]="N";
+		if (array_key_exists("ACTIVE", $arFields) && $arFields["ACTIVE"] != "Y")
+		{
+			$arFields["ACTIVE"] = "N";
+		}
 
-		if(is_set($arFields, "SHARED_KERNEL") && $arFields["SHARED_KERNEL"]!="Y")
-			$arFields["SHARED_KERNEL"]="N";
+		if (array_key_exists("SHARED_KERNEL", $arFields) && $arFields["SHARED_KERNEL"] != "Y")
+		{
+			$arFields["SHARED_KERNEL"] = "N";
+		}
 
-		if(is_set($arFields, "DISCONNECTED") && $arFields["DISCONNECTED"]!="Y" && $arFields["DISCONNECTED"]!="I")
-			$arFields["DISCONNECTED"]="N";
+		if (array_key_exists("DISCONNECTED", $arFields) && $arFields["DISCONNECTED"] != "Y" && $arFields["DISCONNECTED"]!="I")
+		{
+			$arFields["DISCONNECTED"] = "N";
+		}
 
-		global $USER;
-		if(!is_set($arFields, "MODIFIED_BY") && is_object($USER))
+		if (!array_key_exists("MODIFIED_BY", $arFields) && is_object($USER))
+		{
 			$arFields["MODIFIED_BY"] = $USER->GetID();
-		if($ID===false && !is_set($arFields, "CREATED_BY") && is_object($USER))
+		}
+
+		if ($ID === false && !array_key_exists("CREATED_BY", $arFields) && is_object($USER))
+		{
 			$arFields["CREATED_BY"] = $USER->GetID();
-		if($ID===false && !is_set($arFields, "DATE_CREATE"))
+		}
+
+		if ($ID === false && !array_key_exists("DATE_CREATE", $arFields))
+		{
 			$arFields["~DATE_CREATE"] = $DB->CurrentTimeFunction();
+		}
 
 		return true;
 	}
 
 	public static function CloseMember($member_id, $bClose = true, $task_id = false)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		if(!($arMember = CControllerMember::GetMember($member_id)))
 			return false;
 
@@ -1177,7 +1281,7 @@ class CAllControllerMember
 		$result = CControllerMember::RunCommand($member_id, $strCommand, array(), $task_id);
 		if($result === false)
 		{
-			$e = $GLOBALS['APPLICATION']->GetException();
+			$e = $APPLICATION->GetException();
 			$arControllerLog['DESCRIPTION'] = $e->GetString();
 			$arControllerLog['STATUS'] = 'N';
 		}
@@ -1194,9 +1298,10 @@ class CAllControllerMember
 		CTimeZone::Enable();
 		if($arFields = $db_res->Fetch())
 		{
-			$events = GetModuleEvents("controller", "OnAfterCloseMember");
-			while($arEvent = $events->Fetch())
+			foreach (GetModuleEvents("controller", "OnAfterCloseMember", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, array(&$arFields));
+			}
 
 			if($bClose)
 				CEvent::Send("CONTROLLER_MEMBER_CLOSED", SITE_ID, $arFields);
@@ -1209,6 +1314,9 @@ class CAllControllerMember
 
 	public static function UnRegister($member_id)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		if(($ar_member = CControllerMember::GetMember($member_id))===false)
 			return false;
 
@@ -1225,7 +1333,7 @@ class CAllControllerMember
 
 		if($oResponse==false)
 		{
-			$e = $GLOBALS['APPLICATION']->GetException();
+			$e = $APPLICATION->GetException();
 			$arControllerLog['DESCRIPTION'] = $e->GetString();
 			$result = false;
 		}
@@ -1236,7 +1344,7 @@ class CAllControllerMember
 			if($result === false)
 			{
 				$e = new CApplicationException(GetMessage("CTRLR_MEM_LOG_DISCON_ERR")." ".$oResponse->text);
-				$GLOBALS["APPLICATION"]->ThrowException($e);
+				$APPLICATION->ThrowException($e);
 			}
 			else
 				CControllerMember::Update($ar_member['ID'], Array('DISCONNECTED'=>'Y'));
@@ -1283,19 +1391,22 @@ class CAllControllerMember
 
 	public static function GetMember($id)
 	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
 		$dbr_member = CControllerMember::GetById($id);
 		$ar_member = $dbr_member->Fetch();
 		if(!$ar_member)
 		{
 			$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR6")." ".htmlspecialcharsex($id));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
 		if($ar_member['DISCONNECTED'] == 'Y')
 		{
 			$e = new CApplicationException(GetMessage("CTRLR_MEM_ERR7"));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -1310,7 +1421,7 @@ class CAllControllerMember
 		));
 	}
 
-	function _GoodURL($url)
+	public static function _GoodURL($url)
 	{
 		$url = strtolower(trim($url, " \t\r\n./"));
 		if(substr($url, 0, 7) != "http://" && substr($url, 0, 8) != "https://")

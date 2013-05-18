@@ -782,41 +782,6 @@ class CAllIBlock
 	 * @param string $FIELD
 	 * @return mixed
 	 */
-	
-	/**
-	 * <p>Возвращает массив <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblock">полей</a> информационного блока.</p> <p><b>Примечание</b>: если инфоблока с таким ID не существует, то функция вернет false.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор информационного блока <br>
-	 *
-	 *
-	 *
-	 * @param string $FIELD = "" Идентификатор поля. Если этот параметр задан, то функция вернет
-	 * значение конкретного поля. <br>
-	 *
-	 *
-	 *
-	 * @return array <p>Массив полей инфоблока.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>echo CIBlock::GetArrayByID($IBLOCK_ID, "NAME");<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblock">Поля инфоблока</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetArrayByID.php
-	 * @author Bitrix
-	 */
 	public static function GetArrayByID($ID, $FIELD = "")
 	{
 		global $DB;
@@ -1746,33 +1711,6 @@ class CAllIBlock
 		}
 	}
 
-	
-	/**
-	 * <p>Функция устанавливает значения <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/update.php">CIBlock::Update.</a></p> <p><b>Примечание</b>: Значения полей не указанных в параметре arFields сохраняются.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код инфоблока <br>
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида array("Поле" =&gt; "Значение" ...) <br>
-	 *
-	 *
-	 *
-	 * @return mixed <p>Эта функция ничего не возвращает.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocklang">Дополнительные
-	 * поля</a> </li> </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetMessages.php
-	 * @author Bitrix
-	 */
 	public static function SetMessages($ID, $arFields)
 	{
 		global $DB;
@@ -2395,29 +2333,6 @@ REQ
 		}
 	}
 
-	
-	/**
-	 * <p>Функция возвращает описание полей элементов инфоблоков. Структура массива описана в <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields.</a></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код информациооного блока<br>
-	 *
-	 *
-	 *
-	 * @return array <p>Массив.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
-	 * </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetFields.php
-	 * @author Bitrix
-	 */
 	public static function GetFields($ID)
 	{
 		global $DB;
@@ -3584,57 +3499,6 @@ REQ
 		return intval($ar["C"]);
 	}
 
-	
-	/**
-	 * <p>Функция выполняет масштабирование файла.</p> <p><b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFile  Массив описывающий файл. Это может быть элемент массива $_FILES[имя]
-	 * (или $HTTP_POST_FILES[имя]), а также результат функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a>.
-	 *
-	 *
-	 *
-	 * @param array $arResize  Массив параметров масштабирования. Содержит следующие ключи:
-	 * <br><ul> <li>WIDTH - целое число. Размер картинки будет изменен таким
-	 * образом, что ее ширина не будет превышать значения этого поля. <br>
-	 * </li> <li>HEIGHT - целое число. Размер картинки будет изменен таким
-	 * образом, что ее высота не будет превышать значения этого поля. </li>
-	 * <li>METHOD - возможные значения: resample или пусто. Значение поля равное
-	 * "resample" приведет к использованию функции масштабирования
-	 * imagecopyresampled, а не imagecopyresized. Это более качественный метод, но требует
-	 * больше серверных ресурсов. <br> </li> <li>COMPRESSION - целое от 0 до 100. Если
-	 * значение больше 0, то для изображений jpeg оно будет использовано
-	 * как параметр компрессии. 100 соответствует наилучшему качеству
-	 * при большем размере файла. </li> </ul> Параметры METHOD и COMPRESSION
-	 * применяются только если происходит изменение размера. Если
-	 * картинка вписывается в ограничения WIDTH и HEIGHT, то никаких действий
-	 * над файлом выполнено не будет. <br><br>
-	 *
-	 *
-	 *
-	 * @return array <p>Массив описывающий файл или строка с сообщением об ошибке.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("MyHandlers", "ResizeElementProperty"));<br>AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", Array("MyHandlers", "ResizeElementProperty"));<br><br>class MyHandlers<br>{<br>	function ResizeElementProperty(&amp;$arFields)<br>	{<br>		global $APPLICATION;<br>		//Код инфоблока свойство каторого нуждается в масштабировании<br>		$IBLOCK_ID = 1;<br>		//Идентификатор свойства<br>		$PROPERTY_ID = 15;<br>		//Наш инфоблок и значения свойства в наличии<br>		if(<br>			$arFields["IBLOCK_ID"] == $IBLOCK_ID<br>			&amp;&amp; is_array($arFields["PROPERTY_VALUES"])<br>			&amp;&amp; array_key_exists(15, $arFields["PROPERTY_VALUES"])<br>		)<br>		{<br>			foreach($arFields["PROPERTY_VALUES"][$PROPERTY_ID] as $key =&gt; $arFile)<br>			{<br>				//Изменяем размеры картинки<br>				$arNewFile = CIBlock::ResizePicture($arFile, array(<br>					"WIDTH" =&gt; 100,<br>					"HEIGHT" =&gt; 100,<br>					"METHOD" =&gt; "resample",<br>				));<br>				if(is_array($arNewFile))<br>					$arFields["PROPERTY_VALUES"][$PROPERTY_ID][$key] = $arNewFile;<br>				else<br>				{<br>					//Можно вернуть ошибку<br>					$APPLICATION-&gt;throwException("Ошибка масштабирования изображения в свойстве \"Файлы\":".$arNewFile);<br>					return false;<br>				}<br>			}<br>		}<br>	}<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/ResizePicture.php
-	 * @author Bitrix
-	 */
 	public static function ResizePicture($arFile, $arResize)
 	{
 		if(strlen($arFile["tmp_name"]) <= 0)

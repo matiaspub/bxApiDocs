@@ -2,6 +2,19 @@
 
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikidiff/index.php
+ * @author Bitrix
+ */
 class CWikiDiff
 {
 	//http://en.wikipedia.org/wiki/Longest_common_subsequence_problem

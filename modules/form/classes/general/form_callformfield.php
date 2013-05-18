@@ -674,63 +674,6 @@ class CAllFormField
 	}
 
 	// обнуляем результаты по вопросу/полю
-	
-	/**
-	 * <p>Удаляет все значения ответов из <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по заданному <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросу</a>/<a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полю</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $field_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a>.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions">прав</a> текущего
-	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	 * </ul> Для успешного выполнения данной операции необходимо иметь <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
-	 * доступ</b> на веб-форму, к которой принадлежит
-	 * <i>field_id</i>.<br><br>Параметр необязательный. По умолчанию - "Y" (права
-	 * необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FIELD_ID = 4;
-	 * // удалим все ответы из результатов на вопрос с ID=140
-	 * if (<b>CFormField::Reset</b>($FIELD_ID))
-	 * {
-	 *     echo "Операция успешна.";
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/reset.php">CForm::Reset</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/reset.php">CFormResult::Reset</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php
-	 * @author Bitrix
-	 */
 	public static function Reset($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $strError;

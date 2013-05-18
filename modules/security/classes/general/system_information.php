@@ -11,9 +11,45 @@ class CSecuritySystemInformation
 		$systemInformation = array(
 			"php" => self::getPhpInfo(),
 			"db" => self::getDbInfo(),
-			"memcache" => self::getMemCacheInfo()
+			"memcache" => self::getMemCacheInfo(),
+			"environment" => self::getEnvironmentInfo()
 		);
 		return $systemInformation;
+	}
+
+	/**
+	 * Return current domain name (in puny code for cyrillic domain)
+	 * @return string
+	 */
+	public static function getCurrentHost()
+	{
+		$host = COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]);
+		if($host == "")
+			$host = $_SERVER["HTTP_HOST"];
+		return CBXPunycode::ToASCII($host, $arErrors);
+	}
+
+	/**
+	 * Return information about environment, such as BitrixVM version
+	 * @return array
+	 */
+	protected static function getEnvironmentInfo()
+	{
+		return array(
+			"vm_version" => self::getBitrixVMVersion()
+		);
+	}
+
+	/**
+	 * Return BitrixVM version
+	 * @return string
+	 */
+	protected static function getBitrixVMVersion()
+	{
+		$result = getenv('BITRIX_VA_VER');
+		if(!$result)
+			$result = "";
+		return $result;
 	}
 
 	/**

@@ -3,19 +3,6 @@ IncludeModuleLangFile(__FILE__);
 
 $GLOBALS["SALE_ORDER"] = Array();
 
-
-/**
- * 
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/index.php
- * @author Bitrix
- */
 class CAllSaleOrder
 {
 	static function DoCalculateOrder($siteId, $userId, $arShoppingCart, $personTypeId, $arOrderPropsValues,
@@ -2722,6 +2709,7 @@ class CAllSaleOrder
 				"DEDUCTED",
 				"DATE_DEDUCTED",
 				"REASON_UNDO_DEDUCTED",
+				"RESERVED",
 				"STATUS_ID",
 				"DATE_STATUS",
 				"PRICE_DELIVERY",
@@ -2770,6 +2758,7 @@ class CAllSaleOrder
 				"DEDUCTED" => array("FIELD" => "V.DEDUCTED", "TYPE" => "char"),
 				"DATE_DEDUCTED" => array("FIELD" => "V.DATE_DEDUCTED", "TYPE" => "datetime"),
 				"REASON_DEDUCTED" => array("FIELD" => "V.REASON_UNDO_DEDUCTED", "TYPE" => "string"),
+				"RESERVED" => array("FIELD" => "V.RESERVED", "TYPE" => "char"),
 				"STATUS_ID" => array("FIELD" => "V.STATUS_ID", "TYPE" => "char"),
 				"DATE_STATUS" => array("FIELD" => "V.DATE_STATUS", "TYPE" => "datetime"),
 				"PAY_VOUCHER_NUM" => array("FIELD" => "V.PAY_VOUCHER_NUM", "TYPE" => "string"),

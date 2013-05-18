@@ -369,7 +369,7 @@ abstract class Application
 			if (isset($options["extension"]) && !empty($options["extension"]) && !extension_loaded($options["extension"]))
 				throw new Config\ConfigurationException(sprintf("Extension '%s' is not loaded for exception handler log", $options["extension"]));
 
-			if (isset($options["required_file"]) && !empty($options["required_file"]) && ($requiredFile = Loader::getLocal($options["required_file"])))
+			if (isset($options["required_file"]) && !empty($options["required_file"]) && ($requiredFile = Loader::getLocal($options["required_file"])) !== false)
 				require_once($requiredFile);
 
 			$className = $options["class_name"];

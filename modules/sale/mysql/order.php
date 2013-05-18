@@ -1,19 +1,6 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order.php");
 
-
-/**
- * 
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/index.php
- * @author Bitrix
- */
 class CSaleOrder extends CAllSaleOrder
 {
 	
@@ -318,7 +305,7 @@ class CSaleOrder extends CAllSaleOrder
 		elseif (StrPos($key, "PROPERTY_CODE_") === 0)
 			$propIDTmp = IntVal(substr($key, StrLen("PROPERTY_CODE_")));
 		elseif (StrPos($key, "PROPERTY_VAL_BY_CODE_") === 0)
-			$propIDTmp = $DB->ForSQL(trim(substr($key, StrLen("PROPERTY_VAL_BY_CODE_"))));
+			$propIDTmp = preg_replace("/[^a-zA-Z0-9_-]/is", "", trim(substr($key, StrLen("PROPERTY_VAL_BY_CODE_"))));
 
 		if (strlen($propIDTmp) > 0 || $propIDTmp > 0)
 		{

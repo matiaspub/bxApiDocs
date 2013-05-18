@@ -16,8 +16,6 @@ class CComponentEngine
 	 *
 	 * <p>Takes component as parameter and initializing the object.</p>
 	 * @param CBitrixComponent $component
-	 * @return void
-	 *
 	 */
 	function __construct($component = null)
 	{
@@ -189,7 +187,7 @@ class CComponentEngine
 	 * @param string $folder404
 	 * @param array[string]string $arUrlTemplates
 	 * @param array[string]string &$arVariables
-	 * @param string $requestURL
+	 * @param string|bool $requestURL
 	 * @return string
 	 *
 	 */
@@ -205,12 +203,13 @@ class CComponentEngine
 	 * @param string $folder404
 	 * @param array[string]string $arUrlTemplates
 	 * @param array[string]string &$arVariables
-	 * @param string $requestURL
+	 * @param string|bool $requestURL
 	 * @return string
 	 *
 	 */
 	static public function guessComponentPath($folder404, $arUrlTemplates, &$arVariables, $requestURL = false)
 	{
+		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
 		if (!isset($arVariables) || !is_array($arVariables))
@@ -359,4 +358,3 @@ class CComponentEngine
 		return str_replace($arPatterns, $arReplace, $template);
 	}
 }
-?>

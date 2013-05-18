@@ -4,6 +4,7 @@ IncludeModuleLangFile(__FILE__);
 class CCloudStorageBucket extends CAllCloudStorageBucket
 {
 	protected/*.array[string]string.*/$arBucket;
+	/** @var CCloudStorageService $service */
 	protected/*.CCloudStorageService.*/ $service;
 				protected static/*.array[int][string]string.*/$arBuckets;
 	/**

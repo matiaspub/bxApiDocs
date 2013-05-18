@@ -101,7 +101,7 @@ class CControllerGroup
 			return true;
 	}
 
-	function __UpdateAgentPeriod($group_id, $time)
+	public static function __UpdateAgentPeriod($group_id, $time)
 	{
 		$group_id = IntVal($group_id);
 		$time = IntVal($time);
@@ -111,7 +111,7 @@ class CControllerGroup
 			CAgent::AddAgent("CControllerGroup::__UpdateSettingsAgent(".$group_id.");", "controller", "N", $time*60);
 	}
 
-	function __CounterUpdateAgentPeriod($group_id, $time)
+	public static function __CounterUpdateAgentPeriod($group_id, $time)
 	{
 		$group_id = IntVal($group_id);
 		$time = IntVal($time);
@@ -270,7 +270,7 @@ class CControllerGroup
 		}
 	}
 
-	function __UpdateCountersAgent($group_id)
+	public static function __UpdateCountersAgent($group_id)
 	{
 		CControllerGroup::UpdateCounters($group_id);
 		return "CControllerGroup::__UpdateCountersAgent(".$group_id.");";
@@ -281,7 +281,7 @@ class CControllerGroup
 		CControllerGroup::RunCommand($group_id, 'COUNTERS_UPDATE');
 	}
 
-	function __UpdateSettingsAgent($group_id)
+	public static function __UpdateSettingsAgent($group_id)
 	{
 		CControllerGroup::SetGroupSettings($group_id);
 		return "CControllerGroup::__UpdateSettingsAgent(".$group_id.");";
@@ -461,12 +461,11 @@ class CControllerGroupSettings
 
 	public static function Get3rdPartyOptions()
 	{
-		$arResult = Array();
-		$db_events = GetModuleEvents("controller", "OnGetGroupSettings");
-		while($arEvent = $db_events->Fetch())
+		$arResult = array();
+		foreach (GetModuleEvents("controller", "OnGetGroupSettings", true) as $arEvent)
 		{
 			$Object = ExecuteModuleEventEx($arEvent);
-			if(is_object($Object))
+			if (is_object($Object))
 				$arResult[] = $Object;
 		}
 		return $arResult;
@@ -537,8 +536,6 @@ class CControllerGroupSettings
 
 						if(strlen($task_id)>1 && (!is_array($arUniqTasks[$module_id]) || !in_array($task_id, $arUniqTasks[$module_id])))
 						{
-							//print_r($task_id);echo "<br>";
-
 							$arUniqTasks[$module_id][] = $task_id;
 							$dbr_task = CTask::GetList(Array(), Array('NAME'=>$task_id, 'MODULE_ID'=>$module_id, "BINDING" => 'module'));
 							if($ar_task = $dbr_task->Fetch())
@@ -568,12 +565,14 @@ class CControllerGroupSettings
 
 				if($bSubOrdGroups)
 				{
-					$sgroups = $arSecurity["subord_groups"][$group_id];
-					$arSGroupsTmp = preg_split("/[\r\n,;]+/", $sgroups);
+					$arSGroupsTmp = preg_split("/[\r\n,;]+/", $arSecurity["subord_groups"][$group_id]);
 					$arSGroups = array();
-					for($i=0; $i<count($arSGroupsTmp); $i++)
-						if(trim($arSGroupsTmp[$i])!='')
-							$arSGroups[] = trim($arSGroupsTmp[$i]);
+					foreach($arSGroupsTmp as $sGroupTmp)
+					{
+						$sGroupTmp = trim($sGroupTmp);
+						if ($sGroupTmp != '')
+							$arSGroups[] = $sGroupTmp;
+					}
 
 					$str .= 'CControllerClient::SetGroupSecurity('.CControllerGroupSettings::__PHPToString($group_id).', '.CControllerGroupSettings::__PHPToString($arDefinedPermissions).', '.CControllerGroupSettings::__PHPToString($arSGroups).');'."\r\n";
 				}
@@ -655,6 +654,7 @@ class IControllerGroupOption
 	{
 		$arValues = $arAllValues[$this->id];
 		$arOptions = $this->GetOptionArray();
+		$str = "";
 		foreach($arOptions as $id=>$arOptionParams)
 		{
 			if(isset($arValues[$id]))

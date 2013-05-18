@@ -47,14 +47,6 @@ class CSecurityFilterSqlAuditor extends CSecurityFilterBaseAuditor
 			"/(load_)(file{$sql_functions_space}\()/is" => $sql_split_to_2,
 
 			"/(fr)(om{$sql_space}.+{$sql_space}lim)(it)/is" => $sql_split_to_3,
-
-			"/(ben)(chmark{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(sl)(eep{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(us)(er{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(ver)(sion{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(dat)(abase{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(sche)(ma{$sql_functions_space}\()/is" => $sql_split_to_2,
-			"/(sub)(string{$sql_functions_space}\()/is" => $sql_split_to_2,
 		);
 
 		$dbt = strtolower($DBType);

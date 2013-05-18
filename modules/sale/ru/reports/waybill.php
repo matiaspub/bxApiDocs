@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1251">
 <meta name=Generator content="Microsoft Word 12 (filtered)">
-<title langs="ru">Накладная</title>
+<title langs="ru">РќР°РєР»Р°РґРЅР°СЏ</title>
 <style>
 <!--
 /* Font Definitions */
@@ -41,8 +41,8 @@ div.Section1
 
 <div class=Section1>
 
-<p class=Normal style='line-height:133%'>Унифицированная форма<span lang=EN-US>
-N</span> ТОРГ-12 Утверждена постановлением Госкомстата России от 25 12.98 N 132</p>
+<p class=Normal style='line-height:133%'>РЈРЅРёС„РёС†РёСЂРѕРІР°РЅРЅР°СЏ С„РѕСЂРјР°<span lang=EN-US>
+N</span> РўРћР Р“-12 РЈС‚РІРµСЂР¶РґРµРЅР° РїРѕСЃС‚Р°РЅРѕРІР»РµРЅРёРµРј Р“РѕСЃРєРѕРјСЃС‚Р°С‚Р° Р РѕСЃСЃРёРё РѕС‚ 25 12.98 N 132</p>
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0
 style='width:832pt;margin-left:2.0pt;border-collapse:collapse'>
@@ -53,16 +53,16 @@ border:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><a
-name=ТекстовоеПоле28></a><?=$arParams["COMPANY_NAME"]?>, <? echo $arParams["COUNTRY"].", ".$arParams["INDEX"].", г. ".$arParams["CITY"].", ".$arParams["ADDRESS"];?>,  ИНН <?=$arParams["INN"]?>, р/с <?=$arParams["RSCH"]?> в <?=$arParams["RSCH_BANK"]?> г. <?=$arParams["RSCH_CITY"]?>, к/с <?=$arParams["KSCH"]?>, БИК <?=$arParams["BIK"]?></p>
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ28></a><?=$arParams["COMPANY_NAME"]?>, <? echo $arParams["COUNTRY"].", ".$arParams["INDEX"].", Рі. ".$arParams["CITY"].", ".$arParams["ADDRESS"];?>,  Р?РќРќ <?=$arParams["INN"]?>, СЂ/СЃ <?=$arParams["RSCH"]?> РІ <?=$arParams["RSCH_BANK"]?> Рі. <?=$arParams["RSCH_CITY"]?>, Рє/СЃ <?=$arParams["KSCH"]?>, Р‘Р?Рљ <?=$arParams["BIK"]?></p>
 </td>
 <td width=130 rowspan=4 valign=top style='width:97.15pt;border:solid windowtext 1.0pt;
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=right style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:right;
-line-height:normal'><span style='font-size:7.0pt'>Форма по ОКУД </span></p>
+line-height:normal'><span style='font-size:7.0pt'>Р¤РѕСЂРјР° РїРѕ РћРљРЈР” </span></p>
 <p class=Normal align=right style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:right;
-line-height:normal'><span style='font-size:7.0pt'>по ОКПО</span></p>
+line-height:normal'><span style='font-size:7.0pt'>РїРѕ РћРљРџРћ</span></p>
 <p class=Normal align=right style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:5.0pt;margin-bottom:.0001pt;text-align:right;
 text-indent:-5.0pt;line-height:normal'>&nbsp;</p>
@@ -74,7 +74,7 @@ line-height:normal'>&nbsp;</p>
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><span style='font-size:7.0pt'>Код</span></p>
+line-height:normal'><span style='font-size:7.0pt'>РљРѕРґ</span></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -99,8 +99,8 @@ padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <td width=737 colspan=4 valign=top style='width:552.85pt;border:solid windowtext 1.0pt;
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'>грузоотправитель, адрес, номер
-телефона, банковские реквизиты</p>
+text-align:center;line-height:normal'>РіСЂСѓР·РѕРѕС‚РїСЂР°РІРёС‚РµР»СЊ, Р°РґСЂРµСЃ, РЅРѕРјРµСЂ
+С‚РµР»РµС„РѕРЅР°, Р±Р°РЅРєРѕРІСЃРєРёРµ СЂРµРєРІРёР·РёС‚С‹</p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
@@ -116,7 +116,7 @@ border:solid windowtext 1.0pt;border-top:none;padding:0cm 2.0pt 0cm 2.0pt;
 height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>структурное подразделение</p>
+line-height:normal'>СЃС‚СЂСѓРєС‚СѓСЂРЅРѕРµ РїРѕРґСЂР°Р·РґРµР»РµРЅРёРµ</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:560.0pt;margin-bottom:
 0cm;margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:560.0pt;margin-bottom:
@@ -126,8 +126,8 @@ line-height:normal'>структурное подразделение</p>
 border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=right style='margin:0cm;margin-bottom:.0001pt;
-text-align:right;line-height:normal'><span style='font-size:7.0pt'>                                          
-Вид деятельности по ОКДП</span></p>
+text-align:right;line-height:normal'><span style='font-size:7.0pt'>В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В 
+Р’РёРґ РґРµСЏС‚РµР»СЊРЅРѕСЃС‚Рё РїРѕ РћРљР”Рџ</span></p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
@@ -143,7 +143,7 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле19></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ19></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -151,8 +151,8 @@ text-align:center;line-height:normal'>&nbsp;</p>
 <tr style='page-break-inside:avoid;height:9.0pt'>
 <td width=737 colspan=4 valign=top style='width:552.85pt;border:solid windowtext 1.0pt;
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>Грузополучатель  
-<a name=ТекстовоеПоле29></a><?if(empty($arParams))
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>Р“СЂСѓР·РѕРїРѕР»СѓС‡Р°С‚РµР»СЊВ В 
+<a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ29></a><?if(empty($arParams))
 {
 	echo "[".$arOrder["USER_ID"]."] ";
 	$db_user = CUser::GetByID($arOrder["USER_ID"]);
@@ -167,7 +167,7 @@ border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 	elseif(strlen($arVal["COUNTRY_NAME"])>0 || strlen($arVal["CITY_NAME"])>0)
 		echo htmlspecialcharsbx($arVal["COUNTRY_NAME"].$arVal["CITY_NAME"]);
 
-	if (strlen($arOrderProps["F_CITY"])>0) echo ", г. ".$arOrderProps["F_CITY"];
+	if (strlen($arOrderProps["F_CITY"])>0) echo ", Рі. ".$arOrderProps["F_CITY"];
 	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0) 
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
@@ -180,9 +180,9 @@ else
 	else
 		echo $arParams["BUYER_LAST_NAME"]." ".$arParams["BUYER_FIRST_NAME"]." ".$arParams["BUYER_SECOND_NAME"];
 		
-	if (strlen($arParams["BUYER_INN"])>0) echo " ИНН/КПП: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
+	if (strlen($arParams["BUYER_INN"])>0) echo " Р?РќРќ/РљРџРџ: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
 
-	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", г. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", р/с ".$arParams["BUYER_RSCH"]." в ".$arParams["BUYER_RSCH_BANK"]." г. ".$arParams["BUYER_RSCH_CITY"].", к/с ".$arParams["BUYER_KSCH"].", БИК ".$arParams["BUYER_BIK"];
+	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", Рі. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", СЂ/СЃ ".$arParams["BUYER_RSCH"]." РІ ".$arParams["BUYER_RSCH_BANK"]." Рі. ".$arParams["BUYER_RSCH_CITY"].", Рє/СЃ ".$arParams["BUYER_KSCH"].", Р‘Р?Рљ ".$arParams["BUYER_BIK"];
 
 }?></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
@@ -191,13 +191,13 @@ else
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=right style='margin:0cm;margin-bottom:.0001pt;
-text-align:right;line-height:normal'><span style='font-size:7.0pt'>по ОКПО</span></p>
+text-align:right;line-height:normal'><span style='font-size:7.0pt'>РїРѕ РћРљРџРћ</span></p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле20></a></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ20></a></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -207,21 +207,21 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>Поставщик   </span><span
-style='font-size:7.0pt'><a name=ТекстовоеПоле30></a><?=$arParams["COMPANY_NAME"]?>, <? echo $arParams["COUNTRY"].", ".$arParams["INDEX"].", г. ".$arParams["CITY"].", ".$arParams["ADDRESS"];?>,  ИНН <?=$arParams["INN"]?>, р/с <?=$arParams["RSCH"]?> в <?=$arParams["RSCH_BANK"]?> г. <?=$arParams["RSCH_CITY"]?>, к/с <?=$arParams["KSCH"]?>, БИК <?=$arParams["BIK"]?></span></p>
+style='font-size:7.0pt'>РџРѕСЃС‚Р°РІС‰РёРєВ В  </span><span
+style='font-size:7.0pt'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ30></a><?=$arParams["COMPANY_NAME"]?>, <? echo $arParams["COUNTRY"].", ".$arParams["INDEX"].", Рі. ".$arParams["CITY"].", ".$arParams["ADDRESS"];?>,  Р?РќРќ <?=$arParams["INN"]?>, СЂ/СЃ <?=$arParams["RSCH"]?> РІ <?=$arParams["RSCH_BANK"]?> Рі. <?=$arParams["RSCH_CITY"]?>, Рє/СЃ <?=$arParams["KSCH"]?>, Р‘Р?Рљ <?=$arParams["BIK"]?></span></p>
 </td>
 <td width=130 valign=top style='width:97.15pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=right style='margin:0cm;margin-bottom:.0001pt;
-text-align:right;line-height:normal'><span style='font-size:7.0pt'>по ОКПО</span></p>
+text-align:right;line-height:normal'><span style='font-size:7.0pt'>РїРѕ РћРљРџРћ</span></p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле21></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ21></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -232,8 +232,8 @@ line-height:normal'>&nbsp;</p>
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>Плательщик   </span><span
-style='font-size:7.0pt'><a name=ТекстовоеПоле31></a><?
+style='font-size:7.0pt'>РџР»Р°С‚РµР»СЊС‰РёРєВ В  </span><span
+style='font-size:7.0pt'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ31></a><?
 if(empty($arParams))
 {
 	echo "[".$arOrder["USER_ID"]."] ";
@@ -241,7 +241,7 @@ if(empty($arParams))
 	$arUser = $db_user->Fetch();
 	echo htmlspecialcharsbx($arUser["NAME"])." ".htmlspecialcharsbx($arUser["LAST_NAME"]).", ";
 	
-	if (strlen($arOrderProps["F_INN"])>0) echo "ИНН: ".$arOrderProps["F_INN"];
+	if (strlen($arOrderProps["F_INN"])>0) echo "Р?РќРќ: ".$arOrderProps["F_INN"];
 	
 	if (strlen($arOrderProps["F_INDEX"])>0) echo $arOrderProps["F_INDEX"].",";
 
@@ -251,7 +251,7 @@ if(empty($arParams))
 	elseif(strlen($arVal["COUNTRY_NAME"])>0 || strlen($arVal["CITY_NAME"])>0)
 		echo htmlspecialcharsbx($arVal["COUNTRY_NAME"].$arVal["CITY_NAME"]);
 
-	if (strlen($arOrderProps["F_CITY"])>0) echo ", г. ".$arOrderProps["F_CITY"];
+	if (strlen($arOrderProps["F_CITY"])>0) echo ", Рі. ".$arOrderProps["F_CITY"];
 	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0) 
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
@@ -264,9 +264,9 @@ else
 	else
 		echo $arParams["BUYER_LAST_NAME"]." ".$arParams["BUYER_FIRST_NAME"]." ".$arParams["BUYER_SECOND_NAME"];
 
-	if (strlen($arParams["BUYER_INN"])>0) echo " ИНН/КПП: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
+	if (strlen($arParams["BUYER_INN"])>0) echo " Р?РќРќ/РљРџРџ: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
 
-	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", г. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", р/с ".$arParams["BUYER_RSCH"]." в ".$arParams["BUYER_RSCH_BANK"]." г. ".$arParams["BUYER_RSCH_CITY"].", к/с ".$arParams["BUYER_KSCH"].", БИК ".$arParams["BUYER_BIK"];
+	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", Рі. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", СЂ/СЃ ".$arParams["BUYER_RSCH"]." РІ ".$arParams["BUYER_RSCH_BANK"]." Рі. ".$arParams["BUYER_RSCH_CITY"].", Рє/СЃ ".$arParams["BUYER_KSCH"].", Р‘Р?Рљ ".$arParams["BUYER_BIK"];
 
 }?></span></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
@@ -277,36 +277,36 @@ style='font-size:7.0pt'>&nbsp;</span></p>
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=right style='margin:0cm;margin-bottom:.0001pt;
-text-align:right;line-height:normal'><span style='font-size:7.0pt'>по ОКПО</span></p>
+text-align:right;line-height:normal'><span style='font-size:7.0pt'>РїРѕ РћРљРџРћ</span></p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле22></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ22></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 </td>
 </tr>
 <tr style='height:9.0pt'>
 <td width=737 colspan=4 valign=top style='width:552.85pt;border:solid windowtext 1.0pt;
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>Основание   </span><span
-style='font-size:7.0pt'><a name=ТекстовоеПоле32></a><input size="70" style="border:0px solid #000000;font-size:11px;" type="text" value="Платежный документ №       от               г."></span></p>
+style='font-size:7.0pt'>РћСЃРЅРѕРІР°РЅРёРµВ В  </span><span
+style='font-size:7.0pt'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ32></a><input size="70" style="border:0px solid #000000;font-size:11px;" type="text" value="РџР»Р°С‚РµР¶РЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ в„–       РѕС‚               Рі."></span></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=130 valign=top style='width:97.15pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>номер</span></p>
+style='font-size:7.0pt'>РЅРѕРјРµСЂ</span></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле23></a></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ23></a></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -316,44 +316,44 @@ text-align:center;line-height:normal'>&nbsp;</p>
 solid windowtext 1.0pt;border-bottom:solid windowtext 1.0pt;border-right:
 none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><b><span style='font-size:7.0pt'>ТОВАРНАЯ
-НАКЛАДНАЯ</span></b></p>
+text-align:center;line-height:normal'><b><span style='font-size:7.0pt'>РўРћР’РђР РќРђРЇ
+РќРђРљР›РђР”РќРђРЇ</span></b></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><b>&nbsp;</b></p>
 </td>
 <td width=216 colspan=2 valign=top style='width:162.0pt;padding:0cm 2.0pt 0cm 2.0pt;
 height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>договор,
-заказ-наряд</p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>РґРѕРіРѕРІРѕСЂ,
+Р·Р°РєР°Р·-РЅР°СЂСЏРґ</p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=228 rowspan=4 valign=top style='width:170.85pt;border-top:none;
 border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:7.0pt'>Валюта:
-рубль</span></p>
+text-align:center;line-height:normal'><span style='font-size:7.0pt'>Р’Р°Р»СЋС‚Р°:
+СЂСѓР±Р»СЊ</span></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:7.0pt'>Дата
-курса: </span><span style='font-size:7.0pt'><a name=ТекстовоеПоле35></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+text-align:center;line-height:normal'><span style='font-size:7.0pt'>Р”Р°С‚Р°
+РєСѓСЂСЃР°: </span><span style='font-size:7.0pt'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ35></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:7.0pt'>Курс</span><span
+text-align:center;line-height:normal'><span style='font-size:7.0pt'>РљСѓСЂСЃ</span><span
 lang=EN-US style='font-size:7.0pt'> USD:</span><span lang=EN-US
 style='font-size:7.0pt'> </span><span style='font-size:7.0pt'><a
-name=ТекстовоеПоле36></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ36></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=130 valign=top style='width:97.15pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>дата</span></p>
+style='font-size:7.0pt'>РґР°С‚Р°</span></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле24></a></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ24></a></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -362,16 +362,16 @@ text-align:center;line-height:normal'>&nbsp;</p>
 <td width=69 valign=top style='width:52.0pt;border:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:7.0pt'>Номер
-документа</span></p>
+text-align:center;line-height:normal'><span style='font-size:7.0pt'>РќРѕРјРµСЂ
+РґРѕРєСѓРјРµРЅС‚Р°</span></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
 <td width=147 valign=top style='width:110.0pt;border:solid windowtext 1.0pt;
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><span style='font-size:7.0pt'>Дата
-составления</span></p>
+text-align:center;line-height:normal'><span style='font-size:7.0pt'>Р”Р°С‚Р°
+СЃРѕСЃС‚Р°РІР»РµРЅРёСЏ</span></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -379,14 +379,14 @@ text-align:center;line-height:normal'>&nbsp;</p>
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>номер</span></p>
+style='font-size:7.0pt'>РЅРѕРјРµСЂ</span></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td width=116 valign=top style='width:87.0pt;border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле25></a></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ25></a></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -396,7 +396,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле33></a><?echo $ORDER_ID;?></p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ33></a><?echo $ORDER_ID;?></p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -406,7 +406,7 @@ none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле34></a><input size="12" style="border:0px solid #000000;font-size:11px;" type="text" value=""></p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ34></a><input size="12" style="border:0px solid #000000;font-size:11px;" type="text" value=""></p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -416,7 +416,7 @@ none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>дата</span></p>
+style='font-size:7.0pt'>РґР°С‚Р°</span></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -425,7 +425,7 @@ none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле26></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ26></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -444,7 +444,7 @@ none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:11.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><span
-style='font-size:7.0pt'>Вид операции</span></p>
+style='font-size:7.0pt'>Р’РёРґ РѕРїРµСЂР°С†РёРё</span></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -453,7 +453,7 @@ none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:11.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле27></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ27></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -469,7 +469,7 @@ style='margin-left:2.0pt;border-collapse:collapse;width:832pt;'>
 <td rowspan=2 valign=top style='width:26.0pt;border:solid windowtext 1.0pt;
 border-bottom:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>Номер по по рядку</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>РќРѕРјРµСЂ РїРѕ РїРѕ СЂСЏРґРєСѓ</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -477,7 +477,7 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Товар</p>
+line-height:normal'>РўРѕРІР°СЂ</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -486,38 +486,38 @@ border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Единица измерения</p>
+line-height:normal'>Р•РґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ</p>
 
 </td>
 <td rowspan=2 valign=top style='width:45.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'><p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Вид упаков<br />ки</p></td>
+line-height:normal'>Р’РёРґ СѓРїР°РєРѕРІ<br />РєРё</p></td>
 <td colspan="2" valign=top style='width:80.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Количество</p>
+line-height:normal'>РљРѕР»РёС‡РµСЃС‚РІРѕ</p>
 
 </td>
 <td rowspan=2 valign=top style='width:40.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'><p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Масса<br /> брутто</p></td>
+line-height:normal'>РњР°СЃСЃР°<br /> Р±СЂСѓС‚С‚Рѕ</p></td>
 <td rowspan=2 valign=top style='width:40.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'><p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Кол-во (масса нетто)</p></td>
+line-height:normal'>РљРѕР»-РІРѕ (РјР°СЃСЃР° РЅРµС‚С‚Рѕ)</p></td>
 <td rowspan=2 valign=top style='width:60.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Цена, руб., коп.</p>
+line-height:normal'>Р¦РµРЅР°, СЂСѓР±., РєРѕРї.</p>
 
 </td>
 <td rowspan=2 valign=top style='width:60.0pt;border-top:solid windowtext 1.0pt;
@@ -525,14 +525,14 @@ border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Сумма без учета НДС,  руб. коп.</p>
+line-height:normal'>РЎСѓРјРјР° Р±РµР· СѓС‡РµС‚Р° РќР”РЎ,  СЂСѓР±. РєРѕРї.</p>
 
 </td>
 <td colspan=2 valign=top style='width:81.0pt;border:solid windowtext 1.0pt;
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>НДС</p>
+line-height:normal'>РќР”РЎ</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -542,10 +542,10 @@ border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:6.0pt;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Сумма с</p>
+line-height:normal'>РЎСѓРјРјР° СЃ</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>учетом НДС и  руб. коп.</p>
+line-height:normal'>СѓС‡РµС‚РѕРј РќР”РЎ Рё  СЂСѓР±. РєРѕРї.</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -556,7 +556,7 @@ line-height:normal'>&nbsp;</p>
 padding:0cm 2.0pt 0cm 2.0pt;height:26.0pt'>
 <p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>наименование, характеристика, сорт, артикул товара</p>
+line-height:normal'>РЅР°РёРјРµРЅРѕРІР°РЅРёРµ, С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°, СЃРѕСЂС‚, Р°СЂС‚РёРєСѓР» С‚РѕРІР°СЂР°</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -566,7 +566,7 @@ padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 
 <p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>код</p>
+line-height:normal'>РєРѕРґ</p>
 </td>
 
 
@@ -575,7 +575,7 @@ border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>наиме-<br />нование</p>
+line-height:normal'>РЅР°РёРјРµ-<br />РЅРѕРІР°РЅРёРµ</p>
 </td>
 
 
@@ -583,21 +583,21 @@ line-height:normal'>наиме-<br />нование</p>
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'> <p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>код по ОКЕИ</p></td>
+line-height:normal'>РєРѕРґ РїРѕ РћРљР•Р?</p></td>
 <td valign=top style='width:40.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'> <p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>в одном месте</p></td>
+line-height:normal'>РІ РѕРґРЅРѕРј РјРµСЃС‚Рµ</p></td>
 <td valign=top style='width:40.0pt;border-top:solid windowtext 1.0pt;
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'><p class=Normal align=center style='margin-top:2.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>мест, штук</p></td>
+line-height:normal'>РјРµСЃС‚, С€С‚СѓРє</p></td>
 <td valign=top style='width:38.0pt;border:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:26.0pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>ставка, %</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>СЃС‚Р°РІРєР°, %</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -605,7 +605,7 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 border-left:none;border-bottom:none;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:26.0pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>сумма, руб, коп</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>СЃСѓРјРјР°, СЂСѓР±, РєРѕРї</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -720,14 +720,14 @@ for ($i = 0; $i < count($arBasketIDs); $i++)
 	$arBasketOrder[] = $arBasketTmp;
 }
 
-//разбрасываем скидку на заказ по товарам
+//СЂР°Р·Р±СЂР°СЃС‹РІР°РµРј СЃРєРёРґРєСѓ РЅР° Р·Р°РєР°Р· РїРѕ С‚РѕРІР°СЂР°Рј
 if (floatval($arOrder["DISCOUNT_VALUE"]) > 0)
 {
 	$arBasketOrder = GetUniformDestribution($arBasketOrder, $arOrder["DISCOUNT_VALUE"], $priceTotal);
 }
 
 
-//налоги
+//РЅР°Р»РѕРіРё
 $arTaxList = array();
 $db_tax_list = CSaleOrderTax::GetList(array("APPLY_ORDER"=>"ASC"), Array("ORDER_ID"=>$ORDER_ID));
 $iNds = -1;
@@ -735,15 +735,15 @@ $i = 0;
 while ($ar_tax_list = $db_tax_list->Fetch())
 {
 	$arTaxList[$i] = $ar_tax_list;
-	// определяем, какой из налогов - НДС
-	// НДС должен иметь код NDS, либо необходимо перенести этот шаблон 
-	// в каталог пользовательских шаблонов и исправить
+	// РѕРїСЂРµРґРµР»СЏРµРј, РєР°РєРѕР№ РёР· РЅР°Р»РѕРіРѕРІ - РќР”РЎ
+	// РќР”РЎ РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ РєРѕРґ NDS, Р»РёР±Рѕ РЅРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµРЅРµСЃС‚Рё СЌС‚РѕС‚ С€Р°Р±Р»РѕРЅ 
+	// РІ РєР°С‚Р°Р»РѕРі РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… С€Р°Р±Р»РѕРЅРѕРІ Рё РёСЃРїСЂР°РІРёС‚СЊ
 	if ($arTaxList[$i]["CODE"] == "NDS")
 		$iNds = $i;
 	$i++;
 }
 
-//состав заказа
+//СЃРѕСЃС‚Р°РІ Р·Р°РєР°Р·Р°
 $total_price = 0.00;
 $total_sum = 0.00;
 $total_nds = 0.00;
@@ -762,7 +762,7 @@ foreach ($arBasketOrder as $arBasket):
 	
 	$b_AMOUNT = DoubleVal($arBasket["PRICE"]);
 	
-	//определяем начальную цену
+	//РѕРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»СЊРЅСѓСЋ С†РµРЅСѓ
 	$item_price = $b_AMOUNT;
 	if(DoubleVal($arBasket["VAT_RATE"]) > 0)
 	{
@@ -787,14 +787,14 @@ foreach ($arBasketOrder as $arBasket):
 <tr style='height:9.0pt'>
 <td valign=top style='border:solid windowtext 1.0pt;
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=ТекстовоеПоле37></a><?echo $n;?></p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ37></a><?echo $n;?></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 
 <td valign=top style='border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt;width:200px;'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal;width:200px;'><a name=ТекстовоеПоле40></a>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal;width:200px;'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ40></a>
 <?echo htmlspecialcharsEx($arBasket["NAME"]) ?>
 <?
 	if (is_array($arBasket["PROPS"]) && $_GET["PROPS_ENABLE"] == "Y")
@@ -821,7 +821,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле43></a>шт.</p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ43></a>С€С‚.</p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -865,7 +865,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле46></a><?echo $arQuantities[$mi]; $total_n += $arQuantities[$mi]; ?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ46></a><?echo $arQuantities[$mi]; $total_n += $arQuantities[$mi]; ?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -873,7 +873,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле49></a><?echo number_format($item_price, 2, ',', ' ');?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ49></a><?echo number_format($item_price, 2, ',', ' ');?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -889,7 +889,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле54></a><?echo $taxRate."%"?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ54></a><?echo $taxRate."%"?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -931,7 +931,7 @@ if (DoubleVal($arOrder["PRICE_DELIVERY"])>0)
 	else
 	{
 		$basket_tax = CSaleOrderTax::CountTaxes(DoubleVal($arOrder["PRICE_DELIVERY"]), $arTaxList, $arOrder["CURRENCY"]);
-		//определяем начальную цену
+		//РѕРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»СЊРЅСѓСЋ С†РµРЅСѓ
 		$item_price = DoubleVal($arOrder["PRICE_DELIVERY"]);
 		for ($i = 0; $i < count($arTaxList); $i++)
 		{
@@ -955,13 +955,13 @@ if (DoubleVal($arOrder["PRICE_DELIVERY"])>0)
 <tr style='height:9.0pt'>
 <td valign=top style='border:solid windowtext 1.0pt;
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=ТекстовоеПоле38></a><?echo $n;?></p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ38></a><?echo $n;?></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 <td valign=top style='border-top:none;border-left:
 none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=ТекстовоеПоле41></a>Доставка</p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ41></a>Р”РѕСЃС‚Р°РІРєР°</p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
 
@@ -1000,7 +1000,7 @@ padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле44></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ44></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1008,7 +1008,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле47></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ47></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1016,7 +1016,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле50></a><?echo number_format($item_price, 2, ',', ' ');?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ50></a><?echo number_format($item_price, 2, ',', ' ');?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1024,7 +1024,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле52></a><?echo number_format($item_price, 2, ',', ' ');  $total_price += $item_price;?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ52></a><?echo number_format($item_price, 2, ',', ' ');  $total_price += $item_price;?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1032,7 +1032,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле55></a><?echo $nds_pr."%"?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ55></a><?echo $nds_pr."%"?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1040,7 +1040,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле57></a><?echo number_format($nds_val, 2, ',', ' '); $total_nds += $nds_val;?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ57></a><?echo number_format($nds_val, 2, ',', ' '); $total_nds += $nds_val;?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1049,7 +1049,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=ТекстовоеПоле62></a><?echo number_format($nds_val+$item_price, 2, ',', ' '); $total_sum += $nds_val+$item_price?></p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ62></a><?echo number_format($nds_val+$item_price, 2, ',', ' '); $total_sum += $nds_val+$item_price?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -1063,7 +1063,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-right:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'>Итого на странице №1</p>
+line-height:normal'>Р?С‚РѕРіРѕ РЅР° СЃС‚СЂР°РЅРёС†Рµ в„–1</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -1073,7 +1073,7 @@ border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=ТекстовоеПоле67></a></p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ67></a></p>
 </td>
 
 <td valign=top style='border-top:none;border-left:none;
@@ -1156,7 +1156,7 @@ style='margin-left:2.0pt;border-collapse:collapse;width:832pt'>
 border-right:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:11.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:133%'>Всего по накладной: </p>
+line-height:133%'>Р’СЃРµРіРѕ РїРѕ РЅР°РєР»Р°РґРЅРѕР№: </p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td> 
@@ -1164,7 +1164,7 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:11.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:133%'><a name=ТекстовоеПоле66></a>&nbsp;</p>
+line-height:133%'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ66></a>&nbsp;</p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:133%'>&nbsp;</p>
@@ -1235,8 +1235,8 @@ function PrintRussian($num, $ext)
 <tr style='height:9.0pt'>
 <td width=481 colspan=2 valign=top style='width:361.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>Товарная
-накладная имеет приложение на <a name=ТекстовоеПоле4></a><?=htmlspecialcharsbx(Number2Word_Rus(1, false))?> листах</p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>РўРѕРІР°СЂРЅР°СЏ
+РЅР°РєР»Р°РґРЅР°СЏ РёРјРµРµС‚ РїСЂРёР»РѕР¶РµРЅРёРµ РЅР° <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ4></a><?=htmlspecialcharsbx(Number2Word_Rus(1, false))?> Р»РёСЃС‚Р°С…</p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
@@ -1253,13 +1253,13 @@ padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <tr style='height:9.0pt'>
 <td width=481 colspan=2 valign=top style='width:361.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>и
-содержит <a name=ТекстовоеПоле5></a><?=htmlspecialcharsbx(Number2Word_Rus($n-1, false))?></p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>Рё
+СЃРѕРґРµСЂР¶РёС‚ <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ5></a><?=htmlspecialcharsbx(Number2Word_Rus($n-1, false))?></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
-<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>порядков<?=PrintRussian($n-1, array("ый","ых","ых"))?> номер<?=PrintRussian($n-1, array("","а","ов"))?> записей</p>
+<p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>РїРѕСЂСЏРґРєРѕРІ<?=PrintRussian($n-1, array("С‹Р№","С‹С…","С‹С…"))?> РЅРѕРјРµСЂ<?=PrintRussian($n-1, array("","Р°","РѕРІ"))?> Р·Р°РїРёСЃРµР№</p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=116 colspan=2 valign=top style='width:87.0pt;padding:0cm 2.0pt 0cm 2.0pt;
@@ -1272,7 +1272,7 @@ height:9.0pt'>
 <td width=481 colspan=2 valign=top style='width:361.0pt;border:none;
 padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:36.0pt;margin-bottom:.0001pt;line-height:133%'>прописью</p>
+margin-left:36.0pt;margin-bottom:.0001pt;line-height:133%'>РїСЂРѕРїРёСЃСЊСЋ</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
@@ -1300,9 +1300,9 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 <td width=241 valign=top style='width:180.5pt;border:none;border-bottom:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:19.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Масса груза (нетто)  <a name=ТекстовоеПоле8></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РњР°СЃСЃР° РіСЂСѓР·Р° (РЅРµС‚С‚Рѕ)В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ8></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>прописью </p>
+margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>РїСЂРѕРїРёСЃСЊСЋ </p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border-top:none;
 border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
@@ -1319,26 +1319,26 @@ padding:0cm 2.0pt 0cm 2.0pt;height:19.0pt'>
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><a
-name=ТекстовоеПоле64></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ64></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 </td>
 </tr>
 <tr style='height:19.0pt'>
 <td width=241 valign=top style='width:180.5pt;border:none;padding:0cm 2.0pt 0cm 2.0pt;
 height:19.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Всего мест  <a name=ТекстовоеПоле9></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Р’СЃРµРіРѕ РјРµСЃС‚В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ9></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:36.0pt;margin-bottom:.0001pt;line-height:133%'>прописью<br>
+margin-left:36.0pt;margin-bottom:.0001pt;line-height:133%'>РїСЂРѕРїРёСЃСЊСЋ<br>
 <br>
 </p>
 </td>
 <td width=241 valign=top style='width:180.5pt;border:none;padding:0cm 2.0pt 0cm 2.0pt;
 height:19.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Масса груза (брутто) <a name=ТекстовоеПоле7></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РњР°СЃСЃР° РіСЂСѓР·Р° (Р±СЂСѓС‚С‚Рѕ) <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ7></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>прописью<br>
- </p>
+margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>РїСЂРѕРїРёСЃСЊСЋ<br>
+В </p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border-top:none;
 border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
@@ -1355,23 +1355,23 @@ padding:0cm 2.0pt 0cm 2.0pt;height:19.0pt'>
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><a
-name=ТекстовоеПоле65></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ65></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 </td>
 </tr>
 <tr style='height:28.0pt'>
 <td width=481 colspan=2 valign=top style='width:361.0pt;padding:0cm 2.0pt 0cm 2.0pt;
 height:28.0pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Приложение (паспорта,
-сертификаты и т.п.) на    <a name=ТекстовоеПоле6></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-листах</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РџСЂРёР»РѕР¶РµРЅРёРµ (РїР°СЃРїРѕСЂС‚Р°,
+СЃРµСЂС‚РёС„РёРєР°С‚С‹ Рё С‚.Рї.) РЅР°В В В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ6></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В В 
+Р»РёСЃС‚Р°С…</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:136.0pt;margin-bottom:.0001pt;line-height:133%'>прописью</p>
+margin-left:136.0pt;margin-bottom:.0001pt;line-height:133%'>РїСЂРѕРїРёСЃСЊСЋ</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:28.0pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>По доверенности №   <a name=ТекстовоеПоле14></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   от   <a name=ТекстовоеПоле15></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РџРѕ РґРѕРІРµСЂРµРЅРЅРѕСЃС‚Рё в„–В В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ14></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В В  РѕС‚В В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ15></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
@@ -1394,8 +1394,8 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Выданной   <a
-name=ТекстовоеПоле16></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Р’С‹РґР°РЅРЅРѕР№В В  <a
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ16></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
@@ -1411,18 +1411,18 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <td width=481 colspan=2 valign=top style='width:361.0pt;padding:0cm 2.0pt 0cm 2.0pt;
 height:19.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Всего отпущено   <?echo htmlspecialcharsbx(Number2Word_Rus($n-1, false))." порядков".PrintRussian($n-1, array("ый","ых","ых"))." номер".PrintRussian($n-1, array("","а","ов"));?> наименований </p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Р’СЃРµРіРѕ РѕС‚РїСѓС‰РµРЅРѕВ В  <?echo htmlspecialcharsbx(Number2Word_Rus($n-1, false))." РїРѕСЂСЏРґРєРѕРІ".PrintRussian($n-1, array("С‹Р№","С‹С…","С‹С…"))." РЅРѕРјРµСЂ".PrintRussian($n-1, array("","Р°","РѕРІ"));?> РЅР°РёРјРµРЅРѕРІР°РЅРёР№ </p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>на сумму   <a
-name=ТекстовоеПоле11></a><?echo htmlspecialcharsbx(Number2Word_rus($total_sum));?></p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РЅР° СЃСѓРјРјСѓ В В <a
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ11></a><?echo htmlspecialcharsbx(Number2Word_rus($total_sum));?></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 padding:0cm 2.0pt 0cm 2.0pt;height:19.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>кем, кому
-(организация, должность, фамилия, и.о.)</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РєРµРј, РєРѕРјСѓ
+(РѕСЂРіР°РЅРёР·Р°С†РёСЏ, РґРѕР»Р¶РЅРѕСЃС‚СЊ, С„Р°РјРёР»РёСЏ, Рё.Рѕ.)</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
@@ -1461,17 +1461,17 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <td width=481 colspan=2 valign=top style='width:361.0pt;padding:0cm 2.0pt 0cm 2.0pt;
 height:18.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Товар
-отпустил               <a name=ТекстовоеПоле12></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                        
-<a name=ТекстовоеПоле13></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РўРѕРІР°СЂ
+РѕС‚РїСѓСЃС‚РёР»В В В В В В В В В В В В В В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ12></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В 
+<a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ13></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:18.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Товар
-принял                          <a name=ТекстовоеПоле18></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>РўРѕРІР°СЂ
+РїСЂРёРЅСЏР»В В В В В В В В В В В В В В В В В В В В В В В В В  <a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ18></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
@@ -1479,7 +1479,7 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;padding:0cm 2.0pt 0cm 2.0pt;height:18.0pt'>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'><a
-name=ТекстовоеПоле17></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ17></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 </td>
@@ -1488,31 +1488,31 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
 <td width=481 colspan=2 valign=top style='width:361.0pt;padding:0cm 2.0pt 0cm 2.0pt;
 height:40.75pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>должность          
-подпись           расшифровка подписи </p>
+margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>РґРѕР»Р¶РЅРѕСЃС‚СЊВ В В В В В В В В В 
+РїРѕРґРїРёСЃСЊВ В В В В В В В В В  СЂР°СЃС€РёС„СЂРѕРІРєР° РїРѕРґРїРёСЃРё </p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>М.П.</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Рњ.Рџ.</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=409 colspan=6 valign=top style='width:307.0pt;border:none;
 padding:0cm 2.0pt 0cm 2.0pt;height:40.75pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>должность                                      
-подпись </p>
+margin-left:72.0pt;margin-bottom:.0001pt;line-height:133%'>РґРѕР»Р¶РЅРѕСЃС‚СЊВ В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В В 
+РїРѕРґРїРёСЃСЊ </p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>М.П.</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>Рњ.Рџ.</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>
 <td width=116 colspan=2 valign=top style='width:87.0pt;border:none;
 padding:0cm 2.0pt 0cm 2.0pt;height:40.75pt'>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
-margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>расшифровка подписи</p>
+margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>СЂР°СЃС€РёС„СЂРѕРІРєР° РїРѕРґРїРёСЃРё</p>
 <p class=Normal style='margin-top:2.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 </td>

@@ -4927,8 +4927,8 @@ class CJSPopup
 
 			$APPLICATION->AddBufferContent(array($this, "_InitSystem"));
 
-			$APPLICATION->ShowHeadScripts();
 			$APPLICATION->ShowHeadStrings();
+			$APPLICATION->ShowHeadScripts();
 
 			$this->bInited = true;
 		}

@@ -27,6 +27,7 @@ class CSecurityTemporaryStorage
 	{
 		unset($this->sessionData[$pKey]);
 	}
+
 	/**
 	 * @param string $pSessionKey
 	 * @return bool
@@ -58,8 +59,8 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
-	 * @param $pValue
+	 * @param int|string $pKey
+	 * @param mixed $pValue
 	 */
 	static public function setData($pKey, $pValue)
 	{
@@ -67,7 +68,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return string
 	 */
 	static public function getString($pKey)
@@ -83,7 +84,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return int
 	 */
 	static public function getInt($pKey)
@@ -99,7 +100,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return bool
 	 */
 	static public function getBool($pKey)
@@ -115,7 +116,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return bool
 	 */
 	static public function isEmpty($pKey)
@@ -131,7 +132,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return bool
 	 */
 	static public function isExists($pKey)
@@ -140,7 +141,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 */
 	static public function increment($pKey)
 	{
@@ -148,7 +149,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 */
 	static public function decrement($pKey)
 	{
@@ -156,7 +157,7 @@ class CSecurityTemporaryStorage
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return bool|array
 	 */
 	static public function getArray($pKey)
@@ -167,12 +168,12 @@ class CSecurityTemporaryStorage
 		}
 		else
 		{
-			return false;
+			return array();
 		}
 	}
 
 	/**
-	 * @param $pKey
+	 * @param int|string $pKey
 	 * @return bool|mixed
 	 */
 	static public function getArrayPop($pKey)

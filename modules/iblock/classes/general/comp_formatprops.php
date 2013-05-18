@@ -1,6 +1,19 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockformatproperties/index.php
+ * @author Bitrix
+ */
 class CIBlockFormatProperties
 {
 	

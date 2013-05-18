@@ -1,12 +1,12 @@
 <?php
 global $STEMMING_RU_VOWELS;
-$STEMMING_RU_VOWELS = "АЕИОУЫЭЮЯ";
+$STEMMING_RU_VOWELS = "РђР•Р?РћРЈР«Р­Р®РЇ";
 global $STEMMING_RU_PERFECTIVE_GERUND;
-$STEMMING_RU_PERFECTIVE_GERUND = "/(ЫВШИСЬ|ИВШИСЬ|ЯВШИСЬ|АВШИСЬ|ЫВШИ|ИВШИ|ЯВШИ|АВШИ|ЫВ|ИВ|ЯВ|АВ)$/".BX_UTF_PCRE_MODIFIER;
+$STEMMING_RU_PERFECTIVE_GERUND = "/(Р«Р’РЁР?РЎР¬|Р?Р’РЁР?РЎР¬|РЇР’РЁР?РЎР¬|РђР’РЁР?РЎР¬|Р«Р’РЁР?|Р?Р’РЁР?|РЇР’РЁР?|РђР’РЁР?|Р«Р’|Р?Р’|РЇР’|РђР’)$/".BX_UTF_PCRE_MODIFIER;
 
-$STEMMING_RU_ADJECTIVE=array("ЕЕ"=>2, "ИЕ"=>2, "ЫЕ"=>2, "ОЕ"=>2, "ИМИ"=>3, "ЫМИ"=>3, "ЕЙ"=>2, "ИЙ"=>2, "ЫЙ"=>2, "ОЙ"=>2, "ЕМ"=>2, "ИМ"=>2, "ЫМ"=>2, "ОМ"=>2, "ЕГО"=>2, "ОГО"=>3, "ЕМУ"=>3, "ОМУ"=>3, "ИХ"=>2, "ЫХ"=>2, "УЮ"=>2, "ЮЮ"=>2, "АЯ"=>2, "ЯЯ"=>2, "ОЮ"=>2, "ЕЮ"=>2);
-$STEMMING_RU_PARTICIPLE_GR1=array("ЕМ"=>2, "НН"=>2, "ВШ"=>2, "ЮЩ"=>2, "Щ"=>1);
-$STEMMING_RU_PARTICIPLE_GR2=array("ИВШ"=>3, "ЫВШ"=>3, "УЮЩ"=>3);
+$STEMMING_RU_ADJECTIVE=array("Р•Р•"=>2, "Р?Р•"=>2, "Р«Р•"=>2, "РћР•"=>2, "Р?РњР?"=>3, "Р«РњР?"=>3, "Р•Р™"=>2, "Р?Р™"=>2, "Р«Р™"=>2, "РћР™"=>2, "Р•Рњ"=>2, "Р?Рњ"=>2, "Р«Рњ"=>2, "РћРњ"=>2, "Р•Р“Рћ"=>2, "РћР“Рћ"=>3, "Р•РњРЈ"=>3, "РћРњРЈ"=>3, "Р?РҐ"=>2, "Р«РҐ"=>2, "РЈР®"=>2, "Р®Р®"=>2, "РђРЇ"=>2, "РЇРЇ"=>2, "РћР®"=>2, "Р•Р®"=>2);
+$STEMMING_RU_PARTICIPLE_GR1=array("Р•Рњ"=>2, "РќРќ"=>2, "Р’РЁ"=>2, "Р®Р©"=>2, "Р©"=>1);
+$STEMMING_RU_PARTICIPLE_GR2=array("Р?Р’РЁ"=>3, "Р«Р’РЁ"=>3, "РЈР®Р©"=>3);
 $STEMMING_RU_ADJECTIVAL_GR1=array();
 $STEMMING_RU_ADJECTIVAL_GR2=array();
 foreach($STEMMING_RU_ADJECTIVE as $i => $il)
@@ -16,7 +16,7 @@ foreach($STEMMING_RU_ADJECTIVE as $i => $il)
 }
 global $STEMMING_RU_ADJECTIVAL1;
 arsort($STEMMING_RU_ADJECTIVAL_GR1);
-$STEMMING_RU_ADJECTIVAL1="/([АЯ])(".implode("|", array_keys($STEMMING_RU_ADJECTIVAL_GR1)).")$/".BX_UTF_PCRE_MODIFIER;
+$STEMMING_RU_ADJECTIVAL1="/([РђРЇ])(".implode("|", array_keys($STEMMING_RU_ADJECTIVAL_GR1)).")$/".BX_UTF_PCRE_MODIFIER;
 
 global $STEMMING_RU_ADJECTIVAL2;
 foreach($STEMMING_RU_ADJECTIVE as $i => $il)
@@ -25,15 +25,15 @@ arsort($STEMMING_RU_ADJECTIVAL_GR2);
 $STEMMING_RU_ADJECTIVAL2="/(".implode("|", array_keys($STEMMING_RU_ADJECTIVAL_GR2)).")$/".BX_UTF_PCRE_MODIFIER;
 
 global $STEMMING_RU_VERB1;
-$STEMMING_RU_VERB1="/([АЯ])(ННО|ЕТЕ|ЙТЕ|ЕШЬ|ЛА|НА|ЛИ|ЕМ|ЛО|НО|ЕТ|ЮТ|НЫ|ТЬ|Й|Л|Н)$/".BX_UTF_PCRE_MODIFIER;
+$STEMMING_RU_VERB1="/([РђРЇ])(РќРќРћ|Р•РўР•|Р™РўР•|Р•РЁР¬|Р›Рђ|РќРђ|Р›Р?|Р•Рњ|Р›Рћ|РќРћ|Р•Рў|Р®Рў|РќР«|РўР¬|Р™|Р›|Рќ)$/".BX_UTF_PCRE_MODIFIER;
 
 global $STEMMING_RU_VERB2;
-$STEMMING_RU_VERB2="/(ЕЙТЕ|УЙТЕ|ИЛА|ЫЛА|ЕНА|ИТЕ|ИЛИ|ЫЛИ|ИЛО|ЫЛО|ЕНО|УЕТ|УЮТ|ЕНЫ|ИТЬ|ЫТЬ|ИШЬ|ЕЙ|УЙ|ИЛ|ЫЛ|ИМ|ЫМ|ЕН|ЯТ|ИТ|ЫТ|УЮ|Ю)$/".BX_UTF_PCRE_MODIFIER;
+$STEMMING_RU_VERB2="/(Р•Р™РўР•|РЈР™РўР•|Р?Р›Рђ|Р«Р›Рђ|Р•РќРђ|Р?РўР•|Р?Р›Р?|Р«Р›Р?|Р?Р›Рћ|Р«Р›Рћ|Р•РќРћ|РЈР•Рў|РЈР®Рў|Р•РќР«|Р?РўР¬|Р«РўР¬|Р?РЁР¬|Р•Р™|РЈР™|Р?Р›|Р«Р›|Р?Рњ|Р«Рњ|Р•Рќ|РЇРў|Р?Рў|Р«Рў|РЈР®|Р®)$/".BX_UTF_PCRE_MODIFIER;
 global $STEMMING_RU_NOUN;
-$STEMMING_RU_NOUN="/(ИЯМИ|ИЯХ|ИЕМ|ИЯМ|АМИ|ЯМИ|ЬЯ|ИЯ|ЬЮ|ИЮ|ЯХ|АХ|ОМ|АМ|ЕМ|ЯМ|ИЙ|ОЙ|ЕЙ|ИЕЙ|ИИ|ЕИ|ЬЕ|ИЕ|ОВ|ЕВ|Ю|Ь|Ы|У|О|Й|И|Е|Я|А)$/".BX_UTF_PCRE_MODIFIER;
+$STEMMING_RU_NOUN="/(Р?РЇРњР?|Р?РЇРҐ|Р?Р•Рњ|Р?РЇРњ|РђРњР?|РЇРњР?|Р¬РЇ|Р?РЇ|Р¬Р®|Р?Р®|РЇРҐ|РђРҐ|РћРњ|РђРњ|Р•Рњ|РЇРњ|Р?Р™|РћР™|Р•Р™|Р?Р•Р™|Р?Р?|Р•Р?|Р¬Р•|Р?Р•|РћР’|Р•Р’|Р®|Р¬|Р«|РЈ|Рћ|Р™|Р?|Р•|РЇ|Рђ)$/".BX_UTF_PCRE_MODIFIER;
 function stemming_letter_ru()
 {
-	return "ёйцукенгшщзхъфывапролджэячсмитьбюЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ";
+	return "С‘Р№С†СѓРєРµРЅРіС€С‰Р·С…СЉС„С‹РІР°РїСЂРѕР»РґР¶СЌСЏС‡СЃРјРёС‚СЊР±СЋРЃР™Р¦РЈРљР•РќР“РЁР©Р—РҐРЄР¤Р«Р’РђРџР РћР›Р”Р–Р­РЇР§РЎРњР?РўР¬Р‘Р®";
 }
 function stemming_ru_sort($a, $b)
 {
@@ -54,15 +54,15 @@ function stemming_stop_ru($sWord)
 	if(!$stop_list)
 	{
 		$stop_list = array (
-			"QUOTE"=>0,"HTTP"=>0,"WWW"=>0,"RU"=>0,"IMG"=>0,"GIF"=>0,"БЕЗ"=>0,"БЫ"=>0,"БЫЛ"=>0,
-			"БЫТ"=>0,"ВАМ"=>0,"ВАШ"=>0,"ВО"=>0,"ВОТ"=>0,"ВСЕ"=>0,"ВЫ"=>0,"ГДЕ"=>0,"ДА"=>0,
-			"ДАЖ"=>0,"ДЛЯ"=>0,"ДО"=>0,"ЕГ"=>0,"ЕСЛ"=>0,"ЕСТ"=>0,"ЕЩ"=>0,"ЖЕ"=>0,"ЗА"=>0,
-			"ИЗ"=>0,"ИЛИ"=>0,"ИМ"=>0,"ИХ"=>0,"КАК"=>0,"КОГД"=>0,"КТО"=>0,"ЛИ"=>0,"ЛИБ"=>0,
-			"МЕН"=>0,"МНЕ"=>0,"МО"=>0,"МЫ"=>0,"НА"=>0,"НАД"=>0,"НЕ"=>0,"НЕТ"=>0,"НИ"=>0,
-			"НО"=>0,"НУ"=>0,"ОБ"=>0,"ОН"=>0,"ОТ"=>0,"ОЧЕН"=>0,"ПО"=>0,"ПОД"=>0,"ПРИ"=>0,
-			"ПРО"=>0,"САМ"=>0,"СЕБ"=>0,"СВО"=>0,"ТАК"=>0,"ТАМ"=>0,"ТЕБ"=>0,"ТО"=>0,"ТОЖ"=>0,
-			"ТОЛЬК"=>0,"ТУТ"=>0,"ТЫ"=>0,"УЖ"=>0,"ХОТ"=>0,"ЧЕГ"=>0,"ЧЕМ"=>0,"ЧТО"=>0,"ЧТОБ"=>0,
-			"ЭТ"=>0,"ЭТОТ"=>0,
+			"QUOTE"=>0,"HTTP"=>0,"WWW"=>0,"RU"=>0,"IMG"=>0,"GIF"=>0,"Р‘Р•Р—"=>0,"Р‘Р«"=>0,"Р‘Р«Р›"=>0,
+			"Р‘Р«Рў"=>0,"Р’РђРњ"=>0,"Р’РђРЁ"=>0,"Р’Рћ"=>0,"Р’РћРў"=>0,"Р’РЎР•"=>0,"Р’Р«"=>0,"Р“Р”Р•"=>0,"Р”Рђ"=>0,
+			"Р”РђР–"=>0,"Р”Р›РЇ"=>0,"Р”Рћ"=>0,"Р•Р“"=>0,"Р•РЎР›"=>0,"Р•РЎРў"=>0,"Р•Р©"=>0,"Р–Р•"=>0,"Р—Рђ"=>0,
+			"Р?Р—"=>0,"Р?Р›Р?"=>0,"Р?Рњ"=>0,"Р?РҐ"=>0,"РљРђРљ"=>0,"РљРћР“Р”"=>0,"РљРўРћ"=>0,"Р›Р?"=>0,"Р›Р?Р‘"=>0,
+			"РњР•Рќ"=>0,"РњРќР•"=>0,"РњРћ"=>0,"РњР«"=>0,"РќРђ"=>0,"РќРђР”"=>0,"РќР•"=>0,"РќР•Рў"=>0,"РќР?"=>0,
+			"РќРћ"=>0,"РќРЈ"=>0,"РћР‘"=>0,"РћРќ"=>0,"РћРў"=>0,"РћР§Р•Рќ"=>0,"РџРћ"=>0,"РџРћР”"=>0,"РџР Р?"=>0,
+			"РџР Рћ"=>0,"РЎРђРњ"=>0,"РЎР•Р‘"=>0,"РЎР’Рћ"=>0,"РўРђРљ"=>0,"РўРђРњ"=>0,"РўР•Р‘"=>0,"РўРћ"=>0,"РўРћР–"=>0,
+			"РўРћР›Р¬Рљ"=>0,"РўРЈРў"=>0,"РўР«"=>0,"РЈР–"=>0,"РҐРћРў"=>0,"Р§Р•Р“"=>0,"Р§Р•Рњ"=>0,"Р§РўРћ"=>0,"Р§РўРћР‘"=>0,
+			"Р­Рў"=>0,"Р­РўРћРў"=>0,
 		);
 		if(defined("STEMMING_STOP_RU"))
 		{
@@ -79,7 +79,7 @@ function stemming_stop_ru($sWord)
 
 function stemming_upper_ru($sText)
 {
-	return str_replace(array("Ё"), array("Е"), ToUpper($sText, "ru"));
+	return str_replace(array("РЃ"), array("Р•"), ToUpper($sText, "ru"));
 }
 
 function stemming_ru($word, $flags = 0)
@@ -91,19 +91,19 @@ function stemming_ru($word, $flags = 0)
 	global $STEMMING_RU_VERB1;
 	global $STEMMING_RU_VERB2;
 	global $STEMMING_RU_NOUN;
-	//There is a 33rd letter, ё (?), but it is rarely used, and we assume it is mapped into е (e).
-	$word=str_replace("Ё", "Е", $word);
+	//There is a 33rd letter, С‘ (?), but it is rarely used, and we assume it is mapped into Рµ (e).
+	$word=str_replace("РЃ", "Р•", $word);
 	//Exceptions
 	static $STEMMING_RU_EX = array(
-		"БЕЗЕ"=>true,
-		"БЫЛЬ"=>true,
-		"МЕНЮ"=>true,
-		"ГРАНАТ"=>true,
-		"ГРАНИТ"=>true,
-		"ТЕРМИНАЛ"=>true,
-		"ИЛИ"=>true,
-		"РУКАВ"=>true,
-		"ПРИЕМ"=>true,
+		"Р‘Р•Р—Р•"=>true,
+		"Р‘Р«Р›Р¬"=>true,
+		"РњР•РќР®"=>true,
+		"Р“Р РђРќРђРў"=>true,
+		"Р“Р РђРќР?Рў"=>true,
+		"РўР•Р РњР?РќРђР›"=>true,
+		"Р?Р›Р?"=>true,
+		"Р РЈРљРђР’"=>true,
+		"РџР Р?Р•Рњ"=>true,
 	);
 	if(isset($STEMMING_RU_EX[$word]))
 		return $word;
@@ -112,14 +112,14 @@ function stemming_ru($word, $flags = 0)
 	//http://www.gramma.ru/SPR/?id=2.8
 	if($flags & 1)
 	{
-		if(preg_match("/(ОВ|ЕВ)$/", $word))
+		if(preg_match("/(РћР’|Р•Р’)$/", $word))
 		{
 			return array(
-				stemming_ru($word."А"),
+				stemming_ru($word."Рђ"),
 				stemming_ru($word),
 			);
 		}
-		if(preg_match("/(ОВ|ЕВ)(А|У|ЫМ|Е)$/", $word, $found))
+		if(preg_match("/(РћР’|Р•Р’)(Рђ|РЈ|Р«Рњ|Р•)$/", $word, $found))
 		{
 			return array(
 				stemming_ru($word),
@@ -149,12 +149,12 @@ function stemming_ru($word, $flags = 0)
 	if(preg_match($STEMMING_RU_PERFECTIVE_GERUND, $rv, $found))
 	{
 		switch($found[0]) {
-			case "АВ":
-			case "АВШИ":
-			case "АВШИСЬ":
-			case "ЯВ":
-			case "ЯВШИ":
-			case "ЯВШИСЬ":
+			case "РђР’":
+			case "РђР’РЁР?":
+			case "РђР’РЁР?РЎР¬":
+			case "РЇР’":
+			case "РЇР’РЁР?":
+			case "РЇР’РЁР?РЎР¬":
 				$rv = substr($rv, 0, 1-strlen($found[0]));
 				break;
 			default:
@@ -168,7 +168,7 @@ function stemming_ru($word, $flags = 0)
 	// As soon as one of the endings (1) to (3) is found remove it, and terminate step 1.
 	else
 	{
-		$rv = preg_replace("/(СЯ|СЬ)$/".BX_UTF_PCRE_MODIFIER, "", $rv);
+		$rv = preg_replace("/(РЎРЇ|РЎР¬)$/".BX_UTF_PCRE_MODIFIER, "", $rv);
 		//ADJECTIVAL
 		if(preg_match($STEMMING_RU_ADJECTIVAL1, $rv, $found))
 			$rv = substr($rv, 0, -strlen($found[2]));
@@ -182,12 +182,12 @@ function stemming_ru($word, $flags = 0)
 			$rv = preg_replace($STEMMING_RU_NOUN, "", $rv);
 	}
 
-	//Step 2: If the word ends with и (i), remove it.
-	if(substr($rv, -1) == "И")
+	//Step 2: If the word ends with Рё (i), remove it.
+	if(substr($rv, -1) == "Р?")
 		$rv = substr($rv, 0, -1);
 	//Step 3: Search for a DERIVATIONAL ending in R2 (i.e. the entire ending must lie in R2), and if one is found, remove it.
 	//R1 is the region after the first non-vowel following a vowel, or the end of the word if there is no such non-vowel.
-	if(preg_match("/(ОСТЬ|ОСТ)$/".BX_UTF_PCRE_MODIFIER, $rv))
+	if(preg_match("/(РћРЎРўР¬|РћРЎРў)$/".BX_UTF_PCRE_MODIFIER, $rv))
 	{
 		$R1=0;
 		$rv_len = strlen($rv);
@@ -203,17 +203,17 @@ function stemming_ru($word, $flags = 0)
 			$R2++;
 		if($R2 < $rv_len)
 			$R2++;
-		//"ОСТЬ", "ОСТ"
-		if((substr($rv, -4) == "ОСТЬ") && ($rv_len >= ($R2+4)))
+		//"РћРЎРўР¬", "РћРЎРў"
+		if((substr($rv, -4) == "РћРЎРўР¬") && ($rv_len >= ($R2+4)))
 			$rv = substr($rv, 0, $rv_len - 4);
-		elseif((substr($rv, -3) == "ОСТ") && ($rv_len >= ($R2+3)))
+		elseif((substr($rv, -3) == "РћРЎРў") && ($rv_len >= ($R2+3)))
 			$rv = substr($rv, 0, $rv_len - 3);
 	}
-	//Step 4: (1) Undouble н (n), or, (2) if the word ends with a SUPERLATIVE ending, remove it and undouble н (n), or (3) if the word ends ь (') (soft sign) remove it.
-	$rv = preg_replace("/(ЕЙШЕ|ЕЙШ)$/".BX_UTF_PCRE_MODIFIER, "", $rv);
-	$r = preg_replace("/НН$/".BX_UTF_PCRE_MODIFIER, "Н", $rv);
+	//Step 4: (1) Undouble РЅ (n), or, (2) if the word ends with a SUPERLATIVE ending, remove it and undouble РЅ (n), or (3) if the word ends СЊ (') (soft sign) remove it.
+	$rv = preg_replace("/(Р•Р™РЁР•|Р•Р™РЁ)$/".BX_UTF_PCRE_MODIFIER, "", $rv);
+	$r = preg_replace("/РќРќ$/".BX_UTF_PCRE_MODIFIER, "Рќ", $rv);
 	if($r == $rv)
-		$rv = preg_replace("/Ь$/".BX_UTF_PCRE_MODIFIER, "", $rv);
+		$rv = preg_replace("/Р¬$/".BX_UTF_PCRE_MODIFIER, "", $rv);
 	else
 		$rv = $r;
 

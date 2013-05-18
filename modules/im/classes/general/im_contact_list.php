@@ -586,7 +586,7 @@ class CAllIMContactList
 			$cache_ttl = intval($arParams['CACHE_TTL']);
 			if ($cache_ttl <= 0)
 				$cache_ttl = defined("BX_COMP_MANAGED_CACHE") ? 18144000 : 1800;
-			$cache_id = 'bx_mob_recent_list_'.(is_object($USER)? $USER->GetID(): 'AGENT').'_'.$arFilter['ID'].'_'.$nameTemplate.'_'.$nameTemplateSite.'_'.$getDepartment.'_'.LANGUAGE_ID;
+			$cache_id = 'bx_mob_recent_list2_'.(is_object($USER)? $USER->GetID(): 'AGENT').'_'.$arFilter['ID'].'_'.$nameTemplate.'_'.$nameTemplateSite.'_'.$getDepartment.'_'.LANGUAGE_ID;
 			$cache_dir = '/bx/im/rec';
 
 			if($obCache->InitCache($cache_ttl, $cache_id, $cache_dir))
@@ -655,26 +655,31 @@ class CAllIMContactList
 		if($useCache)
 		{
 			$cacheTag = array();
-			if(defined("BX_COMP_MANAGED_CACHE"))
-			{
-				global $CACHE_MANAGER;
-				$CACHE_MANAGER->StartTagCache($cache_dir);
-				if(is_array($arParams['ID']))
-				{
-					foreach ($arParams['ID'] as $id)
-					{
-						$tag = 'USER_CARD_'.intval($id/100);
-						if(!in_array($tag, $cacheTag))
-						{
-							$cacheTag[] = $tag;
-							$CACHE_MANAGER->RegisterTag($tag);
-						}
-					}
-				}
-				$CACHE_MANAGER->EndTagCache();
-			}
 			if($obCache->StartDataCache())
 			{
+				if(defined("BX_COMP_MANAGED_CACHE"))
+				{
+					global $CACHE_MANAGER;
+					$CACHE_MANAGER->StartTagCache($cache_dir);
+					if(is_array($arParams['ID']))
+					{
+						foreach ($arParams['ID'] as $id)
+						{
+							$tag = 'USER_CARD_'.intval($id/100);
+							if(!in_array($tag, $cacheTag))
+							{
+								$cacheTag[] = $tag;
+								$CACHE_MANAGER->RegisterTag($tag);
+							}
+						}
+					}
+					elseif (isset($arParams['ID']) && intval($arParams['ID']) > 0)
+					{
+						$tag = 'USER_CARD_'.intval($arParams['ID']/100);
+						$CACHE_MANAGER->RegisterTag($tag);
+					}
+					$CACHE_MANAGER->EndTagCache();
+				}
 				$obCache->EndDataCache($result);
 				unset($cacheTag);
 			}
@@ -843,7 +848,6 @@ class CAllIMContactList
 
 	public static function DeleteRecent($entityId, $isChat = false, $userId = false)
 	{
-
 		if (is_array($entityId))
 		{
 			foreach ($entityId as $key => $value)
@@ -1059,7 +1063,20 @@ class CAllIMContactList
 		}
 
 		if (!empty($arRecent))
-			uasort($arRecent, create_function('$a, $b', 'if($a["MESSAGE"]["date"] < $b["MESSAGE"]["date"]) return 1; elseif($a["MESSAGE"]["date"]  > $b["MESSAGE"]["date"]) return -1; else return 0;'));
+		{
+			sortByColumn(
+				$arRecent,
+				array(
+					'COUNTER' => array(SORT_NUMERIC, SORT_DESC),
+					'MESSAGE' => array(SORT_NUMERIC, SORT_DESC)
+				),
+				array(
+					'COUNTER' => function($counter){ return !is_null($counter); },
+					'MESSAGE' => function($recent){ return $recent['date']; }
+				),
+				null, true
+			);
+		}
 
 		return $arRecent;
 	}

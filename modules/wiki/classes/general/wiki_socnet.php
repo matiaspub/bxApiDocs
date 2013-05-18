@@ -1,6 +1,19 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/index.php
+ * @author Bitrix
+ */
 class CWikiSocnet
 {
 	static public $bActive = false;

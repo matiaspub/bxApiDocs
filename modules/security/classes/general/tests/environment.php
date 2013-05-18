@@ -18,11 +18,11 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 			"base_message_key" => "SECURITY_SITE_CHECKER_SESSION",
 			"critical" => CSecurityCriticalLevel::HIGHT
 		),
-		"collectivePhpSession" => array(
-			"method" => "checkCollectivePhpSession",
-			"base_message_key" => "SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
-			"critical" => CSecurityCriticalLevel::HIGHT
-		),
+//		"collectivePhpSession" => array(
+//			"method" => "checkCollectivePhpSession",
+//			"base_message_key" => "SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
+//			"critical" => CSecurityCriticalLevel::HIGHT
+//		),
 		"uploadScriptExecution" => array(
 			"method" => "checkUploadScriptExecution"
 		),
@@ -44,7 +44,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		if(self::isHtaccessOverrided())
 		{
 			$isHtaccessOverrided = true;
-			$this->addUnformattedDetailError($baseMessageKey."_PHP", CSecurityCriticalLevel::LOW);
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_HTACCESS", CSecurityCriticalLevel::LOW);
 		}
 		else
 		{
@@ -56,7 +56,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		if(self::isScriptExecutable("test.php", "<?php echo '{$uniqueString}'; ?>", $uniqueString))
 		{
 			$isPhpExecutable = true;
-			$this->addUnformattedDetailError($baseMessageKey."_PHP_DOUBLE", CSecurityCriticalLevel::LOW);
+			$this->addUnformattedDetailError($baseMessageKey."_PHP", CSecurityCriticalLevel::LOW);
 		}
 		else
 		{
@@ -67,7 +67,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		if(!$isPhpExecutable && self::isScriptExecutable("test.php.any", "<?php echo '{$uniqueString}'; ?>", $uniqueString))
 		{
 			$isPhpDoubleExtensionExecutable = true;
-			$this->addUnformattedDetailError($baseMessageKey."_PY", CSecurityCriticalLevel::LOW);
+			$this->addUnformattedDetailError($baseMessageKey."_PHP_DOUBLE", CSecurityCriticalLevel::LOW);
 		}
 		else
 		{
@@ -78,7 +78,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		if(self::isScriptExecutable("test.py", "print 'Content-type:text/html\r\n\r\n{$uniqueString}'", $uniqueString))
 		{
 			$isPythonCgiExecutable = true;
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_HTACCESS", CSecurityCriticalLevel::LOW);
+			$this->addUnformattedDetailError($baseMessageKey."_PY", CSecurityCriticalLevel::LOW);
 		}
 		else
 		{
@@ -131,13 +131,23 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 	}
 
 	/**
+	 * Return current domain name (in puny code for cyrillic domain)
+	 * @return string
+	 */
+	protected static function getCurrentHost()
+	{
+		$host = $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : 'localhost';
+		return CBXPunycode::ToASCII($host, $arErrors);
+	}
+
+	/**
 	 * Return current site url, e.g. http://localhost:8990
 	 * @return string
 	 */
 	protected static function getCurrentSiteUrl()
 	{
 		$url = $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://';
-		$url .= $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : 'localhost';
+		$url .= self::getCurrentHost();
 		$url .= $_SERVER['SERVER_PORT'] ? ':'.$_SERVER['SERVER_PORT'] : '';
 		return $url;
 	}

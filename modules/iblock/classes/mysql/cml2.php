@@ -156,26 +156,6 @@ class CIBlockXMLFile
 		}
 	}
 
-	
-	/**
-	 * <p>Создает таблицы для загрузки XML.</p> <p><b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае если таблицы создать не удалось функция возвращает
-	 * false.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
-	 * </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php
-	 * @author Bitrix
-	 */
 	public static function CreateTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)
@@ -216,26 +196,6 @@ class CIBlockXMLFile
 
 	return : result of the CDatabase::Query method
 	*/
-	
-	/**
-	 * <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>Если во время создания индексов произойдет ошибка БД, функция
-	 * вернет false.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
-	 * </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php
-	 * @author Bitrix
-	 */
 	public static function IndexTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)

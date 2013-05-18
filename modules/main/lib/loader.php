@@ -240,17 +240,6 @@ final class Loader
 
 	public static function getPersonal($path)
 	{
-		/*$context = Application::getInstance()->getContext();
-		if ($context == null)
-			throw new SystemException("Context is not initialized");
-
-		$server = $context->getServer();
-		if ($server == null)
-			throw new SystemException("Server is not initialized");
-
-		$root = $server->getDocumentRoot();
-		$personal = $server->get("BX_PERSONAL_ROOT");
-		*/
 		$root = Application::getDocumentRoot();
 		$personal = isset($_SERVER["BX_PERSONAL_ROOT"]) ? $_SERVER["BX_PERSONAL_ROOT"] : "";
 

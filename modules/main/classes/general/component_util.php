@@ -141,145 +141,148 @@ class CComponentUtil
 	{
 		$arTree = array();
 		$io = CBXVirtualIo::GetInstance();
+		$folders = array(
+			"/local/components",
+			"/bitrix/components",
+		);
 
-		if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components"))
+		foreach($folders as $componentFolder)
 		{
-			while (($file = readdir($handle)) !== false)
+			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 			{
-				if ($file == "." || $file == "..")
-					continue;
-
-				if (is_dir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file))
+				while (($file = readdir($handle)) !== false)
 				{
-					if (CComponentUtil::isComponent("/bitrix/components/".$file))
+					if ($file == "." || $file == "..")
+						continue;
+
+					if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
 					{
-						// It's component
-						if ($filterNamespace !== False && strlen($filterNamespace) > 0)
-							continue;
-						if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file, $arNameFilter))
-							continue;
-
-						if (file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file."/.description.php"))
+						if (CComponentUtil::isComponent($componentFolder."/".$file))
 						{
-							CComponentUtil::__IncludeLang("/bitrix/components/".$file, ".description.php");
+							// It's component
+							if ($filterNamespace !== False && strlen($filterNamespace) > 0)
+								continue;
+							if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file, $arNameFilter))
+								continue;
 
-							$arComponentDescription = array();
-							$componentName = $file;
-							include($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file."/.description.php");
-
-							if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
+							if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php"))
 							{
-								$arComponent = array();
-								$arComponent["NAME"] = $file;
-								$arComponent["NAMESPACE"] = "";
-								$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
-								$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+								CComponentUtil::__IncludeLang($componentFolder."/".$file, ".description.php");
 
-								if (array_key_exists("ICON", $arComponentDescription))
+								$arComponentDescription = array();
+								include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php");
+
+								if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 								{
-									//$arComponent["ICON"] = "/bitrix/components/".$file.$arComponentDescription["ICON"];
-									$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
-									if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath("/bitrix/components/".$file."/".$arComponentDescription["ICON"])))
-										$arComponent["ICON"] = "/bitrix/components/".$file."/".$arComponentDescription["ICON"];
+									$arComponent = array();
+									$arComponent["NAME"] = $file;
+									$arComponent["NAMESPACE"] = "";
+									$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
+									$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+
+									if (array_key_exists("ICON", $arComponentDescription))
+									{
+										$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
+										if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$arComponentDescription["ICON"])))
+											$arComponent["ICON"] = $componentFolder."/".$file."/".$arComponentDescription["ICON"];
+										else
+											$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+									}
+									if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
+										$arComponent["COMPLEX"] = "Y";
 									else
-										$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+										$arComponent["COMPLEX"] = "N";
+									$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
+									if ($arComponent["SORT"] <= 0)
+										$arComponent["SORT"] = 100;
+
+									$arComponent["SCREENSHOT"] = array();
+									if (array_key_exists("SCREENSHOT", $arComponentDescription))
+									{
+										if (!is_array($arComponentDescription["SCREENSHOT"]))
+											$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
+
+										for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
+											$arComponent["SCREENSHOT"][] = $componentFolder."/".$file.$arComponentDescription["SCREENSHOT"][$i];
+									}
+
+									CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 								}
-								if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
-									$arComponent["COMPLEX"] = "Y";
-								else
-									$arComponent["COMPLEX"] = "N";
-								$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
-								if ($arComponent["SORT"] <= 0)
-									$arComponent["SORT"] = 100;
-
-								$arComponent["SCREENSHOT"] = array();
-								if (array_key_exists("SCREENSHOT", $arComponentDescription))
-								{
-									if (!is_array($arComponentDescription["SCREENSHOT"]))
-										$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
-
-									for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
-										$arComponent["SCREENSHOT"][] = "/bitrix/components/".$file.$arComponentDescription["SCREENSHOT"][$i];
-								}
-
-								CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 							}
 						}
-					}
-					else
-					{
-						// It's not a component
-						if ($filterNamespace !== False && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
-							continue;
-
-						if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file))
+						else
 						{
-							while (($file1 = readdir($handle1)) !== false)
+							// It's not a component
+							if ($filterNamespace !== False && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
+								continue;
+
+							if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
 							{
-								if ($file1 == "." || $file1 == "..")
-									continue;
-
-								if (is_dir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file."/".$file1))
+								while (($file1 = readdir($handle1)) !== false)
 								{
-									if (CComponentUtil::isComponent("/bitrix/components/".$file."/".$file1))
+									if ($file1 == "." || $file1 == "..")
+										continue;
+
+									if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1))
 									{
-										if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
-											continue;
-										// It's component
-										if (file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file."/".$file1."/.description.php"))
+										if (CComponentUtil::isComponent($componentFolder."/".$file."/".$file1))
 										{
-											CComponentUtil::__IncludeLang("/bitrix/components/".$file."/".$file1, ".description.php");
-
-											$arComponentDescription = array();
-											$componentName = $file.":".$file1;
-											include($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file."/".$file1."/.description.php");
-
-											if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
+											if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
+												continue;
+											// It's component
+											if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php"))
 											{
-												$arComponent = array();
-												$arComponent["NAME"] = $file.":".$file1;
-												$arComponent["NAMESPACE"] = $file;
-												$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
-												$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
-												if (array_key_exists("ICON", $arComponentDescription))
+												CComponentUtil::__IncludeLang($componentFolder."/".$file."/".$file1, ".description.php");
+
+												$arComponentDescription = array();
+												include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php");
+
+												if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 												{
-													$arComponent["ICON"] = "/bitrix/components/".$file."/".$file1.$arComponentDescription["ICON"];
-													$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
-													if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath("/bitrix/components/".$file."/".$file1."/".$arComponentDescription["ICON"])))
-														$arComponent["ICON"] = "/bitrix/components/".$file."/".$file1."/".$arComponentDescription["ICON"];
+													$arComponent = array();
+													$arComponent["NAME"] = $file.":".$file1;
+													$arComponent["NAMESPACE"] = $file;
+													$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
+													$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+													if (array_key_exists("ICON", $arComponentDescription))
+													{
+														$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
+														if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"])))
+															$arComponent["ICON"] = $componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"];
+														else
+															$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+													}
+													if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
+														$arComponent["COMPLEX"] = "Y";
 													else
-														$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+														$arComponent["COMPLEX"] = "N";
+													$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
+													if ($arComponent["SORT"] <= 0)
+														$arComponent["SORT"] = 100;
+
+													$arComponent["SCREENSHOT"] = array();
+													if (array_key_exists("SCREENSHOT", $arComponentDescription))
+													{
+														if (!is_array($arComponentDescription["SCREENSHOT"]))
+															$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
+
+														for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
+															$arComponent["SCREENSHOT"][] = $componentFolder."/".$file."/".$file1.$arComponentDescription["SCREENSHOT"][$i];
+													}
+
+													CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 												}
-												if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
-													$arComponent["COMPLEX"] = "Y";
-												else
-													$arComponent["COMPLEX"] = "N";
-												$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
-												if ($arComponent["SORT"] <= 0)
-													$arComponent["SORT"] = 100;
-
-												$arComponent["SCREENSHOT"] = array();
-												if (array_key_exists("SCREENSHOT", $arComponentDescription))
-												{
-													if (!is_array($arComponentDescription["SCREENSHOT"]))
-														$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
-
-													for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
-														$arComponent["SCREENSHOT"][] = "/bitrix/components/".$file."/".$file1.$arComponentDescription["SCREENSHOT"][$i];
-												}
-
-												CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 											}
 										}
 									}
 								}
+								@closedir($handle1);
 							}
-							@closedir($handle1);
 						}
 					}
 				}
+				@closedir($handle);
 			}
-			@closedir($handle);
 		}
 
 		return $arTree;
@@ -340,22 +343,33 @@ class CComponentUtil
 	public static function GetNamespaceList()
 	{
 		$arNamespaces = array();
+		$folders = array(
+			"/local/components",
+			"/bitrix/components",
+		);
 
-		if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components"))
+		foreach($folders as $componentFolder)
 		{
-			while (($file = readdir($handle)) !== false)
+			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 			{
-				if ($file == "." || $file == "..")
-					continue;
+				while (($file = readdir($handle)) !== false)
+				{
+					if ($file == "." || $file == "..")
+						continue;
 
-				if (is_dir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$file)
-					&& !CComponentUtil::isComponent("/bitrix/components/".$file))
-					$arNamespaces[] = $file;
+					if (
+						is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file)
+						&& !CComponentUtil::isComponent($componentFolder."/".$file)
+					)
+					{
+						$arNamespaces[] = $file;
+					}
+				}
+				@closedir($handle);
 			}
-			@closedir($handle);
 		}
 
-		return $arNamespaces;
+		return array_unique($arNamespaces);
 	}
 
 	public static function GetComponentDescr($componentName)
@@ -380,7 +394,7 @@ class CComponentUtil
 			}
 			else
 			{
-				$componentPath = "/bitrix/components".$path2Comp;
+				$componentPath = getLocalPath("components".$path2Comp);
 				if(CComponentUtil::isComponent($componentPath))
 				{
 					$arComponentDescription = array();
@@ -423,7 +437,7 @@ class CComponentUtil
 		if (strlen($path2Comp) <= 0)
 			return False;
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 		if(!CComponentUtil::isComponent($componentPath))
 		{
 			return False;
@@ -769,48 +783,44 @@ class CComponentUtil
 		if (strlen($path2Comp) <= 0)
 			return $arTemplateParameters;
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 
 		if (!CComponentUtil::isComponent($componentPath))
 		{
 			return $arTemplateParameters;
 		}
 
-		if ($siteTemplate && strlen($siteTemplate) > 0)
+		if ($siteTemplate <> "")
 		{
 			$siteTemplate = _normalizePath($siteTemplate);
-			if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName))
+		}
+
+		$folders = array();
+		if ($siteTemplate <> "")
+		{
+			$folders[] = "/local/templates/".$siteTemplate."/components".$path2Comp."/".$templateName;
+		}
+		$folders[] = "/local/templates/.default/components".$path2Comp."/".$templateName;
+		$folders[] = "/local/components".$path2Comp."/templates/".$templateName;
+
+		if ($siteTemplate <> "")
+		{
+			$folders[] = BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName;
+		}
+		$folders[] = BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName;
+		$folders[] = "/bitrix/components".$path2Comp."/templates/".$templateName;
+
+		foreach($folders as $templateFolder)
+		{
+			if (file_exists($_SERVER["DOCUMENT_ROOT"].$templateFolder))
 			{
-				if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName)
-					&& file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName."/.parameters.php"))
+				if (file_exists($_SERVER["DOCUMENT_ROOT"].$templateFolder."/.parameters.php"))
 				{
-					CComponentUtil::__IncludeLang(BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName, ".parameters.php");
-					include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName."/.parameters.php");
+					CComponentUtil::__IncludeLang($templateFolder, ".parameters.php");
+					include($_SERVER["DOCUMENT_ROOT"].$templateFolder."/.parameters.php");
 				}
 				return $arTemplateParameters;
 			}
-		}
-
-		if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName))
-		{
-			if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName)
-				&& file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName."/.parameters.php"))
-			{
-				CComponentUtil::__IncludeLang(BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName, ".parameters.php");
-				include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$templateName."/.parameters.php");
-			}
-			return $arTemplateParameters;
-		}
-
-		if (file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/components".$path2Comp."/templates/".$templateName))
-		{
-			if (is_dir($_SERVER["DOCUMENT_ROOT"]."/bitrix/components".$path2Comp."/templates/".$templateName)
-				&& file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/components".$path2Comp."/templates/".$templateName."/.parameters.php"))
-			{
-				CComponentUtil::__IncludeLang("/bitrix/components".$path2Comp."/templates/".$templateName, ".parameters.php");
-				include($_SERVER["DOCUMENT_ROOT"]."/bitrix/components".$path2Comp."/templates/".$templateName."/.parameters.php");
-			}
-			return $arTemplateParameters;
 		}
 
 		return $arTemplateParameters;
@@ -828,146 +838,91 @@ class CComponentUtil
 		if (strlen($path2Comp) <= 0)
 			return $arTemplatesList;
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 
 		if (!CComponentUtil::isComponent($componentPath))
 		{
 			return $arTemplatesList;
 		}
 
+		$templateFolders = array();
 		$arExists = array();
+		$folders = array(
+			"/local/templates",
+			BX_PERSONAL_ROOT."/templates",
+		);
 
-		if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates"))
+		foreach($folders as $folder)
 		{
-			while (($file = readdir($handle)) !== false)
+			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$folder))
 			{
-				if ($file == "." || $file == "..")
-					continue;
-
-				if ($currentTemplate !== False && $currentTemplate != $file || $file == ".default")
-					continue;
-
-				if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file))
+				while (($file = readdir($handle)) !== false)
 				{
-					if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components"))
+					if ($file == "." || $file == "..")
+						continue;
+
+					if ($currentTemplate !== false && $currentTemplate != $file || $file == ".default")
+						continue;
+
+					if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/".$file."/components".$path2Comp))
 					{
-						if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp))
-						{
-							if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp))
-							{
-								while (($file1 = readdir($handle1)) !== false)
-								{
-									if ($file1 == "." || $file1 == "..")
-										continue;
-
-									$arTemplate = array(
-										"NAME" => $file1,
-										"TEMPLATE" => $file
-									);
-
-									if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp."/".$file1))
-									{
-										if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp."/".$file1."/.description.php"))
-										{
-											CComponentUtil::__IncludeLang(BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp."/".$file1, ".description.php");
-
-											$arTemplateDescription = array();
-											include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$file."/components".$path2Comp."/".$file1."/.description.php");
-
-											$arTemplate["TITLE"] = $arTemplateDescription["NAME"];
-											$arTemplate["DESCRIPTION"] = $arTemplateDescription["DESCRIPTION"];
-										}
-									}
-
-									$arTemplatesList[] = $arTemplate;
-									$arExists[] = $arTemplate["NAME"];
-								}
-								@closedir($handle1);
-							}
-						}
+						$templateFolders[] = array(
+							"path" => $folder."/".$file."/components".$path2Comp,
+							"template" => $file,
+						);
 					}
 				}
-			}
-			@closedir($handle);
-		}
+				@closedir($handle);
 
-		if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default"))
-		{
-			if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components"))
-			{
-				if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp))
+				if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/.default/components".$path2Comp))
 				{
-					if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp))
-					{
-						while (($file1 = readdir($handle1)) !== false)
-						{
-							if ($file1 == "." || $file1 == "..")
-								continue;
-
-							if (in_array($file1, $arExists))
-								continue;
-
-							$arTemplate = array(
-								"NAME" => $file1,
-								"TEMPLATE" => ".default"
-							);
-
-							if (is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$file1))
-							{
-								if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$file1."/.description.php"))
-								{
-									CComponentUtil::__IncludeLang(BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$file1, ".description.php");
-
-									$arTemplateDescription = array();
-									include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/.default/components".$path2Comp."/".$file1."/.description.php");
-
-									$arTemplate["TITLE"] = $arTemplateDescription["NAME"];
-									$arTemplate["DESCRIPTION"] = $arTemplateDescription["DESCRIPTION"];
-								}
-							}
-
-							$arTemplatesList[] = $arTemplate;
-							$arExists[] = $arTemplate["NAME"];
-						}
-						@closedir($handle1);
-					}
+					$templateFolders[] = array(
+						"path" => $folder."/.default/components".$path2Comp,
+						"template" => ".default",
+					);
 				}
 			}
 		}
 
-		if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].$componentPath."/templates"))
+		$templateFolders[] = array(
+			"path" => $componentPath."/templates",
+			"template" => "",
+		);
+
+		foreach($templateFolders as $templateFolder)
 		{
-			while (($file1 = readdir($handle1)) !== false)
+			$templateFolderPath = $templateFolder["path"];
+			if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].$templateFolderPath))
 			{
-				if ($file1 == "." || $file1 == "..")
-					continue;
-
-				if (in_array($file1, $arExists))
-					continue;
-
-				$arTemplate = array(
-					"NAME" => $file1,
-					"TEMPLATE" => ""
-				);
-
-				if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentPath."/templates/".$file1))
+				while (($file1 = readdir($handle1)) !== false)
 				{
-					if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentPath."/templates/".$file1."/.description.php"))
+					if ($file1 == "." || $file1 == "..")
+						continue;
+
+					if (in_array($file1, $arExists))
+						continue;
+
+					$arTemplate = array(
+						"NAME" => $file1,
+						"TEMPLATE" => $templateFolder["template"],
+					);
+
+					if (file_exists($_SERVER["DOCUMENT_ROOT"].$templateFolderPath."/".$file1."/.description.php"))
 					{
-						CComponentUtil::__IncludeLang($componentPath."/templates/".$file1, ".description.php");
+						CComponentUtil::__IncludeLang($templateFolderPath."/".$file1, ".description.php");
 
 						$arTemplateDescription = array();
-						include($_SERVER["DOCUMENT_ROOT"].$componentPath."/templates/".$file1."/.description.php");
+						include($_SERVER["DOCUMENT_ROOT"].$templateFolderPath."/".$file1."/.description.php");
 
 						$arTemplate["TITLE"] = $arTemplateDescription["NAME"];
 						$arTemplate["DESCRIPTION"] = $arTemplateDescription["DESCRIPTION"];
 					}
-				}
 
-				$arTemplatesList[] = $arTemplate;
-				$arExists[] = $arTemplate["NAME"];
+					$arTemplatesList[] = $arTemplate;
+					$arExists[] = $arTemplate["NAME"];
+				}
+				@closedir($handle1);
 			}
-			@closedir($handle1);
 		}
 
 		return $arTemplatesList;
@@ -975,6 +930,7 @@ class CComponentUtil
 
 	public static function CopyComponent($componentName, $newNamespace, $newName = False, $bRewrite = False)
 	{
+		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
 		$componentName = trim($componentName);
@@ -991,7 +947,7 @@ class CComponentUtil
 			return false;
 		}
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 
 		if (!CComponentUtil::isComponent($componentPath))
 		{
@@ -1024,10 +980,10 @@ class CComponentUtil
 
 		$namespace = "";
 		$name = $componentName;
-		if (($pos = StrPos($componentName, ":")) !== False)
+		if (($pos = strpos($componentName, ":")) !== False)
 		{
-			$namespace = SubStr($componentName, 0, $pos);
-			$name = SubStr($componentName, $pos + 1);
+			$namespace = substr($componentName, 0, $pos);
+			$name = substr($componentName, $pos + 1);
 		}
 
 		if ($namespace == $newNamespace
@@ -1049,7 +1005,7 @@ class CComponentUtil
 			return false;
 		}
 
-		$componentPathNew = "/bitrix/components".$path2CompNew;
+		$componentPathNew = getLocalPath("components".$path2CompNew);
 
 		if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentPathNew))
 		{
@@ -1089,7 +1045,7 @@ class CComponentUtil
 			return false;
 		}
 
-		$componentPath = "/bitrix/components".$path2Comp;
+		$componentPath = getLocalPath("components".$path2Comp);
 
 		if (!CComponentUtil::isComponent($componentPath))
 		{
@@ -1108,24 +1064,24 @@ class CComponentUtil
 		}
 
 		if (strlen($siteTemplate) <= 0)
-			$siteTemplate = False;
+			$siteTemplate = false;
 
-		if ($siteTemplate != False)
+		if ($siteTemplate != false)
 		{
-			if (!file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate)
-				|| !is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$siteTemplate))
+			$siteTemplateDir = getLocalPath("templates/".$siteTemplate, BX_PERSONAL_ROOT);
+			if ($siteTemplateDir === false || !is_dir($_SERVER["DOCUMENT_ROOT"].$siteTemplateDir))
 			{
 				$APPLICATION->ThrowException(str_replace("#NAME#", $siteTemplate, GetMessage("comp_util_err8")), "ERROR_NO_SITE_TEMPL");
 				return false;
 			}
 		}
 
-		if ($siteTemplate != False)
-			$path = BX_PERSONAL_ROOT."/templates/".$siteTemplate."/components".$path2Comp."/".$templateName;
+		if ($siteTemplate != false)
+			$path = getLocalPath("templates/".$siteTemplate."/components".$path2Comp."/".$templateName, BX_PERSONAL_ROOT);
 		else
-			$path = "/bitrix/components".$path2Comp."/templates/".$templateName;
+			$path = getLocalPath("components".$path2Comp."/templates/".$templateName);
 
-		if (!file_exists($_SERVER["DOCUMENT_ROOT"].$path))
+		if ($path === false || !file_exists($_SERVER["DOCUMENT_ROOT"].$path))
 		{
 			$APPLICATION->ThrowException(str_replace("#C_NAME#", $componentName, str_replace("#T_NAME#", $templateName, GetMessage("comp_util_err9"))), "ERROR_NO_TEMPL");
 			return false;
@@ -1137,22 +1093,22 @@ class CComponentUtil
 			return false;
 		}
 
-		if (!file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$newSiteTemplate)
-			|| !is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$newSiteTemplate))
+		$newSiteTemplateDir = getLocalPath("templates/".$newSiteTemplate, BX_PERSONAL_ROOT);
+		if ($newSiteTemplateDir === false || !is_dir($_SERVER["DOCUMENT_ROOT"].$newSiteTemplateDir))
 		{
 			$APPLICATION->ThrowException(str_replace("#NAME#", $newSiteTemplate, GetMessage("comp_util_err8")), "ERROR_NO_SITE_TEMPL");
 			return false;
 		}
 
-		if ($siteTemplate !== False
+		if ($siteTemplate !== false
 			&& $siteTemplate == $newSiteTemplate
-			&& ($newName === False || $newName !== False && $templateName == $newName))
+			&& ($newName === false || $newName !== false && $templateName == $newName))
 		{
 			$APPLICATION->ThrowException(GetMessage("comp_util_err11"), "ERROR_DUPL1");
 			return false;
 		}
 
-		if ($newName !== False)
+		if ($newName !== false)
 			$templateNameNew = $newName;
 		else
 			$templateNameNew = $templateName;
@@ -1164,7 +1120,7 @@ class CComponentUtil
 			return false;
 		}
 
-		$pathNew = BX_PERSONAL_ROOT."/templates/".$newSiteTemplate."/components".$path2Comp."/".$templateNameNew;
+		$pathNew = $newSiteTemplateDir."/components".$path2Comp."/".$templateNameNew;
 
 		if (file_exists($_SERVER["DOCUMENT_ROOT"].$pathNew))
 		{

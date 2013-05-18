@@ -9,6 +9,7 @@ namespace Bitrix\Main;
 
 use \Bitrix\Main\IO;
 use \Bitrix\Main\Security;
+use Bitrix\Main\Web\Uri;
 
 /**
  * Http application extends application. Contains http specific methods.
@@ -129,7 +130,11 @@ class HttpApplication extends Application
 				if (($p = strpos($uri, "/", $p + strlen($marker))) !== false)
 				{
 					if ($requestUri == '' || $requestUri == '/404.php' || strpos($requestUri, $marker) !== false)
-						$requestUri = substr($uri, $p);
+					{
+						$requestUriTmp = substr($uri, $p);
+						if (!Uri::isPathTraversalUri($requestUriTmp))
+							$requestUri = $requestUriTmp;
+					}
 					$redirectStatus = '404';
 					$queryString = '';
 					break;
@@ -144,7 +149,10 @@ class HttpApplication extends Application
 		if ($redirectStatus == '404' || $sefApplicationCurPageUrl != null)
 		{
 			if ($redirectStatus != '404')
-				$requestUri = $sefApplicationCurPageUrl;
+			{
+				if (!Uri::isPathTraversalUri($sefApplicationCurPageUrl))
+					$requestUri = $sefApplicationCurPageUrl;
+			}
 
 			if (($pos = strpos($requestUri, "?")) !== false)
 				$queryString = substr($requestUri, $pos + 1);

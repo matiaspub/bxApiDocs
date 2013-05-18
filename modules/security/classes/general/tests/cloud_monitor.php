@@ -3,9 +3,8 @@
 class CSecurityCloudMonitorTest extends CSecurityBaseTest
 {
 	const DEFAULT_RECEIVE_RESULTS_TIME = 15;
-	const MAX_CHECKING_REQUEST_REPEATE_COUNT = 1;
+	const MAX_CHECKING_REQUEST_REPEATE_COUNT = 5;
 	const MAX_RESULTS_REQUEST_REPEATE_COUNT = 50;
-//	const PERCENT_PER_STEP = 10;
 
 	protected $internalName = "CloudMonitor";
 	/** @var CSecurityTemporaryStorage */
@@ -146,7 +145,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	}
 
 	/**
-	 * @param $pToken
+	 * @param string $pToken
 	 */
 	protected function setCheckingToken($pToken)
 	{
@@ -165,7 +164,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	}
 
 	/**
-	 * @param $pTimeOut
+	 * @param int $pTimeOut
 	 */
 	protected function setTimeOut($pTimeOut)
 	{
@@ -176,7 +175,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	}
 
 	/**
-	 * @param $pResult
+	 * @param array $pResult
 	 */
 	protected function setCheckingResult($pResult)
 	{
@@ -194,7 +193,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 
 	/**
 	 * Format test results for checking output
-	 * @param $pResults
+	 * @param array $pResults
 	 * @return array
 	 */
 	protected static function formatResults($pResults)

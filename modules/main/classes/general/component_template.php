@@ -357,20 +357,27 @@ class CBitrixComponentTemplate
 		$arFolders = array();
 		$relativePath = $this->__component->GetRelativePath();
 
+		$parentRelativePath = "";
+		$parentTemplateName = "";
 		$parentComponent = & $this->__component->GetParent();
 		if ($parentComponent)
 		{
 			$parentRelativePath = $parentComponent->GetRelativePath();
 			$parentTemplateName = $parentComponent->GetTemplate()->GetName();
 
+			$arFolders[] = "/local/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
+			$arFolders[] = "/local/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
+			$arFolders[] = "/local/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath;
+		}
+		$arFolders[] = "/local/templates/".$this->__siteTemplate."/components".$relativePath;
+		$arFolders[] = "/local/templates/.default/components".$relativePath;
+		$arFolders[] = "/local/components".$relativePath."/templates";
+
+		if ($parentComponent)
+		{
 			$arFolders[] = BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
 			$arFolders[] = BX_PERSONAL_ROOT."/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
 			$arFolders[] = "/bitrix/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath;
-		}
-		else
-		{
-			$parentRelativePath = "";
-			$parentTemplateName = "";
 		}
 		$arFolders[] = BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$relativePath;
 		$arFolders[] = BX_PERSONAL_ROOT."/templates/.default/components".$relativePath;

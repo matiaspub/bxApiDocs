@@ -34,9 +34,9 @@ class CSecurityEvent
 
 	private function __construct()
 	{
-		$this->initializeDBEngine(COption::GetOptionString("security", "security_event_db_active") == "Y");
-		$this->initializeSyslogEngine(COption::GetOptionString("security", "security_event_syslog_active") == "Y");
-		$this->initializeFileEngine(COption::GetOptionString("security", "security_event_file_active") == "Y");
+		$this->initializeDBEngine(COption::getOptionString("security", "security_event_db_active") == "Y");
+		$this->initializeSyslogEngine(COption::getOptionString("security", "security_event_syslog_active") == "Y");
+		$this->initializeFileEngine(COption::getOptionString("security", "security_event_file_active") == "Y");
 	}
 
 	/**
@@ -47,8 +47,8 @@ class CSecurityEvent
 		if($pActive)
 		{
 			$this->isFileEngineActive = true;
-			$this->filePath = COption::GetOptionString("security", "security_event_file_path");
-			if(COption::GetOptionString("security", "security_event_collect_user_info") == "Y")
+			$this->filePath = COption::getOptionString("security", "security_event_file_path");
+			if(COption::getOptionString("security", "security_event_collect_user_info") == "Y")
 				$this->isUserInfoNeeded = true;
 			else
 				$this->isUserInfoNeeded = false;
@@ -85,9 +85,9 @@ class CSecurityEvent
 			if(self::isRunOnWin())
 				$this->syslogFacility = LOG_USER;
 			else
-				$this->syslogFacility = COption::GetOptionString("security", "security_event_syslog_facility");
-			$this->syslogPriority = COption::GetOptionString("security", "security_event_syslog_priority");
-			if(COption::GetOptionString("security", "security_event_collect_user_info") == "Y")
+				$this->syslogFacility = COption::getOptionString("security", "security_event_syslog_facility");
+			$this->syslogPriority = COption::getOptionString("security", "security_event_syslog_priority");
+			if(COption::getOptionString("security", "security_event_collect_user_info") == "Y")
 				$this->isUserInfoNeeded = true;
 			else
 				$this->isUserInfoNeeded = false;
@@ -123,7 +123,7 @@ class CSecurityEvent
 		$savedInDB = $savedInFile = $savedInSyslog = false;
 		if($this->isDBEngineActive)
 		{
-			$savedInDB = CEventLog::Log($pSeverity, $pAuditType, "security", $pItemName, $pItemDescription);
+			$savedInDB = CEventLog::log($pSeverity, $pAuditType, "security", $pItemName, $pItemDescription);
 		}
 		if($this->isSyslogEngineActive)
 		{
@@ -168,27 +168,27 @@ class CSecurityEvent
 		if(!$this->isDBEngineActive)
 			return 0;
 
-		global $DB;
-		$err_mess = "FILE: ".__FILE__."<br>LINE: ";
-
+		/**
+		 * @global CCacheManager $CACHE_MANAGER
+		 * @global CDataBase $DB
+		 */
+		global $DB, $CACHE_MANAGER;
 		$ttl = 3600;
-		$cache_id = 'sec_events_count';
-		$obCache = new CPHPCache;
-		$cache_dir = '/bx/sec_events_count';
-		$result = 0;
-
-		if($obCache->InitCache($ttl, $cache_id, $cache_dir))
+		$cacheId = 'sec_events_count';
+		$cacheDir = '/security/events';
+		
+		if($CACHE_MANAGER->read($ttl, $cacheId, $cacheDir))
 		{
-			$result = $obCache->GetVars();
+			$result = $CACHE_MANAGER->get($cacheId);
 		}
 		else
 		{
 			if(strlen($pTimestamp) <= 0)
 			{
-				$days = COption::GetOptionInt("main", "event_log_cleanup_days", 7);
+				$days = COption::getOptionInt("main", "event_log_cleanup_days", 7);
 				if($days > 7)
 					$days = 7;
-				$pTimestamp = ConvertTimeStamp(time()-$days*24*3600+CTimeZone::GetOffset());
+				$pTimestamp = convertTimeStamp(time()-$days*24*3600+CTimeZone::getOffset());
 			}
 
 			$arAudits = array(
@@ -209,18 +209,17 @@ class CSecurityEvent
 				AND
 					(MODULE_ID = 'security' and MODULE_ID is not null)
 				AND
-					TIMESTAMP_X >= ".$DB->CharToDateFunction($DB->ForSQL($pTimestamp))."
+					TIMESTAMP_X >= ".$DB->charToDateFunction($DB->forSQL($pTimestamp))."
 			";
 
-			$res = $DB->Query($strSql, false, $err_mess.__LINE__);
+			$res = $DB->query($strSql, false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 
-			if($arRes = $res->Fetch())
+			if($arRes = $res->fetch())
 				$result = $arRes["COUNT"];
 			else
 				$result = 0;
 
-			if($obCache->StartDataCache())
-				$obCache->EndDataCache($result);
+			$CACHE_MANAGER->set($cacheId, $result);
 		}
 
 		return $result;

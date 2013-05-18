@@ -6,261 +6,435 @@
  */
 class _CEventsCatalog {
 	/**
-	 * OnBeforePriceAdd - событие, вызываемое перед добавлением новой цены товара. На вход получает ссылку на массив полей цены (см. <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/add.php">CPrice::Add </a>). На вход получает ID цены и ссылку на массив полей.
-	 *
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив параметров ценового предложения.
-	 * Допустимые параметры: <ul> <li> <b>PRODUCT_ID </b> - код товара;</li> <li> <b>EXTRA_ID</b> -
-	 * код наценки;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li> <b>PRICE</b> -
-	 * цена;</li> <li> <b>CURRENCY</b> - валюта цены;</li> <li> <b>QUANTITY_FROM</b> - количество
-	 * товара, начиная с приобретения которого действует эта цена;</li> <li>
-	 * <b>QUANTITY_TO</b> - количество товара, при приобретении которого
-	 * заканчивает действие эта цена. <p class="note">Если необходимо, чтобы
-	 * значения параметров <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы,
-	 * необходимо указать у них в качестве значения false либо не задавать
-	 * поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в измененном массиве. </p> </li> </ul> Если
-	 * установлен код наценки, то появляется возможность автоматически
-	 * пересчитывать эту цену при изменении базовой цены или процента
-	 * наценки.
-	 *
-	 *
-	 *
-	 * @return OnBeforePriceAdd 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/add.php">CPrice::Add </a><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceadd.php
-	 * @author Bitrix
+	 * перед добавлением купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>
 	 */
-	public static function OnBeforePriceAdd(&$arFields){}
+	public static function OnBeforeCouponAdd(){}
 
 	/**
-	 * <b>OnBeforePriceDelete</b> - событие, вызываемое перед удалением существующей цены товара в методе CPrice::Delete(). На вход получает ID цены товара (см. <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete </a>). Если обработчик возвращает false, удаление будет отменено.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  код цены товара (ценового предложения)
-	 *
-	 *
-	 *
-	 * @return OnBeforePriceDelete <ul> <li> <i>true</i>, если удаление разрешено </li> <li> <i>false</i>, если удаление
-	 * запрещено </li> </ul>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete </a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepricedelete.php
-	 * @author Bitrix
+	 * перед удалением купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountCoupon::Delete
 	 */
-	public static function OnBeforePriceDelete($ID){}
+	public static function OnBeforeCouponDelete(){}
 
 	/**
-	 * OnBeforePriceUpdate - событие, вызываемое перед обновлением существующей цены. На входе получает ID цены и ссылку на массив полей. Может вернуть false, если нужно воспрепятствовать обновлению. В противном случае нужно вернуть значение true.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Ассоциативный массив параметров ценового предложения.
-	 * Допустимые параметры: <ul> <li> <b>PRODUCT_ID </b> - код товара;</li> <li> <b>EXTRA_ID</b> -
-	 * код наценки;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li> <b>PRICE</b> -
-	 * цена;</li> <li> <b>CURRENCY</b> - валюта цены;</li> <li> <b>QUANTITY_FROM</b> - количество
-	 * товара, начиная с приобретения которого действует эта цена;</li> <li>
-	 * <b>QUANTITY_TO</b> - количество товара, при приобретении которого
-	 * заканчивает действие эта цена. <p class="note">Если необходимо, чтобы
-	 * значения параметров <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы,
-	 * необходимо указать у них в качестве значения false либо не задавать
-	 * поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в измененном массиве. </p> </li> </ul> Если
-	 * установлен код наценки, то появляется возможность автоматически
-	 * пересчитывать эту цену при изменении базовой цены или процента
-	 * наценки.
-	 *
-	 *
-	 *
-	 * @param array &$arFields  
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/update.php">CPrice::Update</a><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php
-	 * @author Bitrix
+	 * перед изменением купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountCoupon::Update
 	 */
-	public static function OnBeforePriceUpdate($ID, &$arFields){}
+	public static function OnBeforeCouponUpdate(){}
 
 	/**
-	 * <p>Событие вызывается перед добавлением товара и перед проверкой полей.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив, ключами которого являются названия
-	 * параметров товара, а значениями - новые значения параметров.<br>
-	 * Допустимые ключи: <ul> <li> <b>ID</b> - код товара (элемента каталога -
-	 * обязательный);</li> <li> <b>QUANTITY</b> - количество товара на складе;</li> <li>
-	 * <b>QUANTITY_TRACE</b> - флаг (Y/N) "уменьшать ли количество при заказе";</li> <li>
-	 * <b>WEIGHT</b> - вес единицы товара;</li> <li> <b>PRICE_TYPE</b> - тип цены (S -
-	 * одноразовый платеж, R - регулярные платежи, T - пробная подписка;)</li>
-	 * <li> <b>RECUR_SCHEME_TYPE</b> - тип периода подписки ("H" - час, "D" - сутки, "W" -
-	 * неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год);</li> <li>
-	 * <b>RECUR_SCHEME_LENGTH</b> - длина периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код
-	 * товара, для которого данный товар является пробным;</li> <li>
-	 * <b>WITHOUT_ORDER</b> - флаг "Продление подписки без оформления заказа";</li>
-	 * <li> <b>VAT_ID</b> - код НДС;</li> <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в
-	 * цену.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>false</i> при отказе, возвращает <i>true</i> при успешном
-	 * разрешении на добавление. Тип данных, возвращаемых функцией -
-	 * <i>boolean</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * AddEventHandler("catalog", "OnBeforeProductAdd", Array("My_Class", "OnBeforeProductAdd"));   
-	 *   
-	 * class My_Class  
-	 * {
-	 *   function OnBeforeProductAdd(&amp;$arFields)
-	 *   { 
-	 *     $arFields["QUANTITY_TRACE"] = "Y"; 
-	 *     return true;
-	 *   }
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductadd.php
-	 * @author Bitrix
+	 * перед удалением скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.delete.php">CCatalogDiscount::Delete</a>
 	 */
-	public static function OnBeforeProductAdd(&$arFields){}
+	public static function OnBeforeDiscountDelete(){}
 
 	/**
-	 * <b>OnBeforeProductPriceDelete</b> - событие, вызываемое перед удалением существующих цен товара в методе CPrice::DeleteByProduct(). На вход получает ID товара и массив ID цен, не подлежащих удалению. Если обработчик возвращает <i>false</i>, удаление будет отменено.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ProductID  код товара
-	 *
-	 *
-	 *
-	 * @param array &$arExceptionIDs  Массив, содержащий ID цен, которые необходимо оставить (не удалять)
-	 *
-	 *
-	 *
-	 * @return OnBeforeProductPriceDelete <ul> <li> <i>true</i>, если удаление разрешено </li> <li> <i>false</i>, если удаление
-	 * запрещено </li> </ul>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <b>Запрет на удаление цен для товаров</b>/bitrix/php_interface/init.phpfunction DeleteProductPriceStop ($intID,&amp;$arExceptionIDs)<br>{<br>   return false;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStop");<br>
-<b>Запрет на удаление рублевых цен для товаров</b>function DeleteProductPriceStopRub ($intID,&amp;$arExceptionIDs)<br>{<br>   if (CModule::IncludeModule('catalog'))<br>   {<br>      $rsPrices = CPrice::GetList(array(),array('PRODUCT_ID' =&gt; $intID,'CURRENCY' =&gt; 'RUB'));<br>      while ($arPrice = $rsPrices-&gt;Fetch())<br>      {<br>         $arExceptionIDs[] = $arPrice['ID'];<br>      }<br>   }<br>   return true;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStopRub");<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p><b>Методы</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
-	 * </ul><p><b>События</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php
-	 * @author Bitrix
+	 * перед удалением документа.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDocs::delete
 	 */
-	public static function OnBeforeProductPriceDelete($ProductID, &$arExceptionIDs){}
+	public static function OnBeforeDocumentDelete(){}
 
 	/**
-	 * <b> OnPriceDelete</b> - событие, вызываемое при удалении существующей цены товара в методе CPrice::Delete(). На вход получает ID цены товара (см. <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete </a>). Может быть использовано для выполнения каких-либо действий при удалении цены. Возвращаемое значение обработчика игнорируется.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  код цены товара (ценового предложения)
-	 *
-	 *
-	 *
-	 * @return OnPriceDelete 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete </a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onpricedelete.php
-	 * @author Bitrix
+	 * перед удалением элемента.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalog::OnBeforeIBlockElementDelete
 	 */
-	public static function OnPriceDelete($ID){}
+	public static function OnBeforeIBlockElementDelete(){}
 
 	/**
-	 * <i>OnProductPriceDelete</i> - событие, вызываемое в процессе удаления существующих цен товара в методе CPrice::DeleteByProduct(). На вход получает ID товара и массив ID цен, не подлежащих удалению.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ProductID  код товара
-	 *
-	 *
-	 *
-	 * @param array $arExceptionIDs  Массив, содержащий ID цен, которые необходимо оставить (не удалять)
-	 *
-	 *
-	 *
-	 * @return OnProductPriceDelete 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p><b>Методы</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
-	 * </ul><p><b>События</b></p><ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php
-	 * @author Bitrix
+	 * при пересчете цены, к которой применена скидка.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__countpricewithdiscount.9c16046d.php">CCatalogProduct::CountPriceWithDiscount</a>
 	 */
-	public static function OnProductPriceDelete($ProductID, $arExceptionIDs){}
+	public static function OnCountPriceWithDiscount(){}
+
+	/**
+	 * в конце метода CCatalogProduct::CountPriceWithDiscount.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__countpricewithdiscount.9c16046d.php">CCatalogProduct::CountPriceWithDiscount</a>
+	 */
+	public static function OnCountPriceWithDiscountResult(){}
+
+	/**
+	 * при добавлении купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>
+	 */
+	public static function OnCouponAdd(){}
+
+	/**
+	 * при удалении купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountCoupon::Delete
+	 */
+	public static function OnCouponDelete(){}
+
+	/**
+	 * при изменении купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountCoupon::Update
+	 */
+	public static function OnCouponUpdate(){}
+
+	/**
+	 * при добавлении скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount_add.php">CCatalogDiscount::Add</a>
+	 */
+	public static function OnDiscountAdd(){}
+
+	/**
+	 * при удалении скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.delete.php">CCatalogDiscount::Delete</a>
+	 */
+	public static function OnDiscountDelete(){}
+
+	/**
+	 * при изменении скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.update.php">CCatalogDiscount::Update</a>
+	 */
+	public static function OnDiscountUpdate(){}
+
+	/**
+	 * после OnBeforeDocumentDelete в методе CCatalogStoreDocsBarcodeAll::OnBeforeDocumentDelete.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogStoreDocsBarcodeAll::OnBeforeDocumentDelete
+	 */
+	public static function OnDocumentBarcodeDelete(){}
+
+	/**
+	 * после OnDocumentBarcodeDelete в методе CCatalogStoreDocsElementAll::OnDocumentBarcodeDelete.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogStoreDocsElementAll::OnDocumentBarcodeDelete
+	 */
+	public static function OnDocumentElementDelete(){}
+
+	/**
+	 * при генерации купона.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CatalogGenerateCoupon
+	 */
+	public static function OnGenerateCoupon(){}
+
+	/**
+	 * в конце метода CCatalogProduct::GetDiscount
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscount::GetDiscount
+	 */
+	public static function OnGetDiscountResult(){}
+
+	/**
+	 * в начале метода CCatalogDiscSave::GetDiscount
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountSave::GetDiscount
+	 */
+	public static function OnGetDiscountSave(){}
+
+	/**
+	 * в начале метода CCatalogProduct::GetNearestQuantityPrice
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getnearestquantityprice.3c16046d.php">CCatalogProduct::GetNearestQuantityPrice</a>
+	 */
+	public static function OnGetNearestQuantityPrice(){}
+
+	/**
+	 * в конце метода CCatalogProduct::GetNearestQuantityPrice
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getnearestquantityprice.3c16046d.php">CCatalogProduct::GetNearestQuantityPrice</a>
+	 */
+	public static function OnGetNearestQuantityPriceResult(){}
+
+	/**
+	 * при поиске оптимальной цены товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getoptimalprice.7c16046d.php">CCatalogProduct::GetOptimalPrice</a>
+	 */
+	public static function OnGetOptimalPrice(){}
+
+	/**
+	 * ели не отработало событие OnGetOptimalPrice в методе CCatalogProduct::GetOptimalPrice
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getoptimalprice.7c16046d.php">CCatalogProduct::GetOptimalPrice</a>
+	 */
+	public static function OnGetOptimalPriceResult(){}
+
+	/**
+	 * при вычислении накопительной скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscountSave::__SaleOrderSumm
+	 */
+	public static function OnSaleOrderSumm(){}
+
+	/**
+	 * перед добавлением новой цены товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a>
+	 */
+	public static function OnBeforePriceAdd(){}
+
+	/**
+	 * перед изменением существующей цены.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>
+	 */
+	public static function OnBeforePriceUpdate(){}
+
+	/**
+	 * перед удалением существующей цены.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
+	 */
+	public static function OnBeforePriceDelete(){}
+
+	/**
+	 * в процессе удаления существующей цены.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
+	 */
+	public static function OnPriceDelete(){}
+
+	/**
+	 * перед удалением цен в методе CPrice::DeleteByProduct().
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a>
+	 */
+	public static function OnBeforeProductPriceDelete(){}
+
+	/**
+	 * в процессе удаления цен в методе CPrice::DeleteByProduct().
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a>
+	 */
+	public static function OnProductPriceDelete(){}
+
+	/**
+	 * перед добавлением товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php">CCatalogProduct::Add</a>
+	 */
+	public static function OnBeforeProductAdd(){}
+
+	/**
+	 * перед удалением каталога.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalog::OnBeforeCatalogDelete
+	 */
+	public static function OnBeforeCatalogDelete(){}
+
+	/**
+	 * перед добавлением группы.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>
+	 */
+	public static function OnBeforeGroupAdd(){}
+
+	/**
+	 * перед удалением группы.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__delete.dbdc5f0d.php">CCatalogGroup::Delete</a>
+	 */
+	public static function OnBeforeGroupDelete(){}
+
+	/**
+	 * перед изменением группы.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>
+	 */
+	public static function OnBeforeGroupUpdate(){}
+
+	/**
+	 * перед изменением свойств товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php">CCatalogProduct::Update</a>
+	 */
+	public static function OnBeforeProductUpdate(){}
+
+	/**
+	 * при удалении каталога.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__delete.b8b22efb.php">CCatalog::Delete</a>
+	 */
+	public static function OnCatalogDelete(){}
+
+	/**
+	 * при получении скидки.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * CCatalogDiscount::GetDiscount
+	 */
+	public static function OnGetDiscount(){}
+
+	/**
+	 * при удалении группы.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__delete.dbdc5f0d.php">CCatalogGroup::Delete</a>
+	 */
+	public static function OnGroupDelete(){}
+
+	/**
+	 * при изменении группы.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>
+	 */
+	public static function OnGroupUpdate(){}
+
+	/**
+	 * при добавлении новой цены.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a>
+	 */
+	public static function OnPriceAdd(){}
+
+	/**
+	 * в процессе обновления существующей цены.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>
+	 */
+	public static function OnPriceUpdate(){}
+
+	/**
+	 * при добавлении товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php">CCatalogProduct::Add</a>
+	 */
+	public static function OnProductAdd(){}
+
+	/**
+	 * в процессе изменения свойств товара.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php">CCatalogProduct::Update</a>
+	 */
+	public static function OnProductUpdate(){}
+
+	/**
+	 * для изменения логики метода GetDiscountByPrice.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountbyprice.php">CCatalogDiscount::GetDiscountByPrice</a>
+	 */
+	public static function OnGetDiscountByPrice(){}
+
+	/**
+	 * для изменения логики метода GetDiscountByProduct.
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountbyproduct.php">CCatalogDiscount::GetDiscountByProduct</a>
+	 */
+	public static function OnGetDiscountByProduct(){}
+
+	/**
+	 * после успешного импорта товаров из 1с. Событие компонента <a href="http://dev.1c-bitrix.ru/user_help/content/iblock/components_2/catalog/catalog_import_1c.php" target="_blank">catalog.import.1c</a>
+
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 */
+	public static function OnSuccessCatalogImport1C(){}
+
+	/**
+	 * Ассоциативный массив параметров ценового предложения. Допустимые параметры: 
+	 *         <ul>
+<li>
+<b>PRODUCT_ID </b> - код товара;</li>
+	 *          	 
+	 *           <li>
+<b>EXTRA_ID</b> - код наценки;</li>
+	 *          	 
+	 *           <li>
+<b>CATALOG_GROUP_ID</b> - код типа цены;</li>
+	 *          	 
+	 *           <li>
+<b>PRICE</b> - цена;</li>
+	 *          	 
+	 *           <li>
+<b>CURRENCY</b> - валюта цены;</li>
+	 *          	 
+	 *           <li>
+<b>QUANTITY_FROM</b> - количество товара, начиная с приобретения которого действует эта цена;</li>
+	 *          	 
+	 *           <li>
+<b>QUANTITY_TO</b> - количество товара, при приобретении которого заканчивает действие эта цена. 	 
+	 *             <p class="note">Если необходимо, чтобы значения параметров <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были 	 заданы, необходимо указать у них в качестве значения false либо не задавать поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в измененном массиве. </p>
+	 *            	</li>
+	 *          	 	 </ul>
+	 *        Если установлен код наценки, то появляется возможность автоматически пересчитывать эту цену при изменении базовой цены или процента наценки. 
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 */
+	public static function arFields(){}
+
+	/**
+	 * код цены товара (ценового предложения) 
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 */
+	public static function ID(){}
+
+	/**
+	 * код товара
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 */
+	public static function ProductID(){}
+
+	/**
+	 * Массив, содержащий ID цен, которые необходимо оставить (не удалять)
+	 * 
+	 * <i>Вызывается в методе:</i>
+	 */
+	public static function arExceptionIDs(){}
 
 
-}?>
+}
+?>

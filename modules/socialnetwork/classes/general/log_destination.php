@@ -308,7 +308,15 @@ class CSocNetLogDestination
 
 		$cacheTtl = 3153600;
 		$cacheId = 'socnet_destination_getusers_'.md5(serialize($arFilter)).$bSelf;
-		$cacheDir = '/socnet/dest/';
+		$cacheDir = '/socnet/dest/'.(
+			isset($arParams['id']) 
+			? 'user' 
+			: (
+				isset($arParams['deportament_id']) 
+				? 'dept' 
+				: 'all'
+			)
+		).'/';
 
 		$obCache = new CPHPCache;
 		if($obCache->InitCache($cacheTtl, $cacheId, $cacheDir))
@@ -349,15 +357,16 @@ class CSocNetLogDestination
 					'entityId' => $arUser["ID"],
 					'name' => $sName,
 					'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
-					'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION']?$arUser['PERSONAL_PROFESSION']:'&nbsp;'),
+					'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION'] ? $arUser['PERSONAL_PROFESSION'] : '&nbsp;'),
 				);
 				if (defined("BX_COMP_MANAGED_CACHE"))
-					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".IntVal($arUser["ID"] / 100));
+					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".IntVal($arUser["ID"]));
 			}
+
 			if (defined("BX_COMP_MANAGED_CACHE"))
 			{
-					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD");
-					$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+				$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME");
+				$GLOBALS["CACHE_MANAGER"]->EndTagCache();
 			}
 
 			$obCache->EndDataCache($arUsers);

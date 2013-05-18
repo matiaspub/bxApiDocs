@@ -5,8 +5,8 @@ class CSecuritySiteChecker
 {
 	const ADMIN_PAGE_URL = "/bitrix/admin/security_scanner.php";
 	const CHECKING_REPEAT_TIME = 2592000; //60*60*24*30, one month
-	const BASE_CACHE_ID = "sec_site_check";
-	const CACHE_DIR = "/bx/sec_site_check";
+	const CACHE_DIR = "/security/site_checker";
+	const CACHE_BASE_ID = "sec_site_check";
 	const SESSION_DATA_KEY = "SECURITY_SITE_CHECKER";
 
 	protected $allTests = array();
@@ -20,7 +20,7 @@ class CSecuritySiteChecker
 	protected $sessionData = null;
 
 	/**
-	 * @param array  $pTests
+	 * @param array $pTests
 	 * @param bool $pIsFirstStart
 	 * @throws Exception
 	 */
@@ -51,7 +51,6 @@ class CSecuritySiteChecker
 		if(!is_callable($testName, "check"))
 			return false;
 
-//		var_dump("cur_test:".$testName);
 		$test = new $testName;
 		if(!($test instanceof CSecurityBaseTest))
 			return false;
@@ -102,13 +101,13 @@ class CSecuritySiteChecker
 
 	/**
 	 * Return current percent of complete testing
-	 * @return float
+	 * @return int
 	 */
 	static public function getPercent()
 	{
 		$totalTestsCount = count($this->neededTests);
 		$remainingTestsCount = count($this->sessionData->getArray("NEEDED_TESTS"));
-		return number_format((($totalTestsCount - $remainingTestsCount) / $totalTestsCount) * 100, 2);
+		return intval((($totalTestsCount - $remainingTestsCount) / $totalTestsCount) * 100);
 	}
 
 	/**
@@ -181,13 +180,13 @@ class CSecuritySiteChecker
 	 */
 	public static function getLastTestingInfo()
 	{
-		/** @global CDataBase $DB */
-		global $DB;
+		/** @global CCacheManager $CACHE_MANAGER*/
+		global $CACHE_MANAGER;
+		$cacheId = self::CACHE_BASE_ID."_last_results";
 
-		$obCache = new CPHPCache;
-		if($obCache->InitCache(self::CHECKING_REPEAT_TIME, self::BASE_CACHE_ID."_last_results", self::CACHE_DIR))
+		if($CACHE_MANAGER->read(self::CHECKING_REPEAT_TIME, $cacheId, self::CACHE_DIR))
 		{
-			$lastResult = $obCache->GetVars();
+			$lastResult = $CACHE_MANAGER->get($cacheId);
 		}
 		else
 		{
@@ -198,7 +197,7 @@ class CSecuritySiteChecker
 				$result = $dbResults->fetch();
 				if($result && isset($result["RESULTS"]))
 				{
-					if(CheckSerializedData($result["RESULTS"]))
+					if(checkSerializedData($result["RESULTS"]))
 					{
 						$lastResult["results"] = unserialize($result["RESULTS"]);
 					}
@@ -208,10 +207,8 @@ class CSecuritySiteChecker
 					$lastResult["test_date"] = $result["TEST_DATE"];
 				}
 			}
-			if($obCache->StartDataCache())
-			{
-				$obCache->EndDataCache($lastResult);
-			}
+
+			$CACHE_MANAGER->set($cacheId, $lastResult);
 		}
 		return (is_array($lastResult) ? $lastResult: array()) ;
 	}
@@ -230,18 +227,20 @@ class CSecuritySiteChecker
 	 */
 	public static function isNewTestNeeded()
 	{
-		/** @global CDataBase $DB */
-		global $DB;
+		/**
+		 * @global CCacheManager $CACHE_MANAGER
+		 * @global CDataBase $DB
+		 */
+		global $DB, $CACHE_MANAGER;
+		$cacheId = self::CACHE_BASE_ID."_last_check";
 
-		$obCache = new CPHPCache;
-		if($obCache->InitCache(self::CHECKING_REPEAT_TIME, self::BASE_CACHE_ID."_last_check", self::CACHE_DIR))
+		if($CACHE_MANAGER->read(self::CHECKING_REPEAT_TIME, $cacheId, self::CACHE_DIR))
 		{
-			$result = $obCache->GetVars();
+			$result = $CACHE_MANAGER->get($cacheId);
 		}
 		else
 		{
 			$minimalDate = self::getFormatedDate(time() - self::CHECKING_REPEAT_TIME);
-
 			$sqlQuery = "
 				SELECT COUNT(ID) AS COUNT
 				FROM
@@ -250,9 +249,9 @@ class CSecuritySiteChecker
 					TEST_DATE >= ".$minimalDate."
 			";
 
-			$res = $DB->Query($sqlQuery, false, $err_mess = "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			$res = $DB->query($sqlQuery, false, $err_mess = "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 			$result = true;
-			if($count = $res->Fetch())
+			if($count = $res->fetch())
 			{
 				if($count["COUNT"] > 0)
 				{
@@ -260,10 +259,7 @@ class CSecuritySiteChecker
 				}
 			}
 
-			if($obCache->StartDataCache())
-			{
-				$obCache->EndDataCache($result);
-			}
+			$CACHE_MANAGER->set($cacheId, $result);
 		}
 
 		return $result;
@@ -284,8 +280,9 @@ class CSecuritySiteChecker
 	 */
 	protected static function clearCache()
 	{
-		$obCache = new CPHPCache;
-		$obCache->CleanDir(self::CACHE_DIR);
+		/** @global CCacheManager $CACHE_MANAGER*/
+		global $CACHE_MANAGER;
+		$CACHE_MANAGER->CleanDir(self::CACHE_DIR);
 	}
 
 	/**
@@ -359,9 +356,9 @@ class CSecuritySiteChecker
 	 */
 	public static function OnAdminInformerInsertItems()
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-		if($APPLICATION->GetGroupRight("security") < "W")
+		/** @global CUser $USER */
+		global $USER;
+		if(!$USER->isAdmin())
 			return false;
 
 		if(!self::isNewTestNeeded())

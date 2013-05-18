@@ -39,7 +39,7 @@ class CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @param string $strField  Название поля по которому будет осуществляться фильтрация. <br>
+	 * @param string $strField  Название поля, по которому будет осуществляться фильтрация. <br>
 	 * Возможные значения: <br><ul> <li> <b>ID</b> - по идентификатору элемента </li>
 	 * </ul> <ul> <li> <b>PROPERTY_&lt;PROPERTY_CODE&gt;</b> - по значению свойства, где
 	 * <b>PROPERTY_CODE</b> - это ID или мнемонический код свойства привязки.

@@ -294,6 +294,7 @@ class QueryChain
 		$def = array();
 
 		// add members of chain except of init entity
+		/** @var $elements QueryChainElement[] */
 		$elements = array_slice($chain->getAllElements(), 1);
 
 		foreach ($elements  as $element)
@@ -301,7 +302,7 @@ class QueryChain
 			if ($element->getValue() instanceof ExpressionField && $element !== end($elements))
 			{
 				// skip non-last expressions
-				continue;
+				//continue;
 			}
 
 			$def[] = $element->getDefinitionFragment();
@@ -321,7 +322,7 @@ class QueryChain
 		{
 			if ($element->getValue() instanceof ExpressionField && $element !== end($elements))
 			{
-				unset($elements[$k]);
+				//unset($elements[$k]);
 			}
 		}
 

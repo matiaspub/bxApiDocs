@@ -1,7 +1,7 @@
 <?if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();?><?
-// Скопируйте этот файл в папку /bitrix/php_interface/include/sale_payment/ и
-// задайте путь к нему в настройках платежной системы
-// Вы можете изменить этот файл по своему усмотрению
+// РЎРєРѕРїРёСЂСѓР№С‚Рµ СЌС‚РѕС‚ С„Р°Р№Р» РІ РїР°РїРєСѓ /bitrix/php_interface/include/sale_payment/ Рё
+// Р·Р°РґР°Р№С‚Рµ РїСѓС‚СЊ Рє РЅРµРјСѓ РІ РЅР°СЃС‚СЂРѕР№РєР°С… РїР»Р°С‚РµР¶РЅРѕР№ СЃРёСЃС‚РµРјС‹
+// Р’С‹ РјРѕР¶РµС‚Рµ РёР·РјРµРЅРёС‚СЊ СЌС‚РѕС‚ С„Р°Р№Р» РїРѕ СЃРІРѕРµРјСѓ СѓСЃРјРѕС‚СЂРµРЅРёСЋ
 
 // define("NO_KEEP_STATISTIC", true);
 // define("NOT_CHECK_PERMISSIONS", true);
@@ -35,14 +35,14 @@ if (CModule::IncludeModule("sale"))
 		{
 			$strPS_STATUS_DESCRIPTION = "";
 			if (strlen($_POST["pci_mode"]) > 0)
-				$strPS_STATUS_DESCRIPTION .= "тестовый режим, реально деньги не переводились; ";
-			$strPS_STATUS_DESCRIPTION .= "кошелек продавца - ".$_POST["pci_pursedest"]."; ";
-			$strPS_STATUS_DESCRIPTION .= "номер операции - ".$_POST["pci_wmtid"]."; ";
-			$strPS_STATUS_DESCRIPTION .= "дата платежа - ".$_POST["pci_datecrt"]."";
+				$strPS_STATUS_DESCRIPTION .= "С‚РµСЃС‚РѕРІС‹Р№ СЂРµР¶РёРј, СЂРµР°Р»СЊРЅРѕ РґРµРЅСЊРіРё РЅРµ РїРµСЂРµРІРѕРґРёР»РёСЃСЊ; ";
+			$strPS_STATUS_DESCRIPTION .= "РєРѕС€РµР»РµРє РїСЂРѕРґР°РІС†Р° - ".$_POST["pci_pursedest"]."; ";
+			$strPS_STATUS_DESCRIPTION .= "РЅРѕРјРµСЂ РѕРїРµСЂР°С†РёРё - ".$_POST["pci_wmtid"]."; ";
+			$strPS_STATUS_DESCRIPTION .= "РґР°С‚Р° РїР»Р°С‚РµР¶Р° - ".$_POST["pci_datecrt"]."";
 
 			$strPS_STATUS_MESSAGE = "";
-			$strPS_STATUS_MESSAGE .= "кошелек покупателя - ".$_POST["pci_pursesrc"]."; ";
-			$strPS_STATUS_MESSAGE .= "WMId покупателя - ".$_POST["WMID"]."; ";
+			$strPS_STATUS_MESSAGE .= "РєРѕС€РµР»РµРє РїРѕРєСѓРїР°С‚РµР»СЏ - ".$_POST["pci_pursesrc"]."; ";
+			$strPS_STATUS_MESSAGE .= "WMId РїРѕРєСѓРїР°С‚РµР»СЏ - ".$_POST["WMID"]."; ";
 			$strPS_STATUS_MESSAGE .= "".$_POST["pci_desc"]."";
 
 			$arFields = array(

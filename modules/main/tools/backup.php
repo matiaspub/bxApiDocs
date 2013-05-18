@@ -7,7 +7,6 @@ if (ini_get('short_open_tag') == 0)
 error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 
 // define('START_TIME', time());
-@set_time_limit(0);
 @// define('LANGUAGE_ID', 'en');
 @// define('NOT_CHECK_PERMISSIONS', true);
 
@@ -67,6 +66,8 @@ if (!defined('DOCUMENT_ROOT'))
 while(ob_end_flush());
 IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/backup.php");
+
+@set_time_limit(0);
 
 if (function_exists('mb_internal_encoding'))
 	mb_internal_encoding('ISO-8859-1');

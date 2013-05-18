@@ -21,6 +21,22 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
+	 * @param string $pCheckingToken
+	 */
+	static public function setCheckingToken($pCheckingToken)
+	{
+		$this->checkingToken = $pCheckingToken;
+	}
+
+	/**
+	 * @return string
+	 */
+	static public function getCheckingToken()
+	{
+		return $this->checkingToken;
+	}
+
+	/**
 	 * Make a request to the Bitrix server and returns the result
 	 * @param array $pAction
 	 * @return array|bool
@@ -86,7 +102,7 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * @param $pkey
+	 * @param string $pkey
 	 * @return string
 	 */
 	static public function getValue($pkey)
@@ -102,7 +118,7 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * @param $pStatus
+	 * @param string $pStatus
 	 * @return bool
 	 */
 	protected function checkStatus($pStatus)
@@ -117,7 +133,7 @@ class CSecurityCloudMonitorRequest
 	protected function getHostName()
 	{
 		$sheme = (CMain::IsHTTPS() ? "https" : "http")."://";
-		$url = COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]);
+		$url = self::getDomainName();
 		$url .= ($_SERVER["SERVER_PORT"] && strpos($url, ":") === false) ? ":".$_SERVER["SERVER_PORT"] : "";
 		return $sheme.$url;
 	}
@@ -172,6 +188,7 @@ class CSecurityCloudMonitorRequest
 		$result .= self::BITRIX_CHECKER_URL_PATH;
 		return $result;
 	}
+
 	/**
 	 * Send request to Bitrix (check o receive)
 	 * @param array $pPayload
@@ -194,7 +211,7 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * return License key
+	 * Return License key, your Captain Obvious
 	 * @return string
 	 */
 	protected static function getLicenseKey()
@@ -217,5 +234,14 @@ class CSecurityCloudMonitorRequest
 	protected static function getSystemInformation()
 	{
 		return CSecuritySystemInformation::getSystemInformation();
+	}
+
+	/**
+	 * Return current domain name (in puny code for cyrillic domain)
+	 * @return string
+	 */
+	protected static function getDomainName()
+	{
+		return CSecuritySystemInformation::getCurrentHost();
 	}
 }

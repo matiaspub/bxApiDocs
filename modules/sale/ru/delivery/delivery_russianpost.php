@@ -262,7 +262,7 @@ class CDeliveryRUSSIANPOST
 			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_PROFILE."=".urlencode($arProfile[$profile]);
 			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_PROFILE_NAME.'='.urlencode(GetMessage("SALE_DH_RUSSIANPOST_".ToUpper($profile)));
 			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_COUNTRY."=643";
-			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_COUNTRY_NAME.'='.urlencode($GLOBALS['APPLICATION']->ConvertCharset('Российская Федерация', LANG_CHARSET, 'utf-8'));
+			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_COUNTRY_NAME.'='.urlencode($GLOBALS['APPLICATION']->ConvertCharset('Р РѕСЃСЃРёР№СЃРєР°СЏ Р¤РµРґРµСЂР°С†РёСЏ', LANG_CHARSET, 'utf-8'));
 
 			$arQuery[] = DELIVERY_RUSSIANPOST_SERVER_POST_WEIGHT."=".urlencode($arOrder["WEIGHT"]);
 
@@ -402,9 +402,9 @@ class CDeliveryRUSSIANPOST
 		$arLocationFrom = CSaleLocation::GetByID($arOrder["LOCATION_FROM"]);
 
 		if (
-			ToUpper($arLocationFrom["CITY_NAME_ORIG"]) == "МОСКВА"
-			|| ToUpper($arLocationFrom["CITY_SHORT_NAME"]) == "МОСКВА"
-			|| ToUpper($arLocationFrom["CITY_NAME_LANG"]) == "МОСКВА"
+			ToUpper($arLocationFrom["CITY_NAME_ORIG"]) == "РњРћРЎРљР’Рђ"
+			|| ToUpper($arLocationFrom["CITY_SHORT_NAME"]) == "РњРћРЎРљР’Рђ"
+			|| ToUpper($arLocationFrom["CITY_NAME_LANG"]) == "РњРћРЎРљР’Рђ"
 			|| ToUpper($arLocationFrom["CITY_NAME_ORIG"]) == "MOSCOW"
 			|| ToUpper($arLocationFrom["CITY_SHORT_NAME"]) == "MOSCOW"
 			|| ToUpper($arLocationFrom["CITY_NAME_LANG"]) == "MOSCOW"
@@ -430,15 +430,15 @@ class CDeliveryRUSSIANPOST
 	function __IsRussian($arLocation)
 	{
 		return
-			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "РОССИЯ"
-			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "РОССИЯ"
-			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "РОССИЯ"
+			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?РЇ"
+			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "Р РћРЎРЎР?РЇ"
+			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "Р РћРЎРЎР?РЇ"
 			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "RUSSIA"
 			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "RUSSIA"
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIA"
-			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
-			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
-			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
+			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
+			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
+			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
 			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "RUSSIAN FEDERATION"
 			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "RUSSIAN FEDERATION"
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIAN FEDERATION");

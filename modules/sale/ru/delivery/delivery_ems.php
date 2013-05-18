@@ -577,15 +577,15 @@ class CDeliveryEMS
 	function __IsRussian($arLocation)
 	{
 		return
-			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "РОССИЯ"
-			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "РОССИЯ"
-			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "РОССИЯ"
+			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?РЇ"
+			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "Р РћРЎРЎР?РЇ"
+			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "Р РћРЎРЎР?РЇ"
 			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "RUSSIA"
 			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "RUSSIA"
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIA"
-			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
-			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
-			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "РОССИЙСКАЯ ФЕДЕРАЦИЯ"
+			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
+			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
+			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "Р РћРЎРЎР?Р™РЎРљРђРЇ Р¤Р•Р”Р•Р РђР¦Р?РЇ"
 			|| ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "RUSSIAN FEDERATION"
 			|| ToUpper($arLocation["COUNTRY_SHORT_NAME"]) == "RUSSIAN FEDERATION"
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIAN FEDERATION");

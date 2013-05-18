@@ -321,7 +321,7 @@ class CSocNetLogFollow
 
 		$cache_id = 'sonet_follow_default_'.$user_id;
 		$obCache = new CPHPCache;
-		$cache_dir = '/sonet/log_follow/';
+		$cache_dir = '/sonet/log_follow/'.$user_id.'/';
 
 		if($obCache->InitCache($ttl, $cache_id, $cache_dir))
 		{

@@ -114,7 +114,7 @@ class CUpdateClientPartner
 		if (strlen($strError_tmp) <= 0)
 			$content = file_get_contents($updatesDirFull."/update_info.xml");
 
-		//echo "!1!".htmlspecialchars($content)."!2!";
+		//echo "!1!".htmlspecialcharsbx($content)."!2!";
 
 		if (strlen($strError_tmp) <= 0)
 		{
@@ -126,7 +126,7 @@ class CUpdateClientPartner
 		{
 			if (isset($arRes["DATA"]["#"]["ERROR"]) && is_array($arRes["DATA"]["#"]["ERROR"]) && count($arRes["DATA"]["#"]["ERROR"]) > 0)
 			{
-				for ($i = 0; $i < count($arRes["DATA"]["#"]["ERROR"]); $i++)
+				for ($i = 0, $n = count($arRes["DATA"]["#"]["ERROR"]); $i < $n; $i++)
 				{
 					if (strlen($arRes["DATA"]["#"]["ERROR"][$i]["@"]["TYPE"]) > 0)
 						$strError_tmp .= "[".$arRes["DATA"]["#"]["ERROR"][$i]["@"]["TYPE"]."] ";
@@ -835,7 +835,7 @@ class CUpdateClientPartner
 		if (strlen($strError_tmp) <= 0)
 			$content = file_get_contents($updatesDirFull."/update_info.xml");
 
-		//echo "!1!".htmlspecialchars($content)."!2!";
+		//echo "!1!".htmlspecialcharsbx($content)."!2!";
 
 		if (strlen($strError_tmp) <= 0)
 		{
@@ -843,7 +843,7 @@ class CUpdateClientPartner
 			CUpdateClientPartner::__ParseServerData($content, $arResult, $strError_tmp);
 		}
 
-		//echo "!3!".htmlspecialchars($content)."!4!";
+		//echo "!3!".htmlspecialcharsbx($content)."!4!";
 		//echo "<pre>";print_r($arRes);echo "</pre>";
 
 		if (strlen($strError_tmp) <= 0)
@@ -1459,9 +1459,10 @@ class CUpdateClientPartner
 						closedir($handle);
 					}
 
-					for ($i1 = 0; $i1 < count($arUpdaters) - 1; $i1++)
+					$n = count($arUpdaters);
+					for ($i1 = 0; $i1 < $n - 1; $i1++)
 					{
-						for ($j1 = $i1 + 1; $j1 < count($arUpdaters); $j1++)
+						for ($j1 = $i1 + 1; $j1 < $n; $j1++)
 						{
 							if (CUpdateClientPartner::__CompareVersions($arUpdaters[$i1][1], $arUpdaters[$j1][1]) > 0)
 							{
@@ -1483,7 +1484,7 @@ class CUpdateClientPartner
 
 				if (strlen($strError_tmp1) <= 0)
 				{
-					for ($i1 = 0; $i1 < count($arUpdaters); $i1++)
+					for ($i1 = 0, $n = count($arUpdaters); $i1 < $n; $i1++)
 					{
 						if ($arUpdaters[$i1][2] == "N")
 						{
@@ -1506,7 +1507,7 @@ class CUpdateClientPartner
 
 				if (strlen($strError_tmp1) <= 0)
 				{
-					for ($i1 = 0; $i1 < count($arUpdaters); $i1++)
+					for ($i1 = 0, $n = count($arUpdaters); $i1 < $n; $i1++)
 					{
 						if ($arUpdaters[$i1][2]=="Y")
 						{
@@ -1540,9 +1541,8 @@ class CUpdateClientPartner
 		}
 		else
 		{
-			$events = GetModuleEvents("main", "OnModuleUpdate");
-			while ($arEvent = $events->Fetch())
-				ExecuteModuleEventEx($arEvent, Array($arModules));
+			foreach(GetModuleEvents("main", "OnModuleUpdate", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($arModules));
 
 			return True;
 		}
@@ -1592,7 +1592,7 @@ class CUpdateClientPartner
 		{
 			if (isset($arRes["DATA"]["#"]["ERROR"]) && is_array($arRes["DATA"]["#"]["ERROR"]) && count($arRes["DATA"]["#"]["ERROR"]) > 0)
 			{
-				for ($i = 0; $i < count($arRes["DATA"]["#"]["ERROR"]); $i++)
+				for ($i = 0, $n = count($arRes["DATA"]["#"]["ERROR"]); $i < $n; $i++)
 				{
 					if (strlen($arRes["DATA"]["#"]["ERROR"][$i]["@"]["TYPE"]) > 0)
 						$strError_tmp .= "[".$arRes["DATA"]["#"]["ERROR"][$i]["@"]["TYPE"]."] ";
@@ -1855,7 +1855,7 @@ class CUpdateClientPartner
 		CUpdateClientPartner::AddMessage2Log("exec CUpdateClientPartner::ParseServerData");
 
 		//CUpdateClientPartner::AddMessage2Log($strServerOutput, "!2!");
-		//echo "strServerOutput:<br>".htmlspecialchars($strServerOutput)."<br><br>";
+		//echo "strServerOutput:<br>".htmlspecialcharsbx($strServerOutput)."<br><br>";
 
 		if (strlen($strServerOutput) <= 0)
 			$strError_tmp .= "[UPSD01] ".GetMessage("SUPP_AS_EMPTY_RESP").". ";
@@ -1872,7 +1872,7 @@ class CUpdateClientPartner
 		}
 		//CUpdateClientPartner::AddMessage2Log($strServerOutput, "!3!");
 
-		//echo "strServerOutput:<br>".htmlspecialchars($strServerOutput)."<br><br>";
+		//echo "strServerOutput:<br>".htmlspecialcharsbx($strServerOutput)."<br><br>";
 
 		if (strlen($strError_tmp) <= 0)
 		{
@@ -1915,7 +1915,9 @@ class CUpdateClientPartner
 	/** Проверка на установку GZip компрессии **/
 	function __IsGzipInstalled()
 	{
-		if (function_exists("gzcompress")) return True;
+		if (function_exists("gzcompress"))
+			return (COption::GetOptionString("main", "update_is_gzip_installed", "Y") == "Y" ? true : false);
+		
 		return False;
 	}
 

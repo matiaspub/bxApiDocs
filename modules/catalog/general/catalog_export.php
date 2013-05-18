@@ -1,4 +1,17 @@
 <?
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/index.php
+ * @author Bitrix
+ */
 class CAllCatalogExport
 {
 	public static function CheckFields($ACTION, &$arFields)

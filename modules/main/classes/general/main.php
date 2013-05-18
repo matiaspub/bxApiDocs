@@ -429,7 +429,7 @@ abstract class CAllMain
 		$io = CBXVirtualIo::GetInstance();
 		$fn = $io->CombinePath("/", $strDir, $strFileName);
 
-		$p = false;
+		$p = null;
 		while(!$io->FileExists($io->RelativeToAbsolutePath($fn)))
 		{
 			$p = bxstrrpos($strDir, "/");
@@ -3461,21 +3461,6 @@ abstract class CAllMain
 		$this->SetShowIncludeAreas($mode != 'view');
 	}
 
-	
-	/**
-	 * <p>Функция возвращает текущий режим отображения административной панели.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string <p>Одно из следующих зачений:</p><ul> <li>view - просмотр (по умолчанию) <br>
-	 * </li> <li>edit - редактирование <br> </li> <li>configure - редактирование <br> </li>
-	 * </ul><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php
-	 * @author Bitrix
-	 */
 	public static function GetPublicShowMode()
 	{
 		return $this->GetShowIncludeAreas() ? 'configure' : 'view';

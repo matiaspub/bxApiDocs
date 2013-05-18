@@ -1,8 +1,16 @@
 <?
 class CAllSocNetLogPages
 {
-	public static function GetList($arFilter = Array(), $arSelectFields = array())
+/*	function GetList($arFilter = Array(), $arSelectFields = array()) // old arguments order*/
+	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
+		if (func_num_args() <= 2)
+		{
+			$arSelectFields = $arFilter;
+			$arFilter = $arOrder;
+			$arOrder = array();
+		}
+
 		global $DB;
 
 		if (count($arSelectFields) <= 0)
@@ -18,7 +26,7 @@ class CAllSocNetLogPages
 		);
 		// <-- FIELDS
 
-		$arSqls = CSocNetGroup::PrepareSql($arFields, array(), $arFilter, false, $arSelectFields);
+		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, false, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
@@ -28,6 +36,8 @@ class CAllSocNetLogPages
 			"	".$arSqls["FROM"]." ";
 		if (strlen($arSqls["WHERE"]) > 0)
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+		if (strlen($arSqls["ORDERBY"]) > 0)
+			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
 
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -59,7 +69,6 @@ class CAllSocNetLogPages
 		else
 			return false;		
 	}
-	
-	
+
 }
 ?>

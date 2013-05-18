@@ -21,7 +21,7 @@ CModule::AddAutoloadClasses(
 		"CSecurityFilterSqlAuditor" => "classes/general/auditors/sql_auditor.php",
 		"CSecurityFilterPathAuditor" => "classes/general/auditors/path_auditor.php",
 		"CSecurityHtmlEntity" => "classes/general/html_entity.php",
-		"CSecurityFilterMask" => "classes/general/filter.php",
+		"CSecurityFilterMask" => "classes/general/filter_mask.php",
 		"CSecurityXSSDetect" => "classes/general/post_filter.php",
 		"CSecurityXSSDetectVariable" => "classes/general/post_filter.php",
 		"CSecuritySessionDB" => "classes/general/session_db.php",

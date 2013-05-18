@@ -954,60 +954,6 @@ function RemoveEventHandler($FROM_MODULE_ID, $MESSAGE_ID, $iEventHandlerKey)
 	return false;
 }
 
-
-/**
- * <p>Возвращает список обработчиков события <i>event_id</i> модуля <i>module_id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
- *
- *
- *
- *
- * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
- *
- *
- *
- * @param string $event_id  Идентификатор события.
- *
- *
- *
- * @return CDBResult 
- *
- *
- * <h4>Example</h4> 
- * <pre>
- * &lt;?
- * // проверка возможности удаления форума
- * 
- * // флаг запрещающий или разрешающий удалять форум
- * $bCanDelete = true;
- * 
- * // получим данные по всем обработчикам события "OnBeforeForumDelete"
- * // принадлежащего модулю с идентификатором "forum"
- * $rsEvents = <b>GetModuleEvents</b>("forum", "OnBeforeForumDelete");
- * while ($arEvent = $rsEvents-&gt;Fetch())
- * {
- *     // запустим на выполнение очередной обработчик события "OnBeforeForumDelete"
- *     // если функция-обработчик возвращает false, то
- *     if (ExecuteModuleEvent($arEvent, $del_id)===false)
- *     {
- *         // запрещаем удалять форум
- *         $bCanDelete = false;
- *         break;
- *     }
- * }
- * ?&gt;
- * </pre>
- *
- *
- *
- * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/executemoduleevent.php">ExecuteModuleEvent</a>
- * </li></ul><a name="examples"></a>
- *
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php
- * @author Bitrix
- */
 function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
 {
 	global $DB, $CACHE_MANAGER;

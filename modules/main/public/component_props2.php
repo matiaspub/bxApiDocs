@@ -181,8 +181,9 @@ if($strWarning == "")
 }
 $componentPath = CComponentEngine::MakeComponentPath($_GET["component_name"]);
 $arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
-if($arComponentDescription["ICON"] <> "" && $io->FileExists($io->RelativeToAbsolutePath("/bitrix/components".$componentPath."/".$arComponentDescription["ICON"])))
-	$sIcon = "/bitrix/components".$componentPath."/".$arComponentDescription["ICON"];
+$localPath = getLocalPath("components".$componentPath);
+if($localPath !== false && $arComponentDescription["ICON"] <> "" && $io->FileExists($io->RelativeToAbsolutePath($localPath."/".$arComponentDescription["ICON"])))
+	$sIcon = $localPath."/".$arComponentDescription["ICON"];
 else
 	$sIcon = "/bitrix/images/fileman/htmledit2/component.gif";
 ?>
@@ -195,7 +196,7 @@ $obJSPopup->StartDescription($sIcon);
 <?if($arComponentDescription["DESCRIPTION"] <> ""):?>
 <p title="<?echo GetMessage("comp_prop_desc")?>"><?echo $arComponentDescription["DESCRIPTION"]?></p>
 <?endif;?>
-<p class="note" title="<?echo GetMessage("comp_prop_path")?>"><a href="/bitrix/admin/fileman_admin.php?lang=<?echo LANGUAGE_ID?>&amp;path=<?echo urlencode("/bitrix/components".$componentPath)?>"><?echo htmlspecialcharsbx($_GET["component_name"])?></a></p>
+<p class="note" title="<?echo GetMessage("comp_prop_path")?>"><a href="/bitrix/admin/fileman_admin.php?lang=<?echo LANGUAGE_ID?>&amp;path=<?echo urlencode($localPath)?>"><?echo htmlspecialcharsbx($_GET["component_name"])?></a></p>
 <?
 if($strWarning <> "")
 {
@@ -360,10 +361,8 @@ foreach($arComponentTemplates as $template):
 endif; //!empty($arComponentTemplates)
 
 // Fetch tooltips
-$cn = CUtil::addslashes($_GET["component_name"]);
-$cn = str_replace(array(':', '..'), array('/', ''), $cn);
-CComponentUtil::__IncludeLang("/bitrix/components/".$cn, "/help/.tooltips.php");
-$tooltips_path = $_SERVER["DOCUMENT_ROOT"]."/bitrix/components/".$cn."/help/.tooltips.php";
+CComponentUtil::__IncludeLang($localPath, "/help/.tooltips.php");
+$tooltips_path = $_SERVER["DOCUMENT_ROOT"].$localPath."/help/.tooltips.php";
 $arTooltips = array();
 if(file_exists($tooltips_path))
 	include($tooltips_path);

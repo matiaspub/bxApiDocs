@@ -97,26 +97,6 @@ class CBlogComment extends CAllBlogComment
 					$searchContent = blogTextParser::killAllTags($arComment["POST_TEXT"]);
 					$searchContent .= "\r\n" . $GLOBALS["USER_FIELD_MANAGER"]->OnSearchIndex("BLOG_COMMENT", $arComment["ID"]);
 
-					$authorName = "";
-					if(IntVal($arComment["AUTHOR_ID"]) > 0)
-					{
-						$dbUser = CUser::GetByID($arComment["AUTHOR_ID"]);
-						if($arUser = $dbUser->Fetch())
-						{
-							$arTmpUser = array(
-									"NAME" => $arUser["NAME"],
-									"LAST_NAME" => $arUser["LAST_NAME"],
-									"SECOND_NAME" => $arUser["SECOND_NAME"],
-									"LOGIN" => $arUser["LOGIN"],
-								);
-							$authorName = CUser::FormatName(CSite::GetNameFormat(), $arTmpUser, false, false);
-						}
-					}
-					elseif(strlen($arComment["AUTHOR_NAME"]) > 0)
-						$authorName = $arComment["AUTHOR_NAME"];
-					if(strlen($authorName) > 0)
-						$searchContent .= "\r\n".$authorName;
-
 					$arSearchIndex = array(
 						"SITE_ID" => $arCommentSite,
 						"LAST_MODIFIED" => $arComment["DATE_CREATE"],
@@ -133,8 +113,29 @@ class CBlogComment extends CAllBlogComment
 					if($arBlog["USE_SOCNET"] == "Y")
 					{
 						if(is_array($arFields["SC_PERM"]))
+						{
 							$arSearchIndex["PERMISSIONS"] = $arFields["SC_PERM"];
+							$sgId = array();
+							foreach($arFields["SC_PERM"] as $perm)
+							{
+								if(strpos($perm, "SG") !== false)
+								{
+									$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+									if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+										$sgId[] = $sgIdTmp;
+								}
+							}
+
+							if(!empty($sgId))
+							{
+								$arSearchIndex["PARAMS"] = array(
+									"socnet_group" => $sgId,
+									"entity" => "socnet_group",
+								);
+							}
+						}
 					}
+
 					if(strlen($arComment["TITLE"]) <= 0)
 						$arSearchIndex["TITLE"] = substr($arSearchIndex["BODY"], 0, 100);
 
@@ -257,26 +258,6 @@ class CBlogComment extends CAllBlogComment
 					$searchContent = blogTextParser::killAllTags($arComment["POST_TEXT"]);
 					$searchContent .= "\r\n" . $GLOBALS["USER_FIELD_MANAGER"]->OnSearchIndex("BLOG_COMMENT", $arComment["ID"]);
 
-					$authorName = "";
-					if(IntVal($arComment["AUTHOR_ID"]) > 0)
-					{
-						$dbUser = CUser::GetByID($arComment["AUTHOR_ID"]);
-						if($arUser = $dbUser->Fetch())
-						{
-							$arTmpUser = array(
-									"NAME" => $arUser["NAME"],
-									"LAST_NAME" => $arUser["LAST_NAME"],
-									"SECOND_NAME" => $arUser["SECOND_NAME"],
-									"LOGIN" => $arUser["LOGIN"],
-								);
-							$authorName = CUser::FormatName(CSite::GetNameFormat(), $arTmpUser, false, false);
-						}
-					}
-					elseif(strlen($arComment["AUTHOR_NAME"]) > 0)
-						$authorName = $arComment["AUTHOR_NAME"];
-					if(strlen($authorName) > 0)
-						$searchContent .= "\r\n".$authorName;
-
 					$arSearchIndex = array(
 						"SITE_ID" => $arPostSite,
 						"LAST_MODIFIED" => $arComment["DATE_CREATE"],
@@ -289,11 +270,33 @@ class CBlogComment extends CAllBlogComment
 						"ENTITY_TYPE_ID" => "BLOG_COMMENT",
 						"ENTITY_ID" => $arComment["ID"],
 					);
+
 					if($arBlog["USE_SOCNET"] == "Y")
 					{
 						if(is_array($arFields["SC_PERM"]))
+						{
 							$arSearchIndex["PERMISSIONS"] = $arFields["SC_PERM"];
+							$sgId = array();
+							foreach($arFields["SC_PERM"] as $perm)
+							{
+								if(strpos($perm, "SG") !== false)
+								{
+									$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+									if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+										$sgId[] = $sgIdTmp;
+								}
+							}
+
+							if(!empty($sgId))
+							{
+								$arSearchIndex["PARAMS"] = array(
+									"socnet_group" => $sgId,
+									"entity" => "socnet_group",
+								);
+							}
+						}
 					}
+
 					if(strlen($arComment["TITLE"]) <= 0)
 					{
 						//$arPost = CBlogPost::GetByID($arComment["POST_ID"]);

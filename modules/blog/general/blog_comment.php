@@ -501,7 +501,30 @@ class CAllBlogComment
 				"ENTITY_ID" => $arComment["ID"],
 			);
 			if($arParams["USE_SOCNET"] == "Y")
+			{
 				$arSearchIndex["PERMISSIONS"] = $arSp;
+				if(is_array($arSp))
+				{
+					$sgId = array();
+					foreach($arSp as $perm)
+					{
+						if(strpos($perm, "SG") !== false)
+						{
+							$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
+							if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+								$sgId[] = $sgIdTmp;
+						}
+					}
+
+					if(!empty($sgId))
+					{
+						$arSearchIndex["PARAMS"] = array(
+							"socnet_group" => $sgId,
+							"entity" => "socnet_group",
+						);
+					}
+				}
+			}
 			if(strlen($arComment["TITLE"]) <= 0)
 				$arSearchIndex["TITLE"] = substr($arSearchIndex["BODY"], 0, 100);
 

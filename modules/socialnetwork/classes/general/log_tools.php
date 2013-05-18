@@ -2322,7 +2322,7 @@ class CSocNetLogTools
 			if ($arUser = $dbUser->Fetch())
 			{
 				if(defined("BX_COMP_MANAGED_CACHE"))
-					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".intval($arUser["ID"] / 100));
+					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".intval($arUser["ID"]));
 
 				$messageUserID = $arFields["MESSAGE"];
 
@@ -2335,7 +2335,7 @@ class CSocNetLogTools
 					if ($arUser2 = $dbUser2->Fetch())
 					{
 						if(defined("BX_COMP_MANAGED_CACHE"))
-							$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".intval($arUser2["ID"] / 100));
+							$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".intval($arUser2["ID"]));
 
 						$secondUserID = $arFields["ENTITY_ID"];
 						$bActiveUsers = true;
@@ -2609,7 +2609,7 @@ class CSocNetLogTools
 				while($arUser = $dbUser->Fetch())
 				{
 					if (defined("BX_COMP_MANAGED_CACHE"))
-						$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".intval($arUser["ID"] / 100));
+						$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".intval($arUser["ID"]));
 
 					$suffix = (is_array($GLOBALS["arExtranetUserID"]) && in_array($arUser["ID"], $GLOBALS["arExtranetUserID"]) ? GetMessage("SONET_LOG_EXTRANET_SUFFIX") : "");
 

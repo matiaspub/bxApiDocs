@@ -29,8 +29,7 @@ require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/socialnetwork/tools.php
 // define("SONET_MESSAGE_SYSTEM", "S");
 // define("SONET_MESSAGE_PRIVATE", "P");
 
-if (IsModuleInstalled("intranet"))
-	// define("DisableSonetLogVisibleSubscr", true);
+// define("DisableSonetLogVisibleSubscr", true);
 
 global $arSocNetAllowedRolesForUserInGroup;
 $arSocNetAllowedRolesForUserInGroup = array(SONET_ROLES_MODERATOR, SONET_ROLES_USER, SONET_ROLES_BAN, SONET_ROLES_REQUEST, SONET_ROLES_OWNER);
@@ -153,6 +152,7 @@ $arClasses = array(
 	"CSocNetLogRights" => "classes/general/log_rights.php",
 	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
 	"CSocNetLogFollow" => "classes/general/log_follow.php",
+	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
 	"logTextParser" => "classes/general/log_tools.php",
 	"CSocNetPhotoCommentEvent" => "classes/general/log_tools.php",
 	"CSocNetLogComments" => "classes/".$DBType."/log_comments.php",

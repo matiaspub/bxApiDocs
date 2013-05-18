@@ -432,7 +432,7 @@ class CAllSocNetFeaturesPerms
 				);
 				while($arLog = $rsLog->Fetch())
 				{
-					CSocNetLogRights::DeleteByLogID($arLog["ID"], true);
+					CSocNetLogRights::DeleteByLogID($arLog["ID"]);
 					CSocNetLogRights::SetForSonet(
 						$arLog["ID"], 
 						$entity_type, 
@@ -1173,7 +1173,7 @@ class CAllSocNetFeaturesPerms
 				$cache = new CPHPCache;
 				$cache_time = 31536000;
 				$cache_id = "entity_"."_".$type."_".$id;
-				$cache_path = "/sonet/features_perms/";
+				$cache_path = "/sonet/features_perms/".$type."_".$id."/";
 
 				$arTmp = array();
 
@@ -1198,11 +1198,21 @@ class CAllSocNetFeaturesPerms
 					while ($arResult = $dbResult->Fetch())
 					{
 						if (defined("BX_COMP_MANAGED_CACHE"))
-						{
 							$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_features2perms_".$arResult["ID"]);
-							$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_feature_".$arResult["FEATURE_ID"]);
-						}
 						$arTmp[] = $arResult;
+					}
+
+					if (defined("BX_COMP_MANAGED_CACHE"))
+					{
+						$dbResult = CSocNetFeatures::GetList(
+							Array(),
+							Array("ENTITY_ID" => $id, "ENTITY_TYPE" => $type),
+							false,
+							false,
+							array("ID")
+						);
+						while ($arResult = $dbResult->Fetch())
+							$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_feature_".$arResult["ID"]);
 					}
 
 					if (defined("BX_COMP_MANAGED_CACHE"))
@@ -1221,9 +1231,11 @@ class CAllSocNetFeaturesPerms
 					$arCacheData = Array(
 						"RESULT" => $arTmp
 					);
-					$cache->EndDataCache($arCacheData);
+
 					if(defined("BX_COMP_MANAGED_CACHE"))
 						$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+
+					$cache->EndDataCache($arCacheData);
 				}
 
 				foreach($arTmp as $arResult)

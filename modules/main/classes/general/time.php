@@ -82,7 +82,7 @@ class CTimeZone
 		if(self::IsAutoTimeZone(trim($USER->GetParam("AUTO_TIME_ZONE"))))
 		{
 			$APPLICATION->AddHeadString(
-				'<script type="text/javascript">var bxDate = new Date(); document.cookie="'.$cookie_prefix.'_TIME_ZONE="+bxDate.getTimezoneOffset()+","+Math.round(bxDate.getTime()/1000)+",'.time().'; path=/; expires=Fri, 01-Jan-2038 00:00:00 GMT"</script>', true
+				'<script type="text/javascript">var bxDate = new Date(); document.cookie="'.$cookie_prefix.'_TIME_ZONE="+bxDate.getTimezoneOffset()+"%2C"+Math.round(bxDate.getTime()/1000)+"%2C'.time().'; path=/; expires=Fri, 01-Jan-2038 00:00:00 GMT"</script>', true
 			);
 		}
 		elseif(isset($_COOKIE[$cookie_prefix."_TIME_ZONE"]))

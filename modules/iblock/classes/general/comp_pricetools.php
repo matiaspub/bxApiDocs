@@ -1,4 +1,17 @@
 <?
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpricetools/index.php
+ * @author Bitrix
+ */
 class CIBlockPriceTools
 {
 	

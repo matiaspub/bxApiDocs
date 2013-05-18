@@ -39,7 +39,7 @@ class Cache
 			{
 				if (!isset($cacheType["extension"]) || extension_loaded($cacheType["extension"]))
 				{
-					if (isset($cacheType["required_file"]) && ($requiredFile = \Bitrix\Main\Loader::getLocal($cacheType["required_file"])))
+					if (isset($cacheType["required_file"]) && ($requiredFile = \Bitrix\Main\Loader::getLocal($cacheType["required_file"])) !== false)
 						require_once($requiredFile);
 
 					$className = $cacheType["class_name"];

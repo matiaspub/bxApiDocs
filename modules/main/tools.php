@@ -5770,7 +5770,7 @@ function IsIE()
 	global $HTTP_USER_AGENT;
 	if(
 		strpos($HTTP_USER_AGENT, "Opera") == false
-		&& preg_match('#(MSIE|Internet Explorer) ([0-9])\\.([0-9]+)#', $HTTP_USER_AGENT, $version)
+		&& preg_match('#(MSIE|Internet Explorer) ([0-9]+)\\.([0-9]+)#', $HTTP_USER_AGENT, $version)
 	)
 	{
 		if(intval($version[2]) > 0)
@@ -6818,7 +6818,9 @@ class CJSCore
 		global $APPLICATION;
 
 		if ($bReturn)
+		{
 			return '<script type="text/javascript" src="'.CUtil::GetAdditionalFileURL($js).'"></script>'."\r\n";
+		}
 		else
 		{
 			if($APPLICATION->IsJSOptimized())
@@ -8199,6 +8201,16 @@ class CHTTP
 		}
 		return $result;
 	}
+
+	// search for /../ and ulrencoded /../
+	public static function isPathTraversalUri($uri)
+	{
+		if (($pos = strpos($uri, "?")) !== false)
+			$uri = substr($uri, 0, $pos);
+
+		$uri = trim($uri);
+		return preg_match("#(?:/|2f|^|\\\\|5c)(?:(?:%0*(25)*2e)|\.){2,}(?:/|%0*(25)*2f|\\\\|%0*(25)*5c|$)#", $uri) ? true : false;
+	}
 }
 
 function GetMenuTypes($site=false, $default_value=false)
@@ -8677,4 +8689,19 @@ function sortByColumn(array &$array, $columns, $callbacks = '', $defaultValueIfN
 	{
 		$array = array_combine(array_values($preserveDataKeys), array_values($array));
 	}
+}
+
+function getLocalPath($path, $baseFolder = "/bitrix")
+{
+	$root = rtrim($_SERVER["DOCUMENT_ROOT"], "\\/");
+
+	if (file_exists($root."/local/".$path))
+	{
+		return "/local/".$path;
+	}
+	elseif (file_exists($root.$baseFolder."/".$path))
+	{
+		return $baseFolder."/".$path;
+	}
+	return false;
 }

@@ -126,5 +126,19 @@ abstract class CCloudStorageService
 	static public function SetHeader($name, $value)
 	{
 	}
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	static public function UnsetHeader($name)
+	{
+	}
+	/**
+	 * @param bool $public
+	 * @return void
+	 */
+	static public function SetPublic($public)
+	{
+	}
 }
 ?>

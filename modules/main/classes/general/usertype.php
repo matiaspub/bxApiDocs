@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
 /**
  * usertype.php, Пользовательские свойства
  *
@@ -101,6 +108,17 @@ create table b_user_field_lang (
  */
 class CAllUserTypeEntity extends CDBResult
 {
+	//must be extended
+	public static function CreatePropertyTables($entity_id)
+	{
+		return true;
+	}
+	//must be extended
+	public static function DropColumnSQL($strTable, $arColumns)
+	{
+		return array();
+	}
+
 	/**
 	 * Функция для выборки метаданных пользовательского свойства.
 	 *
@@ -341,6 +359,7 @@ class CAllUserTypeEntity extends CDBResult
 			while($ar = $res->Fetch())
 				$arResult[]=$ar;
 
+			/** @noinspection PhpUndefinedVariableInspection */
 			$CACHE_MANAGER->Set($cacheId, $arResult);
 
 			$res = new CDBResult;
@@ -370,11 +389,13 @@ class CAllUserTypeEntity extends CDBResult
 	 * <p>В случае ошибки ловите исключение приложения!</p>
 	 * @param integer $ID - идентификатор свойства. 0 - для нового.
 	 * @param array $arFields метаданные свойства
+	 * @param bool $bCheckUserType
 	 * @return boolean false - если хоть одна проверка не прошла.
 	 */
 	public static function CheckFields($ID, $arFields, $bCheckUserType = true)
 	{
-		global $DB, $APPLICATION, $USER_FIELD_MANAGER;
+		/** @global CUserTypeManager $USER_FIELD_MANAGER */
+		global $APPLICATION, $USER_FIELD_MANAGER;
 		$aMsg = array();
 		$ID = intval($ID);
 
@@ -457,6 +478,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * <li>S - подстрока
 	 * </ul>
 	 * @param array $arFields метаданные нового свойства
+	 * @param bool $bCheckUserType
 	 * @return integer - иднтификатор добавленного свойства, false - если свойство не было добавлено.
 	 */
 	public static function Add($arFields, $bCheckUserType = true)
@@ -674,7 +696,6 @@ class CAllUserTypeEntity extends CDBResult
 		if(is_object($USER_FIELD_MANAGER))
 			$USER_FIELD_MANAGER->CleanCache();
 
-		$result = true;
 		$strUpdate = $DB->PrepareUpdate("b_user_field", $arFields);
 		if($strUpdate!="")
 		{
@@ -684,7 +705,7 @@ class CAllUserTypeEntity extends CDBResult
 				$arBinds = array("SETTINGS" => $arFields["SETTINGS"]);
 			else
 				$arBinds = array();
-			$result = $DB->QueryBind($strSql, $arBinds);
+			$DB->QueryBind($strSql, $arBinds);
 		}
 
 		$arLabels = array("EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL", "ERROR_MESSAGE", "HELP_MESSAGE");
@@ -797,8 +818,8 @@ class CAllUserTypeEntity extends CDBResult
 				}
 				else
 				{
-					$rs = $DB->Query("DROP SEQUENCE SQ_B_UTM_".$arField["ENTITY_ID"], true);
-					$rs = $DB->Query("DROP TABLE b_uts_".strtolower($arField["ENTITY_ID"]), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+					$DB->Query("DROP SEQUENCE SQ_B_UTM_".$arField["ENTITY_ID"], true);
+					$DB->Query("DROP TABLE b_uts_".strtolower($arField["ENTITY_ID"]), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 					$rs = $DB->Query("DROP TABLE b_utm_".strtolower($arField["ENTITY_ID"]), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 				}
 			}
@@ -843,14 +864,14 @@ class CAllUserTypeEntity extends CDBResult
 		while($arField = $rsFields->Fetch())
 		{
 			$bDropTable = true;
-			$rs = $DB->Query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$arField["ID"], false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			$DB->Query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$arField["ID"], false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 			$rs = $DB->Query("DELETE FROM b_user_field WHERE ID = ".$arField["ID"], false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 		}
 
 		if($bDropTable)
 		{
-			$rs = $DB->Query("DROP SEQUENCE SQ_B_UTM_".$entity_id, true);
-			$rs = $DB->Query("DROP TABLE b_uts_".strtolower($entity_id), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			$DB->Query("DROP SEQUENCE SQ_B_UTM_".$entity_id, true);
+			$DB->Query("DROP TABLE b_uts_".strtolower($entity_id), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 			$rs = $DB->Query("DROP TABLE b_utm_".strtolower($entity_id), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 		}
 
@@ -882,6 +903,12 @@ class CAllUserTypeEntity extends CDBResult
  */
 class CAllUserTypeManager
 {
+	//must be extended
+	public static function DateTimeToChar($FIELD_NAME)
+	{
+		return "";
+	}
+
 	/**
 	 * Хранит все типы пользовательских свойств.
 	 *
@@ -904,7 +931,7 @@ class CAllUserTypeManager
 	 * кто последний тот и папа. (на случай если один тип зарегились обрабатывать "несколько" классов)</p>
 	 * <p>Без параметров функция возвращает полный список типов.<p>
 	 * <p>При заданном user_type_id - возвращает массив если такой тип зарегистрирован и false если нет.<p>
-	 * @param string $user_type_id необязательный. идентификатор типа свойства.
+	 * @param string|bool $user_type_id необязательный. идентификатор типа свойства.
 	 * @return array|boolean
 	 */
 	public static function GetUserType($user_type_id = false)
@@ -941,15 +968,16 @@ class CAllUserTypeManager
 
 	public static function PrepareSettings($ID, $arUserField, $bCheckUserType = true)
 	{
+		$user_type_id = $arUserField["USER_TYPE_ID"];
 		if($ID > 0)
 		{
 			$rsUserType = CUserTypeEntity::GetList(array(), array("ID"=>$ID));
 			$arUserType = $rsUserType->Fetch();
 			if($arUserType)
+			{
 				$user_type_id = $arUserType["USER_TYPE_ID"];
+			}
 		}
-		else
-				$user_type_id = $arUserField["USER_TYPE_ID"];
 
 		if(!$bCheckUserType)
 		{
@@ -969,7 +997,10 @@ class CAllUserTypeManager
 				return call_user_func_array(array($arType["CLASS_NAME"], "preparesettings"), array($arUserField));
 		}
 		else
+		{
 			return array();
+		}
+		return null;
 	}
 
 	public static function OnEntityDelete($entity_id)
@@ -1168,8 +1199,28 @@ class CAllUserTypeManager
 					}
 					else
 					{
-						if(isset($GLOBALS[$arUserField["FIELD_NAME"]]) && intval($GLOBALS[$arUserField["FIELD_NAME"]]) > 0)
-							$arFields[$arUserField["FIELD_NAME"]] = intval($GLOBALS[$arUserField["FIELD_NAME"]]);
+						if(isset($GLOBALS[$arUserField["FIELD_NAME"]]))
+						{
+							if(!is_array($GLOBALS[$arUserField["FIELD_NAME"]]))
+							{
+								if(intval($GLOBALS[$arUserField["FIELD_NAME"]]) > 0)
+								{
+									$arFields[$arUserField["FIELD_NAME"]] = intval($GLOBALS[$arUserField["FIELD_NAME"]]);
+								}
+							}
+							else
+							{
+								$fields = array();
+								foreach($GLOBALS[$arUserField["FIELD_NAME"]] as $val)
+								{
+									if(intval($val) > 0)
+									{
+										$fields[] = intval($val);
+									}
+								}
+								$arFields[$arUserField["FIELD_NAME"]] = $fields;
+							}
+						}
 					}
 				}
 				else
@@ -1219,7 +1270,7 @@ class CAllUserTypeManager
 	{
 		if(is_array($value))
 		{
-			foreach($value as $i => $v)
+			foreach($value as $v)
 			{
 				if(strlen($v) > 0)
 					return true;
@@ -1490,6 +1541,7 @@ class CAllUserTypeManager
 				}
 			}
 		}
+		return '';
 	}
 
 	function GetFilterHTML($arUserField, $filter_name, $filter_value)
@@ -1511,8 +1563,14 @@ class CAllUserTypeManager
 				return '<tr><td>'.htmlspecialcharsbx($arUserField["LIST_FILTER_LABEL"]? $arUserField["LIST_FILTER_LABEL"]: $arUserField["FIELD_NAME"]).':</td><td>'.$html.'</td></tr>';
 			}
 		}
+		return '';
 	}
 
+	/**
+	 * @param $arUserField
+	 * @param $value
+	 * @param CAdminListRow $row
+	 */
 	function AddUserField($arUserField, $value, &$row)
 	{
 		if($arUserField["USER_TYPE"])
@@ -1575,7 +1633,6 @@ class CAllUserTypeManager
 					if(!is_array($form_value))
 						$form_value = array();
 
-					$i = -1;
 					foreach($form_value as $i=>$val)
 					{
 						if($html!="")
@@ -1701,6 +1758,7 @@ class CAllUserTypeManager
 				if(is_callable(array($arType["CLASS_NAME"], "getsettingshtml")))
 					return call_user_func_array(array($arType["CLASS_NAME"], "getsettingshtml"), array($arUserField, array("NAME" => "SETTINGS"), $bVarsFromForm));
 		}
+		return null;
 	}
 
 	function CheckFields($entity_id, $ID, &$arFields)
@@ -1742,7 +1800,7 @@ class CAllUserTypeManager
 					{
 						if(is_array($arFields[$FIELD_NAME]))
 						{
-							foreach($arFields[$FIELD_NAME] as $key=>$value)
+							foreach($arFields[$FIELD_NAME] as $value)
 							{
 								if(is_array($value) && array_key_exists("tmp_name", $value))
 								{
@@ -1776,7 +1834,7 @@ class CAllUserTypeManager
 					else
 					{
 						$bFound = false;
-						foreach($arFields[$FIELD_NAME] as $key=>$value)
+						foreach($arFields[$FIELD_NAME] as $value)
 						{
 							if(
 								(is_array($value) && (strlen(implode("", $value)) > 0))
@@ -1811,7 +1869,7 @@ class CAllUserTypeManager
 					}
 					elseif(is_array($arFields[$FIELD_NAME]))
 					{
-						foreach($arFields[$FIELD_NAME] as $key=>$value)
+						foreach($arFields[$FIELD_NAME] as $value)
 						{
 							if(!empty($value))
 							{
@@ -1867,7 +1925,7 @@ class CAllUserTypeManager
 				{
 					$arInsert[$arUserField["ID"]] = array();
 					$arInsertType[$arUserField["ID"]] = $arUserField["USER_TYPE"];
-					foreach($arFields[$FIELD_NAME] as $key=>$value)
+					foreach($arFields[$FIELD_NAME] as $value)
 					{
 						if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave")))
 							$value = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $value));
@@ -1954,7 +2012,7 @@ class CAllUserTypeManager
 				default:
 					$COLUMN = "VALUE";
 			}
-			foreach($arField as $key=>$value)
+			foreach($arField as $value)
 			{
 				switch($arInsertType[$FieldId]["BASE_TYPE"])
 				{
@@ -1983,7 +2041,7 @@ class CAllUserTypeManager
 		global $DB;
 		if($arUserFields = $this->GetUserFields($entity_id, $ID))
 		{
-			foreach($arUserFields as $FIELD_NAME => $arUserField)
+			foreach($arUserFields as $arUserField)
 			{
 				if($arUserField["USER_TYPE"]["BASE_TYPE"]=="file")
 				{
@@ -2006,7 +2064,7 @@ class CAllUserTypeManager
 		$result = "";
 		if($arUserFields = $this->GetUserFields($entity_id, $ID))
 		{
-			foreach($arUserFields as $FIELD_NAME => $arUserField)
+			foreach($arUserFields as $arUserField)
 			{
 				if($arUserField["IS_SEARCHABLE"]=="Y")
 				{
@@ -2184,7 +2242,7 @@ class CUserTypeSQL
 
 	public static function GetSelect()
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		global $USER_FIELD_MANAGER;
 		$result = "";
 		foreach($this->select as $key=>$value)
 		{
@@ -2251,6 +2309,52 @@ class CAllSQLWhere
 	var $c_joins = array();
 	var $l_joins = array();
 	var $bDistinctReqired = false;
+
+	//must be extended
+	function _StringIN($field, $sql_values)
+	{
+		return "";
+	}
+	//must be extended
+	function _ExprEQ($field, CSQLWhereExpression $val)
+	{
+		return "";
+	}
+	//must be extended
+	function _Empty($field)
+	{
+		return "";
+	}
+	//must be extended
+	function _StringEQ($field, $sql_value)
+	{
+		return "";
+	}
+	//must be extended
+	function _Upper($field)
+	{
+		return "";
+	}
+	//must be extended
+	function _StringNotIN($field, $sql_values)
+	{
+		return "";
+	}
+	//must be extended
+	function _ExprNotEQ($field, CSQLWhereExpression $val)
+	{
+		return "";
+	}
+	//must be extended
+	function _NotEmpty($field)
+	{
+		return "";
+	}
+	//must be extended
+	function _StringNotEQ($field, $sql_value)
+	{
+		return "";
+	}
 
 	static $triple_char = array(
 		"!><"=>"NB", //not between
@@ -2346,8 +2450,6 @@ class CAllSQLWhere
 		if(!is_array($arFilter))
 			return "";
 
-		$length_func = ($DB->type=="MSSQL" ? "LEN" : "LENGTH");
-
 		$logic = false;
 		if(isset($arFilter['LOGIC']))
 		{
@@ -2394,6 +2496,7 @@ class CAllSQLWhere
 				{
 					$FIELD_NAME = $this->fields[$key]["FIELD_NAME"];
 					$FIELD_TYPE = $this->fields[$key]["FIELD_TYPE"];
+					$FIELD_OPERATION = "";
 					if($operation=="G")
 						$FIELD_OPERATION = " > ";
 					elseif($operation=="L")
@@ -3055,7 +3158,7 @@ class CUserFieldEnum
 	 */
 	public static function SetEnumValues($FIELD_ID, $values)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER, $APPLICATION;
 		$aMsg = array();
 
 		/*check unique XML_ID*/
@@ -3134,7 +3237,7 @@ class CUserFieldEnum
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS['APPLICATION']->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -3387,4 +3490,3 @@ class CUserFieldEnum
 		if(CACHED_b_user_field_enum!==false) $CACHE_MANAGER->CleanDir("b_user_field_enum");
 	}
 }
-?>

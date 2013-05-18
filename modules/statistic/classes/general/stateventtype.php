@@ -228,66 +228,6 @@ class CAllStatEventType
 		return intval($EVENT_ID);
 	}
 
-	
-	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификаторам</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $event1  Идентификатор event1 типа события.
-	 *
-	 *
-	 *
-	 * @param string $event2  Идентификатор event2 типа события.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // зафиксируем событие типа "Скачивание файла manual.chm" (download/manual)
-	 * // если такого типа не существует, он будет автоматически создан
-	 * // событие будет фиксироваться по параметрам текущего посетителя сайта
-	 * 
-	 * // сначала проверим не скачивал ли уже текущий посетитель этот файл
-	 * // в течение последнего часа
-	 * 
-	 * // получим ID типа события
-	 * $rs = <b>CStatEventType::GetByEvents</b>($event1, $event2);
-	 * if ($ar = $rs-&gt;Fetch())
-	 * {
-	 *     // теперь получим все события данного типа для текущего посетителя сайта
-	 *     // произошедшие за последний час (3600 секунд)
-	 *     $rs = CStatEvent::GetListByGuest($_SESSION["SESS_GUEST_ID"], 
-	 *                                      $ar["TYPE_ID"], "", 3600);
-	 *     
-	 *     // если таких событий не было...
-	 *     if (!($ar = $rs-&gt;Fetch()))
-	 *     {
-	 *         // ...добавляем данное событие
-	 *         CStatEvent::AddCurrent("download", "manual");
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/conditionset.php">CStatEventType::ConditionSet</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип
-	 * события"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php
-	 * @author Bitrix
-	 */
 	public static function GetByEvents($event1, $event2)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";

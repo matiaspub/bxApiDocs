@@ -220,6 +220,8 @@ class CUser extends CAllUser
 		{
 			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
+			$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
+			$CACHE_MANAGER->ClearByTag("USER_NAME");			
 		}
 
 		return $Result;

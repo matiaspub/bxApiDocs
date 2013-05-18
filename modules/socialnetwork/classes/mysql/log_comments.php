@@ -226,7 +226,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				"GROUP_NAME", "GROUP_OWNER_ID", "GROUP_VISIBLE", "GROUP_OPENED", "GROUP_IMAGE_ID",
 				"USER_NAME", "USER_LAST_NAME", "USER_SECOND_NAME", "USER_LOGIN", "USER_PERSONAL_PHOTO", "USER_PERSONAL_GENDER",
 				"CREATED_BY_NAME", "CREATED_BY_LAST_NAME", "CREATED_BY_SECOND_NAME", "CREATED_BY_LOGIN", "CREATED_BY_PERSONAL_PHOTO", "CREATED_BY_PERSONAL_GENDER",
-				"LOG_SITE_ID", "LOG_SOURCE_ID",
+				"LOG_SITE_ID", "LOG_SOURCE_ID", "LOG_USER_ID",
 				"RATING_TYPE_ID", "RATING_ENTITY_ID", "RATING_TOTAL_VALUE", "RATING_TOTAL_VOTES", "RATING_TOTAL_POSITIVE_VOTES", "RATING_TOTAL_NEGATIVE_VOTES", "RATING_USER_VOTE_VALUE"
 			);
 
@@ -246,6 +246,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			"URL" => Array("FIELD" => "LC.URL", "TYPE" => "string"),
 			"MODULE_ID" => Array("FIELD" => "LC.MODULE_ID", "TYPE" => "string"),
 			"LOG_SOURCE_ID" => Array("FIELD" => "L.SOURCE_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_sonet_log L ON (LC.LOG_ID = L.ID)"),
+			"LOG_USER_ID" => Array("FIELD" => "L.USER_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_sonet_log L ON (LC.LOG_ID = L.ID)"),
 			"LOG_TITLE" => Array("FIELD" => "L1.TITLE", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log L1 ON (LC.LOG_ID = L1.ID)"),
 			"LOG_URL" => Array("FIELD" => "L1.URL", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log L1 ON (LC.LOG_ID = L1.ID)"),
 			"LOG_PARAMS" => Array("FIELD" => "L1.PARAMS", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log L1 ON (LC.LOG_ID = L1.ID)"),

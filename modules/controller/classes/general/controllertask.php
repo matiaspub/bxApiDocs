@@ -34,7 +34,10 @@ class CControllerTask
 
 	public static function CheckFields(&$arFields, $ID = false)
 	{
-		$arErrMsg = Array();
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		$arMsg = Array();
 
 		if($ID>0)
 			unset($arFields["ID"]);
@@ -78,7 +81,7 @@ class CControllerTask
 		if(count($arMsg)>0)
 		{
 			$e = new CAdminException($arMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -187,7 +190,9 @@ class CControllerTask
 
 	public static function ProcessTask($ID)
 	{
-		global $DB, $APPLICATION;
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		global $DB;
 		$ID = IntVal($ID);
 
 		$uniq = $APPLICATION->GetServerUniqID();
@@ -395,7 +400,8 @@ class CControllerTask
 
 	public static function ProcessAllTask()
 	{
-		global $DB, $APPLICATION;
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
 
 		$uniq = $APPLICATION->GetServerUniqID();
 

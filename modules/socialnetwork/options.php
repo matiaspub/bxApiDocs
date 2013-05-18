@@ -163,10 +163,11 @@ if (!function_exists('set_valign'))
 }
 
 $arAllOptionsCommon = array(
+	array("follow_default_type", GetMessage("SONET_LOG_FOLLOW_DEFAULT_TYPE"), "Y", Array("checkbox"))
 );
 
-if (IsModuleInstalled("intranet"))
-	$arAllOptionsCommon[] = array("follow_default_type", GetMessage("SONET_LOG_FOLLOW_DEFAULT_TYPE"), "Y", Array("checkbox"));
+if (!IsModuleInstalled("intranet"))
+	$arAllOptionsCommon[] = array("sonet_log_smart_filter", GetMessage("SONET_LOG_SMART_FILTER"), "N", Array("checkbox"));
 
 $arAllOptions = array(
 	array("allow_frields", GetMessage("SONET_ALLOW_FRIELDS"), "Y", Array("checkbox")),
@@ -177,8 +178,11 @@ $arAllOptions = array(
 	array("tooltip_fields", GetMessage("SONET_TOOLTIP_FIELDS"), $arTooltipFieldsDefault, Array("select_fields", true, 7)),
 	array("tooltip_properties", GetMessage("SONET_TOOLTIP_PROPERTIES"), $arTooltipPropertiesDefault, Array("select_properties", true, 3)),
 	array("tooltip_show_rating", GetMessage("SONET_TOOLTIP_SHOW_RATING"), "N", Array("checkbox")),
-	array("tooltip_rating_id", GetMessage("SONET_TOOLTIP_RATING_ID"), serialize(Array()), Array("select_rating", true, 3)),
+	array("tooltip_rating_id", GetMessage("SONET_TOOLTIP_RATING_ID"), serialize(Array()), Array("select_rating", true, 3))
 );
+
+
+
 
 $arAllOptionsUsers = array(
 	array("default_user_viewfriends", GetMessage("SONET_USER_OPERATIONS_viewfriends"), SONET_RELATIONS_TYPE_ALL, Array("select_user_perm")),
@@ -347,7 +351,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 	for ($i = 0; $i < $tmp_count; $i++)
 	{
 		$name = $arAllOptionsCommon[$i][0];
-		$val = $$name;
+		$val = ${$name};
 		if ($arAllOptionsCommon[$i][3][0] == "checkbox" && $val != "Y")
 			$val = "N";
 			
@@ -379,7 +383,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 		for ($i = 0; $i < $tmp_count; $i++)
 		{
 			$name = $arAllOptions[$i][0]."_".$arSite["ID"];
-			$val = $$name;
+			$val = ${$name};
 			if ($arAllOptions[$i][3][0] == "checkbox" && $val != "Y")
 				$val = "N";
 
@@ -409,7 +413,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 		for ($i = 0; $i < $tmp_count; $i++)
 		{
 			$name = $arAllOptionsUsers[$i][0]."_".$arSite["ID"];
-			$val = $$name;
+			$val = ${$name};
 			if ($arAllOptionsUsers[$i][3][0] == "checkbox" && $val != "Y")
 				$val = "N";
 			COption::SetOptionString("socialnetwork", $arAllOptionsUsers[$i][0], $val, $arAllOptionsUsers[$i][1], $arSite["ID"]);
@@ -466,7 +470,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 			for ($i = 0; $i < $tmp_count; $i++)
 			{
 				$name = $arAllOptionsUsersBlocks[$feature][$i][0]."_".$arSite["ID"];
-				$val = $$name;
+				$val = ${$name};
 				if ($arAllOptionsUsersBlocks[$feature][$i][3][0] == "checkbox" && $val != "Y")
 					$val = "N";
 				COption::SetOptionString("socialnetwork", $arAllOptionsUsersBlocks[$feature][$i][0], $val, $arAllOptionsUsersBlocks[$feature][$i][1], $arSite["ID"]);
@@ -505,7 +509,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 		for ($i = 0; $i < $tmp_count; $i++)
 		{
 			$name = $arAllOptionsGroups[$i][0]."_".$arSite["ID"];
-			$val = $$name;
+			$val = ${$name};
 			if ($arAllOptionsGroups[$i][3][0] == "checkbox" && $val != "Y")
 				$val = "N";
 			COption::SetOptionString("socialnetwork", $arAllOptionsGroups[$i][0], $val, $arAllOptionsGroups[$i][1], $arSite["ID"]);
@@ -535,7 +539,7 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 			for ($i = 0; $i < $tmp_count; $i++)
 			{
 				$name = $arAllOptionsGroupsBlocks[$feature][$i][0]."_".$arSite["ID"];
-				$val = $$name;
+				$val = ${$name};
 				if ($arAllOptionsGroupsBlocks[$feature][$i][3][0] == "checkbox" && $val != "Y")
 					$val = "N";
 				COption::SetOptionString("socialnetwork", $arAllOptionsGroupsBlocks[$feature][$i][0], $val, $arAllOptionsGroupsBlocks[$feature][$i][1], $arSite["ID"]);
@@ -785,7 +789,7 @@ $tabControl->BeginNextTab();
 				?><tr>
 					<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
 						if ($type[0]=="checkbox")
-							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$arSite["ID"])."\">".$Option[1]."</label>";
+							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 						else
 							echo $Option[1];
 					?>:</td>

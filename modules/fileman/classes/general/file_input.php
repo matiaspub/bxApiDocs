@@ -127,7 +127,7 @@ class CFileInput
 
 		foreach(self::$curFileIds as $fileId)
 		{
-			if (intVal($fileId) === 0)
+			if (strlen($fileId) <= 1 && intVal($fileId) === 0)
 				continue;
 
 			self::$bFileExists = true;
@@ -234,8 +234,9 @@ class CFileInput
 
 		foreach($values as $inputName => $fileId)
 		{
-			if (intVal($fileId) === 0)
+			if (strlen($fileId) <= 1 && intVal($fileId) === 0)
 				continue;
+
 			self::$bFileExists = true;
 			if($arFile = self::GetFile($fileId))
 			{
@@ -395,7 +396,10 @@ class CFileInput
 					self::DisplayFile($arFile, $ind);
 		?>
 		<script type="text/javascript">new top.BX.file_input(<?= CUtil::PHPToJSObject($arConfig)?>);</script>
-		</div><?
+		</div>
+		<?/* Used to refresh form content - workaround for IE bug (mantis:37969) */?>
+	<div id="<?= self::$jsId.'_ie_bogus_container'?>"><input type="hidden" value="" /></div>
+	<?
 	}
 
 	private static function DisplayDialogs()

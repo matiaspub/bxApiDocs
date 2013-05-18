@@ -598,10 +598,11 @@ class CComponentPanel
 			if(array_key_exists("AREA_BUTTONS", $arComponentDescription))
 			{
 				$componentRelativePath = CComponentEngine::MakeComponentPath($this->componentName);
+				$localPath = getLocalPath("components".$componentRelativePath);
 				foreach($arComponentDescription["AREA_BUTTONS"] as $value)
 				{
 					if (array_key_exists("SRC", $value))
-						$value["SRC"] = "/bitrix/components".$componentRelativePath.$value["SRC"];
+						$value["SRC"] = $localPath.$value["SRC"];
 					$aAddIcons[] = $value;
 				}
 			}

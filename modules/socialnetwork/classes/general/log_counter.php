@@ -10,23 +10,22 @@ class CAllSocNetLogCounter
 
 		$bGroupCounters = ($type === "group");
 
-		if (!$entity_type || !$entity_id || !$created_by_id)
+		if ($type == "L" && ($arLog = CSocNetLog::GetByID($log_id)))
 		{
-			if ($type == "L" && ($arLog = CSocNetLog::GetByID($log_id)))
-			{
-				$entity_type = $arLog["ENTITY_TYPE"];
-				$entity_id = $arLog["ENTITY_ID"];
-				$event_id = $arLog["EVENT_ID"];
-				$created_by_id = $arLog["USER_ID"];
-			}
-			elseif ($type == "LC" && ($arLogComment = CSocNetLogComments::GetByID($log_id)))
-			{
-				$entity_type = $arLogComment["ENTITY_TYPE"];
-				$entity_id = $arLogComment["ENTITY_ID"];
-				$event_id = $arLogComment["EVENT_ID"];
-				$created_by_id = $arLogComment["USER_ID"];
-				$log_id = $arLogComment["LOG_ID"];
-			}
+			$entity_type = $arLog["ENTITY_TYPE"];
+			$entity_id = $arLog["ENTITY_ID"];
+			$event_id = $arLog["EVENT_ID"];
+			$created_by_id = $arLog["USER_ID"];
+			$log_user_id = $arLog["USER_ID"];
+		}
+		elseif ($type == "LC" && ($arLogComment = CSocNetLogComments::GetByID($log_id)))
+		{
+			$entity_type = $arLogComment["ENTITY_TYPE"];
+			$entity_id = $arLogComment["ENTITY_ID"];
+			$event_id = $arLogComment["EVENT_ID"];
+			$created_by_id = $arLogComment["USER_ID"];
+			$log_id = $arLogComment["LOG_ID"];
+			$log_user_id = $arLogComment["LOG_USER_ID"];
 		}
 
 		if (!in_array($entity_type, $GLOBALS["arSocNetAllowedSubscribeEntityTypes"]))
@@ -55,7 +54,11 @@ class CAllSocNetLogCounter
 				$arOfEntities = array();
 		}
 
-		if ((!defined("DisableSonetLogVisibleSubscr") || DisableSonetLogVisibleSubscr !== true) && $visible && strlen($visible) > 0)
+		if (
+			(!defined("DisableSonetLogVisibleSubscr") || DisableSonetLogVisibleSubscr !== true) 
+			&& $visible 
+			&& strlen($visible) > 0
+		)
 		{
 			$key_res = CSocNetGroup::GetFilterOperation($visible);
 			$strField = $key_res["FIELD"];
@@ -115,14 +118,16 @@ class CAllSocNetLogCounter
 			U.ID as ID
 			,1
 			,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
-			,".($bGroupCounters? "SLR0.GROUP_CODE": "'**'")." as CODE
+			,".($bGroupCounters ? "SLR0.GROUP_CODE": "'**'")." as CODE
 		FROM
 			b_user U 
 			INNER JOIN b_sonet_log_right SLR ON SLR.LOG_ID = ".$log_id."
-			".($bGroupCounters? "INNER JOIN b_sonet_log_right SLR0 ON SLR0.LOG_ID = SLR.LOG_ID ": "")."
+			".($bGroupCounters ? "INNER JOIN b_sonet_log_right SLR0 ON SLR0.LOG_ID = SLR.LOG_ID ": "")."
 			INNER JOIN b_user_access UA ON UA.USER_ID = U.ID
 			LEFT JOIN b_sonet_log_site SLS ON SLS.LOG_ID = SLR.LOG_ID
 			".(strlen($followJoin) > 0 ? $followJoin : "")."
+			".(!$bGroupCounters && !IsModuleInstalled("intranet") ? "LEFT JOIN b_sonet_log_smartfilter SLSF ON SLSF.USER_ID = U.ID " : "")."
+			
 		WHERE
 			U.ACTIVE = 'Y'
 			".(
@@ -132,13 +137,69 @@ class CAllSocNetLogCounter
 					? "AND U.ID <> ".$created_by_id 
 					: ""
 			)."
-			".($bGroupCounters? "AND (SLR0.GROUP_CODE like 'SG%' AND SLR0.GROUP_CODE NOT LIKE 'SG%\_%')": "")."
-			AND (
-				0=1 
-				OR (SLR.GROUP_CODE IN ('AU', 'G2'))
-				OR (UA.ACCESS_CODE = SLR.GROUP_CODE)
-			)
-			".(strlen($followWhere) > 0 ? $followWhere : "")."
+			".($bGroupCounters ? "AND (SLR0.GROUP_CODE like 'SG%' AND SLR0.GROUP_CODE NOT LIKE 'SG%\_%')": "").
+			(
+				!$bGroupCounters && !IsModuleInstalled("intranet")
+					? (
+						COption::GetOptionString("socialnetwork", "sonet_log_smart_filter", "N") == "Y"
+							? "
+								AND (
+									0=1 
+									OR (
+										(
+											SLSF.USER_ID IS NULL 
+											OR SLSF.TYPE = 'Y'
+										) 
+										AND UA.ACCESS_CODE = SLR.GROUP_CODE 
+										AND (
+											SLR.GROUP_CODE LIKE 'SG%'
+											OR SLR.GROUP_CODE = 'U".$log_user_id."' 
+											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))." 
+										)
+									)
+									OR (
+										SLSF.TYPE <> 'Y'
+										AND (
+											SLR.GROUP_CODE IN ('AU', 'G2') 
+											OR UA.ACCESS_CODE = SLR.GROUP_CODE
+										)
+									)
+								)
+							"
+							: "
+								AND (
+									0=1 
+									OR (
+										(
+											SLSF.USER_ID IS NULL 
+											OR SLSF.TYPE <> 'Y'
+										) 
+										AND (
+											SLR.GROUP_CODE IN ('AU', 'G2') 
+											OR UA.ACCESS_CODE = SLR.GROUP_CODE
+										)
+									)
+									OR (
+										SLSF.TYPE = 'Y' 
+										AND UA.ACCESS_CODE = SLR.GROUP_CODE 
+										AND (
+											SLR.GROUP_CODE LIKE 'SG%'
+											OR SLR.GROUP_CODE = 'U".$log_user_id."'
+											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))." 
+										)
+									)
+								)
+							"
+					)
+					: "
+						AND (
+							0=1 
+							OR (SLR.GROUP_CODE IN ('AU', 'G2'))
+							OR (UA.ACCESS_CODE = SLR.GROUP_CODE)
+						)
+					"
+			)." ".
+			(strlen($followWhere) > 0 ? $followWhere : "")."
 		";
 
 		if($bGroupCounters)
