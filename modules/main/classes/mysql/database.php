@@ -426,7 +426,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 * @return CDBResult
 	 *
 	 *
 	 * <h4>Example</h4> 
