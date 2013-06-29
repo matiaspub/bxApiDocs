@@ -1,132 +1,184 @@
 <?
-global $SECURITY_SESSION_MC;
-$SECURITY_SESSION_MC = null;
-
-global $SECURITY_SESSION_ID;
-$SECURITY_SESSION_ID = null;
-
 class CSecuritySessionMC
 {
+	/** @var Memcache $connection*/
+	protected static $connection = null;
+	protected static $sessionId = null;
+
+	/**
+	 * @return bool
+	 */
 	public static function Init()
 	{
-		global $SECURITY_SESSION_MC;
-
-		if(isset($SECURITY_SESSION_MC))
+		if(self::isConnected())
 			return true;
 
-		if(extension_loaded('memcache') && defined("BX_SECURITY_SESSION_MEMCACHE_HOST"))
-		{
-			$port = defined("BX_SECURITY_SESSION_MEMCACHE_PORT")? intval(BX_SECURITY_SESSION_MEMCACHE_PORT): 11211;
-
-			$SECURITY_SESSION_MC = memcache_connect(BX_SECURITY_SESSION_MEMCACHE_HOST, $port);
-			if(is_object($SECURITY_SESSION_MC))
-				return true;
-		}
-
-		return false;
+		return self::newConnection();
 	}
 
-	public static function open($save_path, $session_name)
+	/**
+	 * @param string $savePath - unused on this handler
+	 * @param string $sessionName - unused on this handler
+	 * @return bool
+	 */
+	public static function open($savePath, $sessionName)
 	{
 		return CSecuritySessionMC::Init();
 	}
 
+	/**
+	 *
+	 */
 	public static function close()
 	{
-		global $SECURITY_SESSION_MC, $SECURITY_SESSION_ID;
+		if(!self::isConnected() || !self::isValidId(self::$sessionId))
+			return;
 
-		if(
-			isset($SECURITY_SESSION_MC)
-			&& isset($SECURITY_SESSION_ID)
-		)
-		{
-			$sid = defined("BX_CACHE_SID")? BX_CACHE_SID: "BX";
+		if(isSessionExpired())
+			self::destroy(self::$sessionId);
 
-			$SECURITY_SESSION_MC->delete($sid.$SECURITY_SESSION_ID.".lock");
-			$SECURITY_SESSION_MC->close();
-			$SECURITY_SESSION_MC = null;
-			$SECURITY_SESSION_ID = null;
-		}
-
-		return true;
+		self::$connection->delete(self::getPrefix().self::$sessionId.".lock");
+		self::$sessionId = null;
+		self::closeConnection();
 	}
 
+	/**
+	 * @param string $id - session id, must be valid hash
+	 * @return string
+	 */
 	public static function read($id)
 	{
-		global $SECURITY_SESSION_MC, $SECURITY_SESSION_ID;
+		if(!self::isConnected() || !self::isValidId($id))
+			return "";
 
-		if(
-			preg_match("/^[\da-z]{1,32}$/i", $id)
-			&& isset($SECURITY_SESSION_MC)
-		)
+		$lockTimeout = 55;//TODO: add setting
+		$lockWait = 59000000;//micro seconds = 60 seconds TODO: add setting
+		$waitStep = 100;
+		$sid = self::getPrefix();
+
+		while(!self::$connection->add($sid.$id.".lock", 1, 0, $lockTimeout))
 		{
-			$locktimeout = 55;//TODO: add setting
-			$lockwait = 59000000;//micro seconds = 60 seconds TODO: add setting
-			$waitstep = 100;
-			$sid = defined("BX_CACHE_SID")? BX_CACHE_SID: "BX";
+			usleep($waitStep);
+			$lockWait -= $waitStep;
+			if($lockWait < 0)
+				die('Unable to get session lock within 60 seconds.');
 
-			while(!$SECURITY_SESSION_MC->add($sid.$id.".lock", 1, 0, $locktimeout))
-			{
-				usleep($waitstep);
-				$lockwait -= $waitstep;
-				if($lockwait < 0)
-					die('Unable to get session lock within 60 seconds.');
-
-				if($waitstep < 1000000)
-					$waitstep *= 2;
-			}
-
-			$SECURITY_SESSION_ID = $id;
-			$res = $SECURITY_SESSION_MC->get($sid.$id);
-			if($res !== false && $res !== '')
-			{
-				return $res;
-			}
+			if($waitStep < 1000000)
+				$waitStep *= 2;
 		}
+
+		self::$sessionId = $id;
+		$res = self::$connection->get($sid.$id);
+		if($res === false)
+			$res = "";
+
+		return $res;
 	}
 
-	public static function write($id, $sess_data)
+	/**
+	 * @param string $id - session id, must be valid hash
+	 * @param array $sessionData
+	 */
+	public static function write($id, $sessionData)
 	{
-		global $SECURITY_SESSION_MC;
+		if(!self::isConnected() || !self::isValidId($id))
+			return;
 
-		if(
-			preg_match("/^[\da-z]{1,32}$/i", $id)
-			&& isset($SECURITY_SESSION_MC)
-		)
-		{
-			$sid = defined("BX_CACHE_SID")? BX_CACHE_SID: "BX";
-			$maxlifetime = intval(ini_get("session.gc_maxlifetime"));
+		$sid = self::getPrefix();
+		$maxlifetime = intval(ini_get("session.gc_maxlifetime"));
 
-			if($SECURITY_SESSION_OLD_ID && preg_match("/^[\da-z]{1,32}$/i", $SECURITY_SESSION_OLD_ID))
-				$old_sess_id = $SECURITY_SESSION_OLD_ID;
-			else
-				$old_sess_id = $id;
+		if(CSecuritySession::isOldSessionIdExist())
+			$oldSessionId = CSecuritySession::getOldSessionId();
+		else
+			$oldSessionId = $id;
 
-			$SECURITY_SESSION_MC->delete($sid.$old_sess_id);
-			$SECURITY_SESSION_MC->set($sid.$id, $sess_data, 0, time()+$maxlifetime);
-		}
+		self::$connection->delete($sid.$oldSessionId);
+		self::$connection->set($sid.$id, $sessionData, 0, time() + $maxlifetime);
 	}
 
+	/**
+	 * @param string $id - session id, must be valid hash
+	 */
 	public static function destroy($id)
 	{
-		global $SECURITY_SESSION_MC;
+		if(!self::isValidId($id))
+			return;
 
-		if(
-			preg_match("/^[\da-z]{1,32}$/i", $id)
-			&& isset($SECURITY_SESSION_MC)
-		)
-		{
-			$sid = defined("BX_CACHE_SID")? BX_CACHE_SID: "BX";
+		$isConnectionRestored = false;
+		if(!self::isConnected())
+			$isConnectionRestored = self::newConnection();
 
-			$SECURITY_SESSION_MC->delete($sid.$id);
+		if(!self::isConnected())
+			return;
 
-			if($SECURITY_SESSION_OLD_ID && preg_match("/^[\da-z]{1,32}$/i", $SECURITY_SESSION_OLD_ID))
-				$SECURITY_SESSION_MC->delete($sid.$SECURITY_SESSION_OLD_ID);
-		}
+		$sid = self::getPrefix();
+		self::$connection->delete($sid.$id);
+
+		if(CSecuritySession::isOldSessionIdExist())
+			self::$connection->delete($sid.CSecuritySession::getOldSessionId());
+
+		if($isConnectionRestored)
+			self::closeConnection();
 	}
 
-	public static function gc($maxlifetime)
+	/**
+	 * @param int $maxLifeTime - unused on this handler
+	 */
+	public static function gc($maxLifeTime)
 	{
 	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isStorageEnabled()
+	{
+		return defined("BX_SECURITY_SESSION_MEMCACHE_HOST");
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected static function isConnected()
+	{
+		return self::$connection !== null;
+	}
+
+	/**
+	 * @param string $pId
+	 * @return bool
+	 */
+	protected static function isValidId($pId)
+	{
+		return (bool) preg_match("/^[\da-z]{1,32}$/i", $pId);
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function getPrefix()
+	{
+		return defined("BX_CACHE_SID")? BX_CACHE_SID: "BX";
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected static function newConnection()
+	{
+		if(!extension_loaded('memcache') || !self::isStorageEnabled())
+			return false;
+
+		$port = defined("BX_SECURITY_SESSION_MEMCACHE_PORT")? intval(BX_SECURITY_SESSION_MEMCACHE_PORT): 11211;
+
+		self::$connection = new Memcache;
+		return self::$connection->connect(BX_SECURITY_SESSION_MEMCACHE_HOST, $port);
+	}
+
+	protected static function closeConnection()
+	{
+		self::$connection->close();
+		self::$connection = null;
+	}
+
 }
-?>

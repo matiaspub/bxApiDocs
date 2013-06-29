@@ -2483,12 +2483,12 @@ class CGlobalCondTree
 		CJSCore::Init(array("core_condtree"));
 	}
 
-	public function __destruct()
+	static public function __destruct()
 	{
 
 	}
 
-	static public function OnConditionAtomBuildList()
+	public function OnConditionAtomBuildList()
 	{
 		if (!$this->boolError)
 		{
@@ -2510,7 +2510,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function OnConditionControlBuildList()
+	public function OnConditionControlBuildList()
 	{
 		global $APPLICATIONS;
 		if (!$this->boolError)
@@ -2692,7 +2692,7 @@ class CGlobalCondTree
 		return true;
 	}
 
-	static public function Init($intMode, $mxEvent, $arParams = array())
+	public function Init($intMode, $mxEvent, $arParams = array())
 	{
 		global $APPLICATION;
 		$this->arMsg = array();
@@ -2831,7 +2831,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function Show($arConditions)
+	public function Show($arConditions)
 	{
 		global $APPLICATION;
 		$this->arMsg = array();
@@ -2908,7 +2908,7 @@ class CGlobalCondTree
 		);
 	}
 
-	static public function Parse($arData = '', $arParams = false)
+	public function Parse($arData = '', $arParams = false)
 	{
 		global $APPLICATION;
 		$this->arMsg = array();
@@ -3004,7 +3004,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function ShowScripts()
+	public function ShowScripts()
 	{
 		if (!$this->boolError)
 		{
@@ -3012,7 +3012,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function ShowAtoms()
+	public function ShowAtoms()
 	{
 		global $APPLICATION;
 
@@ -3034,7 +3034,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function ShowParams()
+	public function ShowParams()
 	{
 		if (!$this->boolError)
 		{
@@ -3057,7 +3057,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function ShowControls()
+	public function ShowControls()
 	{
 		if (!$this->boolError)
 		{
@@ -3098,7 +3098,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function ShowLevel(&$arLevel, $boolFirst = false)
+	public function ShowLevel(&$arLevel, $boolFirst = false)
 	{
 		$boolFirst = (true === $boolFirst ? true : false);
 		$arResult = array();
@@ -3174,7 +3174,7 @@ class CGlobalCondTree
 		return $arResult;
 	}
 
-	static public function ShowConditions()
+	public function ShowConditions()
 	{
 		if (!$this->boolError)
 		{
@@ -3191,7 +3191,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function Generate($arConditions, $arParams)
+	public function Generate($arConditions, $arParams)
 	{
 		if (!$this->boolError)
 		{
@@ -3221,7 +3221,7 @@ class CGlobalCondTree
 		}
 	}
 
-	static public function GenerateLevel(&$arLevel, $arParams, $boolFirst = false)
+	public function GenerateLevel(&$arLevel, $arParams, $boolFirst = false)
 	{
 		$arResult = array();
 		$boolError = false;
@@ -3318,7 +3318,7 @@ class CGlobalCondTree
 		return $arResult;
 	}
 
-	static public function GetConditionValues($arConditions)
+	public function GetConditionValues($arConditions)
 	{
 		$arResult = false;
 		if (!$this->boolError)
@@ -3333,7 +3333,7 @@ class CGlobalCondTree
 		return $arResult;
 	}
 
-	static public function GetConditionValuesLevel(&$arLevel, &$arResult, $boolFirst = false)
+	public function GetConditionValuesLevel(&$arLevel, &$arResult, $boolFirst = false)
 	{
 		$boolFirst = (true === $boolFirst);
 		if (is_array($arLevel) && !empty($arLevel))

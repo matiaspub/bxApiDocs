@@ -2,7 +2,7 @@
 class CPerfomanceSchema
 {
 	var $data_relations = null;
-	public static function Init()
+	public function Init()
 	{
 		if(!isset($this->data_relations))
 		{
@@ -39,7 +39,7 @@ class CPerfomanceSchema
 		}
 	}
 
-	public static function GetChildren($table_name)
+	public function GetChildren($table_name)
 	{
 		$this->Init();
 		$result = array();
@@ -72,7 +72,7 @@ class CPerfomanceSchema
 		return $result;
 	}
 
-	public static function GetParents($table_name)
+	public function GetParents($table_name)
 	{
 		$this->Init();
 		$result = array();

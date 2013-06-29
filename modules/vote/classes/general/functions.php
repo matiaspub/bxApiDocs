@@ -22,7 +22,7 @@ class CVoteCacheManager
 		return str_replace("#SITE_ID#", $site_id, self::$cacheKey);
 	}
 
-	function __construct()
+	public static function __construct()
 	{
 		AddEventHandler("vote", "onAfterVoteChannelAdd", Array(&$this, "OnAfterVoteChannelChange"));
 		AddEventHandler("vote", "onAfterVoteChannelUpdate", Array(&$this, "OnAfterVoteChannelChange"));

@@ -91,7 +91,7 @@ abstract class Application
 		return static::$instance;
 	}
 
-	static public function turnOnCompatibleMode()
+	public function turnOnCompatibleMode()
 	{
 		$this->initializationStrategy = new \Bitrix\Main\System\CompatibleStrategy();
 	}
@@ -147,7 +147,7 @@ abstract class Application
 	/**
 	 * Initializes application. Should be called before start() method.
 	 */
-	static final public function initialize()
+	final public function initialize()
 	{
 		$initStrategy = $this->initializationStrategy;
 
@@ -252,7 +252,7 @@ abstract class Application
 			$initStrategy->initializeExtendedKernel();
 	}
 
-	static final public function getDispatcher()
+	final public function getDispatcher()
 	{
 		if (is_null($this->dispatcher))
 			throw new NotSupportedException();
@@ -300,7 +300,7 @@ abstract class Application
 	 * Starts request execution. Should be called after initialize.
 	 * Should be implemented in subclass.
 	 */
-	static abstract public function start();
+	abstract public function start();
 
 	protected function updateMainDb()
 	{
@@ -433,7 +433,7 @@ abstract class Application
 	/**
 	 * @return \Bitrix\Main\Diag\ExceptionHandler
 	 */
-	static public function getExceptionHandler()
+	public function getExceptionHandler()
 	{
 		return $this->exceptionHandler;
 	}
@@ -443,7 +443,7 @@ abstract class Application
 	 *
 	 * @return DB\DbConnectionPool
 	 */
-	static public function getDbConnectionPool()
+	public function getDbConnectionPool()
 	{
 		return $this->dbConnectionPool;
 	}
@@ -453,7 +453,7 @@ abstract class Application
 	 *
 	 * @return Context
 	 */
-	static public function getContext()
+	public function getContext()
 	{
 		return $this->context;
 	}
@@ -463,7 +463,7 @@ abstract class Application
 	 *
 	 * @param Context $context
 	 */
-	static public function setContext(Context $context)
+	public function setContext(Context $context)
 	{
 		$this->context = $context;
 	}
@@ -497,7 +497,7 @@ abstract class Application
 	 *
 	 * @return Data\ManagedCache
 	 */
-	static public function getManagedCache()
+	public function getManagedCache()
 	{
 		if ($this->managedCache == null)
 			$this->managedCache = new \Bitrix\Main\Data\ManagedCache();

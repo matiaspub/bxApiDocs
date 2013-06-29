@@ -21,7 +21,7 @@ class StringField extends ScalarField
 	 */
 	protected $format = null;
 
-	function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
 
@@ -35,12 +35,12 @@ class StringField extends ScalarField
 	 * Shortcut for Regexp validator
 	 * @return null|string
 	 */
-	static public function getFormat()
+	public function getFormat()
 	{
 		return $this->format;
 	}
 
-	static public function getValidators()
+	public function getValidators()
 	{
 		$validators = parent::getValidators();
 

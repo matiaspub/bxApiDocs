@@ -16,26 +16,26 @@ class CDataXMLNode
 	var $attributes;
 	var $_parent;
 
-	function CDataXMLNode()
+	static function CDataXMLNode()
 	{
 	}
 
-	public static function name()
+	public function name()
 	{
 		return $this->name;
 	}
 
-	public static function children()
+	public function children()
 	{
 		return $this->children;
 	}
 
-	public static function textContent()
+	public function textContent()
 	{
 		return $this->content;
 	}
 
-	public static function getAttribute($attribute)
+	public function getAttribute($attribute)
 	{
 		if(is_array($this->attributes))
 		{
@@ -46,12 +46,12 @@ class CDataXMLNode
 		return "";
 	}
 
-	public static function getAttributes()
+	public function getAttributes()
 	{
 		return $this->attributes;
 	}
 
-	public static function namespaceURI()
+	public function namespaceURI()
 	{
 		return $this->getAttribute("xmlns");
 	}
@@ -60,7 +60,7 @@ class CDataXMLNode
 	 * @param $tagname
 	 * @return CDataXMLNode[]
 	 */
-	public static function elementsByName($tagname)
+	public function elementsByName($tagname)
 	{
 		$result = array();
 
@@ -82,7 +82,7 @@ class CDataXMLNode
 		return $result;
 	}
 
-	function _SaveDataType_OnDecode(&$result, $name, $value)
+	public static function _SaveDataType_OnDecode(&$result, $name, $value)
 	{
 		if (isset($result[$name]))
 		{
@@ -99,7 +99,7 @@ class CDataXMLNode
 		}
 	}
 
-	public static function decodeDataTypes($attrAsNodeDecode = false)
+	public function decodeDataTypes($attrAsNodeDecode = false)
 	{
 		$result = array();
 
@@ -191,7 +191,7 @@ class CDataXMLNode
 		return $ret;
 	}
 
-	function __toArray()
+	public function __toArray()
 	{
 		$retHash = array(
 			"@" => array(),
@@ -232,11 +232,11 @@ class CDataXMLDocument
 	var $children;
 	var $root;
 
-	function CDataXMLDocument()
+	static function CDataXMLDocument()
 	{
 	}
 
-	public static function elementsByName($tagname)
+	public function elementsByName($tagname)
 	{
 		$result = array();
 		if(is_array($this->children))
@@ -254,7 +254,7 @@ class CDataXMLDocument
 		return $result;
 	}
 
-	public static function encodeDataTypes( $name, $value)
+	public function encodeDataTypes( $name, $value)
 	{
 		static $Xsd = array(
 			"string"=>"string", "bool"=>"boolean", "boolean"=>"boolean",
@@ -341,13 +341,13 @@ class CDataXML
 
 	var $delete_ns = true;
 
-	public static function CDataXML($TrimWhiteSpace = True)
+	public function CDataXML($TrimWhiteSpace = True)
 	{
 		$this->TrimWhiteSpace = ($TrimWhiteSpace ? True : False);
 		$this->tree = False;
 	}
 
-	public static function Load($file)
+	public function Load($file)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -371,7 +371,7 @@ class CDataXML
 		return false;
 	}
 
-	public static function LoadString($text)
+	public function LoadString($text)
 	{
 		unset($this->tree);
 		$this->tree = false;
@@ -683,7 +683,7 @@ class CDataXML
 		return $oXMLDocument;
 	}
 
-	function __stripComments(&$str)
+	public function __stripComments(&$str)
 	{
 		$str = &preg_replace("#<\\!--.*?-->#s", "", $str);
 		return $str;
@@ -802,7 +802,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	static public function registerNodeHandler($nodePath, $callableHandler)
+	public function registerNodeHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -822,7 +822,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	static public function registerElementHandler($nodePath, $callableHandler)
+	public function registerElementHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -841,7 +841,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	static public function openFile($filePath)
+	public function openFile($filePath)
 	{
 		$this->fileHandler = null;
 
@@ -875,7 +875,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	static public function endOfFile()
+	public function endOfFile()
 	{
 		if ($this->fileHandler === null)
 			return true;
@@ -888,7 +888,7 @@ class CXMLFileStream
 	 * @return array[int]string
 	 *
 	 */
-	static public function getPosition()
+	public function getPosition()
 	{
 		$this->xmlPosition = array();
 		foreach($this->elementStack as $i => $elementName)
@@ -908,7 +908,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	static public function setPosition($position)
+	public function setPosition($position)
 	{
 		if(is_array($position))
 		{
@@ -926,7 +926,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	static public function findNext()
+	public function findNext()
 	{
 		$bMB = defined("BX_UTF");
 		$cs = $this->fileCharset;

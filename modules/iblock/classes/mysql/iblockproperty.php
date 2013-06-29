@@ -14,7 +14,7 @@
  */
 class CIBlockProperty extends CAllIBlockProperty
 {
-	function _Update($ID, $arFields)
+	public function _Update($ID, $arFields)
 	{
 		global $DB;
 		$ID=intval($ID);
@@ -192,11 +192,10 @@ class CIBlockProperty extends CAllIBlockProperty
 		return array("ALTER TABLE ".$strTable." DROP ".implode(", DROP ", $arColumns));
 	}
 
-	function _Add($ID, $arFields)
+	public static function _Add($ID, $arFields)
 	{
 		global $DB;
 		$ID = IntVal($ID);
-		$err_mess = "FILE: ".__FILE__."<br>LINE: ";
 
 		if($arFields["MULTIPLE"]=="Y")
 			$strType = "longtext";

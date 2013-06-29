@@ -4,7 +4,7 @@ class CSecurityFilterPathAuditor extends CSecurityFilterBaseAuditor
 {
 	protected $name = "PHP";
 
-	function __construct($pChar = "")
+	public function __construct($pChar = "")
 	{
 		$this->setSplittingChar($pChar);
 	}

@@ -358,7 +358,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * 
 	 * @return bool true - if there is access to given operations
 	 */
-	static public function IsBaseAccessForCR ($in_bitmaskRequested, $isUseCache = false)
+	public function IsBaseAccessForCR ($in_bitmaskRequested, $isUseCache = false)
 	{
 		return ($this->IsBaseAccess ($in_bitmaskRequested, $isUseCache, true));
 	}
@@ -371,7 +371,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * 
 	 * @return bool true - if there is access to given operations
 	 */
-	static public function IsBaseAccess ($in_bitmaskRequested, $isUseCache = false, $checkForAuthor = false)
+	public function IsBaseAccess ($in_bitmaskRequested, $isUseCache = false, $checkForAuthor = false)
 	{
 		global $USER;
 
@@ -419,7 +419,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * @param array $arPermPairs, for example: array ('CR' => 4, 'U2' => '1', ...).
 	 * All unlisted access symbols ("subjects") will be removed.
 	 */
-	static public function SetBasePermissions ($in_arPermPairs)
+	public function SetBasePermissions ($in_arPermPairs)
 	{
 		global $DB, $USER;
 
@@ -570,7 +570,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * $oAccess->SetLessonsPermissions ($arPermissions);
 	 * 
 	 */
-	static public function SetLessonsPermissions ($in_arPermissions)
+	public function SetLessonsPermissions ($in_arPermissions)
 	{
 		global $DB;
 
@@ -657,7 +657,7 @@ class CLearnAccess implements ILearnAccessInterface
 	}
 
 
-	static public function IsLessonAccessible ($in_lessonId, $in_bitmaskOperations, $isUseCache = false)
+	public function IsLessonAccessible ($in_lessonId, $in_bitmaskOperations, $isUseCache = false)
 	{
 		static $cacheArIds = array();
 
@@ -675,7 +675,7 @@ class CLearnAccess implements ILearnAccessInterface
 	}
 
 
-	static public function GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache = false)
+	public function GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache = false)
 	{
 		global $DB;
 		
@@ -711,7 +711,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * // Selects only lessons, which are accessible by user with id = $someUserId
 	 * $rc = $DB->Query ("SELECT NAME FROM b_learn_lesson WHERE ACTIVE = 'Y' AND ID IN (" . $sql . ")");
 	 */
-	static public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $in_prfx = 'DEFPRFX')
+	public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $in_prfx = 'DEFPRFX')
 	{
 		if ( ! (is_int($in_bitmaskOperations) && ($in_bitmaskOperations > 0)) )
 		{

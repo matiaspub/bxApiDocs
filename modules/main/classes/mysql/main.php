@@ -14,16 +14,16 @@ require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/main.ph
 
 class CMain extends CAllMain
 {
-	function __GetConditionFName()
+	public static function __GetConditionFName()
 	{
 		return "`CONDITION`";
 	}
 
-	function FileAction()
+	static function FileAction()
 	{
 	}
 
-	public static function GetLang($cur_dir=false, $cur_host=false)
+	public function GetLang($cur_dir=false, $cur_host=false)
 	{
 		global $DB, $lang, $DOCUMENT_ROOT, $MAIN_LANGS_CACHE, $MAIN_LANGS_ADMIN_CACHE;
 
@@ -295,7 +295,7 @@ class CSite extends CAllSite
 
 class CFilterQuery extends CAllFilterQuery
 {
-	public static function BuildWhereClause($word)
+	public function BuildWhereClause($word)
 	{
 		$this->cnt++;
 		//if($this->cnt>10) return "1=1";

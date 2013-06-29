@@ -92,7 +92,7 @@ class CSaleOrder extends CAllSaleOrder
 	 */
 	public static function Add($arFields)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$arFields1 = array();
 		foreach ($arFields as $key => $value)
@@ -143,9 +143,14 @@ class CSaleOrder extends CAllSaleOrder
 		$strSql =
 			"INSERT INTO b_sale_order(".$arInsert[0].") ".
 			"VALUES(".$arInsert[1].")";
+
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$ID = IntVal($DB->LastID());
+
+		CSaleOrder::SetAccountNumber($ID);
+
+		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
 		foreach(GetModuleEvents("sale", "OnOrderAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
@@ -239,7 +244,7 @@ class CSaleOrder extends CAllSaleOrder
 	 */
 	public static function Update($ID, $arFields, $bDateUpdate = true)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$ID = IntVal($ID);
 
@@ -278,6 +283,8 @@ class CSaleOrder extends CAllSaleOrder
 			$strSql .=	",	DATE_UPDATE = ".$DB->GetNowFunction()." ";
 		$strSql .=	"WHERE ID = ".$ID." ";
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
 		if ($res)
 		{
@@ -449,7 +456,13 @@ class CSaleOrder extends CAllSaleOrder
 	 */
 	public static function GetList($arOrder = Array("ID"=>"DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
+
+		$obUserFieldsSql = new CUserTypeSQL;
+		$obUserFieldsSql->SetEntity("ORDER", "O.ID");
+		$obUserFieldsSql->SetSelect($arSelectFields);
+		$obUserFieldsSql->SetFilter($arFilter);
+		$obUserFieldsSql->SetOrder($arOrder);
 
 		if (array_key_exists("DATE_FROM", $arFilter))
 		{
@@ -560,11 +573,178 @@ class CSaleOrder extends CAllSaleOrder
 			unset($arFilter["DATE_MARKED_TO"]);
 			$arFilter["<=DATE_MARKED"] = $val;
 		}
+		if (array_key_exists("DATE_PAY_BEFORE_FROM", $arFilter))
+		{
+			$val = $arFilter["DATE_PAY_BEFORE_FROM"];
+			unset($arFilter["DATE_PAY_BEFORE_FROM"]);
+			$arFilter[">=DATE_PAY_BEFORE"] = $val;
+		}
+		if (array_key_exists("DATE_PAY_BEFORE_TO", $arFilter))
+		{
+			$val = $arFilter["DATE_PAY_BEFORE_TO"];
+			unset($arFilter["DATE_PAY_BEFORE_TO"]);
+			$arFilter["<=DATE_PAY_BEFORE"] = $val;
+		}
+
+		$callback = false;
+		if (array_key_exists("CUSTOM_SUBQUERY", $arFilter))
+		{
+			$callback = $arFilter["CUSTOM_SUBQUERY"];
+			unset($arFilter["CUSTOM_SUBQUERY"]);
+		}
 
 		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED", "EMP_CANCELED_ID", "REASON_CANCELED", "MARKED", "DATE_MARKED", "EMP_MARKED_ID", "REASON_MARKED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID", "PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "DEDUCTED", "DATE_DEDUCTED", "EMP_DEDUCTED_ID", "REASON_UNDO_DEDUCTED", "RESERVED", "PRICE", "CURRENCY", "DISCOUNT_VALUE", "SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION", "ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE", "COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "RECOUNT_FLAG", "USER_LOGIN", "USER_NAME", "USER_LAST_NAME", "USER_EMAIL", "DELIVERY_DOC_NUM", "DELIVERY_DOC_DATE", "STORE_ID");
+		{
+			$arSelectFields = array(
+				"ID",
+				"LID",
+				"PERSON_TYPE_ID",
+				"PAYED",
+				"DATE_PAYED",
+				"EMP_PAYED_ID",
+				"CANCELED",
+				"DATE_CANCELED",
+				"EMP_CANCELED_ID",
+				"REASON_CANCELED",
+				"MARKED",
+				"DATE_MARKED",
+				"EMP_MARKED_ID",
+				"REASON_MARKED",
+				"STATUS_ID",
+				"DATE_STATUS",
+				"PAY_VOUCHER_NUM",
+				"PAY_VOUCHER_DATE",
+				"EMP_STATUS_ID",
+				"PRICE_DELIVERY",
+				"ALLOW_DELIVERY",
+				"DATE_ALLOW_DELIVERY",
+				"EMP_ALLOW_DELIVERY_ID",
+				"DEDUCTED",
+				"DATE_DEDUCTED",
+				"EMP_DEDUCTED_ID",
+				"REASON_UNDO_DEDUCTED",
+				"RESERVED",
+				"PRICE",
+				"CURRENCY",
+				"DISCOUNT_VALUE",
+				"SUM_PAID",
+				"USER_ID",
+				"PAY_SYSTEM_ID",
+				"DELIVERY_ID",
+				"DATE_INSERT",
+				"DATE_INSERT_FORMAT",
+				"DATE_UPDATE",
+				"USER_DESCRIPTION",
+				"ADDITIONAL_INFO",
+				"PS_STATUS",
+				"PS_STATUS_CODE",
+				"PS_STATUS_DESCRIPTION",
+				"PS_STATUS_MESSAGE",
+				"PS_SUM",
+				"PS_CURRENCY",
+				"PS_RESPONSE_DATE",
+				"COMMENTS",
+				"TAX_VALUE",
+				"STAT_GID",
+				"RECURRING_ID",
+				"RECOUNT_FLAG",
+				"USER_LOGIN",
+				"USER_NAME",
+				"USER_LAST_NAME",
+				"USER_EMAIL",
+				"DELIVERY_DOC_NUM",
+				"DELIVERY_DOC_DATE",
+				"STORE_ID",
+				"ORDER_TOPIC",
+				"RESPONSIBLE_ID",
+				"RESPONSIBLE_LOGIN",
+				"RESPONSIBLE_NAME",
+				"RESPONSIBLE_LAST_NAME",
+				"RESPONSIBLE_SECOND_NAME",
+				"RESPONSIBLE_EMAIL",
+				"RESPONSIBLE_WORK_POSITION",
+				"RESPONSIBLE_PERSONAL_PHOTO",
+				"RESPONSIBLE_GROUP_ID",
+				"DATE_PAY_BEFORE",
+				"ACCOUNT_NUMBER"
+			);
+		}
 		elseif (in_array("*", $arSelectFields))
-			$arSelectFields = array("ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED", "EMP_CANCELED_ID", "REASON_CANCELED", "MARKED", "DATE_MARKED", "EMP_MARKED_ID", "REASON_MARKED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID", "PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "DEDUCTED", "DATE_DEDUCTED", "EMP_DEDUCTED_ID", "REASON_UNDO_DEDUCTED", "RESERVED", "PRICE", "CURRENCY", "DISCOUNT_VALUE", "SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION", "ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE", "COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "RECOUNT_FLAG", "USER_LOGIN", "USER_NAME", "USER_LAST_NAME", "USER_EMAIL", "DELIVERY_DOC_NUM", "DELIVERY_DOC_DATE", "STORE_ID");
+		{
+			$arSelectFields = array(
+				"ID",
+				"LID",
+				"PERSON_TYPE_ID",
+				"PAYED",
+				"DATE_PAYED",
+				"EMP_PAYED_ID",
+				"CANCELED",
+				"DATE_CANCELED",
+				"EMP_CANCELED_ID",
+				"REASON_CANCELED",
+				"MARKED",
+				"DATE_MARKED",
+				"EMP_MARKED_ID",
+				"REASON_MARKED",
+				"STATUS_ID",
+				"DATE_STATUS",
+				"PAY_VOUCHER_NUM",
+				"PAY_VOUCHER_DATE",
+				"EMP_STATUS_ID",
+				"PRICE_DELIVERY",
+				"ALLOW_DELIVERY",
+				"DATE_ALLOW_DELIVERY",
+				"EMP_ALLOW_DELIVERY_ID",
+				"DEDUCTED",
+				"DATE_DEDUCTED",
+				"EMP_DEDUCTED_ID",
+				"REASON_UNDO_DEDUCTED",
+				"RESERVED",
+				"PRICE",
+				"CURRENCY",
+				"DISCOUNT_VALUE",
+				"SUM_PAID",
+				"USER_ID",
+				"PAY_SYSTEM_ID",
+				"DELIVERY_ID",
+				"DATE_INSERT",
+				"DATE_INSERT_FORMAT",
+				"DATE_UPDATE",
+				"USER_DESCRIPTION",
+				"ADDITIONAL_INFO",
+				"PS_STATUS",
+				"PS_STATUS_CODE",
+				"PS_STATUS_DESCRIPTION",
+				"PS_STATUS_MESSAGE",
+				"PS_SUM",
+				"PS_CURRENCY",
+				"PS_RESPONSE_DATE",
+				"COMMENTS",
+				"TAX_VALUE",
+				"STAT_GID",
+				"RECURRING_ID",
+				"RECOUNT_FLAG",
+				"USER_LOGIN",
+				"USER_NAME",
+				"USER_LAST_NAME",
+				"USER_EMAIL",
+				"DELIVERY_DOC_NUM",
+				"DELIVERY_DOC_DATE",
+				"STORE_ID",
+				"ORDER_TOPIC",
+				"RESPONSIBLE_ID",
+				"RESPONSIBLE_LOGIN",
+				"RESPONSIBLE_NAME",
+				"RESPONSIBLE_LAST_NAME",
+				"RESPONSIBLE_SECOND_NAME",
+				"RESPONSIBLE_EMAIL",
+				"RESPONSIBLE_WORK_POSITION",
+				"RESPONSIBLE_PERSONAL_PHOTO",
+				"RESPONSIBLE_GROUP_ID",
+				"DATE_PAY_BEFORE",
+				"ACCOUNT_NUMBER",
+			);
+		}
 
 		$maxLock = IntVal(COption::GetOptionString("sale", "MAX_LOCK_TIME", "60"));
 		if(is_object($GLOBALS["USER"]))
@@ -635,12 +815,25 @@ class CSaleOrder extends CAllSaleOrder
 			"UPDATED_1C" => array("FIELD" => "O.UPDATED_1C", "TYPE" => "string"),
 			"STORE_ID" => array("FIELD" => "O.STORE_ID", "TYPE" => "int"),
 
+			"ORDER_TOPIC" => array("FIELD" => "O.ORDER_TOPIC", "TYPE" => "string"),
+			"RESPONSIBLE_ID" => array("FIELD" => "O.RESPONSIBLE_ID", "TYPE" => "int"),
+			"DATE_PAY_BEFORE" => array("FIELD" => "O.DATE_PAY_BEFORE", "TYPE" => "datetime"),
+			"ACCOUNT_NUMBER" => array("FIELD" => "O.ACCOUNT_NUMBER", "TYPE" => "string"),
+
 			"NAME_SEARCH" => array("FIELD" => "U.NAME, U.LAST_NAME, U.SECOND_NAME, U.EMAIL, U.LOGIN, U.ID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_LOGIN" => array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_NAME" => array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_LAST_NAME" => array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_EMAIL" => array("FIELD" => "U.EMAIL", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_GROUP_ID" => array("FIELD" => "UG.GROUP_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_user_group UG ON (UG.USER_ID = O.USER_ID)"),
+
+			"RESPONSIBLE_LOGIN" => array("FIELD" => "UR.LOGIN", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_NAME" => array("FIELD" => "UR.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_LAST_NAME" => array("FIELD" => "UR.LAST_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_SECOND_NAME" => array("FIELD" => "UR.SECOND_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_EMAIL" => array("FIELD" => "UR.EMAIL", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_WORK_POSITION" => array("FIELD" => "UR.WORK_POSITION", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
+			"RESPONSIBLE_PERSONAL_PHOTO" => array("FIELD" => "UR.PERSONAL_PHOTO", "TYPE" => "string", "FROM" => "LEFT JOIN b_user UR ON (O.RESPONSIBLE_ID = UR.ID)"),
 
 			"BUYER" => array("FIELD" => "U.LOGIN,U.NAME,U.LAST_NAME,U.EMAIL,U.ID", "WHERE_ONLY" => "Y", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"BASKET_ID" => array("FIELD" => "B.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
@@ -696,24 +889,38 @@ class CSaleOrder extends CAllSaleOrder
 		foreach ($arSelectFields as $key => $value)
 			CSaleOrder::PrepareGetListArray($key, $arFields, $arPropIDsTmp);
 
-		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
+		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql, $callback);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
+
+		$r = $obUserFieldsSql->GetFilter();
+		if(strlen($r)>0)
+			$strSqlUFFilter = " (".$r.") ";
 
 		if (is_array($arGroupBy) && count($arGroupBy)==0)
 		{
 			$strSql =
 				"SELECT ".$arSqls["SELECT"]." ".
+					$obUserFieldsSql->GetSelect()." ".
 				"FROM b_sale_order O ".
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+					$obUserFieldsSql->GetJoin("O.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUFFilter) > 0)
+				$strSql .= " AND ".$strSqlUFFilter." ";
+			elseif (strlen($arSqls["WHERE"]) <= 0 && strlen($strSqlUFFilter) > 0)
+				$strSql .= " WHERE ".$strSqlUFFilter." ";
+
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
 			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("ORDER"));
+
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
@@ -722,12 +929,21 @@ class CSaleOrder extends CAllSaleOrder
 
 		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
+				$obUserFieldsSql->GetSelect()." ".
 			"FROM b_sale_order O ".
-			"	".$arSqls["FROM"]." ";
+			"	".$arSqls["FROM"]." ".
+				$obUserFieldsSql->GetJoin("O.ID")." ";
+
 		if (strlen($arSqls["WHERE"]) > 0)
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+		if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUFFilter) > 0)
+			$strSql .= " AND ".$strSqlUFFilter." ";
+		elseif (strlen($arSqls["WHERE"]) <= 0 && strlen($strSqlUFFilter) > 0)
+			$strSql .= " WHERE ".$strSqlUFFilter." ";
+
 		if (strlen($arSqls["GROUPBY"]) > 0)
 			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+
 		if (strlen($arSqls["ORDERBY"]) > 0)
 			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
 
@@ -736,9 +952,16 @@ class CSaleOrder extends CAllSaleOrder
 			$strSql_tmp =
 				"SELECT COUNT('x') as CNT ".
 				"FROM b_sale_order O ".
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+					$obUserFieldsSql->GetJoin("O.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+			if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUFFilter) > 0)
+				$strSql_tmp .= " AND ".$strSqlUFFilter." ";
+			elseif (strlen($arSqls["WHERE"]) <= 0 && strlen($strSqlUFFilter) > 0)
+				$strSql_tmp .= " WHERE ".$strSqlUFFilter." ";
+
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
@@ -760,6 +983,7 @@ class CSaleOrder extends CAllSaleOrder
 
 			//echo "!2.2!=".htmlspecialcharsbx($strSql)."<br>";
 
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("ORDER"));
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
@@ -770,6 +994,7 @@ class CSaleOrder extends CAllSaleOrder
 			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("ORDER"));
 		}
 
 		return $dbRes;
@@ -879,6 +1104,5 @@ class CSaleOrder extends CAllSaleOrder
 
 		return true;
 	}
-
 }
 ?>

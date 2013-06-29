@@ -27,14 +27,14 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 * @param  Exception			  $e
 	 * @param  float				  $time
 	 */
-	static public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+	public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
 	{
 		$this->writeCase(
-		  'error',
-		  $time,
-		  PHPUnit_Util_Filter::getFilteredStacktrace($e, FALSE),
-		  $e->getMessage(),
-		  $test
+			'error',
+			$time,
+			PHPUnit_Util_Filter::getFilteredStacktrace($e, FALSE),
+			$e->getMessage()." @ ".$e->getFile().":".$e->getLine(),
+			$test
 		);
 
 		$this->currentTestPass = FALSE;
@@ -47,7 +47,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 * @param  PHPUnit_Framework_AssertionFailedError $e
 	 * @param  float								  $time
 	 */
-	static public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+	public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
 	{
 		$this->write('fail: '.$e->getMessage());
 
@@ -64,7 +64,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 * @param  Exception			  $e
 	 * @param  float				  $time
 	 */
-	static public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+	public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
 	{
 		$this->writeCase('error', $time, array(), 'Incomplete Test', $test);
 
@@ -78,7 +78,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 * @param  Exception			  $e
 	 * @param  float				  $time
 	 */
-	static public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
 	{
 		$this->writeCase('error', $time, array(), 'Skipped Test', $test);
 
@@ -90,7 +90,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 *
 	 * @param  PHPUnit_Framework_TestSuite $suite
 	 */
-	static public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+	public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
 	{
 		$this->currentTestSuiteName = $suite->getName();
 		$this->currentTestName	  = '';
@@ -107,7 +107,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 *
 	 * @param  PHPUnit_Framework_TestSuite $suite
 	 */
-	static public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+	public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
 	{
 		$this->currentTestSuiteName = '';
 		$this->currentTestName	  = '';
@@ -118,7 +118,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 *
 	 * @param  PHPUnit_Framework_Test $test
 	 */
-	static public function startTest(PHPUnit_Framework_Test $test)
+	public function startTest(PHPUnit_Framework_Test $test)
 	{
 		$this->currentTestName = PHPUnit_Util_Test::describe($test);
 		$this->currentTestPass = TRUE;
@@ -136,7 +136,7 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 	 * @param  PHPUnit_Framework_Test $test
 	 * @param  float				  $time
 	 */
-	static public function endTest(PHPUnit_Framework_Test $test, $time)
+	public function endTest(PHPUnit_Framework_Test $test, $time)
 	{
 		if ($this->currentTestPass)
 		{
@@ -164,28 +164,28 @@ class PHPUnit_Util_Log_BX_Plain extends PHPUnit_Util_Printer implements PHPUnit_
 		}
 
 		$this->write(
-		  array(
-			'event'   => 'test',
-			'suite'   => $this->currentTestSuiteName,
-			'test'	=> $this->currentTestName,
-			'status'  => $status,
-			'time'	=> $time,
-			'trace'   => $trace,
-			'message' => PHPUnit_Util_String::convertToUtf8($message),
-			'output'  => $output,
-		  )
+			array(
+				'event'   => 'test',
+				'suite'   => $this->currentTestSuiteName,
+				'test'	=> $this->currentTestName,
+				'status'  => $status,
+				'time'	=> $time,
+				'trace'   => $trace,
+				'message' => PHPUnit_Util_String::convertToUtf8($message),
+				'output'  => $output,
+			)
 		);
 	}
 
 	/**
 	 * @param string $buffer
 	 */
-	static public function write($buffer)
+	public function write($buffer)
 	{
 		$this->messages[] = $buffer;
 	}
 
-	static public function getMessages()
+	public function getMessages()
 	{
 		return $this->messages;
 	}

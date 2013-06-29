@@ -8,7 +8,7 @@ class CBitrixCloudCDNClass
 	 * @return string
 	 *
 	 */
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
@@ -17,7 +17,7 @@ class CBitrixCloudCDNClass
 	 * @return array[int]string
 	 *
 	 */
-	static public function getExtensions()
+	public function getExtensions()
 	{
 		return $this->extensions;
 	}
@@ -27,7 +27,7 @@ class CBitrixCloudCDNClass
 	 * @return CBitrixCloudCDNClass
 	 *
 	 */
-	static public function setExtensions($extensions)
+	public function setExtensions($extensions)
 	{
 		$this->extensions = /*.(array[int]string).*/ array();
 		if (is_array($extensions))
@@ -47,7 +47,7 @@ class CBitrixCloudCDNClass
 	 * @param array[int]string $extensions
 	 *
 	 */
-	static public function __construct($name, $extensions)
+	public function __construct($name, $extensions)
 	{
 		$this->name = $name;
 		$this->setExtensions($extensions);
@@ -79,7 +79,7 @@ class CBitrixCloudCDNClasses
 	 * @return CBitrixCloudCDNClasses
 	 *
 	 */
-	static public function addClass(CBitrixCloudCDNClass $file_class)
+	public function addClass(CBitrixCloudCDNClass $file_class)
 	{
 		$this->classes[$file_class->getName()] = $file_class;
 		return $this;
@@ -90,7 +90,7 @@ class CBitrixCloudCDNClasses
 	 * @return CBitrixCloudCDNClass
 	 *
 	 */
-	static public function getClass($class_name)
+	public function getClass($class_name)
 	{
 		return $this->classes[$class_name];
 	}
@@ -130,7 +130,7 @@ class CBitrixCloudCDNClasses
 	 * @return CBitrixCloudCDNClasses
 	 *
 	 */
-	static public function saveOption(CBitrixCloudOption $option)
+	public function saveOption(CBitrixCloudOption $option)
 	{
 		$classes = /*.(array[string]string).*/ array();
 		foreach ($this->classes as $class_name => $file_class)

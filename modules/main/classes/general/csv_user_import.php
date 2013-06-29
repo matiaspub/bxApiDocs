@@ -20,7 +20,7 @@ class CSVUserImport
 	var $arSectionCache = Array();
 	var $isUserPropertyCreate = false;
 
-	public static function CSVUserImport($csvFilePath, $delimiter)
+	public function CSVUserImport($csvFilePath, $delimiter)
 	{
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/csv_data.php");
 
@@ -47,7 +47,7 @@ class CSVUserImport
 		}
 	}
 
-	public static function CheckRequiredFields()
+	public function CheckRequiredFields()
 	{
 		if ($this->isErrorOccured || !is_array($this->arHeader) || count($this->arHeader) <= 1)
 		{
@@ -72,7 +72,7 @@ class CSVUserImport
 		return true;
 	}
 
-	public static function AttachUsersToIBlock($iblockID)
+	public function AttachUsersToIBlock($iblockID)
 	{
 		$iblockID = intval($iblockID);
 		if (CModule::IncludeModule("iblock") && $iblockID > 0)
@@ -83,7 +83,7 @@ class CSVUserImport
 		}
 	}
 
-	public static function SetUserPropertyName($userPropertyName)
+	public function SetUserPropertyName($userPropertyName)
 	{
 		$userPropertyName = trim($userPropertyName);
 
@@ -103,28 +103,28 @@ class CSVUserImport
 		return $string;
 	}
 
-	public static function IsErrorOccured()
+	public function IsErrorOccured()
 	{
 		return $this->isErrorOccured;
 	}
 
-	public static function SetExternalAuthID($externalAuthID)
+	public function SetExternalAuthID($externalAuthID)
 	{
 		if (strlen($externalAuthID) > 0)
 			$this->externalAuthID = $externalAuthID;
 	}
 
-	public static function GetErrorMessage()
+	public function GetErrorMessage()
 	{
 		return $this->errorMessage;
 	}
 
-	public static function IgnoreDuplicate($ignore = true)
+	public function IgnoreDuplicate($ignore = true)
 	{
 		$this->ignoreDuplicate = (bool)$ignore;
 	}
 
-	public static function SetCallback($functionName)
+	public function SetCallback($functionName)
 	{
 		if (is_callable($functionName))
 			$this->callback = $functionName;
@@ -135,13 +135,13 @@ class CSVUserImport
 		return $this->csv;
 	}
 
-	public static function SetDefaultEmail($email)
+	public function SetDefaultEmail($email)
 	{
 		if (check_email($email))
 			$this->defaultEmail = $email;
 	}
 
-	public static function GetDefaultEmail()
+	public function GetDefaultEmail()
 	{
 		if ($this->defaultEmail !== false)
 			return $this->defaultEmail;
@@ -149,7 +149,7 @@ class CSVUserImport
 		return COption::GetOptionString("main", "email_from", "admin@".$_SERVER["SERVER_NAME"]);
 	}
 
-	public static function SetUserGroups($arGroups)
+	public function SetUserGroups($arGroups)
 	{
 		if (!is_array($arGroups))
 			return;
@@ -168,14 +168,14 @@ class CSVUserImport
 		}
 	}
 
-	public static function SetImageFilePath($relativePath)
+	public function SetImageFilePath($relativePath)
 	{
 		$relativePath = Rel2Abs("/", $relativePath);
 		if (is_dir($_SERVER["DOCUMENT_ROOT"].$relativePath))
 			$this->imageFilePath = rtrim($_SERVER["DOCUMENT_ROOT"].$relativePath, "/");
 	}
 
-	function __CreateUserProperty()
+	public function __CreateUserProperty()
 	{
 		if ($this->attachIBlockID < 1)
 			return;
@@ -222,7 +222,7 @@ class CSVUserImport
 		return $success;
 	}
 
-	function __GetIBlockSectionID(&$arFields)
+	public function __GetIBlockSectionID(&$arFields)
 	{
 		$sectionID = 0;
 		$i = 0;
@@ -272,7 +272,7 @@ class CSVUserImport
 		return $sectionID;
 	}
 
-	public static function ImportUser()
+	public function ImportUser()
 	{
 		if ($this->isErrorOccured)
 			return false;

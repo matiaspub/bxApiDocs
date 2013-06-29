@@ -16,7 +16,7 @@
 class CLQuestion
 {
 	// 2012-04-10 Checked/modified for compatibility with new data model
-	public static function CheckFields(&$arFields, $ID = false)
+	public function CheckFields(&$arFields, $ID = false)
 	{
 		global $DB, $USER;
 		$arMsg = Array();
@@ -160,11 +160,10 @@ class CLQuestion
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -252,11 +251,10 @@ class CLQuestion
 	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 

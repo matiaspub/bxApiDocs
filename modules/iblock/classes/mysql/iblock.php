@@ -290,12 +290,12 @@ class CIBlock extends CAllIBlock
 		return $res;
 	}
 
-	function _Upper($str)
+	public static function _Upper($str)
 	{
 		return $str;
 	}
 
-	function _Add($ID)
+	public static function _Add($ID)
 	{
 		global $DB;
 		$err_mess = "FILE: ".__FILE__."<br>LINE: ";
@@ -332,7 +332,7 @@ class CIBlock extends CAllIBlock
 		return $rs;
 	}
 
-	function _Order($by, $order, $default_order, $nullable = true)
+	public static function _Order($by, $order, $default_order, $nullable = true)
 	{
 		$o = parent::_Order($by, $order, $default_order, $nullable);
 		//$o[0] - bNullsFirst
@@ -353,7 +353,7 @@ class CIBlock extends CAllIBlock
 		}
 	}
 
-	function _NotEmpty($column)
+	public static function _NotEmpty($column)
 	{
 		return "if(".$column." is null, 0, 1)";
 	}

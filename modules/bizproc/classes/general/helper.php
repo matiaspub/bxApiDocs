@@ -427,7 +427,7 @@ class CBPHelper
 				|| count($arSelectFields)<=0
 				|| in_array("*", $arSelectFields))
 			{
-				for ($i = 0; $i < count($arFieldsKeys); $i++)
+				for ($i = 0, $cnt = count($arFieldsKeys); $i < $cnt; $i++)
 				{
 					if (isset($arFields[$arFieldsKeys[$i]]["WHERE_ONLY"])
 						&& $arFields[$arFieldsKeys[$i]]["WHERE_ONLY"] == "Y")
@@ -533,7 +533,7 @@ class CBPHelper
 		else
 			$filter_keys = array_keys($arFilter);
 
-		for ($i = 0; $i < count($filter_keys); $i++)
+		for ($i = 0, $cnt = count($filter_keys); $i < $cnt; $i++)
 		{
 			$vals = $arFilter[$filter_keys[$i]];
 			if (!is_array($vals))
@@ -549,7 +549,7 @@ class CBPHelper
 			if (array_key_exists($key, $arFields))
 			{
 				$arSqlSearch_tmp = array();
-				for ($j = 0; $j < count($vals); $j++)
+				for ($j = 0, $cntj = count($vals); $j < $cntj; $j++)
 				{
 					$val = $vals[$j];
 
@@ -622,7 +622,7 @@ class CBPHelper
 				}
 
 				$strSqlSearch_tmp = "";
-				for ($j = 0; $j < count($arSqlSearch_tmp); $j++)
+				for ($j = 0, $cntj = count($arSqlSearch_tmp); $j < $cntj; $j++)
 				{
 					if ($j > 0)
 						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
@@ -647,7 +647,7 @@ class CBPHelper
 			}
 		}
 
-		for ($i = 0; $i < count($arSqlSearch); $i++)
+		for ($i = 0, $cnt = count($arSqlSearch); $i < $cnt; $i++)
 		{
 			if (strlen($strSqlWhere) > 0)
 				$strSqlWhere .= " AND ";
@@ -688,7 +688,7 @@ class CBPHelper
 
 		$strSqlOrderBy = "";
 		DelDuplicateSort($arSqlOrder);
-		for ($i=0; $i<count($arSqlOrder); $i++)
+		for ($i = 0, $cnt = count($arSqlOrder); $i < $cnt; $i++)
 		{
 			if (strlen($strSqlOrderBy) > 0)
 				$strSqlOrderBy .= ", ";
@@ -1766,6 +1766,25 @@ class CBPHelper
 		}
 
 		return $result;
+	}
+
+	public static function StripUserPrefix($value)
+	{
+		if (is_array($value) && !CBPHelper::IsAssociativeArray($value))
+		{
+			foreach ($value as &$v)
+			{
+				if (substr($v, 0, 5) == "user_")
+					$v = substr($v, 5);
+			}
+		}
+		else
+		{
+			if (substr($value, 0, 5) == "user_")
+				$value = substr($value, 5);
+		}
+
+		return $value;
 	}
 }
 

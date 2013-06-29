@@ -56,7 +56,7 @@ final class Configuration
 		}
 	}
 
-	static public function saveConfiguration()
+	public function saveConfiguration()
 	{
 		$path = \Bitrix\Main\Application::getDocumentRoot().self::CONFIGURATION_FILE_PATH;
 		$path = preg_replace("'[\\\/]+'", "/", $path);
@@ -68,7 +68,7 @@ final class Configuration
 		file_put_contents($path, "<"."?php\n\$data=".$data.";\n");
 	}
 
-	static public function add($name, $value)
+	public function add($name, $value)
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -85,7 +85,7 @@ final class Configuration
 		$this->data[$name] = array("value" => $value, "readonly" => true);
 	}
 
-	static public function delete($name)
+	public function delete($name)
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -94,7 +94,7 @@ final class Configuration
 			unset($this->data[$name]);
 	}
 
-	static public function get($name)
+	public function get($name)
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -105,7 +105,7 @@ final class Configuration
 		return null;
 	}
 
-	static public function offsetExists($name)
+	public function offsetExists($name)
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -113,22 +113,22 @@ final class Configuration
 		return isset($this->data[$name]);
 	}
 
-	static public function offsetGet($name)
+	public function offsetGet($name)
 	{
 		return $this->get($name);
 	}
 
-	static public function offsetSet($name, $value)
+	public function offsetSet($name, $value)
 	{
 		$this->add($name, $value);
 	}
 
-	static public function offsetUnset($name)
+	public function offsetUnset($name)
 	{
 		$this->delete($name);
 	}
 
-	static public function current()
+	public function current()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -138,7 +138,7 @@ final class Configuration
 		return $c === false ? false : $c["value"];
 	}
 
-	static public function next()
+	public function next()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -148,7 +148,7 @@ final class Configuration
 		return $c === false ? false : $c["value"];
 	}
 
-	static public function key()
+	public function key()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -156,7 +156,7 @@ final class Configuration
 		return key($this->data);
 	}
 
-	static public function valid()
+	public function valid()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -165,7 +165,7 @@ final class Configuration
 		return isset($this->data[$key]);
 	}
 
-	static public function rewind()
+	public function rewind()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();
@@ -173,7 +173,7 @@ final class Configuration
 		return reset($this->data);
 	}
 
-	static public function count()
+	public function count()
 	{
 		if (empty($this->data))
 			$this->loadConfiguration();

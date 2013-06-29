@@ -9,12 +9,12 @@ final class Dispatcher
 
 	private $isInitialized = false;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->isInitialized = false;
 	}
 
-	static public function initialize()
+	public function initialize()
 	{
 		$LICENSE_KEY = '';
 		if (file_exists(($filename = Application::getDocumentRoot()."/bitrix/license_key.php")))
@@ -29,7 +29,7 @@ final class Dispatcher
 		$this->isInitialized = true;
 	}
 
-	static public function getLicenseKey()
+	public function getLicenseKey()
 	{
 		if (!$this->isInitialized)
 			throw new NotSupportedException();

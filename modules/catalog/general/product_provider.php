@@ -8,7 +8,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 {
 	public static function GetProductData($arParams)
 	{
-		if (!is_set($arParams, "QUANTITY") || IntVal($arParams["QUANTITY"]) <= 0)
+		if (!is_set($arParams, "QUANTITY") || doubleval($arParams["QUANTITY"]) <= 0)
 			$arParams["QUANTITY"] = 0;
 
 		if (!is_set($arParams, "RENEWAL") || $arParams["RENEWAL"] != "Y")
@@ -366,11 +366,11 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 		$arParams["QUANTITY_ADD"] = doubleval($arParams["QUANTITY_ADD"]);
 
 		$rsProducts = CCatalogProduct::GetList(
-				array(),
-				array('ID' => $arParams["PRODUCT_ID"]),
-				false,
-				false,
-				array('ID', 'CAN_BUY_ZERO', 'NEGATIVE_AMOUNT_TRACE', 'QUANTITY_TRACE', 'QUANTITY', 'QUANTITY_RESERVED')
+			array(),
+			array('ID' => $arParams["PRODUCT_ID"]),
+			false,
+			false,
+			array('ID', 'CAN_BUY_ZERO', 'NEGATIVE_AMOUNT_TRACE', 'QUANTITY_TRACE', 'QUANTITY', 'QUANTITY_RESERVED')
 		);
 
 		if ($arProduct = $rsProducts->Fetch())
@@ -379,9 +379,12 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 			{
 				$arRes["RESULT"] = true;
 				$arFields["QUANTITY_RESERVED"] = 0;
+				$startReservedQuantity = 0;
 			}
 			else
 			{
+				$startReservedQuantity = $arProduct["QUANTITY_RESERVED"];
+
 				if ($arParams["UNDO_RESERVATION"] == "N")
 				{
 					if ($arProduct["CAN_BUY_ZERO"] == "Y")
@@ -440,7 +443,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 
 		if ($arRes["RESULT"])
 		{
-			$arRes["QUANTITY_RESERVED"] = $arFields["QUANTITY_RESERVED"];
+			$arRes["QUANTITY_RESERVED"] = $arFields["QUANTITY_RESERVED"] - $startReservedQuantity;
 		}
 		else
 		{
@@ -557,6 +560,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 														"BARCODE" => $barcodeValue,
 														"PRODUCT_ID" => $arParams["PRODUCT_ID"]
 													);
+
 													$dbres = CCatalogStoreBarcode::GetList(
 														array(),
 														$arFields,
@@ -564,8 +568,23 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 														false,
 														array("ID", "STORE_ID", "BARCODE", "PRODUCT_ID")
 													);
+
 													if ($arRes = $dbres->Fetch())
+													{
 														CCatalogStoreBarcode::Delete($arRes["ID"]);
+													}
+													else
+													{
+														$GLOBALS["APPLICATION"]->ThrowException(
+															GetMessage(
+																"DDCT_DEDUCTION_BARCODE_ERROR",
+																array_merge(self::GetProductCatalogInfo($arParams["PRODUCT_ID"]), array("#BARCODE#" => $barcodeValue))
+															),
+															"DDCT_DEDUCTION_BARCODE_ERROR"
+														);
+														$arRes["RESULT"] = false;
+														return $arRes;
+													}
 												}
 											}
 										}
@@ -580,10 +599,6 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 							}
 
 							//updating total sum
-							//TODO
-							// $dbAmount = $DB->Query("SELECT SUM(AMOUNT) as AMOUNT FROM b_catalog_store_product WHERE PRODUCT_ID = ".intval($arParams["PRODUCT_ID"])." ", true);
-							// if ($amount = $dbAmount->Fetch())
-							// {
 							if ($arParams["PRODUCT_RESERVED"] == "Y")
 							{
 								if ($totalAmount <= $arProduct["QUANTITY_RESERVED"])
@@ -620,7 +635,6 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 							}
 
 							CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
-							// }
 
 							$arRes["RESULT"] = true;
 						}

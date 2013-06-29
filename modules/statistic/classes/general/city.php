@@ -23,7 +23,7 @@ class CCityLookup
 	 * @param array[string]string $arDBRecord
 	 * @return void
 	*/
-	function __construct($arDBRecord = /*.(array[string]string).*/array())
+	public function __construct($arDBRecord = /*.(array[string]string).*/array())
 	{
 		if(is_array($arDBRecord))
 		{
@@ -55,7 +55,7 @@ class CCityLookup
 	/**
 	 * @return array[string]string
 	*/
-	public static function ArrayForDB()
+	public function ArrayForDB()
 	{
 		$ar = /*.(array[string]string).*/array();
 		if(strlen($this->ip_addr) > 0) $ar["IPA"] = $this->ip_addr;
@@ -72,7 +72,7 @@ class CCityLookup
 	/**
 	 * @return array[string][string]string
 	*/
-	public static function GetFullInfo()
+	public function GetFullInfo()
 	{
 		return array(
 			"IP_ADDR" => array(
@@ -128,7 +128,7 @@ class CCityLookup
 	/**
 	 * @return void
 	*/
-	public static function Lookup()
+	public function Lookup()
 	{
 		$this->country_code = "N0";
 		$this->country_short_name = "N00";
@@ -248,7 +248,7 @@ class CCity
 	 * @param string $dbRecord
 	 * @return void
 	*/
-	function __construct($dbRecord = "")
+	public function __construct($dbRecord = "")
 	{
 		if(strlen($dbRecord) > 0)
 			$arDBRecord = unserialize($dbRecord);
@@ -399,7 +399,7 @@ class CCity
 	/**
 	 * @return string
 	*/
-	public static function ForSQL()
+	public function ForSQL()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		return $DB->ForSQL(serialize(array(
@@ -410,7 +410,7 @@ class CCity
 		)));
 	}
 
-	public static function GetFullInfo()
+	public function GetFullInfo()
 	{
 		$this->GetCityID();
 		return $this->lookup->GetFullInfo();
@@ -445,7 +445,7 @@ class CCity
 		return $selected;
 	}
 
-	public static function GetCountryCode()
+	public function GetCountryCode()
 	{
 		if(!$this->country_code)
 		{
@@ -455,7 +455,7 @@ class CCity
 		return $this->country_code? $this->country_code: "N0";
 	}
 
-	public static function Recode($str)
+	public function Recode($str)
 	{
 		if($str && $this->lookup->charset)
 		{
@@ -465,7 +465,7 @@ class CCity
 		return $str;
 	}
 
-	public static function GetCityID()
+	public function GetCityID()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$country_code = $this->GetCountryCode();

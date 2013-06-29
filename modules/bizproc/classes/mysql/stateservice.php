@@ -4,7 +4,7 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPStateService
 	extends CBPAllStateService
 {
-	static public function SetState($workflowId, $arState, $arStatePermissions = array())
+	public function SetState($workflowId, $arState, $arStatePermissions = array())
 	{
 		global $DB;
 

@@ -221,7 +221,7 @@ class CBXFavAdmMenu
 {
 	private $arItems = array();
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->Init();
 	}
@@ -251,7 +251,7 @@ class CBXFavAdmMenu
 		return true;
 	}
 
-	static public function GetMenuItem($itemsID, $arMenu)
+	public function GetMenuItem($itemsID, $arMenu)
 	{
 		if(!is_array($arMenu))
 			return false;
@@ -277,7 +277,7 @@ class CBXFavAdmMenu
 		return false;
 	}
 
-	static public function GenerateItems()
+	public function GenerateItems()
 	{
 		global $adminMenu;
 
@@ -386,7 +386,7 @@ class CBXFavAdmMenu
 		return false;
 	}
 
-	static public function GenerateMenuHTML($id = 0)
+	public function GenerateMenuHTML($id = 0)
 	{
 		global $adminMenu;
 		$buff = "";

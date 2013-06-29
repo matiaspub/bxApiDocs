@@ -37,12 +37,12 @@ class CSocNetSearch
 		PATH_TO_USER_FILES_ELEMENT
 		PATH_TO_USER_FILES
 	*/
-	function __construct($user_id, $group_id, $arParams)
+	public function __construct($user_id, $group_id, $arParams)
 	{
 		$this->CSocNetSearch($user_id, $group_id, $arParams);
 	}
 
-	public static function CSocNetSearch($user_id, $group_id, $arParams)
+	public function CSocNetSearch($user_id, $group_id, $arParams)
 	{
 		$this->_user_id = intval($user_id);
 		$this->_group_id = intval($group_id);
@@ -330,7 +330,7 @@ class CSocNetSearch
 		return $arResult;
 	}
 
-	public static function BeforeIndexForum($arFields, $entity_type, $entity_id, $feature, $operation, $path_template)
+	public function BeforeIndexForum($arFields, $entity_type, $entity_id, $feature, $operation, $path_template)
 	{
 		global $USER;
 
@@ -482,26 +482,33 @@ class CSocNetSearch
 				&& ($arFields["PARAM1"] == "POST" || $arFields["PARAM1"] == "MICROBLOG")
 			)
 			{
-
-				$arFields["PARAMS"] = $this->GetSearchParams(
+				$paramsTmp = $this->GetSearchParams(
 					"G",
 					$this->_group_id,
 					'blog',
 					'view_post'
 				);
+				if(!empty($arFields["PARAMS"]))
+					$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+				else
+					$arFields["PARAMS"] = $paramsTmp;
 			}
 			elseif(
 				$arFields["MODULE_ID"] == "blog"
 				&& $arFields["PARAM1"] == "COMMENT"
 			)
 			{
-
-				$arFields["PARAMS"] = $this->GetSearchParams(
+				$paramsTmp = $this->GetSearchParams(
 					"G",
 					$this->_group_id,
 					'blog',
 					'view_comment'
 				);
+				if(!empty($arFields["PARAMS"]))
+					$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+				else
+					$arFields["PARAMS"] = $paramsTmp;
+
 			}
 		}
 		elseif($this->_user_id)
@@ -543,31 +550,39 @@ class CSocNetSearch
 				&& ($arFields["PARAM1"] == "POST" || $arFields["PARAM1"] == "MICROBLOG")
 			)
 			{
-				$arFields["PARAMS"] = $this->GetSearchParams(
+				$paramsTmp = $this->GetSearchParams(
 					"U",
 					$this->_user_id,
 					'blog',
 					'view_post'
 				);
+				if(!empty($arFields["PARAMS"]))
+					$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+				else
+					$arFields["PARAMS"] = $paramsTmp;
 			}
 			elseif(
 				$arFields["MODULE_ID"] == "blog"
 				&& $arFields["PARAM1"] == "COMMENT"
 			)
 			{
-				$arFields["PARAMS"] = $this->GetSearchParams(
+				$paramsTmp = $this->GetSearchParams(
 					"U",
 					$this->_user_id,
 					'blog',
 					'view_comment'
 				);
+				if(!empty($arFields["PARAMS"]))
+					$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+				else
+					$arFields["PARAMS"] = $paramsTmp;
 			}
 		}
 
 		return $arFields;
 	}
 
-	public static function IndexIBlockElement($arFields, $entity_id, $entity_type, $feature, $operation, $path_template, $arFieldList)
+	public function IndexIBlockElement($arFields, $entity_id, $entity_type, $feature, $operation, $path_template, $arFieldList)
 	{
 		$ID = intval($arFields["ID"]);
 		$IBLOCK_ID = intval($arFields["IBLOCK_ID"]);
@@ -643,7 +658,7 @@ class CSocNetSearch
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
 	}
 
-	public static function IBlockElementUpdate(&$arFields)
+	public function IBlockElementUpdate(&$arFields)
 	{
 		//Do not index workflow history
 		$WF_PARENT_ELEMENT_ID = intval($arFields["WF_PARENT_ELEMENT_ID"]);
@@ -802,7 +817,7 @@ class CSocNetSearch
 		}
 	}
 
-	public static function IndexIBlockSection($arFields, $entity_id, $entity_type, $feature, $operation, $path_template)
+	public function IndexIBlockSection($arFields, $entity_id, $entity_type, $feature, $operation, $path_template)
 	{
 		$rSection = CIBlockSection::GetByID($arFields['ID']);
 		$arSection = $rSection->Fetch();
@@ -869,7 +884,7 @@ class CSocNetSearch
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
 	}
 
-	public static function IBlockSectionUpdate(&$arFields)
+	public function IBlockSectionUpdate(&$arFields)
 	{
 		if(!CModule::IncludeModule('search'))
 			return;
@@ -909,7 +924,7 @@ class CSocNetSearch
 
 	public static function OnAfterIndexAdd($ID, $arFields)
 	{
-		if (is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
+		if (isset($arFields["PARAMS"]) && is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
 		{
 			$arSiteID = array_keys($arFields["SITE_ID"]);
 

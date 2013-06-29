@@ -68,7 +68,7 @@ class EventManager
 		return $iEventHandlerKey;
 	}
 
-	static public function addEventHandler($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
+	public function addEventHandler($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
 	{
 		return $this->addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, 2);
 	}
@@ -83,12 +83,12 @@ class EventManager
 	 *
 	 * @deprecated Deprecated for new kernel
 	 */
-	static public function addEventHandlerOld($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
+	public function addEventHandlerOld($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
 	{
 		return $this->addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, 1);
 	}
 
-	static public function removeEventHandler($fromModuleId, $eventType, $iEventHandlerKey)
+	public function removeEventHandler($fromModuleId, $eventType, $iEventHandlerKey)
 	{
 		$fromModuleId = strtoupper($fromModuleId);
 		$eventType = strtoupper($eventType);
@@ -366,7 +366,7 @@ class EventManager
 		return $handlers;
 	}
 
-	static public function send(Event $event)
+	public function send(Event $event)
 	{
 		$handlers = $this->findEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
 		foreach ($handlers as $handler)

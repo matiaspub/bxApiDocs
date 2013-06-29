@@ -6,26 +6,11 @@
  */
 class _CEventsSubscribe {
 	/**
-	 * Массив следующего содержания: 	 
-	 *         <ul>
-<li>POSTING_ID - идентификатор выпуска.</li>
-	 *          	 
-	 *           <li>EMAIL - адрес на который будет отправлен выпуск.</li>
-	 *          	 
-	 *           <li>SUBJECT - заголовок письма (в кодированном виде, если установлена соответсветствующая настройка модуля).</li>
-	 *          	 
-	 *           <li>BODY - тело письма уже отформатированное в соответствии со стандартом MIME.</li>
-	 *          	 
-	 *           <li>HEADER - служебные заголовки.</li>
-	 *          
-	 *           <li>EMAIL_EX - расширенная информация о получателе, см. <a href="/api_help/subscribe/classes/cposting/cpostingfields.php">Поля CPosting.</a>
-</li>
-	 *          	</ul>
-
+	 * Вызывается перед отправкой выпуска каждому конкретному адресату.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 */
-	public static function arFields(){}
+	public static function BeforePostingSendMail(){}
 
 
 }

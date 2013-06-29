@@ -27,7 +27,7 @@ class CWiki
 	const GET_BY_NAME_CACHE_ID = "WIKI_BY_NAME_CACHE_ID_";
 	const CWIKI_CACHE_TTL = 36000000;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->cIB_E = new CIBlockElement();
 	}
@@ -71,11 +71,10 @@ class CWiki
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		$arFields['XML_ID'] = $arFields['NAME'];
 
@@ -140,11 +139,10 @@ class CWiki
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		$arCats = array();
 		$CWikiParser = new CWikiParser();
@@ -207,11 +205,10 @@ class CWiki
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Recover.php
 	 * @author Bitrix
 	 */
-	public static function Recover($HISTORY_ID, $ID, $IBLOCK_ID)
+	public function Recover($HISTORY_ID, $ID, $IBLOCK_ID)
 	{
 		$this->CleanCacheById($ID, $IBLOCK_ID);
 
@@ -359,11 +356,10 @@ class CWiki
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/UpdateCategory.php
 	 * @author Bitrix
 	 */
-	public static function UpdateCategory($ID, $IBLOCK_ID, $arCats)
+	public function UpdateCategory($ID, $IBLOCK_ID, $arCats)
 	{
 
 		$this->CleanCacheById($ID, $IBLOCK_ID);
@@ -561,11 +557,10 @@ class CWiki
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Delete.php
 	 * @author Bitrix
 	 */
-	public static function Delete($ID, $IBLOCK_ID)
+	public function Delete($ID, $IBLOCK_ID)
 	{
 		$rIBlock = CIBlock::getList(Array(), array('ID' => $IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'));
 		$arIBlock = $rIBlock->GetNext();
@@ -628,11 +623,10 @@ class CWiki
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/AddImage.php
 	 * @author Bitrix
 	 */
-	public static function AddImage($ID, $IBLOCK_ID, $arImage)
+	public function AddImage($ID, $IBLOCK_ID, $arImage)
 	{
 		$arProperties = array();
 		$arCurImages = array();
@@ -729,11 +723,10 @@ class CWiki
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/DeleteImage.php
 	 * @author Bitrix
 	 */
-	public static function DeleteImage($IMAGE_ID, $ID, $IBLOCK_ID)
+	public function DeleteImage($IMAGE_ID, $ID, $IBLOCK_ID)
 	{
 		$rsProperties = CIBlockElement::GetProperty($IBLOCK_ID, $ID, 'value_id', 'asc', array('ACTIVE' => 'Y', 'CODE' => 'IMAGES'));
 		$_iPropertyId = 0;
@@ -784,11 +777,10 @@ class CWiki
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Rename.php
 	 * @author Bitrix
 	 */
-	public static function Rename($ID, $arFields, $bUpdateSearch=true)
+	public function Rename($ID, $arFields, $bUpdateSearch=true)
 	{
 		$arFilter = array('IBLOCK_ID' => $arFields['IBLOCK_ID'], 'CHECK_PERMISSIONS' => 'N');
 
@@ -868,7 +860,7 @@ class CWiki
 	 *			will be changed.
 	 * @return int the amount of changed pages.
 	 */
-	public static function RenameLinkOnPages($iBlockId, $oldName, $newName, $iBlockSectId = false)
+	public function RenameLinkOnPages($iBlockId, $oldName, $newName, $iBlockSectId = false)
 	{
 		if(!$iBlockId || !$oldName || !$newName)
 			return false;

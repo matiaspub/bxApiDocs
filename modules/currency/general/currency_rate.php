@@ -526,7 +526,7 @@ class CAllCurrencyRates
 		return $res;
 	}
 
-	public static function GetConvertFactorEx($curFrom, $curTo, $valDate = "")
+	public function GetConvertFactorEx($curFrom, $curTo, $valDate = "")
 	{
 		global $stackCacheManager;
 

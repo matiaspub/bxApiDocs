@@ -24,7 +24,7 @@ class CEditArea
 		return implode("_", array_slice($this->includeAreaIndex, 0, $this->includeLevel+1));
 	}
 
-	public static function IncludeStringBefore()
+	public function IncludeStringBefore()
 	{
 		$this->includeLevel++;
 		$this->includeAreaIndex[$this->includeLevel] = intval($this->includeAreaIndex[$this->includeLevel])+1;
@@ -36,7 +36,7 @@ class CEditArea
 		return $res;
 	}
 
-	public static function IncludeStringAfter($arIcons=false, $arParams=array())
+	public function IncludeStringAfter($arIcons=false, $arParams=array())
 	{
 		$res = '';
 		$res .= $this->DrawIcons($arIcons, $arParams);
@@ -50,7 +50,7 @@ class CEditArea
 		return $res;
 	}
 
-	public static function DrawIcons($arIcons, $arParams=array())
+	public function DrawIcons($arIcons, $arParams=array())
 	{
 		$bStack = $this->includeLevel > ($GLOBALS['BX_GLOBAL_AREA_EDIT_ICON'] ? 1 : 0);
 
@@ -315,7 +315,7 @@ class CEditArea
 		echo $res;
 	}
 
-	public static function SetEditArea($areaId, $arIcons)
+	public function SetEditArea($areaId, $arIcons)
 	{
 		if (!$this->bEditAreas)
 		{
@@ -343,7 +343,7 @@ class CComponentPanel
 	var $sSrcFile = "";
 	var $iSrcLine = 0;
 
-	static public function __construct($component, $componentName, $componentTemplate, $parentComponent, $bComponentEnabled)
+	public function __construct($component, $componentName, $componentTemplate, $parentComponent, $bComponentEnabled)
 	{
 		$this->component = $component;
 		$this->componentName = $componentName;
@@ -384,7 +384,7 @@ class CComponentPanel
 		}
 	}
 
-	static public function GetIcons()
+	public function GetIcons()
 	{
 		/** @global CMain $APPLICATION */
 		global $USER, $APPLICATION;

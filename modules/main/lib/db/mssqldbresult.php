@@ -11,7 +11,7 @@ class MssqlDbResult
 		parent::__construct($dbConnection, $result, $trackerQuery);
 	}
 
-	static public function getResultFields()
+	public function getResultFields()
 	{
 		if (empty($this->resultFields))
 		{
@@ -29,17 +29,17 @@ class MssqlDbResult
 		return $this->resultFields;
 	}
 
-	static public function getSelectedRowsCount()
+	public function getSelectedRowsCount()
 	{
 		return sqlsrv_num_rows($this->resultResource);
 	}
 
-	static public function getFieldsCount()
+	public function getFieldsCount()
 	{
 		return count($this->getResultFields());
 	}
 
-	static public function getFieldName($column)
+	public function getFieldName($column)
 	{
 		$fields = $this->getResultFields();
 		return $fields[$column]["name"];

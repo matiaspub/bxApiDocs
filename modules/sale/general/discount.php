@@ -26,9 +26,6 @@ class CAllSaleDiscount
 	{
 		global $DB;
 
-		if (!array_key_exists("COUNT_DISCOUNT_4_ALL_QUANTITY", $arOptions))
-			$arOptions["COUNT_DISCOUNT_4_ALL_QUANTITY"] = COption::GetOptionString("sale", "COUNT_DISCOUNT_4_ALL_QUANTITY", "N");
-
 		$arIDS = array();
 		$rsDiscountIDs = CSaleDiscount::GetDiscountGroupList(
 			array(),
@@ -41,12 +38,26 @@ class CAllSaleDiscount
 		{
 			$arDiscountID['DISCOUNT_ID'] = intval($arDiscountID['DISCOUNT_ID']);
 			if (0 < $arDiscountID['DISCOUNT_ID'])
-				$arIDS[] = $arDiscountID['DISCOUNT_ID'];
+				$arIDS[$arDiscountID['DISCOUNT_ID']] = true;
 		}
 
 		if (!empty($arIDS))
 		{
-			$arIDS = array_values(array_unique($arIDS));
+			if (array_key_exists('BASKET_ITEMS', $arOrder) && !empty($arOrder['BASKET_ITEMS']) && is_array($arOrder['BASKET_ITEMS']))
+			{
+				$arExtend = array(
+					'catalog' => array(
+						'fields' => true,
+						'props' => true,
+					),
+				);
+				foreach (GetModuleEvents("sale", "OnExtendBasketItems", true) as $arEvent)
+				{
+					ExecuteModuleEventEx($arEvent, array(&$arOrder['BASKET_ITEMS'], $arExtend));
+				}
+			}
+
+			$arIDS = array_keys($arIDS);
 			$rsDiscounts = CSaleDiscount::GetList(
 				array("PRIORITY" => "DESC", "SORT" => "ASC"),
 				array(
@@ -66,9 +77,9 @@ class CAllSaleDiscount
 				if (self::__Unpack($arOrder, $arDiscount['UNPACK']))
 				{
 					self::__ApplyActions($arOrder, $arDiscount['APPLICATION']);
+					if ('Y' == $arDiscount['LAST_DISCOUNT'])
+						break;
 				}
-				if ('Y' == $arDiscount['LAST_DISCOUNT'])
-					break;
 			}
 
 			$arOrder["ORDER_PRICE"] = 0;
@@ -167,7 +178,39 @@ class CAllSaleDiscount
 		$ID = intval($ID);
 		if (0 < $ID)
 		{
-			$rsDiscounts = CSaleDiscount::GetList(array(),array('ID' => $ID),false,false,array());
+			$rsDiscounts = CSaleDiscount::GetList(
+				array(),
+				array('ID' => $ID),
+				false,
+				false,
+				array(
+					"ID",
+					"XML_ID",
+					"LID",
+					"SITE_ID",
+					"NAME",
+					"PRICE_FROM",
+					"PRICE_TO",
+					"CURRENCY",
+					"DISCOUNT_VALUE",
+					"DISCOUNT_TYPE",
+					"ACTIVE",
+					"SORT",
+					"ACTIVE_FROM",
+					"ACTIVE_TO",
+					"TIMESTAMP_X",
+					"MODIFIED_BY",
+					"DATE_CREATE",
+					"CREATED_BY",
+					"PRIORITY",
+					"LAST_DISCOUNT",
+					"VERSION",
+					"CONDITIONS",
+					"UNPACK",
+					"APPLICATION",
+					"ACTIONS",
+				)
+			);
 			if ($arDiscount = $rsDiscounts->Fetch())
 			{
 				return $arDiscount;
@@ -289,7 +332,6 @@ class CAllSaleDiscount
 						'ORDER_BASKET' => '$arOrder[\'BASKET_ITEMS\']',
 						'BASKET' => '$arBasket',
 						'BASKET_ROW' => '$row',
-						'IBLOCK' => '$row[\'IBLOCK\']',
 					)
 				);
 				if ('' == $strEval)
@@ -336,10 +378,10 @@ class CAllSaleDiscount
 					array(
 						'ORDER' => '$arOrder',
 						'ORDER_FIELDS' => '$arOrder',
+						'ORDER_PROPS' => '$arOrder[\'PROPS\']',
 						'ORDER_BASKET' => '$arOrder[\'BASKET_ITEMS\']',
 						'BASKET' => '$arBasket',
 						'BASKET_ROW' => '$row',
-						'IBLOCK' => '$row[\'IBLOCK\']',
 					)
 				);
 				if ('' == $strEval)

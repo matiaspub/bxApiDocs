@@ -5,7 +5,7 @@ class CControllerServerRequestTo extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_SERVER_DEBUG";
 	var $debug_file_const = "CONTROLLER_SERVER_LOG_DIR";
 
-	public static function CControllerServerRequestTo($member, $operation, $arParameters = Array())
+	public function CControllerServerRequestTo($member, $operation, $arParameters = Array())
 	{
 		if(is_array($member))
 			$arMember = $member;
@@ -26,7 +26,7 @@ class CControllerServerRequestTo extends __CControllerPacketRequest
 		$this->session_id = md5(uniqid(rand(), true));
 	}
 
-	public static function Send($page="/bitrix/admin/main_controller.php")
+	public function Send($page="/bitrix/admin/main_controller.php")
 	{
 		$this->Sign();
 		$result = parent::Send($this->url, $page);
@@ -42,7 +42,7 @@ class CControllerServerResponseFrom extends __CControllerPacketResponse
 	var $debug_const = "CONTROLLER_SERVER_DEBUG";
 	var $debug_file_const = "CONTROLLER_SERVER_LOG_DIR";
 
-	public static function CControllerServerResponseFrom($oPacket = false)
+	public function CControllerServerResponseFrom($oPacket = false)
 	{
 		$this->_InitFromRequest($oPacket, Array());
 	}
@@ -55,13 +55,13 @@ class CControllerServerRequestFrom extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_SERVER_DEBUG";
 	var $debug_file_const = "CONTROLLER_SERVER_LOG_DIR";
 
-	public static function CControllerServerRequestFrom()
+	public function CControllerServerRequestFrom()
 	{
 		$this->InitFromRequest();
 		$this->Debug('Request received from #'.$this->member_id.' (security check '.($this->Check()?'passed':'failed').') ('.$this->secret_id.") :\r\nPacket: ".print_r($this, true))."\r\n";
 	}
 
-	public static function Check()
+	public function Check()
 	{
 		$dbr_member = CControllerMember::GetByGuid($this->member_id);
 		if(!($ar_member=$dbr_member->Fetch()))
@@ -82,13 +82,13 @@ class CControllerServerResponseTo extends __CControllerPacketResponse
 	var $debug_const = "CONTROLLER_SERVER_DEBUG";
 	var $debug_file_const = "CONTROLLER_SERVER_LOG_DIR";
 
-	public static function CControllerServerResponseTo($oPacket = false)
+	public function CControllerServerResponseTo($oPacket = false)
 	{
 		$this->_InitFromRequest($oPacket);
 		$this->secret_id = false;
 	}
 
-	public static function Sign()
+	public function Sign()
 	{
 		if($this->secret_id === false)
 		{

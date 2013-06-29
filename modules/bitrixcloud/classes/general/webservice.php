@@ -89,7 +89,7 @@ abstract class CBitrixCloudWebService
 	 * @return bool
 	 *
 	 */
-	static public function setDebug($bActive)
+	public function setDebug($bActive)
 	{
 		$this->debug = $bActive === true;
 	}

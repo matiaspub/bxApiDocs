@@ -836,8 +836,15 @@ function BPAShowSelector(id, type, mode, arCurValues)
 					include($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates/'.$file);
 					if(is_array($arFields))
 					{
+						/*
+						 * If DOCUMENT_TYPE not defined, use current documentType
+						 * Overwise check if DOCUMENT_TYPE equals to current documentType
+						 */
 						if (!array_key_exists("DOCUMENT_TYPE", $arFields))
 							$arFields["DOCUMENT_TYPE"] = $documentType;
+						elseif($arFields["DOCUMENT_TYPE"] != $documentType)
+							continue;
+						
 						$arFields["SYSTEM_CODE"] = $file;
 						if(is_object($GLOBALS['USER']))
 							$arFields["USER_ID"] = $GLOBALS['USER']->GetID();

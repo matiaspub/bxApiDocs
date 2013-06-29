@@ -142,7 +142,7 @@ class CPerfQueryStat
 		return $arStat;
 	}
 
-	function _gather_stat($table, $column, $value, $max_size = -1)
+	public static function _gather_stat($table, $column, $value, $max_size = -1)
 	{
 		global $DB;
 
@@ -180,7 +180,7 @@ class CPerfQueryStat
 			return false;
 	}
 
-	function _get_stat($table, $column = "", $value = "")
+	public static function _get_stat($table, $column = "", $value = "")
 	{
 		global $DB;
 		if($column == "")

@@ -11,21 +11,21 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param int $ID
 	 * @return void
 	*/
-	static public function __construct($ID)
+	public function __construct($ID)
 	{
 		$this->_ID = intval($ID);
 	}
 	/**
 	 * @return array[string]string
 	*/
-	static public function getBucketArray()
+	public function getBucketArray()
 	{
 		return $this->arBucket;
 	}
 	/**
 	 * @return CCloudStorageService
 	*/
-	static public function getService()
+	public function getService()
 	{
 		return $this->service;
 	}
@@ -191,7 +191,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $name
 	 * @return mixed
 	*/
-	function __get($name)
+	public function __get($name)
 	{
 		if(!isset($this->arBucket))
 		{
@@ -207,7 +207,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	/**
 	 * @return bool
 	*/
-	public static function Init()
+	public function Init()
 	{
 		if(is_object($this->service))
 		{
@@ -224,14 +224,14 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param array[string]string $arSettings
 	 * @return bool
 	*/
-	public static function CheckSettings(&$arSettings)
+	public function CheckSettings(&$arSettings)
 	{
 		return $this->service->CheckSettings($this->arBucket, $arSettings);
 	}
 	/**
 	 * @return bool
 	*/
-	public static function CreateBucket()
+	public function CreateBucket()
 	{
 		return $this->service->CreateBucket($this->arBucket);
 	}
@@ -239,7 +239,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param mixed $arFile
 	 * @return string
 	*/
-	public static function GetFileSRC($arFile)
+	public function GetFileSRC($arFile)
 	{
 		if(is_array($arFile) && isset($arFile["URN"]))
 			return $this->service->GetFileSRC($this->arBucket, $arFile["URN"]);
@@ -250,7 +250,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $filePath
 	 * @return bool
 	*/
-	public static function FileExists($filePath)
+	public function FileExists($filePath)
 	{
 		return $this->service->FileExists($this->arBucket, $filePath);
 	}
@@ -259,7 +259,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $filePath
 	 * @return bool
 	*/
-	public static function DownloadToFile($arFile, $filePath)
+	public function DownloadToFile($arFile, $filePath)
 	{
 		return $this->service->DownloadToFile($this->arBucket, $arFile, $filePath);
 	}
@@ -268,7 +268,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param mixed $arFile
 	 * @return bool
 	*/
-	public static function SaveFile($filePath, $arFile)
+	public function SaveFile($filePath, $arFile)
 	{
 		return $this->service->SaveFile($this->arBucket, $filePath, $arFile);
 	}
@@ -276,7 +276,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $filePath
 	 * @return bool
 	*/
-	public static function DeleteFile($filePath)
+	public function DeleteFile($filePath)
 	{
 		return $this->service->DeleteFile($this->arBucket, $filePath);
 	}
@@ -285,7 +285,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $filePath
 	 * @return bool
 	*/
-	public static function FileCopy($arFile, $filePath)
+	public function FileCopy($arFile, $filePath)
 	{
 		return $this->service->FileCopy($this->arBucket, $arFile, $filePath);
 	}
@@ -294,7 +294,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param bool $bRecursive
 	 * @return array[string][int]string
 	*/
-	public static function ListFiles($filePath = "/", $bRecursive = false)
+	public function ListFiles($filePath = "/", $bRecursive = false)
 	{
 		return $this->service->ListFiles($this->arBucket, $filePath, $bRecursive);
 	}
@@ -302,7 +302,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $filePath
 	 * @return double
 	*/
-	public static function GetFileSize($filePath)
+	public function GetFileSize($filePath)
 	{
 		$DIR_NAME = substr($filePath, 0, strrpos($filePath, "/") + 1);
 		$FILE_NAME = substr($filePath, strlen($DIR_NAME));
@@ -527,7 +527,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param array[string]string $arFields
 	 * @return mixed
 	*/
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $APPLICATION, $CACHE_MANAGER;
 		$strError = '';
@@ -581,7 +581,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	/**
 	 * @return bool
 	*/
-	public static function Delete()
+	public function Delete()
 	{
 		global $DB, $APPLICATION, $CACHE_MANAGER;
 		$strError = '';
@@ -635,7 +635,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param array[string]string $arFields
 	 * @return mixed
 	*/
-	public static function Update($arFields)
+	public function Update($arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -731,7 +731,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param string $value
 	 * @return void
 	*/
-	public static function setHeader($name, $value)
+	public function setHeader($name, $value)
 	{
 		$this->service->setHeader($name, $value);
 	}

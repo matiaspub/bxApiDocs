@@ -61,7 +61,7 @@ class CIBlockPropertyMapInterface
 		return $arResult;
 	}
 
-	function _GetMapKey($map_type, &$strDomain)
+	public static function _GetMapKey($map_type, &$strDomain)
 	{
 		$MAP_KEY = '';
 		$strMapKeys = COPtion::GetOptionString('fileman', 'map_'.$map_type.'_keys');
@@ -543,7 +543,7 @@ class CIBlockPropertyMapYandex extends CIBlockPropertyMapInterface
 		);
 	}
 
-	function _DrawKeyInputControl($MAP_ID, $strDomain)
+	public static function _DrawKeyInputControl($MAP_ID, $strDomain)
 	{
 		echo BeginNote();
 ?>

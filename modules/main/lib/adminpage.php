@@ -36,7 +36,7 @@ class AdminPage
 		$this->setContextCulture($culture, $language["LID"]);
 	}
 
-	static public function getLanguageId()
+	public function getLanguageId()
 	{
 		return $this->languageId;
 	}

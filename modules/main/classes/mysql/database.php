@@ -30,7 +30,7 @@ class CDatabase extends CAllDatabase
 	public
 		$alias_length = 256;
 
-	public static function GetVersion()
+	public function GetVersion()
 	{
 		if($this->version)
 			return $this->version;
@@ -119,11 +119,10 @@ class CDatabase extends CAllDatabase
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php
 	 * @author Bitrix
 	 */
-	public static function StartTransaction()
+	public function StartTransaction()
 	{
 		$this->Query("START TRANSACTION");
 	}
@@ -197,11 +196,10 @@ class CDatabase extends CAllDatabase
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php
 	 * @author Bitrix
 	 */
-	public static function Commit()
+	public function Commit()
 	{
 		$this->Query("COMMIT", true);
 	}
@@ -275,11 +273,10 @@ class CDatabase extends CAllDatabase
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php
 	 * @author Bitrix
 	 */
-	public static function Rollback()
+	public function Rollback()
 	{
 		$this->Query("ROLLBACK", true);
 	}
@@ -336,11 +333,10 @@ class CDatabase extends CAllDatabase
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
 	 * @author Bitrix
 	 */
-	public static function Connect($DBHost, $DBName, $DBLogin, $DBPassword)
+	public function Connect($DBHost, $DBName, $DBLogin, $DBPassword)
 	{
 		$this->type="MYSQL";
 		$this->DBHost = $DBHost;
@@ -358,7 +354,7 @@ class CDatabase extends CAllDatabase
 			return $this->DoConnect();
 	}
 
-	public static function DoConnect()
+	public function DoConnect()
 	{
 		if($this->bConnected)
 			return true;
@@ -474,11 +470,10 @@ class CDatabase extends CAllDatabase
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
 	 * @author Bitrix
 	 */
-	public static function Query($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
+	public function Query($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
 	{
 		global $DB;
 
@@ -593,7 +588,7 @@ class CDatabase extends CAllDatabase
 		return $res;
 	}
 
-	public static function QueryLong($strSql, $bIgnoreErrors = false)
+	public function QueryLong($strSql, $bIgnoreErrors = false)
 	{
 		return $this->Query($strSql, $bIgnoreErrors);
 	}
@@ -802,11 +797,10 @@ class CDatabase extends CAllDatabase
 	 * датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
 	 * @author Bitrix
 	 */
-	public static function DateToCharFunction($strFieldName, $strType="FULL", $lang=false, $bSearchInSitesOnly=false)
+	public function DateToCharFunction($strFieldName, $strType="FULL", $lang=false, $bSearchInSitesOnly=false)
 	{
 		static $CACHE=array();
 		$id = $strType.",".$lang.",".$bSearchInSitesOnly;
@@ -963,11 +957,10 @@ class CDatabase extends CAllDatabase
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/comparedates.php
 	 * @author Bitrix
 	 */
-	public static function CompareDates($date1, $date2)
+	public function CompareDates($date1, $date2)
 	{
 		$s_date1 = $this->CharToDateFunction($date1);
 		$s_date2 = $this->CharToDateFunction($date2);
@@ -1015,11 +1008,10 @@ class CDatabase extends CAllDatabase
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/lastid.php
 	 * @author Bitrix
 	 */
-	public static function LastID()
+	public function LastID()
 	{
 		$this->DoConnect();
 		return mysql_insert_id($this->db_Conn);
@@ -1050,11 +1042,10 @@ class CDatabase extends CAllDatabase
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php
 	 * @author Bitrix
 	 */
-	public static function Disconnect()
+	public function Disconnect()
 	{
 		if(!DBPersistent && $this->bConnected)
 		{
@@ -1151,11 +1142,10 @@ class CDatabase extends CAllDatabase
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php
 	 * @author Bitrix
 	 */
-	public static function PrepareFields($strTableName, $strPrefix = "str_", $strSuffix = "")
+	public function PrepareFields($strTableName, $strPrefix = "str_", $strSuffix = "")
 	{
 		$arColumns = $this->GetTableFields($strTableName);
 		foreach($arColumns as $arColumn)
@@ -1233,11 +1223,10 @@ class CDatabase extends CAllDatabase
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
 	 * @author Bitrix
 	 */
-	public static function PrepareInsert($strTableName, $arFields, $strFileDir="", $lang=false)
+	public function PrepareInsert($strTableName, $arFields, $strFileDir="", $lang=false)
 	{
 		$strInsert1 = "";
 		$strInsert2 = "";
@@ -1353,16 +1342,16 @@ class CDatabase extends CAllDatabase
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
 	 * @author Bitrix
 	 */
-	public static function PrepareUpdate($strTableName, $arFields, $strFileDir="", $lang = false, $strTableAlias = "")
+	public function PrepareUpdate($strTableName, $arFields, $strFileDir="", $lang = false, $strTableAlias = "")
 	{
+		$arBinds = array();
 		return $this->PrepareUpdateBind($strTableName, $arFields, $strFileDir, $lang, $arBinds, $strTableAlias);
 	}
 
-	public static function PrepareUpdateBind($strTableName, $arFields, $strFileDir, $lang, &$arBinds, $strTableAlias = "")
+	public function PrepareUpdateBind($strTableName, $arFields, $strFileDir, $lang, &$arBinds, $strTableAlias = "")
 	{
 		$arBinds = array();
 		if ($strTableAlias != "")
@@ -1523,11 +1512,10 @@ class CDatabase extends CAllDatabase
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php
 	 * @author Bitrix
 	 */
-	public static function Insert($table, $arFields, $error_position="", $DEBUG=false, $EXIST_ID="", $ignore_errors=false)
+	public function Insert($table, $arFields, $error_position="", $DEBUG=false, $EXIST_ID="", $ignore_errors=false)
 	{
 		if (!is_array($arFields))
 			return false;
@@ -1668,11 +1656,10 @@ class CDatabase extends CAllDatabase
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($table, $arFields, $WHERE="", $error_position="", $DEBUG=false, $ignore_errors=false, $additional_check=true)
+	public function Update($table, $arFields, $WHERE="", $error_position="", $DEBUG=false, $ignore_errors=false, $additional_check=true)
 	{
 		$rows = 0;
 		if(is_array($arFields))
@@ -1896,11 +1883,10 @@ class CDatabase extends CAllDatabase
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php
 	 * @author Bitrix
 	 */
-	public static function InitTableVarsForEdit($tablename, $strIdentFrom="str_", $strIdentTo="str_", $strSuffixFrom="", $bAlways=false)
+	public function InitTableVarsForEdit($tablename, $strIdentFrom="str_", $strIdentTo="str_", $strSuffixFrom="", $bAlways=false)
 	{
 		$this->DoConnect();
 		$db_result = mysql_list_fields($this->DBName, $tablename, $this->db_Conn);
@@ -1929,12 +1915,12 @@ class CDatabase extends CAllDatabase
 		}
 	}
 
-	public static function GetTableFieldsList($table)
+	public function GetTableFieldsList($table)
 	{
 		return array_keys($this->GetTableFields($table));
 	}
 
-	public static function GetTableFields($table)
+	public function GetTableFields($table)
 	{
 		if(!array_key_exists($table, $this->column_cache))
 		{
@@ -1957,13 +1943,13 @@ class CDatabase extends CAllDatabase
 		return $this->column_cache[$table];
 	}
 
-	public static function LockTables($str)
+	public function LockTables($str)
 	{
 		register_shutdown_function(array(&$this, "UnLockTables"));
 		$this->Query("LOCK TABLE ".$str, false, '', array("fixed_connection"=>true));
 	}
 
-	public static function UnLockTables()
+	public function UnLockTables()
 	{
 		$this->Query("UNLOCK TABLES", true, '', array("fixed_connection"=>true));
 	}
@@ -1992,7 +1978,7 @@ class CDatabase extends CAllDatabase
 		return $expr;
 	}
 
-	public static function TableExists($tableName)
+	public function TableExists($tableName)
 	{
 		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
 		$tableName = Trim($tableName);
@@ -2007,12 +1993,12 @@ class CDatabase extends CAllDatabase
 			return False;
 	}
 
-	public static function IndexExists($tableName, $arColumns)
+	public function IndexExists($tableName, $arColumns)
 	{
 		return $this->GetIndexName($tableName, $arColumns) !== "";
 	}
 
-	public static function GetIndexName($tableName, $arColumns, $bStrict = false)
+	public function GetIndexName($tableName, $arColumns, $bStrict = false)
 	{
 		if(!is_array($arColumns) || count($arColumns) <= 0)
 			return "";
@@ -2130,6 +2116,11 @@ class CDatabase extends CAllDatabase
 			}
 		}
 	}
+
+	public static function Instr($str, $toFind)
+	{
+		return "INSTR($str, $toFind)";
+	}
 }
 
 class CDBResult extends CAllDBResult
@@ -2171,11 +2162,10 @@ class CDBResult extends CAllDBResult
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
 	 * @author Bitrix
 	 */
-	public static function Fetch()
+	public function Fetch()
 	{
 		global $DB;
 
@@ -2277,11 +2267,10 @@ class CDBResult extends CAllDBResult
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
 	 * @author Bitrix
 	 */
-	public static function SelectedRowsCount()
+	public function SelectedRowsCount()
 	{
 		if($this->nSelectedCount !== false)
 			return $this->nSelectedCount;
@@ -2362,7 +2351,7 @@ class CDBResult extends CAllDBResult
 		}
 	}
 
-	public static function AffectedRowsCountEx()
+	public function AffectedRowsCountEx()
 	{
 		if(is_resource($this->result) && mysql_num_rows($this->result) > 0)
 			return 0;
@@ -2401,11 +2390,10 @@ class CDBResult extends CAllDBResult
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
 	 * @author Bitrix
 	 */
-	public static function FieldsCount()
+	public function FieldsCount()
 	{
 		if(is_resource($this->result))
 			return mysql_num_fields($this->result);
@@ -2448,16 +2436,15 @@ class CDBResult extends CAllDBResult
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
 	 * @author Bitrix
 	 */
-	public static function FieldName($iCol)
+	public function FieldName($iCol)
 	{
 		return mysql_field_name($this->result, $iCol);
 	}
 
-	public static function DBNavStart()
+	public function DBNavStart()
 	{
 		global $DB;
 
@@ -2527,26 +2514,17 @@ class CDBResult extends CAllDBResult
 		$this->arResult = $temp_arrray;
 	}
 
-	public static function NavQuery($strSql, $cnt, $arNavStartParams)
+	public function NavQuery($strSql, $cnt, $arNavStartParams, $bIgnoreErrors = false)
 	{
 		global $DB;
 
-		if(is_set($arNavStartParams, "SubstitutionFunction"))
+		if(isset($arNavStartParams["SubstitutionFunction"]))
 		{
 			$arNavStartParams["SubstitutionFunction"]($this, $strSql, $cnt, $arNavStartParams);
-			return;
+			return null;
 		}
-		if(is_set($arNavStartParams, "bShowAll"))
-			$bShowAll = $arNavStartParams["bShowAll"];
-		else
-			$bShowAll = true;
 
-		if(is_set($arNavStartParams, "iNumPage"))
-			$iNumPage = $arNavStartParams["iNumPage"];
-		else
-			$iNumPage = false;
-
-		if(is_set($arNavStartParams, "bDescPageNumbering"))
+		if(isset($arNavStartParams["bDescPageNumbering"]))
 			$bDescPageNumbering = $arNavStartParams["bDescPageNumbering"];
 		else
 			$bDescPageNumbering = false;
@@ -2566,21 +2544,19 @@ class CDBResult extends CAllDBResult
 				$this->NavPageCount = 1;
 
 			//page number to display
-			//if($iNumPage===false)
-			//	$this->PAGEN = $this->NavPageCount;
 			$this->NavPageNomer =
-				(
-					$this->PAGEN < 1 || $this->PAGEN > $this->NavPageCount
+			(
+				$this->PAGEN < 1 || $this->PAGEN > $this->NavPageCount
+				?
+					($_SESSION[$this->SESS_PAGEN] < 1 || $_SESSION[$this->SESS_PAGEN] > $this->NavPageCount
 					?
-						($_SESSION[$this->SESS_PAGEN] < 1 || $_SESSION[$this->SESS_PAGEN] > $this->NavPageCount
-						?
-							$this->NavPageCount
-						:
-							$_SESSION[$this->SESS_PAGEN]
-						)
+						$this->NavPageCount
 					:
-						$this->PAGEN
-				);
+						$_SESSION[$this->SESS_PAGEN]
+					)
+				:
+					$this->PAGEN
+			);
 
 			//rows to skip
 			$NavFirstRecordShow = 0;
@@ -2603,7 +2579,7 @@ class CDBResult extends CAllDBResult
 			elseif($arNavStartParams["checkOutOfRange"] !== true)
 				$this->NavPageNomer = 1;
 			else
-				return;
+				return null;
 
 			//rows to skip
 			$NavFirstRecordShow = $this->NavPageSize*($this->NavPageNomer-1);
@@ -2618,9 +2594,13 @@ class CDBResult extends CAllDBResult
 			$strSql .= " LIMIT ".$NavFirstRecordShow.", ".($NavLastRecordShow - $NavFirstRecordShow + $NavAdditionalRecords);
 
 		if(is_object($this->DB))
-			$res_tmp = $this->DB->Query($strSql);
+			$res_tmp = $this->DB->Query($strSql, $bIgnoreErrors);
 		else
-			$res_tmp = $DB->Query($strSql);
+			$res_tmp = $DB->Query($strSql, $bIgnoreErrors);
+
+		// Return false on sql errors (if $bIgnoreErrors == true)
+		if ($bIgnoreErrors && ($res_tmp === false))
+			return false;
 
 		if($this->SqlTraceIndex)
 			$start_time = microtime(true);
@@ -2661,11 +2641,13 @@ class CDBResult extends CAllDBResult
 		}
 
 		$this->result = $res_tmp->result; // added for FieldsCount and other compatibility
-		$this->arResult = count($temp_arrray)? $temp_arrray: false;
-		$this->arResultAdd = count($temp_arrray_add)? $temp_arrray_add: false;
+		$this->arResult = (count($temp_arrray)? $temp_arrray : false);
+		$this->arResultAdd = (count($temp_arrray_add)? $temp_arrray_add : false);
 		$this->nSelectedCount = $cnt;
 		$this->bDescPageNumbering = $bDescPageNumbering;
-		$this->bFromLimited=true;
+		$this->bFromLimited = true;
 		$this->DB = $res_tmp->DB;
+
+		return null;
 	}
 }

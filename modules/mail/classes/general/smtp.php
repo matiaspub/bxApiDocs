@@ -10,7 +10,7 @@ class CSMTPServer
 	var $startPeriodTimeTruncate;
 	var $startTime;
 
-	public static function WriteToLog($txt, $level)
+	public function WriteToLog($txt, $level)
 	{
 		$this->logLevel = IntVal(COption::GetOptionString("mail", "smtp_log_level", "4"));
 
@@ -85,7 +85,7 @@ class CSMTPServer
 		$var->Listen();
 	}
 
-	public static function Start()
+	public function Start()
 	{
 		global $CACHE_MANAGER;
 		$CACHE_MANAGER->Clean("smtpd_stop");
@@ -106,7 +106,7 @@ class CSMTPServer
 		}
 	}
 
-	public static function ReloadServers()
+	public function ReloadServers()
 	{
 		global $BX_MAIL_FILTER_CACHE;
 		$BX_MAIL_FILTER_CACHE = Array();
@@ -148,7 +148,7 @@ class CSMTPServer
 		}
 	}
 
-	public static function Listen()
+	public function Listen()
 	{
 		global $DB, $CACHE_MANAGER;
 		$cnt = 100;
@@ -234,7 +234,7 @@ class CSMTPServer
 		}
 	}
 
-	public static function FindServerSocket($s)
+	public function FindServerSocket($s)
 	{
 		$arServers = $this->arServers;
 		foreach($arServers as $server)
@@ -244,7 +244,7 @@ class CSMTPServer
 		return false;
 	}
 
-	public static function FindServerConnection($s)
+	public function FindServerConnection($s)
 	{
 		$arServers = $this->arServers;
 		foreach($arServers as $server)
@@ -253,13 +253,13 @@ class CSMTPServer
 		return false;
 	}
 
-	public static function Stop()
+	public function Stop()
 	{
 		if ($this->logFile)
 			FClose($this->logFile);
 	}
 
-	public static function RemoveHost($i)
+	public function RemoveHost($i)
 	{
 		unset($this->arServers[$i]);
 	}
@@ -282,7 +282,7 @@ class CSMTPServerHost
 	var $msgCount = 0;
 	var $conCount = 0;
 
-	public static function FindConnection($s)
+	public function FindConnection($s)
 	{
 		$id = array_search($s, $this->arSockets);
 		if($id !== false)
@@ -290,7 +290,7 @@ class CSMTPServerHost
 		return false;
 	}
 
-	public static function GetSockets()
+	public function GetSockets()
 	{
 		if($this->sockServer)
 			return array_merge(array($this->sockServer), $this->arSockets);
@@ -298,7 +298,7 @@ class CSMTPServerHost
 		return array();
 	}
 
-	public static function CSMTPServerHost($server, $arFields)
+	public function CSMTPServerHost($server, $arFields)
 	{
 		$this->server = $server;
 		$this->arFields = $arFields;
@@ -308,7 +308,7 @@ class CSMTPServerHost
 		$this->lastClientId = -1;
 	}
 
-	public static function AddConnection()
+	public function AddConnection()
 	{
 		if(Is_Resource($sock = stream_socket_accept($this->sockServer, 0, $ip)))
 		{
@@ -329,7 +329,7 @@ class CSMTPServerHost
 		return false;
 	}
 
-	public static function RemoveConnection($id)
+	public function RemoveConnection($id)
 	{
 		unset($this->arClients[$id]);
 		unset($this->arSockets[$id]);
@@ -338,12 +338,12 @@ class CSMTPServerHost
 			$this->_Stop();
 	}
 
-	public static function WriteToLog($txt, $level)
+	public function WriteToLog($txt, $level)
 	{
 		$this->server->WriteToLog($txt, $level);
 	}
 
-	public static function Start()
+	public function Start()
 	{
 		$this->startPeriodTime = microtime(true);
 		$this->startPeriodTimeTruncate = microtime(true);
@@ -360,7 +360,7 @@ class CSMTPServerHost
 		return true;
 	}
 
-	public static function Stop($num)
+	public function Stop($num)
 	{
 		$this->num = $num;
 		if(count($this->arClients)<=0)
@@ -369,7 +369,7 @@ class CSMTPServerHost
 			$this->_stopAfterDisconnect = true;
 	}
 
-	function _Stop()
+	public function _Stop()
 	{
 		if($this->sockServer)
 		{
@@ -380,7 +380,7 @@ class CSMTPServerHost
 		$this->server->RemoveHost($this->num);
 	}
 
-	public static function CheckTimeout($timeout)
+	public function CheckTimeout($timeout)
 	{
 		$arConns = $this->arClients;
 		foreach($arConns as $k=>$c)
@@ -404,7 +404,7 @@ class CSMTPConnection
 	var $auth_user_id = 0;
 	var $msgCount = 0;
 
-	public static function CSMTPConnection($id, $sock, $serv)
+	public function CSMTPConnection($id, $sock, $serv)
 	{
 		$this->id = $id;
 		$this->sock = $sock;
@@ -417,12 +417,12 @@ class CSMTPConnection
 		$this->Send('220');
 	}
 
-	public static function WriteToLog($txt, $level)
+	public function WriteToLog($txt, $level)
 	{
 		$this->server->WriteToLog($txt." (C:".$this->uid.")", $level);
 	}
 
-	public static function Receive()
+	public function Receive()
 	{
 		$this->readBuffer .= FRead($this->sock, 8192);
 		$this->WriteToLog("C<- (".$this->id.")\t".$this->readBuffer, 10);
@@ -435,7 +435,7 @@ class CSMTPConnection
 		return $res;
 	}
 
-	function __ParseBuffer()
+	public function __ParseBuffer()
 	{
 		if(StrLen($this->readBuffer) <= 0)
 			return false;
@@ -471,7 +471,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	public static function Send($code, $text = "")
+	public function Send($code, $text = "")
 	{
 		if (!$this->connected)
 			return false;
@@ -510,7 +510,7 @@ class CSMTPConnection
 		return $this->__Send($code." ".$text."\r\n");
 	}
 
-	function __Send($message)
+	public function __Send($message)
 	{
 		if (StrLen($message) <= 0)
 			return false;
@@ -522,7 +522,7 @@ class CSMTPConnection
 		return ($r !== false);
 	}
 
-	public static function Disconnect()
+	public function Disconnect()
 	{
 		@FClose($this->sock);
 		$this->sock = false;
@@ -531,7 +531,7 @@ class CSMTPConnection
 		$this->server->RemoveConnection($this->id);
 	}
 
-	public static function CheckRelaying($email)
+	public function CheckRelaying($email)
 	{
 		$domains = preg_split('/[\s]+/', strtolower($this->server->arFields['DOMAINS']), -1, PREG_SPLIT_NO_EMPTY);
 		if(count($domains)<=0)
@@ -561,7 +561,7 @@ class CSMTPConnection
 	}
 
 	//обработчик команд
-	function __ProcessCommand($command, $arg = '')
+	public function __ProcessCommand($command, $arg = '')
 	{
 		switch(strtoupper($command))
 		{
@@ -732,7 +732,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	public static function Authorize($login, $password)
+	public function Authorize($login, $password)
 	{
 		$authResult = $GLOBALS["USER"]->Login($login, $password, "N");
 
@@ -750,7 +750,7 @@ class CSMTPConnection
 		return false;
 	}
 
-	function __AuthLoginHandler()
+	public function __AuthLoginHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -780,7 +780,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	function __AuthPlainHandler()
+	public function __AuthPlainHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -804,7 +804,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	function __DataHandler()
+	public function __DataHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n.\r\n")===false)
 			return false;

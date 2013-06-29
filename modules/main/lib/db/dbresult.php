@@ -21,29 +21,29 @@ abstract class DbResult
 	 */
 	protected $fetchDataModifier = null;
 
-	static public function __construct(DbConnection $dbConnection, $result, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
+	public function __construct(DbConnection $dbConnection, $result, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		$this->connection = $dbConnection;
 		$this->resultResource = $result;
 		$this->trackerQuery = $trackerQuery;
 	}
 
-	static public function setReplacedAliases(array $arReplacedAliases)
+	public function setReplacedAliases(array $arReplacedAliases)
 	{
 		$this->arReplacedAliases = $arReplacedAliases;
 	}
 
-	static public function setSerializedFields(array $arSerializedFields)
+	public function setSerializedFields(array $arSerializedFields)
 	{
 		$this->arSerializedFields = $arSerializedFields;
 	}
 
-	static public function setFetchDataModifier($fetchDataModifier)
+	public function setFetchDataModifier($fetchDataModifier)
 	{
 		$this->fetchDataModifier = $fetchDataModifier;
 	}
 
-	static public function fetch(\Bitrix\Main\Text\Converter $converter = null)
+	public function fetch(\Bitrix\Main\Text\Converter $converter = null)
 	{
 		if ($this->trackerQuery != null)
 			$this->trackerQuery->restartQuery();
@@ -102,7 +102,7 @@ abstract class DbResult
 		return $data;
 	}
 
-	static public function fetchAll(\Bitrix\Main\Text\Converter $converter = null)
+	public function fetchAll(\Bitrix\Main\Text\Converter $converter = null)
 	{
 		$res = array();
 		while ($ar = $this->fetch($converter))
@@ -110,10 +110,10 @@ abstract class DbResult
 		return $ar;
 	}
 
-	static abstract public function getResultFields();
-	static abstract public function getSelectedRowsCount();
-	static abstract public function getFieldsCount();
-	static abstract public function getFieldName($column);
+	abstract public function getResultFields();
+	abstract public function getSelectedRowsCount();
+	abstract public function getFieldsCount();
+	abstract public function getFieldName($column);
 
 	abstract protected function fetchRowInternal();
 	abstract protected function convertDataFromDb($value, $type);

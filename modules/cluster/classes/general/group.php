@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CClusterGroup
 {
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -44,7 +44,7 @@ class CClusterGroup
 		return $res;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 		$ID = intval($ID);

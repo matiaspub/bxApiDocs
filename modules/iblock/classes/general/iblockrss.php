@@ -466,18 +466,18 @@ class CAllIBlockRSS
 
 	public static function GetRSS($ID, $LANG, $TYPE, $LIMIT_NUM = false, $LIMIT_DAY = false, $yandex = false)
 	{
-		$dbr = GetIBlockListLang($LANG, $TYPE, Array($ID));
-		$bAccessable = False;
-		if (($arIBlock = $dbr->GetNext()) && ($arIBlock["RSS_ACTIVE"]=="Y"))
-			$bAccessable = True;
-
 		echo "<"."?xml version=\"1.0\" encoding=\"".LANG_CHARSET."\"?".">\n";
 		echo "<rss version=\"2.0\"";
-//		echo "<rss version=\"2.0\" xmlns=\"http://backend.userland.com/rss2\"";
-//		if ($yandex) echo " xmlns:yandex=\"http://news.yandex.ru\"";
 		echo ">\n";
 
-		if ($bAccessable)
+		$dbr = CIBlock::GetList(array(), array(
+			"type" => $TYPE,
+			"LID" => $LANG,
+			"ACTIVE" => "Y",
+			"ID" => $ID,
+		));
+		$arIBlock = $dbr->Fetch();
+		if ($arIBlock && ($arIBlock["RSS_ACTIVE"] == "Y"))
 		{
 			echo CIBlockRSS::GetRSSText($arIBlock, $LIMIT_NUM, $LIMIT_DAY, $yandex);
 		}

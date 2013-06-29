@@ -484,12 +484,12 @@ class CSupportSuperCoupon
 		
 	}
 	
-	function _getrandsymbol($x)
+	public static function _getrandsymbol($x)
 	{
 		return ToUpper(randString(1));
 	}
 	
-	function __CheckFields($arFields)
+	public static function __CheckFields($arFields)
 	{
 		$aMsg = array();
 		

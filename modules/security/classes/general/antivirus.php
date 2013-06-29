@@ -47,7 +47,7 @@ class CSecurityAntiVirus
 
 	private $quotes = array();
 
-	function __construct($place = "body")
+	public function __construct($place = "body")
 	{
 		$this->place = $place;
 		global $BX_SECURITY_AV_ACTION;
@@ -246,7 +246,7 @@ class CSecurityAntiVirus
 	}
 
 	// function returns 1, if current block is in white list and needs not processing.
-	public static function isinwhitelist()
+	public function isInWhiteList()
 	{
 		if(strpos($this->atributes, 'src="/bitrix/') !== false)
 			return 1;
@@ -400,22 +400,23 @@ class CSecurityAntiVirus
 
 	//заглушка. Возщвращает рейтинг опасности текущего блока из кеша, или FALSE
 	// кешируются только составляющся рейтинга, вложденная внутренними правилами.
-	public static function returnfromcache()
+	public function returnfromcache()
 	{
 		// тут можно вставить кеширование. Для кеширование вычислять и сохранять кеш от $this->data
 		return false;
 	}
 
 	//заглушка. Добавляет рейтинг опасности для текущего блока в кеш.
-	public static function addtocache()
+	public function addtocache()
 	{
 		// тут можно вставить кеширование. Для кеширование вычислять и сохранять кеш от $this->data
 		return true;
 	}
 
 	//механизм для вывода сообщения об обнаруженном подозрительном текущем блоке
-	public static function dolog()
+	public function dolog()
 	{
+		global $BX_SECURITY_AV_TIMEOUT;
 		if(defined("ANTIVIRUS_CREATE_TRACE"))
 			$this->CreateTrace();
 
@@ -476,19 +477,19 @@ class CSecurityAntiVirus
 
 	// вызывается каждый раз, когда обработка блока закончена и блок признан нормальным.
 	// функция должна возвратить содержимое блока.
-	public static function end_okblock()
+	public function end_okblock()
 	{
 		return $this->data;
 	}
 
-	public static function end_whiteblock()
+	public function end_whiteblock()
 	{
 		return $this->data;
 	}
 
 	// вызывается каждый раз, когда обработка блока закончена и блок признан опасным.
 	// функция должна возвратить содержимое блока.
-	public static function end_blkblock()
+	public function end_blkblock()
 	{
 		if($this->replace)
 			return $this->replacement;
@@ -496,7 +497,7 @@ class CSecurityAntiVirus
 			return $this->data;
 	}
 
-	public static function CreateTrace()
+	public function CreateTrace()
 	{
 		$cache_id = md5($this->data);
 		$fn = $_SERVER["DOCUMENT_ROOT"]."/bitrix/cache/virus.db/".$cache_id.".vir";
@@ -570,7 +571,7 @@ class CSecurityAntiVirus
 				$this->type = 'iframe';
 			}
 
-			$this->whitelist_id = $this->isinwhitelist();
+			$this->whitelist_id = $this->isInWhiteList();
 			if(!$this->whitelist_id)
 			{
 				$cache_id = md5($this->data);
@@ -598,7 +599,7 @@ class CSecurityAntiVirus
 	Возвращает рейтинг опасности блока (ифрейм или скрипт)
 	входные параметры класса должны быть заполнеы.
 	*/
-	public static function returnblockrating()
+	public function returnblockrating()
 	{
 		if($this->type=='iframe')
 		{
@@ -638,7 +639,7 @@ class CSecurityAntiVirus
 
 	// ПРАВИЛА
 	// надбавки и скидки действующие для каждого скрипта (возможно с некоторыми условиями)
-	public static function rulescriptglobals()
+	public function rulescriptglobals()
 	{
 		return 0;
 		$r = 0;
@@ -673,7 +674,7 @@ class CSecurityAntiVirus
 	}
 
 	//правила, учитывающие окружение скрипта
-	public static function rulescriptblocks()
+	public function rulescriptblocks()
 	{
 		$r = 0;
 		$strp = preg_replace('/<!\-\-.*?\-\->$/', '', $this->prev);
@@ -739,7 +740,7 @@ class CSecurityAntiVirus
 	}
 
 	//правила, отлавливающие "невидимость" блока
-	public static function ruleframevisiblity()
+	public function ruleframevisiblity()
 	{
 		$r = 0;
 		if(
@@ -772,7 +773,7 @@ class CSecurityAntiVirus
 	}
 
 	//правила, отлавливающие потенциально опасныеключевые слова в скрипте
-	public static function rulescriptbasics()
+	public function rulescriptbasics()
 	{
 		$r = 0;
 		if(preg_match("/\<iframe/is", $this->body))
@@ -859,7 +860,7 @@ class CSecurityAntiVirus
 	}
 
 	//правила, отлавливающие vbscript
-	public static function rulescriptvbscript()
+	public function rulescriptvbscript()
 	{
 		$r = 0;
 		if(preg_match('/vbscript/is', $this->atributes))
@@ -960,7 +961,7 @@ class CSecurityAntiVirus
 	}
 
 	//правила, учитываюбщие подозрительные длины строк и объектов
-	public static function rulescriptlenghts()
+	public function rulescriptlenghts()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1029,7 +1030,7 @@ class CSecurityAntiVirus
 	}
 
 	// Анализ частотных вхождений символов...
-	public static function rulescriptfrequensy()
+	public function rulescriptfrequensy()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1437,7 +1438,7 @@ class CSecurityAntiVirus
 	}
 
 	// признаки, уменьшающие рейтинг опасности скрипта
-	public static function rulescriptwhiterules()
+	public function rulescriptwhiterules()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1516,7 +1517,7 @@ class CSecurityAntiVirus
 	}
 
 	//анализ признаков в именах функций и переменных
-	public static function rulescriptnamerules()
+	public function rulescriptnamerules()
 	{
 
 		$rr = $this->getnames($this->body);
@@ -1680,13 +1681,13 @@ class CSecurityAntiVirus
 		return $out;
 	}
 
-	public static function getnames_cb($m)
+	public function getnames_cb($m)
 	{
 		$this->quotes[] = ($m[2]);
 		return $m[1].$m[3];
 	}
 
-	public static function getnames($str)
+	public function getnames($str)
 	{
 		$flt = new CSecurityXSSDetect(array("action" => "none", "log" => "N"));
 		$flt->removeQuotedStrings($str);

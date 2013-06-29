@@ -25,7 +25,7 @@ class ScalarField extends Field
 
 	protected $column_name = '';
 
-	static public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
 
@@ -37,27 +37,27 @@ class ScalarField extends Field
 		$this->column_name = isset($parameters['column_name']) ? $parameters['column_name'] : $this->name;
 	}
 
-	static public function isPrimary()
+	public function isPrimary()
 	{
 		return $this->is_primary;
 	}
 
-	static public function isRequired()
+	public function isRequired()
 	{
 		return $this->is_required;
 	}
 
-	static public function isUnique()
+	public function isUnique()
 	{
 		return $this->is_unique;
 	}
 
-	static public function isAutocomplete()
+	public function isAutocomplete()
 	{
 		return $this->is_autocomplete;
 	}
 
-	static public function getColumnName()
+	public function getColumnName()
 	{
 		return $this->column_name;
 	}

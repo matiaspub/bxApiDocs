@@ -18,7 +18,7 @@ class CSearch extends CAllSearch
 {
 	var $arForumTopics = array();
 
-	public static function DBNavStart()
+	public function DBNavStart()
 	{
 		//total rows count
 		$this->NavRecordCount = mysql_num_rows($this->result);
@@ -114,7 +114,7 @@ class CSearch extends CAllSearch
 		$this->arResult = $temp_arrray;
 	}
 
-	public static function MakeSQL($query, $strSqlWhere, $strSort, $bIncSites, $bStem)
+	public function MakeSQL($query, $strSqlWhere, $strSort, $bIncSites, $bStem)
 	{
 		global $USER;
 		$DB = CDatabase::GetModuleConnection('search');
@@ -441,7 +441,7 @@ class CSearch extends CAllSearch
 		return $strSelect."\n".$strSql.$strSort."\nLIMIT ".$limit;
 	}
 
-	public static function tagsMakeSQL($query, $strSqlWhere, $strSort, $bIncSites, $bStem, $limit = 100)
+	public function tagsMakeSQL($query, $strSqlWhere, $strSort, $bIncSites, $bStem, $limit = 100)
 	{
 		global $USER;
 		$DB = CDatabase::GetModuleConnection('search');
@@ -1450,7 +1450,7 @@ class CSearch extends CAllSearch
 class CSearchQuery extends CAllSearchQuery
 {
 	var $cnt = 0;
-	public static function BuildWhereClause($word)
+	public function BuildWhereClause($word)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 

@@ -130,17 +130,17 @@ class Cache
 		return new self($cacheEngine);
 	}
 
-	static public function __construct(ICacheEngine $cacheEngine)
+	public function __construct(ICacheEngine $cacheEngine)
 	{
 		$this->cacheEngine = $cacheEngine;
 	}
 
-	static public function setClearCache($value = false)
+	public function setClearCache($value = false)
 	{
 		$this->clearCache = $value;
 	}
 
-	static public function setClearCacheSession($value = false)
+	public function setClearCacheSession($value = false)
 	{
 		$_SESSION["SESS_CLEAR_CACHE"] = $value;
 		$this->setClearCache($value);
@@ -160,7 +160,7 @@ class Cache
 		return substr($un, 0, 2)."/".$un.".php";
 	}
 
-	static public function clean($uniqueString, $initDir = false, $baseDir = "cache")
+	public function clean($uniqueString, $initDir = false, $baseDir = "cache")
 	{
 		$personalRoot = \Bitrix\Main\Application::getPersonalRoot();
 		$baseDir = \Bitrix\Main\IO\Path::combine($personalRoot, $baseDir);
@@ -168,14 +168,14 @@ class Cache
 		return $this->cacheEngine->clean($baseDir, $initDir, $filename);
 	}
 
-	static public function cleanDir($initDir = false, $baseDir = "cache")
+	public function cleanDir($initDir = false, $baseDir = "cache")
 	{
 		$personalRoot = \Bitrix\Main\Application::getPersonalRoot();
 		$baseDir = \Bitrix\Main\IO\Path::combine($personalRoot, $baseDir);
 		return $this->cacheEngine->clean($baseDir, $initDir);
 	}
 
-	static public function initCache($TTL, $uniqueString, $initDir = false, $baseDir = "cache")
+	public function initCache($TTL, $uniqueString, $initDir = false, $baseDir = "cache")
 	{
 		if ($initDir === false)
 		{
@@ -207,17 +207,17 @@ class Cache
 		return true;
 	}
 
-	static public function output()
+	public function output()
 	{
 		echo $this->content;
 	}
 
-	static public function getVars()
+	public function getVars()
 	{
 		return $this->vars;
 	}
 
-	public static function startDataCache($TTL = false, $uniqueString = false, $initDir = false, $vars = array(), $baseDir = "cache")
+	public function startDataCache($TTL = false, $uniqueString = false, $initDir = false, $vars = array(), $baseDir = "cache")
 	{
 		$narg = func_num_args();
 		if($narg<=0)
@@ -245,7 +245,7 @@ class Cache
 		return true;
 	}
 
-	static public function abortDataCache()
+	public function abortDataCache()
 	{
 		if (!$this->isStarted)
 			return;
@@ -254,7 +254,7 @@ class Cache
 		ob_end_flush();
 	}
 
-	public static function endDataCache($vars=false)
+	public function endDataCache($vars=false)
 	{
 		if (!$this->isStarted)
 			return;
@@ -274,7 +274,7 @@ class Cache
 			ob_end_clean();
 	}
 
-	static public function isCacheExpired($path)
+	public function isCacheExpired($path)
 	{
 		return $this->cacheEngine->isCacheExpired($path);
 	}

@@ -79,7 +79,13 @@ class CAllFile
 	{
 		if(isset($arFields[$field]) && is_array($arFields[$field]))
 		{
-			return self::validateFile($dummy, $arFields[$field]);
+			$arFile = $arFields[$field];
+
+			if($arFile["name"] == "")
+				return "";
+
+			$fileName = self::transformName($arFile["name"]);
+			return self::validateFile($fileName, $arFile);
 		}
 		else
 		{
@@ -87,45 +93,59 @@ class CAllFile
 		}
 	}
 
-	protected function validateFile(&$strFileName, $arFile, $bForceMD5=false)
+	protected function transformName($name, $bForceMD5 = false, $bSkipExt = false)
 	{
-		$strFileName = GetFileName($arFile["name"]);
+		//safe filename without path
+		$fileName = GetFileName($name);
 
-		//File is going to be deleted
-		if(isset($arFile["del"]) && $arFile["del"] <> "")
+		$originalName = ($bForceMD5 != true && COption::GetOptionString("main", "save_original_file_name", "N") == "Y");
+		if($originalName)
 		{
-			//There is no new file as replacement
-			if($strFileName == "")
-				return "";
-		}
+			//transforming original name:
 
-		if($arFile["name"] == "")
-			return "";
-
-		if (COption::GetOptionInt("main", "disk_space") > 0)
-		{
-			$quota = new CDiskQuota();
-			if (!$quota->checkDiskQuota($arFile))
-				return GetMessage("FILE_BAD_QUOTA");
-		}
-
-		$io = CBXVirtualIo::GetInstance();
-		if($bForceMD5 != true && COption::GetOptionString("main", "save_original_file_name", "N") == "Y")
-		{
+			//transliteration
 			if(COption::GetOptionString("main", "translit_original_file_name", "N") == "Y")
-				$strFileName = CUtil::translit($strFileName, LANGUAGE_ID, array("max_len"=>1024, "safe_chars"=>".", "replace_space" => '-'));
+			{
+				$fileName = CUtil::translit($fileName, LANGUAGE_ID, array("max_len"=>1024, "safe_chars"=>".", "replace_space" => '-'));
+			}
 
+			//replace invalid characters
 			if(COption::GetOptionString("main", "convert_original_file_name", "Y") == "Y")
-				$strFileName = $io->RandomizeInvalidFilename($strFileName);
+			{
+				$io = CBXVirtualIo::GetInstance();
+				$fileName = $io->RandomizeInvalidFilename($fileName);
+			}
 		}
 
-		if(!$io->ValidateFilenameString($strFileName))
-			return GetMessage("MAIN_BAD_FILENAME1");
+		//double extension vulnerability
+		$fileName = RemoveScriptExtension($fileName);
 
-		//check for double extension vulnerability
-		$strFileName = RemoveScriptExtension($strFileName);
+		//safe extention without "."
+		$fileExt = GetFileExtension($fileName);
+
+		if(!$originalName)
+		{
+			//name is md5-generated:
+			$fileName = md5(uniqid("", true)).($bSkipExt == true? '' : ".".$fileExt);
+		}
+
+		//.jpe is not image type on many systems
+		if($bSkipExt == false && strtolower($fileExt) == "jpe")
+		{
+			$fileName = substr($fileName, 0, -4).".jpg";
+		}
+
+		return $fileName;
+	}
+
+	protected function validateFile($strFileName, $arFile)
+	{
 		if($strFileName == '')
 			return GetMessage("FILE_BAD_FILENAME");
+
+		$io = CBXVirtualIo::GetInstance();
+		if(!$io->ValidateFilenameString($strFileName))
+			return GetMessage("MAIN_BAD_FILENAME1");
 
 		if(strlen($strFileName) > 255)
 			return GetMessage("MAIN_BAD_FILENAME_LEN");
@@ -137,6 +157,13 @@ class CAllFile
 		//nginx returns octet-stream for .jpg
 		if(GetFileNameWithoutExtension($strFileName) == '')
 			return GetMessage("FILE_BAD_FILENAME");
+
+		if (COption::GetOptionInt("main", "disk_space") > 0)
+		{
+			$quota = new CDiskQuota();
+			if (!$quota->checkDiskQuota($arFile))
+				return GetMessage("FILE_BAD_QUOTA");
+		}
 
 		return "";
 	}
@@ -173,18 +200,19 @@ class CAllFile
 
 		$arFile["ORIGINAL_NAME"] = $strFileName;
 
-		$io = CBXVirtualIo::GetInstance();
-		if (self::validateFile($strFileName, $arFile, $bForceMD5) !== "")
-			return false;
+		//translit, replace unsafe chars, etc.
+		$strFileName = self::transformName($strFileName, $bForceMD5, $bSkipExt);
 
-		$upload_dir = COption::GetOptionString("main", "upload_dir", "upload");
+		//transformed name must be valid, check disk quota, etc.
+		if (self::validateFile($strFileName, $arFile) !== "")
+		{
+			return false;
+		}
 
 		if($arFile["type"] == "image/pjpeg" || $arFile["type"] == "image/jpg")
+		{
 			$arFile["type"] = "image/jpeg";
-
-		//.jpe is not image type on many systems
-		if(strtolower(GetFileExtension($strFileName)) == "jpe")
-			$strFileName = substr($strFileName, 0, -4).".jpg";
+		}
 
 		$bExternalStorage = false;
 		foreach(GetModuleEvents("main", "OnFileSave", true) as $arEvent)
@@ -198,25 +226,30 @@ class CAllFile
 
 		if(!$bExternalStorage)
 		{
-			$newName = '';
+			$upload_dir = COption::GetOptionString("main", "upload_dir", "upload");
+			$io = CBXVirtualIo::GetInstance();
 			if($bForceMD5 != true && COption::GetOptionString("main", "save_original_file_name", "N")=="Y")
 			{
 				$dir_add = '';
 				$i=0;
 				while(true)
 				{
-					$dir_add = substr(md5(uniqid(mt_rand(), true)), 0, 3);
+					$dir_add = substr(md5(uniqid("", true)), 0, 3);
 					if(!$io->FileExists($_SERVER["DOCUMENT_ROOT"]."/".$upload_dir."/".$strSavePath."/".$dir_add."/".$strFileName))
+					{
 						break;
-					if($i>=25)
+					}
+					if($i >= 25)
 					{
 						$j=0;
 						while(true)
 						{
 							$dir_add = substr(md5(mt_rand()), 0, 3)."/".substr(md5(mt_rand()), 0, 3);
 							if(!$io->FileExists($_SERVER["DOCUMENT_ROOT"]."/".$upload_dir."/".$strSavePath."/".$dir_add."/".$strFileName))
+							{
 								break;
-							if($j>=25)
+							}
+							if($j >= 25)
 							{
 								$dir_add = substr(md5(mt_rand()), 0, 3)."/".md5(mt_rand());
 								break;
@@ -231,29 +264,29 @@ class CAllFile
 					$strSavePath .= "/".$dir_add;
 				else
 					$strSavePath .= $dir_add."/";
-
-				$newName = $strFileName;
 			}
 			else
 			{
-				$strFileExt = ($bSkipExt == true? '' : strrchr($strFileName, "."));
+				$strFileExt = ($bSkipExt == true? '' : ".".GetFileExtension($strFileName));
 				while(true)
 				{
-					$newName = md5(uniqid(mt_rand(), true)).$strFileExt;
 					if(substr($strSavePath, -1, 1) <> "/")
-						$strSavePath .= "/".substr($newName, 0, 3);
+						$strSavePath .= "/".substr($strFileName, 0, 3);
 					else
-						$strSavePath .= substr($newName, 0, 3)."/";
+						$strSavePath .= substr($strFileName, 0, 3)."/";
 
-					if(!$io->FileExists($_SERVER["DOCUMENT_ROOT"]."/".$upload_dir."/".$strSavePath."/".$newName))
+					if(!$io->FileExists($_SERVER["DOCUMENT_ROOT"]."/".$upload_dir."/".$strSavePath."/".$strFileName))
 						break;
+
+					//try the new name
+					$strFileName = md5(uniqid("", true)).$strFileExt;
 				}
 			}
 
 			$arFile["SUBDIR"] = $strSavePath;
-			$arFile["FILE_NAME"] = $newName;
+			$arFile["FILE_NAME"] = $strFileName;
 			$strDirName = $_SERVER["DOCUMENT_ROOT"]."/".$upload_dir."/".$strSavePath."/";
-			$strDbFileNameX = $strDirName.$newName;
+			$strDbFileNameX = $strDirName.$strFileName;
 			$strPhysicalFileNameX = $io->GetPhysicalName($strDbFileNameX);
 
 			CheckDirPath($strDirName);
@@ -345,7 +378,8 @@ class CAllFile
 			if ($bucket_size <= 0)
 				$bucket_size = 10;
 			$bucket = intval($ID/$bucket_size);
-			$CACHE_MANAGER->Clean("b_file".$bucket, "b_file");
+			$CACHE_MANAGER->Clean("b_file0".$bucket, "b_file");
+			$CACHE_MANAGER->Clean("b_file1".$bucket, "b_file");
 		}
 	}
 
@@ -358,7 +392,7 @@ class CAllFile
 			$bucket_size = 10;
 
 		$bucket = intval($FILE_ID/$bucket_size);
-		if($CACHE_MANAGER->Read(CACHED_b_file, $cache_id="b_file".$bucket, "b_file"))
+		if($CACHE_MANAGER->Read(CACHED_b_file, $cache_id="b_file".intval(CMain::IsHTTPS()).$bucket, "b_file"))
 		{
 			$arFiles = $CACHE_MANAGER->Get($cache_id);
 		}
@@ -1205,11 +1239,16 @@ class CAllFile
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php
 	 * @author Bitrix
 	 */
-	public static function CheckImageFile($arFile, $iMaxSize=0, $iMaxWidth=0, $iMaxHeight=0, $access_typies=array())
+	public static function CheckImageFile($arFile, $iMaxSize=0, $iMaxWidth=0, $iMaxHeight=0, $access_typies=array(), $bForceMD5=false, $bSkipExt=false)
 	{
 		if($arFile["name"] == "")
 		{
 			return "";
+		}
+
+		if(preg_match("#^php://filter#i", $arFile["tmp_name"]))
+		{
+			return GetMessage("FILE_BAD_FILE_TYPE").".<br>";
 		}
 
 		$file_type = GetFileType($arFile["name"]);
@@ -1223,10 +1262,10 @@ class CAllFile
 		switch ($file_type)
 		{
 			case "FLASH":
-				$res = CFile::CheckFile($arFile, $iMaxSize, "application/x-shockwave-flash", CFile::GetFlashExtensions());
+				$res = CFile::CheckFile($arFile, $iMaxSize, "application/x-shockwave-flash", CFile::GetFlashExtensions(), $bForceMD5, $bSkipExt);
 				break;
 			default:
-				$res = CFile::CheckFile($arFile, $iMaxSize, "image/", CFile::GetImageExtensions());
+				$res = CFile::CheckFile($arFile, $iMaxSize, "image/", CFile::GetImageExtensions(), $bForceMD5, $bSkipExt);
 		}
 
 		if($res <> '')
@@ -1316,14 +1355,18 @@ class CAllFile
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php
 	 * @author Bitrix
 	 */
-	public static function CheckFile($arFile, $intMaxSize=0, $strMimeType=false, $strExt=false)
+	public static function CheckFile($arFile, $intMaxSize=0, $strMimeType=false, $strExt=false, $bForceMD5=false, $bSkipExt=false)
 	{
 		if($arFile["name"] == "")
 		{
 			return "";
 		}
 
-		if(($error = self::validateFile($dummy, $arFile)) <> '')
+		//translit, replace unsafe chars, etc.
+		$strFileName = self::transformName($arFile["name"], $bForceMD5, $bSkipExt);
+
+		//transformed name must be valid, check disk quota, etc.
+		if(($error = self::validateFile($strFileName, $arFile)) <> '')
 		{
 			return $error;
 		}
@@ -1336,7 +1379,7 @@ class CAllFile
 		$strFileExt = '';
 		if($strExt)
 		{
-			$strFileExt = GetFileExtension($arFile["name"]);
+			$strFileExt = GetFileExtension($strFileName);
 			if($strFileExt == '')
 			{
 				return GetMessage("FILE_BAD_TYPE");
@@ -1363,7 +1406,7 @@ class CAllFile
 			{
 				if(strtolower(trim($tok)) == strtolower($strFileExt))
 				{
-					$IsExtCorrect=true;
+					$IsExtCorrect = true;
 					break;
 				}
 				$tok = strtok(",");
@@ -1468,7 +1511,7 @@ function ImgShw(ID, width, height, alt)
 		}
 	}
 
-	function _GetImgParams($strImage, $iSizeWHTTP=0, $iSizeHHTTP=0)
+	public static function _GetImgParams($strImage, $iSizeWHTTP=0, $iSizeHHTTP=0)
 	{
 		global $arCloudImageSizeCache;
 
@@ -1916,7 +1959,14 @@ function ImgShw(ID, width, height, alt)
 
 		return $strReturn;
 	}
-
+	/**
+	 * Returns an array describing file as if it was $_FILES element.
+	 *
+	 * @param string|int $path May contain ID of the file, absolute path, relative path or an url.
+	 * @param string|bool $mimetype Forces type field of the array
+	 * @param bool $skipInternal Excludes using ID as $path
+	 * @return array|bool|null
+	 */
 	
 	/**
 	 * <p>Функция формирует массив описывающий файл. Структура массива аналогична структуре массива $_FILES[имя] (или $HTTP_POST_FILES[имя]). Данный массив может быть использован в функциях <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/savefile.php">SaveFile</a>, <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/checkfile.php">CheckFile</a>, <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/checkimagefile.php">CheckImageFile</a>. Структура возвращаемого массива:<br><br></p> <pre>Array( "name" =&gt; "название файла", "size" =&gt; "размер", "tmp_name" =&gt; "временный путь на сервере", "type" =&gt; "тип загружаемого файла")</pre>
@@ -1971,13 +2021,16 @@ function ImgShw(ID, width, height, alt)
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php
 	 * @author Bitrix
 	 */
-	public static function MakeFileArray($path, $mimetype=false)
+	public static function MakeFileArray($path, $mimetype = false, $skipInternal = false)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$arFile = array();
 
 		if(intval($path)>0)
 		{
+			if ($skipInternal)
+				return false;
+
 			$res = CFile::GetByID($path);
 			if($ar = $res->Fetch())
 			{
@@ -2006,7 +2059,14 @@ function ImgShw(ID, width, height, alt)
 		$path = preg_replace("#(?<!:)[\\\\\\/]+#", "/", $path);
 
 		if(strlen($path) == 0 || $path == "/")
+		{
 			return NULL;
+		}
+
+		if(preg_match("#^php://filter#i", $path))
+		{
+			return NULL;
+		}
 
 		if(preg_match("#^(http[s]?)://#", $path))
 		{
@@ -3055,6 +3115,8 @@ function ImgShw(ID, width, height, alt)
 			else
 				$content_type = "text/html; charset=".LANG_CHARSET;
 		}
+
+		$content_type = str_replace(array("\r", "\n"), "", $content_type);
 
 		if($force_download)
 			$specialchars = false;

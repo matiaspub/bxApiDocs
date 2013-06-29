@@ -759,7 +759,7 @@ function fGetUserShoppingCart($arProduct, $LID, $recalcOrder)
 				CSaleBasket::Update($val["BUSKET_ID"], array("CUSTOM_PRICE" => "Y"));
 			}
 
-			$val["DISCOUNT_PRICE"] = $val["PRICE_DEFAULT"] - $val["PRICE"];
+			//$val["DISCOUNT_PRICE"] = $val["PRICE_DEFAULT"] - $val["PRICE"];
 		}
 
 		$arOrderProductPrice[$i] = $val;
@@ -946,6 +946,7 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 				$arParams["orderCallback"] = "CatalogBasketOrderCallback";
 				$arParams["cancelCallback"] = "CatalogBasketCancelCallback";
 				$arParams["payCallback"] = "CatalogPayOrderCallback";
+				$arParams["productProviderClass"] = "CCatalogProductProvider";
 
 				$result .= "<tr id='more_".$type."_".$items["ID"]."'>
 								<td class=\"tab_img\" >".$imgProduct."</td>

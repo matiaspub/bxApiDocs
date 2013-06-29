@@ -401,7 +401,7 @@ class CControllerGroupSettings
 		return $arModules;
 	}
 
-	function _cmp($a, $b)
+	public static function _cmp($a, $b)
 	{
 		return strcmp($a["name"], $b["name"]);
 	}
@@ -594,7 +594,7 @@ class CControllerGroupSettings
 		return $str;
 	}
 
-	function __PHPToString($arData)
+	public static function __PHPToString($arData)
 	{
 		if(is_array($arData))
 		{
@@ -629,7 +629,7 @@ class CControllerGroupSettings
 class IControllerGroupOption
 {
 	var $id = 'UNDEFINED';
-	public static function GetName()
+	public function GetName()
 	{
 		return GetMessage("CTRLR_GRP_SETTINGS")." ".$this->id;
 	}
@@ -650,7 +650,7 @@ class IControllerGroupOption
 		return Array();
 	}
 
-	public static function GetOptionPHPCode($arAllValues)
+	public function GetOptionPHPCode($arAllValues)
 	{
 		$arValues = $arAllValues[$this->id];
 		$arOptions = $this->GetOptionArray();

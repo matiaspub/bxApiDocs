@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/controller/classes/gener
 
 class CControllerMember extends CAllControllerMember
 {
-	function _CheckCommandId($member_guid, $command_id)
+	public static function _CheckCommandId($member_guid, $command_id)
 	{
 		global $DB;
 		$strSql =

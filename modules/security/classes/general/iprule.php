@@ -5,7 +5,7 @@ class CSecurityIPRule
 {
 	static $bActive = null;
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -98,7 +98,7 @@ class CSecurityIPRule
 		return $res;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 		$ID = intval($ID);
@@ -160,7 +160,7 @@ class CSecurityIPRule
 		global $DB, $CACHE_MANAGER;
 		$IPRULE_ID = intval($IPRULE_ID);
 		if(!$IPRULE_ID)
-			return;
+			return false;
 
 		$arLikeSearch = array("?", "*", ".");
 		$arLikeReplace = array("_",  "%", "\\.");
@@ -234,12 +234,12 @@ class CSecurityIPRule
 		return true;
 	}
 
-	public static function UpdateRuleIPs($IPRULE_ID, $arInclIPs=false, $arExclIPs=false)
+	public function UpdateRuleIPs($IPRULE_ID, $arInclIPs=false, $arExclIPs=false)
 	{
 		global $DB, $CACHE_MANAGER;
 		$IPRULE_ID = intval($IPRULE_ID);
 		if(!$IPRULE_ID)
-			return;
+			return false;
 
 		if(is_array($arInclIPs))
 		{
@@ -328,7 +328,7 @@ class CSecurityIPRule
 		return $res;
 	}
 
-	public static function CheckIP($arInclIPs=false, $arExclIPs=false)
+	public function CheckIP($arInclIPs=false, $arExclIPs=false)
 	{
 		global $DB, $APPLICATION;
 
@@ -401,7 +401,7 @@ class CSecurityIPRule
 		}
 	}
 
-	public static function CheckFields(&$arFields, $ID)
+	public function CheckFields(&$arFields, $ID)
 	{
 		global $DB, $APPLICATION;
 
@@ -544,6 +544,7 @@ class CSecurityIPRule
 					"ACTIVE" => "Y",
 					), array("ID" => "ASC"));
 
+			$masks = array();
 			while ($arIPRule = $rsIPRule->Fetch())
 			{
 
@@ -624,7 +625,7 @@ class CSecurityIPRule
 		return $res;
 	}
 
-	public static function GetList($arSelect, $arFilter, $arOrder)
+	public function GetList($arSelect, $arFilter, $arOrder)
 	{
 		global $DB;
 
@@ -901,6 +902,8 @@ class CSecurityIPRule
 
 		if(CSecurityIPRule::GetActiveCount())
 		{
+			$bMatch = false;
+
 			if(CSecurityIPRule::CheckAntiFile())
 				return;
 
@@ -1168,17 +1171,25 @@ class CSecurityIPRule
 
 	public static function CleanUpAgent()
 	{
-		$cleanup_days = 2;
+		$agentName = "CSecurityIPRule::CleanUpAgent();";
+		$cleanupDays = 2;
+		$activeTo = ConvertTimeStamp(time() - $cleanupDays*24*60*60, "FULL");
+		if(!$activeTo)
+			return $agentName;
+
 		$rs = CSecurityIPRule::GetList(
 			array("ID"),
-			array("=RULE_TYPE"=>"A", "<=ACTIVE_TO"=>ConvertTimeStamp(time()-$cleanup_days*24*60*60, "FULL")),
+			array(
+				"=RULE_TYPE" => "A",
+				"<=ACTIVE_TO" => $activeTo,
+			),
 			array("ID"=>"ASC")
 		);
 		while($ar = $rs->Fetch())
 		{
 			CSecurityIPRule::Delete($ar["ID"]);
 		}
-		return "CSecurityIPRule::CleanUpAgent();";
+		return $agentName;
 	}
 }
 ?>

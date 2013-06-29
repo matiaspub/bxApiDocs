@@ -15,7 +15,7 @@ class CCloudStorage
 	/**
 	 * @return void
 	*/
-	function _init()
+	public static function _init()
 	{
 		if(!isset(self::$_services))
 		{

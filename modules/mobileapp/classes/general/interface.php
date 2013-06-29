@@ -192,28 +192,28 @@ class CAdminMobileDetail
 {
 	private $arDetail;
 
-	static public function setTitle($strTitle)
+	public function setTitle($strTitle)
 	{
 
 		$this->arDetail["TITLE"] = $strTitle;
 	}
 
-	static public function addUpperButton($arButton)
+	public function addUpperButton($arButton)
 	{
 		$this->arDetail["UPPER_BUTTONS"][] = $arButton;
 	}
 
-	static public function addSection($arSection)
+	public function addSection($arSection)
 	{
 		$this->arDetail["SECTIONS"][] = $arSection;
 	}
 
-	static public function getHtml()
+	public function getHtml()
 	{
 		return CAdminMobileDetailTmpl::getHtml($this->arDetail);
 	}
 
-	static public function getItem()
+	public function getItem()
 	{
 		return $this->arDetail;
 	}

@@ -12,7 +12,7 @@ class CVariableDeclare
 	public $tainted_vars = array();
 	public $id = 0;
 
-	function __construct($id, $line, $start, $end, $tokens, $comment, $dependencies, $tainted_vars)
+	public function __construct($id, $line, $start, $end, $tokens, $comment, $dependencies, $tainted_vars)
 	{
 		$this->line = $line;
 		$this->start = $start;
@@ -33,7 +33,7 @@ class CVariable
 	public $name = '';
 	public $requestInitialization = true;
 
-	function __construct($name)
+	public function __construct($name)
 	{
 		$this->name = $name;
 		$this->have_user_input = false;
@@ -42,7 +42,7 @@ class CVariable
 		$this->requestInitialization = true;
 	}
 	
-	static public function newDeclare($id, $line, $start, $end, $tokens, $comment, $dependencies, $tainted_vars)
+	public function newDeclare($id, $line, $start, $end, $tokens, $comment, $dependencies, $tainted_vars)
 	{
 		$this->declares[] = new CVariableDeclare($id, $line, $start, $end, $tokens, $comment, $dependencies, $tainted_vars);
 	}
@@ -60,7 +60,7 @@ class CVuln
 	public $traverse = '';
 	public $additional_text = '';
 
-	function __construct($filename, $line, $name, $tokens, $dependencies, $tainted_vars, $comment)
+	public function __construct($filename, $line, $name, $tokens, $dependencies, $tainted_vars, $comment)
 	{
 		$this->tokens = $tokens;
 		$this->filename = $filename;
@@ -106,7 +106,7 @@ class CVulnScanner
 	private $search_xss = true;
 	private $global_xss_ignore = false;
 
-	function __construct($file_name, $arParams, $template = '.default', $component_template = '')
+	public function __construct($file_name, $arParams, $template = '.default', $component_template = '')
 	{
 		$this->scanning_file = $file_name;
 		$this->source_functions = array();
@@ -346,7 +346,7 @@ class CVulnScanner
 		return false;
 	}
 
-	static public function process()
+	public function process()
 	{
 		for ($i = 0, $tokens_count = count($this->tokens); $i < $tokens_count; $i++)
 		{
@@ -505,7 +505,7 @@ class CVulnScanner
 
 						}
 						//not including bitrix core, too hard:(
-						if(!preg_match($this->arParams['PREG_FOR_SKIP_INCLUDE'], $inc_file))
+						if(is_file($try_file) && !preg_match($this->arParams['PREG_FOR_SKIP_INCLUDE'], $inc_file))
 						{
 							if(!in_array(realpath($try_file), $this->file_history))
 							{
@@ -729,7 +729,7 @@ class CVulnScanner
 			unset($this->variables[$varName]); //TODO: Fix this, with dependency overwritten!
 	}
 
-	static public function tokenize($code, $component_template = '')
+	public function tokenize($code, $component_template = '')
 	{
 		if(preg_match_all('/\$GLOBALS\[\'[_0-9]*\'\]/', $code, $mat) > 20)
 			return array();
@@ -1539,7 +1539,7 @@ class CVulnScanner
 	}
 
 
-	static public function getOutput()
+	public function getOutput()
 	{
 		$output = $this->prepareOutput($this->arResult);
 		$result = '';
@@ -2109,7 +2109,8 @@ class CQAACheckListTests
 		$NS = &$_SESSION['BX_CHECKLIST'][$arParams['TEST_ID']];
 
 		$arScanParams = self::defineScanParams();
-		$arScanParams['time_out'] = COption::GetOptionString('main', 'update_load_timeout', '30');
+		$phpMaxExecutionTime = ini_get("max_execution_time");
+		$arScanParams['time_out'] = $phpMaxExecutionTime > 0 ? $phpMaxExecutionTime - 2: 30;
 		$arScanParams['time_start'] = time();
 		$arScanParams['MP_mode'] = false;
 

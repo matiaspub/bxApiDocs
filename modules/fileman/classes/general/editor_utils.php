@@ -32,7 +32,7 @@ class CEditorUtils
 		echo $s;
 	}
 
-	function _RenderOneComponent($arParams, $bLPA)
+	public static function _RenderOneComponent($arParams, $bLPA)
 	{
 		global $APPLICATION, $USER;
 
@@ -116,7 +116,7 @@ class CEditorUtils
 		return $s;
 	}
 
-	function _RenderAllComponents($arParams, $bLPA)
+	public static function _RenderAllComponents($arParams, $bLPA)
 	{
 		global $APPLICATION, $USER;
 		$s = '';

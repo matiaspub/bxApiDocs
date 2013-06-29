@@ -199,7 +199,7 @@ class CSearchCustomRank
 		return $DB->Query("DELETE FROM b_search_custom_rank WHERE ID=".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	public static function CheckFields($arFields)
+	public function CheckFields($arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$this->LAST_ERROR = "";
@@ -241,11 +241,10 @@ class CSearchCustomRank
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 
@@ -285,11 +284,10 @@ class CSearchCustomRank
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$ID = intval($ID);
@@ -381,11 +379,10 @@ class CSearchCustomRank
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php
 	 * @author Bitrix
 	 */
-	public static function NextUpdate()
+	public function NextUpdate()
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 
@@ -443,7 +440,7 @@ class CSearchCustomRank
 		else
 			return false;
 	}
-	function __GetParam($lang, $site_id, $module_id=false, $param1=false, $param2=false, $item_id=false)
+	public static function __GetParam($lang, $site_id, $module_id=false, $param1=false, $param2=false, $item_id=false)
 	{
 		$name="";
 		if($module_id=="iblock" && CModule::IncludeModule("iblock"))

@@ -19,7 +19,7 @@ class CWikiSecurity
 {
 	var $_filters = false;
 
-	function __construct($char = false)
+	public function __construct($char = false)
 	{
 		if($char === false)
 			$char = " ";
@@ -309,11 +309,10 @@ class CWikiSecurity
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php
 	 * @author Bitrix
 	 */
-	public static function clear(&$str)
+	public function clear(&$str)
 	{
 	    return $this->_dostr($str);
 	}
@@ -362,7 +361,7 @@ class CWikiSecurity
 	/*
 	Function is used in regular expressions in order to decode characters presented as &#123;
 	*/
-	function _decode_cb($in)
+	public static function _decode_cb($in)
 	{
 		$ad = $in[2];
 		if($ad == ';')
@@ -374,7 +373,7 @@ class CWikiSecurity
 	/*
 	Function is used in regular expressions in order to decode characters presented as  &#xAB;
 	*/
-	function _decode_cb_hex($in)
+	public static function _decode_cb_hex($in)
 	{
 		$ad = $in[2];
 		if($ad==';')
@@ -388,7 +387,7 @@ class CWikiSecurity
 	One pass!
 	-- Decode only a-zA-Z:().=, because only theese are used in filters
 	*/
-	function _decode($str)
+	public static function _decode($str)
 	{
 		$str = preg_replace_callback("/\&\#(\d+)([^\d])/is", array("CWikiSecurity", "_decode_cb"), $str);
 		$str = preg_replace_callback("/\&\#x([\da-f]+)([^\da-f])/is", array("CWikiSecurity", "_decode_cb_hex"), $str);

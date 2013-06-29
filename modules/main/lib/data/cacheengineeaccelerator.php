@@ -9,7 +9,7 @@ class CacheEngineEAccelerator
 	private $written = false;
 	private $read = false;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$v = \Bitrix\Main\Config\Configuration::getValue("cache");
 		if ($v != null && isset($v["sid"]) && ($v["sid"] != ""))
@@ -23,7 +23,7 @@ class CacheEngineEAccelerator
 		return function_exists('eaccelerator_get');
 	}
 
-	static public function clean($baseDir, $initDir = false, $filename = false)
+	public function clean($baseDir, $initDir = false, $filename = false)
 	{
 		if(strlen($filename))
 		{
@@ -62,7 +62,7 @@ class CacheEngineEAccelerator
 		return true;
 	}
 
-	static public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		$baseDirVersion = eaccelerator_get($this->sid.$baseDir);
 		if($baseDirVersion === null)
@@ -94,7 +94,7 @@ class CacheEngineEAccelerator
 		return true;
 	}
 
-	static public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		$baseDirVersion = eaccelerator_get($this->sid.$baseDir);
 		if($baseDirVersion === null)

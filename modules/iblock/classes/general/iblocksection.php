@@ -296,8 +296,8 @@ class CAllIBlockSection
 					b_iblock_section M,
 					b_iblock_section BS,
 					b_iblock B
-				WHERE M.ID=".IntVal($SECTION_ID)."
-					".($IBLOCK_ID>0? "AND M.IBLOCK_ID=".IntVal($IBLOCK_ID): "")."
+				WHERE M.ID=".intval($SECTION_ID)."
+					".($IBLOCK_ID>0? "AND M.IBLOCK_ID=".intval($IBLOCK_ID): "")."
 					AND M.IBLOCK_ID=BS.IBLOCK_ID
 					AND B.ID=BS.IBLOCK_ID
 					AND M.LEFT_MARGIN>=BS.LEFT_MARGIN
@@ -399,11 +399,10 @@ class CAllIBlockSection
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields, $bResort=true, $bUpdateSearch=true, $bResizePictures=false)
+	public function Add($arFields, $bResort=true, $bUpdateSearch=true, $bResizePictures=false)
 	{
 		global $USER, $DB, $APPLICATION;
 
@@ -935,11 +934,10 @@ class CAllIBlockSection
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields, $bResort=true, $bUpdateSearch=true, $bResizePictures=false)
+	public function Update($ID, $arFields, $bResort=true, $bUpdateSearch=true, $bResizePictures=false)
 	{
 		global $USER, $DB, $APPLICATION;
 
@@ -1846,7 +1844,7 @@ class CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	// Check function called from Add and Update
 	///////////////////////////////////////////////////////////////////
-	public static function CheckFields(&$arFields, $ID=false)
+	public function CheckFields(&$arFields, $ID=false)
 	{
 		global $DB, $APPLICATION;
 		$this->LAST_ERROR = "";
@@ -2541,7 +2539,7 @@ class CAllIBlockSection
 		return $res["CNT"];
 	}
 
-	function _check_rights_sql($min_permission)
+	public static function _check_rights_sql($min_permission)
 	{
 		global $DB, $USER;
 		$min_permission = (strlen($min_permission)==1) ? $min_permission : "R";

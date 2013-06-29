@@ -4057,6 +4057,13 @@ class CSocNetLogTools
 									CIMNotify::Add($arMessageFields);
 								}
 							}
+
+							CSocNetLog::Update(
+								$arFields["LOG_ID"],
+								array(
+									'PARAMS' => serialize(array('TYPE' => 'comment'))
+								)
+							);
 						}
 					}
 				}				
@@ -5110,7 +5117,7 @@ class CSocNetLogTools
 
 class CSocNetPhotoCommentEvent
 {
-	public static function SetVars($arParams, $arResult)
+	public function SetVars($arParams, $arResult)
 	{
 		if (
 			!array_key_exists("IS_SOCNET", $arParams)
@@ -5161,7 +5168,7 @@ class CSocNetPhotoCommentEvent
 		}
 	}
 
-	public static function OnAfterPhotoCommentAddForum($ID, $arFields)
+	public function OnAfterPhotoCommentAddForum($ID, $arFields)
 	{
 		static $arSiteWorkgroupsPage;
 
@@ -5391,7 +5398,7 @@ class CSocNetPhotoCommentEvent
 		}
 	}
 
-	public static function OnAfterPhotoCommentAddBlog($ID, $arFields)
+	public function OnAfterPhotoCommentAddBlog($ID, $arFields)
 	{
 		if (!CModule::IncludeModule('iblock'))
 			return;
@@ -5583,7 +5590,7 @@ class CSocNetPhotoCommentEvent
 		}
 	}
 
-	public static function OnAfterPhotoCommentDeleteBlog($ID)
+	public function OnAfterPhotoCommentDeleteBlog($ID)
 	{
 		if (!$this->IsSocnet)
 			return;
@@ -5628,7 +5635,7 @@ class CSocNetPhotoCommentEvent
 
 class logTextParser extends CTextParser
 {
-	public static function logTextParser($strLang = False, $pathToSmile = false)
+	public function logTextParser($strLang = False, $pathToSmile = false)
 	{
 		$this->CTextParser();
 		global $CACHE_MANAGER;
@@ -5658,7 +5665,7 @@ class logTextParser extends CTextParser
 				}
 			}
 
-			public static function sonet_sortlen($a, $b) {
+			function sonet_sortlen($a, $b) {
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
 
@@ -5676,7 +5683,7 @@ class logTextParser extends CTextParser
 		$this->smiles = $arSmiles[$strLang];
 	}
 
-	public static function convert($text, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N"), $arParams = Array())
+	public function convert($text, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N"), $arParams = Array())
 	{
 		$this->allow = array(
 			"HTML" => ($allow["HTML"] == "Y" ? "Y" : "N"),
@@ -5785,7 +5792,7 @@ class logTextParser extends CTextParser
 		return trim($text);
 	}
 
-	public static function convert_anchor_tag($url, $text, $pref="")
+	public function convert_anchor_tag($url, $text, $pref="")
 	{
 		if ($this->allow["LOG_ANCHOR"] == "N")
 			return "[URL]".$text."[/URL]";
@@ -5793,7 +5800,7 @@ class logTextParser extends CTextParser
 			return parent::convert_anchor_tag($url, $text, $pref);
 	}
 
-	public static function convert_image_tag($url = "", $params = "")
+	public function convert_image_tag($url = "", $params = "")
 	{
 		if ($this->allow["LOG_IMG"] == "N")
 		{
@@ -5804,7 +5811,7 @@ class logTextParser extends CTextParser
 			return parent::convert_image_tag($url, $params);
 	}
 
-	public static function pre_convert_code_tag ($text = "")
+	public function pre_convert_code_tag ($text = "")
 	{
 		if (strLen($text)<=0) return;
 
@@ -5817,7 +5824,7 @@ class logTextParser extends CTextParser
 		return $text;
 	}
 
-	public static function convert_code_tag($text = "")
+	public function convert_code_tag($text = "")
 	{
 		$text = preg_replace("#(<br[\s]*\/>)#is".BX_UTF_PCRE_MODIFIER, "", $text);
 		if ($this->allow["LOG_CODE"] == "N")
@@ -5829,7 +5836,7 @@ class logTextParser extends CTextParser
 			return parent::convert_code_tag($text);
 	}
 
-	public static function convert_quote_tag($text = "")
+	public function convert_quote_tag($text = "")
 	{
 		if ($this->allow["LOG_QUOTE"] == "N")
 			return preg_replace(
@@ -5843,7 +5850,7 @@ class logTextParser extends CTextParser
 			return parent::convert_quote_tag($text);
 	}
 
-	public static function convert_font_attr($attr, $value = "", $text = "")
+	public function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0) return "";
 		$text = str_replace("\\\"", "\"", $text);
@@ -5857,7 +5864,7 @@ class logTextParser extends CTextParser
 			return parent::convert_font_attr($attr, $value, $text);
 	}
 
-	public static function convert_video($params, $path)
+	public function convert_video($params, $path)
 	{
 		if (strLen($path) <= 0)
 			return "";

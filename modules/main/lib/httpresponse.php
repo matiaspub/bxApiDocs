@@ -9,7 +9,7 @@ class HttpResponse
 
 	//private $contextType;
 
-	static public function addHeader($name, $value = '')
+	public function addHeader($name, $value = '')
 	{
 		if (empty($name))
 			throw new ArgumentNullException("name");
@@ -20,17 +20,17 @@ class HttpResponse
 			$this->headers[] = array($name, $value);
 	}
 
-	static public function addCookie(\Bitrix\Main\Web\Cookie $cookie)
+	public function addCookie(\Bitrix\Main\Web\Cookie $cookie)
 	{
 		$this->cookies[] = $cookie;
 	}
 
-	static public function getCookies()
+	public function getCookies()
 	{
 		return $this->cookies;
 	}
 
-	static public function storeCookies()
+	public function storeCookies()
 	{
 		$storedCookies = array();
 
@@ -101,7 +101,7 @@ class HttpResponse
 		}
 	}
 
-	static public function setStatus($status)
+	public function setStatus($status)
 	{
 		$httpStatus = \Bitrix\Main\Config\Configuration::getValue("http_status");
 

@@ -92,7 +92,7 @@ class CModule
 		return false;
 	}
 
-	function _GetCache()
+	public static function _GetCache()
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -114,7 +114,7 @@ class CModule
 		return self::$installedModules;
 	}
 
-	function _GetName($arEvent)
+	public static function _GetName($arEvent)
 	{
 		$strName = '';
 		if(array_key_exists("CALLBACK", $arEvent))
@@ -217,7 +217,7 @@ class CModule
 		);
 	}
 
-	public static function InstallTasks()
+	public function InstallTasks()
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -308,7 +308,7 @@ class CModule
 		}
 	}
 
-	public static function UnInstallTasks()
+	public function UnInstallTasks()
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -385,11 +385,10 @@ class CModule
 	 * модулей</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php
 	 * @author Bitrix
 	 */
-	public static function IsInstalled()
+	public function IsInstalled()
 	{
 		if (!self::$installedModules)
 			CModule::_GetCache();
@@ -470,11 +469,10 @@ class CModule
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php
 	 * @author Bitrix
 	 */
-	public static function Remove()
+	public function Remove()
 	{
 		global $DB,$CACHE_MANAGER;
 		$DB->Query("DELETE FROM b_module WHERE ID='".$this->MODULE_ID."'");
@@ -509,11 +507,10 @@ class CModule
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php
 	 * @author Bitrix
 	 */
-	public static function Add()
+	public function Add()
 	{
 		global $DB, $CACHE_MANAGER;
 		$DB->Query(

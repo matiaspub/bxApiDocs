@@ -141,11 +141,10 @@ class CTestResult
 	 * тестирования</a></li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -349,11 +348,10 @@ class CTestResult
 	 * href="addresponse.php">AddResponse</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 

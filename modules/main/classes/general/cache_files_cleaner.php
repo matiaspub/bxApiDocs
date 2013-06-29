@@ -9,7 +9,7 @@ class CFileCacheCleaner
 
 	private $_obFileTree;
 
-	function __construct($CacheType)
+	public function __construct($CacheType)
 	{
 		global $DB;
 		$this->_CacheType = $CacheType;
@@ -50,7 +50,7 @@ class CFileCacheCleaner
 		}
 	}
 
-	public static function InitPath($PathToCheck)
+	public function InitPath($PathToCheck)
 	{
 		if(strlen($PathToCheck) > 0)
 		{
@@ -88,7 +88,7 @@ class CFileCacheCleaner
 		}
 	}
 
-	public static function Start()
+	public function Start()
 	{
 		if($this->_CurrentBase)
 		{
@@ -97,7 +97,7 @@ class CFileCacheCleaner
 		}
 	}
 
-	public static function GetNextFile()
+	public function GetNextFile()
 	{
 		if(is_object($this->_obFileTree))
 		{
@@ -176,12 +176,12 @@ class _CFileTree
 	var $_in_path = '/';
 	var $_path = '';
 	var $_dir = false;
-	function __construct($in_path="/")
+	public function __construct($in_path="/")
 	{
 		$this->_in_path = preg_replace("#[\\\\\\/]+#", "/", $in_path);
 	}
 
-	public static function Start($path="/")
+	public function Start($path="/")
 	{
 		$this->_path = preg_replace("#[\\\\\\/]+#", "/", $this->_in_path.trim($path, "/"));
 
@@ -225,7 +225,7 @@ class _CFileTree
 		}
 	}
 
-	public static function GetNextFile()
+	public function GetNextFile()
 	{
 		if(!is_array($this->_dir))
 		{
@@ -266,7 +266,7 @@ class _CFileTree
 		return $path."/".$last;
 	}
 
-	public static function GoUp()
+	public function GoUp()
 	{
 		$last_dir = $this->ExtractFileFromPath($this->_path);
 		//We are not going to go up any more

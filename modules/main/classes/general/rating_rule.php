@@ -401,7 +401,7 @@ class CRatingRule
 	}
 
 	// check only general field
-	function __CheckFields($arFields)
+	public static function __CheckFields($arFields)
 	{
 		$aMsg = array();
 

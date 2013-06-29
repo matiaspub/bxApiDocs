@@ -22,12 +22,12 @@ class QueryChain
 	 */
 	protected $last_element;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->chain = array();
 	}
 
-	static public function addElement(QueryChainElement $element)
+	public function addElement(QueryChainElement $element)
 	{
 		if (empty($this->chain) && !($element->getValue() instanceof Base))
 		{
@@ -42,22 +42,22 @@ class QueryChain
 		$this->size++;
 	}
 
-	static public function getFirstElement()
+	public function getFirstElement()
 	{
 		return $this->chain[0];
 	}
 
-	static public function getLastElement()
+	public function getLastElement()
 	{
 		return $this->last_element;
 	}
 
-	static public function getAllElements()
+	public function getAllElements()
 	{
 		return $this->chain;
 	}
 
-	static public function removeLastElement()
+	public function removeLastElement()
 	{
 		$this->chain = array_slice($this->chain, 0, -1);
 		$this->definition = null;
@@ -67,7 +67,7 @@ class QueryChain
 		$this->size--;
 	}
 
-	static public function hasBackReference()
+	public function hasBackReference()
 	{
 		foreach ($this->chain as $element)
 		{
@@ -80,12 +80,12 @@ class QueryChain
 		return false;
 	}
 
-	static public function getSize()
+	public function getSize()
 	{
 		return $this->size;
 	}
 
-	static public function getDefinition()
+	public function getDefinition()
 	{
 		if (is_null($this->definition))
 		{
@@ -95,7 +95,7 @@ class QueryChain
 		return $this->definition;
 	}
 
-	static public function getAlias()
+	public function getAlias()
 	{
 		if ($this->custom_alias !== null)
 		{
@@ -110,7 +110,7 @@ class QueryChain
 		return $this->alias;
 	}
 
-	static public function setCustomAlias($alias)
+	public function setCustomAlias($alias)
 	{
 		$this->custom_alias = $alias;
 	}
@@ -353,7 +353,7 @@ class QueryChain
 		return self::getChainByDefinition($entity, $definition)->getAlias();
 	}
 
-	static public function hasAggregation()
+	public function hasAggregation()
 	{
 		$elements = array_reverse($this->chain);
 
@@ -371,7 +371,7 @@ class QueryChain
 		return false;
 	}
 
-	static public function hasSubquery()
+	public function hasSubquery()
 	{
 		$elements = array_reverse($this->chain);
 
@@ -389,13 +389,13 @@ class QueryChain
 		return false;
 	}
 
-	static public function isConstant()
+	public function isConstant()
 	{
 		return ($this->getLastElement()->getValue() instanceof ExpressionField
 			&& $this->getLastElement()->getValue()->isConstant());
 	}
 
-	static public function getSqlDefinition($with_alias = false)
+	public function getSqlDefinition($with_alias = false)
 	{
 		$sql_def = $this->getLastElement()->getSqlDefinition();
 
@@ -409,12 +409,12 @@ class QueryChain
 		return $sql_def;
 	}
 
-	static public function __clone()
+	public function __clone()
 	{
 		$this->custom_alias = null;
 	}
 
-	static public function dump()
+	public function dump()
 	{
 		$i = 0;
 		foreach ($this->chain as $elem)

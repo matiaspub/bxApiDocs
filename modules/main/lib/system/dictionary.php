@@ -14,7 +14,7 @@ class Dictionary
 	 *
 	 * @param array $arValues
 	 */
-	static public function __construct(array $arValues)
+	public function __construct(array $arValues)
 	{
 		$this->arValues = $arValues;
 	}
@@ -25,7 +25,7 @@ class Dictionary
 	 * @param string $name
 	 * @return string | null
 	 */
-	static public function get($name)
+	public function get($name)
 	{
 		if (array_key_exists($name, $this->arValues))
 			return $this->arValues[$name];
@@ -36,7 +36,7 @@ class Dictionary
 	/**
 	 * Return the current element
 	 */
-	static public function current()
+	public function current()
 	{
 		return current($this->arValues);
 	}
@@ -44,7 +44,7 @@ class Dictionary
 	/**
 	 * Move forward to next element
 	 */
-	static public function next()
+	public function next()
 	{
 		return next($this->arValues);
 	}
@@ -52,7 +52,7 @@ class Dictionary
 	/**
 	 * Return the key of the current element
 	 */
-	static public function key()
+	public function key()
 	{
 		return key($this->arValues);
 	}
@@ -60,7 +60,7 @@ class Dictionary
 	/**
 	 * Checks if current position is valid
 	 */
-	static public function valid()
+	public function valid()
 	{
 		$key = $this->key();
 		return ($key != null);
@@ -69,7 +69,7 @@ class Dictionary
 	/**
 	 * Rewind the Iterator to the first element
 	 */
-	static public function rewind()
+	public function rewind()
 	{
 		return reset($this->arValues);
 	}
@@ -77,7 +77,7 @@ class Dictionary
 	/**
 	 * Whether a offset exists
 	 */
-	static public function offsetExists($offset)
+	public function offsetExists($offset)
 	{
 		return array_key_exists($offset, $this->arValues);
 	}
@@ -85,7 +85,7 @@ class Dictionary
 	/**
 	 * Offset to retrieve
 	 */
-	static public function offsetGet($offset)
+	public function offsetGet($offset)
 	{
 		if (array_key_exists($offset, $this->arValues))
 			return $this->arValues[$offset];
@@ -96,7 +96,7 @@ class Dictionary
 	/**
 	 * Offset to set
 	 */
-	static public function offsetSet($offset, $value)
+	public function offsetSet($offset, $value)
 	{
 		$this->arValues[$offset] = $value;
 	}
@@ -104,7 +104,7 @@ class Dictionary
 	/**
 	 * Offset to unset
 	 */
-	static public function offsetUnset($offset)
+	public function offsetUnset($offset)
 	{
 		unset($this->arValues[$offset]);
 	}
@@ -112,7 +112,7 @@ class Dictionary
 	/**
 	 * Count elements of an object
 	 */
-	static public function count()
+	public function count()
 	{
 		return count($this->arValues);
 	}
@@ -122,7 +122,7 @@ class Dictionary
 	 *
 	 * @return array
 	 */
-	static public function toArray()
+	public function toArray()
 	{
 		return $this->arValues;
 	}

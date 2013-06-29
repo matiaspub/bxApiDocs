@@ -15,7 +15,7 @@ class Cookie
 	private $secure = false;
 	private $value;
 
-	static public function __construct($name, $value, $expires = null)
+	public function __construct($name, $value, $expires = null)
 	{
 		$this->path = "/";
 		$this->name = static::generateCookieName($name);
@@ -43,12 +43,12 @@ class Cookie
 		$this->httpOnly = (($cookiesSettings && isset($cookiesSettings["http_only"])) ? $cookiesSettings["http_only"] : false);
 	}
 
-	static public function setDomain($domain)
+	public function setDomain($domain)
 	{
 		$this->domain = $domain;
 	}
 
-	static public function getDomain()
+	public function getDomain()
 	{
 		if (is_null($this->domain))
 			$this->domain = $this->getCookieDomain();
@@ -56,72 +56,72 @@ class Cookie
 		return $this->domain;
 	}
 
-	static public function setExpires($expires)
+	public function setExpires($expires)
 	{
 		$this->expires = $expires;
 	}
 
-	static public function getExpires()
+	public function getExpires()
 	{
 		return $this->expires;
 	}
 
-	static public function setHttpOnly($httpOnly)
+	public function setHttpOnly($httpOnly)
 	{
 		$this->httpOnly = $httpOnly;
 	}
 
-	static public function getHttpOnly()
+	public function getHttpOnly()
 	{
 		return $this->httpOnly;
 	}
 
-	static public function setName($name)
+	public function setName($name)
 	{
 		$this->name = static::generateCookieName($name);
 	}
 
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
 
-	static public function setPath($path)
+	public function setPath($path)
 	{
 		$this->path = $path;
 	}
 
-	static public function getPath()
+	public function getPath()
 	{
 		return $this->path;
 	}
 
-	static public function setSecure($secure)
+	public function setSecure($secure)
 	{
 		$this->secure = $secure;
 	}
 
-	static public function getSecure()
+	public function getSecure()
 	{
 		return $this->secure;
 	}
 
-	static public function setValue($value)
+	public function setValue($value)
 	{
 		$this->value = $value;
 	}
 
-	static public function getValue()
+	public function getValue()
 	{
 		return $this->value;
 	}
 
-	static public function setSpread($spread)
+	public function setSpread($spread)
 	{
 		$this->spread = $spread;
 	}
 
-	static public function getSpread()
+	public function getSpread()
 	{
 		return $this->spread;
 	}

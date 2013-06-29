@@ -121,7 +121,7 @@ class CacheEngineFiles
 		return $zeroDanger;
 	}
 
-	static public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
 		$fn = IO\Path::combine($documentRoot, $baseDir, $initDir, $filename);
@@ -187,7 +187,7 @@ class CacheEngineFiles
 		return true;
 	}
 
-	static public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
 		$fn = IO\Path::combine($documentRoot, $baseDir, $initDir, $filename);

@@ -21,7 +21,7 @@ class BooleanField extends ScalarField
 	 */
 	protected $values;
 
-	function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
 
@@ -41,7 +41,7 @@ class BooleanField extends ScalarField
 	 * @param boolean|integer|string $value
 	 * @return mixed
 	 */
-	static public function normalizeValue($value)
+	public function normalizeValue($value)
 	{
 		if (
 			(is_string($value) && ($value == '1' || $value == '0'))
@@ -68,7 +68,7 @@ class BooleanField extends ScalarField
 		return $value;
 	}
 
-	static public function getValues()
+	public function getValues()
 	{
 		return $this->values;
 	}

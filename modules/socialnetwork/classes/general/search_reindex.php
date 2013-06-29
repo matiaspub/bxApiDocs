@@ -41,12 +41,12 @@ class CSocNetSearchReindex extends CSocNetSearch
 		FILES_USER_IBLOCK_ID
 		PATH_TO_USER_FILES_ELEMENT
 	*/
-	function __construct($user_id=0, $group_id=0, $arParams=array())
+	public function __construct($user_id=0, $group_id=0, $arParams=array())
 	{
 		$this->CSocNetSearchReindex($user_id, $group_id, $arParams);
 	}
 
-	public static function CSocNetSearchReindex($user_id=0, $group_id=0, $arParams=array())
+	public function CSocNetSearchReindex($user_id=0, $group_id=0, $arParams=array())
 	{
 		$this->_user_id = intval($user_id);
 		$this->_group_id = intval($group_id);
@@ -54,7 +54,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		$this->_counter = 0;
 	}
 
-	public static function GetCounter()
+	public function GetCounter()
 	{
 		return $this->_counter;
 	}
@@ -71,7 +71,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		$_SESSION["BX_SOCNET_REINDEX_SESS_ID"]["KEY"] = $key;
 	}
 
-	public static function ReindexForum($entity_type, $last_id, $path_template)
+	public function ReindexForum($entity_type, $last_id, $path_template)
 	{
 		global $DB;
 
@@ -141,7 +141,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		return false;
 	}
 
-	public static function GetBlog($ID)
+	public function GetBlog($ID)
 	{
 		if(!is_array($this->_blog_cache))
 			$this->_blog_cache = array();
@@ -160,7 +160,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		return $this->_blog_cache[$ID];
 	}
 
-	public static function IndexBlogItemUser($arFields)
+	public function IndexBlogItemUser($arFields)
 	{
 		global $DB;
 
@@ -180,13 +180,16 @@ class CSocNetSearchReindex extends CSocNetSearch
 					&& strlen($this->_params["PATH_TO_USER_BLOG_POST"]) > 0
 				)
 				{
-
-					$arFields["PARAMS"] = $this->GetSearchParams(
+					$paramsTmp = $this->GetSearchParams(
 						"U",
 						intval($blog["OWNER_ID"]),
 						'blog',
 						'view_post'
 					);
+					if(!empty($arFields["PARAMS"]))
+						$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+					else
+						$arFields["PARAMS"] = $paramsTmp;
 
 					foreach($arFields["SITE_ID"] as $site_id => $url)
 					{
@@ -219,12 +222,16 @@ class CSocNetSearchReindex extends CSocNetSearch
 					&& strlen($this->_params["PATH_TO_USER_BLOG_COMMENT"]) > 0
 				)
 				{
-					$arFields["PARAMS"] = $this->GetSearchParams(
+					$paramsTmp = $this->GetSearchParams(
 						"U",
 						intval($blog["OWNER_ID"]),
 						'blog',
 						'view_comment'
 					);
+					if(!empty($arFields["PARAMS"]))
+						$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+					else
+						$arFields["PARAMS"] = $paramsTmp;
 
 					foreach($arFields["SITE_ID"] as $site_id => $url)
 					{
@@ -258,7 +265,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 			return true;
 	}
 
-	public static function IndexBlogItemGroup($arFields)
+	public function IndexBlogItemGroup($arFields)
 	{
 		return true;
 
@@ -312,12 +319,16 @@ class CSocNetSearchReindex extends CSocNetSearch
 					&& strlen($this->_params["PATH_TO_GROUP_BLOG_POST"]) > 0
 				)
 				{
-					$arFields["PARAMS"] = $this->GetSearchParams(
+					$paramsTmp = $this->GetSearchParams(
 						"G",
 						intval($blog["SOCNET_GROUP_ID"]),
 						'blog',
 						'view_post'
 					);
+					if(!empty($arFields["PARAMS"]))
+						$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+					else
+						$arFields["PARAMS"] = $paramsTmp;
 
 					foreach($arFields["SITE_ID"] as $site_id => $url)
 					{
@@ -349,12 +360,16 @@ class CSocNetSearchReindex extends CSocNetSearch
 					&& strlen($this->_params["PATH_TO_GROUP_BLOG_COMMENT"]) > 0
 				)
 				{
-					$arFields["PARAMS"] = $this->GetSearchParams(
+					$paramsTmp = $this->GetSearchParams(
 						"G",
 						intval($blog["SOCNET_GROUP_ID"]),
 						'blog',
 						'view_comment'
 					);
+					if(!empty($arFields["PARAMS"]))
+						$arFields["PARAMS"] = array_merge($paramsTmp, $arFields["PARAMS"]);
+					else
+						$arFields["PARAMS"] = $paramsTmp;
 
 					foreach($arFields["SITE_ID"] as $site_id => $url)
 					{
@@ -405,7 +420,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 
 	}
 
-	public static function UpdateForumTopicIndex($topic_id, $entity_type, $entity_id, $feature, $operation, $path_template)
+	public function UpdateForumTopicIndex($topic_id, $entity_type, $entity_id, $feature, $operation, $path_template)
 	{
 		global $DB;
 
@@ -466,7 +481,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		CSearch::ChangeIndex("forum", array("UPD" => $this->_sess_id, "PARAMS"=>$arParams), false, $arForumTopic["FORUM_ID"], $topic_id);
 	}
 
-	public static function ReindexIBlock($iblock_id, $entity_type, $feature, $operation, $path_template, $arFieldList, $last_id)
+	public function ReindexIBlock($iblock_id, $entity_type, $feature, $operation, $path_template, $arFieldList, $last_id)
 	{
 		global $DB;
 
@@ -607,7 +622,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		return false;
 	}
 
-	public static function ReindexUserTasks($arSection, $path, $last_id)
+	public function ReindexUserTasks($arSection, $path, $last_id)
 	{
 		$rsElements = CIBlockElement::GetList(
 			array("ID"=>"asc"),
@@ -681,7 +696,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 		return false;
 	}
 
-	public static function ReindexGroupTasks($iblock_id, $path, $last_id)
+	public function ReindexGroupTasks($iblock_id, $path, $last_id)
 	{
 		if(!CModule::IncludeModule("iblock"))
 			return false;
@@ -764,14 +779,14 @@ class CSocNetSearchReindex extends CSocNetSearch
 		return false;
 	}
 
-	public static function ReindexGroups($last_id)
+	public function ReindexGroups($last_id)
 	{
 		return $this->OnSearchReindex(array(
 			"MODULE" => "socialnetwork",
 		), $this, "IndexItem");
 	}
 
-	public static function IndexItem($arFields)
+	public function IndexItem($arFields)
 	{
 		$ID = $arFields["ID"];
 		if($ID=="")
@@ -789,7 +804,7 @@ class CSocNetSearchReindex extends CSocNetSearch
 			return true;
 	}
 
-	public static function StepIndex($arSteps, $current_step, $last_id, $timeout=0)
+	public function StepIndex($arSteps, $current_step, $last_id, $timeout=0)
 	{
 		global $DB;
 

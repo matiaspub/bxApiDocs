@@ -162,7 +162,7 @@ class CTemplates
 		return false;
 	}
 
-	function __FindTemplates($root, &$arTemplates, $arCurrentValues=Array(), $init="")
+	public static function __FindTemplates($root, &$arTemplates, $arCurrentValues=Array(), $init="")
 	{
 		if(is_dir($_SERVER['DOCUMENT_ROOT'].$root.$init))
 		{
@@ -341,7 +341,7 @@ class CPageTemplate
 		return $res;
 	}
 
-	function _templ_sort($a, $b)
+	public static function _templ_sort($a, $b)
 	{
 		if($a["sort"] < $b["sort"])
 			return -1;

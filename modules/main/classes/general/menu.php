@@ -21,7 +21,7 @@ class CMenu
 	/** @var CDebugInfo */
 	var $debug = null;
 
-	public static function CMenu($type="left")
+	public function CMenu($type="left")
 	{
 		$this->type = $type;
 	}
@@ -98,11 +98,10 @@ class CMenu
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php
 	 * @author Bitrix
 	 */
-	public static function Init($InitDir, $bMenuExt=false, $template=false, $onlyCurrentDir=false)
+	public function Init($InitDir, $bMenuExt=false, $template=false, $onlyCurrentDir=false)
 	{
 		global $USER;
 		if($_SESSION["SESS_SHOW_INCLUDE_TIME_EXEC"]=="Y" && ($USER->IsAdmin() || $_SESSION["SHOW_SQL_STAT"]=="Y"))
@@ -201,7 +200,7 @@ class CMenu
 		return $bFounded;
 	}
 
-	public static function RecalcMenu($bMultiSelect = false, $bCheckSelected = true)
+	public function RecalcMenu($bMultiSelect = false, $bCheckSelected = true)
 	{
 		if($this->bMenuCalc !== false)
 			return true;
@@ -539,11 +538,10 @@ class CMenu
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtmlex.php
 	 * @author Bitrix
 	 */
-	public static function GetMenuHtmlEx()
+	public function GetMenuHtmlEx()
 	{
 		/**
 		 * @global CAllMain $APPLICATION
@@ -637,11 +635,10 @@ class CMenu
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtml.php
 	 * @author Bitrix
 	 */
-	public static function GetMenuHtml()
+	public function GetMenuHtml()
 	{
 		/**
 		 * @global CAllMain $APPLICATION
@@ -736,7 +733,7 @@ class CMenuCustom
 {
 	var $arItems = array();
 
-	public static function AddItem($type="left", $arItem=array())
+	public function AddItem($type="left", $arItem=array())
 	{
 		if (count($arItem) <= 0)
 			return;
@@ -770,7 +767,7 @@ class CMenuCustom
 	}
 
 
-	public static function GetItems($type="left")
+	public function GetItems($type="left")
 	{
 		if (array_key_exists($type, $this->arItems))
 			return $this->arItems[$type];

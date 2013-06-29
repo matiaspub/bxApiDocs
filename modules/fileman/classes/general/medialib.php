@@ -93,7 +93,7 @@ class CMedialib
 		return $resTask;
 	}
 
-	function _GetAccessPermissions($arCols = array())
+	public static function _GetAccessPermissions($arCols = array())
 	{
 		global $DB;
 
@@ -868,7 +868,7 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 		return array('arColTree' => $arColTree, 'Collections' => $Collections);
 	}
 
-	function _buildCollection($Col, $ind, &$arColTree, &$Collections, $Params = array())
+	public static function _buildCollection($Col, $ind, &$arColTree, &$Collections, $Params = array())
 	{
 		if ($Params['CHECK_ACCESS'] === true && !CMedialib::CanDoOperation('medialib_view_collection', $Col['ID']))
 			return true;
@@ -884,7 +884,7 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 		return true;
 	}
 
-	function _findChildInColTree(&$arr, $id, $colId)
+	public static function _findChildInColTree(&$arr, $id, $colId)
 	{
 		for ($i = 0, $l = count($arr); $i < $l; $i++)
 		{
@@ -902,7 +902,7 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 		return false;
 	}
 
-	function _BuildCollectionsSelectOptions($Collections = false, $arColTree = false, $level = 0, $selected = false)
+	public static function _BuildCollectionsSelectOptions($Collections = false, $arColTree = false, $level = 0, $selected = false)
 	{
 		if ($Collections === false && $arColTree === false)
 		{

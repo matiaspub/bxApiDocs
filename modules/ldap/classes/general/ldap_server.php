@@ -250,7 +250,7 @@ class CLdapServer
 		return $ID;
 	}
 
-	function __UpdateAgentPeriod($server_id, $time)
+	public static function __UpdateAgentPeriod($server_id, $time)
 	{
 		$group_id = IntVal($group_id);
 		$time = IntVal($time);
@@ -535,7 +535,7 @@ class __CLDAPServerDBResult extends CDBResult
 		return $res;
 	}
 
-	public static function GetNextServer()
+	public function GetNextServer()
 	{
 		if(!($r = $this->GetNext()))
 			return $r;

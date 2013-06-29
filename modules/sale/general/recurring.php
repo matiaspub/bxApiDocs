@@ -481,7 +481,7 @@ class CAllSaleRecurring
 
 			$arTaxSums = array();
 
-			if (count($arTaxList) > 0)
+			if (!empty($arTaxList))
 			{
 				if(!$bUseVat)
 				{
@@ -491,12 +491,12 @@ class CAllSaleRecurring
 							$baseSiteCurrency
 						);
 
-					for ($di = 0; $di < count($arTaxList); $di++)
+					for ($di = 0, $intCount = count($arTaxList); $di < $intCount; $di++)
 					{
 						$arTaxList[$di]["VALUE_MONEY"] += $arTaxList[$di]["TAX_VAL"];
 					}
 
-					for ($di = 0; $di < count($arTaxList); $di++)
+					for ($di = 0, $intCount = count($arTaxList); $di < $intCount; $di++)
 					{
 						$arTaxSums[$arTaxList[$di]["TAX_ID"]]["VALUE"] = $arTaxList[$di]["VALUE_MONEY"];
 						$arTaxSums[$arTaxList[$di]["TAX_ID"]]["NAME"] = $arTaxList[$di]["NAME"];
@@ -613,7 +613,7 @@ class CAllSaleRecurring
 
 				if ($bSuccess)
 				{
-					for ($it = 0; $it < count($arTaxList); $it++)
+					for ($it = 0, $intCount = count($arTaxList); $it < $intCount; $it++)
 					{
 						$arFields = array(
 							"ORDER_ID" => $newOrderID,
@@ -697,10 +697,11 @@ class CAllSaleRecurring
 					$eventName = "SALE_NEW_ORDER_RECURRING";
 
 					$bSend = true;
-					$db_events = GetModuleEvents("sale", "OnOrderRecurringSendEmail");
-					while ($arEvent = $db_events->Fetch())
+					foreach(GetModuleEvents("sale", "OnOrderRecurringSendEmail", true) as $arEvent)
+					{
 						if (ExecuteModuleEventEx($arEvent, Array($newOrderID, &$eventName, &$arFields))===false)
 							$bSend = false;
+					}
 
 					if($bSend)
 					{
@@ -731,8 +732,7 @@ class CAllSaleRecurring
 				{
 					CSaleOrder::PayOrder($newOrderID, "Y", False, False, $arRecur["ID"]);
 					CSaleOrder::DeliverOrder($newOrderID, "Y", $arRecur["ID"]);
-					//check
-					CSaleOrder::DeductOrder($newOrderID, "Y", "", $arRecur["ID"]);
+					CSaleOrder::DeductOrder($newOrderID, "Y", "", true, array(), $arRecur["ID"]);
 				}
 				else
 				{
@@ -758,18 +758,19 @@ class CAllSaleRecurring
 				}
 
 				$arFields = array(
-						"ORDER_ID" => $newOrderID,
-						"PRODUCT_NAME" => $arProduct["PRODUCT_NAME"],
-						"PRODUCT_URL" => $arProduct["PRODUCT_URL"],
-						"PRICE_TYPE" => $arProduct["PRICE_TYPE"],
-						"RECUR_SCHEME_TYPE" => $arProduct["RECUR_SCHEME_TYPE"],
-						"RECUR_SCHEME_LENGTH" => $arProduct["RECUR_SCHEME_LENGTH"],
-						"WITHOUT_ORDER" => $arProduct["WITHOUT_ORDER"],
-						"PRIOR_DATE" => Date($GLOBALS["DB"]->DateFormatToPHP(CLang::GetDateFormat("FULL", SITE_ID))),
-						"NEXT_DATE" => $arProduct["NEXT_DATE"],
-						"REMAINING_ATTEMPTS" => (Defined("SALE_PROC_REC_ATTEMPTS") ? SALE_PROC_REC_ATTEMPTS : 3),
-						"SUCCESS_PAYMENT" => "Y"
-					);
+					"ORDER_ID" => $newOrderID,
+					"PRODUCT_NAME" => $arProduct["PRODUCT_NAME"],
+					"PRODUCT_URL" => $arProduct["PRODUCT_URL"],
+					"PRICE_TYPE" => $arProduct["PRICE_TYPE"],
+					"RECUR_SCHEME_TYPE" => $arProduct["RECUR_SCHEME_TYPE"],
+					"RECUR_SCHEME_LENGTH" => $arProduct["RECUR_SCHEME_LENGTH"],
+					"WITHOUT_ORDER" => $arProduct["WITHOUT_ORDER"],
+					"PRIOR_DATE" => Date($GLOBALS["DB"]->DateFormatToPHP(CLang::GetDateFormat("FULL", SITE_ID))),
+					"NEXT_DATE" => $arProduct["NEXT_DATE"],
+					"REMAINING_ATTEMPTS" => (Defined("SALE_PROC_REC_ATTEMPTS") ? SALE_PROC_REC_ATTEMPTS : 3),
+					"SUCCESS_PAYMENT" => "Y"
+				);
+
 				CSaleRecurring::Update($arRecur["ID"], $arFields);
 			}
 			else
@@ -886,10 +887,11 @@ class CAllSaleRecurring
 		$eventName = "SALE_RECURRING_CANCEL";
 
 		$bSend = true;
-		$db_events = GetModuleEvents("sale", "OnOrderRecurringCancelSendEmail");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("sale", "OnOrderRecurringCancelSendEmail", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
 				$bSend = false;
+		}
 
 		if($bSend)
 		{

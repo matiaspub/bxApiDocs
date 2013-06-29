@@ -62,12 +62,12 @@ define('B_PROLOG_INCLUDED', true);
 /**
  * Текущая версия главного модуля.
  */
-define('SM_VERSION', "12.5.3");
+define('SM_VERSION', "12.5.7");
 
 /**
  * Дата выпуска текущей версии главного модуля.
  */
-define('SM_VERSION_DATE', "2013-04-17 08:09:00");
+define('SM_VERSION_DATE', "2013-05-16 16:00:00");
 
 /**
  * Если необходимо подключать пролог административной части, то значение данной константы - "true".
@@ -109,7 +109,7 @@ define('NEED_AUTH', true);
  *         <pre>define("ERROR_EMAIL", 
  *        "admin@site.ru, support@site.ru");</pre>
  */
-define('ERROR_EMAIL', );
+define('ERROR_EMAIL', null);
 
 /**
  * Хранит абсолютный путь к log-файлу, используемого функцией <a href="/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> для записи ошибок или каких-либо сообщений. 	 	 
@@ -119,7 +119,7 @@ define('ERROR_EMAIL', );
  *        $_SERVER["DOCUMENT_ROOT"].
  *            "/log.txt");</pre>
  */
-define('LOG_FILENAME', );
+define('LOG_FILENAME', null);
 
 /**
  * Как правило данная константа используется в редакции "Веб-Аналитика". Если ее не инициализировать, то в публичной части будет отсылаться HTTP заголовок: 
@@ -160,7 +160,7 @@ define('STOP_STATISTICS', true);
 /**
  * Инициализация этой константы каким-либо значением 	приведет к запрету следующих действий модуля "Статистика", 	выполняемых ежедневно при помощи технологии <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" target="_blank">агентов</a>: 
  *         <ul>
-<li>перевод на новый день; </li>
+ * <li>перевод на новый день; </li>
  *          
  *           <li>очистка устаревших данных статистики; </li>
  *          
@@ -193,7 +193,7 @@ define('NOT_CHECK_PERMISSIONS', true);
  *        Пример: 
  *         <pre>define("ONLY_EMAIL", "admin@site.ru");</pre>
  */
-define('ONLY_EMAIL', );
+define('ONLY_EMAIL', null);
 
 /**
  * Если данная константа инициализирована значением "true", то <a href="/api_help/main/reference/cagent/checkagents.php">функция проверки агентов на запуск</a> будет отбирать только те агенты для которых не критично количество их запусков (т.е. при <a href="/api_help/main/reference/cagent/addagent.php">добавлении</a> этого агента параметр <i>period</i>=N). Как правило данная константа используется для организации запуска агентов на cron'е. 	 	 
@@ -225,7 +225,7 @@ define('BX_DIR_PERMISSIONS', 0700);
  *        Пример: 
  *         <pre>define("SM_SAFE_MODE", true);</pre>
  */
-define('SM_SAFE_MODE', );
+define('SM_SAFE_MODE', null);
 
 /**
  * Данная константа используется в функции <a href="/api_help/main/functions/file/getdirindex.php">GetDirIndex</a> для определения индексного файла каталога. 	 
@@ -240,7 +240,7 @@ define('SM_SAFE_MODE', );
  *     index.php3
  * ");</pre>
  */
-define('DIRECTORY_INDEX', );
+define('DIRECTORY_INDEX', null);
 
 /**
  * Значение данной константы содержит тип таблиц создаваемый в MySQL по умолчанию: "MyISAM" или "InnoDB". 	 
@@ -248,7 +248,7 @@ define('DIRECTORY_INDEX', );
  *        Пример: 
  *         <pre>define("MYSQL_TABLE_TYPE", "InnoDB");</pre>
  */
-define('MYSQL_TABLE_TYPE', );
+define('MYSQL_TABLE_TYPE', null);
 
 /**
  * Если данная константа инициализирована значением "true", то будет создаваться постоянное соединение с базой. 	 
@@ -261,12 +261,12 @@ define('DBPersistent', true);
 /**
  * Может принимать значение true/false. Константа регулирует значение по умолчанию для параметра get_index_page функций GetPagePath(), CMain::GetCurPage(), CMain::GetCurPageParam(). Параметр get_index_page указывает, нужно ли для индексной страницы раздела возвращать путь, заканчивающийся на "index.php". Если значение параметра равно true, то возвращается путь с "index.php", иначе - путь, заканчивающийся на "/". Параметр имеет значение, <i>обратное</i> значению константы.
  */
-define('BX_DISABLE_INDEX_PAGE', );
+define('BX_DISABLE_INDEX_PAGE', null);
 
 /**
  * Может принимать значение true/false. Если инициализировать данную константу каким либо значением,то она отключает/включает сбор бектрейсов при включенной отладке.
  */
-define('BX_NO_SQL_BACKTRACE', );
+define('BX_NO_SQL_BACKTRACE', null);
 
 /**
  * BX_ROOT
@@ -556,7 +556,7 @@ define('START_EXEC_PROLOG_BEFORE_1', microtime());
 /**
  * BX_PUBLIC_MODE
  */
-define('BX_PUBLIC_MODE', true);
+define('BX_PUBLIC_MODE', 1);
 
 /**
  * BX_URLREWRITE

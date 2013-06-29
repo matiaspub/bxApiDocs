@@ -44,7 +44,7 @@ class CLTestMark
 
 
 	// 2012-04-13 Checked/modified for compatibility with new data model
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -62,7 +62,7 @@ class CLTestMark
 
 
 	// 2012-04-13 Checked/modified for compatibility with new data model
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 

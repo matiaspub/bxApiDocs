@@ -12,7 +12,7 @@ class CCalendarWebService extends IWebService
 		'low' => -1, 'normal' => 0, 'high' => 1,
 	);
 
-	function __getFieldsDefinition()
+	public function __getFieldsDefinition()
 	{
 		$obFields = new CXMLCreator('Fields');
 
@@ -82,7 +82,7 @@ class CCalendarWebService extends IWebService
 		return $obFields;
 	}
 
-	function __makeDateTime($ts = null)
+	public static function __makeDateTime($ts = null)
 	{
 		if (null === $ts)
 			$ts = time();
@@ -90,7 +90,7 @@ class CCalendarWebService extends IWebService
 		return date('Y-m-d', $ts).'T'.date('H:i:s', $ts).'Z';
 	}
 
-	function __makeTS($datetime = null)
+	public static function __makeTS($datetime = null)
 	{
 		if (null === $datetime)
 			return time();
@@ -101,7 +101,7 @@ class CCalendarWebService extends IWebService
 		return MakeTimeStamp(substr($datetime, 0, 10).' '.substr($datetime, 11, -1), 'YYYY-MM-DD HH:MI:SS');
 	}
 
-	public static function GetList($listName)
+	public function GetList($listName)
 	{
 		global $APPLICATION, $USER;
 		//todo: check read access for calendar
@@ -162,7 +162,7 @@ class CCalendarWebService extends IWebService
 		return array('GetListResult' => $data);
 	}
 
-	function __getRow($event, $listName, &$last_change)
+	public function __getRow($event, $listName, &$last_change)
 	{
 		global $APPLICATION, $USER;
 
@@ -323,7 +323,7 @@ class CCalendarWebService extends IWebService
 		return $obRow;
 	}
 
-	public static function GetListItemChanges($listName, $viewFields = '', $since = '', $contains = '')
+	public function GetListItemChanges($listName, $viewFields = '', $since = '', $contains = '')
 	{
 		define ('OLD_OUTLOOK_VERSION', true);
 
@@ -335,7 +335,7 @@ class CCalendarWebService extends IWebService
 			return array('GetListItemChangesResult' => $res['GetListItemChangesSinceTokenResult']);
 	}
 
-	public static function GetListItemChangesSinceToken($listName, $viewFields = '', $query = '', $rowLimit = 0, $changeToken = '')
+	public function GetListItemChangesSinceToken($listName, $viewFields = '', $query = '', $rowLimit = 0, $changeToken = '')
 	{
 		global $APPLICATION, $USER;
 
@@ -438,7 +438,7 @@ class CCalendarWebService extends IWebService
 		return array('GetListItemChangesSinceTokenResult' => $data);
 	}
 
-	public static function UpdateListItems($listName, $updates)
+	public function UpdateListItems($listName, $updates)
 	{
 		global $USER;
 

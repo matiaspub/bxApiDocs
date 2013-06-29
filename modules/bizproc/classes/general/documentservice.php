@@ -6,7 +6,7 @@ class CBPDocumentService
 {
 	private $arDocumentsCache = array();
 
-	static public function GetDocument($parameterDocumentId)
+	public function GetDocument($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -26,7 +26,7 @@ class CBPDocumentService
 		return null;
 	}
 
-	static public function UpdateDocument($parameterDocumentId, $arFields)
+	public function UpdateDocument($parameterDocumentId, $arFields)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -56,7 +56,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function PublishDocument($parameterDocumentId)
+	public function PublishDocument($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -73,7 +73,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function UnpublishDocument($parameterDocumentId)
+	public function UnpublishDocument($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -90,7 +90,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function LockDocument($parameterDocumentId, $workflowId)
+	public function LockDocument($parameterDocumentId, $workflowId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -107,7 +107,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function UnlockDocument($parameterDocumentId, $workflowId)
+	public function UnlockDocument($parameterDocumentId, $workflowId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -124,7 +124,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function DeleteDocument($parameterDocumentId)
+	public function DeleteDocument($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -241,7 +241,7 @@ class CBPDocumentService
 		return false;
 	}
 
-	static public function GetJSFunctionsForFields($parameterDocumentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
+	public function GetJSFunctionsForFields($parameterDocumentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
 	{
 		if (!is_array($arDocumentFields) || count($arDocumentFields) <= 0)
 			$arDocumentFields = self::GetDocumentFields($parameterDocumentType);
@@ -480,7 +480,24 @@ $objectName.GetFieldValueByTagName = function(tag, name, form)
 			}
 			else
 			{
-				fieldValues[ar[i].name] = ar[i].value;
+				if (ar[i].name.indexOf("[]", 0) >= 0)
+				{
+					var newName = ar[i].name.replace(/\[\]/g, "");
+
+					if ((typeof(fieldValues[newName]) != 'object') || !(fieldValues[newName] instanceof Array))
+					{
+						if (fieldValues[newName])
+							fieldValues[newName] = [fieldValues[newName]];
+						else
+							fieldValues[newName] = [];
+					}
+
+					fieldValues[newName][fieldValues[newName].length] = ar[i].value;
+				}
+				else
+				{
+					fieldValues[ar[i].name] = ar[i].value;
+				}
 			}
 		}
 	}
@@ -516,6 +533,9 @@ $objectName.GetFieldInputValue = function(type, name, func)
 		for (var v in ar)
 			s[v] = ar[v];
 		ar = this.GetFieldValueByTagName('textarea', name['Field'], name['Form']);
+		for (var v in ar)
+			s[v] = ar[v];
+		ar = this.GetFieldValueByTagName('hidden', name['Field'], name['Form']);
 		for (var v in ar)
 			s[v] = ar[v];
 	}
@@ -558,27 +578,27 @@ function __dump_bx(arr, limitLevel, txt)
 	alert(txt+__dumpInternal_bx(arr, 0, limitLevel));
 }
 function __dumpInternal_bx(arr, level, limitLevel) {
-    var dumped_text = "";
-    if(!level) level = 0;
+	var dumped_text = "";
+	if(!level) level = 0;
 	if (level > limitLevel)
 		return "";
-    var level_padding = "";
-    for(var j=0;j<level+1;j++) level_padding += "    ";
-    if(typeof(arr) == 'object') {
-        for(var item in arr) {
-            var value = arr[item];
-            if(typeof(value) == 'object') {
-                dumped_text += level_padding + "'" + item + "' ...\\n";
-                dumped_text += __dumpInternal_bx(value, level+1, limitLevel);
-            } else {
-                dumped_text += level_padding + "'" + item + "' => '" + value + "'\\n";
-            }
-        }
-    } else {
-        dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
-    }
+	var level_padding = "";
+	for(var j=0;j<level+1;j++) level_padding += "    ";
+	if(typeof(arr) == 'object') {
+		for(var item in arr) {
+			var value = arr[item];
+			if(typeof(value) == 'object') {
+				dumped_text += level_padding + "'" + item + "' ...\\n";
+				dumped_text += __dumpInternal_bx(value, level+1, limitLevel);
+			} else {
+				dumped_text += level_padding + "'" + item + "' => '" + value + "'\\n";
+			}
+		}
+	} else {
+		dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+	}
 
-    return dumped_text;
+	return dumped_text;
 }
 
 </script>
@@ -881,7 +901,7 @@ EOS;
 	}
 
 	// Deprecated
-	static public function GetGUIFieldEdit($parameterDocumentType, $formName, $fieldName, $fieldValue, $arDocumentField = array(), $bAllowSelection = false)
+	public function GetGUIFieldEdit($parameterDocumentType, $formName, $fieldName, $fieldValue, $arDocumentField = array(), $bAllowSelection = false)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
@@ -907,7 +927,7 @@ EOS;
 	}
 
 	// Deprecated
-	static public function SetGUIFieldEdit($parameterDocumentType, $fieldName, $arRequest, &$arErrors, $arDocumentField = array())
+	public function SetGUIFieldEdit($parameterDocumentType, $fieldName, $arRequest, &$arErrors, $arDocumentField = array())
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 

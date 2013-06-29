@@ -26,6 +26,7 @@ class CIBlockResult extends CDBResult
 	var $strSectionUrl = false;
 	var $strListUrl = false;
 	var $arSectionContext = false;
+	var $nameTemplate = "";
 
 	var $_LAST_IBLOCK_ID = "";
 	var $_FILTER_IBLOCK_ID = array();
@@ -35,14 +36,14 @@ class CIBlockResult extends CDBResult
 		parent::CDBResult($res);
 	}
 
-	public static function SetUrlTemplates($DetailUrl = "", $SectionUrl = "", $ListUrl = "")
+	public function SetUrlTemplates($DetailUrl = "", $SectionUrl = "", $ListUrl = "")
 	{
 		$this->strDetailUrl = $DetailUrl;
 		$this->strSectionUrl = $SectionUrl;
 		$this->strListUrl = $ListUrl;
 	}
 
-	public static function SetSectionContext($arSection)
+	public function SetSectionContext($arSection)
 	{
 		if(is_array($arSection) && array_key_exists("ID", $arSection))
 		{
@@ -58,7 +59,7 @@ class CIBlockResult extends CDBResult
 		}
 	}
 
-	public static function SetIBlockTag($iblock_id)
+	public function SetIBlockTag($iblock_id)
 	{
 		if(is_array($iblock_id))
 		{
@@ -80,8 +81,16 @@ class CIBlockResult extends CDBResult
 		}
 	}
 
+	public function SetNameTemplate($nameTemplate)
+	{
+		$this->nameTemplate = $nameTemplate;
+	}
+
 	public static function Fetch()
 	{
+		/** @global CCacheManager $CACHE_MANAGER */
+		global $CACHE_MANAGER;
+		/** @global CDatabase $DB */
 		global $DB;
 		$res = parent::Fetch();
 
@@ -95,7 +104,7 @@ class CIBlockResult extends CDBResult
 			{
 				foreach($res as $k=>$v)
 				{
-					if(preg_match("#^ALIAS_(\d+)_(.*)$#", $k, $match))
+					if(preg_match("#^ALIAS_(\\d+)_(.*)$#", $k, $match))
 					{
 						$res[$this->arIBlockLongProps[$match[1]].$match[2]] = $v;
 						unset($res[$k]);
@@ -109,7 +118,7 @@ class CIBlockResult extends CDBResult
 				&& $res["IBLOCK_ID"] != $this->_LAST_IBLOCK_ID
 			)
 			{
-				$GLOBALS["CACHE_MANAGER"]->RegisterTag("iblock_id_".$res["IBLOCK_ID"]);
+				$CACHE_MANAGER->RegisterTag("iblock_id_".$res["IBLOCK_ID"]);
 				$this->_LAST_IBLOCK_ID = $res["IBLOCK_ID"];
 			}
 
@@ -205,6 +214,23 @@ class CIBlockResult extends CDBResult
 						$res[$field_name] = htmlspecialcharsex(CIBlock::NumberFormat($res[$field_name]));
 				}
 			}
+			if (isset($res["UC_ID"]))
+			{
+				$res["CREATED_BY_FORMATTED"] = CUser::FormatName($this->nameTemplate, array(
+					"NAME" => $res["UC_NAME"],
+					"LAST_NAME" => $res["UC_LAST_NAME"],
+					"SECOND_NAME" => $res["UC_SECOND_NAME"],
+					"EMAIL" => $res["UC_EMAIL"],
+					"ID" => $res["UC_ID"],
+					"LOGIN" => $res["UC_LOGIN"],
+				), true, false);
+				unset($res["UC_NAME"]);
+				unset($res["UC_LAST_NAME"]);
+				unset($res["UC_SECOND_NAME"]);
+				unset($res["UC_EMAIL"]);
+				unset($res["UC_ID"]);
+				unset($res["UC_LOGIN"]);
+			}
 		}
 		elseif(
 			defined("BX_COMP_MANAGED_CACHE")
@@ -213,7 +239,7 @@ class CIBlockResult extends CDBResult
 		)
 		{
 			foreach($this->_FILTER_IBLOCK_ID as $iblock_id => $t)
-				$GLOBALS["CACHE_MANAGER"]->RegisterTag("iblock_id_".$iblock_id);
+				$CACHE_MANAGER->RegisterTag("iblock_id_".$iblock_id);
 		}
 
 		return $res;
@@ -256,11 +282,10 @@ class CIBlockResult extends CDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php
 	 * @author Bitrix
 	 */
-	public static function GetNext($bTextHtmlAuto=true, $use_tilda=true)
+	public function GetNext($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		static $arSectionPathCache = array();
 
@@ -419,11 +444,10 @@ class CIBlockResult extends CDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php
 	 * @author Bitrix
 	 */
-	public static function GetNextElement($bTextHtmlAuto=true, $use_tilda=true)
+	public function GetNextElement($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		if(!($r = $this->GetNext($bTextHtmlAuto, $use_tilda)))
 			return $r;
@@ -435,12 +459,12 @@ class CIBlockResult extends CDBResult
 		return $res;
 	}
 
-	public static function SetTableID($table_id)
+	public function SetTableID($table_id)
 	{
 		$this->table_id = $table_id;
 	}
 
-	public static function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
+	public function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
 	{
 		if($this->table_id)
 		{
@@ -462,7 +486,7 @@ class CIBlockResult extends CDBResult
 		parent::NavStart($nPageSize, $bShowAll, $iNumPage);
 	}
 
-	public static function GetNavPrint($title, $show_allways=true, $StyleText="", $template_path=false, $arDeleteParam=false)
+	public function GetNavPrint($title, $show_allways=true, $StyleText="", $template_path=false, $arDeleteParam=false)
 	{
 		if($this->table_id && ($template_path === false))
 			$template_path = $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/navigation.php";

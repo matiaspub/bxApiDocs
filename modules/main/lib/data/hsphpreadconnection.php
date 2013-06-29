@@ -19,7 +19,7 @@ class HsphpReadConnection extends NosqlConnection implements \Bitrix\Main\Entity
 
 	protected $port = '9998';
 
-	static public function __construct($configuration)
+	public function __construct($configuration)
 	{
 		parent::__construct($configuration);
 
@@ -66,7 +66,7 @@ class HsphpReadConnection extends NosqlConnection implements \Bitrix\Main\Entity
 		return null;
 	}
 
-	static public function getEntityByPrimary(\Bitrix\Main\Entity\Base $entity, $primary, $select)
+	public function getEntityByPrimary(\Bitrix\Main\Entity\Base $entity, $primary, $select)
 	{
 		$this->connectInternal();
 

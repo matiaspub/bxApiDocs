@@ -36,7 +36,7 @@ class RegExp extends Base
 	 *
 	 * @throws ConfigurationException
 	 */
-	static public function __construct($pattern, $errorPhrase = null)
+	public function __construct($pattern, $errorPhrase = null)
 	{
 		if (!is_string($pattern))
 		{
@@ -49,7 +49,7 @@ class RegExp extends Base
 	}
 
 
-	static public function validate($value, $primary, array $row, Entity\Field $field)
+	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
 		if (preg_match($this->pattern, $value))
 		{

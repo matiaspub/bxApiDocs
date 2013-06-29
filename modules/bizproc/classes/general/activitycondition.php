@@ -1,7 +1,7 @@
 <?
 abstract class CBPActivityCondition
 {
-    static public abstract function Evaluate(CBPActivity $ownerActivity);
+    public abstract function Evaluate(CBPActivity $ownerActivity);
 
 	public static function CreateInstance($code, $data)
 	{

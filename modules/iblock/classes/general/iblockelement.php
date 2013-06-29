@@ -103,14 +103,14 @@ class CAllIBlockElement
 		}
 	}
 
-	function _sql_in($strField, $cOperationType)
+	public function _sql_in($strField, $cOperationType)
 	{
 		$strSql = $this->GetList(array(), $this->arFilter, false, false, array($this->strField));
 		$strSql = $strField.(substr($cOperationType, 0, 1) == "N"? ' NOT': '').' IN ('.$strSql.')';
 		return $strSql;
 	}
 
-	public static function CancelWFSetMove()
+	public function CancelWFSetMove()
 	{
 		$this->bWF_SetMove = false;
 	}
@@ -3069,11 +3069,10 @@ class CAllIBlockElement
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false)
+	public function Add($arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false)
 	{
 		global $DB, $USER;
 
@@ -3410,10 +3409,16 @@ class CAllIBlockElement
 			$ID = $DB->Add("b_iblock_element", $arFields, array("DETAIL_TEXT", "SEARCHABLE_CONTENT"), "iblock");
 
 			if(array_key_exists("PREVIEW_PICTURE", $arFields))
+			{
+				$arFields["PREVIEW_PICTURE_ID"] = $arFields["PREVIEW_PICTURE"];
 				$arFields["PREVIEW_PICTURE"] = $SAVED_PREVIEW_PICTURE;
+			}
 
 			if(array_key_exists("DETAIL_PICTURE", $arFields))
+			{
+				$arFields["DETAIL_PICTURE_ID"] = $arFields["DETAIL_PICTURE"];
 				$arFields["DETAIL_PICTURE"] = $SAVED_DETAIL_PICTURE;
+			}
 
 			if(CIBlockElement::GetIBVersion($arFields["IBLOCK_ID"])==2)
 				$DB->Query("INSERT INTO b_iblock_element_prop_s".$arFields["IBLOCK_ID"]."(IBLOCK_ELEMENT_ID)VALUES(".$ID.")");
@@ -4017,7 +4022,7 @@ class CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// Checks fields before update or insert
 	///////////////////////////////////////////////////////////////////
-	public static function CheckFields(&$arFields, $ID=false, $bCheckDiskQuota=true)
+	public function CheckFields(&$arFields, $ID=false, $bCheckDiskQuota=true)
 	{
 		global $DB, $APPLICATION, $USER;
 		$this->LAST_ERROR = "";
@@ -4603,10 +4608,6 @@ class CAllIBlockElement
 		return false;
 	}
 
-
-	//////////////////////////////////////////////////////////////////////////
-	//
-	//////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * <p>Принимает массив идентификаторов элементов. Возвращает группы, которым принадлежит элемент, по его коду <i>ID</i>.</p>
@@ -4867,7 +4868,7 @@ class CAllIBlockElement
 		return !empty($arToDelete) || !empty($arToInsert);
 	}
 
-	function __InitFile($old_id, &$arFields, $fname)
+	public static function __InitFile($old_id, &$arFields, $fname)
 	{
 		if($old_id>0
 			&&
@@ -4891,7 +4892,7 @@ class CAllIBlockElement
 		}
 	}
 
-	function __GetFileContent($FILE_ID)
+	static function __GetFileContent($FILE_ID)
 	{
 		static $max_file_size = null;
 
@@ -6325,7 +6326,7 @@ class CAllIBlockElement
 		/****************************** QUOTA ******************************/
 	}
 
-	function _check_rights_sql($min_permission)
+	public static function _check_rights_sql($min_permission)
 	{
 		global $DB, $USER;
 		$min_permission = (strlen($min_permission)==1) ? $min_permission : "R";

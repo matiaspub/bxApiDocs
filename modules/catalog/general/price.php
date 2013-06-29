@@ -496,7 +496,7 @@ class CAllPrice
 	 * <h4>Example</h4> 
 	 * <pre>
 	 * <b>Удаление всех цен товара</b>$boolResult = CPrice::DeleteByProduct(241);<br>
-<b>Удаление всех цен товара, кроме двух</b>$boolResult = CPrice::DeleteByProduct(241,array(426,456));<br>
+	<b>Удаление всех цен товара, кроме двух</b>$boolResult = CPrice::DeleteByProduct(241,array(426,456));<br>
 	 * </pre>
 	 *
 	 *

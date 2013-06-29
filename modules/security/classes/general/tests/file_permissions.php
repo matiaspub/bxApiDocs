@@ -19,7 +19,7 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 	 * @param array $pParams
 	 * @return array
 	 */
-	static public function check($pParams = array())
+	public function check($pParams = array())
 	{
 		self::initializeParams($pParams);
 		if(!self::isRunOnWin())

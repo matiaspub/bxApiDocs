@@ -5,7 +5,7 @@ if(CModule::IncludeModule('perfmon')) AddMessage2Log(CPerfomanceSQL::_console_ex
 */
 class CPerfomanceSQL extends CAllPerfomanceSQL
 {
-	function _console_explain($strSQL)
+	public static function _console_explain($strSQL)
 	{
 		global $DB;
 		$rs = $DB->Query("explain ".$strSQL);

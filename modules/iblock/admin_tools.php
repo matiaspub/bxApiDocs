@@ -222,7 +222,10 @@ function _ShowFilePropertyField($name, $property_fields, $values, $max_file_size
 					"FILE_SIZE" => "Y",
 					"DIMENSIONS" => "Y",
 					"IMAGE_POPUP" => "Y",
-					"MAX_SIZE" => array("W" => 200, "H"=>200),
+					"MAX_SIZE" => array(
+						"W" => COption::GetOptionString("iblock", "detail_image_size"),
+						"H" => COption::GetOptionString("iblock", "detail_image_size"),
+					),
 				));
 			else
 				echo CFileInput::Show($name."[".$key."]", $file_id, array(
@@ -231,7 +234,10 @@ function _ShowFilePropertyField($name, $property_fields, $values, $max_file_size
 					"FILE_SIZE" => "Y",
 					"DIMENSIONS" => "Y",
 					"IMAGE_POPUP" => "Y",
-					"MAX_SIZE" => array("W" => 200, "H"=>200),
+					"MAX_SIZE" => array(
+						"W" => COption::GetOptionString("iblock", "detail_image_size"),
+						"H" => COption::GetOptionString("iblock", "detail_image_size"),
+					),
 				), array(
 					'upload' => true,
 					'medialib' => true,
@@ -261,7 +267,10 @@ function _ShowFilePropertyField($name, $property_fields, $values, $max_file_size
 				"FILE_SIZE" => "Y",
 				"DIMENSIONS" => "Y",
 				"IMAGE_POPUP" => "Y",
-				"MAX_SIZE" => array("W" => 200, "H"=>200),
+				"MAX_SIZE" => array(
+					"W" => COption::GetOptionString("iblock", "detail_image_size"),
+					"H" => COption::GetOptionString("iblock", "detail_image_size"),
+				),
 			), false);
 		else
 			echo CFileInput::ShowMultiple($inputName, $name."[n#IND#]", array(
@@ -270,7 +279,10 @@ function _ShowFilePropertyField($name, $property_fields, $values, $max_file_size
 				"FILE_SIZE" => "Y",
 				"DIMENSIONS" => "Y",
 				"IMAGE_POPUP" => "Y",
-				"MAX_SIZE" => array("W" => 200, "H"=>200),
+				"MAX_SIZE" => array(
+					"W" => COption::GetOptionString("iblock", "detail_image_size"),
+					"H" => COption::GetOptionString("iblock", "detail_image_size"),
+				),
 			), false, array(
 				'upload' => true,
 				'medialib' => true,
@@ -538,7 +550,7 @@ class _CIBlockError
 {
 	var $err_type, $err_text, $err_level;
 
-	function _CIBlockError($err_level = false, $err_type = "", $err_text = "")
+	public function _CIBlockError($err_level = false, $err_type = "", $err_text = "")
 	{
 		$this->err_type = $err_type;
 		$this->err_text = preg_replace("#<br>$#i", "", $err_text);

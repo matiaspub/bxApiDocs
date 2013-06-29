@@ -36,7 +36,7 @@ class _CEventsSeo {
 	 * @link http://dev.1c-bitrix.ru/api_help/seo/events/onpagecheck.php
 	 * @author Bitrix
 	 */
-	public static function onPageCheck($MandatoryParam1, $OptionalParam2=default, $e){}
+	public static function onPageCheck($MandatoryParam1, $OptionalParam2="default", $e){}
 
 	/**
 	 * 

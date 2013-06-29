@@ -110,7 +110,7 @@ class CCurrencyRates extends CAllCurrencyRates
 		return $obRates->GetConvertFactorEx($curFrom, $curTo, $valDate);
 	}
 
-	function _get_last_rates($valDate, $cur)
+	public static function _get_last_rates($valDate, $cur)
 	{
 		global $DB;
 

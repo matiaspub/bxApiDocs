@@ -37,7 +37,7 @@ class CSOAPRequest extends CSOAPEnvelope
     /// Contains the request parameters
     var $Parameters = array(); 
 	
-    public static function CSOAPRequest( $name="", $namespace="", $parameters = array() )
+    public function CSOAPRequest( $name="", $namespace="", $parameters = array() )
     {
         $this->Name = $name;
         $this->Namespace = $namespace;
@@ -51,17 +51,17 @@ class CSOAPRequest extends CSOAPEnvelope
         }
     }
 
-    public static function name()
+    public function name()
     {
         return $this->Name;
     }
 
-	public static function get_namespace()
+	public function get_namespace()
     {
         return $this->Namespace;
     }
 	
-	public static function GetSOAPAction($separator = '/')
+	public function GetSOAPAction($separator = '/')
 	{			
 		if ($this->Namespace[strlen($this->Namespace)-1] != $separator)
 		{
@@ -99,11 +99,10 @@ class CSOAPRequest extends CSOAPEnvelope
      * </pre>
      *
      *
-     * @static
      * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addsoapheader.php
      * @author Bitrix
      */
-    public static function addSOAPHeader( $name, $value )
+    public function addSOAPHeader( $name, $value )
     {
     	$this->Headers[] = CXMLCreator::encodeValueLight($name, $value);
     }
@@ -126,11 +125,10 @@ class CSOAPRequest extends CSOAPEnvelope
      *
      * @return void 
      *
-     * @static
      * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addbodyattribute.php
      * @author Bitrix
      */
-    public static function addBodyAttribute( $name, $value )
+    public function addBodyAttribute( $name, $value )
     {
         $this->BodyAttributes[$name] = $value;
     }
@@ -156,17 +154,16 @@ class CSOAPRequest extends CSOAPEnvelope
      *
      * @return void 
      *
-     * @static
      * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addparameter.php
      * @author Bitrix
      */
-    public static function addParameter( $name, $value )
+    public function addParameter( $name, $value )
     {
         $this->Parameters[$name] = $value;        
     }
     
 	//      Returns the request payload
-    public static function payload()
+    public function payload()
     {
         $root = new CXMLCreator( "soap:Envelope" );
         $root->setAttribute("xmlns:soap", BX_SOAP_ENV);

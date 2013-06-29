@@ -21,7 +21,7 @@ class UField extends Field
 		$base_type,
 		$field_id;
 
-	static public function __construct(array $info, Base $entity)
+	public function __construct(array $info, Base $entity)
 	{
 		global $USER_FIELD_MANAGER;
 
@@ -62,27 +62,27 @@ class UField extends Field
 		return true;
 	}
 
-	static public function getTypeId()
+	public function getTypeId()
 	{
 		return $this->type_id;
 	}
 
-	static public function isMultiple()
+	public function isMultiple()
 	{
 		return $this->is_multiple;
 	}
 
-	static public function getBaseType()
+	public function getBaseType()
 	{
 		return $this->base_type;
 	}
 
-	static public function getFieldId()
+	public function getFieldId()
 	{
 		return $this->field_id;
 	}
 
-	static public function getValueFieldName()
+	public function getValueFieldName()
 	{
 		if ($this->isMultiple())
 		{

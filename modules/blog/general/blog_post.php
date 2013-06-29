@@ -730,6 +730,30 @@ class CAllBlogPost
 					$socnetPerms[] = "U".$arPost["AUTHOR_ID"];
 				$socnetPerms[] = "SA"; // socnet admin
 
+				if (
+					in_array("AU", $socnetPerms) 
+					|| in_array("G2", $socnetPerms)
+				)
+				{
+					$socnetPermsAdd = array();
+
+					foreach($socnetPerms as $perm_tmp)
+					{
+						if (preg_match('/^SG(\d+)$/', $perm_tmp, $matches))
+						{
+							if (
+								!in_array("SG".$matches[1]."_".SONET_ROLES_USER, $socnetPerms)
+								&& !in_array("SG".$matches[1]."_".SONET_ROLES_MODERATOR, $socnetPerms)
+								&& !in_array("SG".$matches[1]."_".SONET_ROLES_OWNER, $socnetPerms)
+							)
+								$socnetPermsAdd[] = "SG".$matches[1]."_".SONET_ROLES_USER;
+							
+						}
+					}
+					if (count($socnetPermsAdd) > 0)
+						$socnetPerms = array_merge($socnetPerms, $socnetPermsAdd);
+				}
+
 				CSocNetLog::Update($logID, array("TMP_ID" => $logID));
 				if (CModule::IncludeModule("extranet"))
 				{
@@ -997,7 +1021,7 @@ class CAllBlogPost
 		return CBlogPost::AddSocNetPerms($ID, $perms, $arPost);
 	}
 
-	function __AddSocNetPerms($ID, $entityType = "", $entityID = 0, $entity)
+	public static function __AddSocNetPerms($ID, $entityType = "", $entityID = 0, $entity)
 	{
 		global $DB;
 

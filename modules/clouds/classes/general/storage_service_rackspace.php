@@ -16,7 +16,7 @@ class CCloudStorageService_RackSpaceCloudFiles extends CCloudStorageService_Open
 		return "Rackspace Cloud Files";
 	}
 
-	function _GetToken($host, $user, $key)
+	public static function _GetToken($host, $user, $key)
 	{
 		$result = false;
 		$cache_id = "v0|".$host."|".$user."|".$key;
@@ -66,7 +66,7 @@ class CCloudStorageService_RackSpaceCloudFiles extends CCloudStorageService_Open
 		return $result;
 	}
 
-	public static function SendCDNRequest($settings, $verb, $bucket, $file_name='', $params='', $content=false, $additional_headers=array())
+	public function SendCDNRequest($settings, $verb, $bucket, $file_name='', $params='', $content=false, $additional_headers=array())
 	{
 		$arToken = $this->_GetToken($settings["HOST"], $settings["USER"], $settings["KEY"]);
 		if(!$arToken)
@@ -114,7 +114,7 @@ class CCloudStorageService_RackSpaceCloudFiles extends CCloudStorageService_Open
 		return $obRequest;
 	}
 
-	public static function CreateBucket($arBucket)
+	public function CreateBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -143,7 +143,7 @@ class CCloudStorageService_RackSpaceCloudFiles extends CCloudStorageService_Open
 		return ($this->status == 201)/*Created*/ || ($this->status == 202) /*Accepted*/;
 	}
 
-	public static function GetFileSRC($arBucket, $arFile)
+	public function GetFileSRC($arBucket, $arFile)
 	{
 		if($arBucket["CNAME"])
 		{

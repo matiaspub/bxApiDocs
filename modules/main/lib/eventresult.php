@@ -12,7 +12,7 @@ class EventResult
 	protected $type;
 	protected $parameters;
 
-	static public function __construct($type, $parameters = null, $moduleId = null, $handler = null)
+	public function __construct($type, $parameters = null, $moduleId = null, $handler = null)
 	{
 		$this->type = $type;
 		$this->moduleId = $moduleId;
@@ -20,22 +20,22 @@ class EventResult
 		$this->parameters = $parameters;
 	}
 
-	static public function getResultType()
+	public function getResultType()
 	{
 		return $this->type;
 	}
 
-	static public function getModuleId()
+	public function getModuleId()
 	{
 		return $this->moduleId;
 	}
 
-	static public function getHandler()
+	public function getHandler()
 	{
 		return $this->handler;
 	}
 
-	static public function getParameters()
+	public function getParameters()
 	{
 		return $this->parameters;
 	}

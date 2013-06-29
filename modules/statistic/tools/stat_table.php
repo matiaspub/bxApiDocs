@@ -11,7 +11,7 @@ class CCityLookup_stat_table extends CCityLookup
 		return new CCityLookup_stat_table($arDBRecord);
 	}
 
-	function __construct($arDBRecord = false)
+	public function __construct($arDBRecord = false)
 	{
 		parent::__construct($arDBRecord);
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -48,7 +48,7 @@ class CCityLookup_stat_table extends CCityLookup
 		}
 	}
 
-	public static function GetFullInfo()
+	public function GetFullInfo()
 	{
 		if(!$this->country_full_name && !$this->region_name && !$this->city_name)
 		{
@@ -77,7 +77,7 @@ class CCityLookup_stat_table extends CCityLookup
 		return parent::GetFullInfo();
 	}
 
-	public static function GetDescription()
+	public function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_stat_table",
@@ -93,7 +93,7 @@ class CCityLookup_stat_table extends CCityLookup
 		return true;
 	}
 
-	public static function Lookup()
+	public function Lookup()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 

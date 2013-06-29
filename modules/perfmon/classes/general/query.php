@@ -8,7 +8,7 @@ class CPerfQueryJoin
 	var $right_column = "";
 	var $right_const = "";
 
-	function _parse($sql, &$table, &$column, &$const)
+	public static function _parse($sql, &$table, &$column, &$const)
 	{
 		if(preg_match("/^([a-zA-Z0-9_]+)\\.(.+)\$/", $sql, $match))
 		{
@@ -24,12 +24,12 @@ class CPerfQueryJoin
 		}
 	}
 
-	public static function parse_left($sql)
+	public function parse_left($sql)
 	{
 		$this->_parse($sql, $this->left_table, $this->left_column, $this->left_const);
 	}
 
-	public static function parse_right($sql)
+	public function parse_right($sql)
 	{
 		$this->_parse($sql, $this->right_table, $this->right_column, $this->right_const);
 	}
@@ -43,13 +43,13 @@ class CPerfQueryWhere
 	var $simplified_sql = "";
 	var $joins = array();
 
-	function __construct($table_aliases_regex)
+	public function __construct($table_aliases_regex)
 	{
 		$this->table_aliases_regex = $table_aliases_regex;
 		$this->equation_regex = "(?:".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+|[0-9]+|'[^']*') (?:=|<|>|> =|< =|IS) (?:".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+|[0-9]+|'[^']*'|NULL)";
 	}
 
-	public static function parse($sql)
+	public function parse($sql)
 	{
 		//Transform and simplify sql
 		//
@@ -95,7 +95,7 @@ class CPerfQueryWhere
 	}
 
 	//Remove balanced braces around equals
-	function _remove_braces($sql)
+	public function _remove_braces($sql)
 	{
 		while(true)
 		{
@@ -118,7 +118,7 @@ class CPerfQueryWhere
 		return $sql;
 	}
 
-	function _or2in($or_match)
+	public function _or2in($or_match)
 	{
 		$sql = $or_match[0];
 		if(preg_match_all("/(".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+|[0-9]+|'[^']*') (?:=) ([0-9]+|'[^']*')/", $or_match[1], $match))
@@ -138,7 +138,7 @@ class CPerfQueryTable
 	var $alias = "";
 	var $join = "";
 
-	public static function parse($sql)
+	public function parse($sql)
 	{
 		$sql = CPerfQuery::removeSpaces($sql);
 
@@ -174,7 +174,7 @@ class CPerfQueryFrom
 	var $tables = array();
 	var $joins = array();
 
-	public static function parse($sql)
+	public function parse($sql)
 	{
 		$sql = CPerfQuery::removeSpaces($sql);
 
@@ -215,7 +215,7 @@ class CPerfQueryFrom
 		return !empty($this->tables);
 	}
 
-	public static function getTableAliases()
+	public function getTableAliases()
 	{
 		$res = array();
 		foreach($this->tables as $table)
@@ -251,7 +251,7 @@ class CPerfQuery
 		return trim(preg_replace("/[ \t\n\r]+/", " ", $str), " \t\n\r");
 	}
 
-	public static function parse($sql)
+	public function parse($sql)
 	{
 		$this->sql = preg_replace("/([()=])/", " \\1 ", $sql);
 		$this->sql = CPerfQuery::removeSpaces($this->sql);
@@ -286,7 +286,7 @@ class CPerfQuery
 		}
 	}
 
-	public static function parse_subqueries()
+	public function parse_subqueries()
 	{
 		$this->subqueries = array();
 
@@ -324,7 +324,7 @@ class CPerfQuery
 		return true;
 	}
 
-	public static function table_joins($table_alias)
+	public function table_joins($table_alias)
 	{
 		//Lookup table by its alias
 		$suggest_table = null;
@@ -404,7 +404,7 @@ class CPerfQuery
 		return $arTableJoins;
 	}
 
-	public static function suggest_index($table_alias)
+	public function suggest_index($table_alias)
 	{
 		global $DB;
 
@@ -484,7 +484,7 @@ class CPerfQuery
 		return $results;
 	}
 
-	function _adjust_columns($arColumns)
+	public static function _adjust_columns($arColumns)
 	{
 		$arColumns = array_unique($arColumns);
 		while(strlen(implode(",", $arColumns)) > 250)
@@ -497,7 +497,7 @@ class CPerfQuery
 		return $arColumns;
 	}
 
-	public static function has_where($table_alias = false)
+	public function has_where($table_alias = false)
 	{
 		if($table_alias === false)
 			return !empty($this->where->joins);
@@ -517,7 +517,7 @@ class CPerfQuery
 		return false;
 	}
 
-	public static function find_value($table_name, $column_name)
+	public function find_value($table_name, $column_name)
 	{
 		//Lookup table by its name
 		foreach($this->from->tables as $table)
@@ -571,7 +571,7 @@ class CPerfQuery
 		return "";
 	}
 
-	public static function find_join($table_name, $column_name)
+	public function find_join($table_name, $column_name)
 	{
 		//Lookup table by its name
 		$suggest_table = null;

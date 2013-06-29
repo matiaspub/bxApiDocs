@@ -145,7 +145,7 @@ class CPHPCacheFiles
 		}
 	}
 
-	public static function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		$fn = rtrim($_SERVER["DOCUMENT_ROOT"], "/")."/".ltrim($basedir.$initdir, "/").$filename;
 
@@ -196,7 +196,7 @@ class CPHPCacheFiles
 		return true;
 	}
 
-	public static function write($arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function write($arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		$folder = rtrim($_SERVER["DOCUMENT_ROOT"], "/")."/".ltrim($basedir.$initdir, "/");
 		$fn = $folder.$filename;

@@ -13,7 +13,7 @@ abstract class CSecurityFilterBaseAuditor
 	 * @param string $pString
 	 * @return bool
 	 */
-	static public function process($pString)
+	public function process($pString)
 	{
 		$this->lazyLoadFilters();
 		$this->setValidString("");
@@ -39,7 +39,7 @@ abstract class CSecurityFilterBaseAuditor
 	/**
 	 * @return string
 	 */
-	static public function getValidString()
+	public function getValidString()
 	{
 		return $this->validString;
 	}
@@ -48,7 +48,7 @@ abstract class CSecurityFilterBaseAuditor
 	/**
 	 * @return string
 	 */
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}

@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CGridOptions
@@ -8,7 +8,7 @@ class CGridOptions
 	protected $options;
 	protected $filter;
 
-	static public function __construct($grid_id)
+	public function __construct($grid_id)
 	{
 		$this->grid_id = $grid_id;
 		$this->options = array();
@@ -34,7 +34,7 @@ class CGridOptions
 				$this->filter = $aOptions["filters"][$this->options["saved_filter"]]["fields"];
 	}
 
-	static public function GetSorting($arParams=array())
+	public function GetSorting($arParams=array())
 	{
 		if(!is_array($arParams["vars"]))
 			$arParams["vars"] = array("by" => "by", "order" => "order");
@@ -77,7 +77,7 @@ class CGridOptions
 		return $arResult;
 	}
 
-	static public function GetNavParams($arParams=array())
+	public function GetNavParams($arParams=array())
 	{
 		$arResult = array(
 			"nPageSize" => (isset($arParams["nPageSize"])? $arParams["nPageSize"] : 20),
@@ -89,14 +89,14 @@ class CGridOptions
 		return $arResult;
 	}
 
-	static public function GetVisibleColumns()
+	public function GetVisibleColumns()
 	{
 		if($this->options["columns"] <> '')
 			return explode(",", $this->options["columns"]);
 		return array();
 	}
 
-	static public function GetFilter($arFilter)
+	public function GetFilter($arFilter)
 	{
 		$aRes = array();
 		foreach($arFilter as $field)
@@ -199,12 +199,12 @@ class CGridOptions
 		return $aRes;
 	}
 
-	static public function Save()
+	public function Save()
 	{
 		CUserOptions::SetOption("main.interface.grid", $this->grid_id, $this->all_options);
 	}
 
-	static public function SetColumns($columns)
+	public function SetColumns($columns)
 	{
 		$aColsTmp = explode(",", $columns);
 		$aCols = array();
@@ -214,12 +214,12 @@ class CGridOptions
 		$this->all_options["views"][$this->all_options["current_view"]]["columns"] = implode(",", $aCols);
 	}
 
-	static public function SetTheme($theme)
+	public function SetTheme($theme)
 	{
 		$this->all_options["theme"] = $theme;
 	}
 
-	static public function SetViewSettings($view_id, $settings)
+	public function SetViewSettings($view_id, $settings)
 	{
 		$this->all_options["views"][$view_id] = array(
 			"name"=>$settings["name"],
@@ -231,12 +231,12 @@ class CGridOptions
 		);
 	}
 
-	static public function DeleteView($view_id)
+	public function DeleteView($view_id)
 	{
 		unset($this->all_options["views"][$view_id]);
 	}
 	
-	static public function SetView($view_id)
+	public function SetView($view_id)
 	{
 		if(!array_key_exists($view_id, $this->all_options["views"]))
 			$view_id = "default";
@@ -251,7 +251,7 @@ class CGridOptions
 			unset($_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]);
 	}
 	
-	static public function SetFilterRows($rows, $filter_id='')
+	public function SetFilterRows($rows, $filter_id='')
 	{
 		$aColsTmp = explode(",", $rows);
 		$aCols = array();
@@ -264,7 +264,7 @@ class CGridOptions
 			$this->all_options["filter_rows"] = implode(",", $aCols);
 	}
 
-	static public function SetFilterSettings($filter_id, $settings)
+	public function SetFilterSettings($filter_id, $settings)
 	{
 		$option = array(
 			"name"=>$settings["name"],
@@ -296,12 +296,12 @@ class CGridOptions
 		$this->all_options["filters"][$filter_id] = $option;
 	}
 
-	static public function DeleteFilter($filter_id)
+	public function DeleteFilter($filter_id)
 	{
 		unset($this->all_options["filters"][$filter_id]);
 	}
 
-	static public function SetFilterSwitch($show)
+	public function SetFilterSwitch($show)
 	{
 		$this->all_options["filter_shown"] = ($show == "Y"? "Y":"N");
 	}
@@ -390,5 +390,26 @@ class CGridOptions
 		uasort($arThemes, create_function('$a, $b', 'return strcmp($a["name"], $b["name"]);'));
 		return $arThemes;
 	}
+
+	public static function GetTheme($grid_id)
+	{
+		$aOptions = CUserOptions::GetOption("main.interface.grid", $grid_id, array());
+		if($aOptions["theme"] == '')
+		{
+			$aGlobalOptions = CUserOptions::GetOption("main.interface", "global", array(), 0);
+			if($aGlobalOptions["theme_template"][SITE_TEMPLATE_ID] <> '')
+				$theme = $aGlobalOptions["theme_template"][SITE_TEMPLATE_ID];
+			else
+				$theme = "";
+		}
+		else
+		{
+			$theme = $aOptions["theme"];
+		}
+		if($theme <> '')
+		{
+			$theme = preg_replace("/[^a-z0-9_.-]/i", "", $theme);
+		}
+		return $theme;
+	}
 }
-?>

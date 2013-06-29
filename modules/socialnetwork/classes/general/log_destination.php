@@ -192,7 +192,7 @@ class CSocNetLogDestination
 		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$USER->GetID()]))
 		{
 			$arUsers = Array();
-			$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION"));
+			$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
 
 			if (CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser())
 			{
@@ -278,7 +278,7 @@ class CSocNetLogDestination
 		$userId = $USER->GetID();
 
 		$arFilter = Array('ACTIVE' => 'Y');
-		$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION"));
+		$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
 
 		if (isset($arParams['id']))
 		{
@@ -392,7 +392,7 @@ class CSocNetLogDestination
 			);
 
 			$arExtParams = Array(
-				"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION"),
+				"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"),
 				"SELECT" => Array("UF_DEPARTMENT")
 			);
 
@@ -463,28 +463,9 @@ class CSocNetLogDestination
 		if (strlen($search) <= 0)
 			return $arUsers;
 
-		$strUserIDs = '';
-		$arUserSearch = explode(' ', urldecode($search));
-		if (empty($arUserSearch))
-			return $arUsers;
-
-		$dbRes = CUser::SearchUserByName($arUserSearch, '', true);
-		while ($arRes = $dbRes->Fetch())
-		{
-			if (
-				!$bSelf
-				&& is_object($GLOBALS["USER"])
-				&& $GLOBALS["USER"]->GetID() == $arRes['ID']
-			)
-				continue;
-
-			$strUserIDs .= ($strUserIDs == '' ? '' : '|').$arRes['ID'];
-		}
-
 		$arFilter = array(
 			"ACTIVE" => "Y",
 			"NAME_SEARCH" => $search,
-			"ID" => $strUserIDs
 		);
 
 		if (
@@ -493,12 +474,14 @@ class CSocNetLogDestination
 		)
 			$arFilter["!UF_DEPARTMENT"] = false;
 
-		$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION"));
+		$arExtParams = Array(
+			"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"),
+			"NAV_PARAMS" => Array("nTopCount" => 20)
+		);
 		if ($bIntranetEnable)
 			$arExtParams['SELECT'] = array('UF_DEPARTMENT');
 		$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc', 'IS_ONLINE'=>'desc')), ($dummy=''), $arFilter, $arExtParams);
-		$dbUsers->NavStart(20);
-		while ($arUser = $dbUsers->NavNext(false))
+		while ($arUser = $dbUsers->Fetch())
 		{
 			if (
 				!$bSelf

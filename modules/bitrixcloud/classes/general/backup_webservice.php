@@ -58,7 +58,7 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionGetInformation() /*. throws CBitrixCloudException .*/
+	public function actionGetInformation() /*. throws CBitrixCloudException .*/
 	{
 		$this->check_word = "";
 		$this->file_name = "";
@@ -72,7 +72,7 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionReadFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function actionReadFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
 	{
 		$this->check_word = $check_word;
 		$this->file_name = $file_name;
@@ -86,7 +86,7 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionWriteFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function actionWriteFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
 	{
 		$this->check_word = "";
 		$this->file_name = $file_name;

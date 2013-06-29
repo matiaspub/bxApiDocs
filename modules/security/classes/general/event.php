@@ -118,7 +118,7 @@ class CSecurityEvent
 	 * @param string $pItemDescription
 	 * @return bool
 	 */
-	static public function doLog($pSeverity, $pAuditType, $pItemName, $pItemDescription)
+	public function doLog($pSeverity, $pAuditType, $pItemName, $pItemDescription)
 	{
 		$savedInDB = $savedInFile = $savedInSyslog = false;
 		if($this->isDBEngineActive)
@@ -163,7 +163,7 @@ class CSecurityEvent
 	 * @param string $pTimestamp  - from date
 	 * @return integer
 	 */
-	static public function getEventsCount($pTimestamp = '')
+	public function getEventsCount($pTimestamp = '')
 	{
 		if(!$this->isDBEngineActive)
 			return 0;

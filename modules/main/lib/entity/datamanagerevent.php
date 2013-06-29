@@ -24,7 +24,7 @@ class DataManagerEvent extends \Bitrix\Main\Event
 	 * @param Result $result
 	 * @return bool
 	 */
-	static public function getErrors(Result $result = null)
+	public function getErrors(Result $result = null)
 	{
 		$hasErrors = false;
 		if ($this->getResults() != null)

@@ -85,7 +85,7 @@ class Base
 	 * @return BooleanField|ScalarField|ExpressionField|ReferenceField|UField
 	 * @throws \Exception
 	 */
-	static public function initializeField($fieldName, $fieldInfo)
+	public function initializeField($fieldName, $fieldInfo)
 	{
 		if (!empty($fieldInfo['reference']))
 		{
@@ -127,7 +127,7 @@ class Base
 		return $field;
 	}
 
-	static public function initialize($className)
+	public function initialize($className)
 	{
 		$this->className = $className;
 		//TODO: don't use $this->filePath
@@ -140,7 +140,7 @@ class Base
 		$this->isUtm = $className::isUtm();
 	}
 
-	static public function postInitialize()
+	public function postInitialize()
 	{
 		// basic properties
 		$classPath = explode('\\', ltrim($this->className, '\\'));
@@ -237,7 +237,7 @@ class Base
 		}
 	}
 
-	static public function getReferencesCountTo($refEntityName)
+	public function getReferencesCountTo($refEntityName)
 	{
 		if (array_key_exists($key = strtolower($refEntityName), $this->references))
 		{
@@ -248,7 +248,7 @@ class Base
 	}
 
 
-	static public function getReferencesTo($refEntityName)
+	public function getReferencesTo($refEntityName)
 	{
 		if (array_key_exists($key = strtolower($refEntityName), $this->references))
 		{
@@ -259,7 +259,7 @@ class Base
 	}
 
 	// getters
-	static public function getFields()
+	public function getFields()
 	{
 		return $this->fields;
 	}
@@ -270,7 +270,7 @@ class Base
 	 * @return Field
 	 * @throws \Exception
 	 */
-	static public function getField($name)
+	public function getField($name)
 	{
 		if ($this->hasField($name))
 		{
@@ -282,12 +282,12 @@ class Base
 		));
 	}
 
-	static public function hasField($name)
+	public function hasField($name)
 	{
 		return isset($this->fields[$name]);
 	}
 
-	static public function getUField($name)
+	public function getUField($name)
 	{
 		if ($this->hasUField($name))
 		{
@@ -299,7 +299,7 @@ class Base
 		));
 	}
 
-	static public function hasUField($name)
+	public function hasUField($name)
 	{
 		if (is_null($this->u_fields))
 		{
@@ -327,22 +327,22 @@ class Base
 		return isset($this->u_fields[$name]);
 	}
 
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
 
-	static public function getFullName()
+	public function getFullName()
 	{
 		return substr($this->className, 0, -5);
 	}
 
-	static public function getNamespace()
+	public function getNamespace()
 	{
 		return substr($this->className, 0, strrpos($this->className, '\\')+1);
 	}
 
-	static public function getModule()
+	public function getModule()
 	{
 		// Bitrix\Main\Site -> main
 		// Partner\Module\Thing -> partner.module
@@ -353,52 +353,52 @@ class Base
 			return strtolower($parts[0].".".$parts[1]);
 	}
 
-	static public function getDataClass()
+	public function getDataClass()
 	{
 		return $this->className;
 	}
 
-	static public function getConnection()
+	public function getConnection()
 	{
 		return \Bitrix\Main\Application::getInstance()->getDbConnectionPool()->getConnection($this->connectionName);
 	}
 
-	static public function getFilePath()
+	public function getFilePath()
 	{
 		return $this->filePath;
 	}
 
-	static public function getDBTableName()
+	public function getDBTableName()
 	{
 		return $this->dbTableName;
 	}
 
-	static public function getPrimary()
+	public function getPrimary()
 	{
 		return count($this->primary) == 1 ? $this->primary[0] : $this->primary;
 	}
 
-	static public function getPrimaryArray()
+	public function getPrimaryArray()
 	{
 		return $this->primary;
 	}
 
-	static public function getAutoIncrement()
+	public function getAutoIncrement()
 	{
 		return $this->autoIncrement;
 	}
 
-	static public function isUts()
+	public function isUts()
 	{
 		return $this->isUts;
 	}
 
-	static public function isUtm()
+	public function isUtm()
 	{
 		return $this->isUtm;
 	}
 
-	static public function getUfId()
+	public function getUfId()
 	{
 		return $this->uf_id;
 	}
@@ -408,7 +408,7 @@ class Base
 		return class_exists($name . 'Table');
 	}
 
-	static public function getCode()
+	public function getCode()
 	{
 		$code = '';
 
@@ -436,7 +436,7 @@ class Base
 		return $code;
 	}
 
-	static public function getLangCode()
+	public function getLangCode()
 	{
 		return $this->getCode().'_ENTITY';
 	}

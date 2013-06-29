@@ -23,6 +23,13 @@ class CSaleHelper
 		return $fl;
 	}
 
+	/**
+	* Writes to /bitrix/modules/sale.log
+	*
+	* @param string $text message to write
+	* @param array $arVars array (varname => value) to print out variables
+	* @param string $code log record tag
+	*/
 	public static function WriteToLog($text, $arVars = array(), $code = "")
 	{
 		$filename = $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale.log";

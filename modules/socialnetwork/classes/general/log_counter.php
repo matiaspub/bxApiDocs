@@ -24,7 +24,7 @@ class CAllSocNetLogCounter
 			$entity_id = $arLogComment["ENTITY_ID"];
 			$event_id = $arLogComment["EVENT_ID"];
 			$created_by_id = $arLogComment["USER_ID"];
-			$log_id = $arLogComment["LOG_ID"];
+			$log_id = $arLogComment["LOG_ID"]; // recalculate log_id
 			$log_user_id = $arLogComment["LOG_USER_ID"];
 		}
 

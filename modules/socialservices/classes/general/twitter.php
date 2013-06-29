@@ -24,7 +24,7 @@ class CSocServTwitter extends CSocServAuth
 
 	}
 
-	static public function Authorize()
+	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		$bSuccess = 1;
@@ -154,7 +154,7 @@ class CTwitterInterface
 	protected $tokenSecret = false;
 	protected $oauthArray;
 
-	static public function __construct($appID, $appSecret, $token=false, $tokenVerifier=false, $tokenSecret=false)
+	public function __construct($appID, $appSecret, $token=false, $tokenVerifier=false, $tokenSecret=false)
 	{
 		$this->httpTimeout = 10;
 		$this->appID = $appID;
@@ -180,7 +180,7 @@ class CTwitterInterface
 		return $this->oauthArray;
 	}
 
-	static public function GetRequestToken($callback)
+	public function GetRequestToken($callback)
 	{
 		$arParams = array_merge($this->GetDefParams(), array(
 			"oauth_callback" => $callback,
@@ -199,14 +199,14 @@ class CTwitterInterface
 		return false;
 	}
 
-	static public function RedirectAuthUrl()
+	public function RedirectAuthUrl()
 	{
 		if(!$this->token)
 			return false;
 		LocalRedirect(self::AUTH_URL."?oauth_token=".urlencode($this->token).'&check_key='.$_SESSION["UNIQUE_KEY"], true);
 	}
 
-	static public function GetAccessToken()
+	public function GetAccessToken()
 	{
 		if(!$this->token || !$this->tokenVerifier || !$this->tokenSecret)
 			return false;
@@ -229,7 +229,7 @@ class CTwitterInterface
 		return false;
 	}
 
-	static public function GetUserInfo($user_id)
+	public function GetUserInfo($user_id)
 	{
 		$arParams = array_merge($this->GetDefParams(), array(
 			"oauth_token" => $this->token,
@@ -262,7 +262,7 @@ class CTwitterInterface
 		return true;
 	}
 
-	static public function SearchByHash($hash, $socServUserArray, $sinceId)
+	public function SearchByHash($hash, $socServUserArray, $sinceId)
 	{
 		if(!defined("BX_UTF"))
 			$hash = CharsetConverter::ConvertCharset($hash, LANG_CHARSET, "utf-8");
@@ -340,7 +340,7 @@ class CTwitterInterface
 		return self::GetAllPages($arResult);
 	}
 
-	static public function SendTwit($socServUserId, $message, $messageId)
+	public function SendTwit($socServUserId, $message, $messageId)
 	{
 		$isSetOauthKeys = true;
 		if(!$this->token || !$this->tokenSecret)

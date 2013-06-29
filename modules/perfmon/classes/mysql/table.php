@@ -40,12 +40,12 @@ class CPerfomanceTable extends CAllPerfomanceTable
 {
 	var $TABLE_NAME;
 
-	public static function Init($TABLE_NAME)
+	public function Init($TABLE_NAME)
 	{
 		$this->TABLE_NAME = $TABLE_NAME;
 	}
 
-	public static function IsExists($TABLE_NAME = false)
+	public function IsExists($TABLE_NAME = false)
 	{
 		if($TABLE_NAME===false)
 			$TABLE_NAME = $this->TABLE_NAME;
@@ -62,7 +62,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			return false;
 	}
 
-	public static function GetIndexes($TABLE_NAME = false)
+	public function GetIndexes($TABLE_NAME = false)
 	{
 		static $cache = array();
 
@@ -88,7 +88,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 		return $cache[$TABLE_NAME];
 	}
 
-	public static function GetUniqueIndexes($TABLE_NAME = false)
+	public function GetUniqueIndexes($TABLE_NAME = false)
 	{
 		static $cache = array();
 
@@ -115,7 +115,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 		return $cache[$TABLE_NAME];
 	}
 
-	public static function GetTableFields($TABLE_NAME = false, $bExtended = false)
+	public function GetTableFields($TABLE_NAME = false, $bExtended = false)
 	{
 		static $cache = array();
 

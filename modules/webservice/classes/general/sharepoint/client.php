@@ -9,7 +9,7 @@ class CSPListsClient extends CSOAPClient
 	
 	/* public section */
 	
-	static public function __construct($arParams)
+	public function __construct($arParams)
 	{
 		if (is_array($arParams))
 		{
@@ -17,7 +17,7 @@ class CSPListsClient extends CSOAPClient
 		}
 	}
 	
-	static public function SetConnectionParams($arParams)
+	public function SetConnectionParams($arParams)
 	{
 		$arDefaultParams = array(
 			'scheme' => 'http',
@@ -43,7 +43,7 @@ class CSPListsClient extends CSOAPClient
 		return $this->__initialize();
 	}
 	
-	static public function Call($method, $arParams = array())
+	public function Call($method, $arParams = array())
 	{
 		$REQUEST = new CSOAPRequest($method, WS_SP_SERVICE_NS, $arParams);
 		$this->RESPONSE = $this->send($REQUEST);
@@ -65,7 +65,7 @@ class CSPListsClient extends CSOAPClient
 	}
 	
 	/* ws methods functions */
-	static public function GetListCollection()
+	public function GetListCollection()
 	{
 		if (
 			$this->__initialize() 
@@ -109,7 +109,7 @@ class CSPListsClient extends CSOAPClient
 		return $node;
 	}
 	
-	static public function GetByID($listName, $XML_ID)
+	public function GetByID($listName, $XML_ID)
 	{
 		$RESULT = false;
 	
@@ -158,7 +158,7 @@ class CSPListsClient extends CSOAPClient
 		return $this->GetByIDProcessResult($RESULT);
 	}
 	
-	static public function GetList($listName)
+	public function GetList($listName)
 	{
 		if (
 			$this->__initialize() 
@@ -252,7 +252,7 @@ class CSPListsClient extends CSOAPClient
 		'DATA' => array of data rows ('ows_' prefix is cutted from attrubute names)
 	)
 */
-	static public function GetListItemChangesSinceToken($listName, $arParams = array())
+	public function GetListItemChangesSinceToken($listName, $arParams = array())
 	{
 		$arMethodParams = array('listName' => $listName);
 		
@@ -326,7 +326,7 @@ class CSPListsClient extends CSOAPClient
 		return false;
 	}
 	
-	static public function GetAttachmentCollection($listName, $arParams)
+	public function GetAttachmentCollection($listName, $arParams)
 	{
 		$arMethodParams = array('listName' => $listName);
 		$arMethodParams['listItemID'] = $arParams['SP_ID'];
@@ -352,7 +352,7 @@ class CSPListsClient extends CSOAPClient
 		return false;
 	}
 	
-	static public function UpdateListItems($listName, $arChanges)
+	public function UpdateListItems($listName, $arChanges)
 	{
 		$arMethodParams = array('listName' => $listName);
 		
@@ -435,7 +435,7 @@ class CSPListsClient extends CSOAPClient
 		return $RESULT;
 	}
 	
-	static public function LoadFile($listName, $arParams)
+	public function LoadFile($listName, $arParams)
 	{
 		if ($arParams['URL'])
 		{
@@ -485,12 +485,12 @@ class CSPListsClient extends CSOAPClient
 	}
 	
 	/* getters */
-	static public function GetConnectionParams()
+	public function GetConnectionParams()
 	{
 		return $this->arConnectionParams;
 	}
 	
-	static public function GetResponseObject()
+	public function GetResponseObject()
 	{
 		return $this->RESPONSE;
 	}

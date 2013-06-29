@@ -15,7 +15,7 @@ class CSecurityFilter
 
 	private static $validActions = array("none", "clear", "filter");
 
-	function __construct($pCustomOptions = array(), $pChar = "")
+	public function __construct($pCustomOptions = array(), $pChar = "")
 	{
 		if(isset($pCustomOptions["action"]))
 		{
@@ -65,7 +65,7 @@ class CSecurityFilter
 	/**
 	 * Main filtering loop also sets up global vars GET POST COOKIE and some $_SERVER keys
 	 */
-	static public function process()
+	public function process()
 	{
 		global $HTTP_GET_VARS, $HTTP_POST_VARS, $HTTP_COOKIE_VARS, $HTTP_REQUEST_VARS;
 
@@ -272,7 +272,7 @@ class CSecurityFilter
 	 * @param string $pAction
 	 * @return string
 	 */
-	static public function testXSS($pValue, $pAction = "clear")
+	public function testXSS($pValue, $pAction = "clear")
 	{
 		$this->setStop("N");
 		$this->setLog("N");

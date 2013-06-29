@@ -45,7 +45,7 @@ class HttpApplication extends Application
 		);
 	}
 
-	static public function setInputParameters($get, $post, $files, $cookie, $server, $env)
+	public function setInputParameters($get, $post, $files, $cookie, $server, $env)
 	{
 		if (!$this->canSetInputParameters())
 			return;
@@ -390,7 +390,7 @@ class HttpApplication extends Application
 	/**
 	 * Starts request execution. Should be called after initialize.
 	 */
-	static public function start()
+	public function start()
 	{
 		if (!$this->page)
 			$this->page = $this->getPageByFactory();
@@ -406,7 +406,7 @@ class HttpApplication extends Application
 	 * Finishes request execution.
 	 * It is registered in start() and called automatically on script shutdown.
 	 */
-	static public function finish()
+	public function finish()
 	{
 		$buffer = $this->page->render();
 
@@ -440,7 +440,7 @@ class HttpApplication extends Application
 	 *
 	 * @param Page $page
 	 */
-	static public function setPage(Page $page)
+	public function setPage(Page $page)
 	{
 		$page->setApplication($this);
 		$this->page = $page;
@@ -451,7 +451,7 @@ class HttpApplication extends Application
 	 *
 	 * @return Page
 	 */
-	static public function getPage()
+	public function getPage()
 	{
 		return $this->page;
 	}

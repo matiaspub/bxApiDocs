@@ -9,7 +9,7 @@ class CCloudSecurityService_AmazonS3
 	protected $errstr = '';
 	protected $result = '';
 
-	public static function GetLastRequestStatus()
+	public function GetLastRequestStatus()
 	{
 		return $this->status;
 	}
@@ -59,7 +59,7 @@ class CCloudSecurityService_AmazonS3
 		);
 	}
 
-	public static function GetFederationToken($arBucket, $Policy, $Name, $DurationSeconds = 129600/*36h*/)
+	public function GetFederationToken($arBucket, $Policy, $Name, $DurationSeconds = 129600/*36h*/)
 	{
 		global $APPLICATION;
 
@@ -152,7 +152,7 @@ class CCloudSecurityService_AmazonS3
 		}
 	}
 
-	public static function SendRequest($access_key, $secret_key, $verb, $bucket, $file_name='/', $params='')
+	public function SendRequest($access_key, $secret_key, $verb, $bucket, $file_name='/', $params='')
 	{
 		global $APPLICATION;
 		$this->status = 0;
@@ -242,7 +242,7 @@ class CCloudSecurityService_AmazonS3
 		return $hmac;
 	}
 
-	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false)
+	public function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false)
 	{
 		static $aSearch = array("\r", "\n");
 		if(is_array($arData))

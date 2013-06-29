@@ -125,21 +125,21 @@ class CPostingGeneral
 	{
 		$found = array();
 		// exapmle(2).txt
-		if(preg_match("/^(.*)\((\d+?)\)(\..+?)$/", $file_name, $found))
+		if(preg_match("/^(.*)\\((\\d+?)\\)(\\..+?)$/", $file_name, $found))
 		{
 			$fname = $found[1];
 			$fext = $found[3];
 			$index = $found[2];
 		}
 		// example(2)
-		elseif(preg_match("/^(.*)\((\d+?)\)$/", $file_name, $found))
+		elseif(preg_match("/^(.*)\\((\\d+?)\\)$/", $file_name, $found))
 		{
 			$fname = $found[1];
 			$fext = "";
 			$index = $found[2];
 		}
 		// example.txt
-		elseif(preg_match("/^(.*)(\..+?)$/", $file_name, $found))
+		elseif(preg_match("/^(.*)(\\..+?)$/", $file_name, $found))
 		{
 			$fname = $found[1];
 			$fext = $found[2];
@@ -155,7 +155,7 @@ class CPostingGeneral
 		return array($fname, $fext, $index);
 	}
 
-	public static function SaveFile($ID, $file)
+	public function SaveFile($ID, $file)
 	{
 		global $DB;
 		$ID = intval($ID);
@@ -221,9 +221,13 @@ class CPostingGeneral
 	}
 
 	//check fields before writing
-	public static function CheckFields($arFields, $ID)
+	public function CheckFields($arFields, $ID)
 	{
+		/** @global CDatabase $DB */
 		global $DB;
+		/** @global  CMain $APPLICATION */
+		global $APPLICATION;
+
 		$this->LAST_ERROR = "";
 		$aMsg = array();
 
@@ -267,7 +271,7 @@ class CPostingGeneral
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			$this->LAST_ERROR = $e->GetString();
 			return false;
 		}
@@ -318,7 +322,7 @@ class CPostingGeneral
 	}
 
 	//Addition
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -339,9 +343,9 @@ class CPostingGeneral
 	}
 
 	//Update
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
-		global $DB, $USER;
+		global $DB;
 		$ID = intval($ID);
 
 		if(!$this->CheckFields($arFields, $ID))
@@ -410,11 +414,14 @@ class CPostingGeneral
 		if($BCC <> "")
 		{
 			$BCC = str_replace("\r\n", "\n", $BCC);
-			$BCC = str_replace("\n", ",", Trim($BCC));
+			$BCC = str_replace("\n", ",", $BCC);
 			$aBcc = explode(",", $BCC);
-			for($i=0; $i<count($aBcc); $i++)
-				if(Trim($aBcc[$i]) <> "")
-					$aEmail[] = Trim($aBcc[$i]);
+			foreach ($aBcc as $bccEmail)
+			{
+				$bccEmail = trim($bccEmail);
+				if($bccEmail <> "")
+					$aEmail[] = $bccEmail;
+			}
 		}
 
 		$aEmail = array_unique($aEmail);
@@ -475,7 +482,7 @@ class CPostingGeneral
 	}
 
 	//Send message
-	public static function SendMessage($ID, $timeout=0, $maxcount=0, $check_charset=false)
+	public function SendMessage($ID, $timeout=0, $maxcount=0, $check_charset=false)
 	{
 		global $DB, $APPLICATION;
 
@@ -597,7 +604,7 @@ class CPostingGeneral
 					'From: '.$sFrom.$eol.
 					'X-Bitrix-Posting: '.$post_arr["ID"].$eol.
 					'MIME-Version: 1.0'.$eol.
-					'Content-Type: multipart/related; boundary="'.$sBoundary.'"'.$eol.
+					'Content-Type: multipart/mixed; boundary="'.$sBoundary.'"'.$eol.
 					'Content-Transfer-Encoding: 8bit';
 
 				$sBody =
@@ -639,7 +646,7 @@ class CPostingGeneral
 					"From: ".$sFrom.$eol.
 					'X-Bitrix-Posting: '.$post_arr["ID"].$eol.
 					"MIME-Version: 1.0".$eol.
-					"Content-Type: multipart/related; boundary=\"".$sBoundary."\"".$eol.
+					"Content-Type: multipart/mixed; boundary=\"".$sBoundary."\"".$eol.
 					"Content-Transfer-Encoding: 8bit";
 
 				$sBody =
@@ -696,10 +703,7 @@ class CPostingGeneral
 		if($post_arr["DIRECT_SEND"] == "Y")
 		{
 			//personal delivery
-			$arEvents = array();
-			$rsEvents = GetModuleEvents("subscribe", "BeforePostingSendMail");
-			while($arEvent = $rsEvents->Fetch())
-				$arEvents[]=$arEvent;
+			$arEvents = GetModuleEvents("subscribe", "BeforePostingSendMail", true);
 
 			$rsEmails = $DB->Query($DB->TopSql("
 				SELECT *
@@ -821,7 +825,7 @@ class CPostingGeneral
 		");
 	}
 
-	public static function ChangeStatus($ID, $status)
+	public function ChangeStatus($ID, $status)
 	{
 		global $DB;
 
@@ -1034,7 +1038,7 @@ class CMailTools
 			return "=?".$charset."?B?".base64_encode(CUtil::BinSubstr($text, 0, $i))."?=".CUtil::BinSubstr($text, $i);
 	}
 
-	function __replace_img($matches)
+	public function __replace_img($matches)
 	{
 		$src = $matches[3];
 		if($src <> "")
@@ -1059,7 +1063,7 @@ class CMailTools
 		return $matches[0];
 	}
 
-	public static function ReplaceHrefs($text)
+	public function ReplaceHrefs($text)
 	{
 		if($this->pcre_backtrack_limit === false)
 			$this->pcre_backtrack_limit = intval(ini_get("pcre.backtrack_limit"));
@@ -1084,7 +1088,7 @@ class CMailTools
 		return $text;
 	}
 
-	public static function ReplaceImages($text)
+	public function ReplaceImages($text)
 	{
 		if($this->pcre_backtrack_limit === false)
 			$this->pcre_backtrack_limit = intval(ini_get("pcre.backtrack_limit"));

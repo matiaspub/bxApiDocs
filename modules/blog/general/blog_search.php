@@ -478,8 +478,6 @@ class CBlogSearch {
 									$socnetPerms[] = "U".$ar["AUTHOR_ID"];
 								$socnetPerms[] = "SA"; // socnet admin
 								CSocNetLog::Update($logID, array("TMP_ID" => $logID, "=LOG_UPDATE" => $arSoFields["LOG_UPDATE"]));
-								CSocNetLogRights::DeleteByLogID($logID);
-								CSocNetLogRights::Add($logID, $socnetPerms);
 							}
 						}
 						else
@@ -489,8 +487,40 @@ class CBlogSearch {
 							if(!in_array("U".$ar["AUTHOR_ID"], $socnetPerms))
 								$socnetPerms[] = "U".$ar["AUTHOR_ID"];
 							$socnetPerms[] = "SA"; // socnet admin
-							CSocNetLogRights::DeleteByLogID($ar["SLID"]);
-							CSocNetLogRights::Add($ar["SLID"], $socnetPerms);
+							$logID = $ar["SLID"];
+						}
+
+						if (
+							intval($logID) > 0
+							&& is_array($socnetPerms)
+						)
+						{
+							if (
+								in_array("AU", $socnetPerms) 
+								|| in_array("G2", $socnetPerms)
+							)
+							{
+								$socnetPermsAdd = array();
+
+								foreach($socnetPerms as $perm_tmp)
+								{
+									if (preg_match('/^SG(\d+)$/', $perm_tmp, $matches))
+									{
+										if (
+											!in_array("SG".$matches[1]."_".SONET_ROLES_USER, $socnetPerms)
+											&& !in_array("SG".$matches[1]."_".SONET_ROLES_MODERATOR, $socnetPerms)
+											&& !in_array("SG".$matches[1]."_".SONET_ROLES_OWNER, $socnetPerms)
+										)
+											$socnetPermsAdd[] = "SG".$matches[1]."_".SONET_ROLES_USER;
+										
+									}
+								}
+								if (count($socnetPermsAdd) > 0)
+									$socnetPerms = array_merge($socnetPerms, $socnetPermsAdd);
+							}
+
+							CSocNetLogRights::DeleteByLogID($logID);
+							CSocNetLogRights::Add($logID, $socnetPerms);
 						}
 					}
 				}

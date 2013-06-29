@@ -14,7 +14,7 @@ class CListFile
 	private $_width = 0;
 	private $_height = 0;
 
-	function __construct($list_id, $section_id, $element_id, $field_id, $file_id)
+	public function __construct($list_id, $section_id, $element_id, $field_id, $file_id)
 	{
 		$this->_list_id = intval($list_id);
 		$this->_section_id = intval($section_id);
@@ -31,13 +31,13 @@ class CListFile
 		}
 	}
 
-	public static function SetSocnetGroup($socnet_group_id)
+	public function SetSocnetGroup($socnet_group_id)
 	{
 		if($socnet_group_id > 0)
 			$this->_socnet_group_id = intval($socnet_group_id);
 	}
 
-	public static function GetInfoHTML()
+	public function GetInfoHTML()
 	{
 		$html = '';
 
@@ -58,7 +58,7 @@ class CListFile
 		return $html;
 	}
 
-	public static function GetInputHTML($params = array())
+	public function GetInputHTML($params = array())
 	{
 		$input_name = $this->_field_id;
 		$size = 20;
@@ -94,7 +94,7 @@ class CListFile
 		return $strReturn;
 	}
 
-	public static function GetImgSrc($params = array())
+	public function GetImgSrc($params = array())
 	{
 		if(is_array($params) && isset($params['url_template']) && (strlen($params['url_template']) > 0))
 			return str_replace(
@@ -108,7 +108,7 @@ class CListFile
 			return '';
 
 	}
-	public static function GetImgHtml($params = array())
+	public function GetImgHtml($params = array())
 	{
 		$max_width = 0;
 		$max_height = 0;
@@ -152,7 +152,7 @@ class CListFile
 		}
 	}
 
-	public static function GetLinkHtml($params = array())
+	public function GetLinkHtml($params = array())
 	{
 		if(is_array($this->_file))
 		{
@@ -165,17 +165,17 @@ class CListFile
 		}
 	}
 
-	public static function GetWidth()
+	public function GetWidth()
 	{
 		return $this->_width;
 	}
 
-	public static function GetHeight()
+	public function GetHeight()
 	{
 		return $this->_height;
 	}
 
-	public static function GetSize()
+	public function GetSize()
 	{
 		if(is_array($this->_file))
 			return $this->_file["FILE_SIZE"];
@@ -183,7 +183,7 @@ class CListFile
 			return 0;
 	}
 
-	public static function IsImage()
+	public function IsImage()
 	{
 		return is_array($this->_file) && ($this->_width > 0) && ($this->_height > 0);
 	}

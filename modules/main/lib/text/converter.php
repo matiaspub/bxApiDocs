@@ -39,6 +39,6 @@ abstract class Converter
 		return $textType;
 	}
 
-	static abstract public function encode($text, $textType = "");
-	static abstract public function decode($text, $textType = "");
+	abstract public function encode($text, $textType = "");
+	abstract public function decode($text, $textType = "");
 }

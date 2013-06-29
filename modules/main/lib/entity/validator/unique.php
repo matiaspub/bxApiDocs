@@ -25,7 +25,7 @@ class Unique extends Base
 	 */
 	protected $errorPhrase = 'MAIN_ENTITY_VALIDATOR_UNIQUE';
 
-	static public function validate($value, $primary, array $row, Entity\Field $field)
+	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
 		$entity = $field->getEntity();
 		$primaryNames = $entity->getPrimaryArray();

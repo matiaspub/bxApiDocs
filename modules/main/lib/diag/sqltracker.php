@@ -10,20 +10,20 @@ class SqlTracker
 
 	protected $time;
 
-	static public function reset()
+	public function reset()
 	{
 		$this->arQuery = array();
 		$this->time = 0;
 	}
 
-	static public function getNewTrackerQuery()
+	public function getNewTrackerQuery()
 	{
 		$query = new SqlTrackerQuery($this);
 		$this->arQuery[] = $query;
 		return $query;
 	}
 
-	static public function addTime($time)
+	public function addTime($time)
 	{
 		$this->time += $time;
 	}

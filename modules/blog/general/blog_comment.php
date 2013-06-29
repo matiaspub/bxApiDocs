@@ -461,7 +461,7 @@ class CAllBlogComment
 
 		return $rssText;
 	}
-	function _IndexPostComments($arParams = Array())
+	public static function _IndexPostComments($arParams = Array())
 	{
 		if(IntVal($arParams["BLOG_ID"]) <= 0 || IntVal($arParams["POST_ID"]) <= 0 || !CModule::IncludeModule("search"))
 			return false;

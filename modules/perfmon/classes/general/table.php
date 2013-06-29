@@ -1,7 +1,7 @@
 <?
 class CAllPerfomanceTable
 {
-	public static function GetList($arSelect, $arFilter, $arOrder = array(), $arNavParams = false)
+	public function GetList($arSelect, $arFilter, $arOrder = array(), $arNavParams = false)
 	{
 		global $DB;
 

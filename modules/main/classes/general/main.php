@@ -27,7 +27,6 @@ abstract class CAllMain
 	var $arPageProperties = array();
 	var $arPagePropertiesChanger = array();
 	var $arDirProperties = array();
-	var $bDirProperties = false;
 	var $sLastError;
 	var $sPath2css = array();
 	var $iHeaderLastCss = 0;
@@ -73,12 +72,12 @@ abstract class CAllMain
 	var $arComponentMatch = false;
 	var $arAuthResult;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->CMain();
 	}
 
-	public static function CMain()
+	public function CMain()
 	{
 		global $QUERY_STRING;
 		$this->sDocPath2 = GetPagePath(false, true);
@@ -86,7 +85,7 @@ abstract class CAllMain
 		$this->sUriParam = (strlen($_SERVER["QUERY_STRING"])>0) ? $_SERVER["QUERY_STRING"] : $QUERY_STRING;
 	}
 
-	public static function reinitPath()
+	public function reinitPath()
 	{
 		$this->sDocPath2 = GetPagePath(false, true);
 		$this->sDirPath = GetDirPath($this->sDocPath2);
@@ -132,11 +131,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php
 	 * @author Bitrix
 	 */
-	public static function GetCurPage($get_index_page=null)
+	public function GetCurPage($get_index_page=null)
 	{
 		if (null === $get_index_page)
 		{
@@ -194,11 +192,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php
 	 * @author Bitrix
 	 */
-	public static function SetCurPage($page, $param=false)
+	public function SetCurPage($page, $param=false)
 	{
 		$this->sDocPath2 = GetPagePath($page);
 		$this->sDirPath = GetDirPath($this->sDocPath2);
@@ -241,11 +238,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php
 	 * @author Bitrix
 	 */
-	public static function GetCurUri($addParam="", $get_index_page=null)
+	public function GetCurUri($addParam="", $get_index_page=null)
 	{
 		$page = $this->GetCurPage($get_index_page);
 		$param = $this->GetCurParam();
@@ -325,11 +321,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php
 	 * @author Bitrix
 	 */
-	public static function GetCurPageParam($strParam="", $arParamKill=array(), $get_index_page=null)
+	public function GetCurPageParam($strParam="", $arParamKill=array(), $get_index_page=null)
 	{
 		$sUrlPath = $this->GetCurPage($get_index_page);
 		$strNavQueryString = DeleteParam($arParamKill);
@@ -341,7 +336,7 @@ abstract class CAllMain
 			return $sUrlPath."?".$strParam.$strNavQueryString;
 	}
 
-	public static function GetCurParam()
+	public function GetCurParam()
 	{
 		return $this->sUriParam;
 	}
@@ -378,11 +373,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php
 	 * @author Bitrix
 	 */
-	public static function GetCurDir()
+	public function GetCurDir()
 	{
 		return $this->sDirPath;
 	}
@@ -417,11 +411,10 @@ abstract class CAllMain
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfilerecursive.php
 	 * @author Bitrix
 	 */
-	public static function GetFileRecursive($strFileName, $strDir=false)
+	public function GetFileRecursive($strFileName, $strDir=false)
 	{
 		if($strDir === false)
 			$strDir = $this->GetCurDir();
@@ -512,7 +505,7 @@ abstract class CAllMain
 		die();
 	}
 
-	public static function SetAuthResult($arAuthResult)
+	public function SetAuthResult($arAuthResult)
 	{
 		$this->arAuthResult = $arAuthResult;
 	}
@@ -567,11 +560,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/authform.php
 	 * @author Bitrix
 	 */
-	public static function AuthForm($mess, $show_prolog=true, $show_epilog=true, $not_show_links="N", $do_die=true)
+	public function AuthForm($mess, $show_prolog=true, $show_epilog=true, $not_show_links="N", $do_die=true)
 	{
 		$excl = array("excl"=>1, "key"=>1, "GLOBALS"=>1, "mess"=>1, "show_epilog"=>1, "not_show_links"=>1, "do_die"=>1);
 		foreach($GLOBALS as $key => $value)
@@ -909,11 +901,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php
 	 * @author Bitrix
 	 */
-	public static function GetMenuHtml($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
+	public function GetMenuHtml($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
 	{
 		$menu = $this->GetMenu($type, $bMenuExt, $template, $sInitDir);
 		return $menu->GetMenuHtml();
@@ -1152,11 +1143,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php
 	 * @author Bitrix
 	 */
-	public static function GetMenuHtmlEx($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
+	public function GetMenuHtmlEx($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
 	{
 		$menu = $this->GetMenu($type, $bMenuExt, $template, $sInitDir);
 		return $menu->GetMenuHtmlEx();
@@ -1225,11 +1215,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenu.php
 	 * @author Bitrix
 	 */
-	public static function GetMenu($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
+	public function GetMenu($type="left", $bMenuExt=false, $template = false, $sInitDir = false)
 	{
 		$menu = new CMenu($type);
 		if($sInitDir===false)
@@ -1310,11 +1299,10 @@ abstract class CAllMain
 	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php
 	 * @author Bitrix
 	 */
-	public static function GetTitle($property_name = false, $strip_tags = false)
+	public function GetTitle($property_name = false, $strip_tags = false)
 	{
 		if($property_name!==false && strlen($this->GetProperty($property_name))>0)
 			$res = $this->GetProperty($property_name);
@@ -1354,11 +1342,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php
 	 * @author Bitrix
 	 */
-	public static function SetTitle($title, $arOptions = null)
+	public function SetTitle($title, $arOptions = null)
 	{
 		$this->sDocTitle = $title;
 
@@ -1437,11 +1424,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php
 	 * @author Bitrix
 	 */
-	public static function ShowTitle($property_name="title", $strip_tags = true)
+	public function ShowTitle($property_name="title", $strip_tags = true)
 	{
 		$this->AddBufferContent(array(&$this, "GetTitle"), $property_name, $strip_tags);
 	}
@@ -1485,11 +1471,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php
 	 * @author Bitrix
 	 */
-	public static function SetPageProperty($PROPERTY_ID, $PROPERTY_VALUE, $arOptions = null)
+	public function SetPageProperty($PROPERTY_ID, $PROPERTY_VALUE, $arOptions = null)
 	{
 		$this->arPageProperties[strtoupper($PROPERTY_ID)] = $PROPERTY_VALUE;
 
@@ -1537,11 +1522,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php
 	 * @author Bitrix
 	 */
-	public static function GetPageProperty($PROPERTY_ID, $default_value = false)
+	public function GetPageProperty($PROPERTY_ID, $default_value = false)
 	{
 		if(isset($this->arPageProperties[strtoupper($PROPERTY_ID)]))
 			return $this->arPageProperties[strtoupper($PROPERTY_ID)];
@@ -1599,11 +1583,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php
 	 * @author Bitrix
 	 */
-	public static function ShowProperty($PROPERTY_ID, $default_value = false)
+	public function ShowProperty($PROPERTY_ID, $default_value = false)
 	{
 		$this->AddBufferContent(array(&$this, "GetProperty"), $PROPERTY_ID, $default_value);
 	}
@@ -1650,11 +1633,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php
 	 * @author Bitrix
 	 */
-	public static function GetProperty($PROPERTY_ID, $default_value = false)
+	public function GetProperty($PROPERTY_ID, $default_value = false)
 	{
 		$propVal = $this->GetPageProperty($PROPERTY_ID);
 		if($propVal !== false)
@@ -1700,13 +1682,23 @@ abstract class CAllMain
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php
 	 * @author Bitrix
 	 */
-	public static function GetPagePropertyList()
+	public function GetPagePropertyList()
 	{
 		return $this->arPageProperties;
+	}
+
+	public static function InitPathVars(&$site, &$path)
+	{
+		$site = false;
+		if(is_array($path))
+		{
+			$site = $path[0];
+			$path = $path[1];
+		}
+		return $path;
 	}
 
 	
@@ -1748,43 +1740,42 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php
 	 * @author Bitrix
 	 */
-	public static function SetDirProperty($PROPERTY_ID, $PROPERTY_VALUE)
+	public function SetDirProperty($PROPERTY_ID, $PROPERTY_VALUE, $path=false)
 	{
-		$this->arDirProperties[strtoupper($PROPERTY_ID)] = $PROPERTY_VALUE;
+		self::InitPathVars($site, $path);
+
+		if($path === false)
+			$path = $this->GetCurDir();
+		if($site === false)
+			$site = SITE_ID;
+
+		$this->arDirProperties[$site][$path][strtoupper($PROPERTY_ID)] = $PROPERTY_VALUE;
 	}
 
-	public static function InitPathVars(&$site, &$path)
+	public function InitDirProperties($path)
 	{
-		$site = false;
-		if(is_array($path))
-		{
-			$site = $path[0];
-			$path = $path[1];
-		}
-		return $path;
-	}
+		self::InitPathVars($site, $path);
 
-	public static function InitDirProperties($path)
-	{
-		CMain::InitPathVars($site, $path);
 		$DOC_ROOT = CSite::GetSiteDocRoot($site);
 
-		if($this->bDirProperties)
-			return true;
-
-		if($path===false)
+		if($path === false)
 			$path = $this->GetCurDir();
+		if($site === false)
+			$site = SITE_ID;
+
+		if(isset($this->arDirProperties[$site][$path]))
+			return true;
 
 		$io = CBXVirtualIo::GetInstance();
 
+		$dir = $path;
 		while (true) // until the root
 		{
-			$path = rtrim($path, "/");
-			$section_file_name = $DOC_ROOT.$path."/.section.php";
+			$dir = rtrim($dir, "/");
+			$section_file_name = $DOC_ROOT.$dir."/.section.php";
 
 			if($io->FileExists($section_file_name))
 			{
@@ -1795,25 +1786,24 @@ abstract class CAllMain
 					foreach($arDirProperties as $prid=>$prval)
 					{
 						$prid = strtoupper($prid);
-						if(!isset($this->arDirProperties[$prid]))
-							$this->arDirProperties[$prid] = $prval;
+						if(!isset($this->arDirProperties[$site][$path][$prid]))
+							$this->arDirProperties[$site][$path][$prid] = $prval;
 					}
 				}
 			}
 
-			if(strlen($path)<=0)
+			if(strlen($dir)<=0)
 				break;
 
 			// file or folder
-			$pos = bxstrrpos($path, "/");
+			$pos = bxstrrpos($dir, "/");
 			if($pos===false)
 				break;
 
 			//parent folder
-			$path = substr($path, 0, $pos+1);
+			$dir = substr($dir, 0, $pos+1);
 		}
 
-		$this->bDirProperties = true;
 		return true;
 	}
 
@@ -1865,22 +1855,24 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirproperty.php
 	 * @author Bitrix
 	 */
-	public static function GetDirProperty($PROPERTY_ID, $path=false, $default_value = false)
+	public function GetDirProperty($PROPERTY_ID, $path=false, $default_value = false)
 	{
-		CMain::InitPathVars($site, $path);
+		self::InitPathVars($site, $path);
 
-		if($path===false)
+		if($path === false)
 			$path = $this->GetCurDir();
+		if($site === false)
+			$site = SITE_ID;
 
-		if(!$this->bDirProperties)
+		if(!isset($this->arDirProperties[$site][$path]))
 			$this->InitDirProperties(array($site, $path));
 
-		if(isset($this->arDirProperties[strtoupper($PROPERTY_ID)]))
-			return $this->arDirProperties[strtoupper($PROPERTY_ID)];
+		$prop_id = strtoupper($PROPERTY_ID);
+		if(isset($this->arDirProperties[$site][$path][$prop_id]))
+			return $this->arDirProperties[$site][$path][$prop_id];
 
 		return $default_value;
 	}
@@ -1926,22 +1918,23 @@ abstract class CAllMain
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php
 	 * @author Bitrix
 	 */
-	public static function GetDirPropertyList($path=false)
+	public function GetDirPropertyList($path=false)
 	{
-		CMain::InitPathVars($site, $path);
+		self::InitPathVars($site, $path);
 
-		if($path===false)
+		if($path === false)
 			$path = $this->GetCurDir();
+		if($site === false)
+			$site = SITE_ID;
 
-		if(!$this->bDirProperties)
+		if(!isset($this->arDirProperties[$site][$path]))
 			$this->InitDirProperties(array($site, $path));
 
-		if(is_array($this->arDirProperties))
-			return $this->arDirProperties;
+		if(is_array($this->arDirProperties[$site][$path]))
+			return $this->arDirProperties[$site][$path];
 
 		return false;
 	}
@@ -1993,11 +1986,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php
 	 * @author Bitrix
 	 */
-	public static function GetMeta($id, $meta_name=false, $bXhtmlStyle=true)
+	public function GetMeta($id, $meta_name=false, $bXhtmlStyle=true)
 	{
 		if($meta_name==false)
 			$meta_name=$id;
@@ -2113,11 +2105,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php
 	 * @author Bitrix
 	 */
-	public static function ShowMeta($id, $meta_name=false, $bXhtmlStyle=true)
+	public function ShowMeta($id, $meta_name=false, $bXhtmlStyle=true)
 	{
 		$this->AddBufferContent(array(&$this, "GetMeta"), $id, $meta_name, $bXhtmlStyle);
 	}
@@ -2152,11 +2143,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php
 	 * @author Bitrix
 	 */
-	public static function SetAdditionalCSS($Path2css, $additional=false)
+	public function SetAdditionalCSS($Path2css, $additional=false)
 	{
 		if($additional)
 			$this->arHeadAdditionalCss[] = $Path2css;
@@ -2164,22 +2154,22 @@ abstract class CAllMain
 			$this->sPath2css[] = $Path2css;
 	}
 
-	public static function SetHeaderLastCss($lastKey = 0)
+	public function SetHeaderLastCss($lastKey = 0)
 	{
 		$this->iHeaderLastCss = intval($lastKey);
 	}
 
-	public static function SetWorkAreaLastCss($lastKey = 0)
+	public function SetWorkAreaLastCss($lastKey = 0)
 	{
 		$this->iWorkAreaLastCss = intval($lastKey);
 	}
 
-	public static function SetHeaderLastJs($lastKey = 0)
+	public function SetHeaderLastJs($lastKey = 0)
 	{
 		$this->iHeaderLastJs = intval($lastKey);
 	}
 
-	public static function SetWorkAreaLastJs($lastKey = 0)
+	public function SetWorkAreaLastJs($lastKey = 0)
 	{
 		$this->iWorkAreaLastJs = intval($lastKey);
 	}
@@ -2203,7 +2193,7 @@ abstract class CAllMain
 		return $contents;
 	}
 
-	public static function GetAdditionalCSS()
+	public function GetAdditionalCSS()
 	{
 		$n = count($this->sPath2css);
 		if($n > 0)
@@ -2211,7 +2201,7 @@ abstract class CAllMain
 		return false;
 	}
 
-	public static function GetCSSArray()
+	public function GetCSSArray()
 	{
 		return array_unique($this->sPath2css);
 	}
@@ -2250,11 +2240,10 @@ abstract class CAllMain
 	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php
 	 * @author Bitrix
 	 */
-	public static function GetCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
+	public function GetCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
 	{
 		$res = '';
 		$site_template = '';
@@ -2749,7 +2738,7 @@ abstract class CAllMain
 	 * @param bool $gzip_content - For disabled gzip
 	 * @return bool - TRUE or FALSE result
 	 */
-	function __WriteCssJsCache($file_path, $contents, $gzip_content = true)
+	public static function __WriteCssJsCache($file_path, $contents, $gzip_content = true)
 	{
 		$result = false;
 
@@ -2915,11 +2904,10 @@ abstract class CAllMain
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php
 	 * @author Bitrix
 	 */
-	public static function ShowCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
+	public function ShowCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
 	{
 		$this->AddBufferContent(array(&$this, "GetCSS"), $cMaxStylesCnt, $bXhtmlStyle);
 	}
@@ -2950,11 +2938,10 @@ abstract class CAllMain
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadstring.php
 	 * @author Bitrix
 	 */
-	public static function AddHeadString($str, $bUnique=false, $additional=false)
+	public function AddHeadString($str, $bUnique=false, $additional=false)
 	{
 		if($str <> '')
 		{
@@ -2982,7 +2969,7 @@ abstract class CAllMain
 		}
 	}
 
-	public static function GetHeadStrings($additional=false)
+	public function GetHeadStrings($additional=false)
 	{
 		if($additional)
 		{
@@ -3042,11 +3029,10 @@ abstract class CAllMain
 	 * >Отложенные функции</a> </li> <li>CMain::AddHeadString() </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showheadstrings.php
 	 * @author Bitrix
 	 */
-	public static function ShowHeadStrings()
+	public function ShowHeadStrings()
 	{
 		if(!$this->bShowHeadString)
 		{
@@ -3085,11 +3071,10 @@ abstract class CAllMain
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php
 	 * @author Bitrix
 	 */
-	public static function AddHeadScript($src, $additional=false)
+	public function AddHeadScript($src, $additional=false)
 	{
 		if($src <> '')
 		{
@@ -3100,39 +3085,39 @@ abstract class CAllMain
 		}
 	}
 
-	public static function AddLangJS($content)
+	public function AddLangJS($content)
 	{
 		if($content <> '')
 			$this->arLangJS[] = $content;
 	}
 
-	public static function GetLangJS()
+	public function GetLangJS()
 	{
 		return implode("\n", $this->arLangJS)."\n";
 	}
 
-	public static function AddAdditionalJS($content)
+	public function AddAdditionalJS($content)
 	{
 		if($content <> '')
 			$this->arAdditionalJS[] = $content;
 	}
 
-	public static function GetAdditionalJS()
+	public function GetAdditionalJS()
 	{
 		return implode("\n", $this->arAdditionalJS)."\n";
 	}
 
-	public static function IsCSSOptimized()
+	public function IsCSSOptimized()
 	{
 		return defined('SITE_TEMPLATE_ID') && COption::GetOptionString('main', 'optimize_css_files', 'N') == 'Y' && !$this->bInAjax;
 	}
 
-	public static function IsJSOptimized()
+	public function IsJSOptimized()
 	{
 		return defined('SITE_TEMPLATE_ID') && COption::GetOptionString('main', 'optimize_js_files', 'N') == 'Y' && !$this->bInAjax;
 	}
 
-	public static function GetHeadScripts($type = 0)
+	public function GetHeadScripts($type = 0)
 	{
 		$res = "";
 		$optimJS = $this->IsJSOptimized();
@@ -3261,11 +3246,10 @@ abstract class CAllMain
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showheadscripts.php
 	 * @author Bitrix
 	 */
-	public static function ShowHeadScripts()
+	public function ShowHeadScripts()
 	{
 		$this->bShowHeadScript = true;
 		$this->AddBufferContent(array(&$this, "GetHeadScripts"), 2);
@@ -3297,11 +3281,10 @@ abstract class CAllMain
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/ShowHead.php
 	 * @author Bitrix
 	 */
-	public static function ShowHead($bXhtmlStyle=true)
+	public function ShowHead($bXhtmlStyle=true)
 	{
 		echo '<meta http-equiv="Content-Type" content="text/html; charset='.LANG_CHARSET.'"'.($bXhtmlStyle? ' /':'').'>'."\n";
 		$this->ShowMeta("robots", false, $bXhtmlStyle);
@@ -3312,7 +3295,7 @@ abstract class CAllMain
 		$this->ShowHeadScripts();
 	}
 
-	public static function ShowAjaxHead($bXhtmlStyle=true)
+	public function ShowAjaxHead($bXhtmlStyle=true)
 	{
 		$this->RestartBuffer();
 
@@ -3456,17 +3439,17 @@ abstract class CAllMain
 		return $panel_dynamic_mode;
 	}
 
-	public static function SetPublicShowMode($mode)
+	public function SetPublicShowMode($mode)
 	{
 		$this->SetShowIncludeAreas($mode != 'view');
 	}
 
-	public static function GetPublicShowMode()
+	public function GetPublicShowMode()
 	{
 		return $this->GetShowIncludeAreas() ? 'configure' : 'view';
 	}
 
-	public static function SetEditArea($areaId, $arIcons)
+	public function SetEditArea($areaId, $arIcons)
 	{
 		if(!$this->GetShowIncludeAreas())
 			return;
@@ -3477,14 +3460,14 @@ abstract class CAllMain
 		$this->editArea->SetEditArea($areaId, $arIcons);
 	}
 
-	public static function IncludeStringBefore()
+	public function IncludeStringBefore()
 	{
 		if($this->editArea === false)
 			$this->editArea = new CEditArea();
 		return $this->editArea->IncludeStringBefore();
 	}
 
-	public static function IncludeStringAfter($arIcons=false, $arParams=array())
+	public function IncludeStringAfter($arIcons=false, $arParams=array())
 	{
 		return $this->editArea->IncludeStringAfter($arIcons, $arParams);
 	}
@@ -3595,11 +3578,10 @@ abstract class CAllMain
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includestring.php
 	 * @author Bitrix
 	 */
-	public static function IncludeString($string, $arIcons=false)
+	public function IncludeString($string, $arIcons=false)
 	{
 		return $this->IncludeStringBefore().$string.$this->IncludeStringAfter($arIcons);
 	}
@@ -3701,11 +3683,10 @@ abstract class CAllMain
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php
 	 * @author Bitrix
 	 */
-	public static function SetTemplateCSS($rel_path)
+	public function SetTemplateCSS($rel_path)
 	{
 		if($path = $this->GetTemplatePath($rel_path))
 			$this->SetAdditionalCSS($path);
@@ -3780,11 +3761,10 @@ abstract class CAllMain
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includecomponent.php
 	 * @author Bitrix
 	 */
-	public static function IncludeComponent($componentName, $componentTemplate, $arParams = array(), $parentComponent = null, $arFunctionParams = array())
+	public function IncludeComponent($componentName, $componentTemplate, $arParams = array(), $parentComponent = null, $arFunctionParams = array())
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
@@ -3893,11 +3873,10 @@ abstract class CAllMain
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php
 	 * @author Bitrix
 	 */
-	public static function AddViewContent($view, $content, $pos = 500)
+	public function AddViewContent($view, $content, $pos = 500)
 	{
 		if(!is_array($this->__view[$view]))
 			$this->__view[$view] = array(array($content, $pos));
@@ -3926,16 +3905,15 @@ abstract class CAllMain
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showviewcontent.php
 	 * @author Bitrix
 	 */
-	public static function ShowViewContent($view)
+	public function ShowViewContent($view)
 	{
 		$this->AddBufferContent(array(&$this, "GetViewContent"), $view);
 	}
 
-	public static function GetViewContent($view)
+	public function GetViewContent($view)
 	{
 		if(!is_array($this->__view[$view]))
 			return '';
@@ -4134,11 +4112,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php
 	 * @author Bitrix
 	 */
-	public static function IncludeFile($rel_path, $arParams = array(), $arFunctionParams = array())
+	public function IncludeFile($rel_path, $arParams = array(), $arFunctionParams = array())
 	{
 		/** @global CMain $APPLICATION */
 		/** @noinspection PhpUnusedLocalVariableInspection */
@@ -4429,11 +4406,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php
 	 * @author Bitrix
 	 */
-	public static function AddChainItem($title, $link="", $bUnQuote=true)
+	public function AddChainItem($title, $link="", $bUnQuote=true)
 	{
 		if($bUnQuote)
 			$title = str_replace(array("&amp;", "&quot;", "&#039;", "&lt;", "&gt;"), array("&", "\"", "'", "<", ">"), $title);
@@ -4479,11 +4455,10 @@ abstract class CAllMain
 	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php
 	 * @author Bitrix
 	 */
-	public static function GetNavChain($path=false, $iNumFrom=0, $sNavChainPath=false, $bIncludeOnce=false, $bShowIcons = true)
+	public function GetNavChain($path=false, $iNumFrom=0, $sNavChainPath=false, $bIncludeOnce=false, $bShowIcons = true)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -4549,7 +4524,7 @@ abstract class CAllMain
 		return $this->_mkchain($arChain, $strChainTemplate, $bIncludeOnce, $bShowIcons);
 	}
 
-	function _mkchain($arChain, $strChainTemplate, $bIncludeOnce=false, $bShowIcons = true)
+	public static function _mkchain($arChain, $strChainTemplate, $bIncludeOnce=false, $bShowIcons = true)
 	{
 		$strChain = $sChainProlog = $sChainEpilog = "";
 		if(file_exists($strChainTemplate))
@@ -4692,16 +4667,15 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php
 	 * @author Bitrix
 	 */
-	public static function ShowNavChain($path=false, $iNumFrom=0, $sNavChainPath=false)
+	public function ShowNavChain($path=false, $iNumFrom=0, $sNavChainPath=false)
 	{
 		$this->AddBufferContent(array(&$this, "GetNavChain"), $path, $iNumFrom, $sNavChainPath);
 	}
 
-	public static function ShowNavChainEx($path=false, $iNumFrom=0, $sNavChainPath=false)
+	public function ShowNavChainEx($path=false, $iNumFrom=0, $sNavChainPath=false)
 	{
 		$this->AddBufferContent(array(&$this, "GetNavChain"), $path, $iNumFrom, $sNavChainPath, true);
 	}
@@ -4770,11 +4744,10 @@ abstract class CAllMain
 	 * "OnChangePermissions"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php
 	 * @author Bitrix
 	 */
-	public static function SetFileAccessPermission($path, $arPermissions, $bOverWrite=true)
+	public function SetFileAccessPermission($path, $arPermissions, $bOverWrite=true)
 	{
 		global $CACHE_MANAGER;
 
@@ -4919,11 +4892,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php
 	 * @author Bitrix
 	 */
-	public static function RemoveFileAccessPermission($path, $arGroups=false)
+	public function RemoveFileAccessPermission($path, $arGroups=false)
 	{
 		global $CACHE_MANAGER;
 
@@ -5047,11 +5019,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php
 	 * @author Bitrix
 	 */
-	public static function CopyFileAccessPermission($path_from, $path_to, $bOverWrite=false)
+	public function CopyFileAccessPermission($path_from, $path_to, $bOverWrite=false)
 	{
 		CMain::InitPathVars($site_from, $path_from);
 		$DOC_ROOT_FROM = CSite::GetSiteDocRoot($site_from);
@@ -5127,11 +5098,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfileaccesspermission.php
 	 * @author Bitrix
 	 */
-	public static function GetFileAccessPermission($path, $groups=false, $task_mode=false) // task_mode - new access mode
+	public function GetFileAccessPermission($path, $groups=false, $task_mode=false) // task_mode - new access mode
 	{
 		global $USER;
 
@@ -5313,7 +5283,7 @@ abstract class CAllMain
 			return $max_perm;
 	}
 
-	public static function GetFileAccessPermissionByUser($intUserID, $path, $groups=false, $task_mode=false) // task_mode - new access mode
+	public function GetFileAccessPermissionByUser($intUserID, $path, $groups=false, $task_mode=false) // task_mode - new access mode
 	{
 		$intUserIDTmp = intval($intUserID);
 		if ($intUserIDTmp.'|' != $intUserID.'|')
@@ -5526,11 +5496,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php
 	 * @author Bitrix
 	 */
-	public static function SaveFileContent($abs_path, $strContent)
+	public function SaveFileContent($abs_path, $strContent)
 	{
 		$strContent = str_replace("\r\n", "\n", $strContent);
 
@@ -5852,7 +5821,7 @@ abstract class CAllMain
 		}
 	}
 
-	function _ReplaceNonLatin($str)
+	public static function _ReplaceNonLatin($str)
 	{
 		return preg_replace("/[^a-zA-Z0-9_:\\.!\$\\-;@\\^\\~]/is", "", $str);
 	}
@@ -5862,7 +5831,7 @@ abstract class CAllMain
 		return CMain::GetSiteSwitcherArray();
 	}
 
-	public static function GetSiteSwitcherArray()
+	public function GetSiteSwitcherArray()
 	{
 		$cur_dir = $this->GetCurDir();
 		$cur_page = $this->GetCurPage();
@@ -6530,11 +6499,10 @@ abstract class CAllMain
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/set_cookie.php
 	 * @author Bitrix
 	 */
-	public static function set_cookie($name, $value, $time=false, $folder="/", $domain=false, $secure=false, $spread=true, $name_prefix=false)
+	public function set_cookie($name, $value, $time=false, $folder="/", $domain=false, $secure=false, $spread=true, $name_prefix=false)
 	{
 		if($time === false)
 			$time = time()+60*60*24*30*12; // 30 days * 12 ~ 1 year
@@ -6621,7 +6589,7 @@ abstract class CAllMain
 		return $cache;
 	}
 
-	public static function StoreCookies()
+	public function StoreCookies()
 	{
 		$_SESSION['SPREAD_COOKIE'] = $this->arrSPREAD_COOKIE;
 	}
@@ -6720,11 +6688,10 @@ abstract class CAllMain
 	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php
 	 * @author Bitrix
 	 */
-	public static function ShowSpreadCookieHTML()
+	public function ShowSpreadCookieHTML()
 	{
 		$this->AddBufferContent(array(&$this, "GetSpreadCookieHTML"));
 	}
@@ -6798,11 +6765,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php
 	 * @author Bitrix
 	 */
-	public static function AddPanelButton($arButton, $bReplace=false)
+	public function AddPanelButton($arButton, $bReplace=false)
 	{
 		if(is_array($arButton) && count($arButton)>0)
 		{
@@ -6852,7 +6818,7 @@ abstract class CAllMain
 		}
 	}
 
-	public static function AddPanelButtonMenu($button_id, $arMenuItem)
+	public function AddPanelButtonMenu($button_id, $arMenuItem)
 	{
 		if(isset($this->arPanelButtons[$button_id]))
 		{
@@ -6934,11 +6900,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php
 	 * @author Bitrix
 	 */
-	public static function ShowPanel()
+	public function ShowPanel()
 	{
 		global $USER;
 
@@ -6963,7 +6928,7 @@ abstract class CAllMain
 		return CHotKeys::GetInstance()->PrintGlobalUrlVar();
 	}
 
-	public static abstract function GetLang($cur_dir=false, $cur_host=false);
+	abstract function GetLang($cur_dir=false, $cur_host=false);
 
 	
 	/**
@@ -7008,11 +6973,10 @@ abstract class CAllMain
 	 * <li>[link=89624]Сайты[/link] </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getsitebydir.php
 	 * @author Bitrix
 	 */
-	public static function GetSiteByDir($cur_dir=false, $cur_host=false)
+	public function GetSiteByDir($cur_dir=false, $cur_host=false)
 	{
 		return $this->GetLang($cur_dir, $cur_host);
 	}
@@ -7071,11 +7035,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addbuffercontent.php
 	 * @author Bitrix
 	 */
-	public static function AddBufferContent($callback)
+	public function AddBufferContent($callback)
 	{
 		//var_dump($callback);
 		//var_dump("-----");
@@ -7105,7 +7068,7 @@ abstract class CAllMain
 			ob_start();
 	}
 
-	public static function RestartBuffer()
+	public function RestartBuffer()
 	{
 		$this->bShowHeadString = false;
 		$this->bShowHeadScript = false;
@@ -7143,7 +7106,7 @@ abstract class CAllMain
 		return $res;
 	}
 
-	public static function EndBufferContent($content="")
+	public function EndBufferContent($content="")
 	{
 		if($this->buffer_man)
 		{
@@ -7201,11 +7164,10 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/resetexception.php
 	 * @author Bitrix
 	 */
-	public static function ResetException()
+	public function ResetException()
 	{
 		if($this->LAST_ERROR)
 			$this->ERROR_STACK[] = $this->LAST_ERROR;
@@ -7251,11 +7213,10 @@ abstract class CAllMain
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php
 	 * @author Bitrix
 	 */
-	public static function ThrowException($msg, $id = false)
+	public function ThrowException($msg, $id = false)
 	{
 		$this->ResetException();
 		if(is_object($msg) && (is_subclass_of($msg, 'CApplicationException') || (strtolower(get_class($msg))=='capplicationexception')))
@@ -7290,16 +7251,15 @@ abstract class CAllMain
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php
 	 * @author Bitrix
 	 */
-	public static function GetException()
+	public function GetException()
 	{
 		return $this->LAST_ERROR;
 	}
 
-	public static function ConvertCharset($string, $charset_in, $charset_out)
+	public function ConvertCharset($string, $charset_in, $charset_out)
 	{
 		$this->ResetException();
 
@@ -7311,10 +7271,15 @@ abstract class CAllMain
 		return $result;
 	}
 
-	public static function ConvertCharsetArray($arData, $charset_from, $charset_to)
+	public function ConvertCharsetArray($arData, $charset_from, $charset_to)
 	{
 		if (!is_array($arData))
-			return $this->ConvertCharset($arData, $charset_from, $charset_to);
+		{
+			if (is_string($arData))
+				$arData = $this->ConvertCharset($arData, $charset_from, $charset_to);
+
+			return ($arData);
+		}
 
 		foreach ($arData as $key => $value)
 		{
@@ -7642,6 +7607,9 @@ abstract class CAllMain
 		if(empty($arFunctions))
 			return true;
 
+		//Release session
+		session_write_close();
+
 		$func = BX_FORK_AGENTS_AND_EVENTS_FUNCTION;
 		$pid = $func();
 
@@ -7656,8 +7624,6 @@ abstract class CAllMain
 		//Mark start of execution
 		// define("BX_FORK_AGENTS_AND_EVENTS_FUNCTION_STARTED", true);
 
-		//Release session
-		session_write_close();
 		global $DB, $CACHE_MANAGER;
 		$CACHE_MANAGER = new CCacheManager;
 
@@ -7955,7 +7921,7 @@ class CAllSite
 		return trim(substr($dateTimeFormat, $chars[0][1]));
 	}
 
-	public static function CheckFields($arFields, $ID=false)
+	public function CheckFields($arFields, $ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $DB;
@@ -8166,11 +8132,10 @@ class CAllSite
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/csite/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $DOCUMENT_ROOT, $CACHE_MANAGER;
 
@@ -8277,11 +8242,10 @@ class CAllSite
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/csite/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $MAIN_LANGS_CACHE, $MAIN_LANGS_ADMIN_CACHE, $CACHE_MANAGER;
 		UnSet($MAIN_LANGS_CACHE[$ID]);
@@ -8457,7 +8421,7 @@ class CAllSite
 			if($ar && strlen($ar["DOC_ROOT"])>0)
 				$BX_CACHE_DOCROOT[$site] = Rel2Abs($_SERVER["DOCUMENT_ROOT"], $ar["DOC_ROOT"]);
 			else
-				$BX_CACHE_DOCROOT[$site] = RTrim($_SERVER["DOCUMENT_ROOT"], "/\\");
+				$BX_CACHE_DOCROOT[$site] = rtrim($_SERVER["DOCUMENT_ROOT"], "/\\");
 		}
 
 		return $BX_CACHE_DOCROOT[$site];
@@ -8962,12 +8926,12 @@ class CAllSite
 class _CLangDBResult extends CDBResult
 {
 
-	function _CLangDBResult($res)
+	public static function _CLangDBResult($res)
 	{
 		parent::CDBResult($res);
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		if($res = parent::Fetch())
 		{
@@ -9021,7 +8985,7 @@ class _CLangDBResult extends CDBResult
 
 						}
 				}
-				$res["DOMAINS"] = Trim($res["DOMAINS"]);
+				$res["DOMAINS"] = trim($res["DOMAINS"]);
 				$arCache[$res["LID"]] = $res["DOMAINS"];
 			}
 
@@ -9202,7 +9166,7 @@ class CAllLanguage
 		return CLanguage::GetList($o, $b, array("LID"=>$ID));
 	}
 
-	public static function CheckFields($arFields, $ID=false)
+	public function CheckFields($arFields, $ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $DB;
@@ -9314,11 +9278,10 @@ class CAllLanguage
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -9396,11 +9359,10 @@ class CAllLanguage
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $MAIN_LANGS_CACHE, $MAIN_LANGS_ADMIN_CACHE;
 		UnSet($MAIN_LANGS_CACHE[$ID]);
@@ -9622,19 +9584,19 @@ abstract class CAllFilterQuery
 	var $clob_upper;
 	var $errorno;
 
-	function __construct($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
+	public function __construct($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
 	{
 		$this->CFilterQuery($default_query_type, $rus_bool_lang, $procent, $ex_sep, $clob, $div_fields, $clob_upper);
 	}
 
-	public static abstract function BuildWhereClause($word);
+	abstract function BuildWhereClause($word);
 
 	/*
 	$default_query_type - logic for spaces
 	$rus_bool_lang - use russian logic words
 	$ex_sep - array with exceptions for delimiters
 	*/
-	public static function CFilterQuery($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
+	public function CFilterQuery($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
 	{
 		$this->m_query  = "";
 		$this->m_fields = "";
@@ -9649,7 +9611,7 @@ abstract class CAllFilterQuery
 		$this->div_fields = $div_fields;
 	}
 
-	public static function GetQueryString($fields, $query)
+	public function GetQueryString($fields, $query)
 	{
 		$this->m_words = array();
 		if($this->div_fields=="Y")
@@ -9672,7 +9634,7 @@ abstract class CAllFilterQuery
 		return $query;
 	}
 
-	public static function CutKav($query)
+	public function CutKav($query)
 	{
 		$bdcnt = 0;
 		while (preg_match("/\"([^\"]*)\"/",$query,$pt))
@@ -9712,7 +9674,7 @@ abstract class CAllFilterQuery
 		return $query;
 	}
 
-	public static function ParseQ($q)
+	public function ParseQ($q)
 	{
 		$q = trim($q);
 		if(strlen($q) <= 0)
@@ -9731,7 +9693,7 @@ abstract class CAllFilterQuery
 		return $q;
 	}
 
-	public static function ParseStr($qwe)
+	public function ParseStr($qwe)
 	{
 		$qwe=trim($qwe);
 
@@ -9795,7 +9757,7 @@ abstract class CAllFilterQuery
 		return($qwe);
 	}
 
-	public static function PrepareQuery($q)
+	public function PrepareQuery($q)
 	{
 		$state = 0;
 		$qu = "";
@@ -9955,7 +9917,7 @@ class CSiteTemplate
 		return $db_res;
 	}
 
-	function __GetByStylesTitle($file)
+	public static function __GetByStylesTitle($file)
 	{
 		if(file_exists($file))
 			return include($file);
@@ -9967,7 +9929,7 @@ class CSiteTemplate
 		return CSiteTemplate::GetList(array(), array("ID"=>$ID));
 	}
 
-	public static function CheckFields($arFields, $ID=false)
+	public function CheckFields($arFields, $ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -10009,7 +9971,7 @@ class CSiteTemplate
 		return true;
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		if(!$this->CheckFields($arFields))
 			return false;
@@ -10049,7 +10011,7 @@ class CSiteTemplate
 	}
 
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -10169,7 +10131,7 @@ class CSiteTemplate
 class CApplicationException
 {
 	var $msg, $id;
-	public static function CApplicationException($msg, $id = false)
+	public function CApplicationException($msg, $id = false)
 	{
 		$this->msg = $msg;
 		$this->id = $id;
@@ -10206,16 +10168,15 @@ class CApplicationException
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/getstring.php
 	 * @author Bitrix
 	 */
-	public static function GetString()
+	public function GetString()
 	{
 		return $this->msg;
 	}
 
-	public static function GetID()
+	public function GetID()
 	{
 		return $this->id;
 	}
@@ -10224,7 +10185,7 @@ class CApplicationException
 class CAdminException extends CApplicationException
 {
 	var $messages;
-	public static function CAdminException($messages, $id = false)
+	public function CAdminException($messages, $id = false)
 	{
 		//array("id"=>"", "text"=>""), array(...), ...
 		$this->messages = $messages;
@@ -10234,12 +10195,12 @@ class CAdminException extends CApplicationException
 		parent::CApplicationException($s, $id);
 	}
 
-	public static function GetMessages()
+	public function GetMessages()
 	{
 		return $this->messages;
 	}
 
-	public static function AddMessage($message)
+	public function AddMessage($message)
 	{
 		$this->messages[]=$message;
 		$this->msg.=$message["text"]."<br>";
@@ -10271,12 +10232,12 @@ class CDebugInfo
 	static $level = 0;
 	var $is_comp = true;
 
-	function __construct($is_comp = true)
+	public function __construct($is_comp = true)
 	{
 		$this->is_comp = $is_comp;
 	}
 
-	public static function Start()
+	public function Start()
 	{
 		global $DB;
 		if($this->is_comp)
@@ -10297,7 +10258,7 @@ class CDebugInfo
 		}
 	}
 
-	public static function Stop($rel_path="", $path="", $cache_type="")
+	public function Stop($rel_path="", $path="", $cache_type="")
 	{
 		global $DB, $APPLICATION;
 		if($this->is_comp)
@@ -10333,7 +10294,7 @@ class CDebugInfo
 		$APPLICATION->arIncludeDebug[] = $this->arResult;
 	}
 
-	public static function Output($rel_path="", $path="", $cache_type="")
+	public function Output($rel_path="", $path="", $cache_type="")
 	{
 		global $APPLICATION;
 

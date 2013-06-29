@@ -253,7 +253,7 @@ class CSubscriptionGeneral
 	}
 
 	//check fields before writing
-	public static function CheckFields($arFields, $ID)
+	public function CheckFields($arFields, $ID)
 	{
 		global $DB;
 
@@ -355,7 +355,7 @@ class CSubscriptionGeneral
 	}
 
 	//adding
-	public static function Add($arFields, $SITE_ID=SITE_ID)
+	public function Add($arFields, $SITE_ID=SITE_ID)
 	{
 		global $DB;
 
@@ -385,7 +385,7 @@ class CSubscriptionGeneral
 	}
 
 	//Updating record
-	public static function Update($ID, $arFields, $SITE_ID=SITE_ID)
+	public function Update($ID, $arFields, $SITE_ID=SITE_ID)
 	{
 		global $DB;
 		$ID = intval($ID);

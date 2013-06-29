@@ -263,7 +263,7 @@ class CAllStatEventType
 		return $d;
 	}
 	//check fields before writing
-	public static function CheckFields($arFields, $ID)
+	public function CheckFields($arFields, $ID)
 	{
 		$aMsg = array();
 

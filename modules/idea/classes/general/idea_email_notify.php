@@ -10,17 +10,17 @@ Class CAllIdeaManagmentEmailNotify {
     private $Notify = NULL;
     private static $Enable = true;
     
-    static public function __construct($parent)
+    public function __construct($parent)
     {
         $this->Notify = $parent;
     }
     
-    static public function IsAvailable()
+    public function IsAvailable()
     {
         return CModule::IncludeModule('blog') && NULL!=$this->Notify && self::$Enable;
     }
     
-    static public function Send()
+    public function Send()
     {
         if(!$this->IsAvailable())
             return false;

@@ -68,7 +68,7 @@ class CMailError
 
 class _CMailBoxDBRes  extends CDBResult
 {
-	function _CMailBoxDBRes($res)
+	public static function _CMailBoxDBRes($res)
 	{
 		parent::CDBResult($res);
 	}
@@ -470,7 +470,7 @@ class CAllMailBox
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function SendCommand($command)
+	public function SendCommand($command)
 	{
 		fputs($this->pop3_conn, $command."\r\n");
 
@@ -489,7 +489,7 @@ class CAllMailBox
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function GetResponse($bMultiline = false, $bSkipFirst = true)
+	public function GetResponse($bMultiline = false, $bSkipFirst = true)
 	{
 		if(!$this->resp) return false;
 		$this->resp = false;
@@ -533,21 +533,21 @@ class CAllMailBox
 		return $this->last_result;
 	}
 
-	public static function GetResponseBody()
+	public function GetResponseBody()
 	{
 		return $this->response_body;
 	}
 
-	public static function GetResponseString()
+	public function GetResponseString()
 	{
 		return $this->response_body;
 	}
 
-	function GetPassword($p)
+	static function GetPassword($p)
 	{
 	}
 
-	public static function Check($server, $port, $use_tls, $login, $passw)
+	public function Check($server, $port, $use_tls, $login, $passw)
 	{
 		if($use_tls == 'Y' && strpos($server, 'tls://') === false)
 			$server = 'tls://' . $server;
@@ -579,7 +579,7 @@ class CAllMailBox
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function Connect($mailbox_id)
+	public function Connect($mailbox_id)
 	{
 		global $DB;
 		$mailbox_id = IntVal($mailbox_id);
@@ -744,7 +744,7 @@ class CAllMailBox
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function GetMessage($mailbox_id, $msgnum, $msguid, $session_id)
+	public function GetMessage($mailbox_id, $msgnum, $msguid, $session_id)
 	{
 		global $DB;
 
@@ -776,7 +776,7 @@ class CAllMailBox
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function DeleteMessage($msgnum)
+	public function DeleteMessage($msgnum)
 	{
 		$this->SendCommand("DELE ".$msgnum);
 		if(!$this->GetResponse())
@@ -828,7 +828,7 @@ class CMailHeader
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function Parse($message_header, $charset)
+	public function Parse($message_header, $charset)
 	{
 		if(preg_match("'content-type:.*?charset=([^\r\n;]+)'is", $message_header, $res))
 			$this->charset = strtolower(trim($res[1], ' "'));
@@ -913,28 +913,28 @@ class CMailHeader
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function IsMultipart()
+	public function IsMultipart()
 	{
 		return $this->bMultipart;
 	}
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function MultipartType()
+	public function MultipartType()
 	{
 		return strtolower($this->MultipartType);
 	}
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function GetBoundary()
+	public function GetBoundary()
 	{
 		return $this->boundary;
 	}
 
 	/*********************************************************************
 	*********************************************************************/
-	public static function GetHeader($type)
+	public function GetHeader($type)
 	{
 		return $this->arHeader[strtoupper($type)];
 	}
@@ -3160,7 +3160,7 @@ class CMailLog
 
 class _CMailLogDBRes  extends CDBResult
 {
-	function _CMailLogDBRes($res)
+	public static function _CMailLogDBRes($res)
 	{
 		parent::CDBResult($res);
 	}

@@ -5,7 +5,7 @@ class CAllIMContactList
 {
 	private $user_id = 0;
 
-	function __construct($user_id = false)
+	public function __construct($user_id = false)
 	{
 		global $USER;
 		$user_id = intval($user_id);
@@ -367,7 +367,7 @@ class CAllIMContactList
 					if(defined("BX_COMP_MANAGED_CACHE"))
 					{
 						$CACHE_MANAGER->StartTagCache($cache_dir);
-						$CACHE_MANAGER->RegisterTag("USER_CARD");
+						$CACHE_MANAGER->RegisterTag("USER_NAME");
 						$CACHE_MANAGER->EndTagCache();
 					}
 					if($obCLCache->StartDataCache())
@@ -552,6 +552,7 @@ class CAllIMContactList
 	static function GetUserData($arParams = Array())
 	{
 		$getDepartment = $arParams['DEPARTMENT'] == 'N' ? false : true;
+		$getHrPhoto = $arParams['HR_PHOTO'] == 'Y' ? true : false;
 		$useCache = $arParams['USE_CACHE'] == 'Y' ? true : false;
 		$showOnline = $arParams['SHOW_ONLINE'] == 'N' ? false : true;
 
@@ -586,7 +587,7 @@ class CAllIMContactList
 			$cache_ttl = intval($arParams['CACHE_TTL']);
 			if ($cache_ttl <= 0)
 				$cache_ttl = defined("BX_COMP_MANAGED_CACHE") ? 18144000 : 1800;
-			$cache_id = 'bx_mob_recent_list2_'.(is_object($USER)? $USER->GetID(): 'AGENT').'_'.$arFilter['ID'].'_'.$nameTemplate.'_'.$nameTemplateSite.'_'.$getDepartment.'_'.LANGUAGE_ID;
+			$cache_id = 'bx_mob_recent_list3_'.(is_object($USER)? $USER->GetID(): 'AGENT').'_'.$arFilter['ID'].'_'.$nameTemplate.'_'.$nameTemplateSite.'_'.$getDepartment.'_'.LANGUAGE_ID;
 			$cache_dir = '/bx/im/rec';
 
 			if($obCache->InitCache($cache_ttl, $cache_id, $cache_dir))
@@ -594,11 +595,24 @@ class CAllIMContactList
 				$arCacheResult = $obCache->GetVars();
 				if ($showOnline)
 					$arOnline = self::GetStatus(Array('ID' => array_keys($arCacheResult['users'])));
+
 				foreach ($arCacheResult['users'] as $userId => $value)
 				{
 					$arCacheResult['users'][$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arCacheResult['users'][$userId]['birthday']): false;
+
 					if ($showOnline)
 						$arCacheResult['users'][$userId]['status'] = isset($arOnline['users'][$userId])? 'online': 'offline';
+
+					if ($getHrPhoto && !isset($arCacheResult['hrphoto']))
+					{
+						$arPhotoHrTmp = CFile::ResizeImageGet(
+							$arCacheResult['source'][$userId]["PERSONAL_PHOTO"],
+							array('width' => 200, 'height' => 200),
+							BX_RESIZE_IMAGE_EXACT,
+							false
+						);
+						$arCacheResult['hrphoto'][$userId] = empty($arPhotoHrTmp['src'])? '/bitrix/js/im/images/hidef-avatar.png': $arPhotoHrTmp['src'];
+					}
 				}
 				return $arCacheResult;
 			}
@@ -611,10 +625,14 @@ class CAllIMContactList
 		$arUsers = array();
 		$arUserInGroup = array();
 		$arWoUserInGroup = array();
+		$arHrPhoto = array();
+		$arSource = array();
 		$dbUsers = CUser::GetList(($sort_by = Array('is_online'=>'desc', 'last_name'=>'asc')), ($dummy=''), $arFilter, $arSelect);
 		while ($arUser = $dbUsers->GetNext(true, false))
 		{
-			$arFileTmp = CFile::ResizeImageGet(
+			$arSource[$arUser["ID"]]["PERSONAL_PHOTO"] = $arUser["PERSONAL_PHOTO"];
+
+			$arPhotoTmp = CFile::ResizeImageGet(
 				$arUser["PERSONAL_PHOTO"],
 				array('width' => 58, 'height' => 58),
 				BX_RESIZE_IMAGE_EXACT,
@@ -625,7 +643,7 @@ class CAllIMContactList
 				'id' => $arUser["ID"],
 				'name' => CUser::FormatName($nameTemplateSite, $arUser, true, false),
 				'nameList' => CUser::FormatName($nameTemplate, $arUser, true, false),
-				'avatar' => empty($arFileTmp['src'])? '/bitrix/js/im/images/blank.gif': $arFileTmp['src'],
+				'avatar' => empty($arPhotoTmp['src'])? '/bitrix/js/im/images/blank.gif': $arPhotoTmp['src'],
 				'status' => ($arUser['IS_ONLINE'] == 'Y'? 'online': 'offline'),
 				'birthday' => $arUser['PERSONAL_BIRTHDAY'],
 				'gender' => $arUser['PERSONAL_GENDER'] == 'F'? 'F': 'M',
@@ -646,11 +664,22 @@ class CAllIMContactList
 				else
 					$arWoUserInGroup['all'] = Array('id' => 'all', 'users' => Array($arUser["ID"]));
 			}
+
+			if ($getHrPhoto)
+			{
+				$arPhotoHrTmp = CFile::ResizeImageGet(
+					$arUser["PERSONAL_PHOTO"],
+					array('width' => 200, 'height' => 200),
+					BX_RESIZE_IMAGE_EXACT,
+					false
+				);
+				$arHrPhoto[$arUser["ID"]] = empty($arPhotoHrTmp['src'])? '/bitrix/js/im/images/hidef-avatar.png': $arPhotoHrTmp['src'];
+			}
 		}
-		foreach ($arUsers as $userId => $value)
+		foreach ($arUsers as $userId => $arUser)
 			$arUsers[$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arUsers[$userId]['birthday']): false;
 
-		$result = array('users' => $arUsers, 'userInGroup' => $arUserInGroup, 'woUserInGroup' => $arWoUserInGroup );
+		$result = array('users' => $arUsers, 'hrphoto' => $arHrPhoto, 'userInGroup' => $arUserInGroup, 'woUserInGroup' => $arWoUserInGroup, 'source' => $arSource);
 
 		if($useCache)
 		{
@@ -665,7 +694,7 @@ class CAllIMContactList
 					{
 						foreach ($arParams['ID'] as $id)
 						{
-							$tag = 'USER_CARD_'.intval($id/100);
+							$tag = 'USER_NAME_'.intval($id);
 							if(!in_array($tag, $cacheTag))
 							{
 								$cacheTag[] = $tag;
@@ -675,7 +704,7 @@ class CAllIMContactList
 					}
 					elseif (isset($arParams['ID']) && intval($arParams['ID']) > 0)
 					{
-						$tag = 'USER_CARD_'.intval($arParams['ID']/100);
+						$tag = 'USER_NAME_'.intval($arParams['ID']);
 						$CACHE_MANAGER->RegisterTag($tag);
 					}
 					$CACHE_MANAGER->EndTagCache();
@@ -684,6 +713,8 @@ class CAllIMContactList
 				unset($cacheTag);
 			}
 		}
+		unset($result['source']);
+
 		return $result;
 	}
 
@@ -751,10 +782,10 @@ class CAllIMContactList
 
 		if ($cache && $userId == $USER->GetId())
 		{
-			if (isset($_SESSION['USER_LAST_ONLINE']) && intval($_SESSION['USER_LAST_ONLINE'])+60 > time())
+			if (isset($_SESSION['USER_LAST_ONLINE_'.$userId]) && intval($_SESSION['USER_LAST_ONLINE_'.$userId])+60 > time())
 				return false;
 
-			$_SESSION['USER_LAST_ONLINE'] = time();
+			$_SESSION['USER_LAST_ONLINE_'.$userId] = time();
 		}
 
 		CUser::SetLastActivityDate($userId);

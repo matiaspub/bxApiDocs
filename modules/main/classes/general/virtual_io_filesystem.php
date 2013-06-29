@@ -119,7 +119,7 @@ class CBXVirtualIoFileSystem
 		return $result;
 	}
 
-	static public function RelativeToAbsolutePath($relativePath)
+	public function RelativeToAbsolutePath($relativePath)
 	{
 		if (empty($relativePath))
 			return null;
@@ -129,7 +129,7 @@ class CBXVirtualIoFileSystem
 		return $this->CombinePath($basePath, $relativePath);
 	}
 
-	static public function SiteRelativeToAbsolutePath($relativePath, $site = null)
+	public function SiteRelativeToAbsolutePath($relativePath, $site = null)
 	{
 		if ((string)$site === "")
 		{
@@ -168,7 +168,7 @@ class CBXVirtualIoFileSystem
 		return $path;
 	}
 
-	static public function ExtractPathFromPath($path)
+	public function ExtractPathFromPath($path)
 	{
 		return substr($path, 0, -strlen($this->ExtractNameFromPath($path)) - 1);
 	}
@@ -182,9 +182,6 @@ class CBXVirtualIoFileSystem
 
 		if (($p = strpos($res, "\0")) !== false)
 			$res = substr($res, 0, $p);
-
-		while(strpos($res, ".../") !== false)
-			$res = str_replace(".../", "../", $res);
 
 		$arPath = explode('/', $res);
 		$nPath = count($arPath);
@@ -276,13 +273,13 @@ class CBXVirtualIoFileSystem
 		return new CBXVirtualFileFileSystem($path);
 	}
 
-	static public function OpenFile($path, $mode)
+	public function OpenFile($path, $mode)
 	{
 		$file = $this->GetFile($path);
 		return $file->Open($mode);
 	}
 
-	static public function Delete($path)
+	public function Delete($path)
 	{
 		$this->ClearErrors();
 
@@ -422,12 +419,12 @@ class CBXVirtualIoFileSystem
 		return false;
 	}
 
-	static public function Copy($source, $target, $bRewrite = true)
+	public function Copy($source, $target, $bRewrite = true)
 	{
 		return $this->CopyDirFiles($source, $target, $bRewrite, false);
 	}
 
-	static public function Move($source, $target, $bRewrite = true)
+	public function Move($source, $target, $bRewrite = true)
 	{
 		return $this->CopyDirFiles($source, $target, $bRewrite, true);
 	}
@@ -439,7 +436,7 @@ class CBXVirtualIoFileSystem
 		return rename($sourceEncoded, $targetEncoded);
 	}
 
-	static public function CreateDirectory($path)
+	public function CreateDirectory($path)
 	{
 		$fld = $this->GetDirectory($path);
 		if ($fld->Create())
@@ -453,7 +450,7 @@ class CBXVirtualIoFileSystem
 		clearstatcache();
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}
@@ -487,7 +484,7 @@ class CBXVirtualFileFileSystem
 		return $this->pathEncoded;
 	}
 
-	static public function Open($mode)
+	public function Open($mode)
 	{
 		$lmode = strtolower(substr($mode, 0, 1));
 		$bExists = $this->IsExists();
@@ -501,7 +498,7 @@ class CBXVirtualFileFileSystem
 		return null;
 	}
 
-	static public function GetContents()
+	public function GetContents()
 	{
 		if ($this->IsExists())
 			return file_get_contents($this->GetPathWithNameEncoded());
@@ -509,7 +506,7 @@ class CBXVirtualFileFileSystem
 		return null;
 	}
 
-	static public function PutContents($data)
+	public function PutContents($data)
 	{
 		$this->ClearErrors();
 
@@ -541,7 +538,7 @@ class CBXVirtualFileFileSystem
 		return true;
 	}
 
-	static public function GetFileSize()
+	public function GetFileSize()
 	{
 		if ($this->IsExists())
 			return intval(filesize($this->GetPathWithNameEncoded()));
@@ -549,7 +546,7 @@ class CBXVirtualFileFileSystem
 		return 0;
 	}
 
-	static public function GetCreationTime()
+	public function GetCreationTime()
 	{
 		if ($this->IsExists())
 			return filectime($this->GetPathWithNameEncoded());
@@ -557,7 +554,7 @@ class CBXVirtualFileFileSystem
 		return null;
 	}
 
-	static public function GetModificationTime()
+	public function GetModificationTime()
 	{
 		if ($this->IsExists())
 			return filemtime($this->GetPathWithNameEncoded());
@@ -565,7 +562,7 @@ class CBXVirtualFileFileSystem
 		return null;
 	}
 
-	static public function GetLastAccessTime()
+	public function GetLastAccessTime()
 	{
 		if ($this->IsExists())
 			return fileatime($this->GetPathWithNameEncoded());
@@ -573,44 +570,44 @@ class CBXVirtualFileFileSystem
 		return null;
 	}
 
-	static public function IsWritable()
+	public function IsWritable()
 	{
 		return is_writable($this->GetPathWithNameEncoded());
 	}
 
-	static public function IsReadable()
+	public function IsReadable()
 	{
 		return is_readable($this->GetPathWithNameEncoded());
 	}
 
-	static public function MarkWritable()
+	public function MarkWritable()
 	{
 		if ($this->IsExists())
 			@chmod($this->GetPathWithNameEncoded(), BX_FILE_PERMISSIONS);
 	}
 
-	static public function IsExists()
+	public function IsExists()
 	{
 		$io = CBXVirtualIo::GetInstance();
 		return $io->FileExists($this->path);
 	}
 
-	static public function GetPermissions()
+	public function GetPermissions()
 	{
 		return fileperms($this->GetPathWithNameEncoded());
 	}
 
-	static public function ReadFile()
+	public function ReadFile()
 	{
 		return readfile($this->GetPathWithNameEncoded());
 	}
 
-	static public function unlink()
+	public function unlink()
 	{
 		return unlink($this->GetPathWithNameEncoded());
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}
@@ -644,7 +641,7 @@ class CBXVirtualDirectoryFileSystem
 		return $this->pathEncoded;
 	}
 
-	static public function GetChildren()
+	public function GetChildren()
 	{
 		$arResult = array();
 
@@ -670,7 +667,7 @@ class CBXVirtualDirectoryFileSystem
 		return $arResult;
 	}
 
-	static public function Create()
+	public function Create()
 	{
 		if (!file_exists($this->GetPathWithNameEncoded()))
 			return mkdir($this->GetPathWithNameEncoded(), BX_DIR_PERMISSIONS, true);
@@ -678,24 +675,24 @@ class CBXVirtualDirectoryFileSystem
 			return is_dir($this->GetPathWithNameEncoded());
 	}
 
-	static public function IsExists()
+	public function IsExists()
 	{
 		$io = CBXVirtualIo::GetInstance();
 		return $io->DirectoryExists($this->path);
 	}
 
-	static public function MarkWritable()
+	public function MarkWritable()
 	{
 		if ($this->IsExists())
 			@chmod($this->GetPathWithNameEncoded(), BX_DIR_PERMISSIONS);
 	}
 
-	static public function GetPermissions()
+	public function GetPermissions()
 	{
 		return fileperms($this->GetPathWithNameEncoded());
 	}
 
-	static public function GetCreationTime()
+	public function GetCreationTime()
 	{
 		if ($this->IsExists())
 			return filectime($this->GetPathWithNameEncoded());
@@ -703,7 +700,7 @@ class CBXVirtualDirectoryFileSystem
 		return null;
 	}
 
-	static public function GetModificationTime()
+	public function GetModificationTime()
 	{
 		if ($this->IsExists())
 			return filemtime($this->GetPathWithNameEncoded());
@@ -711,7 +708,7 @@ class CBXVirtualDirectoryFileSystem
 		return null;
 	}
 
-	static public function GetLastAccessTime()
+	public function GetLastAccessTime()
 	{
 		if ($this->IsExists())
 			return fileatime($this->GetPathWithNameEncoded());
@@ -719,7 +716,7 @@ class CBXVirtualDirectoryFileSystem
 		return null;
 	}
 
-	static public function IsEmpty()
+	public function IsEmpty()
 	{
 		if ($this->IsExists())
 		{
@@ -739,12 +736,12 @@ class CBXVirtualDirectoryFileSystem
 		return true;
 	}
 
-	static public function rmdir()
+	public function rmdir()
 	{
 		return rmdir($this->GetPathWithNameEncoded());
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}

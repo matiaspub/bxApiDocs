@@ -13,7 +13,7 @@ class CMSSOAPResearch extends CSOAPServerResponser
 		//AddMessage2Log(mydump($cserver->GetRequestData()));	
 	}
 
-	public static function ProcessRequestBody(&$cserver, $body) 
+	public function ProcessRequestBody(&$cserver, $body) 
 	{
 		$functionName = $body->name();
 		$namespaceURI = $body->namespaceURI();

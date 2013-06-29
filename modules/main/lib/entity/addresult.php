@@ -17,12 +17,12 @@ class AddResult extends Result
 		parent::__construct();
 	}
 
-	static public function setId($id)
+	public function setId($id)
 	{
 		$this->id = $id;
 	}
 
-	static public function getId()
+	public function getId()
 	{
 		return $this->id;
 	}

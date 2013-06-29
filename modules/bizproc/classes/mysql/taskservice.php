@@ -43,8 +43,7 @@ class CBPTaskService
 				$ar[] = $userId;
 			}
 
-			$events = GetModuleEvents("bizproc", "OnTaskAdd");
-			while ($arEvent = $events->Fetch())
+			foreach (GetModuleEvents("bizproc", "OnTaskAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($taskId, $arFields));
 		}
 
@@ -72,9 +71,11 @@ class CBPTaskService
 
 		if (is_set($arFields, "USERS"))
 		{
-			$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
+			$dbResUser = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
+			while ($arResUser = $dbResUser->Fetch())
+				CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
 
-			CUserCounter::ClearByTag($id, 'bp_tasks', '**');
+			$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
 
 			$ar = array();
 			foreach ($arFields["USERS"] as $userId)
@@ -94,8 +95,7 @@ class CBPTaskService
 			}
 		}
 
-		$events = GetModuleEvents("bizproc", "OnTaskUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("bizproc", "OnTaskUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 
 		return $id;

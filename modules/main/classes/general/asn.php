@@ -3,12 +3,12 @@ class CASNReader
 {
 	protected $value;
 
-	static public function __construct($value='')
+	public function __construct($value='')
 	{
 		$this->value = $value;
 	}
 
-	static public function Read(&$buf)
+	public function Read(&$buf)
 	{
 		self::ReadByte($buf);
 		$size = self::ReadByte($buf);
@@ -47,7 +47,7 @@ class CASNReader
 		return $result;
 	}
 
-	static public function GetValue()    
+	public function GetValue()    
 	{
 		$result = $this->value;
 		if(ord($result{0}) == 0x00)
@@ -55,7 +55,7 @@ class CASNReader
 		return $result;
 	}
 
-	static public function GetSequence()
+	public function GetSequence()
 	{
 		$arResult = array();
 		$val = $this->value;

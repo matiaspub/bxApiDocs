@@ -6,7 +6,7 @@ class CIMNotify
 	private $user_id = 0;
 	private $bHideLink = false;
 
-	function __construct($user_id = false, $arParams = Array())
+	public function __construct($user_id = false, $arParams = Array())
 	{
 		global $USER;
 		$this->user_id = intval($user_id);
@@ -23,7 +23,7 @@ class CIMNotify
 		return CIMMessenger::Add($arFields);
 	}
 
-	static public function GetNotifyList($arParams)
+	public function GetNotifyList($arParams)
 	{
 		global $DB;
 
@@ -87,7 +87,7 @@ class CIMNotify
 		return $arNotify;
 	}
 
-	static public function GetUnreadNotify($arParams = Array())
+	public function GetUnreadNotify($arParams = Array())
 	{
 		global $DB;
 
@@ -132,6 +132,7 @@ class CIMNotify
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
+			$strSql = $DB->TopSql($strSql, 500);
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$arMark = Array();
@@ -172,7 +173,6 @@ class CIMNotify
 					}
 				}
 			}
-
 			$arNotify['result'] = true;
 		}
 		else
@@ -265,7 +265,7 @@ class CIMNotify
 		return $arResult;
 	}
 
-	static public function GetNotify($ID)
+	public function GetNotify($ID)
 	{
 		global $DB;
 
@@ -314,7 +314,7 @@ class CIMNotify
 		return $arNotify;
 	}
 
-	static public function MarkNotifyRead($id = 0, $checkAll = false)
+	public function MarkNotifyRead($id = 0, $checkAll = false)
 	{
 		global $DB;
 
@@ -409,7 +409,7 @@ class CIMNotify
 		return true;
 	}
 
-	static public function Confirm($ID, $VALUE)
+	public function Confirm($ID, $VALUE)
 	{
 		global $DB;
 
@@ -471,7 +471,7 @@ class CIMNotify
 		return true;
 	}
 
-	static public function DeleteWithCheck($ID)
+	public function DeleteWithCheck($ID)
 	{
 		global $DB;
 
@@ -544,7 +544,7 @@ class CIMNotify
 		return true;
 	}
 
-	static public function GetNotifyCounter($arNotify = Array())
+	public function GetNotifyCounter($arNotify = Array())
 	{
 		$count = 0;
 		if (isset($arNotify['unreadNotify']) && !empty($arNotify['unreadNotify']) && isset($arNotify['notify']))

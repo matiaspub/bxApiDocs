@@ -1125,12 +1125,12 @@ class CStatisticSort
 {
 	var $field = false;
 
-	function __construct($field = "")
+	public function __construct($field = "")
 	{
 		return $this->CStatisticSort($field);
 	}
 
-	public static function CStatisticSort($field = "")
+	public function CStatisticSort($field = "")
 	{
 		$this->field = $field;
 	}
@@ -1141,7 +1141,7 @@ class CStatisticSort
 		uasort($ar, array($sort, "Compare"));
 	}
 
-	public static function Compare($ar1, $ar2)
+	public function Compare($ar1, $ar2)
 	{
 		if($ar1[$this->field] < $ar2[$this->field])
 			return 1;

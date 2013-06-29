@@ -12,7 +12,7 @@ class CPGalleryInterface
 		$userAliasesCache = array(),
 		$arPassFormShowed = array();
 
-	public static function CPGalleryInterface($main_params = array(), $additional_params = array())
+	public function CPGalleryInterface($main_params = array(), $additional_params = array())
 	{
 		// check id iblock
 		if (intval($main_params["IBlockID"]) <= 0)
@@ -126,7 +126,7 @@ class CPGalleryInterface
 		return $arResult[$arCache["id"]];
 	}
 
-	public static function GetSection($id, &$arSection, $params = array())
+	public function GetSection($id, &$arSection, $params = array())
 	{
 		static $arResult = array();
 		$params = (is_array($params) ? $params : array($params));
@@ -280,7 +280,7 @@ class CPGalleryInterface
 		return 200;
 	}
 
-	public static function GetSectionGallery($arSection = array())
+	public function GetSectionGallery($arSection = array())
 	{
 		CModule::IncludeModule("iblock");
 		$db_res = CIBlockSection::GetList(
@@ -298,7 +298,7 @@ class CPGalleryInterface
 		{
 			if ($this->arError["show_error"] == "Y")
 				ShowError(GetMessage("P_GALLERY_NOT_FOUND"));
-			if ($this->arError["// set_404"] == "Y")
+			if ($this->arError["set_404"] == "// Y")
 			{
 				@define("ERROR_404","Y");
 				CHTTP::SetStatus("404 Not Found");

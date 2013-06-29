@@ -29,7 +29,7 @@ class CSeoPageChecker
 	var $bError = false;
 	var $bSearch = false;
 	
-	public static function CSeoPageChecker($site, $url, $get = true, $check_errors = true)
+	public function CSeoPageChecker($site, $url, $get = true, $check_errors = true)
 	{
 		global $APPLICATION;
 
@@ -70,7 +70,7 @@ class CSeoPageChecker
 		return false;
 	}
 	
-	public static function GetHTTPData()
+	public function GetHTTPData()
 	{
 		global $APPLICATION;
 		$this->__getter = new CHTTP();
@@ -94,7 +94,7 @@ class CSeoPageChecker
 		return false;
 	}
 	
-	function __prepareText($text)
+	public function __prepareText($text)
 	{
 		$res = array();
 		if ($this->bSearch)
@@ -105,7 +105,7 @@ class CSeoPageChecker
 		return $res;
 	}
 	
-	function _PrepareData()
+	public function _PrepareData()
 	{
 		if($this->pcre_backtrack_limit === false)
 			$this->pcre_backtrack_limit = intval(ini_get("pcre.backtrack_limit"));
@@ -309,7 +309,7 @@ class CSeoPageChecker
 		}
 	}
 	
-	function _GetContrast($word)
+	public function _GetContrast($word)
 	{
 		if (null == $this->__index_total_len)
 			$this->__index_total_len = array_sum($this->__index['TOTAL']);
@@ -321,7 +321,7 @@ class CSeoPageChecker
 		return log($count+1)/$logDocLength;
 	}
 	
-	public static function GetStatistics()
+	public function GetStatistics()
 	{
 		if (!is_array($this->__index))
 			return false;
@@ -339,12 +339,12 @@ class CSeoPageChecker
 		);
 	}
 	
-	public static function GetURL()
+	public function GetURL()
 	{
 		return $this->__url;
 	}
 	
-	public static function CheckKeyword($keyword, $bStemmed = false)
+	public function CheckKeyword($keyword, $bStemmed = false)
 	{
 		if (!is_array($this->__index))
 			return false;
@@ -383,12 +383,12 @@ class CSeoPageChecker
 		return $arResult;
 	}
 	
-	public static function GetExtendedData()
+	public function GetExtendedData()
 	{
 		return array_merge(array('HEADERS' => $this->__result_headers), $this->__result_extended);
 	}
 	
-	public static function GetErrors()
+	public function GetErrors()
 	{
 		$arResult = false;
 	

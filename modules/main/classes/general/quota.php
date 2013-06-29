@@ -13,17 +13,17 @@ class CAllDiskQuota
 	var $max_execution_time = 20; // 20 sec
 	var $LAST_ERROR = false;
 
-	public static function CAllDiskQuota($params = array())
+	public function CAllDiskQuota($params = array())
 	{
 		if(array_key_exists("max_execution_time", $params) && intval($params["max_execution_time"]) > 0)
 			$this->max_execution_time = intval($params["max_execution_time"]);
 	}
 
-	function SetDBSize()
+	static function SetDBSize()
 	{
 	}
 
-	public static function SetDirSize($path="", $name="", $recount=false, $skip_dir = false)
+	public function SetDirSize($path="", $name="", $recount=false, $skip_dir = false)
 	{
 		if (empty($name))
 			$name = $path;
@@ -104,7 +104,7 @@ class CAllDiskQuota
 		return array("status" => "error");
 	}
 
-	public static function GetDirListSimple($path, $check_time = true, $skip_dir=false)
+	public function GetDirListSimple($path, $check_time = true, $skip_dir=false)
 	{
 		$path = str_replace("//", "/", $path."/");
 		$res = array();
@@ -156,7 +156,7 @@ class CAllDiskQuota
 		return array("tree" => $res, "status" => "done", "last_file" => $path.$file, "size" => $size);
 	}
 
-	public static function GetDirListFromLastFile($path, $path_to_last_file="", $check_time = true, $skip_dir = false)
+	public function GetDirListFromLastFile($path, $path_to_last_file="", $check_time = true, $skip_dir = false)
 	{
 		$path = str_replace("//", "/", $path."/");
 		$path_to_last_file = str_replace("//", "/", $path_to_last_file);
@@ -213,7 +213,7 @@ class CAllDiskQuota
 		return array("tree" => $res, "status" => "done", "last_file" => $path.$file, "size" => $size);
 	}
 
-	public static function Recount($id, $recount=false)
+	public function Recount($id, $recount=false)
 	{
 		if ((COption::GetOptionInt("main", "disk_space") <= 0))
 			return true;
@@ -248,7 +248,7 @@ class CAllDiskQuota
 		return $result;
 	}
 
-	public static function GetDiskQuota()
+	public function GetDiskQuota()
 	{
 		if (COption::GetOptionInt("main", "disk_space") <= 0)
 			return true;
@@ -313,7 +313,7 @@ class CAllDiskQuota
 		return false;
 	}
 
-	public static function CheckDiskQuota($params = array())
+	public function CheckDiskQuota($params = array())
 	{
 		if (COption::GetOptionInt("main", "disk_space") <= 0)
 			return true;

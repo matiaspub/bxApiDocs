@@ -21,7 +21,7 @@ class CCloudStorageUpload
 	 * @param string $filePath
 	 * @return void
 	*/
-	function __construct($filePath)
+	public function __construct($filePath)
 	{
 		$this->_filePath = $filePath;
 		$this->_ID = "1".substr(md5($filePath), 1);
@@ -30,7 +30,7 @@ class CCloudStorageUpload
 	/**
 	 * @return array[string]string
 	*/
-	static public function GetArray()
+	public function GetArray()
 	{
 		global $DB;
 
@@ -50,7 +50,7 @@ class CCloudStorageUpload
 	/**
 	 * @return bool
 	*/
-	static public function isStarted()
+	public function isStarted()
 	{
 		return is_array($this->GetArray());
 	}
@@ -58,7 +58,7 @@ class CCloudStorageUpload
 	/**
 	 * @return void
 	*/
-	static public function Delete()
+	public function Delete()
 	{
 		global $DB;
 		//TODO: clean up temp files in Clodo
@@ -81,7 +81,7 @@ class CCloudStorageUpload
 	 * @param string $ContentType
 	 * @return bool
 	*/
-	public static function Start($bucket_id, $fileSize, $ContentType = 'binary/octet-stream', $tmpFileName = false)
+	public function Start($bucket_id, $fileSize, $ContentType = 'binary/octet-stream', $tmpFileName = false)
 	{
 		global $DB;
 
@@ -130,7 +130,7 @@ class CCloudStorageUpload
 	 * @param string $data
 	 * @return bool
 	*/
-	public static function Next($data, $obBucket = null)
+	public function Next($data, $obBucket = null)
 	{
 		global $DB;
 
@@ -192,7 +192,7 @@ class CCloudStorageUpload
 	/**
 	 * @return bool
 	*/
-	public static function Finish($obBucket = null)
+	public function Finish($obBucket = null)
 	{
 		if($this->isStarted())
 		{
@@ -223,7 +223,7 @@ class CCloudStorageUpload
 	/**
 	 * @return int
 	*/
-	public static function GetPartCount()
+	public function GetPartCount()
 	{
 		$ar = $this->GetArray();
 
@@ -236,7 +236,7 @@ class CCloudStorageUpload
 	/**
 	 * @return float
 	*/
-	public static function GetPos()
+	public function GetPos()
 	{
 		$ar = $this->GetArray();
 
@@ -249,7 +249,7 @@ class CCloudStorageUpload
 	/**
 	 * @return int
 	*/
-	public static function getPartSize()
+	public function getPartSize()
 	{
 		$ar = $this->GetArray();
 
@@ -262,7 +262,7 @@ class CCloudStorageUpload
 	/**
 	 * @return bool
 	*/
-	public static function hasRetries()
+	public function hasRetries()
 	{
 		$ar = $this->GetArray();
 		return is_array($ar) && (intval($ar["PART_FAIL_COUNTER"]) < $this->_max_retries);
@@ -271,7 +271,7 @@ class CCloudStorageUpload
 	/**
 	 * @return string
 	*/
-	public static function getTempFileName()
+	public function getTempFileName()
 	{
 		$ar = $this->GetArray();
 		if(is_array($ar))

@@ -93,12 +93,12 @@ class PublicPage
 		$this->siteTemplate = new SiteTemplate($siteTemplateId);
 	}
 
-	static public function getSite()
+	public function getSite()
 	{
 		return $this->site;
 	}
 
-	static public function getSiteTemplate()
+	public function getSiteTemplate()
 	{
 		return $this->siteTemplate;
 	}

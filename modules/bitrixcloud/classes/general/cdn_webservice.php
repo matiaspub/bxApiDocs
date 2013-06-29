@@ -10,7 +10,7 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 	 * @return void
 	 *
 	 */
-	static public function __construct($domain)
+	public function __construct($domain)
 	{
 		$this->domain = $domain;
 	}
@@ -43,7 +43,7 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionQuota() /*. throws CBitrixCloudException .*/
+	public function actionQuota() /*. throws CBitrixCloudException .*/
 	{
 		return $this->action("get_quota_info");
 	}
@@ -52,7 +52,7 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionStop() /*. throws CBitrixCloudException .*/
+	public function actionStop() /*. throws CBitrixCloudException .*/
 	{
 		return $this->action("stop");
 	}
@@ -61,7 +61,7 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 	 * @return CDataXML
 	 *
 	 */
-	static public function actionGetConfig() /*. throws CBitrixCloudException .*/
+	public function actionGetConfig() /*. throws CBitrixCloudException .*/
 	{
 		return $this->action("");
 	}

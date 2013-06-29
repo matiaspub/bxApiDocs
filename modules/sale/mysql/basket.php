@@ -22,7 +22,7 @@ class CSaleBasket extends CAllSaleBasket
 	* @param string $LID - site for cleaning
 	* @return true false
 	*/
-	function _ClearProductSubscribe($LID)
+	public static function _ClearProductSubscribe($LID)
 	{
 		global $DB;
 
@@ -720,68 +720,68 @@ class CSaleBasket extends CAllSaleBasket
 	 * <h4>Example</h4> 
 	 * <pre>
 	 * &lt;?<br>if (CModule::IncludeModule("sale"))<br>{<br>  $arFields = array(<br>    "PRODUCT_ID" =&gt; 51,<br>    "PRODUCT_PRICE_ID" =&gt; 0,<br>    "PRICE" =&gt; 138.54,<br>    "CURRENCY" =&gt; "RUB",<br>    "WEIGHT" =&gt; 530,<br>    "QUANTITY" =&gt; 1,<br>    "LID" =&gt; LANG,<br>    "DELAY" =&gt; "N",<br>    "CAN_BUY" =&gt; "Y",<br>    "NAME" =&gt; "Чемодан кожаный",<br>    "CALLBACK_FUNC" =&gt; "MyBasketCallback",<br>    "MODULE" =&gt; "my_module",<br>    "NOTES" =&gt; "",<br>    "ORDER_CALLBACK_FUNC" =&gt; "MyBasketOrderCallback",<br>    "DETAIL_PAGE_URL" =&gt; "/".LANG."/detail.php?ID=51"<br>  );<br><br>  $arProps = array();<br><br>  $arProps[] = array(<br>    "NAME" =&gt; "Цвет",<br>    "CODE" =&gt; "color",<br>    "VALUE" =&gt; "черный"<br>  );<br><br>  $arProps[] = array(<br>    "NAME" =&gt; "Размер",<br>    "VALUE" =&gt; "1.5 x 2.5"<br>  );<br><br>  $arFields["PROPS"] = $arProps;<br><br>  CSaleBasket::Add($arFields);<br>}<br>?&gt;<br>
-Функция обратного вызова для поддержки актуальности корзиныФункция обратного вызова вызывается (если установлена) при каждом чтении корзины для обновления параметров содержащихся в корзине товаров. Например, если после добавления товара в корзину изменилась его цена или товар сняли с продажи, то использование функции обратного вызова позволяет соответственно обновить данные в корзине. В поле <b>CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова уже написаны (например, для модуля <b>catalog</b> функция обратного вызова называется <code>CatalogBasketCallback($PRODUCT_ID, $QUANTITY = 0, $renewal = "N")</code>)
-<b>array CALLBACK_FUNC(</b>
+	Функция обратного вызова для поддержки актуальности корзиныФункция обратного вызова вызывается (если установлена) при каждом чтении корзины для обновления параметров содержащихся в корзине товаров. Например, если после добавления товара в корзину изменилась его цена или товар сняли с продажи, то использование функции обратного вызова позволяет соответственно обновить данные в корзине. В поле <b>CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова уже написаны (например, для модуля <b>catalog</b> функция обратного вызова называется <code>CatalogBasketCallback($PRODUCT_ID, $QUANTITY = 0, $renewal = "N")</code>)
+	<b>array CALLBACK_FUNC(</b>
 	 *  <b>int</b> <i>PRODUCT_ID</i> [, <br><b>int</b> <i>QUANTITY</i>,<br> char <i>renewal</i>]<br><b>);</b>
-Функция обратного вызова должна возвращать массив той же структуры, что и входной массив функции <b> CSaleBasket::Add(array arFields)</b>. Если функция возвращает пустой массив, то это означает, что данный товар не доступен для покупки. Параметры функции обратного вызова<tbody>
-<tr>
-<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-<tr>
-<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-<tr>
-<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
-<tr>
-<td><b>renewal</b></td>	<td>Равен "<i>Y</i>", если функция вызывается для продления подписки, и 		"<i>N</i>" в остальных случаях.</td> </tr>
-</tbody>&lt;?<br>function MyBasketCallback($PRODUCT_ID, $QUANTITY = 0)<br>{<br>  $arResult = array();<br><br>  $iProductQuantity = GetProductQuantity($PRODUCT_ID);<br>  if ($iProductQuantity&lt;=0)<br>    return $arResult;    // товар кончился, возвращаем пустой массив<br><br>  $arResult = array(<br>    "PRODUCT_PRICE_ID" =&gt; 0,<br>    "PRICE" =&gt; 125.2,<br>    "CURRENCY" =&gt; "RUB",<br>    "WEIGHT" =&gt; 530,<br>    "NAME" =&gt; "Чемодан кожаный",<br>    "CAN_BUY" =&gt; "Y"<br>  );<br><br>  if (IntVal($QUANTITY)&gt;0 &amp;&amp; ($iProductQuantity-$QUANTITY)&lt;0)<br>    $arResult["QUANTITY"] = $iProductQuantity;    // товара осталось <br>                     // меньше, чем в корзине, поэтому уменьшаем <br>                     // количество товара в корзине<br><br>  return $arResult;<br>}<br>?&gt;Функция обратного вызова для оформления заказаФункция обратного вызова для оформления заказа вызывается (если установлена) в момент оформления заказа на данный товар. Например, если отслеживается количество оставшихся в магазине единиц товара, то использование функции обратного вызова заказа позволяет соответственно уменьшить количество оставшихся в магазине единиц товара. В поле <i>ORDER_CALLBACK_FUNC</i> записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется <code> CatalogBasketOrderCallback($PRODUCT_ID, $QUANTITY)</code>)
-<b>void ORDER_CALLBACK_FUNC(</b>
+	Функция обратного вызова должна возвращать массив той же структуры, что и входной массив функции <b> CSaleBasket::Add(array arFields)</b>. Если функция возвращает пустой массив, то это означает, что данный товар не доступен для покупки. Параметры функции обратного вызова<tbody>
+	<tr>
+	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
+	<tr>
+	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
+	<tr>
+	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
+	<tr>
+	<td><b>renewal</b></td>	<td>Равен "<i>Y</i>", если функция вызывается для продления подписки, и 		"<i>N</i>" в остальных случаях.</td> </tr>
+	</tbody>&lt;?<br>function MyBasketCallback($PRODUCT_ID, $QUANTITY = 0)<br>{<br>  $arResult = array();<br><br>  $iProductQuantity = GetProductQuantity($PRODUCT_ID);<br>  if ($iProductQuantity&lt;=0)<br>    return $arResult;    // товар кончился, возвращаем пустой массив<br><br>  $arResult = array(<br>    "PRODUCT_PRICE_ID" =&gt; 0,<br>    "PRICE" =&gt; 125.2,<br>    "CURRENCY" =&gt; "RUB",<br>    "WEIGHT" =&gt; 530,<br>    "NAME" =&gt; "Чемодан кожаный",<br>    "CAN_BUY" =&gt; "Y"<br>  );<br><br>  if (IntVal($QUANTITY)&gt;0 &amp;&amp; ($iProductQuantity-$QUANTITY)&lt;0)<br>    $arResult["QUANTITY"] = $iProductQuantity;    // товара осталось <br>                     // меньше, чем в корзине, поэтому уменьшаем <br>                     // количество товара в корзине<br><br>  return $arResult;<br>}<br>?&gt;Функция обратного вызова для оформления заказаФункция обратного вызова для оформления заказа вызывается (если установлена) в момент оформления заказа на данный товар. Например, если отслеживается количество оставшихся в магазине единиц товара, то использование функции обратного вызова заказа позволяет соответственно уменьшить количество оставшихся в магазине единиц товара. В поле <i>ORDER_CALLBACK_FUNC</i> записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется <code> CatalogBasketOrderCallback($PRODUCT_ID, $QUANTITY)</code>)
+	<b>void ORDER_CALLBACK_FUNC(</b>
 	 *  <b>int</b> <i>PRODUCT_ID</i>, <br><b>int</b> <i>QUANTITY</i>
 	 * <b>);</b>
-Функция вызывается на каждый товар в заказе. В случае если функция возвращяет не пустой массив считается, что товар можно купить он попадает в заказ, если возвращяет пустой массив, товар в заказ не попадает. Если функция ничего не возвращяет или возвращяет не массив, товар также попадает в заказ.Параметры функции обратного вызова заказа<tbody>
-<tr>
-<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-<tr>
-<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-<tr>
-<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
-</tbody>&lt;?<br>function MyBasketOrderCallback($PRODUCT_ID, $QUANTITY)<br>{<br>   UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}<br>?&gt;Функция обратного вызова для отмены заказаФункция обратного вызова для отмены заказа вызывается при отмене или удалении заказа. Она служит как правило для возвращения в продажу зарезервированого для заказа количества товара. В поле CANCEL_CALLBACK_FUNC записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется CatalogBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel))
-<b>void CANCEL_CALLBACK_FUNC(
+	Функция вызывается на каждый товар в заказе. В случае если функция возвращяет не пустой массив считается, что товар можно купить он попадает в заказ, если возвращяет пустой массив, товар в заказ не попадает. Если функция ничего не возвращяет или возвращяет не массив, товар также попадает в заказ.Параметры функции обратного вызова заказа<tbody>
+	<tr>
+	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
+	<tr>
+	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
+	<tr>
+	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
+	</tbody>&lt;?<br>function MyBasketOrderCallback($PRODUCT_ID, $QUANTITY)<br>{<br>   UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}<br>?&gt;Функция обратного вызова для отмены заказаФункция обратного вызова для отмены заказа вызывается при отмене или удалении заказа. Она служит как правило для возвращения в продажу зарезервированого для заказа количества товара. В поле CANCEL_CALLBACK_FUNC записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется CatalogBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel))
+	<b>void CANCEL_CALLBACK_FUNC(
 	 *    </b><b>int</b> <i>PRODUCT_ID</i>, <br><b>int</b> <i>QUANTITY</i>,<br><b>bool</b> <i>bCancel</i>
 	 * <b>);</b>
-Функция не возвращает значений.Параметры функции обратного вызова заказа.PRODUCT_IDtruefalse<tbody>
-<tr>
-<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-<tr>
-<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-<tr>
-<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине. </td> </tr>
-<tr>
-<td><b>bCancel</b></td>	<td>
-<i>true</i>, если отменяется заказ, и <i>false</i>, если отменяется.</td> </tr>
-</tbody>function MyBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel)<br>{<br>    $PRODUCT_ID = IntVal($PRODUCT_ID);<br>    $QUANTITY = IntVal($QUANTITY);<br>    $bCancel = ($bCancel ? True : False);<br><br>    if ($bCancel)<br>        UpdateProductQuantity($PRODUCT_ID, -$QUANTITY);<br>    else<br>        UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}Функция обратного вызова при разрешении доставкиФункция обратного вызова при разрешении доставки вызывается при разрешении доставки заказа. Она может служить для привязки пользователя к каким-либо группам пользователей, для начисления на счет пользователя каких-либо сумм и для других действий, которые должны произойти в момент выполнения заказа. В поле <b> PAY_CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля <b> catalog</b> функция обратного вызова заказа называется <code> CatalogPayOrderCallback($productID, $userID, $bPaid, $orderID)</code>)
-<b>array PAY_CALLBACK_FUNC(
+	Функция не возвращает значений.Параметры функции обратного вызова заказа.PRODUCT_IDtruefalse<tbody>
+	<tr>
+	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
+	<tr>
+	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
+	<tr>
+	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине. </td> </tr>
+	<tr>
+	<td><b>bCancel</b></td>	<td>
+	<i>true</i>, если отменяется заказ, и <i>false</i>, если отменяется.</td> </tr>
+	</tbody>function MyBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel)<br>{<br>    $PRODUCT_ID = IntVal($PRODUCT_ID);<br>    $QUANTITY = IntVal($QUANTITY);<br>    $bCancel = ($bCancel ? True : False);<br><br>    if ($bCancel)<br>        UpdateProductQuantity($PRODUCT_ID, -$QUANTITY);<br>    else<br>        UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}Функция обратного вызова при разрешении доставкиФункция обратного вызова при разрешении доставки вызывается при разрешении доставки заказа. Она может служить для привязки пользователя к каким-либо группам пользователей, для начисления на счет пользователя каких-либо сумм и для других действий, которые должны произойти в момент выполнения заказа. В поле <b> PAY_CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля <b> catalog</b> функция обратного вызова заказа называется <code> CatalogPayOrderCallback($productID, $userID, $bPaid, $orderID)</code>)
+	<b>array PAY_CALLBACK_FUNC(
 	 *    </b> <b>int</b> <i>productID</i>, <br><b>int</b> <i>userID</i>,<br><b>bool</b> <i>bPaid</i>,<br><b>int</b> <i>orderID</i>
 	 * <b>);</b>
-Функция может вернуть одно из следующих значений:
-<li>массив для вставки в продление заказа;</li>
+	Функция может вернуть одно из следующих значений:
+	<li>массив для вставки в продление заказа;</li>
 	 *  	 
 	 *   <li>
-<i>true</i>, если функция отработала успешно, но вставлять в продление ничего не надо;</li>
+	<i>true</i>, если функция отработала успешно, но вставлять в продление ничего не надо;</li>
 	 *  	 
 	 *   <li>
-<i>false</i>, если функция во время работы функции произошли ошибки.</li>
+	<i>false</i>, если функция во время работы функции произошли ошибки.</li>
 	 *  Параметры функции обратного вызова при разрешении доставки<tbody>
-<tr>
-<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-<tr>
-<td><b>productID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-<tr>
-<td><b>userID</b></td>	<td>Код пользователя, осуществившего заказ.</td> </tr>
-<tr>
-<td><b>bPaid</b></td>	<td>
-<i>true</i>, если доставка заказа разрешена, и <i>false</i>, если запрещена.</td> </tr>
-<tr>
-<td><b>orderID</b></td>	<td>Код заказа.</td> </tr>
-</tbody>function MyBasketPayOrderCallback($productID, $userID, $bPaid, $orderID)<br>{<br>    global $DB;<br><br>    $productID = IntVal($productID);<br>    $userID = IntVal($userID);<br>    $bPaid = ($bPaid ? True : False);<br>    $orderID = IntVal($orderID);<br><br>    if ($userID &lt;= 0)<br>        return False;<br><br>    if ($orderID &lt;= 0)<br>        return False;<br><br>    if (!array_key_exists($productID, $GLOBALS["arMP3Sums"]))<br>        return False;<br><br>    if (!($arOrder = CSaleOrder::GetByID($orderID)))<br>        return False;<br><br>    $currentPrice = 10;<br>    $currentCurrency = "USD";<br><br>    if (!CSaleUserAccount::UpdateAccount($userID, <br>                                         ($bPaid ? $currentPrice : -$currentPrice), <br>                                         $currentCurrency, "MANUAL", $orderID))<br>        return False;<br><br>    return True;<br>}
+	<tr>
+	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
+	<tr>
+	<td><b>productID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
+	<tr>
+	<td><b>userID</b></td>	<td>Код пользователя, осуществившего заказ.</td> </tr>
+	<tr>
+	<td><b>bPaid</b></td>	<td>
+	<i>true</i>, если доставка заказа разрешена, и <i>false</i>, если запрещена.</td> </tr>
+	<tr>
+	<td><b>orderID</b></td>	<td>Код заказа.</td> </tr>
+	</tbody>function MyBasketPayOrderCallback($productID, $userID, $bPaid, $orderID)<br>{<br>    global $DB;<br><br>    $productID = IntVal($productID);<br>    $userID = IntVal($userID);<br>    $bPaid = ($bPaid ? True : False);<br>    $orderID = IntVal($orderID);<br><br>    if ($userID &lt;= 0)<br>        return False;<br><br>    if ($orderID &lt;= 0)<br>        return False;<br><br>    if (!array_key_exists($productID, $GLOBALS["arMP3Sums"]))<br>        return False;<br><br>    if (!($arOrder = CSaleOrder::GetByID($orderID)))<br>        return False;<br><br>    $currentPrice = 10;<br>    $currentCurrency = "USD";<br><br>    if (!CSaleUserAccount::UpdateAccount($userID, <br>                                         ($bPaid ? $currentPrice : -$currentPrice), <br>                                         $currentCurrency, "MANUAL", $orderID))<br>        return False;<br><br>    return True;<br>}
 	 * </pre>
 	 *
 	 *
@@ -1199,7 +1199,7 @@ class CSaleUser extends CAllSaleUser
 		return $ID;
 	}
 
-	function _Add($arFields)
+	public static function _Add($arFields)
 	{
 		global $DB;
 

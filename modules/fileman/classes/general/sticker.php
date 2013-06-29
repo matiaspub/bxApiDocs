@@ -796,7 +796,7 @@ class blogTextParser1
 		7 => 160); //"xx-large"
 	var $word_separator = "\s.,;:!?\#\-\*\|\[\]\(\)\{\}";
 
-	public static function blogTextParser1($strLang = False, $pathToSmile = false)
+	public function blogTextParser1($strLang = False, $pathToSmile = false)
 	{
 		global $DB, $CACHE_MANAGER;
 		if ($strLang===False)
@@ -848,7 +848,7 @@ class blogTextParser1
 		// $this->smiles = $arSmiles[$strLang];
 	}
 
-	public static function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $arParams = Array())
+	public function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $arParams = Array())
 	{
 		global $DB;
 
@@ -1276,7 +1276,7 @@ class blogTextParser1
 		return trim($text);
 	}
 
-	public static function defended_tags($text, $tag = 'replace')
+	public function defended_tags($text, $tag = 'replace')
 	{
 		switch ($tag) {
 			case "replace":
@@ -1415,7 +1415,7 @@ class blogTextParser1
 		return false;
 	}
 
-	public static function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
+	public function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
 	{
 		if (strlen($code)<=0 || strlen($image)<=0) return;
 		$code = stripslashes($code);
@@ -1432,7 +1432,7 @@ class blogTextParser1
 		return '<img src="'.$servername.'/bitrix/images/blog/smile/'.$image.'" border="0" '.$alt.' />';
 	}
 
-	public static function pre_convert_code_tag ($text = "")
+	public function pre_convert_code_tag ($text = "")
 	{
 		if (strLen($text)<=0) return;
 		$text = str_replace(
@@ -1446,7 +1446,7 @@ class blogTextParser1
 		return $text;
 	}
 
-	public static function convert_code_tag($text = "", $type = "html", $allowHTML = false)
+	public function convert_code_tag($text = "", $type = "html", $allowHTML = false)
 	{
 		if (strLen($text)<=0) return;
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1473,7 +1473,7 @@ class blogTextParser1
 		return $text;
 	}
 
-	public static function convert_quote_tag($text = "", $type = "html")
+	public function convert_quote_tag($text = "", $type = "html")
 	{
 		if (strlen($text)<=0) return;
 		$txt = $text;
@@ -1492,7 +1492,7 @@ class blogTextParser1
 		return $text;
 	}
 
-	public static function convert_open_tag($marker = "quote", $type = "html")
+	public function convert_open_tag($marker = "quote", $type = "html")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1503,7 +1503,7 @@ class blogTextParser1
 		return "<div class='blog-post-".$marker."'><span>".GetMessage("BLOG_".ToUpper($marker))."</span><table class='blog".$marker."'><tr><td>".$text;
 	}
 
-	public static function convert_close_tag($marker = "quote", $type = "html")
+	public function convert_close_tag($marker = "quote", $type = "html")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1520,7 +1520,7 @@ class blogTextParser1
 		return "</td></tr></tbody></table></div>";
 	}
 
-	public static function convert_image_tag($url = "", $type = "html", $serverName="", $params = "")
+	public function convert_image_tag($url = "", $type = "html", $serverName="", $params = "")
 	{
 		$url = trim($url);
 		if (strlen($url)<=0) return;
@@ -1574,7 +1574,7 @@ class blogTextParser1
 			return '<img src="'.$serverName.$url.'" border="0"'.$strPar.' />';
 	}
 
-	public static function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html", $serverName="")
+	public function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html", $serverName="")
 	{
 		$imageId = IntVal($imageId);
 		if($imageId <= 0)
@@ -1637,7 +1637,7 @@ class blogTextParser1
 		return $res;
 	}
 
-	public static function convert_font_attr($attr, $value = "", $text = "")
+	public function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0) return "";
 		if (strlen($value)<=0) return $text;
@@ -1662,7 +1662,7 @@ class blogTextParser1
 		}
 	}
 	// Only for public using
-	public static function wrap_long_words($text="")
+	public function wrap_long_words($text="")
 	{
 		if ($this->MaxStringLen > 0 && !empty($text))
 		{
@@ -1673,7 +1673,7 @@ class blogTextParser1
 		return $text;
 	}
 
-	public static function part_long_words($str)
+	public function part_long_words($str)
 	{
 		$word_separator = $this->word_separator;
 		if (($this->MaxStringLen > 0) && (strLen(trim($str)) > 0))
@@ -1697,7 +1697,7 @@ class blogTextParser1
 		return $str;
 	}
 
-	public static function cut_long_words($str)
+	public function cut_long_words($str)
 	{
 		if (($this->MaxStringLen > 0) && (strLen($str) > 0))
 			$str = preg_replace("/([^ \n\r\t\x01]{".$this->MaxStringLen."})/is".BX_UTF_PCRE_MODIFIER, "\\1<WBR/>&shy;", $str);
@@ -1754,7 +1754,7 @@ class blogTextParser1
 		//return $pref.(COption::GetOptionString("blog", "parser_nofollow", "N") == "Y" ? '<noindex>' : '').'<a href="'.$url.'" target="_blank"'.(COption::GetOptionString("blog", "parser_nofollow", "N") == "Y" ? ' rel="nofollow"' : '').'>'.$text.'</a>'.(COption::GetOptionString("blog", "parser_nofollow", "N") == "Y" ? '</noindex>' : '').$end;
 	}
 
-	public static function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $bPreview = true)
+	public function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $bPreview = true)
 	{
 		$text = $this->convert($text, $bPreview, $arImages, $arAllow, "rss");
 		return trim($text);

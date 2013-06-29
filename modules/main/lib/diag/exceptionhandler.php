@@ -27,38 +27,38 @@ class ExceptionHandler
 
 	private $isInitialized = false;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->handledErrorsTypes = E_ALL & ~E_STRICT;
 		$this->exceptionErrorsTypes = E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT;
 	}
 
-	static public function setDebugMode($debug)
+	public function setDebugMode($debug)
 	{
 		$this->debug = $debug;
 	}
 
-	static public function setHandledErrorsTypes($handledErrorsTypes)
+	public function setHandledErrorsTypes($handledErrorsTypes)
 	{
 		$this->handledErrorsTypes = $handledErrorsTypes;
 	}
 
-	static public function setAssertionErrorType($assertionErrorType)
+	public function setAssertionErrorType($assertionErrorType)
 	{
 		$this->assertionErrorType = $assertionErrorType;
 	}
 
-	static public function setAssertionThrowsException($assertionThrowsException)
+	public function setAssertionThrowsException($assertionThrowsException)
 	{
 		$this->assertionThrowsException = $assertionThrowsException;
 	}
 
-	static public function setExceptionErrorsTypes($errorTypesException)
+	public function setExceptionErrorsTypes($errorTypesException)
 	{
 		$this->exceptionErrorsTypes = $errorTypesException;
 	}
 
-	static public function setIgnoreSilence($ignoreSilence)
+	public function setIgnoreSilence($ignoreSilence)
 	{
 		$this->ignoreSilence = $ignoreSilence;
 	}
@@ -66,7 +66,7 @@ class ExceptionHandler
 	/**
 	 * @param \Bitrix\Main\Diag\ExceptionHandlerLog $handlerLog
 	 */
-	static public function setHandlerLog(\Bitrix\Main\Diag\ExceptionHandlerLog $handlerLog = null)
+	public function setHandlerLog(\Bitrix\Main\Diag\ExceptionHandlerLog $handlerLog = null)
 	{
 		$this->handlerLog = $handlerLog;
 	}
@@ -74,7 +74,7 @@ class ExceptionHandler
 	/**
 	 * @param \Bitrix\Main\Diag\IExceptionHandlerOutput $handlerOutput
 	 */
-	static public function setHandlerOutput(\Bitrix\Main\Diag\IExceptionHandlerOutput $handlerOutput)
+	public function setHandlerOutput(\Bitrix\Main\Diag\IExceptionHandlerOutput $handlerOutput)
 	{
 		$this->handlerOutput = $handlerOutput;
 	}
@@ -94,7 +94,7 @@ class ExceptionHandler
 		}
 	}
 
-	static public function initialize(IExceptionHandlerOutput $exceptionHandlerOutput, ExceptionHandlerLog $exceptionHandlerLog = null)
+	public function initialize(IExceptionHandlerOutput $exceptionHandlerOutput, ExceptionHandlerLog $exceptionHandlerLog = null)
 	{
 		if ($this->isInitialized)
 			return;
@@ -124,7 +124,7 @@ class ExceptionHandler
 		$this->isInitialized = true;
 	}
 
-	static public function handleException(\Exception $exception)
+	public function handleException(\Exception $exception)
 	{
 		$this->writeToLog($exception, ExceptionHandlerLog::UNCAUGHT_EXCEPTION);
 		$out = $this->handlerOutput;
@@ -132,7 +132,7 @@ class ExceptionHandler
 		die();
 	}
 
-	static public function handleError($code, $message, $file, $line)
+	public function handleError($code, $message, $file, $line)
 	{
 		$exception = new \ErrorException($message, 0, $code, $file, $line);
 
@@ -150,7 +150,7 @@ class ExceptionHandler
 		throw $exception;
 	}
 
-	static public function handleAssertion($file, $line, $message)
+	public function handleAssertion($file, $line, $message)
 	{
 		$exception = new \ErrorException($message, 0, $this->assertionErrorType, $file, $line);
 
@@ -163,7 +163,7 @@ class ExceptionHandler
 		throw $exception;
 	}
 
-	static public function handleFatalError()
+	public function handleFatalError()
 	{
 		if ($error = error_get_last())
 		{

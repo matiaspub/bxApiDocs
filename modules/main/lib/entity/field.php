@@ -45,7 +45,7 @@ abstract class Field
 	 * @param array       $parameters
 	 * @throws \Exception
 	 */
-	static public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		if (!strlen($name))
 		{
@@ -84,7 +84,7 @@ abstract class Field
 		}
 	}
 
-	static public function validateValue($value, $primary, $row, Result $result)
+	public function validateValue($value, $primary, $row, Result $result)
 	{
 		$validators = $this->getValidators();
 
@@ -111,7 +111,7 @@ abstract class Field
 	 * @return callback[]|Validator\Base[]
 	 * @throws \Exception
 	 */
-	static public function getValidators()
+	public function getValidators()
 	{
 		if ($this->validators === null)
 		{
@@ -147,27 +147,27 @@ abstract class Field
 		return $this->validators;
 	}
 
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
 
-	static public function getTitle()
+	public function getTitle()
 	{
 		return $this->title;
 	}
 
-	static public function getDataType()
+	public function getDataType()
 	{
 		return $this->dataType;
 	}
 
-	static public function getEntity()
+	public function getEntity()
 	{
 		return $this->entity;
 	}
 
-	static public function getLangCode()
+	public function getLangCode()
 	{
 		return $this->getEntity()->getLangCode().'_'.$this->getName().'_FIELD';
 	}
@@ -176,7 +176,7 @@ abstract class Field
 	 * @deprecated Use getTitle instead
 	 * @return mixed|string
 	 */
-	static public function getLangText()
+	public function getLangText()
 	{
 		if($this->title !== null)
 			return $this->title;

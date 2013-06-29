@@ -107,7 +107,7 @@ class CFormValidatorINN
 		return true;
 	}
 	
-	function __checkINN($value)
+	public static function __checkINN($value)
 	{
 		$arCheck = array(41,37,31,29,23,19,17,13,7,5,3);
 		

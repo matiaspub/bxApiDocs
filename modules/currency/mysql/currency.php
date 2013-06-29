@@ -16,7 +16,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/currency/general/currenc
  */
 class CCurrency extends CAllCurrency
 {
-	function __GetList(&$by, &$order, $lang = LANGUAGE_ID)
+	public static function __GetList(&$by, &$order, $lang = LANGUAGE_ID)
 	{
 		global $DB;
 

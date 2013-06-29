@@ -19,7 +19,7 @@ class MemcachedConnection extends NosqlConnection
 
 	protected $port = '11211';
 
-	static public function __construct($configuration)
+	public function __construct($configuration)
 	{
 		parent::__construct($configuration);
 
@@ -56,14 +56,14 @@ class MemcachedConnection extends NosqlConnection
 	{
 	}
 
-	static public function get($key)
+	public function get($key)
 	{
 		$this->connectInternal();
 
 		return $this->resource->get($key);
 	}
 
-	static public function set($key, $value)
+	public function set($key, $value)
 	{
 		$this->connectInternal();
 

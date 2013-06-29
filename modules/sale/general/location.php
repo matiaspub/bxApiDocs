@@ -1217,7 +1217,7 @@ class CAllSaleLocation
 		return;
 	}
 
-	function _GetZIPImportStats()
+	public static function _GetZIPImportStats()
 	{
 		global $DB;
 
@@ -1228,7 +1228,7 @@ class CAllSaleLocation
 		return $arStat;
 	}
 
-	function _GetCityImport($arCityName, $country_id = false)
+	public static function _GetCityImport($arCityName, $country_id = false)
 	{
 		global $DB;
 

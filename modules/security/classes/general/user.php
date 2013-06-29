@@ -1,111 +1,157 @@
 <?
 IncludeModuleLangFile(__FILE__);
-// define("BX_SECURITY_SYNC_WINDOW", 15000);
 class CSecurityUser
 {
-	public static function OnBeforeUserLogin($arParams)
+	const BX_SECURITY_SYNC_WINDOW = 15000;
+
+	/**
+	 * @param array $arParams
+	 * @return bool
+	 */
+	public static function onBeforeUserLogin($arParams)
 	{
 		/**
 		* @global CMain $APPLICATION
 		* @global CDataBase $DB
 		*/
 		global $DB, $APPLICATION;
-
-		$rsUser = CUser::GetList($by, $order, array("LOGIN_EQUAL_EXACT" => $arParams["LOGIN"]));
-		while($arUser = $rsUser->Fetch())
+		$userId = self::getUserIdForLogin($arParams["LOGIN"]);
+		$userInfo = self::getSecurityUserInfo($userId, true);
+		if(!$userId || !$userInfo)
 		{
-			if(!$arUser["EXTERNAL_AUTH_ID"])
-				break;
+			//user not found or not use OTP
+			return true;
 		}
 
-		if($arUser)
+		$isSuccess = false;
+		if(preg_match("/(\\d{6})$/", $arParams["PASSWORD"], $arMatch))
 		{
-			$USER_ID = intval($arUser["ID"]);
-			$rsKey = $DB->Query("SELECT * from b_sec_user WHERE ACTIVE='Y' AND USER_ID = ".$USER_ID);
-			$arKey = $rsKey->Fetch();
-			if($arKey)
+			$bin_secret = pack('H*', $userInfo["SECRET"]);
+			$sync = $arMatch[1];
+			$cnt = intval($userInfo["COUNTER"])+1;
+			$window = COption::GetOptionInt("security", "hotp_user_window");
+
+			$i = 0;
+			while($i < $window)
 			{
-				$bSuccess = false;
-				if(preg_match("/(\\d{6})$/", $arParams["PASSWORD"], $arMatch))
+				if(CSecurityUser::HOTP($bin_secret, $cnt) == $sync)
 				{
-					$bin_secret = pack('H*', $arKey["SECRET"]);
-					$sync = $arMatch[1];
-					$cnt = intval($arKey["COUNTER"])+1;
-					$window = COption::GetOptionInt("security", "hotp_user_window");
-
-					$i = 0;
-					while($i < $window)
-					{
-						if(CSecurityUser::HOTP($bin_secret, $cnt) == $sync)
-						{
-							$bSuccess = true;
-							$arParams["PASSWORD"] = substr($arParams["PASSWORD"], 0, -6);
-							$DB->Query("UPDATE b_sec_user SET COUNTER = ".$cnt." WHERE USER_ID = ".$USER_ID);
-							break;
-						}
-						$cnt++;
-						$i++;
-					}
-
+					$isSuccess = true;
+					$arParams["PASSWORD"] = substr($arParams["PASSWORD"], 0, -6);
+					$DB->Query("UPDATE b_sec_user SET COUNTER = ".$cnt." WHERE USER_ID = ".$userId);
+					break;
 				}
-
-				if(!$bSuccess)
-				{
-					$APPLICATION->ThrowException(GetMessage("WRONG_LOGIN"));
-					return false;
-				}
+				$cnt++;
+				$i++;
 			}
+		}
+
+		if(!$isSuccess)
+		{
+			$APPLICATION->ThrowException(GetMessage("WRONG_LOGIN"));
+			return false;
 		}
 
 		return true;
 	}
 
-	public static function Deactivate($USER_ID)
+	/**
+	 * @param int $pUserId
+	 * @param bool $pActiveOnly
+	 * @return bool|array
+	 */
+	protected static function getSecurityUserInfo($pUserId, $pActiveOnly = false)
+	{
+		/**	 @global CDataBase $DB */
+		global $DB;
+		$queryWhere = "USER_ID = ".intval($pUserId);
+		if($pActiveOnly)
+			$queryWhere .= " AND ACTIVE='Y'";
+
+		$rsKey = $DB->Query("SELECT * from b_sec_user WHERE ".$queryWhere);
+		$arKey = $rsKey->Fetch();
+		return $arKey;
+	}
+
+	/**
+	 * @param string $pLogin
+	 * @return int
+	 */
+	protected static function getUserIdForLogin($pLogin)
+	{
+		$selectedFields = array("ID");
+		$filter = array("LOGIN_EQUAL_EXACT" => $pLogin, "EXTERNAL_AUTH_ID" => "");
+		$dbUser = CUser::GetList($by = 'ID', $order = 'ASC', $filter, array("FIELDS" => $selectedFields));
+		$userId = 0;
+		if($dbUser)
+		{
+			$userInfo = $dbUser->Fetch();
+			$userId = $userInfo["ID"];
+		}
+		return $userId;
+	}
+
+	/**
+	 * @param int $pUserId
+	 * @return bool|CDBResult
+	 */
+	public static function deactivate($pUserId)
 	{
 		/** @global CDataBase $DB */
 		global $DB;
 		$res = $DB->Query("
 			UPDATE b_sec_user SET ACTIVE = 'N'
-			WHERE USER_ID = ".intval($USER_ID)."
+			WHERE USER_ID = ".intval($pUserId)."
 		");
 		return $res;
 	}
 
-	public static function Delete($USER_ID)
+	/**
+	 * @param int $pUserId
+	 * @return bool|CDBResult
+	 */
+	public static function delete($pUserId)
 	{
 		/** @global CDataBase $DB */
 		global $DB;
 		$res = $DB->Query("
 			DELETE FROM b_sec_user
-			WHERE USER_ID = ".intval($USER_ID)."
+			WHERE USER_ID = ".intval($pUserId)."
 		");
 		return $res;
 	}
 
-	public static function GetSyncCounter($bin_secret, $sync1, $sync2, &$aMsg)
+	/**
+	 * @param string $pBinSecret
+	 * @param string $pSync1
+	 * @param string $pSync2
+	 * @param array $pMessages
+	 * @return int
+	 */
+	public static function getSyncCounter($pBinSecret, $pSync1, $pSync2, &$pMessages)
 	{
-		if(CSecurityUser::HOTP($bin_secret, 0) === false)
+		if(CSecurityUser::HOTP($pBinSecret, 0) === false)
 		{
-			$aMsg[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR2"));
+			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR2"));
 			return 0;
 		}
 
-		if(!$sync1)
-			$aMsg[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_EMPTY"));
-		elseif(!preg_match("/^\d{6}$/", $sync1))
-			$aMsg[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_INVALID"));
+		if(!$pSync1)
+			$pMessages[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_EMPTY"));
+		elseif(!preg_match("/^\d{6}$/", $pSync1))
+			$pMessages[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_INVALID"));
 
-		if(!$sync2)
-			$aMsg[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_EMPTY"));
-		elseif(!preg_match("/^\d{6}$/", $sync2))
-			$aMsg[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_INVALID"));
+		if(!$pSync2)
+			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_EMPTY"));
+		elseif(!preg_match("/^\d{6}$/", $pSync2))
+			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_INVALID"));
 
 		$cnt = 0;
-		for($i = 0; $i < BX_SECURITY_SYNC_WINDOW; $i++)
+		for($i = 0; $i < self::BX_SECURITY_SYNC_WINDOW; $i++)
 		{
 			if(
-				CSecurityUser::HOTP($bin_secret, $cnt) == $sync1
-				&& CSecurityUser::HOTP($bin_secret, $cnt+1) == $sync2
+				CSecurityUser::HOTP($pBinSecret, $cnt) == $pSync1
+				&& CSecurityUser::HOTP($pBinSecret, $cnt+1) == $pSync2
 			)
 			{
 				$cnt++;
@@ -114,16 +160,20 @@ class CSecurityUser
 			$cnt++;
 		}
 
-		if($i == BX_SECURITY_SYNC_WINDOW)
+		if($i == self::BX_SECURITY_SYNC_WINDOW)
 		{
-			$aMsg[] = array("id"=>"security_SECRET", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR"));
+			$pMessages[] = array("id"=>"security_SECRET", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR"));
 			$cnt = 0;
 		}
 
 		return $cnt;
 	}
 
-	public static function Update($arFields)
+	/**
+	 * @param $arFields
+	 * @return bool
+	 */
+	public static function update($arFields)
 	{
 		/**
 		 * @global CMain $APPLICATION
@@ -137,19 +187,18 @@ class CSecurityUser
 		{
 			if($arFields["ACTIVE"]!=="Y")
 			{
-				CSecurityUser::Deactivate($USER_ID);
+				CSecurityUser::deactivate($USER_ID);
 			}
 			else
 			{
 				$secret = substr(trim($arFields["SECRET"]), 0, 64);
 				if(strlen($secret) <= 0)
 				{
-					CSecurityUser::Delete($USER_ID);
+					CSecurityUser::delete($USER_ID);
 				}
 				else
 				{
-					$rsKey = $DB->Query("SELECT * from b_sec_user WHERE USER_ID = ".$USER_ID);
-					$arKey = $rsKey->Fetch();
+					$arKey = self::getSecurityUserInfo($USER_ID);
 					if($arKey && ($arKey["SECRET"] == $secret))
 						$cnt = intval($arKey["COUNTER"]);
 					else
@@ -161,7 +210,7 @@ class CSecurityUser
 					if($sync1 || $sync2)
 					{
 						$bin_secret = pack('H*', $secret);
-						$cnt = CSecurityUser::GetSyncCounter($bin_secret, $sync1, $sync2, $aMsg);
+						$cnt = CSecurityUser::getSyncCounter($bin_secret, $sync1, $sync2, $aMsg);
 					}
 
 					if($arKey)
@@ -197,50 +246,70 @@ class CSecurityUser
 
 	}
 
-	public static function OnUserDelete($ID)
+	/**
+	 * @param $pId
+	 * @return bool
+	 */
+	public static function onUserDelete($pId)
 	{
 		/** @global CDataBase $DB */
 		global $DB;
-		$DB->Query("DELETE from b_sec_user WHERE USER_ID = ".intval($ID));
+		$DB->Query("DELETE from b_sec_user WHERE USER_ID = ".intval($pId));
 		return true;
 	}
 
-	public static function hmacsha1($data, $key)
+	/**
+	 * @param $pData
+	 * @param $pKey
+	 * @return string
+	 */
+	protected static function hmacsha1($pData, $pKey)
 	{
 		if(function_exists("hash_hmac"))
-			return hash_hmac("sha1", $data, $key);
+			return hash_hmac("sha1", $pData, $pKey);
 
-		if(strlen($key)>64)
-			$key=pack('H*', sha1($key));
+		if(strlen($pKey)>64)
+			$pKey=pack('H*', sha1($pKey));
 
-		$key = str_pad($key, 64, chr(0x00));
+		$pKey = str_pad($pKey, 64, chr(0x00));
 		$ipad = str_repeat(chr(0x36), 64);
 		$opad = str_repeat(chr(0x5c), 64);
-		$hmac = pack('H*', sha1(($key^$opad).pack('H*', sha1(($key^$ipad).$data))));
+		$hmac = pack('H*', sha1(($pKey^$opad).pack('H*', sha1(($pKey^$ipad).$pData))));
 		return bin2hex($hmac);
 	}
 
-	public static function hmacsha256($data, $key)
+	/**
+	 * @param $pData
+	 * @param $pKey
+	 * @return bool|string
+	 */
+	protected static function hmacsha256($pData, $pKey)
 	{
 		if(function_exists("hash_hmac"))
-			return hash_hmac("sha256", $data, $key);
+			return hash_hmac("sha256", $pData, $pKey);
 		else
 			return false;
 	}
 
-	public static function HOTP($secret, $cnt, $digits = 6)
+	/**
+	 * @param $pSecret
+	 * @param $pCount
+	 * @param int $pDigits
+	 * @return bool|int
+	 */
+	protected static function HOTP($pSecret, $pCount, $pDigits = 6)
 	{
-		if(CUtil::BinStrlen($secret) <= 25)
-			$sha_hash = CSecurityUser::hmacsha1(pack("NN", 0, $cnt), $secret);
+		if(CUtil::BinStrlen($pSecret) <= 25)
+			$sha_hash = self::hmacsha1(pack("NN", 0, $pCount), $pSecret);
 		else
-			$sha_hash = CSecurityUser::hmacsha256(pack("NN", 0, $cnt), $secret);
+			$sha_hash = self::hmacsha256(pack("NN", 0, $pCount), $pSecret);
 
 		if($sha_hash !== false)
 		{
 			$dwOffset = hexdec(substr($sha_hash, -1, 1));
 			$dbc1 = hexdec(substr($sha_hash, $dwOffset * 2, 8 ));
 			$dbc2 = $dbc1 & 0x7fffffff;
-			$hotp = $dbc2 % pow(10, $digits);
+			$hotp = $dbc2 % pow(10, $pDigits);
 			return $hotp;
 		}
 		else
@@ -249,7 +318,10 @@ class CSecurityUser
 		}
 	}
 
-	public static function IsActive()
+	/**
+	 * @return bool
+	 */
+	public static function isActive()
 	{
 		$bActive = false;
 		foreach(GetModuleEvents("main", "OnBeforeUserLogin", true) as $event)
@@ -266,11 +338,14 @@ class CSecurityUser
 		return $bActive;
 	}
 
-	public static function SetActive($bActive = false)
+	/**
+	 * @param bool $pActive
+	 */
+	public static function setActive($pActive = false)
 	{
-		if($bActive)
+		if($pActive)
 		{
-			if(!CSecurityUser::IsActive())
+			if(!CSecurityUser::isActive())
 			{
 				RegisterModuleDependences("main", "OnBeforeUserLogin", "security", "CSecurityUser", "OnBeforeUserLogin", "100");
 				$f = fopen($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/options_user_settings.php", "w");
@@ -280,7 +355,7 @@ class CSecurityUser
 		}
 		else
 		{
-			if(CSecurityUser::IsActive())
+			if(CSecurityUser::isActive())
 			{
 				UnRegisterModuleDependences("main", "OnBeforeUserLogin", "security", "CSecurityUser", "OnBeforeUserLogin");
 				unlink($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/options_user_settings.php");
@@ -289,4 +364,3 @@ class CSecurityUser
 	}
 
 }
-?>

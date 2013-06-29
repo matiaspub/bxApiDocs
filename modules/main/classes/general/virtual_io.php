@@ -39,7 +39,7 @@ class CBXVirtualIo
 	private static $instance;
 	private $io;
 
-	static public function __construct()
+	public function __construct()
 	{
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/virtual_io_filesystem.php");
 		$this->io = new CBXVirtualIoFileSystem();
@@ -106,11 +106,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/combinepath.php
 	 * @author Bitrix
 	 */
-	static public function CombinePath()
+	public function CombinePath()
 	{
 		$numArgs = func_num_args();
 		if ($numArgs <= 0)
@@ -171,11 +170,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/relativetoabsolutepath.php
 	 * @author Bitrix
 	 */
-	static public function RelativeToAbsolutePath($relativePath)
+	public function RelativeToAbsolutePath($relativePath)
 	{
 		return $this->io->RelativeToAbsolutePath($relativePath);
 	}
@@ -204,11 +202,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/siterelativetoabsolutepath.php
 	 * @author Bitrix
 	 */
-	static public function SiteRelativeToAbsolutePath($relativePath, $site = null)
+	public function SiteRelativeToAbsolutePath($relativePath, $site = null)
 	{
 		return $this->io->SiteRelativeToAbsolutePath($relativePath, $site);
 	}
@@ -219,12 +216,12 @@ class CBXVirtualIo
 	 * @param string $path - Path
 	 * @return string - Physical path
 	 */
-	static public function GetPhysicalName($path)
+	public function GetPhysicalName($path)
 	{
 		return $this->io->GetPhysicalName($path);
 	}
 
-	public static function GetLogicalName($path)
+	public function GetLogicalName($path)
 	{
 		return $this->io->GetLogicalName($path);
 	}
@@ -255,11 +252,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractnamefrompath.php
 	 * @author Bitrix
 	 */
-	static public function ExtractNameFromPath($path)
+	public function ExtractNameFromPath($path)
 	{
 		return $this->io->ExtractNameFromPath($path);
 	}
@@ -290,11 +286,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractpathfrompath.php
 	 * @author Bitrix
 	 */
-	static public function ExtractPathFromPath($path)
+	public function ExtractPathFromPath($path)
 	{
 		return $this->io->ExtractPathFromPath($path);
 	}
@@ -324,11 +319,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/validatepathstring.php
 	 * @author Bitrix
 	 */
-	static public function ValidatePathString($path)
+	public function ValidatePathString($path)
 	{
 		return $this->io->ValidatePathString($path);
 	}
@@ -337,7 +331,7 @@ class CBXVirtualIo
 	 * @param string $filename
 	 * @return bool
 	 */
-	static public function ValidateFilenameString($filename)
+	public function ValidateFilenameString($filename)
 	{
 		return $this->io->ValidateFilenameString($filename);
 	}
@@ -346,7 +340,7 @@ class CBXVirtualIo
 	 * @param string $filename
 	 * @return string
 	 */
-	static public function RandomizeInvalidFilename($filename)
+	public function RandomizeInvalidFilename($filename)
 	{
 		return $this->io->RandomizeInvalidFilename($filename);
 	}
@@ -377,11 +371,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/directoryexists.php
 	 * @author Bitrix
 	 */
-	static public function DirectoryExists($path)
+	public function DirectoryExists($path)
 	{
 		return $this->io->DirectoryExists($path);
 	}
@@ -412,11 +405,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/fileexists.php
 	 * @author Bitrix
 	 */
-	static public function FileExists($path)
+	public function FileExists($path)
 	{
 		return $this->io->FileExists($path);
 	}
@@ -453,11 +445,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getdirectory.php
 	 * @author Bitrix
 	 */
-	static public function GetDirectory($path)
+	public function GetDirectory($path)
 	{
 		return $this->io->GetDirectory($path);
 	}
@@ -491,11 +482,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getfile.php
 	 * @author Bitrix
 	 */
-	static public function GetFile($path)
+	public function GetFile($path)
 	{
 		return $this->io->GetFile($path);
 	}
@@ -507,7 +497,7 @@ class CBXVirtualIo
 	 * @param string $mode - The type of access to the file ('rb' - reading, 'wb' - writing, 'ab' - appending)
 	 * @return resource
 	 */
-	static public function OpenFile($path, $mode)
+	public function OpenFile($path, $mode)
 	{
 		return $this->io->OpenFile($path, $mode);
 	}
@@ -545,11 +535,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/delete.php
 	 * @author Bitrix
 	 */
-	static public function Delete($path)
+	public function Delete($path)
 	{
 		return $this->io->Delete($path);
 	}
@@ -583,11 +572,10 @@ class CBXVirtualIo
 	 *
 	 * @return bool 
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/copy.php
 	 * @author Bitrix
 	 */
-	static public function Copy($source, $target, $bRewrite = true)
+	public function Copy($source, $target, $bRewrite = true)
 	{
 		return $this->io->Copy($source, $target, $bRewrite);
 	}
@@ -621,16 +609,15 @@ class CBXVirtualIo
 	 *
 	 * @return bool 
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/move.php
 	 * @author Bitrix
 	 */
-	static public function Move($source, $target, $bRewrite = true)
+	public function Move($source, $target, $bRewrite = true)
 	{
 		return $this->io->Move($source, $target, $bRewrite);
 	}
 
-	static public function Rename($source, $target)
+	public function Rename($source, $target)
 	{
 		return $this->io->Rename($source, $target);
 	}
@@ -640,7 +627,7 @@ class CBXVirtualIo
 	 *
 	 * @return void
 	 */
-	public static function ClearCache()
+	public function ClearCache()
 	{
 		$this->io->ClearCache();
 	}
@@ -672,11 +659,10 @@ class CBXVirtualIo
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/createdirectory.php
 	 * @author Bitrix
 	 */
-	static public function CreateDirectory($path)
+	public function CreateDirectory($path)
 	{
 		return $this->io->CreateDirectory($path);
 	}
@@ -686,7 +672,7 @@ class CBXVirtualIo
 	 *
 	 * @return array - Array of errors
 	 */
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->io->GetErrors();
 	}

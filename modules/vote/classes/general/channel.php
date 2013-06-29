@@ -487,7 +487,7 @@ class CVoteDiagramType
 {
 	var $arType = Array();
 
-	public static function CVoteDiagramType($directCall=true)
+	public function CVoteDiagramType($directCall=true)
 	{
 		if ($directCall)
 		{

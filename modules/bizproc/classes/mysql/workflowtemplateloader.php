@@ -27,7 +27,7 @@ class CBPWorkflowTemplateLoader
 		return self::$instance;
 	}
 
-	static public function GetTemplatesList($arOrder = array("ID" => "DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
+	public function GetTemplatesList($arOrder = array("ID" => "DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
  		global $DB;
 

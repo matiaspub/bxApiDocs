@@ -16,13 +16,13 @@ class FieldError extends EntityError
 	/** @var Field */
 	protected $field;
 
-	static public function __construct(Field $field, $message, $code=0)
+	public function __construct(Field $field, $message, $code=0)
 	{
 		parent::__construct($message, $code);
 		$this->field = $field;
 	}
 
-	static public function getField()
+	public function getField()
 	{
 		return $this->field;
 	}

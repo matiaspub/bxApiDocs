@@ -7,7 +7,7 @@ class CAccess
 	protected static $arChecked = array();
 	protected $arParams = false;
 
-	static public function __construct($arParams=false)
+	public function __construct($arParams=false)
 	{
 		$this->arParams = $arParams;
 
@@ -225,7 +225,7 @@ class CAccess
 		}
 	}
 
-	static public function GetFormHtml($arParams=false)
+	public function GetFormHtml($arParams=false)
 	{
 		$arHtml = array();
 		foreach(self::$arAuthProviders as $provider)
@@ -241,7 +241,7 @@ class CAccess
 		return $arHtml;
 	}
 
-	static public function AjaxRequest($arParams)
+	public function AjaxRequest($arParams)
 	{
 		if(array_key_exists($arParams["provider"], self::$arAuthProviders))
 		{

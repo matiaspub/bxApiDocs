@@ -29,7 +29,7 @@ abstract class Base implements Entity\IValidator
 	 * @param null $errorPhrase
 	 * @throws ConfigurationException
 	 */
-	static public function __construct($errorPhrase = null)
+	public function __construct($errorPhrase = null)
 	{
 		if ($errorPhrase !== null && !is_string($errorPhrase))
 		{

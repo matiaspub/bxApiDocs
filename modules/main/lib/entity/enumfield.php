@@ -17,7 +17,7 @@ class EnumField extends ScalarField
 {
 	protected $values;
 
-	function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
 
@@ -40,7 +40,7 @@ class EnumField extends ScalarField
 		$this->values = $parameters['values'];
 	}
 
-	static public function getValidators()
+	public function getValidators()
 	{
 		$validators = parent::getValidators();
 
@@ -52,7 +52,7 @@ class EnumField extends ScalarField
 		return $validators;
 	}
 
-	static public function getValues()
+	public function getValues()
 	{
 		return $this->values;
 	}

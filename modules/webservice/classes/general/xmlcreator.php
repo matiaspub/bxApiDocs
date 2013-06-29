@@ -95,7 +95,7 @@ class CXMLCreator {
 	var $attributs = array();
 	var $children = array();
 
-	public static function CXMLCreator($tag, $cdata = false)
+	public function CXMLCreator($tag, $cdata = false)
 	{
 		$cdata ? $this->setCDATA() : null;
 		$this->tag = $tag;
@@ -246,13 +246,13 @@ class CXMLCreator {
 		return $node;
 	}
 
-	public static function setCDATA()
+	public function setCDATA()
 	{
 		$this->startCDATA = "<![CDATA[";
 		$this->endCDATA = "]]>";
 	}
 
-	public static function setAttribute($attrName, $attrValue)
+	public function setAttribute($attrName, $attrValue)
 	{
 		global $APPLICATION;
 
@@ -263,7 +263,7 @@ class CXMLCreator {
 		$this->attributs = array_merge($this->attributs, $newAttribute);
 	}
 
-	public static function setData($data)
+	public function setData($data)
 	{
 		global $APPLICATION;
 
@@ -271,13 +271,13 @@ class CXMLCreator {
 		$this->data = $APPLICATION->ConvertCharset($data, SITE_CHARSET, "utf-8");
 	}
 
-	public static function setName($tag)
+	public function setName($tag)
 	{
 		//$tag = CDataXML::xmlspecialchars($tag);
 		$this->tag = $tag;
 	}
 
-	public static function addChild($element)
+	public function addChild($element)
 	{
 		//AddMessage2Log(mydump(get_class($element)));
 		if($element && (get_class($element) == "CXMLCreator" || get_class($element) == "cxmlcreator"))
@@ -286,12 +286,12 @@ class CXMLCreator {
 		}
 	}
 
-	public static function getChildrenCount()
+	public function getChildrenCount()
 	{
 		return count($this->children);
 	}
 
-	function _getAttributs()
+	public function _getAttributs()
 	{
 		$attributs = "";
 		if (is_array($this->attributs)){
@@ -303,7 +303,7 @@ class CXMLCreator {
 		return $attributs;
 	}
 
-	function _getChildren()
+	public function _getChildren()
 	{
 		$children = "";
 		foreach($this->children as $key=>$val)
@@ -314,7 +314,7 @@ class CXMLCreator {
 
 	}
 
-	public static function getXML()
+	public function getXML()
 	{
 		if (!$this->tag) return "";
 		$xml  = "<" . CDataXML::xmlspecialchars($this->tag) . $this->_getAttributs() . ">";
@@ -331,7 +331,7 @@ class CXMLCreator {
 		return "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 	}
 
-	function __destruct()
+	public function __destruct()
 	{
 		unset($this->tag);
 	}
@@ -343,7 +343,7 @@ class CXMLCreator {
 	}
 
 	/* static */
-	function __createFromDOM($domNode)
+	public static function __createFromDOM($domNode)
 	{
 		$result = new CXMLCreator($domNode->name);
 

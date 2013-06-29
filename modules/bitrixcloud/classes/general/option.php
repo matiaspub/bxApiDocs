@@ -9,7 +9,7 @@ abstract class CAllBitrixCloudOption
 	 * @return void
 	 *
 	 */
-	static public function __construct($name)
+	public function __construct($name)
 	{
 		$this->name = $name;
 	}
@@ -100,7 +100,7 @@ abstract class CAllBitrixCloudOption
 	 * @return array[string]string
 	 *
 	 */
-	static public function getArrayValue()
+	public function getArrayValue()
 	{
 		global $CACHE_MANAGER;
 		if (strlen($this->name) <= 0)
@@ -136,7 +136,7 @@ abstract class CAllBitrixCloudOption
 	 * @return string
 	 *
 	 */
-	static public function getStringValue()
+	public function getStringValue()
 	{
 		$value = $this->getArrayValue();
 		return (string)current($value);
@@ -146,7 +146,7 @@ abstract class CAllBitrixCloudOption
 	 * @return void
 	 *
 	 */
-	static public function setArrayValue($value)
+	public function setArrayValue($value)
 	{
 		global $CACHE_MANAGER;
 		if (strlen($this->name) > 0)
@@ -167,7 +167,7 @@ abstract class CAllBitrixCloudOption
 	 * @return void
 	 *
 	 */
-	static public function setStringValue($value)
+	public function setStringValue($value)
 	{
 		$this->setArrayValue(array(
 			"0" => $value,
@@ -177,7 +177,7 @@ abstract class CAllBitrixCloudOption
 	 * @return void
 	 *
 	 */
-	static public function delete()
+	public function delete()
 	{
 		$this->setArrayValue(/*.(array[string]string).*/ array());
 	}

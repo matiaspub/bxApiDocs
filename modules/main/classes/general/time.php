@@ -142,7 +142,7 @@ class CTimeZone
 			$localTime = new DateTime();
 			$localOffset = $localTime->getOffset();
 			$userOffset = $localOffset;
-	
+
 			$autoTimeZone = $userZone = '';
 			$factOffset = 0;
 			if($USER_ID !== null)

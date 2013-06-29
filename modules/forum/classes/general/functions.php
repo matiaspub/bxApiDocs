@@ -20,7 +20,7 @@ class forumTextParser extends CTextParser
 	var $preg_smiles = array();
 	var $component = null;
 
-	public static function forumTextParser($lang = false, $pathToSmiles = '', $type=false, $mode = 'full')
+	public function forumTextParser($lang = false, $pathToSmiles = '', $type=false, $mode = 'full')
 	{
 		$this->CTextParser();
 		$lang = (($lang === false) ? LANGUAGE_ID : $lang);
@@ -147,7 +147,7 @@ class forumTextParser extends CTextParser
 		return $result;
 	}
 
-	public static function convert($text, $allow = array(), $type = "html", $arFiles = false)	//, "KEEP_AMP" => "N"
+	public function convert($text, $allow = array(), $type = "html", $arFiles = false)	//, "KEEP_AMP" => "N"
 	{
 		if (!isset($this->image_params['width'])) $this->image_params['width'] = 300;
 		if (!isset($this->image_params['height'])) $this->image_params['height'] = 300;
@@ -172,7 +172,7 @@ class forumTextParser extends CTextParser
 		return $this->convertText($text);
 	}
 
-	public static function convert4mail($text, $arFiles = false)
+	public function convert4mail($text, $arFiles = false)
 	{
 		$text = textParser::convert4mail($text);
 		if ($arFiles !== false)
@@ -184,7 +184,7 @@ class forumTextParser extends CTextParser
 		return $text;
 	}
 
-	public static function ParserSpoiler(&$text, &$obj)
+	public function ParserSpoiler(&$text, &$obj)
 	{
 		if (method_exists($obj, "convert_spoiler_tag") && preg_match("/\[(cut|spoiler)/is".BX_UTF_PCRE_MODIFIER, $text, $matches))
 		{
@@ -234,7 +234,7 @@ class forumTextParser extends CTextParser
 		return str_replace(array(chr(34), chr(39)), array("\013", "\014"), $result);
 	}
 
-	public static function convert_open_tag($marker = "quote")
+	public function convert_open_tag($marker = "quote")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 
@@ -244,7 +244,7 @@ class forumTextParser extends CTextParser
 		return '<table class="forum-'.$marker.'"><thead><tr><th>'.($marker == "quote" ? GetMessage("FRM_QUOTE") : GetMessage("FRM_CODE")).'</th></tr></thead><tbody><tr><td>';
 	}
 
-	public static function convert_close_tag($marker = "quote")
+	public function convert_close_tag($marker = "quote")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 
@@ -260,7 +260,7 @@ class forumTextParser extends CTextParser
 		return "</td></tr></tbody></table>";
 	}
 
-	public static function convert_image_tag($url = "", $params="")
+	public function convert_image_tag($url = "", $params="")
 	{
 		static $bShowedScript = false;
 		$url = trim($url);
@@ -304,7 +304,7 @@ class forumTextParser extends CTextParser
 		return $result;
 	}
 
-	public static function convert_attachment($fileID = "", $p = "", $type = "", $text = "")
+	public function convert_attachment($fileID = "", $p = "", $type = "", $text = "")
 	{
 		$fileID = intVal($fileID);
 		$type = strToLower(empty($type) ? $this->type : $type);
@@ -377,7 +377,7 @@ class forumTextParser extends CTextParser
 		return $this->arFilesParsed[$fileID][$type];
 	}
 
-	public static function convert_to_rss(
+	public function convert_to_rss(
 		$text,
 		$arImages = Array(),
 		$arAllow = Array(
@@ -501,7 +501,7 @@ class textParser // deprecated
 	var $word_separator = "\s.,;:!?\#\-\*\|\[\]\(\)\{\}";
 	var $preg = array("counter" => 0, "pattern" => array(), "replace" => array());
 
-	public static function textParser($strLang = False, $pathToSmile = false)
+	public function textParser($strLang = False, $pathToSmile = false)
 	{
 		global $DB;
 		static $arSmiles = array();
@@ -550,7 +550,7 @@ class textParser // deprecated
 		$this->path_to_smile = $pathToSmile;
 	}
 
-	public static function convert($text, $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")	//, "KEEP_AMP" => "N"
+	public function convert($text, $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")	//, "KEEP_AMP" => "N"
 	{
 		global $DB;
 
@@ -868,7 +868,7 @@ class textParser // deprecated
 		return trim($text);
 	}
 
-	public static function defended_tags($text, $tag = 'replace')
+	public function defended_tags($text, $tag = 'replace')
 	{
 		switch ($tag) {
 			case "replace":
@@ -1061,7 +1061,7 @@ class textParser // deprecated
 		return "<nomodify>".str_replace(array(chr(34), chr(39)), array("\013", "\014"), $video)."</nomodify>";
 	}
 
-	public static function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
+	public function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
 	{
 		if (strlen($code)<=0 || strlen($image)<=0) return;
 		$code = stripslashes($code);
@@ -1089,7 +1089,7 @@ class textParser // deprecated
 			$text);
 	}
 
-	public static function convert_code_tag($text = "", $type = "html")
+	public function convert_code_tag($text = "", $type = "html")
 	{
 		if (strLen($text)<=0) return;
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1104,7 +1104,7 @@ class textParser // deprecated
 		return $text;
 	}
 
-	public static function convert_quote_tag($text = "", $type = "html")
+	public function convert_quote_tag($text = "", $type = "html")
 	{
 		if (strlen($text)<=0) return;
 		$txt = $text;
@@ -1123,7 +1123,7 @@ class textParser // deprecated
 		return $text;
 	}
 
-	public static function convert_open_tag($marker = "quote", $type = "html")
+	public function convert_open_tag($marker = "quote", $type = "html")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1134,7 +1134,7 @@ class textParser // deprecated
 		return '<table class="forum-'.$marker.'"><thead><tr><th>'.($marker == "quote" ? GetMessage("FRM_QUOTE") : GetMessage("FRM_CODE")).'</th></tr></thead><tbody><tr><td>';
 	}
 
-	public static function convert_close_tag($marker = "quote", $type = "html")
+	public function convert_close_tag($marker = "quote", $type = "html")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 		$type = ($type == "rss" ? "rss" : "html");
@@ -1150,7 +1150,7 @@ class textParser // deprecated
 		return '</td></tr></tbody></table>';
 	}
 
-	public static function convert_image_tag($url = "", $type = "html")
+	public function convert_image_tag($url = "", $type = "html")
 	{
 		static $bShowedScript = false;
 		if (strlen($url)<=0) return;
@@ -1194,7 +1194,7 @@ class textParser // deprecated
 		return str_replace(array(chr(34), chr(39)), array("\013", "\014"), $result);
 	}
 
-	public static function convert_font_attr($attr, $value = "", $text = "")
+	public function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0) return "";
 		if (strlen($value)<=0) return $text;
@@ -1219,7 +1219,7 @@ class textParser // deprecated
 		}
 	}
 	// Only for public using
-	public static function wrap_long_words($text="")
+	public function wrap_long_words($text="")
 	{
 		if ($this->MaxStringLen > 0 && !empty($text))
 		{
@@ -1230,7 +1230,7 @@ class textParser // deprecated
 		return $text;
 	}
 
-	public static function part_long_words($str)
+	public function part_long_words($str)
 	{
 		$word_separator = $this->word_separator;
 		if (($this->MaxStringLen > 0) && (strLen(trim($str)) > 0))
@@ -1256,7 +1256,7 @@ class textParser // deprecated
 		return $str;
 	}
 
-	public static function cut_long_words($str)
+	public function cut_long_words($str)
 	{
 		if (($this->MaxStringLen > 0) && (strLen($str) > 0))
 			$str = preg_replace("/([^ \n\r\t\x01]{".$this->MaxStringLen."})/is".BX_UTF_PCRE_MODIFIER, "\\1<WBR/>&shy;", $str);
@@ -1333,7 +1333,7 @@ class textParser // deprecated
 	}
 
 
-	public static function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N"), $arParams = array())
+	public function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N"), $arParams = array())
 	{
 		global $DB;
 		if (empty($arAllow))
@@ -1401,12 +1401,12 @@ class CForumSimpleHTMLParser {
 	var $parse_params = '/([a-z]+)\s*=\s*(?:([^\s]*)|(?:[\'"]([^\'"])[\'"]))/im';
 	var $lastError = '';
 
-	function __construct ($data)
+	public function __construct ($data)
 	{
 		$this->data = $data;
 	}
 
-	public static function findTagStart($needle) // needle = input[name=input;class=red]
+	public function findTagStart($needle) // needle = input[name=input;class=red]
 	{
 		$offset = 0;
 
@@ -1502,13 +1502,13 @@ class CForumSimpleHTMLParser {
 		return false;
 	}
 
-	public static function setError($msg)
+	public function setError($msg)
 	{
 		$this->lastError = $msg;
 		return false;
 	}
 
-	public static function findTagEnd($startIndex)
+	public function findTagEnd($startIndex)
 	{
 		if ($startIndex === false || (intval($startIndex) == 0 && $startIndex !== 0))
 			return $this->setError('E_PARSE_INVALID_INDEX');
@@ -1580,7 +1580,7 @@ class CForumSimpleHTMLParser {
 		return $this->setError('E_PARSE_INVALID_DOM_4');  // not enough data in $data ?
 	}
 
-	public static function getTagHTML($search)
+	public function getTagHTML($search)
 	{
 		$messagePost = '';
 		$messageStart = $this->findTagStart($search);
@@ -1591,7 +1591,7 @@ class CForumSimpleHTMLParser {
 		return trim($messagePost);
 	}
 
-	public static function getInnerHTML($startLabel, $endLabel, $multiple=false)
+	public function getInnerHTML($startLabel, $endLabel, $multiple=false)
 	{
 		$startPos = strpos($this->data, $startLabel);
 		if ($startPos === false) return '';
@@ -1713,7 +1713,7 @@ class CForumCacheManager
 			$CACHE_MANAGER->ClearByTag($type);
 	}
 
-	public static function OnRate($rateID, $arData)
+	public function OnRate($rateID, $arData)
 	{
 		if (!isset($arData['ENTITY_TYPE_ID']) ||
 			!isset($arData['ENTITY_ID']) ||
@@ -1736,36 +1736,36 @@ class CForumCacheManager
 		return true;
 	}
 
-	public static function OnMessageAdd(&$ID, &$arFields)
+	public function OnMessageAdd(&$ID, &$arFields)
 	{
 		$this->ClearTag("T", isset($arFields["FORUM_TOPIC_ID"]) ? $arFields["FORUM_TOPIC_ID"] : $arFields["TOPIC_ID"]);
 		$this->ClearTag("forum_msg_count".$arFields["FORUM_ID"]);
 	}
 
-	public static function OnMessageUpdate(&$ID, &$arFields)
+	public function OnMessageUpdate(&$ID, &$arFields)
 	{
 		$this->ClearTag("T", isset($arFields["FORUM_TOPIC_ID"]) ? $arFields["FORUM_TOPIC_ID"] : $arFields["TOPIC_ID"]);
 		$this->ClearTag("forum_msg_count".$arFields["FORUM_ID"]);
 	}
 
-	public static function OnMessageDelete($ID, $arMessage)
+	public function OnMessageDelete($ID, $arMessage)
 	{
 		$this->ClearTag("T", isset($arMessage["FORUM_TOPIC_ID"]) ? $arMessage["FORUM_TOPIC_ID"] : $arMessage["TOPIC_ID"]);
 		$this->ClearTag("forum_msg_count".$arMessage["FORUM_ID"]);
 	}
 
-	public static function OnTopicAdd($ID, $arFields)
+	public function OnTopicAdd($ID, $arFields)
 	{
 		$this->ClearTag("F", $arFields["FORUM_ID"]);
 	}
 
-	public static function OnTopicUpdate($ID, $arFields)
+	public function OnTopicUpdate($ID, $arFields)
 	{
 		$this->ClearTag("T", $ID);
 		$this->ClearTag("F", $arFields["FORUM_ID"]);
 	}
 
-	public static function OnTopicDelete(&$ID, $arTopic)
+	public function OnTopicDelete(&$ID, $arTopic)
 	{
 		$this->ClearTag("T", $ID);
 		$this->ClearTag("F", $arTopic["FORUM_ID"]);
@@ -1775,7 +1775,7 @@ class CForumCacheManager
 	//{
 	//}
 
-	public static function OnForumUpdate($ID, $arFields)
+	public function OnForumUpdate($ID, $arFields)
 	{
 		$this->ClearTag("F", $arFields["FORUM_ID"]);
 	}
@@ -1790,7 +1790,7 @@ class CForumAutosave
 	private static $instance;
 	private static $as;
 
-	static public function __construct()
+	public function __construct()
 	{
 		echo CJSCore::Init(array('autosave'), true);
 		$this->as = new CAutoSave();
@@ -1812,7 +1812,7 @@ class CForumAutosave
 		return self::$instance;
 	}
 
-	static public function LoadScript($arParams)
+	public function LoadScript($arParams)
 	{
 		if (!is_array($arParams))
 			$arParams = array("formID" => $arParams);
@@ -1833,12 +1833,12 @@ class CForumAutosave
 		ob_end_flush();
 	}
 
-	static public function Init()
+	public function Init()
 	{
 		return $this->as->Init(false);
 	}
 
-	static public function Reset()
+	public function Reset()
 	{
 		return $this->as->Reset();
 	}

@@ -159,7 +159,7 @@ class CMobile
 	 *
 	 * @return string
 	 */
-	static public function getTargetDpi()
+	public function getTargetDpi()
 	{
 		$targetDpi = "medium-dpi";
 		if ($this->getDevice() == "iPad")
@@ -193,7 +193,7 @@ class CMobile
 	 *
 	 * @return mixed|string
 	 */
-	static public function getViewPort($width = "")
+	public function getViewPort($width = "")
 	{
 
 		if ($width == "")
@@ -236,7 +236,7 @@ class CMobile
 	/**
 	 * Use it to get value of viewport-metadata for large screen of android based device.
 	 */
-	static public function getLargeScreenViewPort()
+	public function getLargeScreenViewPort()
 	{
 		return "<meta id=\"bx_mobile_viewport\" name=\"viewport\" content=\"user-scalable=0 width=device-width target-densitydpi=" . $this->getTargetDpi() . "\">";
 	}
@@ -244,7 +244,7 @@ class CMobile
 	/**
 	 * Use it to get value of viewport-metadata for iPad.
 	 */
-	static public function getIPadViewPort($width = 320)
+	public function getIPadViewPort($width = 320)
 	{
 		if ($width == false)
 			$width = $this->getDevicewidth();
@@ -266,7 +266,7 @@ class CMobile
 	 *
 	 * @return string
 	 */
-	static public function getViewPortPortrait()
+	public function getViewPortPortrait()
 	{
 		return $this->getViewPort($this->deviceWidth);
 	}
@@ -276,7 +276,7 @@ class CMobile
 	 *
 	 * @return string
 	 */
-	static public function getViewPortLandscape()
+	public function getViewPortLandscape()
 	{
 		return $this->getViewPort($this->deviceHeight);
 	}
@@ -286,7 +286,7 @@ class CMobile
 	 *
 	 * @param mixed $pixelRatio the pixelRatio
 	 */
-	static public function setPixelratio($pixelRatio)
+	public function setPixelratio($pixelRatio)
 	{
 		$this->pixelRatio = $pixelRatio;
 	}
@@ -296,7 +296,7 @@ class CMobile
 	 *
 	 * @param mixed $minScale the minScale
 	 */
-	static public function setMinscale($minScale)
+	public function setMinscale($minScale)
 	{
 		$this->minScale = $minScale;
 	}
@@ -307,7 +307,7 @@ class CMobile
 	 *
 	 * @param mixed $device the pixelRatio
 	 */
-	static public function setDevice($device)
+	public function setDevice($device)
 	{
 		$this->device = $device;
 	}
@@ -317,7 +317,7 @@ class CMobile
 	 *
 	 * @param mixed $iniScale the iniScale
 	 */
-	static public function setIniscale($iniScale)
+	public function setIniscale($iniScale)
 	{
 		$this->iniScale = $iniScale;
 	}
@@ -327,7 +327,7 @@ class CMobile
 	 *
 	 * @param mixed $maxScale the maxScale
 	 */
-	static public function setMaxscale($maxScale)
+	public function setMaxscale($maxScale)
 	{
 		$this->maxScale = $maxScale;
 	}
@@ -337,7 +337,7 @@ class CMobile
 	 *
 	 * @param mixed $deviceWidth the deviceWidth
 	 */
-	static public function setDevicewidth($deviceWidth)
+	public function setDevicewidth($deviceWidth)
 	{
 		$this->deviceWidth = $deviceWidth;
 	}
@@ -347,7 +347,7 @@ class CMobile
 	 *
 	 * @param mixed $deviceHeight the deviceHeight
 	 */
-	static public function setDeviceheight($deviceHeight)
+	public function setDeviceheight($deviceHeight)
 	{
 		$this->deviceHeight = $deviceHeight;
 	}
@@ -357,7 +357,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getPixelratio()
+	public function getPixelratio()
 	{
 		return $this->pixelRatio;
 	}
@@ -367,7 +367,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getMinscale()
+	public function getMinscale()
 	{
 		return $this->minScale;
 	}
@@ -377,7 +377,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getIniscale()
+	public function getIniscale()
 	{
 		return $this->iniScale;
 	}
@@ -387,7 +387,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getMaxscale()
+	public function getMaxscale()
 	{
 		return $this->maxScale;
 	}
@@ -397,7 +397,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getDevicewidth()
+	public function getDevicewidth()
 	{
 		return $this->deviceWidth;
 	}
@@ -407,12 +407,12 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getDeviceheight()
+	public function getDeviceheight()
 	{
 		return $this->deviceHeight;
 	}
 
-	static public function getDevice()
+	public function getDevice()
 	{
 		return $this->device;
 	}
@@ -422,7 +422,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getScreenCategory()
+	public function getScreenCategory()
 	{
 		return $this->screenCategory;
 	}
@@ -432,7 +432,7 @@ class CMobile
 	 *
 	 * @param mixed $screenCategory the screenCategory
 	 */
-	static public function setScreenCategory($screenCategory)
+	public function setScreenCategory($screenCategory)
 	{
 		$this->screenCategory = $screenCategory;
 	}
@@ -442,7 +442,7 @@ class CMobile
 	 *
 	 * @param mixed $largeScreenSupport the $largeScreenSupport
 	 */
-	static public function setLargeScreenSupport($largeScreenSupport)
+	public function setLargeScreenSupport($largeScreenSupport)
 	{
 		$this->largeScreenSupport = $largeScreenSupport;
 	}
@@ -452,7 +452,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getLargeScreenSupport()
+	public function getLargeScreenSupport()
 	{
 		return $this->largeScreenSupport;
 	}
@@ -462,7 +462,7 @@ class CMobile
 	 *
 	 * @return mixed
 	 */
-	static public function getScale()
+	public function getScale()
 	{
 		return $this->scale;
 	}
@@ -473,7 +473,7 @@ class CMobile
 	 * @param $scale
 	 */
 
-	static public function setScale($scale)
+	public function setScale($scale)
 	{
 		$this->scale = $scale;
 	}
@@ -522,7 +522,7 @@ class CMobile
 	 *  Returns true if device has a large screen
 	 * @return bool
 	 */
-	static public function isLarge()
+	public function isLarge()
 	{
 		return ($this->getScreenCategory() == "LARGE" || $this->getScreenCategory() == "XLARGE");
 	}

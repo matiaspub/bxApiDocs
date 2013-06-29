@@ -3,23 +3,23 @@ class CPackageWelcome extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageWelcome($package)
+	public function CPackageWelcome($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 		$this->SetTitle(GetMessage("MAIN_WIZARD_WELCOME_TITLE"));
 	}
 
-	function OnPostForm()
+	static function OnPostForm()
 	{
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 
@@ -33,13 +33,13 @@ class CPackageLicense extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageLicense($package)
+	public function CPackageLicense($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 		$this->SetTitle(GetMessage("MAIN_WIZARD_LICENSE_STEP_TITLE"));
@@ -47,7 +47,7 @@ class CPackageLicense extends CWizardStep
 		$this->SetCancelStep(BX_WIZARD_CANCEL_ID);
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -60,7 +60,7 @@ class CPackageLicense extends CWizardStep
 			$this->SetError(GetMessage("MAIN_WIZARD_LICENSE_STEP_ERROR"));
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -80,20 +80,20 @@ class CPackageSelectSite extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageSelectSite($package)
+	public function CPackageSelectSite($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetTitle(GetMessage("MAIN_WIZARD_SELECT_SITE_TITLE"));
 		$this->SetSubTitle(GetMessage("MAIN_WIZARD_SELECT_SITE_DESC"));
 		$this->SetCancelStep(BX_WIZARD_CANCEL_ID);
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -128,7 +128,7 @@ class CPackageSelectSite extends CWizardStep
 		}
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -178,13 +178,13 @@ class CPackageSelectGroup extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageSelectGroup($package)
+	public function CPackageSelectGroup($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetCancelStep(BX_WIZARD_CANCEL_ID);
 		$this->SetTitle(GetMessage("MAIN_WIZARD_SELECT_GROUP_TITLE"));
@@ -192,7 +192,7 @@ class CPackageSelectGroup extends CWizardStep
 		$this->SetDisplayVars(Array("__groupID"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -216,7 +216,7 @@ class CPackageSelectGroup extends CWizardStep
 		}
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 		$wizard = $this->GetWizard();
@@ -273,13 +273,13 @@ class CPackageSelectTemplate extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageSelectTemplate($package)
+	public function CPackageSelectTemplate($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetTitle(GetMessage("MAIN_WIZARD_SELECT_TEMPLATE_TITLE"));
 		$this->SetSubTitle(GetMessage("MAIN_WIZARD_SELECT_TEMPLATE_DESC"));
@@ -287,7 +287,7 @@ class CPackageSelectTemplate extends CWizardStep
 		$this->SetDisplayVars(Array("__templateID"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -318,7 +318,7 @@ class CPackageSelectTemplate extends CWizardStep
 		}
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 		$wizard = $this->GetWizard();
@@ -382,20 +382,20 @@ class CPackageSelectService extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageSelectService($package)
+	public function CPackageSelectService($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetCancelStep(BX_WIZARD_CANCEL_ID);
 		$this->SetTitle(GetMessage("MAIN_WIZARD_SELECT_SERVICE_TITLE"));
 		$this->SetSubTitle(GetMessage("MAIN_WIZARD_SELECT_SERVICE_DESC"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -435,7 +435,7 @@ class CPackageSelectService extends CWizardStep
 		}
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 		$wizard = $this->GetWizard();
@@ -545,20 +545,20 @@ class CPackageSelectStructure extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageSelectStructure($package)
+	public function CPackageSelectStructure($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetTitle(GetMessage("MAIN_WIZARD_SELECT_STRUCTURE_TITLE"));
 		$this->SetSubTitle(GetMessage("MAIN_WIZARD_SELECT_STRUCTURE_DESC"));
 		$this->SetCancelStep(BX_WIZARD_CANCEL_ID);
 	}
 
-	public static function DisplayTree(&$arStructure, $systemTree = false)
+	public function DisplayTree(&$arStructure, $systemTree = false)
 	{
 		$strTree = "";
 
@@ -613,7 +613,7 @@ class CPackageSelectStructure extends CWizardStep
 		return $strTree;
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$wizard = $this->GetWizard();
 		$package = $this->package;
@@ -1081,26 +1081,26 @@ class CPackageStartInstall extends CWizardStep
 	var $package;
 	var $arSelected;
 
-	public static function CPackageStartInstall($package, $arSelected)
+	public function CPackageStartInstall($package, $arSelected)
 	{
 		$this->package = $package;
 		$this->arSelected = $arSelected;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 		$this->SetTitle(GetMessage("MAIN_WIZARD_START_INSTALL_TITLE"));
 		$this->SetNextCaption(GetMessage("MAIN_WIZARD_INSTALL_CAPTION"));
 	}
 
-	function OnPostForm()
+	static function OnPostForm()
 	{
 
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 
@@ -1134,7 +1134,7 @@ class CPackageInstallSite extends CWizardStep
 	var $package;
 	var $siteID;
 
-	public static function CPackageInstallSite($package, $siteID)
+	public function CPackageInstallSite($package, $siteID)
 	{
 		$this->package = $package;
 		$this->siteID = $siteID;
@@ -1143,13 +1143,13 @@ class CPackageInstallSite extends CWizardStep
 		$this->SetTitle(GetMessage("MAIN_WIZARD_RUN_INSTALLATION"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$package = $this->package;
 		$package->__InstallSite($this->siteID);
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		if (strlen($this->content) == 0)
 			$this->content = GetMessage("MAIN_WIZARD_SITE_INSTALL");
@@ -1162,7 +1162,7 @@ class CPackageInstallTemplate extends CWizardStep
 	var $package;
 	var $templateID;
 
-	public static function CPackageInstallTemplate($package, $templateID)
+	public function CPackageInstallTemplate($package, $templateID)
 	{
 		$this->package = $package;
 		$this->templateID = $templateID;
@@ -1171,13 +1171,13 @@ class CPackageInstallTemplate extends CWizardStep
 		$this->SetTitle(GetMessage("MAIN_WIZARD_RUN_INSTALLATION"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$package = $this->package;
 		$package->__InstallTemplate($this->templateID);
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		if (strlen($this->content) == 0)
 			$this->content = GetMessage("MAIN_WIZARD_TEMPLATE_INSTALL");
@@ -1189,7 +1189,7 @@ class CPackageInstallService extends CWizardStep
 	var $package;
 	var $serviceID;
 
-	public static function CPackageInstallService($package, $serviceID)
+	public function CPackageInstallService($package, $serviceID)
 	{
 		$this->package = $package;
 		$this->serviceID = $serviceID;
@@ -1198,13 +1198,13 @@ class CPackageInstallService extends CWizardStep
 		$this->SetTitle(GetMessage("MAIN_WIZARD_RUN_INSTALLATION"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$package = $this->package;
 		$package->__InstallService($this->serviceID);
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		$package = $this->package;
 
@@ -1224,20 +1224,20 @@ class CPackageInstallStructure extends CWizardStep
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$this->SetAutoSubmit();
 		$this->SetTitle(GetMessage("MAIN_WIZARD_RUN_INSTALLATION"));
 	}
 
-	public static function OnPostForm()
+	public function OnPostForm()
 	{
 		$wizard = $this->GetWizard();
 		$package = $wizard->GetPackage();
 		$package->__InstallStructure();
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		if (strlen($this->content) == 0)
 			$this->content = GetMessage("MAIN_WIZARD_INSTALL_STRUCTURE");
@@ -1248,24 +1248,24 @@ class CPackageFinish extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageStepFinal($package)
+	public function CPackageStepFinal($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 		$this->SetTitle(GetMessage("MAIN_WIZARD_FINISH_TITLE"));
 		$this->SetCancelCaption(GetMessage("MAIN_WIZARD_FINISH_CAPTION"));
 	}
 
-	function OnPostForm()
+	static function OnPostForm()
 	{
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		if (strlen($this->content) == 0)
 			$this->content = GetMessage("MAIN_WIZARD_FINISH_DESC");
@@ -1276,24 +1276,24 @@ class CPackageCancel extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageCancel($package)
+	public function CPackageCancel($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 		$this->SetTitle(GetMessage("MAIN_WIZARD_CANCEL_TITLE"));
 		$this->SetCancelCaption(GetMessage("MAIN_WIZARD_FINISH_CAPTION"));
 	}
 
-	function OnPostForm()
+	static function OnPostForm()
 	{
 	}
 
-	public static function ShowStep()
+	public function ShowStep()
 	{
 		if (strlen($this->content) == 0)
 			$this->content .= GetMessage("MAIN_WIZARD_CANCEL_DESC");
@@ -1304,13 +1304,13 @@ class CPackageError extends CWizardStep
 {
 	var $package;
 
-	public static function CPackageError($package)
+	public function CPackageError($package)
 	{
 		$this->package = $package;
 		parent::CWizardStep();
 	}
 
-	public static function InitStep()
+	public function InitStep()
 	{
 		$package = $this->package;
 

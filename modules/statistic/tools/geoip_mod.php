@@ -24,7 +24,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		return new CCityLookup_geoip_mod($arDBRecord);
 	}
 
-	function __construct($arDBRecord = false)
+	public function __construct($arDBRecord = false)
 	{
 		parent::__construct($arDBRecord);
 		if(!$arDBRecord)
@@ -44,7 +44,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		}
 	}
 
-	public static function ArrayForDB()
+	public function ArrayForDB()
 	{
 		$ar = parent::ArrayForDB();
 		if($this->continent_code) $ar["XCONT"] = $this->continent_code;
@@ -53,7 +53,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		return $ar;
 	}
 
-	public static function GetFullInfo()
+	public function GetFullInfo()
 	{
 		$ar = parent::GetFullInfo();
 		$ar["CONTINENT"] = array(
@@ -74,7 +74,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		return $ar;
 	}
 
-	public static function GetDescription()
+	public function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_geoip_mod",
@@ -86,12 +86,12 @@ class CCityLookup_geoip_mod extends CCityLookup
 		);
 	}
 
-	public static function IsInstalled()
+	public function IsInstalled()
 	{
 		return $this->is_installed;
 	}
 
-	public static function Lookup()
+	public function Lookup()
 	{
 		if(array_key_exists("GEOIP_COUNTRY_NAME", $_SERVER) && strlen($_SERVER["GEOIP_COUNTRY_NAME"]) > 0)
 		{

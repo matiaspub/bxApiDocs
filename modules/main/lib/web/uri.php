@@ -10,7 +10,7 @@ class Uri
 
 	protected static $directoryIndex = "index.php";
 
-	static public function __construct($uri, $uriType)
+	public function __construct($uri, $uriType)
 	{
 		if ($uriType < UriType::UNKNOWN || $uriType > UriType::RELATIVE)
 			throw new \Bitrix\Main\ArgumentOutOfRangeException("uriType", UriType::getTypeNamesArray());
@@ -22,12 +22,12 @@ class Uri
 		$this->uriType = $uriType;
 	}
 
-	static public function parse($uriPart = -1)
+	public function parse($uriPart = -1)
 	{
 		return parse_url($this->uri, $uriPart);
 	}
 
-	static public function convertToPath()
+	public function convertToPath()
 	{
 		if ($this->uriType != UriType::RELATIVE)
 		{

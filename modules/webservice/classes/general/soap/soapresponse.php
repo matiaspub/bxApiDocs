@@ -23,7 +23,7 @@ class CSOAPResponse extends CSOAPEnvelope
     /// Contains the DOM document for the current SOAP response
     var $DOMDocument = false;
 
-    public static function CSOAPResponse( $name="", $namespace="" )
+    public function CSOAPResponse( $name="", $namespace="" )
     {
         $this->Name = $name;
         $this->Namespace = $namespace;
@@ -33,7 +33,7 @@ class CSOAPResponse extends CSOAPEnvelope
     }
 
 	//	Decodes the SOAP response stream
-    public static function decodeStream( $request, $stream )
+    public function decodeStream( $request, $stream )
     {
 		global $APPLICATION;
 
@@ -121,7 +121,7 @@ class CSOAPResponse extends CSOAPEnvelope
     }
 
 	// Decodes a DOM node and returns the PHP datatype instance of it.
-    public static function decodeDataTypes( $node, $complexDataTypeName = "" )
+    public function decodeDataTypes( $node, $complexDataTypeName = "" )
     {
     	global $xsd_simple_type;
         $returnValue = false;
@@ -345,7 +345,7 @@ class CSOAPResponse extends CSOAPEnvelope
     }
 
 	//      Returns the XML payload for the response.
-    public static function payload( )
+    public function payload( )
     {
         $root = new CXMLCreator("soap:Envelope");
 		$root->setAttribute("xmlns:soap", BX_SOAP_ENV);
@@ -441,37 +441,37 @@ class CSOAPResponse extends CSOAPEnvelope
         return $data;
     }
 
-    public static function value()
+    public function value()
     {
         return $this->Value;
     }
 
-    public static function setValue( $value )
+    public function setValue( $value )
     {
         $this->Value = $value;
     }
 
-    public static function setValueName ( $valname )
+    public function setValueName ( $valname )
     {
     	$this->ValueName = $valname;
     }
 
-    public static function isFault()
+    public function isFault()
     {
         return $this->IsFault;
     }
 
-    public static function faultCode()
+    public function faultCode()
     {
         return $this->FaultCode;
     }
 
-    public static function faultString()
+    public function faultString()
     {
         return $this->FaultString;
     }
 
-    public static function setTypensVars($vars)
+    public function setTypensVars($vars)
     {
     	$this->typensVars = $vars;
     }

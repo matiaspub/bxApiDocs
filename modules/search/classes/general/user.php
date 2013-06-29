@@ -1,9 +1,9 @@
 <?
 class CSearchUser
 {
-	var $_user_id;
+	protected $_user_id;
 
-	function __construct($user_id)
+	public function __construct($user_id)
 	{
 		$this->_user_id = intval($user_id);
 	}
@@ -26,33 +26,31 @@ class CSearchUser
 	public static function CheckCurrentUserGroups()
 	{
 		global $USER;
-		$user_id = intval($USER->GetID());
+		$user_id = is_object($USER)? intval($USER->GetID()): 0;
 
 		if($user_id > 0)
 		{
-			$ob = new CSearchUser($user_id);
-
-			if(!$ob->IsGroupsExists())
+			$arGroupCodes = array('AU', 'U'.$user_id); // Authorized
+			foreach($USER->GetUserGroupArray() as $group_id)
 			{
-				$arGroupCodes = array('AU', 'U'.$user_id); // Authorized
-
-				foreach($USER->GetUserGroupArray() as $group_id)
-					$arGroupCodes[] = 'G'.$group_id;
-
-				$events = GetModuleEvents("search", "OnSearchCheckPermissions");
-				while($arEvent = $events->Fetch())
-				{
-					$arCodes = ExecuteModuleEventEx($arEvent, array($FIELD));
-					if(is_array($arCodes))
-						$arGroupCodes = array_merge($arGroupCodes, $arCodes);
-				}
-
-				$ob->AddGroups($arGroupCodes);
+				$arGroupCodes[] = 'G'.$group_id;
 			}
+
+			foreach (GetModuleEvents("search", "OnSearchCheckPermissions", true) as $arEvent)
+			{
+				$arCodes = ExecuteModuleEventEx($arEvent, array(null));
+				if(is_array($arCodes))
+				{
+					$arGroupCodes = array_merge($arGroupCodes, $arCodes);
+				}
+			}
+
+			$ob = new CSearchUser($user_id);
+			$ob->SetGroups($arGroupCodes);
 		}
 	}
 
-	public static function IsGroupsExists()
+	public function IsGroupsExists()
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$rs = $DB->Query($DB->TopSql("
@@ -62,7 +60,7 @@ class CSearchUser
 		return is_array($rs->Fetch());
 	}
 
-	public static function DeleteGroups()
+	public function DeleteGroups()
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$DB->Query("
@@ -71,14 +69,16 @@ class CSearchUser
 		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	public static function AddGroups($arGroups)
+	public function AddGroups($arGroups)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 
 		$arToInsert = array();
 		foreach($arGroups as $group_code)
-			if(strlen($group_code))
+		{
+			if($group_code != "")
 				$arToInsert[$group_code] = $group_code;
+		}
 
 		foreach($arToInsert as $group_code)
 		{
@@ -89,6 +89,28 @@ class CSearchUser
 				(".$this->_user_id.", '".$DB->ForSQL($group_code, 100)."')
 			", true, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
+	}
+
+	public function SetGroups($arGroups)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$dbCodes = $DB->Query("
+			SELECT GROUP_CODE
+			FROM b_search_user_right
+			WHERE USER_ID = ".$this->_user_id."
+		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while ($dbCode = $dbCodes->Fetch())
+		{
+			if (!in_array($dbCode["GROUP_CODE"], $arGroups))
+			{
+				$DB->Query("
+					DELETE FROM b_search_user_right
+					WHERE USER_ID = ".$this->_user_id."
+					AND GROUP_CODE = '".$DB->ForSQL($dbCode["GROUP_CODE"])."'
+				", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+		}
+		$this->AddGroups($arGroups);
 	}
 }
 ?>

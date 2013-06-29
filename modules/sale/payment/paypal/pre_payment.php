@@ -15,7 +15,7 @@ class CSalePaySystemPrePayment
 	var $encoding = "";
 	var $version = "";
 
-	public static function init()
+	public function init()
 	{
 		$this->username = CSalePaySystemAction::GetParamValue("USER");
 		$this->pwd = CSalePaySystemAction::GetParamValue("PWD");
@@ -60,7 +60,7 @@ class CSalePaySystemPrePayment
 		</form>";
 	}
 
-	public static function BasketButtonAction($orderData = array())
+	public function BasketButtonAction($orderData = array())
 	{
 		global $APPLICATION;
 		if($_POST["paypal"] == "Y")
@@ -105,7 +105,7 @@ class CSalePaySystemPrePayment
 		return true;
 	}
 
-	public static function getHiddenInputs()
+	public function getHiddenInputs()
 	{
 		return "
 			<input type=\"hidden\" name=\"paypal\" value=\"Y\">
@@ -114,14 +114,14 @@ class CSalePaySystemPrePayment
 		";
 	}
 
-	public static function isAction()
+	public function isAction()
 	{
 		if($_REQUEST["paypal"] == "Y" && strlen($this->token) > 0)
 			return true;
 		return false;
 	}
 
-	public static function parseResult($data)
+	public function parseResult($data)
 	{
 		global $APPLICATION;
 
@@ -138,7 +138,7 @@ class CSalePaySystemPrePayment
 
 	}
 
-	public static function getProps()
+	public function getProps()
 	{
 		if(strlen($this->token) > 0)
 		{
@@ -175,7 +175,7 @@ class CSalePaySystemPrePayment
 		}
 	}
 
-	public static function payOrder()
+	public function payOrder()
 	{
 		if(strlen($this->token) > 0)
 		{

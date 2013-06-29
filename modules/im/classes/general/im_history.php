@@ -6,7 +6,7 @@ class CIMHistory
 	private $user_id = 0;
 	private $bHideLink = false;
 
-	function __construct($user_id = false, $arParams = Array())
+	public function __construct($user_id = false, $arParams = Array())
 	{
 		global $USER;
 		$this->user_id = intval($user_id);
@@ -16,7 +16,7 @@ class CIMHistory
 			$this->bHideLink = true;
 	}
 
-	public static function SearchMessage($searchText, $toUserId, $fromUserId = false, $bTimeZone = true)
+	public function SearchMessage($searchText, $toUserId, $fromUserId = false, $bTimeZone = true)
 	{
 		global $DB;
 
@@ -96,7 +96,7 @@ class CIMHistory
 		return Array('message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $arUsers);
 	}
 
-	public static function GetMoreMessage($pageId, $toUserId, $fromUserId = false, $bTimeZone = true)
+	public function GetMoreMessage($pageId, $toUserId, $fromUserId = false, $bTimeZone = true)
 	{
 		global $DB;
 
@@ -196,7 +196,7 @@ class CIMHistory
 		return false;
 	}
 
-	public static function RemoveAllMessage($userId)
+	public function RemoveAllMessage($userId)
 	{
 		global $DB;
 
@@ -238,7 +238,7 @@ class CIMHistory
 	}
 
 	/* CHAT */
-	public static function HideAllChatMessage($chatId)
+	public function HideAllChatMessage($chatId)
 	{
 		global $DB;
 		$chatId = intval($chatId);
@@ -268,7 +268,7 @@ class CIMHistory
 		return true;
 	}
 
-	public static function SearchChatMessage($searchText, $chatId, $bTimeZone = true)
+	public function SearchChatMessage($searchText, $chatId, $bTimeZone = true)
 	{
 		global $DB;
 
@@ -324,7 +324,7 @@ class CIMHistory
 		return Array('message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $usersMessage);
 	}
 
-	public static function GetMoreChatMessage($pageId, $chatId, $bTimeZone = true)
+	public function GetMoreChatMessage($pageId, $chatId, $bTimeZone = true)
 	{
 		global $DB;
 

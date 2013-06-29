@@ -8,7 +8,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 	protected $errstr = '';
 	protected $result = '';
 
-	public static function GetLastRequestStatus()
+	public function GetLastRequestStatus()
 	{
 		return $this->status;
 	}
@@ -35,7 +35,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		);
 	}
 
-	public static function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
+	public function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
 	{
 		if($bVarsFromForm)
 			$arSettings = $_POST["SETTINGS"][$this->GetID()];
@@ -64,7 +64,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return $result;
 	}
 
-	public static function CheckSettings($arBucket, &$arSettings)
+	public function CheckSettings($arBucket, &$arSettings)
 	{
 		global $APPLICATION;
 		$aMsg = array();
@@ -105,7 +105,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return true;
 	}
 
-	function _GetToken($host, $user, $key)
+	public static function _GetToken($host, $user, $key)
 	{
 		static $results = array();
 		$cache_id = "v0|".$host."|".$user."|".$key;
@@ -155,7 +155,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return $result;
 	}
 
-	public static function SendRequest($settings, $verb, $bucket, $file_name='', $params='', $content=false, $additional_headers=array())
+	public function SendRequest($settings, $verb, $bucket, $file_name='', $params='', $content=false, $additional_headers=array())
 	{
 		$arToken = $this->_GetToken($settings["HOST"], $settings["USER"], $settings["KEY"]);
 		if(!$arToken)
@@ -193,7 +193,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return $obRequest;
 	}
 
-	public static function CreateBucket($arBucket)
+	public function CreateBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -214,7 +214,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return ($this->status == 201)/*Created*/ || ($this->status == 202) /*Accepted*/;
 	}
 
-	public static function DeleteBucket($arBucket)
+	public function DeleteBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -250,7 +250,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		}
 	}
 
-	public static function IsEmptyBucket($arBucket)
+	public function IsEmptyBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -293,7 +293,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		}
 	}
 
-	public static function GetFileSRC($arBucket, $arFile)
+	public function GetFileSRC($arBucket, $arFile)
 	{
 		if($arBucket["CNAME"])
 		{
@@ -327,7 +327,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return $host."/".CCloudUtil::URLEncode($URI, "UTF-8");
 	}
 
-	public static function FileExists($arBucket, $filePath)
+	public function FileExists($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -348,7 +348,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return ($this->status == 200 || $this->status == 206);
 	}
 
-	public static function FileCopy($arBucket, $arFile, $filePath)
+	public function FileCopy($arBucket, $arFile, $filePath)
 	{
 		global $APPLICATION;
 
@@ -376,7 +376,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			return false;
 	}
 
-	public static function DownloadToFile($arBucket, $arFile, $filePath)
+	public function DownloadToFile($arBucket, $arFile, $filePath)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$obRequest = new CHTTP;
@@ -384,7 +384,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return $obRequest->Download($this->GetFileSRC($arBucket, $arFile), $io->GetPhysicalName($filePath));
 	}
 
-	public static function DeleteFile($arBucket, $filePath)
+	public function DeleteFile($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -405,7 +405,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return ($obRequest->status == 204 || $obRequest->status == 404);
 	}
 
-	public static function SaveFile($arBucket, $filePath, $arFile)
+	public function SaveFile($arBucket, $filePath, $arFile)
 	{
 		global $APPLICATION;
 
@@ -457,7 +457,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		}
 	}
 
-	public static function ListFiles($arBucket, $filePath, $bRecursive = false)
+	public function ListFiles($arBucket, $filePath, $bRecursive = false)
 	{
 		global $APPLICATION;
 
@@ -591,7 +591,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		return 5*1024*1024; //5MB
 	}
 
-	public static function UploadPart($arBucket, &$NS, $data)
+	public function UploadPart($arBucket, &$NS, $data)
 	{
 		$filePath = $NS["fileTemp"]."/".sprintf("%06d", $NS["partsCount"]+1);
 
@@ -615,7 +615,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		}
 	}
 
-	public static function CompleteMultipartUpload($arBucket, &$NS)
+	public function CompleteMultipartUpload($arBucket, &$NS)
 	{
 		global $APPLICATION;
 

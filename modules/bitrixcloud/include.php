@@ -32,17 +32,17 @@ class CBitrixCloudException extends Exception
 {
 	protected $error_code = "";
 	protected $debug_info = "";
-	static public function __construct($message = "", $error_code = "", $debug_info = "")
+	public function __construct($message = "", $error_code = "", $debug_info = "")
 	{
 		parent::__construct($message);
 		$this->error_code = $error_code;
 		$this->debug_info = $debug_info;
 	}
-	static final public function getErrorCode()
+	final public function getErrorCode()
 	{
 		return $this->error_code;
 	}
-	static final public function getDebugInfo()
+	final public function getDebugInfo()
 	{
 		return $this->debug_info;
 	}

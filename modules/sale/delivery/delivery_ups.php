@@ -106,7 +106,7 @@ class CDeliveryUPS
 		return $arSettings["zones_csv"].";".$arSettings["export_csv"];
 	}
 
-	function __parseZonesFile($file)
+	public static function __parseZonesFile($file)
 	{
 		$arResult = array();
 
@@ -147,7 +147,7 @@ class CDeliveryUPS
 		return $arResult;
 	}
 
-	function __parseExportFile($file)
+	public static function __parseExportFile($file)
 	{
 		$arResult = array();
 
@@ -287,7 +287,7 @@ class CDeliveryUPS
 	}
 
 
-	function __GetLocation(&$arLocation, $arConfig)
+	public static function __GetLocation(&$arLocation, $arConfig)
 	{
 		$zones_file = $arConfig["zones_csv"]["VALUE"];
 		$arZones = CDeliveryUPS::__GetZones($zones_file);

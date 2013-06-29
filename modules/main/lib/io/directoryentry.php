@@ -9,7 +9,7 @@ abstract class DirectoryEntry
 		parent::__construct($path);
 	}
 
-	static public function create()
+	public function create()
 	{
 		if ($this->isExists())
 			return;
@@ -30,13 +30,13 @@ abstract class DirectoryEntry
 	/**
 	 * @return FileSystemEntry[]
 	 */
-	static abstract public function getChildren();
+	abstract public function getChildren();
 
 	/**
 	 * @param string $path
 	 * @return DirectoryEntry
 	 */
-	static abstract public function createSubdirectory($name);
+	abstract public function createSubdirectory($name);
 
 	static public function isDirectory()
 	{

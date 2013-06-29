@@ -117,7 +117,7 @@ class CPerfCluster
 		return $DB->Query($strSql, false, '', array('fixed_connection'=>true));
 	}
 
-	public static function Measure($host, $port, $url, $threads, $iterations = 3, $arOptions = array())
+	public function Measure($host, $port, $url, $threads, $iterations = 3, $arOptions = array())
 	{
 		$strRequest = "GET ".$url." HTTP/1.0\r\n";
 		$strRequest.= "User-Agent: BitrixSMCluster (thread #thread#)\r\n";

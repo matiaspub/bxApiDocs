@@ -19,7 +19,7 @@ class CLearnLessonTree
 	 * @param array filter
 	 * @param bool skip publish prohibited lessons in context of $rootLessonId
 	 */
-	static public function __construct ($rootLessonId, $arOrder = null, $arFilter = array(), $publishProhibitionMode = true, $arSelectFields = array())
+	public function __construct ($rootLessonId, $arOrder = null, $arFilter = array(), $publishProhibitionMode = true, $arSelectFields = array())
 	{
 		$this->EnsureStrictlyCastableToInt ($rootLessonId);		// throws an exception on error
 		if ($arOrder === null)
@@ -94,7 +94,7 @@ class CLearnLessonTree
 	 *    ...
 	 * )
 	 */
-	static public function GetTree ()
+	public function GetTree ()
 	{
 		return ($this->arTree);
 	}
@@ -123,7 +123,7 @@ class CLearnLessonTree
 	 *    ...
 	 * )
 	 */
-	static public function GetTreeAsList()
+	public function GetTreeAsList()
 	{
 		return ($this->arLessonsAsList);
 	}
@@ -134,7 +134,7 @@ class CLearnLessonTree
 	 * if there is some duplicates lessons, only one of them
 	 * will be in resulted tree.
 	 */
-	static public function GetTreeAsListOldMode()
+	public function GetTreeAsListOldMode()
 	{
 		return ($this->arLessonsAsListOldMode);
 	}
@@ -145,7 +145,7 @@ class CLearnLessonTree
 	 * if there is some duplicates lessons, only one of them
 	 * will be in resulted tree.
 	 */
-	static public function GetLessonsIdListInTree()
+	public function GetLessonsIdListInTree()
 	{
 		return ($this->arLessonsInTree);
 	}

@@ -8,7 +8,7 @@ class CSearchLanguage
 	var $_has_bigramm_info = null;
 	var $_bigrams = null;
 
-	function __construct($lang_id)
+	public function __construct($lang_id)
 	{
 		$this->_lang_id = $lang_id;
 	}
@@ -62,7 +62,7 @@ class CSearchLanguage
 	}
 
 	//Reads file with trigrams (combinations not allowed in the words)
-	public static function LoadTrigrams($dir_name)
+	public function LoadTrigrams($dir_name)
 	{
 		if(empty($this->_trigrams))
 		{
@@ -97,13 +97,13 @@ class CSearchLanguage
 		}
 	}
 
-	public static function HasTrigrams()
+	public function HasTrigrams()
 	{
 		return !empty($this->_trigrams);
 	}
 
 	//Check phrase against trigrams
-	public static function CheckTrigrams($arScanCodes)
+	public function CheckTrigrams($arScanCodes)
 	{
 		$result = 0;
 		$check = "";
@@ -156,7 +156,7 @@ class CSearchLanguage
 		);
 	}
 
-	public static function ConvertFromScancode($arScancode)
+	public function ConvertFromScancode($arScancode)
 	{
 		$result = "";
 		$keyboard = $this->GetKeyboardLayout();
@@ -228,7 +228,7 @@ class CSearchLanguage
 
 	//This function converts text into array of character positions
 	//on the keyboard. Not defined chars turns into "false" value.
-	public static function ConvertToScancode($text, $strict=false, $binary=false)
+	public function ConvertToScancode($text, $strict=false, $binary=false)
 	{
 		static $cache = array();
 		if(!isset($cache[$this->_lang_id]))
@@ -470,7 +470,7 @@ class CSearchLanguage
 
 	//Function returns distance of the text (sequence of scan codes)
 	//from language model
-	public static function GetDeviation($arScanCodes)
+	public function GetDeviation($arScanCodes)
 	{
 		//This is language model
 		$lang_bigrams = $this->GetBigrammScancodeFreq();
@@ -523,13 +523,13 @@ class CSearchLanguage
 		return $result;
 	}
 
-	public static function HasBigrammInfo()
+	public function HasBigrammInfo()
 	{
 		return $this->_has_bigramm_info;
 	}
 
 	//Function returns model of the language
-	public static function GetBigrammScancodeFreq()
+	public function GetBigrammScancodeFreq()
 	{
 		if(!$this->HasBigrammInfo())
 			return array("count"=>1);

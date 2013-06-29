@@ -72,7 +72,7 @@ class ExpressionField extends Field
 
 
 
-	static public function __construct($name, $dataType, Base $entity, $expression, $parameters = array())
+	public function __construct($name, $dataType, Base $entity, $expression, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
 
@@ -88,22 +88,22 @@ class ExpressionField extends Field
 		}
 	}
 
-	static public function __call($name, $arguments)
+	public function __call($name, $arguments)
 	{
 		return call_user_func_array(array($this->valueField, $name), $arguments);
 	}
 
-	static public function validateValue($value, $row, Result $result)
+	public function validateValue($value, $row, Result $result)
 	{
 		return $this->valueField->validateValue($value, $row, $result);
 	}
 
-	static public function getExpression()
+	public function getExpression()
 	{
 		return $this->expression;
 	}
 
-	static public function getFullExpression()
+	public function getFullExpression()
 	{
 		if (!isset($this->fullExpression))
 		{
@@ -127,7 +127,7 @@ class ExpressionField extends Field
 		return $this->fullExpression;
 	}
 
-	static public function isAggregated()
+	public function isAggregated()
 	{
 		if (!isset($this->isAggregated))
 		{
@@ -137,7 +137,7 @@ class ExpressionField extends Field
 		return $this->isAggregated;
 	}
 
-	static public function hasSubquery()
+	public function hasSubquery()
 	{
 		if (!isset($this->hasSubquery))
 		{
@@ -147,12 +147,12 @@ class ExpressionField extends Field
 		return $this->hasSubquery;
 	}
 
-	static public function isConstant()
+	public function isConstant()
 	{
 		return empty($this->buildFrom);
 	}
 
-	static public function getBuildFromChains()
+	public function getBuildFromChains()
 	{
 		if (is_null($this->buildFromChains))
 		{
@@ -195,7 +195,7 @@ class ExpressionField extends Field
 		return (preg_match('/(?:^|[^a-z0-9_])EXISTS\s*\(/', $expression) || preg_match('/(?:^|[^a-z0-9_])\(\s*SELECT/', $expression));
 	}
 
-	static public function __clone()
+	public function __clone()
 	{
 		$this->buildFromChains = null;
 	}

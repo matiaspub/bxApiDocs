@@ -310,9 +310,37 @@ class CSocNetGroup extends CAllSocNetGroup
 					"WHERE LID IN (".$str_SiteID.") ";
 				$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
+				$arLogID = array();
+
 				$dbResult = CSocNetLog::GetList(
 					array(),
-					array("ENTITY_ID" => $ID, "ENTITY_TYPE" => SONET_ENTITY_GROUP),
+					array("LOG_RIGHTS" => "SG".$ID),
+					false,
+					false,
+					array("ID")
+				);
+
+				while ($arResult = $dbResult->Fetch())
+				{
+					$DB->Query("DELETE FROM b_sonet_log_site WHERE LOG_ID = ".$arResult["ID"]."", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+					$DB->Query("
+						INSERT INTO b_sonet_log_site(LOG_ID, SITE_ID)
+						SELECT ".$arResult["ID"].", LID
+						FROM b_lang
+						WHERE LID IN (".$str_SiteID.")
+					", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+					$arLogID[] = $arResult["ID"];
+				}
+
+				$dbResult = CSocNetLog::GetList(
+					array(),
+					array(
+						"!ID" => $arLogID,
+						"ENTITY_ID" => $ID, 
+						"ENTITY_TYPE" => SONET_ENTITY_GROUP
+					),
 					false,
 					false,
 					array("ID")

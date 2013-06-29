@@ -40,7 +40,7 @@ class CSocServGoogleOAuth extends CSocServAuth
 		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)" class="bx-ss-button google-button"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
 	}
 
-	static public function Authorize()
+	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		$bSuccess = 1;
@@ -150,7 +150,7 @@ class CGoogleOAuthInterface
 	protected $code = false;
 	protected $access_token = false;
 
-	static public function __construct($appID, $appSecret, $code=false)
+	public function __construct($appID, $appSecret, $code=false)
 	{
 		$this->httpTimeout = 10;
 		$this->appID = $appID;
@@ -158,7 +158,7 @@ class CGoogleOAuthInterface
 		$this->code = $code;
 	}
 
-	static public function GetAuthUrl($redirect_uri, $state='')
+	public function GetAuthUrl($redirect_uri, $state='')
 	{
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
@@ -168,7 +168,7 @@ class CGoogleOAuthInterface
 			($state <> ''? '&state='.urlencode($state):'');
 	}
 
-	static public function GetAccessToken($redirect_uri)
+	public function GetAccessToken($redirect_uri)
 	{
 		if($this->code === false)
 			return false;
@@ -191,7 +191,7 @@ class CGoogleOAuthInterface
 		return false;
 	}
 
-	static public function GetCurrentUser()
+	public function GetCurrentUser()
 	{
 		if($this->access_token === false)
 			return false;

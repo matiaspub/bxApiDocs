@@ -23,7 +23,7 @@ class CSaleDeliveryHandler extends CAllSaleDeliveryHandler
 		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CSaleDeliveryHandler<br>File: ".__FILE__;
 	}	
 	
-	function __spreadHandlerData($SID)
+	public static function __spreadHandlerData($SID)
 	{
 		global $DB;
 		

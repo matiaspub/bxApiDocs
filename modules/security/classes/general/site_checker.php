@@ -24,7 +24,7 @@ class CSecuritySiteChecker
 	 * @param bool $pIsFirstStart
 	 * @throws Exception
 	 */
-	static public function __construct($pTests = array(), $pIsFirstStart = false)
+	public function __construct($pTests = array(), $pIsFirstStart = false)
 	{
 		$this->sessionData = new CSecurityTemporaryStorage(self::SESSION_DATA_KEY, $pIsFirstStart);
 		$isOk = $this->initializeAvailableTests();
@@ -43,7 +43,7 @@ class CSecuritySiteChecker
 	 * @param array $pParams
 	 * @return array|bool
 	 */
-	static public function startTesting($pParams = array())
+	public function startTesting($pParams = array())
 	{
 		$testName = $this->getCurrentTestName();
 		if(!$testName)
@@ -103,7 +103,7 @@ class CSecuritySiteChecker
 	 * Return current percent of complete testing
 	 * @return int
 	 */
-	static public function getPercent()
+	public function getPercent()
 	{
 		$totalTestsCount = count($this->neededTests);
 		$remainingTestsCount = count($this->sessionData->getArray("NEEDED_TESTS"));
@@ -312,7 +312,7 @@ class CSecuritySiteChecker
 	/**
 	 * @return bool
 	 */
-	static public function isAllTestCompleted()
+	public function isAllTestCompleted()
 	{
 		return $this->sessionData->getBool("ALL_DONE");
 	}

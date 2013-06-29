@@ -8,7 +8,7 @@ class _CEventsIblock {
 	/**
 	 * перед добавлением информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlock::CheckFields
 	 */
 	public static function OnBeforeIBlockAdd(){}
@@ -16,7 +16,7 @@ class _CEventsIblock {
 	/**
 	 * после добавления информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">Add</a>
 	 */
 	public static function OnAfterIBlockAdd(){}
@@ -24,7 +24,7 @@ class _CEventsIblock {
 	/**
 	 * перед изменением информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlock::CheckFields
 	 */
 	public static function OnBeforeIBlockUpdate(){}
@@ -32,7 +32,7 @@ class _CEventsIblock {
 	/**
 	 * после изменения информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">Update</a>
 	 */
 	public static function OnAfterIBlockUpdate(){}
@@ -40,7 +40,7 @@ class _CEventsIblock {
 	/**
 	 * перед удалением информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/delete.php">Delete</a>
 	 */
 	public static function OnBeforeIBlockDelete(){}
@@ -48,7 +48,7 @@ class _CEventsIblock {
 	/**
 	 * при удалении информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/delete.php">Delete</a>
 	 */
 	public static function OnIBlockDelete(){}
@@ -56,7 +56,7 @@ class _CEventsIblock {
 	/**
 	 * перед добавлением свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockProperty::CheckFields
 	 */
 	public static function OnBeforeIBlockPropertyAdd(){}
@@ -64,7 +64,7 @@ class _CEventsIblock {
 	/**
 	 * после добавления свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">Add</a>
 	 */
 	public static function OnAfterIBlockPropertyAdd(){}
@@ -72,7 +72,7 @@ class _CEventsIblock {
 	/**
 	 * перед изменением свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockProperty::CheckFields
 	 */
 	public static function OnBeforeIBlockPropertyUpdate(){}
@@ -80,7 +80,7 @@ class _CEventsIblock {
 	/**
 	 * при удалении свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">Delete</a>
 	 */
 	public static function OnIBlockPropertyDelete(){}
@@ -88,7 +88,7 @@ class _CEventsIblock {
 	/**
 	 * после изменения свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">Update</a>
 	 */
 	public static function OnAfterIBlockPropertyUpdate(){}
@@ -96,7 +96,7 @@ class _CEventsIblock {
 	/**
 	 * перед удалением свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">Delete</a>
 	 */
 	public static function OnBeforeIBlockPropertyDelete(){}
@@ -104,7 +104,7 @@ class _CEventsIblock {
 	/**
 	 * при построении списка свойств.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/GetUserType.php">GetUserType</a>
 	 */
 	public static function OnIBlockPropertyBuildList(){}
@@ -112,7 +112,7 @@ class _CEventsIblock {
 	/**
 	 * перед добавлением раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockSection::CheckFields
 	 */
 	public static function OnBeforeIBlockSectionAdd(){}
@@ -120,7 +120,7 @@ class _CEventsIblock {
 	/**
 	 * после добавления раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">Add</a>
 	 */
 	public static function OnAfterIBlockSectionAdd(){}
@@ -128,7 +128,7 @@ class _CEventsIblock {
 	/**
 	 * перед изменением раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockSection::CheckFields
 	 */
 	public static function OnBeforeIBlockSectionUpdate(){}
@@ -136,7 +136,7 @@ class _CEventsIblock {
 	/**
 	 * после изменения раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">Update</a>
 	 */
 	public static function OnAfterIBlockSectionUpdate(){}
@@ -144,7 +144,7 @@ class _CEventsIblock {
 	/**
 	 * перед удалением раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">Delete</a>
 	 */
 	public static function OnBeforeIBlockSectionDelete(){}
@@ -152,7 +152,7 @@ class _CEventsIblock {
 	/**
 	 * после удаления раздела.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">Delete</a>
 	 */
 	public static function OnAfterIBlockSectionDelete(){}
@@ -160,7 +160,7 @@ class _CEventsIblock {
 	/**
 	 * перед добавлением элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockElement::CheckFields
 	 */
 	public static function OnBeforeIBlockElementAdd(){}
@@ -168,7 +168,7 @@ class _CEventsIblock {
 	/**
 	 * в момент начала добавления элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockElement::CheckFields
 	 */
 	public static function OnStartIBlockElementAdd(){}
@@ -176,7 +176,7 @@ class _CEventsIblock {
 	/**
 	 * после добавления элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">Add</a>
 	 */
 	public static function OnAfterIBlockElementAdd(){}
@@ -184,7 +184,7 @@ class _CEventsIblock {
 	/**
 	 * перед изменением элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockElement::CheckFields
 	 */
 	public static function OnBeforeIBlockElementUpdate(){}
@@ -192,7 +192,7 @@ class _CEventsIblock {
 	/**
 	 * в момент начала изменения элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockElement::CheckFields
 	 */
 	public static function OnStartIBlockElementUpdate(){}
@@ -200,7 +200,7 @@ class _CEventsIblock {
 	/**
 	 * после изменения элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">Update</a>
 	 */
 	public static function OnAfterIBlockElementUpdate(){}
@@ -208,7 +208,7 @@ class _CEventsIblock {
 	/**
 	 * перед удалением элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">Delete</a>
 	 */
 	public static function OnBeforeIBlockElementDelete(){}
@@ -216,7 +216,7 @@ class _CEventsIblock {
 	/**
 	 * после удаления элемента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">Delete</a>
 	 */
 	public static function OnAfterIBlockElementDelete(){}
@@ -224,7 +224,7 @@ class _CEventsIblock {
 	/**
 	 * при удалении элемента информационного блока.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">Delete</a>
 	 */
 	public static function OnIBlockElementDelete(){}
@@ -232,7 +232,7 @@ class _CEventsIblock {
 	/**
 	 * перед внесением записи в лог.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">Update</a>
 	 */
 	public static function OnBeforeEventLog(){}
@@ -240,7 +240,7 @@ class _CEventsIblock {
 	/**
 	 * при поиске файла.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CIBlockElement::__GetFileContent
 	 */
 	public static function OnSearchGetFileContent(){}
@@ -248,7 +248,7 @@ class _CEventsIblock {
 	/**
 	 * при возвращении описания журналу событий
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CEventIBlock::GetAuditTypes
 	 */
 	public static function GetAuditTypesIblock(){}
@@ -256,7 +256,7 @@ class _CEventsIblock {
 	/**
 	 * аналог <a href="/api_help/main/events/onadmincontextmenushow.php">OnAdminContextMenuShow</a> для списка SKU
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CAdminSubContextMenu::Show
 	 */
 	public static function OnAdminSubContextMenuShow(){}
@@ -266,7 +266,7 @@ class _CEventsIblock {
 	 *         <br>
 
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CAdminSubList::Display
 	 */
 	public static function OnAdminSubListDisplay(){}

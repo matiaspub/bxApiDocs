@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
 class CUrlRewriter
 {
 	static $arRules = array();
@@ -15,7 +22,7 @@ class CUrlRewriter
 		if (!array_key_exists("SITE_ID", $arFilter))
 			$arFilter["SITE_ID"] = SITE_ID;
 
-		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === False)
+		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === false)
 			$arFilter["QUERY"] = $APPLICATION->GetCurPage();
 
 		$docRoot = CSite::GetSiteDocRoot($arFilter["SITE_ID"]);
@@ -35,15 +42,15 @@ class CUrlRewriter
 		$arResult = array();
 		foreach($arUrlRewrite as $arRule)
 		{
-			$bMatch = True;
+			$bMatch = true;
 			if ($bFilterQuery && !preg_match($arRule["CONDITION"], $arFilter["QUERY"]))
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterID && $arRule["ID"] != $arFilter["ID"])
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
-				$bMatch = False;
+				$bMatch = false;
 
 			if ($bMatch)
 			{
@@ -109,11 +116,11 @@ class CUrlRewriter
 	{
 		$output = "\$arUrlRewrite = array(\n";
 
-		foreach ($arr as $key => $val)
+		foreach ($arr as $val)
 		{
 			$output .= "\tarray(\n";
 			foreach ($val as $key1 => $val1)
-				$output .= "\t\t\"".addslashes($key1)."\"\t=>\t\"".addslashes($val1)."\",\n";
+				$output .= "\t\t\"".EscapePHPString($key1)."\" => \"".EscapePHPString($val1)."\",\n";
 			$output .= "\t),\n";
 		}
 
@@ -122,10 +129,10 @@ class CUrlRewriter
 		return $output;
 	}
 
-	function __RecordsCompare($a, $b)
+	public static function __RecordsCompare($a, $b)
 	{
-		$len_a = StrLen($a["CONDITION"]);
-		$len_b = StrLen($b["CONDITION"]);
+		$len_a = strlen($a["CONDITION"]);
+		$len_b = strlen($b["CONDITION"]);
 		if ($len_a < $len_b)
 			return 1;
 		elseif ($len_a > $len_b)
@@ -161,10 +168,10 @@ class CUrlRewriter
 			fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
 			fclose($f);
 			bx_accelerator_reset();
-			return True;
+			return true;
 		}
 
-		return False;
+		return false;
 	}
 
 	public static function Update($arFilter, $arFields)
@@ -174,7 +181,7 @@ class CUrlRewriter
 		if (!array_key_exists("SITE_ID", $arFilter))
 			$arFilter["SITE_ID"] = SITE_ID;
 
-		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === False)
+		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === false)
 			$arFilter["QUERY"] = $APPLICATION->GetCurPage();
 
 		$docRoot = CSite::GetSiteDocRoot($arFilter["SITE_ID"]);
@@ -191,18 +198,17 @@ class CUrlRewriter
 		$bFilterID = array_key_exists("ID", $arFilter);
 		$bFilterPath = array_key_exists("PATH", $arFilter);
 
-		$arResult = array();
 		foreach(self::$arRules[$docRoot] as $key => $arRule)
 		{
-			$bMatch = True;
+			$bMatch = true;
 			if ($bFilterQuery && !preg_match($arRule["CONDITION"], $arFilter["QUERY"]))
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterID && $arRule["ID"] != $arFilter["ID"])
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
-				$bMatch = False;
+				$bMatch = false;
 
 			if ($bMatch)
 			{
@@ -223,10 +229,10 @@ class CUrlRewriter
 			fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
 			fclose($f);
 			bx_accelerator_reset();
-			return True;
+			return true;
 		}
 
-		return False;
+		return false;
 	}
 
 	public static function Delete($arFilter)
@@ -236,7 +242,7 @@ class CUrlRewriter
 		if (!array_key_exists("SITE_ID", $arFilter))
 			$arFilter["SITE_ID"] = SITE_ID;
 
-		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === False)
+		if (array_key_exists("QUERY", $arFilter) && $arFilter["QUERY"] === false)
 			$arFilter["QUERY"] = $APPLICATION->GetCurPage();
 
 
@@ -258,20 +264,19 @@ class CUrlRewriter
 		$bFilterID = array_key_exists("ID", $arFilter);
 		$bFilterPath = array_key_exists("PATH", $arFilter);
 
-		$arResult = array();
 		foreach (self::$arRules[$docRoot] as $key => $arRule)
 		{
-			$bMatch = True;
+			$bMatch = true;
 			if ($bFilterQuery && !preg_match($arRule["CONDITION"], $arFilter["QUERY"]))
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterID
-				&& (($arFilter["ID"] != "NULL" && $arRule["ID"] != $arFilter["ID"]) || ($arFilter["ID"] == "NULL" && StrLen($arRule["ID"]) <= 0))
+				&& (($arFilter["ID"] != "NULL" && $arRule["ID"] != $arFilter["ID"]) || ($arFilter["ID"] == "NULL" && strlen($arRule["ID"]) <= 0))
 				)
-				$bMatch = False;
+				$bMatch = false;
 			if ($bMatch && $bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
-				$bMatch = False;
+				$bMatch = false;
 
 			if ($bMatch)
 				unset(self::$arRules[$docRoot][$key]);
@@ -286,19 +291,17 @@ class CUrlRewriter
 
 			bx_accelerator_reset();
 
-			return True;
+			return true;
 		}
 
-		return False;
+		return false;
 	}
 
-	public static function ReIndexAll($max_execution_time = 0, $NS = Array())
+	public static function ReIndexAll($max_execution_time = 0, $NS = array())
 	{
-		global $DOCUMENT_ROOT, $APPLICATION, $DB;
-
 		@set_time_limit(0);
 		if(!is_array($NS))
-			$NS = Array();
+			$NS = array();
 
 		if($max_execution_time<=0)
 		{
@@ -315,26 +318,24 @@ class CUrlRewriter
 
 			if($NS_OLD["SITE_ID"]!="") $NS["SITE_ID"]=$NS_OLD["SITE_ID"];
 		}
-		$NS["CNT"] = IntVal($NS["CNT"]);
+		$NS["CNT"] = intval($NS["CNT"]);
 
-		$p1 = getmicrotime();
-
-		$arLangDirs = Array();
-		$arFilter = Array("ACTIVE"=>"Y");
+		$arLangDirs = array();
+		$arFilter = array("ACTIVE"=>"Y");
 		if($NS["SITE_ID"]!="")
 			$arFilter["ID"]=$NS["SITE_ID"];
 		$r = CSite::GetList($by="sort", $order="asc", $arFilter);
 		while($arR = $r->Fetch())
 		{
-			$path = Trim($arR["DIR"], "/");
-			$key = Trim($arR["ABS_DOC_ROOT"], "/")."/".(StrLen($path) > 0 ? $path."/" : "");
+			$path = trim($arR["DIR"], "/");
+			$key = trim($arR["ABS_DOC_ROOT"], "/")."/".(strlen($path) > 0 ? $path."/" : "");
 			if (!array_key_exists($key, $arLangDirs))
 				$arLangDirs[$key] = $arR;
 		}
 
 		if($NS["CLEAR"]!="Y")
 		{
-			foreach($arLangDirs as $path=>$arR)
+			foreach($arLangDirs as $arR)
 			{
 				CUrlRewriter::Delete(
 					array(
@@ -343,12 +344,11 @@ class CUrlRewriter
 					)
 				);
 			}
-//				@unlink($path."urlrewrite.php");
 		}
 		$NS["CLEAR"] = "Y";
 
 		//get rid of duplicates
-		$dub = Array();
+		$dub = array();
 		foreach($arLangDirs as $path=>$arR)
 		{
 			foreach($arLangDirs as $path2=>$arR2)
@@ -372,23 +372,20 @@ class CUrlRewriter
 			while(($l=strlen($path))>0 && $path[$l-1]=="/")
 				$path = substr($path, 0, $l-1);
 
-			if($max_execution_time>0 && StrLen($NS["FLG"]) > 0 && substr($NS["ID"]."/", 0, strlen($site."|".$path."/")) != $site."|".$path."/")
+			if($max_execution_time>0 && strlen($NS["FLG"]) > 0 && substr($NS["ID"]."/", 0, strlen($site."|".$path."/")) != $site."|".$path."/")
 				continue;
 
-			CUrlRewriter::RecurseIndex(Array($site, $path), $max_execution_time, $NS);
+			CUrlRewriter::RecurseIndex(array($site, $path), $max_execution_time, $NS);
 
-			if($max_execution_time>0 && StrLen($NS["FLG"]) > 0)
+			if($max_execution_time>0 && strlen($NS["FLG"]) > 0)
 				return $NS;
 		}
-
-		$p1 = getmicrotime();
 
 		return $NS["CNT"];
 	}
 
-	public static function RecurseIndex($path=Array(), $max_execution_time = 0, &$NS)
+	public static function RecurseIndex($path=array(), $max_execution_time = 0, &$NS)
 	{
-		global $DOCUMENT_ROOT, $APPLICATION;
 		CMain::InitPathVars($site, $path);
 		$DOC_ROOT = CSite::GetSiteDocRoot($site);
 		$abs_path = $DOC_ROOT.$path;
@@ -411,11 +408,10 @@ class CUrlRewriter
 					continue;
 
 				//this is not first step and we had stopped here, so go on to reindex
-				if($max_execution_time<=0 || StrLen($NS["FLG"])<=0 || (StrLen($NS["FLG"]) > 0 && substr($NS["ID"]."/", 0, strlen($site."|".$full_path."/")) == $site."|".$full_path."/"))
+				if($max_execution_time<=0 || strlen($NS["FLG"])<=0 || (strlen($NS["FLG"]) > 0 && substr($NS["ID"]."/", 0, strlen($site."|".$full_path."/")) == $site."|".$full_path."/"))
 				{
-					$prevSTEP_ID = $NS["ID"];
 					$new_site = CSite::GetSiteByFullPath($DOC_ROOT.$full_path);
-					if(CUrlRewriter::RecurseIndex(Array($new_site, $full_path), $max_execution_time, $NS)===false)
+					if(CUrlRewriter::RecurseIndex(array($new_site, $full_path), $max_execution_time, $NS)===false)
 						return false;
 				}
 				else //all done
@@ -434,10 +430,10 @@ class CUrlRewriter
 				}
 				elseif(strlen($NS["FLG"])<=0)
 				{
-					$ID = CUrlRewriter::ReindexFile(Array($site, $full_path), $NS["SESS_ID"], $NS["max_file_size"]);
+					$ID = CUrlRewriter::ReindexFile(array($site, $full_path), $NS["SESS_ID"], $NS["max_file_size"]);
 					if($ID)
 					{
-						$NS["CNT"] = IntVal($NS["CNT"]) + 1;
+						$NS["CNT"] = intval($NS["CNT"]) + 1;
 					}
 				}
 
@@ -454,7 +450,7 @@ class CUrlRewriter
 
 	public static function ReindexFile($path, $SEARCH_SESS_ID="", $max_file_size = 0)
 	{
-		global $DOCUMENT_ROOT, $APPLICATION, $DB;
+		global $APPLICATION;
 
 		CMain::InitPathVars($site, $path);
 		$DOC_ROOT = CSite::GetSiteDocRoot($site);
@@ -487,7 +483,7 @@ class CUrlRewriter
 			}
 		}
 
-		return True;
+		return true;
 	}
 
 	function CheckPath($path)
@@ -500,35 +496,35 @@ class CUrlRewriter
 		}
 		else
 		{
+			$arInc = $arExc = array();
 			$inc = COption::GetOptionString("main", "urlrewrite_include_mask", "*.php");
-			$inc = str_replace("'", "\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\.", str_replace("\\", "/", $inc)))));
+			$inc = str_replace("'", "\\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\\.", str_replace("\\", "/", $inc)))));
 			$arIncTmp = explode(";", $inc);
-			for($i=0;$i<count($arIncTmp);$i++)
-				if(strlen(Trim($arIncTmp[$i]))>0)
-					$arInc[] = "'^".Trim($arIncTmp[$i])."$'";
+			for($i = 0, $n = count($arIncTmp); $i < $n; $i++)
+				if(strlen(trim($arIncTmp[$i]))>0)
+					$arInc[] = "'^".trim($arIncTmp[$i])."$'";
 
 			$exc = COption::GetOptionString("main", "urlrewrite_exclude_mask", "/bitrix/*;");
-			$exc = str_replace("'", "\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\.", str_replace("\\", "/", $exc)))));
+			$exc = str_replace("'", "\\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\\.", str_replace("\\", "/", $exc)))));
 			$arExcTmp = explode(";", $exc);
-			for($i=0;$i<count($arExcTmp);$i++)
-				if(strlen(Trim($arExcTmp[$i]))>0)
-					$arExc[] = "'^".Trim($arExcTmp[$i])."$'";
+			for($i = 0, $n = count($arExcTmp); $i < $n; $i++)
+				if(strlen(trim($arExcTmp[$i]))>0)
+					$arExc[] = "'^".trim($arExcTmp[$i])."$'";
 
-			$SEARCH_MASKS_CACHE = Array("exc"=>$arExc, "inc"=>$arInc);
+			$SEARCH_MASKS_CACHE = array("exc"=>$arExc, "inc"=>$arInc);
 		}
 
 		$file = basename($path);
 		if(substr($file, 0, 1)==".") return 0;
 
-		for($i=0; $i<count($arExc); $i++)
+		for($i = 0, $n = count($arExc); $i < $n; $i++)
 			if(preg_match($arExc[$i], $path))
 				return false;
 
-		for($i=0; $i<count($arInc); $i++)
+		for($i = 0, $n = count($arInc); $i < $n; $i++)
 			if(preg_match($arInc[$i], $path))
 				return true;
 
 		return false;
 	}
 }
-?>

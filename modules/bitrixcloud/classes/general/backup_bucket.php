@@ -13,7 +13,7 @@ class CBitrixCloudBackupBucket extends CCloudStorageBucket
 	 * @param string $check_word
 	 * @param string $file_name
 	 */
-	function __construct($bucket_name, $prefix, $access_key, $secret_key, $session_token, $check_word, $file_name)
+	public function __construct($bucket_name, $prefix, $access_key, $secret_key, $session_token, $check_word, $file_name)
 	{
 		$this->_ID = 0;
 		$this->arBucket = array(
@@ -51,12 +51,12 @@ class CBitrixCloudBackupBucket extends CCloudStorageBucket
 	 * @return string
 	 *
 	 */
-	public static function getFileName()
+	public function getFileName()
 	{
 		return $this->GetFileSRC($this->file_name);
 	}
 
-	public static function getHeaders()
+	public function getHeaders()
 	{
 		$service = new CCloudStorageService_AmazonS3;
 		$headers = $service->SignRequest(
@@ -73,17 +73,17 @@ class CBitrixCloudBackupBucket extends CCloudStorageBucket
 		return $headers;
 	}
 
-	static function setPublic($public)
+	function setPublic($public)
 	{
 		$this->service->setPublic($public);
 	}
 
-	public static function unsetCheckWordHeader()
+	public function unsetCheckWordHeader()
 	{
 		$this->service->unsetHeader("x-amz-meta-check-word");
 	}
 
-	public static function setCheckWordHeader()
+	public function setCheckWordHeader()
 	{
 		$this->service->setHeader("x-amz-meta-check-word" , $this->check_word);
 	}

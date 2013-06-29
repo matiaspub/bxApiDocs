@@ -52,11 +52,10 @@ class _CIBElement
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getfields.php
 	 * @author Bitrix
 	 */
-	public static function GetFields()
+	public function GetFields()
 	{
 		return $this->fields;
 	}
@@ -98,11 +97,10 @@ class _CIBElement
 	 * в настройках информационного блока) или, если символьный код
 	 * свойства не указан, то уникальный числовой ID свойства. </li>
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getproperties.php
 	 * @author Bitrix
 	 */
-	public static function GetProperties($arOrder = false, $arFilter=Array())
+	public function GetProperties($arOrder = false, $arFilter=Array())
 	{
 		if($arOrder===false)
 			$arOrder = Array("sort"=>"asc","id"=>"asc","enum_sort"=>"asc","value_id"=>"asc");
@@ -468,11 +466,10 @@ class _CIBElement
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getproperty.php
 	 * @author Bitrix
 	 */
-	public static function GetProperty($ID)
+	public function GetProperty($ID)
 	{
 		$res = $this->GetProperties(Array(), Array("ID"=>$ID));
 		list(, $res) = each($res);
@@ -502,11 +499,10 @@ class _CIBElement
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getgroups.php
 	 * @author Bitrix
 	 */
-	public static function GetGroups()
+	public function GetGroups()
 	{
 		$res = CIBlockElement::GetElementGroups($this->fields["ID"]);
 		return $res;

@@ -8,7 +8,7 @@ class CBPAllHistoryService
 {
 	protected $useGZipCompression = false;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->useGZipCompression = (function_exists("gzcompress") && ($GLOBALS["DB"]->type != "ORACLE" || !defined('BX_UTF')));
 	}
@@ -98,7 +98,7 @@ class CBPAllHistoryService
 		return $dest;
 	}
 
-	static public function DeleteHistory($id, $documentId = null)
+	public function DeleteHistory($id, $documentId = null)
 	{
 		global $DB;
 
@@ -265,7 +265,7 @@ class CBPHistoryResult extends CDBResult
 {
 	private $useGZipCompression = false;
 
-	static public function __construct($res, $useGZipCompression)
+	public function __construct($res, $useGZipCompression)
 	{
 		$this->useGZipCompression = $useGZipCompression;
 		parent::CDBResult($res);
@@ -289,7 +289,7 @@ class CBPHistoryResult extends CDBResult
 		return $value;
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		$res = parent::Fetch();
 

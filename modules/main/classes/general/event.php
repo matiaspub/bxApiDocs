@@ -401,10 +401,10 @@ class CAllEvent
 		$MESSAGE_ID = intval($arEvent["MESSAGE_ID"]);
 		if($MESSAGE_ID > 0)
 		{
-			$strSql = "SELECT 'x' FROM b_event_message M WHERE M.ID=$MESSAGE_ID";
+			$strSql = "SELECT 'x' FROM b_event_message M WHERE M.ID=".$MESSAGE_ID;
 			$z = $DB->Query($strSql);
 			if($z->Fetch())
-				$strWhere = "WHERE M.ID=$MESSAGE_ID and M.ACTIVE='Y'";
+				$strWhere = "WHERE M.ID=".$MESSAGE_ID." and M.ACTIVE='Y'";
 		}
 
 		$strSql = "
@@ -579,7 +579,7 @@ class CAllEventMessage
 {
 	var $LAST_ERROR;
 
-	public static function CheckFields($arFields, $ID=false)
+	public function CheckFields($arFields, $ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -708,11 +708,10 @@ class CAllEventMessage
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -829,11 +828,10 @@ class CAllEventMessage
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 
@@ -860,7 +858,7 @@ class CAllEventMessage
 			}
 		}
 
-		$ID = IntVal($ID);
+		$ID = intval($ID);
 		$strUpdate = $DB->PrepareUpdate("b_event_message", $arFields);
 		$strSql = "UPDATE b_event_message SET ".$strUpdate." WHERE ID=".$ID;
 
@@ -934,7 +932,7 @@ class CAllEventMessage
 	public static function GetSite($event_message_id)
 	{
 		global $DB;
-		$strSql = "SELECT L.*, MS.* FROM b_event_message_site MS, b_lang L WHERE L.LID=MS.SITE_ID AND MS.EVENT_MESSAGE_ID=".IntVal($event_message_id);
+		$strSql = "SELECT L.*, MS.* FROM b_event_message_site MS, b_lang L WHERE L.LID=MS.SITE_ID AND MS.EVENT_MESSAGE_ID=".intval($event_message_id);
 		return $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 	}
 
@@ -1361,7 +1359,7 @@ class CEventType
 					$arSqlSearch[] = "ET.LID = '".$val."'";
 					break;
 				case "ID":
-					$arSqlSearch[] = "ET.ID=".IntVal($val);
+					$arSqlSearch[] = "ET.ID=".intval($val);
 					break;
 			}
 		}
@@ -1592,7 +1590,7 @@ class _CEventTypeResult extends CDBResult
 	var $LID = LANGUAGE_ID;
 	var $SITE_ID = SITE_ID;
 
-	function _CEventTypeResult($res, $arParams = array())
+	public function _CEventTypeResult($res, $arParams = array())
 	{
 		$this->type = empty($arParams["type"]) ? "type" : $arParams["type"];
 		$this->LID = empty($arParams["LID"]) ? LANGUAGE_ID : $arParams["LID"];
@@ -1600,7 +1598,7 @@ class _CEventTypeResult extends CDBResult
 		parent::CDBResult($res);
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		$arr = array();
 		$arr_lid = array();

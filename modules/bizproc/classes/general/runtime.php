@@ -87,7 +87,7 @@ class CBPRuntime
 	* Public method starts runtime
 	* 
 	*/
-	static public function StartRuntime()
+	public function StartRuntime()
 	{
 		if ($this->isStarted)
 			return;
@@ -115,7 +115,7 @@ class CBPRuntime
 	* Public method stops runtime
 	* 
 	*/
-	static public function StopRuntime()
+	public function StopRuntime()
 	{
 		if (!$this->isStarted)
 			return;
@@ -179,11 +179,10 @@ class CBPRuntime
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/CreateWorkflow.php
 	 * @author Bitrix
 	 */
-	static public function CreateWorkflow($workflowTemplateId, $documentId, $workflowParameters = array())
+	public function CreateWorkflow($workflowTemplateId, $documentId, $workflowParameters = array())
 	{
 		$workflowTemplateId = intval($workflowTemplateId);
 		if ($workflowTemplateId <= 0)
@@ -229,7 +228,7 @@ class CBPRuntime
 	* @param mixed $instanceId - ID of the workflow instance
 	* @return CBPWorkflow
 	*/
-	static public function GetWorkflow($workflowId)
+	public function GetWorkflow($workflowId)
 	{
 		if (strlen($workflowId) <= 0)
 			throw new Exception("workflowId");
@@ -261,7 +260,7 @@ class CBPRuntime
 	* @param mixed $name - Service code.
 	* @return mixed - Service instance or null if service is not found.
 	*/
-	static public function GetService($name)
+	public function GetService($name)
 	{
 		if (array_key_exists($name, $this->arServices))
 			return $this->arServices[$name];
@@ -275,7 +274,7 @@ class CBPRuntime
 	* @param string $name - Service code.
 	* @param CBPRuntimeService $service - Service object.
 	*/
-	static public function AddService($name, CBPRuntimeService $service)
+	public function AddService($name, CBPRuntimeService $service)
 	{
 		if ($this->isStarted)
 			throw new Exception("Runtime is started");
@@ -316,7 +315,7 @@ class CBPRuntime
 	* 
 	* @param string $code - Activity code.
 	*/
-	static public function IncludeActivityFile($code)
+	public function IncludeActivityFile($code)
 	{
 		if (in_array($code, $this->arLoadedActivities))
 			return true;
@@ -356,7 +355,7 @@ class CBPRuntime
 		return false;
 	}
 
-	static public function GetActivityDescription($code)
+	public function GetActivityDescription($code)
 	{
 		$code = preg_replace("[^a-zA-Z0-9]", "", $code);
 		if (strlen($code) <= 0)
@@ -426,7 +425,7 @@ class CBPRuntime
 			return null;
 	}
 
-	static public function ExecuteResourceFile($activityPath, $filePath, $arParameters = array())
+	public function ExecuteResourceFile($activityPath, $filePath, $arParameters = array())
 	{
 		$result = null;
 		$path = $this->GetResourceFilePath($activityPath, $filePath);
@@ -445,7 +444,7 @@ class CBPRuntime
 		return $result;
 	}
 
-	static public function SearchActivitiesByType($type)
+	public function SearchActivitiesByType($type)
 	{
 		$type = strtolower(trim($type));
 		if (strlen($type) <= 0)

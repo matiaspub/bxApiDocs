@@ -5,17 +5,17 @@ Class CIdeaManagmentNotify {
     const EMAIL = 'CIdeaManagmentEmailNotify';
     const SONET = 'CIdeaManagmentSonetNotify';
     
-    static public function __construct($arNotification = array()) {
+    public function __construct($arNotification = array()) {
         $this->SetNotification($arNotification);
     }
     
-    static public function SetNotification($arNotification = array())
+    public function SetNotification($arNotification = array())
     {
         $this->arNotification = $arNotification;
         return $this;
     }
     
-    static public function GetNotification()
+    public function GetNotification()
     {
         return $this->arNotification;
     }

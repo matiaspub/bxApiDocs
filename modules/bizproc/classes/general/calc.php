@@ -4,7 +4,7 @@ class CBPCalc
 	private $activity;
 	private $arErrorsList = array();
 
-	static public function __construct($activity)
+	public function __construct($activity)
 	{
 		$this->activity = $activity;
 	}
@@ -23,7 +23,7 @@ class CBPCalc
 		$this->arErrorsList[] = array($errnum, str_replace('#STR#', $errstr, $this->arAvailableErrors[$errnum]));
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrorsList;
 	}
@@ -187,7 +187,7 @@ class CBPCalc
 		return $arPolishNotation;
 	}
 
-	static public function Calculate($text)
+	public function Calculate($text)
 	{
 		if (!$arPolishNotation = $this->GetPolishNotation($text))
 			return null;

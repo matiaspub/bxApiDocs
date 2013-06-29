@@ -47,10 +47,6 @@ class CAllSaleOrder
 				if (0 > $arShoppingCartItem['DISCOUNT_PRICE'])
 					$arShoppingCartItem['DISCOUNT_PRICE'] = 0;
 				$arShoppingCartItem['DISCOUNT_PRICE_PERCENT'] = $arShoppingCartItem['DISCOUNT_PRICE']*100/$arShoppingCartItem['DEFAULT_PRICE'];
-				if ($arShoppingCartItem["VAT_RATE"] > 0)
-				{
-					$arShoppingCartItem["VAT_VALUE"] = (($arShoppingCartItem["PRICE"] / ($arShoppingCartItem["VAT_RATE"] + 1)) * $arShoppingCartItem["VAT_RATE"]);
-				}
 			}
 
 			$arOrder["ORDER_PRICE"] += $arShoppingCartItem["PRICE"] * $arShoppingCartItem["QUANTITY"];
@@ -58,6 +54,8 @@ class CAllSaleOrder
 
 			if ($arShoppingCartItem["VAT_RATE"] > 0)
 			{
+				$arShoppingCartItem["VAT_VALUE"] = (($arShoppingCartItem["PRICE"] / ($arShoppingCartItem["VAT_RATE"] + 1)) * $arShoppingCartItem["VAT_RATE"]);
+
 				$arOrder["USE_VAT"] = true;
 				if ($arShoppingCartItem["VAT_RATE"] > $arOrder["VAT_RATE"])
 					$arOrder["VAT_RATE"] = $arShoppingCartItem["VAT_RATE"];
@@ -591,6 +589,8 @@ class CAllSaleOrder
 	//*************** ADD, UPDATE, DELETE *********************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
+		global $USER_FIELD_MANAGER;
+
 		if (is_set($arFields, "SITE_ID") && strlen($arFields["SITE_ID"]) > 0)
 			$arFields["LID"] = $arFields["SITE_ID"];
 
@@ -750,12 +750,17 @@ class CAllSaleOrder
 			}
 		}
 
+		if (!$USER_FIELD_MANAGER->CheckFields("ORDER", $ID, $arFields))
+		{
+			return false;
+		}
+
 		return True;
 	}
 
-	function _Delete($ID)
+	public static function _Delete($ID)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$ID = IntVal($ID);
 		$bSuccess = True;
@@ -802,6 +807,9 @@ class CAllSaleOrder
 
 		if ($bSuccess)
 			$bSuccess = $DB->Query("DELETE FROM b_sale_order WHERE ID = ".$ID."", true);
+
+		if ($bSuccess)
+			$USER_FIELD_MANAGER->Delete("ORDER", $ID);
 
 		if ($bSuccess)
 			$DB->Commit();
@@ -941,7 +949,7 @@ class CAllSaleOrder
 		return array("FIELD" => $key, "NEGATIVE" => $strNegative, "OPERATION" => $strOperation, "OR_NULL" => $strOrNull);
 	}
 
-	public static function PrepareSql(&$arFields, $arOrder, &$arFilter, $arGroupBy, $arSelectFields)
+	public static function PrepareSql(&$arFields, $arOrder, &$arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql = false, $callback = false)
 	{
 		global $DB;
 
@@ -1308,6 +1316,12 @@ class CAllSaleOrder
 			}
 		}
 
+		//custom subquery callback
+		if (is_callable($callback))
+		{
+			$arSqlSearch[] = call_user_func_array($callback, array($arFields));
+		}
+
 		$countSqlSearch = count($arSqlSearch);
 		for ($i = 0; $i < $countSqlSearch; $i++)
 		{
@@ -1346,6 +1360,10 @@ class CAllSaleOrder
 					$strSqlFrom .= $arFields[$by]["FROM"];
 					$arAlreadyJoined[] = $arFields[$by]["FROM"];
 				}
+			}
+			elseif ($obUserFieldsSql)
+			{
+				$arSqlOrder[] = " ".$obUserFieldsSql->GetOrder($by)." ".$order." ";
 			}
 		}
 
@@ -1741,7 +1759,6 @@ class CAllSaleOrder
 		//reservation
 		if (COption::GetOptionString("sale", "product_reserve_condition", "O") == "P")
 		{
-			//TODO - ERROR?
 			if (!CSaleOrder::ReserveOrder($ID, $val))
 				return false;
 		}
@@ -1987,7 +2004,10 @@ class CAllSaleOrder
 		}
 		else
 		{
-			CSaleOrder::UnsetMark($ID);
+			if ($arOrder["MARKED"] == "Y")
+			{
+				CSaleOrder::UnsetMark($ID);
+			}
 		}
 
 		if ($arDeductResult["RESULT"])
@@ -2025,13 +2045,12 @@ class CAllSaleOrder
 			return false;
 	}
 
-	public static function ReserveOrder($ID, $val, $recurringID = 0)
+	public static function ReserveOrder($ID, $val)
 	{
 		global $DB, $USER;
 
 		$ID = IntVal($ID);
 		$val = (($val != "Y") ? "N" : "Y");
-		$recurringID = IntVal($recurringID);
 
 		if ($ID <= 0)
 		{
@@ -2044,8 +2063,6 @@ class CAllSaleOrder
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $ID, GetMessage("SKGO_NO_ORDER")), "NO_ORDER");
 			return false;
-
-			//TODO - UnsetMark?
 		}
 
 		if ($arOrder["RESERVED"] == $val)
@@ -2055,21 +2072,14 @@ class CAllSaleOrder
 		}
 
 		foreach(GetModuleEvents("sale", "OnSaleBeforeReserveOrder", true) as $arEvent)
-			if (ExecuteModuleEventEx($arEvent, Array($ID, $val, $recurringID, $arAdditionalFields))===false)
+			if (ExecuteModuleEventEx($arEvent, Array($ID, $val, $arAdditionalFields))===false)
 				return false;
 
 		unset($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID]);
 
-		if ($recurringID <= 0)
-		{
-			if (IntVal($arOrder["RECURRING_ID"]) > 0)
-				$recurringID = IntVal($arOrder["RECURRING_ID"]);
-		}
-
-		//TODO - recurring?
 		$res = CSaleOrder::Update($ID, array("RESERVED" => $val));
 
-		$arRes = CSaleBasket::OrderReservation($ID, (($val == "N") ? true : false), $recurringID);
+		$arRes = CSaleBasket::OrderReservation($ID, (($val == "N") ? true : false));
 		if (array_key_exists("ERROR", $arRes))
 		{
 			foreach ($arRes["ERROR"] as $productId => $arError)
@@ -2083,8 +2093,10 @@ class CAllSaleOrder
 		}
 		else
 		{
-			//don't unset if not set yet
-			CSaleOrder::UnsetMark($ID);
+			if ($arOrder["MARKED"] == "Y")
+			{
+				CSaleOrder::UnsetMark($ID);
+			}
 		}
 
 		foreach(GetModuleEvents("sale", "OnSaleReserveOrder", true) as $arEvent)
@@ -2161,6 +2173,18 @@ class CAllSaleOrder
 
 		if ($val == "Y")
 		{
+			if ($arOrder["DEDUCTED"] == "Y")
+			{
+				if (!CSaleOrder::DeductOrder($ID, "N"))
+					return false;
+			}
+
+			if ($arOrder["RESERVED"] == "Y")
+			{
+				if (!CSaleOrder::ReserveOrder($ID, "N"))
+					return false;
+			}
+
 			if ($arOrder["PAYED"] == "Y")
 			{
 				if (!CSaleOrder::PayOrder($ID, "N", True, True))
@@ -2180,6 +2204,14 @@ class CAllSaleOrder
 			{
 				if (!CSaleOrder::DeliverOrder($ID, "N"))
 					return False;
+			}
+		}
+		else //if undo cancel
+		{
+			if (COption::GetOptionString("sale", "product_reserve_condition", "O") == "O" && $arOrder["RESERVED"] != "Y")
+			{
+				if (!CSaleOrder::ReserveOrder($ID, "Y"))
+					return false;
 			}
 		}
 
@@ -2241,30 +2273,6 @@ class CAllSaleOrder
 			if (CModule::IncludeModule("statistic"))
 			{
 				CStatEvent::AddByEvents("eStore", "order_cancel", $ID, "", $arOrder["STAT_GID"]);
-			}
-		}
-
-		if ($val == "Y")
-		{
-			if ($arOrder["DEDUCTED"] == "Y")
-			{
-				$rs = CSaleOrder::DeductOrder($ID, "N");
-				if (!$rs)
-					return false;
-			}
-
-			if ($arOrder["RESERVED"] == "Y")
-			{
-				if (!CSaleOrder::ReserveOrder($ID, "N"));
-					return false;
-			}
-		}
-		else //if undo cancel
-		{
-			if (COption::GetOptionString("sale", "product_reserve_condition", "O") == "O" && $arOrder["RESERVED"] != "Y")
-			{
-				if (!CSaleOrder::ReserveOrder($ID, "Y"));
-					return false;
 			}
 		}
 
@@ -2614,7 +2622,7 @@ class CAllSaleOrder
 		return "CSaleOrder::RemindPayment();";
 	}
 
-	function __SaleOrderCount($arFilter, $strCurrency = '')
+	public static function __SaleOrderCount($arFilter, $strCurrency = '')
 	{
 		$mxResult = false;
 		if (is_array($arFilter) && !empty($arFilter))
@@ -2662,7 +2670,7 @@ class CAllSaleOrder
 
 
 	/**
-	* The function select order history
+	* The function selects order history
 	*
 	* @param array $arOrder - array to sort
 	* @param array $arFilter - array to filter
@@ -2877,6 +2885,43 @@ class CAllSaleOrder
 		);
 
 		return CSaleOrder::Update($ID, $arFields);
+	}
+
+	/**
+	* Sets order account number
+	* Use OnBeforeOrderAccountNumberSet event to generate custom account number.
+	* Account number value must be unique! By default order ID is used
+	*
+	* @param int $ID - order ID
+	* @return bool - true if account number is set successfully
+	*/
+	public static function SetAccountNumber($ID)
+	{
+		$ID = intval($ID);
+		if ($ID <= 0)
+			return false;
+
+		$value = $ID;
+
+		$bCustomTemplateSet = false;
+		foreach(GetModuleEvents("sale", "OnBeforeOrderAccountNumberSet", true) as $arEvent)
+		{
+			$tmpRes = ExecuteModuleEventEx($arEvent, Array($ID));
+			if ($tmpRes !== false)
+			{
+				$bCustomTemplateSet = true;
+				$value = $tmpRes;
+			}
+		}
+
+		if (!$bCustomTemplateSet)
+		{
+			//todo - get selected template from settings and make value out of it
+		}
+
+		$res = CSaleOrder::Update($ID, array("ACCOUNT_NUMBER" => $value));
+
+		return $res;
 	}
 }
 ?>

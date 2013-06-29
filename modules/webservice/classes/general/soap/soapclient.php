@@ -68,7 +68,7 @@ class CSOAPClient
     var $SOAPRawRequest;
     var $SOAPRawResponse;
     
-    public static function CSOAPClient( $server, $path = '/', $port = 80 )
+    public function CSOAPClient( $server, $path = '/', $port = 80 )
     {
         $this->Login = "";
         $this->Password = "";
@@ -86,7 +86,7 @@ class CSOAPClient
     /*!
       Sends a SOAP message and returns the response object.
     */
-    public static function send( $request )
+    public function send( $request )
     {
     	if ( $this->Port == 443)
     	{
@@ -165,37 +165,37 @@ class CSOAPClient
         return $response;
     }
 
-    public static function setTimeout( $timeout )
+    public function setTimeout( $timeout )
     {
         $this->Timeout = $timeout;
     }
 
-    public static function setLogin( $login  )
+    public function setLogin( $login  )
     {
         $this->Login = $login;
     }
     
-    public static function getRawRequest()
+    public function getRawRequest()
     {
     	return $this->SOAPRawRequest;
     }
     
-    public static function getRawResponse()
+    public function getRawResponse()
     {
     	return $this->SOAPRawResponse;
     }
 
-    public static function login()
+    public function login()
     {
         return $this->Login;
     }
 
-    public static function setPassword( $password  )
+    public function setPassword( $password  )
     {
         $this->Password = $password;
     }
 
-    public static function password()
+    public function password()
     {
         return $this->Password;
     }

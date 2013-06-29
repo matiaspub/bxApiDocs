@@ -132,7 +132,7 @@ abstract class CAllUser extends CDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php
 	 * @author Bitrix
 	 */
-	static abstract public function Add($arFields);
+	abstract public function Add($arFields);
 
 	
 	/**
@@ -502,7 +502,7 @@ abstract class CAllUser extends CDBResult
 		return $_SESSION["SESS_AUTH"]["SECOND_NAME"];
 	}
 
-	public static function GetFormattedName($bUseBreaks = true, $bHTMLSpec = true)
+	public function GetFormattedName($bUseBreaks = true, $bHTMLSpec = true)
 	{
 		return CUser::FormatName(CSite::GetNameFormat($bUseBreaks),
 			array(
@@ -636,16 +636,15 @@ abstract class CAllUser extends CDBResult
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php
 	 * @author Bitrix
 	 */
-	public static function GetUserGroupString()
+	public function GetUserGroupString()
 	{
 		return $this->GetGroups();
 	}
 
-	public static function GetGroups()
+	public function GetGroups()
 	{
 		return implode(",", $this->GetUserGroupArray());
 	}
@@ -697,11 +696,10 @@ abstract class CAllUser extends CDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php
 	 * @author Bitrix
 	 */
-	public static function LoginByHash($login, $hash)
+	public function LoginByHash($login, $hash)
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -891,7 +889,7 @@ abstract class CAllUser extends CDBResult
 		}
 	}
 
-	public static function LoginHitByHash()
+	public function LoginHitByHash()
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -915,7 +913,7 @@ abstract class CAllUser extends CDBResult
 		$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($arUser = $result->Fetch())
 		{
-			register_shutdown_function('session_destroy');
+			setSessionExpired(true);
 			$this->Authorize($arUser["USER_ID"], false);
 
 			$DB->Query("UPDATE b_user_hit_auth SET TIMESTAMP_X = ".$DB->GetNowFunction()." WHERE HASH='".$DB->ForSQL($hash, 32)."'");
@@ -1042,11 +1040,10 @@ abstract class CAllUser extends CDBResult
 	 * </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php
 	 * @author Bitrix
 	 */
-	public static function Authorize($id, $bSave = false)
+	public function Authorize($id, $bSave = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -1287,11 +1284,10 @@ abstract class CAllUser extends CDBResult
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php
 	 * @author Bitrix
 	 */
-	public static function SavePasswordHash()
+	public function SavePasswordHash()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -1378,11 +1374,10 @@ abstract class CAllUser extends CDBResult
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php
 	 * @author Bitrix
 	 */
-	public static function Login($login, $password, $remember="N", $password_original="Y")
+	public function Login($login, $password, $remember="N", $password_original="Y")
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -1973,11 +1968,10 @@ abstract class CAllUser extends CDBResult
 	 * "OnBeforeUserRegister"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php
 	 * @author Bitrix
 	 */
-	public static function Register($USER_LOGIN, $USER_NAME, $USER_LAST_NAME, $USER_PASSWORD, $USER_CONFIRM_PASSWORD, $USER_EMAIL, $SITE_ID = false, $captcha_word = "", $captcha_sid = 0)
+	public function Register($USER_LOGIN, $USER_NAME, $USER_LAST_NAME, $USER_PASSWORD, $USER_CONFIRM_PASSWORD, $USER_EMAIL, $SITE_ID = false, $captcha_word = "", $captcha_sid = 0)
 	{
 		/**
 		 * @global CMain $APPLICATION
@@ -2161,11 +2155,10 @@ abstract class CAllUser extends CDBResult
 	 * "OnBeforeUserSimpleRegister"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php
 	 * @author Bitrix
 	 */
-	public static function SimpleRegister($USER_EMAIL, $SITE_ID = false/*, $captcha_word = "", $captcha_sid = 0*/)
+	public function SimpleRegister($USER_EMAIL, $SITE_ID = false/*, $captcha_word = "", $captcha_sid = 0*/)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $DB;
@@ -2362,11 +2355,10 @@ abstract class CAllUser extends CDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php
 	 * @author Bitrix
 	 */
-	public static function IsAdmin()
+	public function IsAdmin()
 	{
 		if ($this->admin === null)
 		{
@@ -2614,7 +2606,7 @@ abstract class CAllUser extends CDBResult
 		return $res;
 	}
 
-	public static function CheckFields(&$arFields, $ID=false)
+	public function CheckFields(&$arFields, $ID=false)
 	{
 		/**
 		 * @global CMain $APPLICATION
@@ -2990,11 +2982,10 @@ abstract class CAllUser extends CDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
@@ -3213,6 +3204,11 @@ abstract class CAllUser extends CDBResult
 		global $DB;
 
 		$USER_ID = intval($USER_ID);
+
+		if ($USER_ID === 0)
+		{
+			return false;
+		}
 
 		$log = (COption::GetOptionString("main", "event_log_user_groups", "N") === "Y");
 		if($log)
@@ -3642,7 +3638,7 @@ abstract class CAllUser extends CDBResult
 	}
 
 
-	public static function GetAllOperations()
+	public function GetAllOperations()
 	{
 		global $DB;
 		$userGroups = $this->GetGroups();
@@ -3676,7 +3672,7 @@ abstract class CAllUser extends CDBResult
 		return $arr;
 	}
 
-	public static function CanDoOperation($op_name)
+	public function CanDoOperation($op_name)
 	{
 		if ($this->IsAdmin())
 			return true;
@@ -3703,7 +3699,7 @@ abstract class CAllUser extends CDBResult
 	}
 
 
-	public static function CanDoFileOperation($op_name,$arPath)
+	public function CanDoFileOperation($op_name,$arPath)
 	{
 		if ($this->IsAdmin())
 			return true;
@@ -3742,7 +3738,7 @@ abstract class CAllUser extends CDBResult
 			return "D";
 	}
 
-	public static function CanAccess($arCodes)
+	public function CanAccess($arCodes)
 	{
 		if(!is_array($arCodes) || empty($arCodes))
 			return false;
@@ -3776,7 +3772,7 @@ abstract class CAllUser extends CDBResult
 		return false;
 	}
 
-	public static function GetAccessCodes()
+	public function GetAccessCodes()
 	{
 		if(!$this->IsAuthorized())
 			return array('G2');
@@ -4154,7 +4150,7 @@ class CAllGroup
 		return "<br>Class: CAllGroup<br>File: ".__FILE__;
 	}
 
-	public static function CheckFields($arFields, $ID=false)
+	public function CheckFields($arFields, $ID=false)
 	{
 		global $DB;
 		$this->LAST_ERROR = "";
@@ -4245,11 +4241,10 @@ class CAllGroup
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -5076,7 +5071,7 @@ class CAllTask
 			foreach($arFilter as $n => $val)
 			{
 				$n = strtoupper($n);
-				if($val == '' || strval($val)=="NOT_REF")
+				if(strlen($val) <= 0 || strval($val) == "NOT_REF")
 					continue;
 				if ($n == 'ID' || $n == 'MODULE_ID' || $n == 'BINDING' || $n == 'SYS')
 					$arSqlSearch[] = GetFilterQuery($arFields[$n]["FIELD_NAME"], $val, 'N');

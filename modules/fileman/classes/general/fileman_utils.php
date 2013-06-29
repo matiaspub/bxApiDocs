@@ -1030,7 +1030,7 @@ CAdminFileDialog::ShowScript(Array
 //
 class CFilemanSearch
 {
-	public static function Init($Params)
+	public function Init($Params)
 	{
 		$this->maxFileOpenSize = 1024 * COption::GetOptionString("fileman", "search_max_open_file_size", 1024);
 		$this->maxResultCount = COption::GetOptionString("fileman", "search_max_res_count", false);
@@ -1140,7 +1140,7 @@ class CFilemanSearch
 		}
 	}
 
-	public static function Search($file)
+	public function Search($file)
 	{
 		global $APPLICATION, $USER;
 
@@ -1294,7 +1294,7 @@ class CFilemanSearch
 		);
 	}
 
-	public static function CheckBreak()
+	public function CheckBreak()
 	{
 		return time() - $this->startTime > CFilemanUtils::GetTimeout();
 	}
@@ -1469,7 +1469,7 @@ class CFilemanUtilDir
 	var $cntDir = 0;
 	var $cntFile = 0;
 
-	public static function CFilemanUtilDir($dir, $Params)
+	public function CFilemanUtilDir($dir, $Params)
 	{
 		$this->dir = str_replace('\\','/',$dir);
 		$this->obj = $Params['obj'];
@@ -1481,7 +1481,7 @@ class CFilemanUtilDir
 		$this->processDir = isset($Params['processDir']) ? $Params['processDir'] : false;
 	}
 
-	public static function Start($dir = false)
+	public function Start($dir = false)
 	{
 		if ($dir)
 			$this->dir = str_replace('\\','/',$dir);
@@ -1509,7 +1509,7 @@ class CFilemanUtilDir
 		return $r;
 	}
 
-	public static function Recursion($dir)
+	public function Recursion($dir)
 	{
 		//error_reporting(0);
 		global $USER;
@@ -1608,7 +1608,7 @@ class CFilemanUtilDir
 		return true;
 	}
 
-	public static function CallMethod($method = '', $param = false)
+	public function CallMethod($method = '', $param = false)
 	{
 		$obj = $this->obj;
 		if ($param)
@@ -1620,7 +1620,7 @@ class CFilemanUtilDir
 
 class CFilemanChmod
 {
-	public static function Init($Params)
+	public function Init($Params)
 	{
 		$this->value = $Params['value'];
 		$this->startTime = time();
@@ -1635,12 +1635,12 @@ class CFilemanChmod
 		}
 	}
 
-	public static function CheckBreak()
+	public function CheckBreak()
 	{
 		return time() - $this->startTime > CFilemanUtils::GetTimeout();
 	}
 
-	public static function Chmod($file)
+	public function Chmod($file)
 	{
 		if ($this->bSkip)
 		{

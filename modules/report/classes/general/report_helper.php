@@ -4,13 +4,13 @@ use Bitrix\Main\Entity;
 
 abstract class CReportHelper
 {
-	abstract public static function getEntityName();
+	abstract public function getEntityName();
 
-	abstract public static function getOwnerId();
+	abstract public function getOwnerId();
 
-	abstract public static function getColumnList();
+	abstract public function getColumnList();
 
-	abstract public static function getDefaultColumns();
+	abstract public function getDefaultColumns();
 
 	public static function getGrcColumns()
 	{
@@ -391,7 +391,7 @@ abstract class CReportHelper
 		}
 	}
 
-	abstract public static function getPeriodFilter($date_from, $date_to);
+	abstract public function getPeriodFilter($date_from, $date_to);
 
 	public static function getDefaultElemHref($elem, $fList)
 	{

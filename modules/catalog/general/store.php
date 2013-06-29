@@ -174,6 +174,10 @@ class CAllCatalogStore
 
 			$DB->Query("DELETE FROM b_catalog_store_product WHERE STORE_ID = ".$id." ", true);
 			$DB->Query("DELETE FROM b_catalog_store WHERE ID = ".$id." ", true);
+
+			foreach(GetModuleEvents("catalog", "OnCatalogStoreDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array(intval($id)));
+
 			self::recalculateStoreBalances($id);
 			return true;
 		}

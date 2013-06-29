@@ -579,7 +579,8 @@ class CAllSocNetUserToGroup
 		if ($arGroup["OPENED"] == "Y")
 			$arFields["ROLE"] = SONET_ROLES_USER;
 
-		if (!CSocNetUserToGroup::Add($arFields))
+		$ID = CSocNetUserToGroup::Add($arFields);
+		if (!$ID)
 		{
 			$errorMessage = "";
 			if ($e = $APPLICATION->GetException())
@@ -680,27 +681,79 @@ class CAllSocNetUserToGroup
 				$userName = $arUser["NAME"]." ".$arUser["LAST_NAME"];
 
 				$groupName = $arGroup["NAME"];
-				$title = GetMessage('SONET_UG_REQUEST_G_TITLE', array('#USER_NAME#' => $userName, '#GROUP_NAME#' => $groupName));
-				$mess = GetMessage('SONET_UG_REQUEST_G', array('#USER_NAME#' => $userName, '#GROUP_NAME#' => $groupName));
-
-				if (strlen(trim($message)) > 0)
-					$mess .= "\n\n".GetMessage('SONET_UG_REQUEST_G_TEXT', array('#REQUEST_TEXT#' => $message));
-
-				$mess .= "\n\n".GetMessage('SONET_UG_REQUEST_G_LINK', array('#LINK#' => $RequestConfirmUrl));
 
 				while ($arRequests = $dbRequests->GetNext())
 				{
-					$arMessageFields = array(
-						"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-						"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM,
-						"FROM_USER_ID" => $userID,
-						"TITLE" => $title,
-						"TO_USER_ID" => $arRequests["USER_ID"],
-						"MESSAGE" => $mess,
-						"EMAIL_TEMPLATE" => $emailTemplate
-					);
+					if (CModule::IncludeModule("im"))
+					{
+						$arMessageFields = array(
+							"TO_USER_ID" => $arRequests["USER_ID"],
+							"FROM_USER_ID" => $userID,
+							"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
+							"NOTIFY_MODULE" => "socialnetwork",
+							"NOTIFY_EVENT" => "invite_group",
+							"NOTIFY_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID),
+							"NOTIFY_TITLE" => str_replace(
+								"#GROUP_NAME#", 
+								$groupName, 
+								GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+							),
+							"NOTIFY_MESSAGE" => str_replace(
+								Array("#TEXT#", "#GROUP_NAME#"), 
+								Array($message, $groupName), 
+								(empty($message)
+									? GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+									: GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT")
+								)
+							),
+							"NOTIFY_BUTTONS" => Array(
+								Array("TITLE" => GetMessage("SONET_UG_REQUEST_CONFIRM"), "VALUE" => "Y", "TYPE" => "accept"),
+								Array("TITLE" => GetMessage("SONET_UG_REQUEST_REJECT"), "VALUE" => "N", "TYPE" => "cancel"),
+							),
+						);
 
-					$res = CSocNetMessages::Add($arMessageFields);
+						$dbSite = CSite::GetByID(SITE_ID);
+						$arSite = $dbSite->Fetch();
+						$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
+						if (strlen($serverName) <= 0)
+						{
+							if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
+								$serverName = SITE_SERVER_NAME;
+							else
+								$serverName = COption::GetOptionString("main", "server_name", "");
+							if (strlen($serverName) <=0)
+								$serverName = $_SERVER["SERVER_NAME"];
+						}
+						$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".$serverName;
+						$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
+
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE"];
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] .= "\n\n".GetMessage("SONET_UG_GROUP_LINK").$groupUrl;
+						$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage("SONET_UG_REQUEST_CONFIRM_REJECT").": ".$RequestConfirmUrl;
+
+						CIMNotify::Add($arMessageFields);
+					}
+					else
+					{
+						$title = GetMessage('SONET_UG_REQUEST_G_TITLE', array('#USER_NAME#' => $userName, '#GROUP_NAME#' => $groupName));
+						$mess = GetMessage('SONET_UG_REQUEST_G', array('#USER_NAME#' => $userName, '#GROUP_NAME#' => $groupName));
+
+						if (strlen(trim($message)) > 0)
+							$mess .= "\n\n".GetMessage('SONET_UG_REQUEST_G_TEXT', array('#REQUEST_TEXT#' => $message));
+
+						$mess .= "\n\n".GetMessage('SONET_UG_REQUEST_G_LINK', array('#LINK#' => $RequestConfirmUrl));
+
+						$arMessageFields = array(
+							"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+							"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM,
+							"FROM_USER_ID" => $userID,
+							"TITLE" => $title,
+							"TO_USER_ID" => $arRequests["USER_ID"],
+							"MESSAGE" => $mess,
+							"EMAIL_TEMPLATE" => $emailTemplate
+						);
+						$res = CSocNetMessages::Add($arMessageFields);
+					}
 				}
 			}
 
@@ -2458,7 +2511,7 @@ class CAllSocNetUserToGroup
 		return $arReturn;
 	}
 
-	function __SpeedFileCheckMessages($userID)
+	public static function __SpeedFileCheckMessages($userID)
 	{
 		$userID = IntVal($userID);
 		if ($userID <= 0)
@@ -2481,7 +2534,7 @@ class CAllSocNetUserToGroup
 			CSocNetUserToGroup::__SpeedFileDelete($userID);
 	}
 
-	function __SpeedFileCreate($userID)
+	public static function __SpeedFileCreate($userID)
 	{
 		global $CACHE_MANAGER;
 
@@ -2493,7 +2546,7 @@ class CAllSocNetUserToGroup
 			$CACHE_MANAGER->Clean("socnet_cg_".$userID);
 	}
 
-	function __SpeedFileDelete($userID)
+	public static function __SpeedFileDelete($userID)
 	{
 		global $CACHE_MANAGER;
 
@@ -2553,6 +2606,16 @@ class CAllSocNetUserToGroup
 					return true;
 				}
 			}
+			elseif (count($arTag) == 5 && $arTag[1] == "REQUEST_GROUP")
+			{
+				if ($value == "Y")
+					self::ConfirmRequestToBeMember($arTag[2], $arTag[3], array($arTag[4]));
+				else
+					self::RejectRequestToBeMember($arTag[2], $arTag[3], array($arTag[4]));
+
+				CIMNotify::DeleteByTag("SOCNET|REQUEST_GROUP|".$arTag[2]."|".$arTag[3]."|".$arTag[4]);
+				return true;
+			}			
 		}
 	}
 }

@@ -53,7 +53,7 @@ class CAllClusterDBNode
 		return $arNodes[$node_id];
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -92,7 +92,7 @@ class CAllClusterDBNode
 		return $res;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 		$ID = intval($ID);

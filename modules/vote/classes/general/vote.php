@@ -994,7 +994,7 @@ class CAllVote
 
 class _CVoteDBResult extends CDBResult
 {
-	function _CVoteDBResult($res, $params = array())
+	public static function _CVoteDBResult($res, $params = array())
 	{
 		parent::CDBResult($res);
 	}

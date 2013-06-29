@@ -10,7 +10,7 @@ class CControllerAgent
 		return "CControllerAgent::CleanUp();";
 	}
 
-	function _OrderBy($arOrder, $arFields, $obUserFieldsSql = null)
+	public static function _OrderBy($arOrder, $arFields, $obUserFieldsSql = null)
 	{
 		$arOrderBy = array();
 		if(is_array($arOrder))
@@ -39,7 +39,7 @@ class CControllerAgent
 			return "";
 	}
 
-	function _Lock($uniq)
+	public static function _Lock($uniq)
 	{
 		global $DB;
 
@@ -52,7 +52,7 @@ class CControllerAgent
 			return false;
 	}
 
-	function _UnLock($uniq)
+	public static function _UnLock($uniq)
 	{
 		global $DB;
 

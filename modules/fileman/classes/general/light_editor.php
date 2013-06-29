@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 class CLightHTMLEditor // LHE
 {
 	var $ownerType;
-	public static function Init(&$arParams)
+	public function Init(&$arParams)
 	{
 		global $USER, $APPLICATION;
 		$basePath = '/bitrix/js/fileman/light_editor/';
@@ -155,7 +155,7 @@ class CLightHTMLEditor // LHE
 		return $path.'?'.@filemtime($_SERVER['DOCUMENT_ROOT'].$path);
 	}
 
-	public static function Show($arParams)
+	public function Show($arParams)
 	{
 		CUtil::InitJSCore(array('window', 'ajax'));
 		$this->Init($arParams);
@@ -170,7 +170,7 @@ class CLightHTMLEditor // LHE
 			$this->InitMedialibDialogs();
 	}
 
-	public static function BuildSceleton()
+	public function BuildSceleton()
 	{
 		$width = isset($this->JSConfig['width']) && intval($this->JSConfig['width']) > 0 ? $this->JSConfig['width'] : "100%";
 		$height = isset($this->JSConfig['height']) && intval($this->JSConfig['height']) > 0 ? $this->JSConfig['height'] : "100%";
@@ -193,7 +193,7 @@ class CLightHTMLEditor // LHE
 		<?
 	}
 
-	public static function InitScripts()
+	public function InitScripts()
 	{
 		ob_start();
 		foreach(GetModuleEvents("fileman", "OnIncludeLightEditorScript", true) as $arEvent)

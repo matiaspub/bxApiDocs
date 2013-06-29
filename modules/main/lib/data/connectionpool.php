@@ -48,7 +48,7 @@ class ConnectionPool
 	 * @return Connection
 	 * @throws \Bitrix\Main\Config\ConfigurationException If connection with specified name does not exist
 	 */
-	static public function getConnection($name = "")
+	public function getConnection($name = "")
 	{
 		if ($name === "")
 		{

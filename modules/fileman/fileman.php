@@ -241,7 +241,7 @@ class CFileMan
 		}
 	}
 
-	public static function CFileMan()
+	public function CFileMan()
 	{
 		$this->arFILE_TYPES = Array("SOURCE"=>GetMessage("FILEMAN_FILEMAN_SCRIPT_TEXT"), "IMAGE"=>GetMessage("FILEMAN_FILEMAN_PIC"), "UNKNOWN"=>GetMessage("FILEMAN_FILEMAN_UNK"));
 	}
@@ -752,7 +752,7 @@ class CFileMan
 		return GetDirList($path, $arDirs, $arFiles, $arFilter, $sort, $type, $bLogical,$task_mode);
 	}
 
-	function __CheckSite($site)
+	public static function __CheckSite($site)
 	{
 		if($site !== false)
 		{
@@ -1638,7 +1638,7 @@ class CFileMan
 		return $arResult;
 	}
 
-	function __CheckOnAllowedComponents($str)
+	public static function __CheckOnAllowedComponents($str)
 	{
 		$allowed_components = trim(COption::GetOptionString('fileman', "~allowed_components", ''));
 		if ($allowed_components == '')

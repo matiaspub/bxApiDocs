@@ -73,11 +73,10 @@ class CPosting extends CPostingGeneral
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostinggetlist.php
 	 * @author Bitrix
 	 */
-	public static function GetList($aSort=Array(), $arFilter=Array())
+	public function GetList($aSort=Array(), $arFilter=Array())
 	{
 		global $DB;
 		$this->LAST_ERROR = "";

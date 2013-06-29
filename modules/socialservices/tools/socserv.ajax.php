@@ -28,8 +28,10 @@ if (check_bitrix_sessid())
 	CUtil::JSPostUnescape();
 	if($_REQUEST['action'] == "getuserdata" || $_REQUEST['action'] == 'getsettings')
 	{
-		$arResult['SOCSERVARRAY'] = unserialize(CUserOptions::GetOption("socialservices", "user_socserv_array", '', $userId));
-		if(!is_array($arResult['SOCSERVARRAY']))
+		$serializedSocservUser = CUserOptions::GetOption("socialservices", "user_socserv_array", '', $userId);
+		if(CheckSerializedData($serializedSocservUser))
+			$arResult['SOCSERVARRAY'] = unserialize($serializedSocservUser);
+		if(!isset($arResult['SOCSERVARRAY']) || !is_array($arResult['SOCSERVARRAY']))
 			$arResult['SOCSERVARRAY'] = '';
 		if($_REQUEST['checkEnabled'] == 'true')
 			$arResult['ENABLED'] = CUserOptions::GetOption("socialservices", "user_socserv_enable", "N", $userId);

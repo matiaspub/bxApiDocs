@@ -176,12 +176,12 @@ class CPerfAccel
 {
 	var $enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit;
 
-	function __construct($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit=-1)
+	public function __construct($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit=-1)
 	{
 		return $this->CPerfAccel($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit);
 	}
 
-	public static function CPerfAccel($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit=-1)
+	public function CPerfAccel($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit=-1)
 	{
 		$this->enabled = $enabled;
 		$this->cache_ttl = $cache_ttl;
@@ -192,7 +192,7 @@ class CPerfAccel
 		$this->cache_limit = $cache_limit;
 	}
 
-	public static function IsWorking()
+	public function IsWorking()
 	{
 		if(!$this->enabled)
 			return false;
@@ -228,7 +228,7 @@ class CPerfAccel
 		return true;
 	}
 
-	public static function GetRecommendations()
+	public function GetRecommendations()
 	{
 		$arResult = array();
 
@@ -341,7 +341,7 @@ class CPerfAccel
 
 class CPerfAccelZend extends CPerfAccel
 {
-	function __construct()
+	public function __construct()
 	{
 		return $this->CPerfAccelZend();
 	}
@@ -413,12 +413,12 @@ class CPerfAccelAPC extends CPerfAccel
 	var $is_enabled = null;
 	var $is_cache_by_default = null;
 
-	function __construct()
+	public function __construct()
 	{
 		return $this->CPerfAccelAPC();
 	}
 
-	public static function CPerfAccelAPC()
+	public function CPerfAccelAPC()
 	{
 		$apc_enabled = strtolower(ini_get('apc.enabled'));
 		$this->is_enabled = !($apc_enabled=="0" || $apc_enabled=="off");
@@ -437,7 +437,7 @@ class CPerfAccelAPC extends CPerfAccel
 		);
 	}
 
-	public static function GetParams()
+	public function GetParams()
 	{
 		return array(
 			"enabled" => array(
@@ -488,7 +488,7 @@ class CPerfAccelAPC extends CPerfAccel
 
 class CPerfAccelEAccel extends CPerfAccel
 {
-	function __construct()
+	public function __construct()
 	{
 		return $this->CPerfAccelEAccel();
 	}
@@ -569,7 +569,7 @@ class CPerfAccelEAccel extends CPerfAccel
 
 class CPerfAccelXCache extends CPerfAccel
 {
-	function __construct()
+	public function __construct()
 	{
 		return $this->CPerfAccelXCache();
 	}
@@ -625,7 +625,7 @@ class CPerfAccelXCache extends CPerfAccel
 
 class CPerfAccelWinCache extends CPerfAccel
 {
-	function __construct()
+	public function __construct()
 	{
 		return $this->CPerfAccelWinCache();
 	}

@@ -14,7 +14,7 @@ class CRsaBcmathProvider extends CRsaProvider
 		COption::SetOptionString("main", "~rsa_keys_bcmath", serialize($arKeys));
 	}
 	
-	static public function Decrypt($data) 
+	public function Decrypt($data) 
 	{
 		$d = self::raw2int(base64_decode($this->_D));
 		$n = self::raw2int(base64_decode($this->_M));

@@ -4,7 +4,7 @@ class CWikiCategories
 {
 	private $arItems=array();
 
-	static public function addItem($catParams)
+	public function addItem($catParams)
 	{
 		$this->arItems[strtolower($catParams->sName)] = array(
 			'TITLE' => $catParams->sTitle,
@@ -17,12 +17,12 @@ class CWikiCategories
 		return true;
 	}
 
-	static public function getItems()
+	public function getItems()
 	{
 		return $this->arItems;
 	}
 
-	static public function getItemsNames()
+	public function getItemsNames()
 	{
 		$arItemsNames = array();
 
@@ -43,12 +43,12 @@ class CWikiCategoryParams
 
 	private $sPathTemplate = "";
 
-	static public function setPathTemplate($sTemplate)
+	public function setPathTemplate($sTemplate)
 	{
 		$this->sPathTemplate = $sTemplate;
 	}
 
-	static public function createLinkFromTemplate($sTemplate="")
+	public function createLinkFromTemplate($sTemplate="")
 	{
 		if((!$this->sPathTemplate && !$sTemplate) || !$this->sName)
 			return false;
@@ -61,7 +61,7 @@ class CWikiCategoryParams
 		return true;
 	}
 
-	static public function clear($bClearTemplate = false)
+	public function clear($bClearTemplate = false)
 	{
 		$this->sName = $this->sTitle = $this->sLink = "";
 		$this->iItemsCount = 0;

@@ -684,7 +684,7 @@ class CAllSocNetMessages
 		return true;
 	}
 
-	function __SpeedFileCheckMessages($userID)
+	public static function __SpeedFileCheckMessages($userID)
 	{
 		$userID = IntVal($userID);
 		if ($userID <= 0)
@@ -707,7 +707,7 @@ class CAllSocNetMessages
 			CSocNetMessages::__SpeedFileDelete($userID);
 	}
 
-	function __SpeedFileCreate($userID)
+	public static function __SpeedFileCreate($userID)
 	{
 		global $CACHE_MANAGER;
 
@@ -731,7 +731,7 @@ class CAllSocNetMessages
 */
 	}
 
-	function __SpeedFileDelete($userID)
+	public static function __SpeedFileDelete($userID)
 	{
 		global $CACHE_MANAGER;
 

@@ -65,11 +65,11 @@
 								'td'		=> self::TABLE_COLS
 								);
 
-		static public function __construct()
+		public function __construct()
 		{
 			if(SITE_CHARSET == "UTF-8")
 			{
-				$this->localAlph="\p{L}";
+				$this->localAlph="\p{L}".GetMessage("SNT_SYMB_NONE_LETTERS");
 			}
 			elseif(LANGUAGE_ID != "en")
 			{
@@ -113,11 +113,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/addtags.php
 		 * @author Bitrix
 		 */
-		static public function AddTags($arTags)
+		public function AddTags($arTags)
 		{
 			if(!is_array($arTags))
 				return false;
@@ -166,11 +165,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/updatetags.php
 		 * @author Bitrix
 		 */
-		static public function UpdateTags($arTags)
+		public function UpdateTags($arTags)
 		{
 			return $this->AddTags($arTags);
 		}
@@ -202,11 +200,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deltags.php
 		 * @author Bitrix
 		 */
-		static public function DelTags($arTagNames)
+		public function DelTags($arTagNames)
 		{
 			if(!is_array($arTagNames))
 				return false;
@@ -245,11 +242,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/delalltags.php
 		 * @author Bitrix
 		 */
-		static public function DelAllTags()
+		public function DelAllTags()
 		{
 			$this->secLevel = self::SECURE_LEVEL_CUSTOM;
 			$this->arHtmlTags = array();
@@ -262,7 +258,7 @@
 		 *	http://php.net/manual/ru/function.htmlspecialchars.php (double_encode)
 		 * @param bool $bApply true|false
 		 */
-		static public function ApplyDoubleEncode($bApply=true)
+		public function ApplyDoubleEncode($bApply=true)
 		{
 			if($bApply)
 				$this->bDoubleEncode = true;
@@ -296,11 +292,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/applyhtmlspecchars.php
 		 * @author Bitrix
 		 */
-		static public function ApplyHtmlSpecChars($bApply=true)
+		public function ApplyHtmlSpecChars($bApply=true)
 		{
 			if($bApply)
 				$this->bHtmlSpecChars = true;
@@ -334,11 +329,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deletesanitizedtags.php
 		 * @author Bitrix
 		 */
-		static public function DeleteSanitizedTags($bApply=true)
+		public function DeleteSanitizedTags($bApply=true)
 		{
 			if($bApply)
 				$this->bDelSanitizedTags = true;
@@ -412,11 +406,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/setlevel.php
 		 * @author Bitrix
 		 */
-		static public function SetLevel($secLevel)
+		public function SetLevel($secLevel)
 		{
 			if($secLevel!=self::SECURE_LEVEL_HIGH && $secLevel!=self::SECURE_LEVEL_MIDDLE && $secLevel!=self::SECURE_LEVEL_LOW)
 				$secLevel=self::SECURE_LEVEL_HIGH;
@@ -625,11 +618,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/gettags.php
 		 * @author Bitrix
 		 */
-		static public function GetTags()
+		public function GetTags()
 		{
 			if(!is_array($this->arHtmlTags))
 				return false;
@@ -710,11 +702,10 @@
 		 * </pre>
 		 *
 		 *
-		 * @static
 		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/sanitizehtml.php
 		 * @author Bitrix
 		 */
-		static public function SanitizeHtml($html)
+		public function SanitizeHtml($html)
 		{
 			if(empty($this->arHtmlTags))
 				$this->SetLevel(self::SECURE_LEVEL_HIGH);
@@ -966,7 +957,7 @@
 		 * @param string $str
 		 * @return decoded string
 		 * */
-		static public function Decode($str)
+		public function Decode($str)
 		{
 			$str1="";
 

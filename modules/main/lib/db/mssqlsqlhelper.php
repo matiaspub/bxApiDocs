@@ -76,7 +76,7 @@ class MssqlSqlHelper
 		return "CONVERT(varchar(19), ".$fieldName.", 120)";
 	}
 
-	static public function prepareInsert($tableName, $arFields)
+	public function prepareInsert($tableName, $arFields)
 	{
 		$strInsert1 = "";
 		$strInsert2 = "";
@@ -105,7 +105,7 @@ class MssqlSqlHelper
 		return array($strInsert1, $strInsert2, array());
 	}
 
-	static public function prepareUpdate($tableName, $arFields)
+	public function prepareUpdate($tableName, $arFields)
 	{
 		$strUpdate = "";
 

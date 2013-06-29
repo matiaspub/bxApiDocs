@@ -68,6 +68,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 				return false;
 
 		$arInsert = $DB->PrepareInsert("b_sonet_user_relations", $arFields);
+		$strUpdate = $DB->PrepareUpdate("b_sonet_user_relations", $arFields);
 
 		foreach ($arFields1 as $key => $value)
 		{
@@ -79,12 +80,21 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 			$arInsert[1] .= $value;
 		}
 
+		foreach ($arFields1 as $key => $value)
+		{
+			if (strlen($strUpdate) > 0)
+				$strUpdate .= ", ";
+			$strUpdate .= $key."=".$value." ";
+		}
+
 		$ID = false;
 		if (strlen($arInsert[0]) > 0)
 		{
 			$strSql =
 				"INSERT INTO b_sonet_user_relations(".$arInsert[0].") ".
-				"VALUES(".$arInsert[1].")";
+				"VALUES(".$arInsert[1].") 
+				ON DUPLICATE KEY UPDATE ".$strUpdate;
+
 			$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$ID = IntVal($DB->LastID());

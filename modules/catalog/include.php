@@ -118,6 +118,10 @@ CModule::AddAutoloadClasses(
 		"CCatalogCondCtrlIBlockFields" => "general/catalog_cond.php",
 		"CCatalogCondCtrlIBlockProps" => "general/catalog_cond.php",
 		"CCatalogCondTree" => "general/catalog_cond.php",
+		"CCatalogCondCtrlBasketProductFields" => "general/sale_cond.php",
+		"CCatalogCondCtrlBasketProductProps" => "general/sale_cond.php",
+		"CCatalogActionCtrlBasketProductFields" => "general/sale_act.php",
+		"CCatalogActionCtrlBasketProductProps" => "general/sale_act.php",
 		"CCatalogDiscountConvert" => "general/discount_convert.php",
 		"CCatalogDiscountConvertTmp" => $DBType."/discount_convert.php",
 		"CCatalogProductProvider" => "general/product_provider.php",
@@ -1123,7 +1127,7 @@ function CatalogPayOrderCallback($productID, $userID, $bPaid, $orderID)
 				}
 				else
 				{
-					if ('R' > CIBlock::GetPermission($arProduct['IBLOCK_ID'], $userID))
+					if ('R' > CIBlock::GetPermission($arIBlockElement['IBLOCK_ID'], $userID))
 					{
 						return false;
 					}
@@ -1417,7 +1421,7 @@ function CatalogRecurringCallback($productID, $userID)
 	}
 	else
 	{
-		if ('R' > CIBlock::GetPermission($arProduct['IBLOCK_ID'], $userID))
+		if ('R' > CIBlock::GetPermission($arIBlockElement['IBLOCK_ID'], $userID))
 		{
 			$APPLICATION->ThrowException(str_replace("#ID#", $productID, GetMessage("I_NO_IBLOCK_ELEM")), "NO_IBLOCK_ELEMENT");
 			return false;

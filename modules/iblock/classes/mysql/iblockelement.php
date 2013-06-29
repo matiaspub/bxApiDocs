@@ -163,10 +163,13 @@ class CIBlockElement extends CAllIBlockElement
 				switch($key)
 				{
 				case "ID":
-					$arr = explode(",",$val); $str = "";
-					foreach ($arr as $a)
-						$str .= intval($a).",";
-					$strSqlSearch .= " and E.ID in (".$DB->ForSQL($str)."0)";
+					$arr = explode(",", $val);
+					if (!empty($arr))
+					{
+						$arr = array_map("intval", $arr);
+						$str = implode(", ", $arr);
+						$strSqlSearch .= " and E.ID in (".$str.")";
+					}
 					break;
 				case "TIMESTAMP_FROM":
 					$strSqlSearch .= " and E.TIMESTAMP_X>=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y"),"d.m.Y")."')";
@@ -874,6 +877,24 @@ class CIBlockElement extends CAllIBlockElement
 			}
 		}
 
+		$i = array_search("CREATED_BY_FORMATTED", $arSelectFields);
+		if ($i !== false)
+		{
+			if (
+				$sSelect
+				&& $sGroupBy==""
+				&& !$bOnlyCount
+				&& !(is_object($this) && isset($this->strField))
+			)
+			{
+				$sSelect .= ",UC.NAME UC_NAME, UC.LAST_NAME UC_LAST_NAME, UC.SECOND_NAME UC_SECOND_NAME, UC.EMAIL UC_EMAIL, UC.ID UC_ID, UC.LOGIN UC_LOGIN";
+			}
+			else
+			{
+				unset($arSelectFields[$i]);
+			}
+		}
+
 		$sOrderBy = "";
 		foreach($arSqlOrder as $i=>$val)
 		{
@@ -905,7 +926,7 @@ class CIBlockElement extends CAllIBlockElement
 			".ltrim($sFrom, "\t\n")
 			.(in_array("USER_NAME", $arSelectFields)? "\t\t\tLEFT JOIN b_user U ON U.ID=BE.MODIFIED_BY\n": "")
 			.(in_array("LOCKED_USER_NAME", $arSelectFields)? "\t\t\tLEFT JOIN b_user UL ON UL.ID=BE.WF_LOCKED_BY\n": "")
-			.(in_array("CREATED_USER_NAME", $arSelectFields)? "\t\t\tLEFT JOIN b_user UC ON UC.ID=BE.CREATED_BY\n": "")."
+			.(in_array("CREATED_USER_NAME", $arSelectFields) || in_array("CREATED_BY_FORMATTED", $arSelectFields)? "\t\t\tLEFT JOIN b_user UC ON UC.ID=BE.CREATED_BY\n": "")."
 		";
 
 		$strSql = "
@@ -1105,11 +1126,10 @@ class CIBlockElement extends CAllIBlockElement
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false, $bCheckDiskQuota=true)
+	public function Update($ID, $arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false, $bCheckDiskQuota=true)
 	{
 		global $DB, $USER;
 		$ID = intval($ID);
@@ -1344,7 +1364,6 @@ class CIBlockElement extends CAllIBlockElement
 			)
 			{
 				$arNewPicture = CIBlock::ResizePicture($arFields["PREVIEW_PICTURE"], $arDef);
-
 				if(is_array($arNewPicture))
 				{
 					$arNewPicture["description"] = $arFields["PREVIEW_PICTURE"]["description"];
@@ -1828,15 +1847,25 @@ class CIBlockElement extends CAllIBlockElement
 				CIBlockElement::WF_CleanUpHistoryCopies($ID);
 
 			//Restore saved values
-			if($SAVED_PREVIEW_PICTURE!==false)
+			if($SAVED_PREVIEW_PICTURE !== false)
+			{
+				$arFields["PREVIEW_PICTURE_ID"] = $arFields["PREVIEW_PICTURE"];
 				$arFields["PREVIEW_PICTURE"] = $SAVED_PREVIEW_PICTURE;
+			}
 			else
+			{
 				unset($arFields["PREVIEW_PICTURE"]);
+			}
 
-			if($SAVED_DETAIL_PICTURE!==false)
+			if($SAVED_DETAIL_PICTURE !== false)
+			{
+				$arFields["DETAIL_PICTURE_ID"] = $arFields["DETAIL_PICTURE"];
 				$arFields["DETAIL_PICTURE"] = $SAVED_DETAIL_PICTURE;
+			}
 			else
+			{
 				unset($arFields["DETAIL_PICTURE"]);
+			}
 
 			if($arIBlock["FIELDS"]["LOG_ELEMENT_EDIT"]["IS_REQUIRED"] == "Y")
 			{

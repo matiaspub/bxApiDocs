@@ -11,7 +11,7 @@ abstract class CListField
 
 	private static $prop_cache = array();
 
-	static public function __construct($iblock_id, $field_id, $label, $sort)
+	public function __construct($iblock_id, $field_id, $label, $sort)
 	{
 		global $DB;
 
@@ -79,32 +79,32 @@ abstract class CListField
 			unset(self::$prop_cache[$this->_iblock_id]);
 	}
 
-	static public function GetID()
+	public function GetID()
 	{
 		return $this->_field_id;
 	}
 
-	static public function GetLabel()
+	public function GetLabel()
 	{
 		return $this->_label;
 	}
 
-	static public function GetTypeID()
+	public function GetTypeID()
 	{
 		return $this->_type->GetID();
 	}
 
-	static public function IsReadOnly()
+	public function IsReadOnly()
 	{
 		return $this->_type->IsReadonly();
 	}
 
-	static public function GetSort()
+	public function GetSort()
 	{
 		return $this->_sort;
 	}
 
-	static public function GetSettingsDefaults()
+	public function GetSettingsDefaults()
 	{
 		switch($this->_field_id)
 		{
@@ -119,7 +119,7 @@ abstract class CListField
 		}
 	}
 
-	static public function GetSettings()
+	public function GetSettings()
 	{
 		$arField = $this->_read_from_cache($this->_field_id);
 		if($arField)
@@ -131,7 +131,7 @@ abstract class CListField
 		return $this->GetSettingsDefaults();
 	}
 
-	static public function SetSettings($arSettings)
+	public function SetSettings($arSettings)
 	{
 		global $DB;
 
@@ -182,13 +182,13 @@ abstract class CListField
 		}
 	}
 
-	static abstract public function IsRequired();
+	abstract public function IsRequired();
 	abstract public function IsMultiple();
-	static abstract public function GetDefaultValue();
-	static abstract public function SetSort($sort);
+	abstract public function GetDefaultValue();
+	abstract public function SetSort($sort);
 	abstract public function GetArray();
 
-	static public function Delete()
+	public function Delete()
 	{
 		global $DB;
 		$DB->Query("
@@ -198,7 +198,7 @@ abstract class CListField
 		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	static abstract public function Update($arFields);
+	abstract public function Update($arFields);
 	static public function Add($iblock_id, $arFields)
 	{
 	}
@@ -208,7 +208,7 @@ class CListElementField extends CListField
 {
 	private $_iblock_field;
 
-	static public function __construct($iblock_id, $field_id, $label, $sort)
+	public function __construct($iblock_id, $field_id, $label, $sort)
 	{
 		parent::__construct($iblock_id, $field_id, $label, $sort);
 
@@ -222,7 +222,7 @@ class CListElementField extends CListField
 		$this->_iblock_field = $arIBlockFields[$field_id];
 	}
 
-	static public function IsRequired()
+	public function IsRequired()
 	{
 		return $this->_iblock_field["IS_REQUIRED"] == "Y";
 	}
@@ -232,18 +232,18 @@ class CListElementField extends CListField
 		return false;
 	}
 
-	static public function GetDefaultValue()
+	public function GetDefaultValue()
 	{
 		return $this->_iblock_field["DEFAULT_VALUE"];
 	}
 
-	static public function SetSort($sort)
+	public function SetSort($sort)
 	{
 		$this->_sort = intval($sort);
 	}
 
 	//This is only backward compat method
-	static public function GetArray()
+	public function GetArray()
 	{
 		return array(
 			"SORT" => $this->_sort,
@@ -258,7 +258,7 @@ class CListElementField extends CListField
 		);
 	}
 
-	static public function Delete()
+	public function Delete()
 	{
 		if($this->_iblock_field["IS_REQUIRED"] == "Y")
 		{
@@ -276,7 +276,7 @@ class CListElementField extends CListField
 		return true;
 	}
 
-	static public function Update($arFields)
+	public function Update($arFields)
 	{
 		if(isset($arFields["TYPE"]))
 			$newType = $arFields["TYPE"];
@@ -317,7 +317,7 @@ class CListPropertyField extends CListField
 	private $_property = false;
 	private static $prop_cache = array();
 
-	static public function __construct($iblock_id, $field_id, $label, $sort)
+	public function __construct($iblock_id, $field_id, $label, $sort)
 	{
 		parent::__construct($iblock_id, $field_id, $label, $sort);
 
@@ -352,22 +352,22 @@ class CListPropertyField extends CListField
 			$this->_type = CListFieldTypeList::GetByID("S");
 	}
 
-	static public function IsRequired()
+	public function IsRequired()
 	{
 		return is_array($this->_property) && $this->_property["IS_REQUIRED"] == "Y";
 	}
 
-	static public function IsMultiple()
+	public function IsMultiple()
 	{
 		return is_array($this->_property) && $this->_property["MULTIPLE"] == "Y";
 	}
 
-	static public function GetDefaultValue()
+	public function GetDefaultValue()
 	{
 		return is_array($this->_property) && $this->_property["DEFAULT_VALUE"];
 	}
 
-	static public function SetSort($sort)
+	public function SetSort($sort)
 	{
 		if(is_array($this->_property))
 		{
@@ -385,7 +385,7 @@ class CListPropertyField extends CListField
 	}
 
 	//This is only backward compat method
-	static public function GetArray()
+	public function GetArray()
 	{
 		if(is_array($this->_property))
 		{
@@ -410,7 +410,7 @@ class CListPropertyField extends CListField
 		}
 	}
 
-	static public function Delete()
+	public function Delete()
 	{
 		if(is_array($this->_property))
 		{
@@ -423,7 +423,7 @@ class CListPropertyField extends CListField
 		return true;
 	}
 
-	static public function Update($arFields)
+	public function Update($arFields)
 	{
 		if(isset($arFields["TYPE"]))
 			$newType = $arFields["TYPE"];

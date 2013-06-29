@@ -33,22 +33,22 @@ class OracleDbResult
 		return $value;
 	}
 
-	static public function getSelectedRowsCount()
+	public function getSelectedRowsCount()
 	{
 		return oci_num_rows($this->resultResource);
 	}
 
-	static public function getFieldsCount()
+	public function getFieldsCount()
 	{
 		return oci_num_fields($this->resultResource);
 	}
 
-	static public function getFieldName($column)
+	public function getFieldName($column)
 	{
 		return oci_field_name($this->resultResource, $column + 1);
 	}
 
-	static public function getResultFields()
+	public function getResultFields()
 	{
 		if (empty($this->resultFields))
 		{

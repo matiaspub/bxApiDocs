@@ -33,7 +33,7 @@ class CSocServFacebook extends CSocServAuth
 
 	}
 
-	static public function Authorize()
+	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		$bSuccess = 1;
@@ -121,7 +121,7 @@ class CFacebookInterface
 	protected $access_token = false;
 	protected $userId = false;
 
-	static public function __construct($appID, $appSecret, $code=false)
+	public function __construct($appID, $appSecret, $code=false)
 	{
 		$this->httpTimeout = 10;
 		$this->appID = $appID;
@@ -129,12 +129,12 @@ class CFacebookInterface
 		$this->code = $code;
 	}
 
-	static public function GetAuthUrl($redirect_uri)
+	public function GetAuthUrl($redirect_uri)
 	{
 		return self::AUTH_URL."?client_id=".$this->appID."&redirect_uri=".urlencode($redirect_uri)."&scope=email,user_birthday,publish_stream&display=popup";
 	}
 
-	static public function GetAccessToken($redirect_uri)
+	public function GetAccessToken($redirect_uri)
 	{
 		if($this->code === false)
 			return false;
@@ -161,7 +161,7 @@ class CFacebookInterface
 		return false;
 	}
 
-	static public function GetCurrentUser()
+	public function GetCurrentUser()
 	{
 		if($this->access_token === false)
 			return false;
@@ -174,7 +174,7 @@ class CFacebookInterface
 		return CUtil::JsObjectToPhp($result);
 	}
 
-	static public function SendFeed($socServUserId, $message, $messageId)
+	public function SendFeed($socServUserId, $message, $messageId)
 	{
 		$isSetOauthKeys = true;
 		if(!$this->access_token || !$this->userId)

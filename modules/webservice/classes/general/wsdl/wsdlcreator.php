@@ -25,7 +25,7 @@ class CWSDLCreator
 	var $targetNamespace;
 	var $classes = array();
 
-	public static function CWSDLCreator($serviceName, $serviceUrl = "", $targetNamespace = "")
+	public function CWSDLCreator($serviceName, $serviceUrl = "", $targetNamespace = "")
 	{
 		global $APPLICATION;
 		$serviceName = str_replace(" ", "_", $serviceName);
@@ -50,12 +50,12 @@ class CWSDLCreator
 		$this->targetNamespace = $targetNamespace;
 	}
 
-	public static function setClasses($classes)
+	public function setClasses($classes)
 	{
 		$this->classes = $classes;
 	}
 
-	public static function AddComplexDataType($name, $vars)
+	public function AddComplexDataType($name, $vars)
 	{
 		global $xsd_simple_type;
 		if (isset($this->typensVars[$name]))
@@ -82,7 +82,7 @@ class CWSDLCreator
 		return true;
 	}
 
-	public static function AddArrayType($pname, $param)
+	public function AddArrayType($pname, $param)
 	{
 		if (isset($param["varType"])
 			and isset($this->typensVars[$param["varType"]]))
@@ -114,7 +114,7 @@ class CWSDLCreator
 		return false;
 	}
 
-	function __createMessage ($name, $returnType = false, $params = array())
+	public function __createMessage ($name, $returnType = false, $params = array())
 	{
 		global $xsd_simple_type;
 		$insoap = array();
@@ -183,7 +183,7 @@ class CWSDLCreator
 		$this->typensVars[$name."Response"] = $outsoap;
 	}
 
-	function __createPortType ($portTypes)
+	public function __createPortType ($portTypes)
 	{
 		if (is_array($portTypes)) {
 			foreach ($portTypes as $class=>$methods) {
@@ -214,7 +214,7 @@ class CWSDLCreator
 		}
 	}
 
-	function __createBinding ($bindings)
+	public function __createBinding ($bindings)
 	{
 		if (is_array($bindings)) {
 			$b = new CXMLCreator("wsdl:binding");
@@ -249,7 +249,7 @@ class CWSDLCreator
 		}
 	}
 
-	function __createService ($services)
+	public function __createService ($services)
 	{
 		if (is_array($services)) {
 			foreach ($services as $class=>$methods) {
@@ -264,7 +264,7 @@ class CWSDLCreator
 		}
 	}
 
-	public static function createWSDL ()
+	public function createWSDL ()
 	{
 		global $xsd_simple_type;
 		if (!$this->classes or !count($this->classes)) return 0;
@@ -395,17 +395,17 @@ class CWSDLCreator
 
 	}
 
-	public static function getWSDL()
+	public function getWSDL()
 	{
 		return $this->WSDL;
 	}
 
-	public static function printWSDL()
+	public function printWSDL()
 	{
 		print $this->WSDL;
 	}
 
-	public static function saveWSDL ($targetFile, $overwrite = true)
+	public function saveWSDL ($targetFile, $overwrite = true)
 	{
 		if (file_exists($targetFile) && $overwrite == false) {
 			$this->downloadWSDL();
@@ -416,7 +416,7 @@ class CWSDLCreator
 		}
 	}
 
-	public static function downloadWSDL ()
+	public function downloadWSDL ()
 	{
 		session_cache_limiter();
 		header("Content-Type: application/force-download");

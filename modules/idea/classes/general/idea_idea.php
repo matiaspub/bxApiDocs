@@ -5,17 +5,17 @@ Class CIdeaManagmentIdea
     private $CacheStorage = array();
     private static $CategoryIB = false;
     
-    function __construct($IdeaId = false)
+    public function __construct($IdeaId = false)
     {
         $this->SetId($IdeaId);
     }
     
-    static public function IsAvailable()
+    public function IsAvailable()
     {
         return $this->IdeaId>0;
     }
     
-    static public function SetID($IdeaId)
+    public function SetID($IdeaId)
     {
         $this->IdeaId = $IdeaId;
         return $this;
@@ -36,7 +36,7 @@ Class CIdeaManagmentIdea
     /*
      * Not for USE Can be changed
      */
-    static public function GetSubCategoryList($CategoryCode)
+    public function GetSubCategoryList($CategoryCode)
     {
         if(self::$CategoryIB <= 0)
             return array();
@@ -65,7 +65,7 @@ Class CIdeaManagmentIdea
     /*
      * Not for USE Can be changed
      */
-    static public function GetCategorySequence($CODE)
+    public function GetCategorySequence($CODE)
     {
         if(self::$CategoryIB <= 0 || !$CODE)
             return array();
@@ -98,7 +98,7 @@ Class CIdeaManagmentIdea
         return $arSequnce;
     }
     
-    static public function GetCategoryList($CategoryIB = false)
+    public function GetCategoryList($CategoryIB = false)
     {
         if(self::$CategoryIB <= 0)
             return array();
@@ -152,7 +152,7 @@ Class CIdeaManagmentIdea
     /*
      * Not for USE Can be changed
      */
-    static public function GetDefaultStatus($arStatusPriority = array())
+    public function GetDefaultStatus($arStatusPriority = array())
     {
         if(!is_array($arStatusPriority))
             $arStatusPriority = array();
@@ -188,7 +188,7 @@ Class CIdeaManagmentIdea
         return $arDefaultStatus;
     }
     
-    static public function GetStatusList($XML_ID = false)
+    public function GetStatusList($XML_ID = false)
     {   
         if(is_array($this->CacheStorage["STATUS_LIST"]) && array_key_exists(intval($XML_ID), $this->CacheStorage["STATUS_LIST"]))
             return $this->CacheStorage["STATUS_LIST"][intval($XML_ID)];
@@ -230,7 +230,7 @@ Class CIdeaManagmentIdea
         return $this->CacheStorage["STATUS_LIST"][intval($XML_ID)] = $arStatus;
     }
     
-    static public function SetStatus($StatusId)
+    public function SetStatus($StatusId)
     {
         if(!$this->IsAvailable())
             return false;

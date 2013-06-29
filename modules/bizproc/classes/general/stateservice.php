@@ -20,7 +20,7 @@ class CBPAllStateService
 		);
 	}
 
-	static public function SetStatePermissions($workflowId, $arStatePermissions = array(), $bRewrite = true)
+	public function SetStatePermissions($workflowId, $arStatePermissions = array(), $bRewrite = true)
 	{
 		global $DB;
 

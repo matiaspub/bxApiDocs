@@ -3453,12 +3453,12 @@ class CAllForumSmile
 class _CForumDBResult extends CDBResult
 {
 	var $sNameTemplate = '';
-	function _CForumDBResult($res, $params = array())
+	public function _CForumDBResult($res, $params = array())
 	{
 		$this->sNameTemplate = (!empty($params["sNameTemplate"]) ? $params["sNameTemplate"] : '');
 		parent::CDBResult($res);
 	}
-	public static function Fetch()
+	public function Fetch()
 	{
 		global $DB;
 		if($res = parent::Fetch())

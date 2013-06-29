@@ -9,12 +9,12 @@ class CSOAPCodec
     {
     }
 
-    public static function setTypensVars($vars)
+    public function setTypensVars($vars)
     {
     	$this->typensVars = $vars;
     }
 
-    public static function setOutputVars($functionName)
+    public function setOutputVars($functionName)
     {
     	if (!isset($this->typensVars[$functionName]["output"]))
     	{
@@ -25,7 +25,7 @@ class CSOAPCodec
     	$this->outputVars = $this->typensVars[$functionName]["output"];
     }
 
-	function _validateSimpleType($dataType, $value)
+	public static function _validateSimpleType($dataType, $value)
 	{
 		global $xsd_simple_type;
 		if (!isset($xsd_simple_type[$dataType]))
@@ -47,7 +47,7 @@ class CSOAPCodec
 		}
 	}
 
-	function _validateClassType($classType, $value)
+	public static function _validateClassType($classType, $value)
 	{
 		$phpClassType = strtolower($classType);
 		$phpValue = strtolower(get_class($value));
@@ -58,7 +58,7 @@ class CSOAPCodec
 		}
 	}
 
-	function _validateType($dataType, $value)
+	public static function _validateType($dataType, $value)
 	{
 		global $xsd_simple_type;
 		if (isset($xsd_simple_type[$dataType]))
@@ -92,14 +92,14 @@ class CSOAPCodec
 		}
 	}
 
-	function _errorTypeValidation($dataType, $value)
+	public static function _errorTypeValidation($dataType, $value)
 	{
 		CSOAPServer::ShowSOAPFault("_errorTypeValidation(): Type validation for func. failed: {$dataType} != ".gettype($value));
     	exit();
 	}
 
 	// Encodes a PHP variable into a SOAP datatype.
-    public static function encodeValue($name, $value, $complexDataTypeName = "")
+    public function encodeValue($name, $value, $complexDataTypeName = "")
     {
     	global $xsd_simple_type;
     	if (!is_array($this->outputVars) or !count($this->outputVars))

@@ -3,10 +3,10 @@
 IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/zip.php");
 include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/archive.php");
 
-if (!defined("BX_DIR_PERMISSIONS"))
+//if (!defined("BX_DIR_PERMISSIONS"))
 	// define("BX_DIR_PERMISSIONS", 0700);
 
-if (!defined("BX_FILE_PERMISSIONS"))
+//if (!defined("BX_FILE_PERMISSIONS"))
 	// define("BX_FILE_PERMISSIONS", 0600);
 
 class CZip implements IBXArchive
@@ -27,7 +27,7 @@ class CZip implements IBXArchive
 
 	private static $bMbstring = false;
 
-	static public function __construct($pzipname)
+	public function __construct($pzipname)
 	{
 		$this->io = CBXVirtualIo::GetInstance();
 
@@ -52,7 +52,7 @@ class CZip implements IBXArchive
 	* @param string $startFile - if specified then all files before it won't be packed during the traversing of $arFileList. Can be used for multi-step archivation
 	* @return mixed 0 or false if error, 1 if success, 2 if the next step should be performed. Errors can be seen using GetErrors() method
 	*/
-	static public function Pack($arFileList, $startFile = "")
+	public function Pack($arFileList, $startFile = "")
 	{
 		$this->_errorReset();
 		$this->startFile = $this->io->GetPhysicalName($startFile);
@@ -375,7 +375,7 @@ class CZip implements IBXArchive
 	* Called from the archive object it returns the name of the file for the next step during multi-step archivation. Call if Pack method returned 2
 	* @return string path to file
 	*/
-	static public function GetStartFile()
+	public function GetStartFile()
 	{
 		return $this->startFile;
 	}
@@ -385,7 +385,7 @@ class CZip implements IBXArchive
 	* @param string $strPath - path to the directory to unpack archive to
 	* @return mixed 0 or false if error, 1 if success. Errors can be seen using GetErrors() method
 	*/
-	static public function Unpack($strPath)
+	public function Unpack($strPath)
 	{
 		if (strpos($strPath, $_SERVER["DOCUMENT_ROOT"]) === false)
 			return false;
@@ -428,7 +428,7 @@ class CZip implements IBXArchive
 	* @param array $arOptions an array with the options' names and their values
 	* @return nothing
 	*/
-	static public function SetOptions($arOptions)
+	public function SetOptions($arOptions)
 	{
 		if (array_key_exists("COMPRESS", $arOptions))
 			$this->compress = $arOptions["COMPRESS"] === true;
@@ -453,7 +453,7 @@ class CZip implements IBXArchive
 	* Returns an array of packing/unpacking options and their current values
 	* @return array
 	*/
-	static public function GetOptions()
+	public function GetOptions()
 	{
 		$arOptions = array(
 			"COMPRESS"          => $this->compress,
@@ -471,7 +471,7 @@ class CZip implements IBXArchive
 	* Returns an array containing error codes and messages. Call this method after Pack or Unpack
 	* @return array
 	*/
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}
@@ -482,7 +482,7 @@ class CZip implements IBXArchive
 	* @param array $arParams an array of parameters
 	* @return mixed 0 if error, array $arResultList with packed files if success
 	*/
-	static public function Create($arFileList, $arParams = 0)
+	public function Create($arFileList, $arParams = 0)
 	{
 		$this->_errorReset();
 
@@ -528,7 +528,7 @@ class CZip implements IBXArchive
 	* @param array $arParams - if specified contains options to use for archivation
 	* @return mixed 0 or false if error, array with the list of packed files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function Add($arFileList, $arParams = 0)
+	public function Add($arFileList, $arParams = 0)
 	{
 		$this->_errorReset();
 
@@ -574,7 +574,7 @@ class CZip implements IBXArchive
 	* Returns the list of files and folders in the archive
 	* @return mixed 0 if error, array of results if success
 	*/
-	static public function GetContent()
+	public function GetContent()
 	{
 		$this->_errorReset();
 
@@ -596,7 +596,7 @@ class CZip implements IBXArchive
 	* @param array $arParams an array of parameters
 	* @return mixed 0 or false if error, array of extracted files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function Extract($arParams = 0)
+	public function Extract($arParams = 0)
 	{
 		$this->_errorReset();
 
@@ -636,7 +636,7 @@ class CZip implements IBXArchive
 	* @param array $arParams an rules defining which files should be deleted
 	* @return mixed 0 if error, array $arResultList with deleted files if success
 	*/
-	static public function Delete($arParams)
+	public function Delete($arParams)
 	{
 		$this->_errorReset();
 
@@ -667,7 +667,7 @@ class CZip implements IBXArchive
 	* Returns archive properties
 	* @return mixed 0 if error, array $arProperties if success
 	*/
-	static public function GetProperties()
+	public function GetProperties()
 	{
 		$this->_errorReset();
 
@@ -1649,11 +1649,12 @@ class CZip implements IBXArchive
 		//check if extraction should be done
 		if ($arEntry['status'] == 'ok')
 		{
+			$logicalFilename = $this->io->GetLogicalName($arEntry['filename']);
 			if
 				(((HasScriptExtension($arEntry['filename']))
 				|| IsFileUnsafe($arEntry['filename'])
-				|| !$this->io->ValidatePathString($arEntry['filename'])
-				|| !$this->io->ValidateFilenameString(GetFileName($arEntry['filename'])))
+				|| !$this->io->ValidatePathString($logicalFilename)
+				|| !$this->io->ValidateFilenameString(GetFileName($logicalFilename)))
 				&& $this->checkBXPermissions == true)
 			{
 					$arEntry['status'] = "no_permissions";

@@ -6,7 +6,7 @@ class CIMMessage
 	private $user_id = 0;
 	private $bHideLink = false;
 
-	function __construct($user_id = false, $arParams = Array())
+	public function __construct($user_id = false, $arParams = Array())
 	{
 		global $USER;
 		$this->user_id = intval($user_id);
@@ -31,7 +31,7 @@ class CIMMessage
 		return CIMMessenger::Add($arFields);
 	}
 
-	static public function GetMessage($ID)
+	public function GetMessage($ID)
 	{
 		global $DB;
 
@@ -45,7 +45,7 @@ class CIMMessage
 		return false;
 	}
 
-	static public function GetUnreadMessage($arParams = Array())
+	public function GetUnreadMessage($arParams = Array())
 	{
 		global $DB;
 
@@ -93,6 +93,7 @@ class CIMMessage
 					M.MESSAGE,
 					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.AUTHOR_ID,
+					M.NOTIFY_EVENT,
 					R1.USER_ID R1_USER_ID,
 					R1.STATUS R1_STATUS,
 					R2.USER_ID R2_USER_ID
@@ -140,6 +141,7 @@ class CIMMessage
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
 					'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+					'system' => $arRes['NOTIFY_EVENT'] == 'private'? 'N': 'Y',
 					'text' => $arRes['MESSAGE'],
 				);
 				if ($bGroupByChat)
@@ -232,7 +234,7 @@ class CIMMessage
 		return $arResult;
 	}
 
-	public static function GetLastMessage($toUserId, $fromUserId = false, $loadUserData = false, $bTimeZone = true)
+	public function GetLastMessage($toUserId, $fromUserId = false, $loadUserData = false, $bTimeZone = true)
 	{
 		global $DB;
 
@@ -252,8 +254,10 @@ class CIMMessage
 		$arMessages = Array();
 		$arUsersMessage = Array();
 
+		if (!$bTimeZone)
+			CTimeZone::Disable();
 		$strSql ="
-			SELECT R1.CHAT_ID, R1.START_ID
+			SELECT R1.CHAT_ID, R1.START_ID, R2.LAST_ID, ".$DB->DateToCharFunction('R2.LAST_READ')." LAST_READ
 			FROM b_im_relation R1
 			INNER JOIN b_im_relation R2 on R2.CHAT_ID = R1.CHAT_ID
 			WHERE
@@ -261,11 +265,15 @@ class CIMMessage
 				AND R1.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."'
 				AND R2.USER_ID = ".$toUserId."
 		";
+		if (!$bTimeZone)
+			CTimeZone::Enable();
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
 		{
 			$chatId = intval($arRes['CHAT_ID']);
 			$startId = intval($arRes['START_ID']);
+			$lastId = intval($arRes['LAST_ID']);
+			$lastRead = MakeTimeStamp($arRes['LAST_READ']);
 		}
 
 		if ($chatId > 0)
@@ -278,7 +286,8 @@ class CIMMessage
 					M.CHAT_ID,
 					M.MESSAGE,
 					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
-					M.AUTHOR_ID
+					M.AUTHOR_ID,
+					M.NOTIFY_EVENT
 				FROM b_im_message M
 				WHERE M.CHAT_ID = ".$chatId."
 				ORDER BY ID DESC
@@ -314,6 +323,7 @@ class CIMMessage
 					'id' => $arRes['ID'],
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
+					'system' => $arRes['NOTIFY_EVENT'] == 'private'? 'N': 'Y',
 					'date' => MakeTimeStamp($arRes['DATE_CREATE']),
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
@@ -321,8 +331,22 @@ class CIMMessage
 				$arUsersMessage[$convId][] = $arRes['ID'];
 			}
 		}
+		$arResult = Array(
+			'message' => $arMessages,
+			'usersMessage' => $arUsersMessage,
+			'users' => Array(),
+			'userInGroup' => Array(),
+			'woUserInGroup' => Array(),
+		);
 
-		$arResult = Array('message' => $arMessages, 'usersMessage' => $arUsersMessage, 'users' => Array(), 'userInGroup' => Array(), 'woUserInGroup' => Array());
+		if ($lastRead > 0)
+		{
+			$arResult['readedList'][$toUserId] = Array(
+				'messageId' => $lastId,
+				'date' => $lastRead,
+			);
+		}
+
 		if (is_array($loadUserData) || is_bool($loadUserData) && $loadUserData == true)
 		{
 			$bDepartment = true;
@@ -343,7 +367,7 @@ class CIMMessage
 		return $arResult;
 	}
 
-	public static function GetLastSendMessage($arParams)
+	public function GetLastSendMessage($arParams)
 	{
 		global $DB;
 
@@ -488,7 +512,7 @@ class CIMMessage
 		return $arMessages;
 	}
 
-	static public function SetReadMessage($fromUserId, $lastId = null)
+	public function SetReadMessage($fromUserId, $lastId = null)
 	{
 		global $DB;
 
@@ -542,6 +566,16 @@ class CIMMessage
 						'id' => $fromUserId,
 						'userId' => $fromUserId,
 						'lastId' => $lastId
+					),
+				));
+				CPullStack::AddByUser($fromUserId, Array(
+					'module_id' => 'im',
+					'command' => 'readMessageApponent',
+					'params' => Array(
+						'chatId' => intval($arRes['CHAT_ID']),
+						'userId' => $this->user_id,
+						'lastId' => $lastId,
+						'date' => time()
 					),
 				));
 			}
@@ -603,9 +637,9 @@ class CIMMessage
 
 		$strSql = "
 			UPDATE b_im_relation
-			SET ".$ssqlLastId."
+			SET ".$ssqlLastId.", LAST_READ = ".$DB->CurrentTimeFunction()."
 			WHERE CHAT_ID = ".intval($chatId)." AND USER_ID = ".intval($userId)." ".$ssqlWhereLastId;
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
 	}
@@ -703,6 +737,8 @@ class CIMMessage
 				'id' => $arParams['ID'],
 				'senderId' => $arParams['FROM_USER_ID'],
 				'recipientId' => isset($arParams['TO_CHAT_ID'])? 'chat'.$arParams['TO_USER_ID']: $arParams['TO_USER_ID'],
+				'system' => $arParams['SYSTEM'] == 'Y'? 'Y': 'N',
+				'readed' => $arParams['READED'] == 'Y'? 'Y': 'N',
 				'date' => $arParams['DATE_CREATE'],
 				'text' => $CCTP->convertText(htmlspecialcharsbx($arParams['MESSAGE'])),
 				'text_mobile' => $CCTPM->convertText(htmlspecialcharsbx($arParams['MESSAGE']))

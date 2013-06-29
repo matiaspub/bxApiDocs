@@ -9,7 +9,7 @@ class MysqliSqlHelper
 		return ';';
 	}
 
-	static public function forSql($value, $maxLength = 0)
+	public function forSql($value, $maxLength = 0)
 	{
 		if ($maxLength > 0)
 			$value = substr($value, 0, $maxLength);
@@ -84,7 +84,7 @@ class MysqliSqlHelper
 		return $expr;
 	}
 
-	static public function prepareInsert($tableName, $arFields)
+	public function prepareInsert($tableName, $arFields)
 	{
 		$strInsert1 = "";
 		$strInsert2 = "";
@@ -113,7 +113,7 @@ class MysqliSqlHelper
 		return array($strInsert1, $strInsert2, array());
 	}
 
-	static public function prepareUpdate($tableName, $arFields)
+	public function prepareUpdate($tableName, $arFields)
 	{
 		$strUpdate = "";
 

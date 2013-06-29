@@ -12,7 +12,7 @@ abstract class CSecurityBaseTest
 	 * Return test name
 	 * @return string
 	 */
-	static public function getName()
+	public function getName()
 	{
 		return GetMessage("SECURITY_SITE_CHECKER_".$this->getInternalName()."_NAME");
 	}
@@ -22,7 +22,7 @@ abstract class CSecurityBaseTest
 	 * @param array $pParams
 	 * @return array
 	 */
-	static public function check($pParams = array())
+	public function check($pParams = array())
 	{
 		$this->initializeParams($pParams);
 		$isSomethingFound = false;
@@ -83,7 +83,7 @@ abstract class CSecurityBaseTest
 	 * Return internal name (for technical usage)
 	 * @return string
 	 */
-	static public function getInternalName()
+	public function getInternalName()
 	{
 		return $this->internalName;
 	}

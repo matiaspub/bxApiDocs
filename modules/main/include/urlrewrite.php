@@ -140,7 +140,7 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 			if(!$io->FileExists($_SERVER['DOCUMENT_ROOT'].$url))
 				continue;
 
-			if (!$io->ValidatePathString($io->GetPhysicalName($url)))
+			if (!$io->ValidatePathString($url))
 				continue;
 
 			$urlTmp = strtolower(ltrim($url, "/\\"));

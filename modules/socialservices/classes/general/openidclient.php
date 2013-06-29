@@ -5,13 +5,13 @@ class COpenIDClient
 {
 	var $_trust_providers = array();
 
-	public static function SetTrustProviders($t)
+	public function SetTrustProviders($t)
 	{
 		if (is_array($t))
 			$this->_trust_providers = array_filter($t);
 	}
 
-	public static function CheckTrustProviders($url)
+	public function CheckTrustProviders($url)
 	{
 		if (count($this->_trust_providers) <= 0)
 			return true;
@@ -50,7 +50,7 @@ class COpenIDClient
 		return false;
 	}
 
-	public static function GetRedirectUrl($identity, $return_to=false)
+	public function GetRedirectUrl($identity, $return_to=false)
 	{
 		if (strlen($identity) <= 0)
 		{
@@ -99,7 +99,7 @@ class COpenIDClient
 		return false;
 	}
 
-	public static function Validate()
+	public function Validate()
 	{
 		if(CSocServAuthManager::CheckUniqueKey())
 		{
@@ -153,7 +153,7 @@ class COpenIDClient
 		LocalRedirect($redirect_url, true);
 	}
 
-	public static function Authorize()
+	public function Authorize()
 	{
 		global $APPLICATION, $USER;
 		$errorCode = 1;

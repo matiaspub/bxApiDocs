@@ -1620,12 +1620,12 @@ class CAllForumTopic
 class _CTopicDBResult extends CDBResult
 {
 	var $sNameTemplate = '';
-	function _CTopicDBResult($res, $params = array())
+	public function _CTopicDBResult($res, $params = array())
 	{
 		$this->sNameTemplate = (!empty($params["sNameTemplate"]) ? $params["sNameTemplate"] : '');
 		parent::CDBResult($res);
 	}
-	public static function Fetch()
+	public function Fetch()
 	{
 		global $DB;
 		if($res = parent::Fetch())

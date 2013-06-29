@@ -11,7 +11,7 @@ class DateTime
 	 */
 	protected $value;
 
-	static public function __construct($time = null, $format = null, \DateTimeZone $timezone = null)
+	public function __construct($time = null, $format = null, \DateTimeZone $timezone = null)
 	{
 		if (($time == null) || ($time === "") || (strtolower($time) == 'now'))
 		{
@@ -42,12 +42,12 @@ class DateTime
 		return $d;
 	}
 
-	static public function format($format)
+	public function format($format)
 	{
 		return $this->value->format($format);
 	}
 
-	static public function __clone()
+	public function __clone()
 	{
 		$this->value = clone $this->value;
 	}
@@ -69,7 +69,7 @@ class DateTime
 	 *
 	 * @return DateTime
 	 */
-	static public function add($interval)
+	public function add($interval)
 	{
 		$i = null;
 		try
@@ -102,17 +102,17 @@ class DateTime
 		return $this;
 	}
 
-	static public function getTimezoneOffset()
+	public function getTimezoneOffset()
 	{
 		return $this->value->getOffset();
 	}
 
-	static public function getTimestamp()
+	public function getTimestamp()
 	{
 		return $this->value->getTimestamp();
 	}
 
-	static public function getTimeZone()
+	public function getTimeZone()
 	{
 		return $this->value->getTimezone();
 	}
@@ -124,13 +124,13 @@ class DateTime
 		return $obj;
 	}
 
-	static public function toString($type = self::DATE_WITH_TIME, \Bitrix\Main\Localization\Culture $culture = null)
+	public function toString($type = self::DATE_WITH_TIME, \Bitrix\Main\Localization\Culture $culture = null)
 	{
 		$format = static::getFormatFromCulture($type, $culture);
 		return $this->format($format);
 	}
 
-	static public function __toString()
+	public function __toString()
 	{
 		return $this->toString();
 	}

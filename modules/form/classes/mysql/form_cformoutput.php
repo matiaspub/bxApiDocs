@@ -107,7 +107,7 @@ class CFormOutput extends CAllFormOutput
 		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CFormOutput<br>File: ".__FILE__;
 	}	
 	
-	public static function CFormOutput()
+	public function CFormOutput()
 	{
 		$this->CAllFormOutput();
 	}

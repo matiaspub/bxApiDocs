@@ -9,7 +9,7 @@ class CPHPCacheMemcache implements ICacheBackend
 	var $read = false;
 	// unfortunately is not available for memcache...
 
-	function __construct()
+	public function __construct()
 	{
 		$this->CPHPCacheMemcache();
 	}
@@ -50,7 +50,7 @@ class CPHPCacheMemcache implements ICacheBackend
 		return defined("BX_MEMCACHE_CONNECTED");
 	}
 
-	public static function clean($basedir, $initdir = false, $filename = false)
+	public function clean($basedir, $initdir = false, $filename = false)
 	{
 		if(is_object(self::$obMemcache))
 		{
@@ -101,7 +101,7 @@ class CPHPCacheMemcache implements ICacheBackend
 		return false;
 	}
 
-	public static function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		if(!isset(self::$basedir_version[$basedir]))
 			self::$basedir_version[$basedir] = self::$obMemcache->get($this->sid.$basedir);
@@ -128,7 +128,7 @@ class CPHPCacheMemcache implements ICacheBackend
 		return true;
 	}
 
-	public static function write($arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function write($arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		if(!isset(self::$basedir_version[$basedir]))
 			self::$basedir_version[$basedir] = self::$obMemcache->get($this->sid.$basedir);

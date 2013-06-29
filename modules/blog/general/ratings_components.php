@@ -133,7 +133,7 @@ class CAllRatingsComponentsBlog
 	// Utilities
 	
 	// check input values, if value does not validate, set the default value
-	function __CheckFields($entityId, $arConfigs)
+	public static function __CheckFields($entityId, $arConfigs)
 	{
 		$arDefaultConfig = CRatingsComponentsBlog::__AssembleConfigDefault($entityId);
 		if ($entityId == "USER") {
@@ -185,7 +185,7 @@ class CAllRatingsComponentsBlog
 	}
 	
 	// collect the default and regular expressions for the fields component-rating
-	function __AssembleConfigDefault($objectType = null) 
+	public static function __AssembleConfigDefault($objectType = null) 
 	{
 		$arConfigs = array();
 		$arRatingConfigs = CRatingsComponentsBlog::OnGetRatingConfigs();

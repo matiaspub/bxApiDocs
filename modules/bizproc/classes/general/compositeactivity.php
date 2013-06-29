@@ -4,7 +4,7 @@ abstract class CBPCompositeActivity
 {
 	protected $arActivities = array();
 
-	static public function SetWorkflow(CBPWorkflow $workflow)
+	public function SetWorkflow(CBPWorkflow $workflow)
 	{
 		parent::SetWorkflow($workflow);
 		foreach ($this->arActivities as $activity)
@@ -18,12 +18,12 @@ abstract class CBPCompositeActivity
 			$activity->ReInitialize();
 	}
 
-	static public function CollectNestedActivities()
+	public function CollectNestedActivities()
 	{
 		return $this->arActivities;
 	}
 
-	static public function FixUpParentChildRelationship(CBPActivity $nestedActivity)
+	public function FixUpParentChildRelationship(CBPActivity $nestedActivity)
 	{
 		parent::FixUpParentChildRelationship($nestedActivity);
 
@@ -38,13 +38,13 @@ abstract class CBPCompositeActivity
 		$this->arActivities = array();
 	}
 
-	static public function Initialize()
+	public function Initialize()
 	{
 		foreach ($this->arActivities as $activity)
 			$this->workflow->InitializeActivity($activity);
 	}
 	
-	static public function HandleFault(Exception $exception)
+	public function HandleFault(Exception $exception)
 	{
 		if (!$exception)
 			throw new Exception("exception");

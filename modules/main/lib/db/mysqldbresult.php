@@ -29,17 +29,17 @@ class MysqlDbResult
 		return $value;
 	}
 
-	static public function getSelectedRowsCount()
+	public function getSelectedRowsCount()
 	{
 		return mysql_num_rows($this->resultResource);
 	}
 
-	static public function getFieldsCount()
+	public function getFieldsCount()
 	{
 		return mysql_num_fields($this->resultResource);
 	}
 
-	static public function getFieldName($column)
+	public function getFieldName($column)
 	{
 		return mysql_field_name($this->resultResource, $column);
 	}
@@ -49,7 +49,7 @@ class MysqlDbResult
 		return sprintf("[%s] %s", mysql_errno($this->connection->getResource()), mysql_error($this->connection->getResource()));
 	}
 
-	static public function getResultFields()
+	public function getResultFields()
 	{
 		if (empty($this->resultFields))
 		{

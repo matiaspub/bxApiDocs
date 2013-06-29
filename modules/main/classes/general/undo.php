@@ -214,7 +214,7 @@ class CAutoSave
 		'LANG'=>1, 'SITE'=>1, 'PATH'=>1, 'TYPE'=>1, 'EVENT_NAME'=>1, 'SHOW_ERROR'=>1, 'NAME'=>1, 'FULL_SRC'=>1, 'ACTION'=>1, 'LOGICAL'=>1, 'ADMIN'=>1, 'ADDITIONAL'=>1, 'NEW'=>1, 'MODE'=>1, 'CONDITION'=>1, 'QUESTION_TYPE'=>1,
 	);
 
-	static public function __construct()
+	public function __construct()
 	{
 		global $APPLICATION;
 
@@ -240,7 +240,7 @@ class CAutoSave
 		}
 	}
 
-	static public function Init($admin = true)
+	public function Init($admin = true)
 	{
 		if (!$GLOBALS['USER']->IsAuthorized())
 			return false;
@@ -265,14 +265,14 @@ class CAutoSave
 		}
 	}
 
-	static public function checkRestore()
+	public function checkRestore()
 	{
 		$key = addEventHandler('main', 'OnAutoSaveRestore', array($this, 'Restore'));
 		CUndo::Escape($this->GetID());
 		removeEventHandler('main', 'OnAutoSaveRestore', $key);
 	}
 
-	static public function Reset()
+	public function Reset()
 	{
 		global $USER, $DB;
 
@@ -284,7 +284,7 @@ class CAutoSave
 		return true;
 	}
 
-	static public function Set($data)
+	public function Set($data)
 	{
 		global $USER, $DB;
 
@@ -309,7 +309,7 @@ class CAutoSave
 		return false;
 	}
 
-	static public function Restore($arFields)
+	public function Restore($arFields)
 	{
 		if (is_array($arFields))
 		{
@@ -319,7 +319,7 @@ class CAutoSave
 		}
 	}
 
-	static public function GetID()
+	public function GetID()
 	{
 		if (!$this->autosaveId)
 		{

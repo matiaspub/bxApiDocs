@@ -14,7 +14,7 @@ class FileExceptionHandlerLog
 
 	private $maxLogSize;
 
-	static public function initialize(array $options)
+	public function initialize(array $options)
 	{
 		$this->logFile = static::DEFAULT_LOG_FILE;
 		if (isset($options["file"]) && !empty($options["file"]))
@@ -31,7 +31,7 @@ class FileExceptionHandlerLog
 			$this->maxLogSize = intval($options["log_size"]);
 	}
 
-	static public function write(\Exception $exception, $logType)
+	public function write(\Exception $exception, $logType)
 	{
 		$text = ExceptionHandlerFormatter::format($exception, false);
 		$this->writeToLog(date("Y-m-d H:i:s")." - ".static::logTypeToString($logType)." - ".$text."\n");

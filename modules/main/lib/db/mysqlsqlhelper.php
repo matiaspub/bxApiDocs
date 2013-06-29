@@ -4,7 +4,7 @@ namespace Bitrix\Main\DB;
 class MysqlSqlHelper
 	extends MysqliSqlHelper
 {
-	static public function forSql($value, $maxLength = 0)
+	public function forSql($value, $maxLength = 0)
 	{
 		if ($maxLength > 0)
 			$value = substr($value, 0, $maxLength);

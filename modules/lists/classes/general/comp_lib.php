@@ -6,13 +6,13 @@ class CListFileControl
 	private $_ob_file;
 	private $_input_name;
 
-	function __construct($obFile, $input_name)
+	public function __construct($obFile, $input_name)
 	{
 		$this->_ob_file = $obFile;
 		$this->_input_name = $input_name;
 	}
 
-	public static function GetHTML($params)
+	public function GetHTML($params)
 	{
 		$html = '';
 

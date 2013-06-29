@@ -547,10 +547,13 @@ class CSocServAuthManager
 			$arSiteId = $socServUserArray[3];
 		$twitManager = new CSocServTwitter();
 		$arUserTwit = $twitManager->GetUserMessage($socServUserArray, $lastTwitId);
-		if(!empty($arUserTwit["statuses"]))
-			$lastTwitId = self::PostIntoBuzz($arUserTwit, $lastTwitId, $arSiteId);
-		elseif((is_array($arUserTwit["search_metadata"]) && isset($arUserTwit["search_metadata"]["max_id_str"])) &&	(strlen($arUserTwit["search_metadata"]["max_id_str"]) > 0))
-			$lastTwitId = $arUserTwit["search_metadata"]["max_id_str"];
+		if(is_array($arUserTwit))
+		{
+			if(isset($arUserTwit["statuses"]) && !empty($arUserTwit["statuses"]))
+				$lastTwitId = self::PostIntoBuzz($arUserTwit, $lastTwitId, $arSiteId);
+			elseif((is_array($arUserTwit["search_metadata"]) && isset($arUserTwit["search_metadata"]["max_id_str"])) &&	(strlen($arUserTwit["search_metadata"]["max_id_str"]) > 0))
+				$lastTwitId = $arUserTwit["search_metadata"]["max_id_str"];
+		}
 		$counter++;
 		if($counter >= 20)
 		{
@@ -762,7 +765,25 @@ class CSocServAuth
 		if(COption::GetOptionString("socialservices", "allow_send_user_activity", "Y") != 'Y')
 			return;
 		global $USER;
-		$arResult = array();
+		$arIntranetData = $arResult = $arData = array();
+		$eventCounter = $taskCounter = 0;
+		if(CModule::IncludeModule('intranet'))
+		{
+			$arIntranetData = CIntranetPlanner::getData(SITE_ID, true);
+		}
+		if(isset($arIntranetData['DATA']))
+		{
+			$arData = $arIntranetData['DATA'];
+		}
+		if(isset($arData['EVENTS']) && is_array($arData['EVENTS']))
+		{
+			$eventCounter = count($arData['EVENTS']);
+		}
+		if(isset($arData['TASKS']) && is_array($arData['TASKS']))
+		{
+			$taskCounter = count($arData['TASKS']);
+		}
+
 		$arResult['USER_ID'] = intval($USER->GetID());
 		if($arResult['USER_ID'] > 0)
 		{
@@ -772,7 +793,7 @@ class CSocServAuth
 				$enabledEndDaySend = CUserOptions::GetOption("socialservices", "user_socserv_end_day", "N", $arResult['USER_ID']);
 				if($enabledEndDaySend == 'Y')
 				{
-					$arResult['MESSAGE'] = CUserOptions::GetOption("socialservices", "user_socserv_end_text", GetMessage("JS_CORE_SS_WORKDAY_START"), $arResult['USER_ID']);
+					$arResult['MESSAGE'] = str_replace('#event#', $eventCounter, str_replace('#task#', $taskCounter, CUserOptions::GetOption("socialservices", "user_socserv_end_text", GetMessage("JS_CORE_SS_WORKDAY_START"), $arResult['USER_ID'])));
 					$arSocServUser['SOCSERVARRAY'] = unserialize(CUserOptions::GetOption("socialservices", "user_socserv_array", "a:0:{}", $arResult['USER_ID']));
 
 					if(is_array($arSocServUser['SOCSERVARRAY']) && count($arSocServUser['SOCSERVARRAY']) > 0)
@@ -821,7 +842,7 @@ class CSocServAuth
 		}
 	}
 
-	static public function CheckSettings()
+	public function CheckSettings()
 	{
 		$arSettings = $this->GetSettings();
 		if(is_array($arSettings))
@@ -863,7 +884,15 @@ class CSocServAuth
 		if(!isset($arFields['EXTERNAL_AUTH_ID']) || $arFields['EXTERNAL_AUTH_ID'] == '')
 			return false;
 
-		$errorCode = 1;
+		$arOAuthKeys = array();
+		if(isset($arFields["OATOKEN"]))
+			$arOAuthKeys["OATOKEN"] = $arFields["OATOKEN"];
+		if(isset($arFields["REFRESH_TOKEN"]))
+			$arOAuthKeys["REFRESH_TOKEN"] = $arFields["REFRESH_TOKEN"];
+		if(isset($arFields["OATOKEN_EXPIRES"]))
+			$arOAuthKeys["OATOKEN_EXPIRES"] = $arFields["OATOKEN_EXPIRES"];
+
+		$errorCode = SOCSERV_AUTHORISATION_ERROR;
 		if($GLOBALS["USER"]->IsAuthorized() && $GLOBALS["USER"]->GetID())
 		{
 			$id = CSocServAuthDB::Add($arFields);
@@ -883,6 +912,7 @@ class CSocServAuth
 			{
 				if($arUser["ACTIVE"] === 'Y')
 					$USER_ID = $arUser["USER_ID"];
+				CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
 			}
 			elseif($arUser = $dbUsersOld->Fetch())
 			{
@@ -917,7 +947,7 @@ class CSocServAuth
 				unset($arFields['CAN_DELETE']);
 			}
 			elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
-				$errorCode = 2;
+				$errorCode = SOCSERV_REGISTRATION_DENY;
 
 			if(isset($USER_ID) && $USER_ID > 0)
 				$GLOBALS["USER"]->Authorize($USER_ID);

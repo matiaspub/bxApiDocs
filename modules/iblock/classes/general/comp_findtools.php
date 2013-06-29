@@ -131,10 +131,13 @@ class CIBlockFindTools
 
 		if ($arVariables["SECTION_CODE_PATH"] != "")
 		{
+			//The path may be incomplete so we join part of the section tree BS and BSP
 			$strFrom .= "
 				INNER JOIN b_iblock_section_element BSE ON BSE.IBLOCK_ELEMENT_ID = BE.ID AND BSE.ADDITIONAL_PROPERTY_ID IS NULL
+				INNER JOIN b_iblock_section BS ON BS.ID = BSE.IBLOCK_SECTION_ID
+				INNER JOIN b_iblock_section BSP ON BS.IBLOCK_ID = BSP.IBLOCK_ID AND BS.LEFT_MARGIN >= BSP.LEFT_MARGIN AND BS.RIGHT_MARGIN <= BSP.RIGHT_MARGIN
 			";
-			$joinField = "BSE.IBLOCK_SECTION_ID";
+			$joinField = "BSP.ID";
 
 			$sectionPath = explode("/", $arVariables["SECTION_CODE_PATH"]);
 			foreach (array_reverse($sectionPath) as $i => $SECTION_CODE)
@@ -174,12 +177,6 @@ class CIBlockFindTools
 
 		$sectionPath = explode("/", $arVariables["SECTION_CODE_PATH"]);
 
-		if (count($sectionPath) == 1)
-		{
-			$arVariables["SECTION_CODE"] = $arVariables["SECTION_CODE_PATH"];
-			return true;
-		}
-
 		$strFrom = "";
 		$joinField = "";
 		$strWhere = "";
@@ -214,8 +211,9 @@ class CIBlockFindTools
 			".$strWhere."
 		";
 		$rs = $DB->Query($strSql);
-		if ($rs->Fetch())
+		if ($ar = $rs->Fetch())
 		{
+			$arVariables["SECTION_ID"] = $ar["ID"];
 			$arVariables["SECTION_CODE"] = $sectionPath[count($sectionPath)-1];
 			return true;
 		}

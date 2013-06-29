@@ -15,7 +15,7 @@ namespace Bitrix\Main\Entity;
  */
 class DateField extends ScalarField
 {
-	static public function getValidators()
+	public function getValidators()
 	{
 		$validators = parent::getValidators();
 

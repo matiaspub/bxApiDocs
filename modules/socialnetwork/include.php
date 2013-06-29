@@ -551,7 +551,7 @@ if (COption::GetOptionString("socialnetwork", "allow_blog_user", "Y") == "Y" || 
 				"OPERATION" => "",
 				"NO_SET" => true,
 				"REAL_EVENT_ID" => "blog_post",
-				"FULL_SET"	=> array("blog", "blog_post", "blog_comment")
+				"FULL_SET"	=> array("blog", "blog_post", "blog_post_important", "blog_comment")
 			),
 			"blog_post" => array(
 				"ENTITIES" => array(),
@@ -645,6 +645,7 @@ if (COption::GetOptionString("socialnetwork", "allow_blog_user", "Y") == "Y" || 
 		$arSocNetFeaturesSettings["blog"]["operations"]["moderate_comment"]["restricted"][SONET_ENTITY_GROUP] = array(SONET_ROLES_ALL);
 		$arSocNetFeaturesSettings["blog"]["operations"]["full_comment"]["restricted"][SONET_ENTITY_GROUP] = array(SONET_ROLES_ALL);
 	}
+	$arSocNetFeaturesSettings["blog"]["subscribe_events"]["blog_post_important"] = $arSocNetFeaturesSettings["blog"]["subscribe_events"]["blog_post"];
 }
 /*
 if (COption::GetOptionString("socialnetwork", "allow_microblog_user", "Y") == "Y" || COption::GetOptionString("socialnetwork", "allow_microblog_group", "Y") == "Y")

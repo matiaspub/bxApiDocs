@@ -9,13 +9,13 @@ class Directory
 		parent::__construct($path);
 	}
 
-	static public function isExists()
+	public function isExists()
 	{
 		$p = $this->getPhysicalPath();
 		return file_exists($p) && is_dir($p);
 	}
 
-	static public function delete()
+	public function delete()
 	{
 		return self::deleteInternal($this->getPhysicalPath());
 	}
@@ -51,7 +51,7 @@ class Directory
 	 * @return array|FileSystemEntry[]
 	 * @throws FileNotFoundException
 	 */
-	static public function getChildren()
+	public function getChildren()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -82,7 +82,7 @@ class Directory
 	 * @param $name
 	 * @return Directory|DirectoryEntry
 	 */
-	static public function createSubdirectory($name)
+	public function createSubdirectory($name)
 	{
 		$dir = new Directory(Path::combine($this->path, $name));
 		if (!$dir->isExists())
@@ -90,7 +90,7 @@ class Directory
 		return $dir;
 	}
 
-	static public function getCreationTime()
+	public function getCreationTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -98,7 +98,7 @@ class Directory
 		return filectime($this->getPhysicalPath());
 	}
 
-	static public function getLastAccessTime()
+	public function getLastAccessTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -106,7 +106,7 @@ class Directory
 		return fileatime($this->getPhysicalPath());
 	}
 
-	static public function getModificationTime()
+	public function getModificationTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -114,7 +114,7 @@ class Directory
 		return filemtime($this->getPhysicalPath());
 	}
 
-	static public function markWritable()
+	public function markWritable()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -122,7 +122,7 @@ class Directory
 		@chmod($this->getPhysicalPath(), BX_DIR_PERMISSIONS);
 	}
 
-	static public function getPermissions()
+	public function getPermissions()
 	{
 		return fileperms($this->getPhysicalPath());
 	}

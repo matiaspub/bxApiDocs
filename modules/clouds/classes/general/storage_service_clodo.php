@@ -18,7 +18,7 @@ class CCloudStorageService_ClodoRU extends CCloudStorageService_OpenStackStorage
 		return "Clodo.ru";
 	}
 
-	public static function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
+	public function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
 	{
 		if($bVarsFromForm)
 			$arSettings = $_POST["SETTINGS"][$this->GetID()];

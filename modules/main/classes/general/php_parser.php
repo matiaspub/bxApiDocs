@@ -11,13 +11,21 @@ class PHPParser
 	public static function ReplString($str, $arAllStr)
 	{
 		if(preg_match("'^\x01([0-9]+)\x02$'s", $str))
+		{
 			return preg_replace("'\x01([0-9]+)\x02'es", "\$arAllStr['\\1']", $str);
+		}
 		if(strval(floatval($str)) == $str)
+		{
 			return preg_replace("'\x01([0-9]+)\x02'es", "'\"'.\$arAllStr['\\1'].'\"'", $str);
+		}
 		elseif($str=="")
+		{
 			return "";
+		}
 		else
+		{
 			return "={".preg_replace("'\x01([0-9]+)\x02'es", "'\"'.\$arAllStr['\\1'].'\"'", $str)."}";
+		}
 	}
 
 	public static function GetParams($params)
@@ -56,12 +64,12 @@ class PHPParser
 		if (strtolower(substr($params, 0, 6)) == 'array(')
 		{
 			$arParams = PHPParser::GetParams(substr($params, 6));
-			foreach ($arParams as $el)
+			foreach ($arParams as $i => $el)
 			{
 				$p = strpos($el, "=>");
 				if ($p === false)
 				{
-					PHPParser::GetParamsRec($el, $arAllStr, $arResult);
+					PHPParser::GetParamsRec($el, $arAllStr, $arResult[$i]);
 				}
 				else
 				{

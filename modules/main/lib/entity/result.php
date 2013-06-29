@@ -15,7 +15,7 @@ class Result
 	/** @var EntityError[] */
 	protected $errors;
 
-	static public function __construct()
+	public function __construct()
 	{
 		$this->isSuccess = true;
 		$this->errors = array();
@@ -26,7 +26,7 @@ class Result
 	 *
 	 * @return bool
 	 */
-	static public function isSuccess()
+	public function isSuccess()
 	{
 		return $this->isSuccess;
 	}
@@ -36,7 +36,7 @@ class Result
 	 *
 	 * @param EntityError $error
 	 */
-	static public function addError(EntityError $error)
+	public function addError(EntityError $error)
 	{
 		$this->isSuccess = false;
 		$this->errors[] = $error;
@@ -47,7 +47,7 @@ class Result
 	 *
 	 * @return FieldError[]
 	 */
-	static public function getErrors()
+	public function getErrors()
 	{
 		return $this->errors;
 	}
@@ -57,7 +57,7 @@ class Result
 	 *
 	 * @return array
 	 */
-	static public function getErrorMessages()
+	public function getErrorMessages()
 	{
 		$messages = array();
 
@@ -72,7 +72,7 @@ class Result
 	 *
 	 * @param FieldError[] $errors
 	 */
-	static public function addErrors(array $errors)
+	public function addErrors(array $errors)
 	{
 		if(is_array($errors))
 		{

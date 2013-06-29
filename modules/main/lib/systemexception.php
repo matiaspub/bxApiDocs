@@ -14,7 +14,7 @@ class SystemException
 	 * @param int $code
 	 * @param \Exception $previous
 	 */
-	static public function __construct($message = "", $code = 0, $file = "", $line = "", \Exception $previous = null)
+	public function __construct($message = "", $code = 0, $file = "", $line = "", \Exception $previous = null)
 	{
 		parent::__construct($message, $code, $previous);
 

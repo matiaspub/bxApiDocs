@@ -193,7 +193,7 @@ class CAllSocNetLog
 	/***************************************/
 	/**********  SEND EVENTS  **************/
 	/***************************************/
-	function __InitUserTmp($userID)
+	public static function __InitUserTmp($userID)
 	{
 		$title = "";
 
@@ -204,7 +204,7 @@ class CAllSocNetLog
 		return $title;
 	}
 
-	function __InitUsersTmp($message, $titleTemplate1, $titleTemplate2)
+	public static function __InitUsersTmp($message, $titleTemplate1, $titleTemplate2)
 	{
 		$arUsersID = explode(",", $message);
 
@@ -230,7 +230,7 @@ class CAllSocNetLog
 		return Str_Replace("#TITLE#", $title, (($count > 1) ? $titleTemplate2 : $titleTemplate1));
 	}
 
-	function __InitGroupTmp($groupID)
+	public static function __InitGroupTmp($groupID)
 	{
 		$title = "";
 
@@ -241,7 +241,7 @@ class CAllSocNetLog
 		return $title;
 	}
 
-	function __InitGroupsTmp($message, $titleTemplate1, $titleTemplate2)
+	public static function __InitGroupsTmp($message, $titleTemplate1, $titleTemplate2)
 	{
 		$arGroupsID = explode(",", $message);
 

@@ -188,7 +188,7 @@ class OracleDbConnection
 	 * @param string $identity
 	 * @return integer
 	 */
-	static public function add($tableName, array $data, $identity = "ID")
+	public function add($tableName, array $data, $identity = "ID")
 	{
 		if($identity !== null && !isset($data[$identity]))
 			$data[$identity] = $this->getIdentity("sq_".$tableName);
@@ -209,7 +209,7 @@ class OracleDbConnection
 		return $data[$identity];
 	}
 
-	static public function getIdentity($name = "")
+	public function getIdentity($name = "")
 	{
 		$name = preg_replace("/[^A-Za-z0-9_]+/i", "", $name);
 		$name = trim($name);
@@ -231,7 +231,7 @@ class OracleDbConnection
 		return new OracleDbResult($this, $result, $trackerQuery);
 	}
 
-	static public function getAffectedRowsCount()
+	public function getAffectedRowsCount()
 	{
 		return oci_num_rows($this->lastQueryResult);
 	}
@@ -240,7 +240,7 @@ class OracleDbConnection
 	 * DDL
 	 *********************************************************/
 
-	static public function isTableExists($tableName)
+	public function isTableExists($tableName)
 	{
 		if (empty($tableName))
 			return false;
@@ -253,12 +253,12 @@ class OracleDbConnection
 		return ($result > 0);
 	}
 
-	static public function isIndexExists($tableName, array $arColumns)
+	public function isIndexExists($tableName, array $arColumns)
 	{
 		return $this->getIndexName($tableName, $arColumns) !== null;
 	}
 
-	static public function getIndexName($tableName, array $arColumns, $strict = false)
+	public function getIndexName($tableName, array $arColumns, $strict = false)
 	{
 		if (!is_array($arColumns) || empty($arColumns))
 			return null;
@@ -301,7 +301,7 @@ class OracleDbConnection
 		return null;
 	}
 
-	static public function getTableFields($tableName)
+	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
 		{
@@ -325,19 +325,19 @@ class OracleDbConnection
 	 * Transaction
 	 *********************************************************/
 
-	static public function startTransaction()
+	public function startTransaction()
 	{
 		$this->transaction = OCI_DEFAULT;
 	}
 
-	static public function commitTransaction()
+	public function commitTransaction()
 	{
 		$this->connectInternal();
 		OCICommit($this->resource);
 		$this->transaction = OCI_COMMIT_ON_SUCCESS;
 	}
 
-	static public function rollbackTransaction()
+	public function rollbackTransaction()
 	{
 		$this->connectInternal();
 		OCIRollback($this->resource);
@@ -371,7 +371,7 @@ class OracleDbConnection
 		return "oracle";
 	}
 
-	static public function getVersion()
+	public function getVersion()
 	{
 		if ($this->version == null)
 		{

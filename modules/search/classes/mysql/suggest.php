@@ -4,12 +4,12 @@ class CSearchSuggest
 	var $_filter_md5 = "";
 	var $_phrase = "";
 
-	function __construct($strFilterMD5 = "", $phrase = "")
+	public function __construct($strFilterMD5 = "", $phrase = "")
 	{
 		return $this->CSearchSuggest($strFilterMD5, $phrase);
 	}
 
-	public static function CSearchSuggest($strFilterMD5 = "", $phrase = "")
+	public function CSearchSuggest($strFilterMD5 = "", $phrase = "")
 	{
 		$strFilterMD5 = strtolower($strFilterMD5);
 		if(preg_match("/^[0-9a-f]{32}$/", $strFilterMD5))
@@ -30,7 +30,7 @@ class CSearchSuggest
 		}
 	}
 
-	public static function SetResultCount($result_count)
+	public function SetResultCount($result_count)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		if(strlen($this->_filter_md5) && strlen($this->_phrase))
@@ -105,7 +105,7 @@ class CSearchSuggest
 		}
 	}
 
-	public static function GetList($nTopCount, $site_id = null)
+	public function GetList($nTopCount, $site_id = null)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		if (!isset($site_id))

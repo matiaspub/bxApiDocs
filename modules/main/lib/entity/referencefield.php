@@ -24,7 +24,7 @@ class ReferenceField extends Field
 	protected $join_type = 'LEFT';
 
 
-	static public function __construct($name, Base $entity, $refEntityName, $reference, $parameters = array())
+	public function __construct($name, Base $entity, $refEntityName, $reference, $parameters = array())
 	{
 		parent::__construct($name, $parameters['data_type'], $entity);
 
@@ -48,7 +48,7 @@ class ReferenceField extends Field
 		throw new Exception('Reference field doesn\'t support value set up and validation.');
 	}
 
-	static public function getRefEntity()
+	public function getRefEntity()
 	{
 		if ($this->refEntity === null)
 		{
@@ -58,12 +58,12 @@ class ReferenceField extends Field
 		return $this->refEntity;
 	}
 
-	static public function getReference()
+	public function getReference()
 	{
 		return $this->reference;
 	}
 
-	static public function getJoinType()
+	public function getJoinType()
 	{
 		return $this->join_type;
 	}

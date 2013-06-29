@@ -215,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD']=="POST" && strlen($Update)>0 && !$bReadOnly && ch
 	$strUseStoreControlBeforeSubmit = COption::GetOptionString('catalog', 'default_use_store_control', '');
 	$strUseStoreControl = (!empty($_REQUEST['use_store_control']) && $_REQUEST['use_store_control'] == 'Y' ? 'Y' : 'N');
 
-
 	$strAllowCanBuyZero = (!empty($_REQUEST['allow_can_buy_zero']) && $_REQUEST['allow_can_buy_zero'] == 'Y' ? 'Y' : 'N');
 	COption::SetOptionString('catalog', 'default_can_buy_zero', $strAllowCanBuyZero);
 
@@ -231,9 +230,10 @@ if ($_SERVER['REQUEST_METHOD']=="POST" && strlen($Update)>0 && !$bReadOnly && ch
 		COption::SetOptionString('catalog', 'discsave_apply', $strDiscSaveApply);
 	}
 
-	if($strUseStoreControl == 'Y')
+
+	if($strUseStoreControlBeforeSubmit != $strUseStoreControl)
 	{
-		if($strUseStoreControlBeforeSubmit != $strUseStoreControl)
+		if($strUseStoreControl == 'Y')
 		{
 			$dbStores = CCatalogStore::GetList(array(), array("ACTIVE" => 'Y'));
 			if(!$dbStores->Fetch())
@@ -252,6 +252,10 @@ if ($_SERVER['REQUEST_METHOD']=="POST" && strlen($Update)>0 && !$bReadOnly && ch
 			}
 			else
 				$strWarning .= GetMessage("CAT_STORE_SYNCHRONIZE_ERROR");
+		}
+		elseif($strUseStoreControl == 'N')
+		{
+			$strWarning .= GetMessage("CAT_STORE_DEACTIVATE_NOTICE");
 		}
 	}
 

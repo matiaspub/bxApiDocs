@@ -143,7 +143,7 @@ class CDeliveryRUSSIANPOST
 		return intval($arSettings["category"]);
 	}
 
-	function __GetLocation($location, $bGetZIP = false)
+	public static function __GetLocation($location, $bGetZIP = false)
 	{
 		$arLocation = CSaleLocation::GetByID($location);
 
@@ -427,7 +427,7 @@ class CDeliveryRUSSIANPOST
 		}
 	}
 
-	function __IsRussian($arLocation)
+	public static function __IsRussian($arLocation)
 	{
 		return
 			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?РЇ"
@@ -444,7 +444,7 @@ class CDeliveryRUSSIANPOST
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIAN FEDERATION");
 	}
 
-	function __Write2Log($data)
+	public static function __Write2Log($data)
 	{
 		if (defined('DELIVERY_RUSSIANPOST_WRITE_LOG') && DELIVERY_RUSSIANPOST_WRITE_LOG === 1)
 		{

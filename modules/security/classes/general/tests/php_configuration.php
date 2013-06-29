@@ -52,6 +52,9 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 		return true;
 	}
 
+	/**
+	 * @return bool
+	 */
 	protected function checkPhpEntropyConfigs()
 	{
 		$entropyFile = ini_get("session.entropy_file");

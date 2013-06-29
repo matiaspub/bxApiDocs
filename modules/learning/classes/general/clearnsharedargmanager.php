@@ -31,14 +31,14 @@ class CLearnSharedArgManager
 	 *		);
 	 * 
 	 */
-	static public function __construct ($arOptions, $arParseParams)
+	public function __construct ($arOptions, $arParseParams)
 	{
 		$this->CheckParseParams ($arParseParams);
 
 		$this->parsedOptions = $this->ParseOptions ($arOptions, $arParseParams);
 	}
 
-	static public function GetParsedOptions()
+	public function GetParsedOptions()
 	{
 		if ($this->parsedOptions === NULL)
 			throw new Exception();

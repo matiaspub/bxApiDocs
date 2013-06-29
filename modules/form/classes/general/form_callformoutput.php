@@ -142,12 +142,12 @@ class CAllFormOutput extends CFormOutput_old
 
 	var $bIsFormValidateErrors = false;
 
-	public static function CAllFormOutput()
+	public function CAllFormOutput()
 	{
 		$this->__cache_path = BX_PERSONAL_ROOT."/tmp/form";
 	}
 
-	public static function InitializeTemplate($arParams, $arResult)
+	public function InitializeTemplate($arParams, $arResult)
 	{
 		//echo '<pre>'; print_r($arResult); echo '</pre>';
 
@@ -187,7 +187,7 @@ class CAllFormOutput extends CFormOutput_old
 		}
 	}
 
-	public static function IncludeFormCustomTemplate()
+	public function IncludeFormCustomTemplate()
 	{
 		if ($this->__check_form_cache())
 		{
@@ -205,7 +205,7 @@ class CAllFormOutput extends CFormOutput_old
 		}
 	}
 
-	public static function IncludeFormTemplate()
+	public function IncludeFormTemplate()
 	{
 		global $APPLICATION;
 		if ($this->__check_form_cache())
@@ -234,7 +234,7 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 * @return bool
 	 */
-	function __check_form_cache()
+	public function __check_form_cache()
 	{
 		global $CACHE_MANAGER;
 
@@ -276,7 +276,7 @@ class CAllFormOutput extends CFormOutput_old
 	}
 
 	/*
-	function __clear_form_cache_files()
+	public function __clear_form_cache_files()
 	{
 		$path = $_SERVER['DOCUMENT_ROOT'].$this->__cache_path;
 		$fname_mask = "form_".$this->WEB_FORM_ID;
@@ -320,11 +320,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformerrors.php
 	 * @author Bitrix
 	 */
-	public static function isFormErrors()
+	public function isFormErrors()
 	{
 		if (is_array($this->__form_validate_errors))
 			return count($this->__form_validate_errors) > 0;
@@ -359,11 +358,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrors.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormErrors()
+	public function ShowFormErrors()
 	{
 		ob_start();
 
@@ -406,11 +404,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrorstext.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormErrorsText()
+	public function ShowFormErrorsText()
 	{
 		if ($this->arParams['USE_EXTENDED_ERRORS'] == 'N')
 			return $this->__form_validate_errors;
@@ -444,11 +441,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnote.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormNote()
+	public function ShowFormNote()
 	{
 		ob_start();
 		ShowNote($this->strFormNote);
@@ -483,11 +479,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnotetext.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormNoteText()
+	public function ShowFormNoteText()
 	{
 		return $this->strFormNote;
 	}
@@ -515,11 +510,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformnote.php">CFormOutput::ShowFormNote</a></p>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformnote.php
 	 * @author Bitrix
 	 */
-	public static function isFormNote()
+	public function isFormNote()
 	{
 		return strlen($this->strFormNote) > 0;
 	}
@@ -555,11 +549,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showerrormsg.php
 	 * @author Bitrix
 	 */
-	public static function ShowErrorMsg()
+	public function ShowErrorMsg()
 	{
 		return $this->__error_msg;
 	}
@@ -590,11 +583,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformheader.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormHeader()
+	public function ShowFormHeader()
 	{
 		global $APPLICATION;
 
@@ -658,7 +650,7 @@ class CAllFormOutput extends CFormOutput_old
 		return "</form>";
 	}
 
-	function __admin_GetInputType($FIELD_SID)
+	public function __admin_GetInputType($FIELD_SID)
 	{
 		if (is_array($this->arAnswers[$FIELD_SID]))
 		{
@@ -678,7 +670,7 @@ class CAllFormOutput extends CFormOutput_old
 		else return "none";
 	}
 
-	function __admin_GetInputAnswersStructure($FIELD_SID)
+	public function __admin_GetInputAnswersStructure($FIELD_SID)
 	{
 		if (is_array($this->arAnswers[$FIELD_SID]))
 		{
@@ -768,11 +760,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php
 	 * @author Bitrix
 	 */
-	public static function ShowInputCaption($FIELD_SID, $css_style = "")
+	public function ShowInputCaption($FIELD_SID, $css_style = "")
 	{
 		$ret = "";
 		if (empty($this->arQuestions[$FIELD_SID])) $ret = "";
@@ -804,7 +795,7 @@ class CAllFormOutput extends CFormOutput_old
 	}
 
 
-	function __admin_ShowInputCaption($FIELD_SID, $caption_css_class = "", $unform = false)
+	public function __admin_ShowInputCaption($FIELD_SID, $caption_css_class = "", $unform = false)
 	{
 		if (empty($this->arQuestions[$FIELD_SID])) return "";
 		if ($unform) return $this->arQuestions[$FIELD_SID]["TITLE"];
@@ -920,11 +911,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaptionimage.php
 	 * @author Bitrix
 	 */
-	public static function ShowInputCaptionImage($FIELD_SID, $sAlign = "", $iMaxW="", $iMaxH="", $bPopup="N", $strPopupTitle="", $sHSpace = "", $sVSpace = "", $sBorder = "")
+	public function ShowInputCaptionImage($FIELD_SID, $sAlign = "", $iMaxW="", $iMaxH="", $bPopup="N", $strPopupTitle="", $sHSpace = "", $sVSpace = "", $sBorder = "")
 	{
 		if ($this->isInputCaptionImage($FIELD_SID))
 		{
@@ -990,11 +980,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isinputcaptionimage.php
 	 * @author Bitrix
 	 */
-	public static function isInputCaptionImage($FIELD_SID)
+	public function isInputCaptionImage($FIELD_SID)
 	{
 		return intval($this->arQuestions[$FIELD_SID]["IMAGE_ID"])>0;
 	}
@@ -1040,11 +1029,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php
 	 * @author Bitrix
 	 */
-	public static function ShowInput($FIELD_SID, $caption_css_class = '')
+	public function ShowInput($FIELD_SID, $caption_css_class = '')
 	{
 		$arrVALUES = $this->arrVALUES;
 
@@ -1362,11 +1350,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php
 	 * @author Bitrix
 	 */
-	public static function isUseCaptcha()
+	public function isUseCaptcha()
 	{
 		return $this->arForm["USE_CAPTCHA"] == "Y" && strlen($this->CAPTCHACode) > 0;
 	}
@@ -1399,11 +1386,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php
 	 * @author Bitrix
 	 */
-	public static function ShowCaptchaImage()
+	public function ShowCaptchaImage()
 	{
 
 		if ($this->isUseCaptcha())
@@ -1439,11 +1425,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php
 	 * @author Bitrix
 	 */
-	public static function ShowCaptchaField()
+	public function ShowCaptchaField()
 	{
 		if ($this->isUseCaptcha())
 			return "<input type=\"text\" name=\"captcha_word\" size=\"30\" maxlength=\"50\" value=\"\" class=\"inputtext\" />";
@@ -1477,11 +1462,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptcha.php
 	 * @author Bitrix
 	 */
-	public static function ShowCaptcha()
+	public function ShowCaptcha()
 	{
 		return $this->ShowCaptchaImage()."<br />".$this->ShowCaptchaField();
 	}
@@ -1528,11 +1512,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showsubmitbutton.php
 	 * @author Bitrix
 	 */
-	public static function ShowSubmitButton($caption = "", $css_style = "")
+	public function ShowSubmitButton($caption = "", $css_style = "")
 	{
 		$button_value = strlen(trim($caption)) > 0 ? trim($caption) : (strlen(trim($this->arForm["BUTTON"]))<=0 ? GetMessage("FORM_ADD") : $this->arForm["BUTTON"]);
 
@@ -1580,11 +1563,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showapplybutton.php
 	 * @author Bitrix
 	 */
-	public static function ShowApplyButton($caption = "", $css_style = "")
+	public function ShowApplyButton($caption = "", $css_style = "")
 	{
 		$button_value = strlen(trim($caption)) > 0 ? trim($caption) : GetMessage("FORM_APPLY");
 
@@ -1649,7 +1631,7 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 * @return string
 	 */
-	public static function ShowFormDescription($css_style = "")
+	public function ShowFormDescription($css_style = "")
 	{
 		$ret = $this->arForm["DESCRIPTION_TYPE"] == "html" ? trim($this->arForm["DESCRIPTION"]) : nl2br(htmlspecialcharsbx(trim($this->arForm["DESCRIPTION"])));
 
@@ -1681,11 +1663,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></p>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformdescription.php
 	 * @author Bitrix
 	 */
-	public static function isFormDescription()
+	public function isFormDescription()
 	{
 		return strlen(trim($this->arForm["DESCRIPTION"])) > 0;
 	}
@@ -1778,11 +1759,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformimage.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormImage($sAlign = "", $iMaxW="", $iMaxH="", $bPopup="N", $strPopupTitle="", $sHSpace = "", $sVSpace = "", $sBorder = "")
+	public function ShowFormImage($sAlign = "", $iMaxW="", $iMaxH="", $bPopup="N", $strPopupTitle="", $sHSpace = "", $sVSpace = "", $sBorder = "")
 	{
 		if ($this->isFormImage())
 		{
@@ -1836,11 +1816,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformimage.php
 	 * @author Bitrix
 	 */
-	public static function isFormImage()
+	public function isFormImage()
 	{
 		return intval($this->arForm["IMAGE_ID"])>0;
 	}
@@ -1881,11 +1860,10 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformtitle.php
 	 * @author Bitrix
 	 */
-	public static function ShowFormTitle($css_style = "")
+	public function ShowFormTitle($css_style = "")
 	{
 		$ret = trim(htmlspecialcharsbx($this->arForm["NAME"]));
 
@@ -1918,16 +1896,15 @@ class CAllFormOutput extends CFormOutput_old
 	 * </menu>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformtitle.php
 	 * @author Bitrix
 	 */
-	public static function isFormTitle()
+	public function isFormTitle()
 	{
 		return strlen(trim($this->arForm["NAME"])) > 0;
 	}
 
-	public static function ShowResultStatusForm()
+	public function ShowResultStatusForm()
 	{
 		if ($this->isResultStatusChangeAccess())
 		{
@@ -1937,7 +1914,7 @@ class CAllFormOutput extends CFormOutput_old
 			return "";
 	}
 
-	public static function ShowResultStatus($bNotShowCSS = "N")
+	public function ShowResultStatus($bNotShowCSS = "N")
 	{
 		if (intval($this->RESULT_ID) <= 0) return "";
 		if ($bNotShowCSS != "N")
@@ -1950,17 +1927,17 @@ class CAllFormOutput extends CFormOutput_old
 		}
 	}
 
-	public static function ShowResultStatusText()
+	public function ShowResultStatusText()
 	{
 		return $this->arResult["STATUS_TITLE"];
 	}
 
-	public static function GetResultStatusCSSClass()
+	public function GetResultStatusCSSClass()
 	{
 		return $this->arResult["STATUS_CSS"];
 	}
 
-	public static function isResultStatusChangeAccess()
+	public function isResultStatusChangeAccess()
 	{
 		return (!empty($this->RESULT_ID) && in_array("EDIT", $this->arrRESULT_PERMISSION));
 	}
@@ -2108,44 +2085,44 @@ class CAllFormOutput extends CFormOutput_old
 		}
 	}
 
-	public static function setError($error)
+	public function setError($error)
 	{
 		$this->__error_msg = $error;
 	}
 
-	public static function isAccessFormParams()
+	public function isAccessFormParams()
 	{
 		return $this->F_RIGHT >= 25;
 	}
 
-	public static function isAccessForm()
+	public function isAccessForm()
 	{
 		return $this->F_RIGHT >= 10;
 	}
 
-	public static function isAccessFormResult($arrResult)
+	public function isAccessFormResult($arrResult)
 	{
 		global $USER;
 
 		return $this->F_RIGHT>=20 || ($this->F_RIGHT>=15 && $USER->GetID()==$arrResult["USER_ID"]);
 	}
 
-	public static function isAccessFormResultEdit()
+	public function isAccessFormResultEdit()
 	{
 		return in_array("EDIT",$this->arrRESULT_PERMISSION);
 	}
 
-	public static function isAccessFormResultView()
+	public function isAccessFormResultView()
 	{
 		return in_array("VIEW",$this->arrRESULT_PERMISSION);
 	}
 
-	public static function isAccessFormResultList()
+	public function isAccessFormResultList()
 	{
 		return $this->F_RIGHT >= 15;
 	}
 
-	public static function getFormImagePath()
+	public function getFormImagePath()
 	{
 		if (!$this->isFormImage()) return false;
 		if (empty($this->__form_image_path_cache))
@@ -2154,7 +2131,7 @@ class CAllFormOutput extends CFormOutput_old
 		return $this->__form_image_path_cache;
 	}
 
-	public static function getInputCaptionImagePath($FIELD_SID)
+	public function getInputCaptionImagePath($FIELD_SID)
 	{
 		if (!$this->isInputCaptionImage($FIELD_SID)) return false;
 		if (empty($this->__form_input_caption_image_path_cache[$FIELD_SID]))
@@ -2163,7 +2140,7 @@ class CAllFormOutput extends CFormOutput_old
 		return $this->__form_input_caption_image_path_cache[$FIELD_SID];
 	}
 
-	public static function setInputDefaultValue($FIELD_SID, $value, $ANSWER_ID = false)
+	public function setInputDefaultValue($FIELD_SID, $value, $ANSWER_ID = false)
 	{
 		if (is_array($this->arAnswers) && is_array($this->arAnswers[$FIELD_SID]))
 		{

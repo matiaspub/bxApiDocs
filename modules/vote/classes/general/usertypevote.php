@@ -123,7 +123,7 @@ class CUserTypeVote extends CUserTypeInteger
 			if (is_array($arSettings["UNIQUE"])) {
 				foreach ( $arSettings["UNIQUE"] as $res) {
 					$uniqType |= $res; }
-				$uniqType + 5;
+				$uniqType += 5;
 			}
 
 			$arSettings["UNIQUE"] = $uniqType;
@@ -227,6 +227,11 @@ class CUserTypeVote extends CUserTypeInteger
 		else
 		{
 			$uniqType = ($arUserField["SETTINGS"]["UNIQUE"] ? $arUserField["SETTINGS"]["UNIQUE"] : 13);
+			if (is_array($arUserField["SETTINGS"]["UNIQUE"])) {
+				foreach ( $arUserField["SETTINGS"]["UNIQUE"] as $res) {
+					$uniqType |= $res; }
+				$uniqType += 5;
+			}
 			$uniqType -=5;
 		}
 ?>

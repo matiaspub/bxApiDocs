@@ -21,7 +21,7 @@ class MysqlDbConnection
 	 * Connection and disconnection
 	 ***********************************************************/
 
-	static public function disconnectInternal()
+	public function disconnectInternal()
 	{
 		if (!$this->isConnected)
 			return;
@@ -110,13 +110,13 @@ class MysqlDbConnection
 		return new MysqlDbResult($this, $result, $trackerQuery);
 	}
 
-	static public function getIdentity($name = "")
+	public function getIdentity($name = "")
 	{
 		$this->connectInternal();
 		return mysql_insert_id($this->resource);
 	}
 
-	static public function getAffectedRowsCount()
+	public function getAffectedRowsCount()
 	{
 		return mysql_affected_rows($this->getResource());
 	}
@@ -125,7 +125,7 @@ class MysqlDbConnection
 	 * DDL
 	 *********************************************************/
 
-	static public function isTableExists($tableName)
+	public function isTableExists($tableName)
 	{
 		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
 		$tableName = trim($tableName);
@@ -140,12 +140,12 @@ class MysqlDbConnection
 			return false;
 	}
 
-	static public function isIndexExists($tableName, array $arColumns)
+	public function isIndexExists($tableName, array $arColumns)
 	{
 		return $this->getIndexName($tableName, $arColumns) !== null;
 	}
 
-	static public function getIndexName($tableName, array $arColumns, $strict = false)
+	public function getIndexName($tableName, array $arColumns, $strict = false)
 	{
 		if (!is_array($arColumns) || count($arColumns) <= 0)
 			return null;
@@ -178,7 +178,7 @@ class MysqlDbConnection
 		return null;
 	}
 
-	static public function getTableFields($tableName)
+	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
 		{
@@ -207,17 +207,17 @@ class MysqlDbConnection
 	 * Transaction
 	 *********************************************************/
 
-	static public function startTransaction()
+	public function startTransaction()
 	{
 		$this->query("START TRANSACTION");
 	}
 
-	static public function commitTransaction()
+	public function commitTransaction()
 	{
 		$this->query("COMMIT");
 	}
 
-	static public function rollbackTransaction()
+	public function rollbackTransaction()
 	{
 		$this->query("ROLLBACK");
 	}
@@ -227,7 +227,7 @@ class MysqlDbConnection
 	 * Type, version, cache, etc.
 	 *********************************************************/
 
-	static public function getVersion()
+	public function getVersion()
 	{
 		if ($this->version == null)
 		{

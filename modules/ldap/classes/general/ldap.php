@@ -35,7 +35,7 @@ class CLDAP
 		return false;
 	}
 
-	public static function BindAdmin()
+	public function BindAdmin()
 	{
 		if(strlen($this->arFields["ADMIN_LOGIN"])<=0)
 			return false;
@@ -47,7 +47,7 @@ class CLDAP
 		return $r;
 	}
 
-	public static function Bind($login, $password)
+	public function Bind($login, $password)
 	{
 		if($this->arFields["CONVERT_UTF8"]=="Y")
 		{
@@ -59,12 +59,12 @@ class CLDAP
 		return $r;
 	}
 
-	public static function Disconnect()
+	public function Disconnect()
 	{
 		ldap_close($this->conn);
 	}
 
-	public static function RootDSE()
+	public function RootDSE()
 	{
 		$values = $this->_RootDSE('namingcontexts');
 		if ($values == false)
@@ -72,7 +72,7 @@ class CLDAP
 		return $this->WorkAttr($values);
 	}
 
-	function _RootDSE($filtr)
+	public function _RootDSE($filtr)
 	{
 		$sr = ldap_read($this->conn, '', 'objectClass=*', Array($filtr), 0);
 		//$sr = ldap_read($this->conn, '', 'objectClass=*');
@@ -86,7 +86,7 @@ class CLDAP
 		return $values;
 	}
 
-	public static function WorkAttr($values)
+	public function WorkAttr($values)
 	{
 		if(is_array($values) && $values['count']==1)
 		{
@@ -102,7 +102,7 @@ class CLDAP
 		return $values;
 	}
 
-	public static function QueryArray($str = '(ObjectClass=*)', $fields = false)
+	public function QueryArray($str = '(ObjectClass=*)', $fields = false)
 	{
 		if(strlen($this->arFields['BASE_DN'])<=0)
 			return false;
@@ -167,7 +167,7 @@ class CLDAP
 		return $info;
 	}
 
-	public static function Query($str = '(ObjectClass=*)', $fields = false)
+	public function Query($str = '(ObjectClass=*)', $fields = false)
 	{
 		$info = $this->QueryArray($str, $fields);
 		$result = new CDBResult;
@@ -177,7 +177,7 @@ class CLDAP
 	}
 
 	// query for group list from AD - server
-	public static function GetGroupListArray($query = '')
+	public function GetGroupListArray($query = '')
 	{
 		static $groupslists = array();
 
@@ -227,7 +227,7 @@ class CLDAP
 		return $groupslists[$query];
 	}
 
-	public static function GetGroupList($query = '')
+	public function GetGroupList($query = '')
 	{
 		$arGroups = $this->GetGroupListArray($query);
 		$result = new CDBResult();
@@ -307,7 +307,7 @@ class CLDAP
 	}
 
 	// this function is called on user logon (either normal or ntlm) to find user in ldap
-	public static function FindUser($LOGIN, $PASSWORD = false)
+	public function FindUser($LOGIN, $PASSWORD = false)
 	{
 		$login_field = $LOGIN;
 		$password_field = $PASSWORD;
@@ -336,7 +336,7 @@ class CLDAP
 	}
 
 	// converts LDAP values to those suitable for user fields
-	public static function GetUserFields($arLdapUser, &$departmentCache=FALSE)
+	public function GetUserFields($arLdapUser, &$departmentCache=FALSE)
 	{
 		global $APPLICATION;
 		$arFields = array(
@@ -515,7 +515,7 @@ class CLDAP
 	// returns array:
 	// 'ID' - department id
 	// 'IS_HEAD' - true if this user is head of the department, false if not
-	public static function GetDepartmentIdForADUser($department, $managerDN, $username, &$cache=FALSE, $iblockId = FALSE, $names = FALSE)
+	public function GetDepartmentIdForADUser($department, $managerDN, $username, &$cache=FALSE, $iblockId = FALSE, $names = FALSE)
 	{
 		global $APPLICATION;
 
@@ -677,7 +677,7 @@ class CLDAP
 
 
 	// get user list (with attributes) from AD server
-	public static function GetUserList($arFilter = Array())
+	public function GetUserList($arFilter = Array())
 	{
 		$query = '';
 		foreach($arFilter as $key=>$value)
@@ -714,7 +714,7 @@ class CLDAP
 		return $arResult;
 	}
 
-	public static function GetUserArray($cn)
+	public function GetUserArray($cn)
 	{
 		$user_filter = $this->arFields['USER_FILTER'];
 		if(strlen(trim($user_filter))>0 && substr(trim($user_filter), 0, 1)!='(')
@@ -801,7 +801,7 @@ class CLDAP
 	 * @param $arUserGroups - full array with uppergroups
 	 * @param $arAllGroups - list of all ldap groups
 	 */
-	public static function GetAllMemberOf($arFindGroups, &$arUserGroups, $arAllGroups)
+	public function GetAllMemberOf($arFindGroups, &$arUserGroups, $arAllGroups)
 	{
 		if(!$arFindGroups || $arFindGroups=='')
 			return;
@@ -858,7 +858,7 @@ class CLDAP
 	}
 
 	// update user info, using previously loaded data from AD, make additional calls to AD if needed
-	public static function SetUser($arLdapUser, $bAddNew = true)
+	public function SetUser($arLdapUser, $bAddNew = true)
 	{
 		global $USER, $DB;
 		if(!is_object($USER))

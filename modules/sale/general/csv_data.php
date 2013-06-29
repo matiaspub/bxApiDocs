@@ -10,13 +10,13 @@ class CCSVDataSale
 	var $arWidthMap = array();		// массив координат меток разделения для полей фиксированой ширины
 	var $bFirstHeader = false;		// в 1 строке заголовки полей
 
-	public static function CCSVData($fields_type = "R", $first_header = false)
+	public function CCSVData($fields_type = "R", $first_header = false)
 	{
 		$this->SetFieldsType($fields_type);
 		$this->SetFirstHeader($first_header);
 	}
 
-	public static function LoadFile($filename)
+	public function LoadFile($filename)
 	{
 		$this->sFileName = $filename;
 		$file_id = fopen($this->sFileName, "rb");
@@ -25,27 +25,27 @@ class CCSVDataSale
 		fclose($file_id); 
 	}
 
-	public static function SetFieldsType($fields_type = "R")
+	public function SetFieldsType($fields_type = "R")
 	{
 		$this->cFieldsType = ($fields_type=="F") ? "F" : "R";
 	}
 
-	public static function SetDelimiter($delimiter = ";")
+	public function SetDelimiter($delimiter = ";")
 	{
 		$this->cDelimiter = (strlen($delimiter)>1) ? substr($delimiter, 0, 1) : $delimiter;
 	}
 
-	public static function SetFirstHeader($first_header = false)
+	public function SetFirstHeader($first_header = false)
 	{
 		$this->bFirstHeader = $first_header;
 	}
 
-	public static function GetFirstHeader()
+	public function GetFirstHeader()
 	{
 		return $this->bFirstHeader;
 	}
 
-	public static function SetWidthMap($arMap)
+	public function SetWidthMap($arMap)
 	{
 		$this->arWidthMap = array();
 		for ($i = 0; $i < count($arMap); $i++)
@@ -54,7 +54,7 @@ class CCSVDataSale
 		}
 	}
 
-	public static function FetchDelimiter()
+	public function FetchDelimiter()
 	{
 		$bInString = false;
 		$str = "";
@@ -131,7 +131,7 @@ class CCSVDataSale
 		return false;
 	}
 
-	public static function FetchWidth()
+	public function FetchWidth()
 	{
 		$str = "";
 		$ind = 1;
@@ -187,7 +187,7 @@ class CCSVDataSale
 		return false;
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		if ($this->cFieldsType=="R")
 		{
@@ -201,17 +201,17 @@ class CCSVDataSale
 		}
 	}
 
-	public static function MoveFirst()
+	public function MoveFirst()
 	{
 		$this->iCurPos = 0;
 	}
 
-	public static function GetPos()
+	public function GetPos()
 	{
 		return $this->iCurPos;
 	}
 
-	public static function SetPos($iCurPos = 0)
+	public function SetPos($iCurPos = 0)
 	{
 		$iCurPos = IntVal($iCurPos);
 		if ($iCurPos<=$this->iFileLength)
@@ -224,7 +224,7 @@ class CCSVDataSale
 		}
 	}
 
-	public static function SaveFile($filename, $arFields)
+	public function SaveFile($filename, $arFields)
 	{
 		$this->sFileName = $filename;
 

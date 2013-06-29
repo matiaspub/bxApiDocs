@@ -9,7 +9,7 @@ class CLearnParsePermissionsFromFilter
 	protected $requestedOperations = false;
 	protected $oAccess             = false;
 
-	function __construct ($arFilter)
+	public function __construct ($arFilter)
 	{
 		$loggedUserId = false;
 
@@ -101,7 +101,7 @@ class CLearnParsePermissionsFromFilter
 	}
 
 
-	static public function SQLForAccessibleLessons()
+	public function SQLForAccessibleLessons()
 	{
 		$rc = false;
 
@@ -121,7 +121,7 @@ class CLearnParsePermissionsFromFilter
 	}
 
 
-	static public function IsNeedCheckPerm()
+	public function IsNeedCheckPerm()
 	{
 		return ($this->bCheckPerm);
 	}

@@ -4,12 +4,12 @@ class CAllSearchTitle extends CDBResult
 	var $_arPhrase = array();
 	var $_arStemFunc;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->_arStemFunc = stemming_init(LANGUAGE_ID);
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		$r = parent::Fetch();
 

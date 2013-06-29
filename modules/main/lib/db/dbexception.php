@@ -9,7 +9,7 @@ class DbException
 {
 	protected $databaseMessage;
 
-	static public function __construct($message = "", $databaseMessage = "", \Exception $previous = null)
+	public function __construct($message = "", $databaseMessage = "", \Exception $previous = null)
 	{
 		if (($message != "") && ($databaseMessage != ""))
 			$message .= ": ".$databaseMessage;
@@ -21,7 +21,7 @@ class DbException
 		parent::__construct($message, 400, '', '', $previous);
 	}
 
-	static public function getDatabaseMessage()
+	public function getDatabaseMessage()
 	{
 		return $this->databaseMessage;
 	}

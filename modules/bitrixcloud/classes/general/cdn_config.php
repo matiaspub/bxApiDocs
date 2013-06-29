@@ -43,7 +43,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function updateQuota() /*. throws CBitrixCloudException .*/
+	public function updateQuota() /*. throws CBitrixCloudException .*/
 	{
 		$web_service = new CBitrixCloudCDNWebService($this->domain);
 		$obXML = $web_service->actionQuota();
@@ -64,7 +64,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function loadRemoteXML() /*. throws CBitrixCloudException .*/
+	public function loadRemoteXML() /*. throws CBitrixCloudException .*/
 	{
 		//Get configuration from remote service
 		$this->sites = CBitrixCloudOption::getOption("cdn_config_site")->getArrayValue();
@@ -128,7 +128,7 @@ class CBitrixCloudCDNConfig
 	 * @return bool
 	 *
 	 */
-	static public function isActive()
+	public function isActive()
 	{
 		return ($this->active > 0);
 	}
@@ -138,7 +138,7 @@ class CBitrixCloudCDNConfig
 	 * @return bool
 	 *
 	 */
-	static public function isExpired()
+	public function isExpired()
 	{
 		return ($this->expires < time());
 	}
@@ -149,7 +149,7 @@ class CBitrixCloudCDNConfig
 	 * @return void
 	 *
 	 */
-	static public function setExpired($time)
+	public function setExpired($time)
 	{
 		$this->expires = $time;
 		CBitrixCloudOption::getOption("cdn_config_expire_time")->setStringValue((string)$this->expires);
@@ -160,7 +160,7 @@ class CBitrixCloudCDNConfig
 	 * @return string
 	 *
 	 */
-	static public function getDomain()
+	public function getDomain()
 	{
 		return $this->domain;
 	}
@@ -171,7 +171,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function setDomain($domain)
+	public function setDomain($domain)
 	{
 		$this->domain = $domain;
 		return $this;
@@ -193,7 +193,7 @@ class CBitrixCloudCDNConfig
 	 * @return bool
 	 *
 	 */
-	static public function isKernelRewriteEnabled()
+	public function isKernelRewriteEnabled()
 	{
 		//It is true by default
 		if(!isset($this->kernel_rewrite))
@@ -207,7 +207,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function setKernelRewrite($rewrite = true)
+	public function setKernelRewrite($rewrite = true)
 	{
 		$this->kernel_rewrite = ($rewrite != false);
 		return $this;
@@ -218,7 +218,7 @@ class CBitrixCloudCDNConfig
 	 * @return bool
 	 *
 	 */
-	static public function isContentRewriteEnabled()
+	public function isContentRewriteEnabled()
 	{
 		//It is false by default
 		if(!isset($this->content_rewrite))
@@ -232,7 +232,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function setContentRewrite($rewrite = true)
+	public function setContentRewrite($rewrite = true)
 	{
 		$this->content_rewrite = ($rewrite == true);
 		return $this;
@@ -243,7 +243,7 @@ class CBitrixCloudCDNConfig
 	 * @return array[string]string
 	 *
 	 */
-	static public function getSites()
+	public function getSites()
 	{
 		return $this->sites;
 	}
@@ -254,7 +254,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function setSites($sites)
+	public function setSites($sites)
 	{
 		$this->sites = /*.(array[string]string).*/ array();
 		if (is_array($sites))
@@ -270,7 +270,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNQuota
 	 *
 	 */
-	static public function getQuota()
+	public function getQuota()
 	{
 		return $this->quota;
 	}
@@ -281,7 +281,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNClass
 	 *
 	 */
-	static public function getClassByName($class_name)
+	public function getClassByName($class_name)
 	{
 		return $this->classes->getClass($class_name);
 	}
@@ -293,7 +293,7 @@ class CBitrixCloudCDNConfig
 	 *
 	 *
 	 */
-	static public function getServerGroupByName($server_group_name)
+	public function getServerGroupByName($server_group_name)
 	{
 		return $this->server_groups->getGroup($server_group_name);
 	}
@@ -303,7 +303,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNLocations
 	 *
 	 */
-	static public function getLocations()
+	public function getLocations()
 	{
 		return $this->locations;
 	}
@@ -315,7 +315,7 @@ class CBitrixCloudCDNConfig
 	 * @return array[int]string
 	 *
 	 */
-	static public function getLocationsPrefixes($bKernel = true, $bContent = false)
+	public function getLocationsPrefixes($bKernel = true, $bContent = false)
 	{
 		$arPrefixes = /*.(array[int]string).*/array();
 		/** @var CBitrixCloudCDNLocation $location */
@@ -347,7 +347,7 @@ class CBitrixCloudCDNConfig
 	 * @return array[int]string
 	 *
 	 */
-	static public function getLocationsExtensions()
+	public function getLocationsExtensions()
 	{
 		$arExtensions = array();
 		/** @var CBitrixCloudCDNLocation $location */
@@ -368,7 +368,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function saveToOptions()
+	public function saveToOptions()
 	{
 		CBitrixCloudOption::getOption("cdn_config_active")->setStringValue((string)$this->active);
 		CBitrixCloudOption::getOption("cdn_config_expire_time")->setStringValue((string)$this->expires);
@@ -390,7 +390,7 @@ class CBitrixCloudCDNConfig
 	 * @return CBitrixCloudCDNConfig
 	 *
 	 */
-	static public function loadFromOptions()
+	public function loadFromOptions()
 	{
 		$this->active = intval(CBitrixCloudOption::getOption("cdn_config_active")->getStringValue());
 		$this->expires = intval(CBitrixCloudOption::getOption("cdn_config_expire_time")->getStringValue());
@@ -424,7 +424,7 @@ class CBitrixCloudCDNConfig
 	 * @return void
 	 *
 	 */
-	static public function setDebug($bActive)
+	public function setDebug($bActive)
 	{
 		$this->debug = $bActive === true;
 	}

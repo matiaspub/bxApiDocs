@@ -251,7 +251,7 @@ class CDeliveryEMS
 		return $arResult;
 	}
 
-	function __EMSQuery($method, $arParams = array())
+	public static function __EMSQuery($method, $arParams = array())
 	{
 		$arQuery = array('method='.$method);
 
@@ -283,7 +283,7 @@ class CDeliveryEMS
 		return $arResult;
 	}
 
-	function __GetLocation($location)
+	public static function __GetLocation($location)
 	{
 		$arLocation = CSaleLocation::GetByID($location);
 
@@ -574,7 +574,7 @@ class CDeliveryEMS
 			return array();
 	}
 
-	function __IsRussian($arLocation)
+	public static function __IsRussian($arLocation)
 	{
 		return
 			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?РЇ"
@@ -591,7 +591,7 @@ class CDeliveryEMS
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIAN FEDERATION");
 	}
 
-	function __Write2Log($data)
+	public static function __Write2Log($data)
 	{
 		if (defined('DELIVERY_EMS_WRITE_LOG') && DELIVERY_EMS_WRITE_LOG === 1)
 		{

@@ -387,7 +387,7 @@ class CAllTicketDictionary
 		return false;
 	}
 
-	function __CleanDefault(&$arFields)
+	public static function __CleanDefault(&$arFields)
 	{
 		if (
 				array_key_exists('SET_AS_DEFAULT', $arFields) && $arFields['SET_AS_DEFAULT'] == 'Y' &&
@@ -411,7 +411,7 @@ class CAllTicketDictionary
 		}
 	}
 
-	function __SetSites($id, $arFields)
+	public static function __SetSites($id, $arFields)
 	{
 		global $DB;
 		if (!array_key_exists('arrSITE', $arFields))

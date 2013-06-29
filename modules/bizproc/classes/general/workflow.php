@@ -32,7 +32,7 @@ class CBPWorkflow
 
 	/************************  PROPERTIES  *******************************/
 
-	static public function GetInstanceId()
+	public function GetInstanceId()
 	{
 		return $this->instanceId;
 	}
@@ -53,11 +53,10 @@ class CBPWorkflow
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetRuntime.php
 	 * @author Bitrix
 	 */
-	static public function GetRuntime()
+	public function GetRuntime()
 	{
 		return $this->runtime;
 	}
@@ -76,7 +75,6 @@ class CBPWorkflow
 	 * <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li>
 	 * </ul>
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionStatus.php
 	 * @author Bitrix
 	 */
@@ -107,7 +105,6 @@ class CBPWorkflow
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionResult.php
 	 * @author Bitrix
 	 */
@@ -126,12 +123,12 @@ class CBPWorkflow
 		$this->rootActivity->SetWorkflowStatus($newStatus);
 	}
 
-	static public function GetService($name)
+	public function GetService($name)
 	{
 		return $this->runtime->GetService($name);
 	}
 
-	static public function GetDocumentId()
+	public function GetDocumentId()
 	{
 		return $this->rootActivity->GetDocumentId();
 	}
@@ -168,11 +165,10 @@ class CBPWorkflow
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/constructor.php
 	 * @author Bitrix
 	 */
-	static public function __construct($instanceId, CBPRuntime $runtime)
+	public function __construct($instanceId, CBPRuntime $runtime)
 	{
 		if (strlen($instanceId) <= 0)
 			throw new Exception("instanceId");
@@ -185,7 +181,7 @@ class CBPWorkflow
 
 	/************************  CREATE / LOAD WORKFLOW  ****************************************/
 
-	static public function Initialize(CBPActivity $rootActivity, $documentId, $workflowParameters = array(), $workflowVariablesTypes = array(), $workflowParametersTypes = array())
+	public function Initialize(CBPActivity $rootActivity, $documentId, $workflowParameters = array(), $workflowVariablesTypes = array(), $workflowParametersTypes = array())
 	{
 		$this->rootActivity = $rootActivity;
 		$rootActivity->SetWorkflow($this);
@@ -215,7 +211,7 @@ class CBPWorkflow
 		$rootActivity->SetPropertiesTypes($workflowParametersTypes);
 	}
 
-	static public function Reload(CBPActivity $rootActivity)
+	public function Reload(CBPActivity $rootActivity)
 	{
 		$this->rootActivity = $rootActivity;
 		$rootActivity->SetWorkflow($this);
@@ -228,7 +224,7 @@ class CBPWorkflow
 		}
 	}
 
-	static public function OnRuntimeStopped()
+	public function OnRuntimeStopped()
 	{
 		$workflowStatus = $this->GetWorkflowStatus();
 
@@ -256,7 +252,7 @@ class CBPWorkflow
 	* Starts new workflow instance.
 	* 
 	*/
-	static public function Start()
+	public function Start()
 	{
 		if ($this->GetWorkflowStatus() != CBPWorkflowStatus::Created)
 			throw new Exception("CanNotStartInstanceTwice");
@@ -294,7 +290,7 @@ class CBPWorkflow
 	* Resume existing workflow.
 	* 
 	*/
-	static public function Resume()
+	public function Resume()
 	{
 		if ($this->GetWorkflowStatus() != CBPWorkflowStatus::Suspended)
 			throw new Exception("CanNotResumeInstance");
@@ -342,7 +338,7 @@ class CBPWorkflow
 	* @param mixed $eventName - Event name.
 	* @param mixed $arEventParameters - Event parameters.
 	*/
-	static public function SendExternalEvent($eventName, $arEventParameters = array())
+	public function SendExternalEvent($eventName, $arEventParameters = array())
 	{
 		$this->AddEventToQueue($eventName, $arEventParameters);
 		$this->Resume();
@@ -379,7 +375,7 @@ class CBPWorkflow
 	* @param mixed $activityName - Activity name.
 	* @return CBPActivity - Returns activity object or null if activity is not found.
 	*/
-	static public function GetActivityByName($activityName)
+	public function GetActivityByName($activityName)
 	{
 		if (strlen($activityName) <= 0)
 			throw new Exception("activityName");
@@ -418,7 +414,7 @@ class CBPWorkflow
 	* @param CBPActivity $activity - Activity object.
 	* @param mixed $arEventParameters - Optional parameters.
 	*/
-	static public function ExecuteActivity(CBPActivity $activity, $arEventParameters = array())
+	public function ExecuteActivity(CBPActivity $activity, $arEventParameters = array())
 	{
 		if ($activity == null)
 			throw new Exception("activity");
@@ -465,7 +461,7 @@ class CBPWorkflow
 	* @param CBPActivity $activity - Activity object.
 	* @param mixed $arEventParameters - Optional parameters.
 	*/
-	static public function CancelActivity(CBPActivity $activity, $arEventParameters = array())
+	public function CancelActivity(CBPActivity $activity, $arEventParameters = array())
 	{
 		if ($activity == null)
 			throw new Exception("activity");
@@ -477,7 +473,7 @@ class CBPWorkflow
 		$this->AddItemToQueue(array($activity, CBPActivityExecutorOperationType::Cancel));
 	}
 
-	static public function FaultActivity(CBPActivity $activity, Exception $e, $arEventParameters = array())
+	public function FaultActivity(CBPActivity $activity, Exception $e, $arEventParameters = array())
 	{
 		if ($activity == null)
 			throw new Exception("activity");
@@ -597,7 +593,7 @@ class CBPWorkflow
 		}
 	}
 
-	static public function Terminate(Exception $e = null)
+	public function Terminate(Exception $e = null)
 	{
 		$taskService = $this->GetService("TaskService");
 		$taskService->DeleteAllWorkflowTasks($this->GetInstanceId());
@@ -665,7 +661,7 @@ class CBPWorkflow
 	* @param mixed $eventName - Event name.
 	* @param IBPActivityExternalEventListener $eventHandler - Event handler.
 	*/
-	static public function AddEventHandler($eventName, IBPActivityExternalEventListener $eventHandler)
+	public function AddEventHandler($eventName, IBPActivityExternalEventListener $eventHandler)
 	{
 		if (!is_array($this->rootActivity->arEventsMap))
 			$this->rootActivity->arEventsMap = array();
@@ -682,7 +678,7 @@ class CBPWorkflow
 	* @param mixed $eventName - Event name.
 	* @param IBPActivityExternalEventListener $eventHandler - Event handler.
 	*/
-	static public function RemoveEventHandler($eventName, IBPActivityExternalEventListener $eventHandler)
+	public function RemoveEventHandler($eventName, IBPActivityExternalEventListener $eventHandler)
 	{
 		if (!is_array($this->rootActivity->arEventsMap))
 			$this->rootActivity->arEventsMap = array();
@@ -704,7 +700,7 @@ class CBPWorkflow
 	* Returns available events for current state of state machine workflow activity.
 	* 
 	*/
-	static public function GetAvailableStateEvents()
+	public function GetAvailableStateEvents()
 	{
 		if (!is_a($this->rootActivity, "CBPStateMachineWorkflowActivity"))
 			throw new Exception("NotAStateMachineWorkflow");

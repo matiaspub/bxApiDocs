@@ -82,7 +82,7 @@ class Query
 	 * @param Base|Query|string $source
 	 * @throws \Exception
 	 */
-	static public function __construct($source)
+	public function __construct($source)
 	{
 		if ($source instanceof $this)
 		{
@@ -106,18 +106,18 @@ class Query
 		$this->DB = $GLOBALS['DB'];
 	}
 
-	static public function getSelect()
+	public function getSelect()
 	{
 		return $this->select;
 	}
 
-	static public function setSelect(array $select)
+	public function setSelect(array $select)
 	{
 		$this->select = $select;
 		return $this;
 	}
 
-	static public function addSelect($definition, $alias = '')
+	public function addSelect($definition, $alias = '')
 	{
 		if (strlen($alias))
 		{
@@ -131,18 +131,18 @@ class Query
 		return $this;
 	}
 
-	static public function getFilter()
+	public function getFilter()
 	{
 		return $this->filter;
 	}
 
-	static public function setFilter(array $filter)
+	public function setFilter(array $filter)
 	{
 		$this->filter = $filter;
 		return $this;
 	}
 
-	static public function addFilter($key, $value)
+	public function addFilter($key, $value)
 	{
 		if (is_null($key) && is_array($value))
 		{
@@ -156,12 +156,12 @@ class Query
 		return $this;
 	}
 
-	static public function getGroup()
+	public function getGroup()
 	{
 		return $this->group;
 	}
 
-	static public function setGroup($group)
+	public function setGroup($group)
 	{
 		$group = !is_array($group) ? array($group) : $group;
 		$this->group = $group;
@@ -169,18 +169,18 @@ class Query
 		return $this;
 	}
 
-	static public function addGroup($group)
+	public function addGroup($group)
 	{
 		$this->group[] = $group;
 		return $this;
 	}
 
-	static public function getOrder()
+	public function getOrder()
 	{
 		return $this->order;
 	}
 
-	static public function setOrder(array $order)
+	public function setOrder(array $order)
 	{
 		$this->order = array();
 
@@ -199,7 +199,7 @@ class Query
 		return $this;
 	}
 
-	static public function addOrder($definition, $order = 'ASC')
+	public function addOrder($definition, $order = 'ASC')
 	{
 		$order = strtoupper($order);
 		$definition = strtoupper($definition);
@@ -228,29 +228,29 @@ class Query
 		return $this;
 	}
 
-	static public function getLimit()
+	public function getLimit()
 	{
 		return $this->limit;
 	}
 
-	static public function setLimit($limit)
+	public function setLimit($limit)
 	{
 		$this->limit = $limit;
 		return $this;
 	}
 
-	static public function getOffset()
+	public function getOffset()
 	{
 		return $this->offset;
 	}
 
-	static public function setOffset($offset)
+	public function setOffset($offset)
 	{
 		$this->offset = $offset;
 		return $this;
 	}
 
-	static public function countTotal($count = null)
+	public function countTotal($count = null)
 	{
 		if ($count === null)
 		{
@@ -263,34 +263,34 @@ class Query
 		}
 	}
 
-	static public function enableDataDoubling()
+	public function enableDataDoubling()
 	{
 		$this->data_doubling = true;
 	}
 
-	static public function disableDataDoubling()
+	public function disableDataDoubling()
 	{
 		$this->data_doubling = false;
 	}
 
-	static public function getOptions()
+	public function getOptions()
 	{
 		return $this->options;
 	}
 
-	static public function setOptions($options)
+	public function setOptions($options)
 	{
 		$this->options = $options;
 		return $this;
 	}
 
-	static public function addOption($option_name, $option_value)
+	public function addOption($option_name, $option_value)
 	{
 		$this->options[$option_name] = $option_value;
 		return $this;
 	}
 
-	static public function registerRuntimeField($name, $fieldInfo)
+	public function registerRuntimeField($name, $fieldInfo)
 	{
 		$field = $this->init_entity->initializeField($name, $fieldInfo);
 
@@ -303,18 +303,18 @@ class Query
 		return $this;
 	}
 
-	static public function setTableAliasPostfix($postfix)
+	public function setTableAliasPostfix($postfix)
 	{
 		$this->table_alias_postfix = $postfix;
 		return $this;
 	}
 
-	static public function getTableAliasPostfix()
+	public function getTableAliasPostfix()
 	{
 		return $this->table_alias_postfix;
 	}
 
-	static public function exec()
+	public function exec()
 	{
 		$this->is_executing = true;
 
@@ -426,7 +426,7 @@ class Query
 		return $this;
 	}
 
-	static public function setFilterChains(array $filter, $section = 'filter')
+	public function setFilterChains(array $filter, $section = 'filter')
 	{
 		foreach ($filter as $filter_def => $filter_match)
 		{
@@ -1231,7 +1231,7 @@ class Query
 		}
 	}
 
-	static public function registerChain($section, QueryChain $chain, $opt_key = null)
+	public function registerChain($section, QueryChain $chain, $opt_key = null)
 	{
 		$alias = $chain->getAlias();
 
@@ -1259,7 +1259,7 @@ class Query
 		return $reg_chain;
 	}
 
-	static public function getRegisteredChain($key, $force_create = false)
+	public function getRegisteredChain($key, $force_create = false)
 	{
 		if (isset($this->global_chains[$key]))
 		{
@@ -1406,7 +1406,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getChains()
+	public function getChains()
 	{
 		return $this->global_chains;
 	}
@@ -1414,7 +1414,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getGroupChains()
+	public function getGroupChains()
 	{
 		return $this->group_chains;
 	}
@@ -1422,7 +1422,7 @@ class Query
 	/**
 	 * @return array
 	 */
-	static public function getHiddenChains()
+	public function getHiddenChains()
 	{
 		return $this->hidden_chains;
 	}
@@ -1430,7 +1430,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getHavingChains()
+	public function getHavingChains()
 	{
 		return $this->having_chains;
 	}
@@ -1438,7 +1438,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getFilterChains()
+	public function getFilterChains()
 	{
 		return $this->filter_chains;
 	}
@@ -1446,7 +1446,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getOrderChains()
+	public function getOrderChains()
 	{
 		return $this->order_chains;
 	}
@@ -1454,7 +1454,7 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getSelectChains()
+	public function getSelectChains()
 	{
 		return $this->select_chains;
 	}
@@ -1462,37 +1462,37 @@ class Query
 	/**
 	 * @return array|QueryChain[]
 	 */
-	static public function getWhereChains()
+	public function getWhereChains()
 	{
 		return $this->where_chains;
 	}
 
-	static public function getJoinMap()
+	public function getJoinMap()
 	{
 		return $this->join_map;
 	}
 
-	static public function getQuery()
+	public function getQuery()
 	{
 		return $this->buildQuery(false);
 	}
 
-	static public function getLastQuery()
+	public function getLastQuery()
 	{
 		return $this->last_query;
 	}
 
-	static public function getEntity()
+	public function getEntity()
 	{
 		return $this->init_entity;
 	}
 
-	static public function getReplacedAliases()
+	public function getReplacedAliases()
 	{
 		return $this->replaced_aliases;
 	}
 
-	static public function dump()
+	public function dump()
 	{
 		echo '<pre>';
 

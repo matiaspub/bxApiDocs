@@ -7,7 +7,7 @@ class CAllCloudStorageBucket
 	 * @param int $file_count
 	 * @return CDBResult
 	*/
-	static public function SetFileCounter($file_size, $file_count)
+	public function SetFileCounter($file_size, $file_count)
 	{
 		global $DB, $CACHE_MANAGER;
 		$res = $DB->Query($s="
@@ -24,7 +24,7 @@ class CAllCloudStorageBucket
 	 * @param double $file_size
 	 * @return CDBResult
 	*/
-	public static function IncFileCounter($file_size = 0.0)
+	public function IncFileCounter($file_size = 0.0)
 	{
 		global $DB;
 		return $DB->Query("
@@ -38,7 +38,7 @@ class CAllCloudStorageBucket
 	 * @param double $file_size
 	 * @return CDBResult
 	*/
-	public static function DecFileCounter($file_size = 0.0)
+	public function DecFileCounter($file_size = 0.0)
 	{
 		global $DB;
 		$res = $DB->Query("

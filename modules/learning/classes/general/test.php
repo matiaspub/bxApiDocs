@@ -176,11 +176,10 @@ class CAllTest
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -265,11 +264,10 @@ class CAllTest
 	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 

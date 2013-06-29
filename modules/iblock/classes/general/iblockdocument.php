@@ -27,6 +27,17 @@ class CIBlockDocument
 		if (!is_array($fieldValue) || is_array($fieldValue) && CBPHelper::IsAssociativeArray($fieldValue))
 			$fieldValue = array($fieldValue);
 
+		$customMethodName = "";
+		$customMethodNameMulty = "";
+		if (strpos($arFieldType["Type"], ":") !== false)
+		{
+			$ar = CIBlockProperty::GetUserType(substr($arFieldType["Type"], 2));
+			if (array_key_exists("GetPublicEditHTML", $ar))
+				$customMethodName = $ar["GetPublicEditHTML"];
+			if (array_key_exists("GetPublicEditHTMLMulty", $ar))
+				$customMethodNameMulty = $ar["GetPublicEditHTMLMulty"];
+		}
+
 		ob_start();
 
 		if ($arFieldType["Type"] == "select")
@@ -72,6 +83,69 @@ class CIBlockDocument
 		{
 			$fieldValue = CBPHelper::UsersArrayToString($fieldValue, null, array("iblock", "CIBlockDocument", $documentType));
 			?><input type="text" size="40" id="id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>" name="<?= htmlspecialcharsbx($arFieldName["Field"]) ?>" value="<?= htmlspecialcharsbx($fieldValue) ?>"><input type="button" value="..." onclick="BPAShowSelector('id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>', 'user');"><?
+		}
+		elseif ((strpos($arFieldType["Type"], ":") !== false)
+			&& $arFieldType["Multiple"]
+			&& (
+				is_array($customMethodNameMulty) && count($customMethodNameMulty) > 0
+				|| !is_array($customMethodNameMulty) && strlen($customMethodNameMulty) > 0
+			)
+		)
+		{
+			if (!is_array($fieldValue))
+				$fieldValue = array();
+
+			if ($bAllowSelection)
+			{
+				$fieldValueTmp1 = array();
+				$fieldValueTmp2 = array();
+				foreach ($fieldValue as $v)
+				{
+					$vTrim = trim($v);
+					if (preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", $vTrim) || (substr($vTrim, 0, 1) == "="))
+						$fieldValueTmp1[] = $vTrim;
+					else
+						$fieldValueTmp2[] = $v;
+				}
+			}
+			else
+			{
+				$fieldValueTmp1 = array();
+				$fieldValueTmp2 = $fieldValue;
+			}
+
+			if (($arFieldType["Type"] == "S:employee") && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+				$fieldValueTmp2 = CBPHelper::StripUserPrefix($fieldValueTmp2);
+
+			foreach ($fieldValueTmp2 as &$fld)
+				$fld = array("VALUE" => $fld);
+
+			echo call_user_func_array(
+				$customMethodNameMulty,
+				array(
+					array("LINK_IBLOCK_ID" => $arFieldType["Options"]),
+					$fieldValueTmp2,
+					array(
+						"FORM_NAME" => $arFieldName["Form"],
+						"VALUE" => htmlspecialcharsbx($arFieldName["Field"])
+					),
+					true
+				)
+			);
+
+			if ($bAllowSelection)
+			{
+				?>
+				<br /><input type="text" id="id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text" name="<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text" value="<?
+				if (count($fieldValueTmp1) > 0)
+				{
+					$a = array_values($fieldValueTmp1);
+					echo htmlspecialcharsbx($a[0]);
+				}
+				?>">
+				<input type="button" value="..." onclick="BPAShowSelector('id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text', 'user');">
+				<?
+			}
 		}
 		else
 		{
@@ -134,14 +208,6 @@ class CIBlockDocument
 				<?
 			}
 
-			$customMethodName = "";
-			if (strpos($arFieldType["Type"], ":") !== false)
-			{
-				$ar = CIBlockProperty::GetUserType(substr($arFieldType["Type"], 2));
-				if (array_key_exists("GetPublicEditHTML", $ar))
-					$customMethodName = $ar["GetPublicEditHTML"];
-			}
-
 			if ($arFieldType["Multiple"])
 				echo '<table width="100%" border="0" cellpadding="2" cellspacing="2" id="CBPVirtualDocument_'.htmlspecialcharsbx($arFieldName["Field"]).'_Table">';
 
@@ -164,6 +230,9 @@ class CIBlockDocument
 						$value1 = null;
 					else
 						unset($fieldValueTmp[$key]);
+
+					if (($arFieldType["Type"] == "S:employee") && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+						$value1 = CBPHelper::StripUserPrefix($value1);
 
 					echo call_user_func_array(
 						$customMethodName,
@@ -214,15 +283,42 @@ class CIBlockDocument
 							break;
 						case "date":
 						case "datetime":
-							$v = "";
-							if (!preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", trim($value))
-								&& (substr(trim($value), 0, 1) != "="))
+
+							if (defined("ADMIN_SECTION") && ADMIN_SECTION)
 							{
-								$v = $value;
-								unset($fieldValueTmp[$key]);
+								$v = "";
+								if (!preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", trim($value))
+									&& (substr(trim($value), 0, 1) != "="))
+								{
+									$v = $value;
+									unset($fieldValueTmp[$key]);
+								}
+								require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/init_admin.php");
+								echo CAdminCalendar::CalendarDate($fieldNameName, $v, 19, ($arFieldType["Type"] != "date"));
 							}
-							require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/init_admin.php");
-							echo CAdminCalendar::CalendarDate($fieldNameName, $v, 19, ($arFieldType["Type"] != "date"));
+							else
+							{
+								$value1 = $value;
+								if ($bAllowSelection && (preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", trim($value1)) || substr(trim($value1), 0, 1) == "="))
+									$value1 = null;
+								else
+									unset($fieldValueTmp[$key]);
+
+								$ar = CIBlockProperty::GetUserType("DateTime");
+								echo call_user_func_array(
+									$ar["GetPublicEditHTML"],
+									array(
+										array("LINK_IBLOCK_ID" => $arFieldType["Options"]),
+										array("VALUE" => $value1),
+										array(
+											"FORM_NAME" => $arFieldName["Form"],
+											"VALUE" => $fieldNameName
+										),
+										true
+									)
+								);
+							}
+
 							break;
 						default:
 							unset($fieldValueTmp[$key]);
@@ -500,6 +596,13 @@ class CIBlockDocument
 									);
 							}
 						}
+
+						if (($value !== null)
+							&& ($arFieldType["Type"] == "S:employee")
+							&& COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+						{
+							$value = "user_".$value;
+						}
 					}
 					else
 					{
@@ -594,6 +697,9 @@ class CIBlockDocument
 
 		if (strpos($arFieldType['Type'], ":") !== false)
 		{
+			if ($arFieldType["Type"] == "S:employee")
+				$fieldValue = CBPHelper::StripUserPrefix($fieldValue);
+
 			$arCustomType = CIBlockProperty::GetUserType(substr($arFieldType['Type'], 2));
 			if (array_key_exists("GetPublicViewHTML", $arCustomType))
 			{
@@ -743,7 +849,8 @@ class CIBlockDocument
 			{
 				if (strlen($propertyValue["USER_TYPE"]) > 0)
 				{
-					if ($propertyValue["USER_TYPE"] == "UserID")
+					if ($propertyValue["USER_TYPE"] == "UserID"
+						|| $propertyValue["USER_TYPE"] == "employee" && (COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y"))
 					{
 						$arPropertyValue = $propertyValue["VALUE"];
 						$arPropertyKey = $propertyValue["VALUE_ENUM_ID"];
@@ -1028,7 +1135,8 @@ class CIBlockDocument
 
 			if (strlen($arProperty["USER_TYPE"]) > 0)
 			{
-				if ($arProperty["USER_TYPE"] == "UserID")
+				if ($arProperty["USER_TYPE"] == "UserID"
+					|| $arProperty["USER_TYPE"] == "employee" && (COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y"))
 				{
 					$arResult[$key]["Type"] = "user";
 					$arResult[$key."_PRINTABLE"] = array(
@@ -1132,6 +1240,8 @@ class CIBlockDocument
 
 			$arResult[$t] = array("Name" => $ar["DESCRIPTION"], "BaseType" => "string");
 			if ($t == "S:UserID")
+				$arResult[$t]["BaseType"] = "user";
+			elseif ($t == "S:employee" && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
 				$arResult[$t]["BaseType"] = "user";
 			elseif ($t == "S:DateTime")
 				$arResult[$t]["BaseType"] = "datetime";
@@ -1389,9 +1499,10 @@ class CIBlockDocument
 
 		if ($result > 0)
 		{
-			$db_events = GetModuleEvents("iblock", "CIBlockDocument_OnUnlockDocument");
-			while ($arEvent = $db_events->Fetch())
+			foreach (GetModuleEvents("iblock", "CIBlockDocument_OnUnlockDocument", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, array(array("iblock", "CIBlockDocument", $documentId)));
+			}
 		}
 
 		return $result > 0;

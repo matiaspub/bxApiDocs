@@ -4,18 +4,18 @@ class CIBlockSequence
 	var $iblock_id = 0;
 	var $property_id = 0;
 
-	function __construct($iblock_id, $property_id = 0)
+	public function __construct($iblock_id, $property_id = 0)
 	{
 		return $this->CIBlockSequence($iblock_id, $property_id);
 	}
 
-	public static function CIBlockSequence($iblock_id, $property_id = 0)
+	public function CIBlockSequence($iblock_id, $property_id = 0)
 	{
 		$this->iblock_id = $iblock_id;
 		$this->property_id = $property_id;
 	}
 
-	public static function Drop($bAll = false)
+	public function Drop($bAll = false)
 	{
 		global $DB;
 		//OR part of the where is just for some cleanup
@@ -35,7 +35,7 @@ class CIBlockSequence
 		return $rs;
 	}
 
-	public static function GetCurrent()
+	public function GetCurrent()
 	{
 		global $DB;
 		$strSql = "
@@ -52,7 +52,7 @@ class CIBlockSequence
 			return 0;
 	}
 
-	public static function GetNext()
+	public function GetNext()
 	{
 		global $DB;
 		$strSql = "
@@ -64,7 +64,7 @@ class CIBlockSequence
 		return $DB->LastID();
 	}
 
-	public static function SetNext($value)
+	public function SetNext($value)
 	{
 		global $DB;
 		$value = intval($value);

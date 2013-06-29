@@ -424,7 +424,7 @@ class CPushManager
 		return false;
 	}
 
-	static public function SendMessage($arMessages = Array(), $sandbox = false)
+	public function SendMessage($arMessages = Array(), $sandbox = false)
 	{
 		if(empty($arMessages))
 			return false;

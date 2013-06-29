@@ -290,7 +290,7 @@ class CSocNetLogEvents extends CAllSocNetLogEvents
 						{
 							if (!function_exists('__tmp_str_apos'))
 							{
-								function __tmp_str_apos(&$tmpval, $tmpind)
+								public static function __tmp_str_apos(&$tmpval, $tmpind)
 								{
 									if (strlen($tmpval) > 0)
 										$tmpval = "'".$GLOBALS["DB"]->ForSql($tmpval, 50)."'";

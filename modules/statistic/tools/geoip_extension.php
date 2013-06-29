@@ -30,7 +30,7 @@ class CCityLookup_geoip_extension extends CCityLookup
 		return new CCityLookup_geoip_extension($arDBRecord);
 	}
 
-	function __construct($arDBRecord = false)
+	public function __construct($arDBRecord = false)
 	{
 		parent::__construct($arDBRecord);
 		if(!$arDBRecord)
@@ -51,7 +51,7 @@ class CCityLookup_geoip_extension extends CCityLookup
 		}
 	}
 
-	public static function ArrayForDB()
+	public function ArrayForDB()
 	{
 		$ar = parent::ArrayForDB();
 		if($this->postal_code) $ar["XPOST"] = $this->postal_code;
@@ -60,7 +60,7 @@ class CCityLookup_geoip_extension extends CCityLookup
 		return $ar;
 	}
 
-	public static function GetFullInfo()
+	public function GetFullInfo()
 	{
 		$ar = parent::GetFullInfo();
 		$ar["POSTAL_CODE"] = array(
@@ -81,7 +81,7 @@ class CCityLookup_geoip_extension extends CCityLookup
 		return $ar;
 	}
 
-	public static function GetDescription()
+	public function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_geoip_extension",
@@ -92,12 +92,12 @@ class CCityLookup_geoip_extension extends CCityLookup
 		);
 	}
 
-	public static function IsInstalled()
+	public function IsInstalled()
 	{
 		return $this->is_installed;
 	}
 
-	public static function Lookup()
+	public function Lookup()
 	{
 		if($this->city_avail)
 		{

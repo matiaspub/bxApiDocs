@@ -1781,10 +1781,20 @@ class CAllRatings
 
 				CUser::SetUserGroup($userId, $arGroups);
 			}
+			if (CACHED_b_rating_vote!==false)
+			{
+				global $CACHE_MANAGER;
+				$bucket_size = intval(CACHED_b_rating_bucket_size);
+				if($bucket_size <= 0)
+					$bucket_size = 100;
+
+				$bucket = intval($userId/$bucket_size);
+				$CACHE_MANAGER->Clean("b_rvu_".$authorityRatingId.$bucket, "b_rating_user");
+			}
 		}
 	}
 
-	function __SortWeight($a, $b)
+	public static function __SortWeight($a, $b)
 	{
 		if (isset($a['RATING_FROM']) || isset($b['RATING_FROM']))
 			return 1;
@@ -1793,7 +1803,7 @@ class CAllRatings
 	}
 
 	// check only general field
-	function __CheckFields($arFields)
+	public static function __CheckFields($arFields)
 	{
 		$aMsg = array();
 
@@ -1821,7 +1831,7 @@ class CAllRatings
 	}
 
 	// creates a configuration record for each item rating
-	function __AddComponents($ID, $arFields)
+	public static function __AddComponents($ID, $arFields)
 	{
 		global $DB;
 
@@ -1861,7 +1871,7 @@ class CAllRatings
 		return true;
 	}
 
-	function __UpdateComponents($ID, $arFields)
+	public static function __UpdateComponents($ID, $arFields)
 	{
 		global $DB;
 

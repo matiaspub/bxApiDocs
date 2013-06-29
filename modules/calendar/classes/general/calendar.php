@@ -63,7 +63,7 @@ class CCalendar
 		$bCurUserSocNetAdmin,
 		$pathesList = array('path_to_user','path_to_user_calendar','path_to_group','path_to_group_calendar','path_to_vr','path_to_rm');
 
-	public static function Init($Params)
+	public function Init($Params)
 	{
 		global $USER;
 		$access = new CAccess();
@@ -167,7 +167,7 @@ class CCalendar
 			self::$allowVideoMeeting = false;
 	}
 
-	static public function Show($Params = array())
+	public function Show($Params = array())
 	{
 		global $APPLICATION, $USER, $EC_UserFields;
 		$arType = false;
@@ -1269,10 +1269,28 @@ class CCalendar
 				{
 					foreach($res_i as $i => $event)
 					{
-						if ($res_i[$i]['IS_MEETING'] && $res_i[$i]['SECT_ID'] != intVal($spUser['SECTION_ID']) && !$resEventInd[$res_i[$i]['ID']])
+						if ($event['IS_MEETING'] && $event['SECT_ID'] != intVal($spUser['SECTION_ID']) && !$resEventInd[$event['ID']])
 						{
-							$res_i[$i]['SECT_ID'] = intVal($spUser['SECTION_ID']);
-							$res_i[$i] = CCalendarEvent::ApplyAccessRestrictions($res_i[$i], self::$userId);
+							$event['SECT_ID'] = intVal($spUser['SECTION_ID']);
+
+							$checkPermissionsForEvent = self::$userId != $event['CREATED_BY']; // It's creator
+							// It's event in user's calendar
+							if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && self::$userId == $event['OWNER_ID'])
+								$checkPermissionsForEvent = false;
+							if ($checkPermissionsForEvent && $event['IS_MEETING'] && $event['USER_MEETING'] && $event['USER_MEETING']['ATTENDEE_ID'] == self::$userId)
+								$checkPermissionsForEvent = false;
+							if ($checkPermissionsForEvent && $event['IS_MEETING'] && is_array($event['~ATTENDEES']))
+							{
+								foreach($event['~ATTENDEES'] as $att)
+								{
+									if ($att['USER_ID'] == self::$userId)
+									{
+										$checkPermissionsForEvent = false;
+										break;
+									}
+								}
+							}
+							$event = CCalendarEvent::ApplyAccessRestrictions($event, self::$userId);
 							$resAdd[] = $res_i[$i];
 						}
 					}
@@ -1605,7 +1623,7 @@ class CCalendar
 				if (intVal($id) > 0)
 					$res[] = intVal($id);
 			CUserOptions::SetOption("calendar", "superpose_tracking_users", serialize($res));
-			return $true;
+			return $res;
 		}
 	}
 
@@ -2923,7 +2941,8 @@ class CCalendar
 				'parseRecursion' => true,
 				'fetchAttendees' => true,
 				'userId' => $curUserId,
-				'fetchMeetings' => $type == 'user'
+				'fetchMeetings' => $type == 'user',
+				'preciseLimits' => true
 			)
 		);
 
@@ -4734,28 +4753,44 @@ class CCalendar
 
 	public static function GetOffset($userId = false)
 	{
-		if (!$userId)
+		$offset = 0;
+		if ($userId > 0)
+		{
+			if (!isset(self::$arTimezoneOffsets[$userId]))
+			{
+				if (!CTimeZone::Enabled())
+				{
+					CTimeZone::Enable();
+					$offset = CTimeZone::GetOffset($userId);
+					CTimeZone::Disable();
+				}
+				else
+				{
+					$offset = CTimeZone::GetOffset($userId);
+				}
+			}
+			self::$arTimezoneOffsets[$userId] = $offset;
+		}
+		else
 		{
 			if (!isset(self::$offset))
 			{
 				if (!CTimeZone::Enabled())
 				{
 					CTimeZone::Enable();
-					self::$offset = CTimeZone::GetOffset();
+					$offset = CTimeZone::GetOffset();
 					CTimeZone::Disable();
 				}
 				else
-					self::$offset = CTimeZone::GetOffset();
+					$offset = CTimeZone::GetOffset();
+				self::$offset = $offset;
 			}
-			return self::$offset;
+			else
+			{
+				$offset = self::$offset;
+			}
 		}
-
-		// Fetch recipient timezone
-		if (!isset(self::$arTimezoneOffsets[$userId]))
-		{
-			self::$arTimezoneOffsets[$userId] = CTimeZone::GetOffset($userId);
-		}
-		return self::$arTimezoneOffsets[$userId];
+		return $offset;
 	}
 
 	public static function SetOffset($userId = false, $value = 0)

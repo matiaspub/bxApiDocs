@@ -2,7 +2,7 @@
 IncludeModuleLangFile(__FILE__);
 class blogTextParser extends CTextParser
 {
-	public static function blogTextParser($strLang = False, $pathToSmile = false)
+	public function blogTextParser($strLang = False, $pathToSmile = false)
 	{
 		$this->CTextParser();
 		global $CACHE_MANAGER;
@@ -20,7 +20,7 @@ class blogTextParser extends CTextParser
 		$this->arUserfields = array();
 
 		$this->smiles = array();
-		if($CACHE_MANAGER->Read(60*60*24*7, "b_blog_smile"))
+		if($CACHE_MANAGER->Read(60*60*24*365, "b_blog_smile"))
 		{
 			$arSmiles = $CACHE_MANAGER->Get("b_blog_smile");
 		}
@@ -40,7 +40,7 @@ class blogTextParser extends CTextParser
 				}
 			}
 
-			public static function sortlen($a, $b) {
+			function sortlen($a, $b) {
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
 
@@ -58,7 +58,7 @@ class blogTextParser extends CTextParser
 		$this->smiles = $arSmiles[$strLang];
 	}
 
-	public static function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N"), $arParams = Array())
+	public function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N"), $arParams = Array())
 	{
 		if(!is_array($arParams) && strlen($arParams) > 0)
 			$type = $arParams;
@@ -181,7 +181,7 @@ class blogTextParser extends CTextParser
 		return $text;
 	}
 
-	public static function convert_userfields($matches)
+	public function convert_userfields($matches)
 	{
 		$id = intval($matches[1]);
 		if ($id > 0 && in_array($id, $this->userField["VALUE"]))
@@ -193,7 +193,7 @@ class blogTextParser extends CTextParser
 	}
 
 
-	public static function convert_blog_user($userId = 0, $name = "")
+	public function convert_blog_user($userId = 0, $name = "")
 	{
 		$userId = IntVal($userId);
 		if($userId <= 0)
@@ -208,7 +208,7 @@ class blogTextParser extends CTextParser
 		return "TAG [".$name."]";
 	}
 
-	public static function convert4mail($text, $arImages = Array())
+	public function convert4mail($text, $arImages = Array())
 	{
 		$text = Trim($text);
 		if (strlen($text)<=0) return "";
@@ -286,7 +286,7 @@ class blogTextParser extends CTextParser
 		return $text;
 	}
 
-	public static function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html", $serverName="")
+	public function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html", $serverName="")
 	{
 		$imageId = IntVal($imageId);
 		if($imageId <= 0)
@@ -433,14 +433,14 @@ class blogTextParser extends CTextParser
 		return $res;
 	}
 
-	public static function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $bPreview = true, $arParams = Array())
+	public function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $bPreview = true, $arParams = Array())
 	{
 		$arParams["type"] = "rss";
 		$text = $this->convert($text, $bPreview, $arImages, $arAllow, $arParams);
 		return trim($text);
 	}
 
-	public static function convert_open_tag($marker = "quote")
+	public function convert_open_tag($marker = "quote")
 	{
 		$marker = (strToLower($marker) == "code" ? "code" : "quote");
 		$this->{$marker."_open"}++;

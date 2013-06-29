@@ -13,45 +13,45 @@ class CGoogleMessage
 	public $_sound;
 	public $_sParams = array();
 
-	static public function __construct($sDeviceToken = null)
+	public function __construct($sDeviceToken = null)
 	{
 		if (isset($sDeviceToken)) {
 			$this->addRecipient($sDeviceToken);
 		}
 	}
 
-	static public function addRecipient($sDeviceToken)
+	public function addRecipient($sDeviceToken)
 	{
 		$this->_aDeviceTokens[] = $sDeviceToken;
 	}
 
-	static public function setText($sText)
+	public function setText($sText)
 	{
 		$this->_sText = $sText;
 	}
 
-	static public function setTitle($sTitle)
+	public function setTitle($sTitle)
 	{
 		$this->_sTitle = $sTitle;
 	}
 
-	static public function setCustomProperty($string1, $params)
+	public function setCustomProperty($string1, $params)
 	{
 		$this->_sParams[$string1] = $params;
 	}
 
-	static public function setSound($sound = true)
+	public function setSound($sound = true)
 	{
 		$this->_sound = true;
 	}
 
-	static public function setExpiry($nExpiryValue)
+	public function setExpiry($nExpiryValue)
 	{
 		if (is_int($nExpiryValue))
 			$this->_nExpiryValue = $nExpiryValue;
 	}
 
-	static public function getBatch()
+	public function getBatch()
 	{
 
 		$data = array(

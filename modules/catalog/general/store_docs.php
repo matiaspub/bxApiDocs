@@ -204,6 +204,27 @@ class CAllCatalogDocs
 		}
 		return $result;
 	}
+
+	public static function OnIBlockElementDelete($productID)
+	{
+		global $DB;
+		$productID = IntVal($productID);
+		if ($productID > 0)
+		{
+			return $DB->Query("DELETE FROM b_catalog_store_barcode WHERE PRODUCT_ID = ".$productID." ", true);
+		}
+	}
+
+	public static function OnCatalogStoreDelete($storeID)
+	{
+		global $DB;
+		$storeID = IntVal($storeID);
+		if ($storeID > 0)
+		{
+			return $DB->Query("DELETE FROM b_catalog_store_barcode WHERE STORE_ID = ".$storeID." ", true);
+		}
+	}
+
 }
 
 abstract class CCatalogTypesDocs
@@ -366,13 +387,13 @@ abstract class CCatalogTypesDocs
 	/** The method of conducting a document, distributes products to warehouses, according to the document type.
 	 * @param $arFields
 	 */
-	abstract static function conductDocument($arFields);
+	abstract function conductDocument($arFields);
 
 	/** Method cancels an instrument and perform the reverse action of conducting a document.
 	 * @param $arFields
 	 * @return mixed
 	 */
-	abstract static function cancellationDocument($arFields);
+	abstract function cancellationDocument($arFields);
 
 }
 
@@ -1038,7 +1059,7 @@ class CCatalogStoreControlUtil
 			$imgCode = "";
 
 			if ($arProduct["IBLOCK_ID"] > 0)
-				$arProduct["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arProduct["IBLOCK_ID"], $elementId);
+				$arProduct["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arProduct["IBLOCK_ID"], $elementId, array("find_section_section" => $arProduct["IBLOCK_SECTION_ID"]));
 
 			if ($arProduct["DETAIL_PICTURE"] > 0)
 				$imgCode = $arProduct["DETAIL_PICTURE"];

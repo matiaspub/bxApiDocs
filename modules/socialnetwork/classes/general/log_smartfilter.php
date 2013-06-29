@@ -81,6 +81,7 @@ class CAllSocNetLogSmartFilter
 				$obCache->StartDataCache($ttl, $cache_id, $cache_dir);
 
 			$rsSmartFilter = CSocNetLogSmartFilter::GetList(
+				array(),
 				array(
 					"USER_ID" => $user_id
 				),

@@ -21,7 +21,7 @@ class ManagedCache
 	// Tries to read cached variable value from the file
 	// Returns true on success
 	// overwise returns false
-	static public function read($ttl, $uniqueId, $tableId = false)
+	public function read($ttl, $uniqueId, $tableId = false)
 	{
 		if (array_key_exists($uniqueId, $this->cache))
 		{
@@ -38,7 +38,7 @@ class ManagedCache
 
 	// This method is used to read the variable value
 	// from the cache after successfull Read
-	static public function get($uniqueId)
+	public function get($uniqueId)
 	{
 		if (array_key_exists($uniqueId, $this->vars))
 			return $this->vars[$uniqueId];
@@ -49,13 +49,13 @@ class ManagedCache
 	}
 
 	// Sets new value to the variable
-	static public function set($uniqueId, $val)
+	public function set($uniqueId, $val)
 	{
 		if(array_key_exists($uniqueId, $this->cache))
 			$this->vars[$uniqueId] = $val;
 	}
 
-	static public function setImmediate($uniqueId, $val)
+	public function setImmediate($uniqueId, $val)
 	{
 		if(array_key_exists($uniqueId, $this->cache))
 		{
@@ -70,7 +70,7 @@ class ManagedCache
 	}
 
 	// Marks cache entry as invalid
-	static public function clean($uniqueId, $tableId = false)
+	public function clean($uniqueId, $tableId = false)
 	{
 		$obCache = Cache::createInstance();
 		$obCache->clean(
@@ -87,7 +87,7 @@ class ManagedCache
 	}
 
 	// Marks cache entries associated with the table as invalid
-	static public function cleanDir($tableId)
+	public function cleanDir($tableId)
 	{
 		$dbType = strtoupper(\Bitrix\Main\Application::getDbConnection()->getType());
 		$strPath = $dbType."/".$tableId;
@@ -105,7 +105,7 @@ class ManagedCache
 	}
 
 	// Clears all managed_cache
-	static public function cleanAll()
+	public function cleanAll()
 	{
 		$this->cache= array();
 		$this->cachePath = array();
@@ -121,7 +121,7 @@ class ManagedCache
 
 	// Use it to flush cache to the files.
 	// Causion: only at the end of all operations!
-	static public function finalize()
+	public function finalize()
 	{
 		$obCache = Cache::createInstance();
 		foreach ($this->cache as $uniqueId => $val)
@@ -171,7 +171,7 @@ class ManagedCache
 		}
 	}
 
-	static public function getCompCachePath($relativePath)
+	public function getCompCachePath($relativePath)
 	{
 		// TODO: global var!
 		global $BX_STATE;
@@ -186,12 +186,12 @@ class ManagedCache
 		return $path;
 	}
 
-	static public function startTagCache($relativePath)
+	public function startTagCache($relativePath)
 	{
 		array_unshift($this->compCacheStack, array($relativePath, array()));
 	}
 
-	static public function endTagCache()
+	public function endTagCache()
 	{
 		$this->initCompSalt();
 
@@ -234,12 +234,12 @@ class ManagedCache
 		array_shift($this->compCacheStack);
 	}
 
-	static public function abortTagCache()
+	public function abortTagCache()
 	{
 		array_shift($this->compCacheStack);
 	}
 
-	static public function registerTag($tag)
+	public function registerTag($tag)
 	{
 		if (count($this->compCacheStack))
 		{
@@ -248,7 +248,7 @@ class ManagedCache
 		}
 	}
 
-	static public function clearByTag($tag)
+	public function clearByTag($tag)
 	{
 		$con = \Bitrix\Main\Application::getDbConnection();
 		$sqlHelper = $con->getSqlHelper();

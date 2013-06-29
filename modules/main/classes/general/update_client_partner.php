@@ -862,7 +862,7 @@ class CUpdateClientPartner
 			return $arResult;
 	}
 
-	function __CollectRequestData(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $arAdditionalData = array(), $bStrongList = false)
+	public static function __CollectRequestData(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $arAdditionalData = array(), $bStrongList = false)
 	{
 		$strResult = "";
 		$strError_tmp = "";
@@ -1613,7 +1613,7 @@ class CUpdateClientPartner
 	}
 
 	/** Запускает updater модуля **/
-	function __RunUpdaterScript($path, &$strError, $updateDirFrom, $moduleID)
+	public static function __RunUpdaterScript($path, &$strError, $updateDirFrom, $moduleID)
 	{
 		global $DBType, $DB, $APPLICATION, $USER;
 
@@ -1656,7 +1656,7 @@ class CUpdateClientPartner
 	/** Возвращает 1, если $strVers1 > $strVers2  **/
 	/** Возвращает -1, если $strVers1 < $strVers2 **/
 	/** Возвращает 0, если $strVers1 == $strVers2 **/
-	function __CompareVersions($strVers1, $strVers2)
+	public static function __CompareVersions($strVers1, $strVers2)
 	{
 		$strVers1 = Trim($strVers1);
 		$strVers2 = Trim($strVers2);
@@ -1685,7 +1685,7 @@ class CUpdateClientPartner
 	/** Запрашивает методом POST страницу $page со списком параметров **/
 	/** $strVars и возвращает тело ответа. В параметре $strError      **/
 	/** возвращается текст ошибки, если таковая была.                 **/
-	function __GetHTTPPage($page, $strVars, &$strError)
+	public static function __GetHTTPPage($page, $strVars, &$strError)
 	{
 		global $SERVER_NAME, $DB;
 
@@ -1847,7 +1847,7 @@ class CUpdateClientPartner
 
 	/** Проверяет на ошибки ответ сервера $strServerOutput **/
 	/** и парсит в массив $arRes                           **/
-	function __ParseServerData(&$strServerOutput, &$arRes, &$strError)
+	public static function __ParseServerData(&$strServerOutput, &$arRes, &$strError)
 	{
 		$strError_tmp = "";
 		$arRes = array();
@@ -1913,7 +1913,7 @@ class CUpdateClientPartner
 	}
 
 	/** Проверка на установку GZip компрессии **/
-	function __IsGzipInstalled()
+	public static function __IsGzipInstalled()
 	{
 		if (function_exists("gzcompress"))
 			return (COption::GetOptionString("main", "update_is_gzip_installed", "Y") == "Y" ? true : false);
@@ -1921,7 +1921,7 @@ class CUpdateClientPartner
 		return False;
 	}
 
-	function __GetFooPath()
+	public static function __GetFooPath()
 	{
 		$db = CLang::GetList($by="", $order="", array("ACTIVE" => "Y"));
 		$cnt = 0;
@@ -1930,7 +1930,7 @@ class CUpdateClientPartner
 		return $cnt;
 	}
 
-	function __GetFooPath1($v = 0)
+	public static function __GetFooPath1($v = 0)
 	{
 		$q = "SELECT COUNT(ID) as C FROM b_user WHERE ACTIVE = 'Y' AND LAST_LOGIN IS NOT NULL";
 		if ($v == 0)
@@ -1943,7 +1943,7 @@ class CUpdateClientPartner
 	}
 
 	/** Создание путя, если его нет, и установка прав писать **/
-	function __CheckDirPath($path, $bPermission = true)
+	public static function __CheckDirPath($path, $bPermission = true)
 	{
 		$badDirs = Array();
 		$path = str_replace("\\", "/", $path);
@@ -1983,7 +1983,7 @@ class CUpdateClientPartner
 	}
 
 	/** Рекурсивное копирование из $path_from в $path_to **/
-	function __CopyDirFiles($path_from, $path_to, &$strError, $bSkipUpdater = True)
+	public static function __CopyDirFiles($path_from, $path_to, &$strError, $bSkipUpdater = True)
 	{
 		$strError_tmp = "";
 
@@ -2102,7 +2102,7 @@ class CUpdateClientPartner
 	}
 
 	/** Рекурсивное удаление $path **/
-	function __DeleteDirFilesEx($path)
+	public static function __DeleteDirFilesEx($path)
 	{
 		if (!file_exists($path))
 			return False;
@@ -2134,7 +2134,7 @@ class CUpdateClientPartner
 		return True;
 	}
 
-	function __bxstrrpos($haystack, $needle)
+	public static function __bxstrrpos($haystack, $needle)
 	{
 		$index = strpos(strrev($haystack), strrev($needle));
 		if($index === false)
@@ -2144,7 +2144,7 @@ class CUpdateClientPartner
 	}
 
 	/** Возвращает экземпляр класса-инсталятора модуля по абсолютному пути $path **/
-	function __GetModuleInfo($path)
+	public static function __GetModuleInfo($path)
 	{
 		$arModuleVersion = array();
 //		include($path."/install/version.php");
@@ -2170,7 +2170,7 @@ class CUpdateClientPartner
 		);
 	}
 
-	function __GetMicroTime()
+	public static function __GetMicroTime()
 	{
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);

@@ -263,7 +263,7 @@ class CSearchParameters
 	}
 
 
-	function _main($arParam)
+	public static function _main($arParam)
 	{
 		if(is_array($arParam))
 		{
@@ -295,7 +295,7 @@ class CSearchParameters
 		);
 	}
 
-	function _forum($arParam)
+	public static function _forum($arParam)
 	{
 		if(is_array($arParam))
 		{
@@ -325,7 +325,7 @@ class CSearchParameters
 		);
 	}
 
-	function _iblock($arParam, $strFILTER)
+	public static function _iblock($arParam, $strFILTER)
 	{
 		if(is_array($arParam))
 		{
@@ -358,7 +358,7 @@ class CSearchParameters
 		);
 	}
 
-	function _blog($arParam)
+	public static function _blog($arParam)
 	{
 		if(is_array($arParam))
 		{
@@ -391,7 +391,7 @@ class CSearchParameters
 		);
 	}
 
-	function _socialnetwork($arParam)
+	public static function _socialnetwork($arParam)
 	{
 		if(is_array($arParam))
 		{
@@ -421,7 +421,7 @@ class CSearchParameters
 		);
 	}
 
-	function _socialnetwork_user($arParam)
+	public static function _socialnetwork_user($arParam)
 	{
 		$intSCUser = intval($arParam);
 		if($intSCUser > 0)

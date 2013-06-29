@@ -1169,6 +1169,114 @@ class CAllCatalogDiscount
 		}
 	}
 
+	static public function CheckDiscount($arProduct, $arDiscount)
+	{
+		if (empty($arProduct) || !is_array($arProduct))
+			return false;
+		if (empty($arDiscount) || !is_array(empty($arDiscount)) || !array_key_exists('UNPACK', $arDiscount))
+			return false;
+		return CCatalogDiscount::__Unpack($arProduct, $arDiscount['UNPACK']);
+	}
+
+	static public function ExtendBasketItems(&$arBasket, $arExtend)
+	{
+		$arFields = array(
+			'ID',
+			'IBLOCK_ID',
+			'XML_ID',
+			'CODE',
+			'TAGS',
+/*			'PREVIEW_TEXT',
+			'DETAIL_TEXT', */
+		);
+		$arCatFields = array(
+			'ID',
+			'QUANTITY'
+		);
+		if (!empty($arExtend) && is_array($arExtend))
+		{
+			if (array_key_exists('catalog', $arExtend) && !empty($arExtend['catalog']) && is_array($arExtend['catalog']))
+			{
+				$boolFields = false;
+				if (array_key_exists('fields', $arExtend['catalog']))
+					$boolFields = (boolean)$arExtend['catalog']['fields'];
+				$boolProps = false;
+				if (array_key_exists('props', $arExtend['catalog']))
+					$boolProps = (boolean)$arExtend['catalog']['props'];
+				if ($boolFields || $boolProps)
+				{
+					$boolExtend = false;
+					$arMap = array();
+					$arItemID = array();
+					foreach ($arBasket as $strKey => $arOneRow)
+					{
+						if (array_key_exists('MODULE', $arOneRow) && 'catalog' == $arOneRow['MODULE'])
+						{
+							$boolExtend = true;
+							$intProductID = intval($arOneRow['PRODUCT_ID']);
+							if (0 < $intProductID)
+							{
+								$arIDS[$intProductID] = true;
+								if (!array_key_exists($intProductID, $arMap))
+									$arMap[$intProductID] = array();
+								$arMap[$intProductID][] = $strKey;
+							}
+						}
+					}
+					if ($boolExtend)
+					{
+						$arBasketResult = array();
+						$arIDS = array_keys($arIDS);
+						$rsItems = CIBlockElement::GetList(array(), array('ID' => $arIDS), false, false, $arFields);
+						while ($obItem = $rsItems->GetNextElement())
+						{
+							$arBasketData = array();
+							$arItem = $obItem->GetFields();
+							$arItem['ID'] = intval($arItem['ID']);
+							if ($boolFields)
+							{
+								$arBasketData['IBLOCK_ID'] = intval($arItem['IBLOCK_ID']);
+								$arBasketData['XML_ID'] = (string)$arItem['~XML_ID'];
+								$arBasketData['CODE'] = (string)$arItem['~CODE'];
+								$arBasketData['TAGS'] = (string)$arItem['~TAGS'];
+								$arProductSections = self::__GetSectionList($arItem['IBLOCK_ID'], $arItem['ID']);
+								if (false !== $arProductSections)
+									$arBasketData['SECTION_ID'] = $arProductSections;
+								else
+									$arBasketData['SECTION_ID'] = array();
+							}
+							if ($boolProps)
+							{
+								$arProps = $obItem->GetProperties(array(), array('ACTIVE' => 'Y'));
+								self::__ConvertProperties($arBasketData, $arProps, array('TIME_ZONE' => 'N'));
+							}
+							$arBasketResult[$arItem['ID']] = array();
+							$arBasketResult[$arItem['ID']] = $arBasketData;
+						}
+						$rsProducts = CCatalogProduct::GetList(array(), array('ID' => $arIDS), false, false, $arCatFields);
+						while ($arProduct = $rsProducts->Fetch())
+						{
+							$arProduct['ID'] = intval($arProduct['ID']);
+							if (!array_key_exists($arProduct['ID'], $arBasketResult))
+								$arBasketResult[$arProduct['ID']] = array();
+							$arBasketResult[$arProduct['ID']]['CATALOG_QUANTITY'] = doubleval($arProduct['QUANTITY']);
+						}
+						if (!empty($arBasketResult))
+						{
+							foreach ($arBasketResult as $intProductID => $arBasketData)
+							{
+								foreach ($arMap[$intProductID] as $mxRowID)
+								{
+									$arBasket[$mxRowID]['CATALOG'] = $arBasketData;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	protected function __GenerateFields(&$arProduct, $arParams = false)
 	{
 		$boolResult = false;

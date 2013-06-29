@@ -492,21 +492,21 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	 *     [form_text_606] =&gt; 2345
 	 *     [form_image_607] =&gt; 1045
 	 * )Параметры функции
-<tr>
-<th width="15%">Параметр</th>
+	<tr>
+	<th width="15%">Параметр</th>
 	 * 	<th>Описание</th>
 	 * </tr>
-<tr>
-<td><i>result_id</i></td>
+	<tr>
+	<td><i>result_id</i></td>
 	 * 	<td>ID результата.</td>
 	 * </tr>
-<tr>
-<td><i>get_fields</i></td>
+	<tr>
+	<td><i>get_fields</i></td>
 	 * 	<td>Если значение данного параметра равно "Y", то в в массиве возвращаемом данной функцией будет также значения <a href="/api_help/form/terms.php#field">полей</a> веб-формы; в противном случае, в возвращаемом массиве будут только значения <a href="/api_help/form/terms.php#answer">ответов</a> на <a href="/api_help/form/terms.php#question">вопросов</a> веб-формы.<br><br>
 	 * 	Параметр необязательный. По умолчанию - "N".
 	 * </td>
 	 * </tr>
-
+	
 	 * &lt;?
 	 * $RESULT_ID = 189; // ID результата
 	 * 

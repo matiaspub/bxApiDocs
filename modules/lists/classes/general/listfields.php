@@ -7,7 +7,7 @@ class CListFieldList
 	protected $form_id = "";
 	protected $fields = array();
 
-	function __construct($iblock_id)
+	public function __construct($iblock_id)
 	{
 		if($iblock_id > 0)
 		{
@@ -28,7 +28,7 @@ class CListFieldList
 		}
 	}
 
-	static public function GetByID($field_id)
+	public function GetByID($field_id)
 	{
 		if(isset($this->fields[$field_id]))
 			return $this->fields[$field_id];
@@ -36,12 +36,12 @@ class CListFieldList
 			return null;
 	}
 
-	static public function GetFields()
+	public function GetFields()
 	{
 		return array_keys($this->fields);
 	}
 
-	static public function GetArrayByID($field_id)
+	public function GetArrayByID($field_id)
 	{
 		if(isset($this->fields[$field_id]))
 			$result = $this->fields[$field_id]->GetArray();
@@ -53,7 +53,7 @@ class CListFieldList
 		return $result;
 	}
 
-	static public function DeleteField($field_id)
+	public function DeleteField($field_id)
 	{
 		if($field_id != "NAME" && isset($this->fields[$field_id]))
 		{
@@ -64,7 +64,7 @@ class CListFieldList
 		}
 	}
 
-	static public function AddField($arFields)
+	public function AddField($arFields)
 	{
 		$new_field_id = false;
 		$newField = null;
@@ -96,7 +96,7 @@ class CListFieldList
 		return $new_field_id;
 	}
 
-	static public function UpdateField($field_id, $arFields)
+	public function UpdateField($field_id, $arFields)
 	{
 		$new_field_id = false;
 		$newField = null;

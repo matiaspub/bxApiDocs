@@ -16,13 +16,13 @@ class CCSVData
 	var $__buffer_size = 0;
 	var $__hasBOM = false;
 
-	public static function CCSVData($fields_type = "R", $first_header = false)
+	public function CCSVData($fields_type = "R", $first_header = false)
 	{
 		$this->SetFieldsType($fields_type);
 		$this->SetFirstHeader($first_header);
 	}
 
-	public static function LoadFile($filename)
+	public function LoadFile($filename)
 	{
 		$this->sFileName = $filename;
 		$this->__file = fopen($this->sFileName, "rb");
@@ -31,7 +31,7 @@ class CCSVData
 		$this->SetPos(0);
 	}
 
-	public static function CheckUTF8BOM()
+	public function CheckUTF8BOM()
 	{
 		//check UTF-8 Byte-Order Mark
 		fseek($this->__file, 0);
@@ -40,27 +40,27 @@ class CCSVData
 			$this->__hasBOM = true;
 	}
 
-	public static function SetFieldsType($fields_type = "R")
+	public function SetFieldsType($fields_type = "R")
 	{
 		$this->cFieldsType = ($fields_type=="F") ? "F" : "R";
 	}
 
-	public static function SetDelimiter($delimiter = ";")
+	public function SetDelimiter($delimiter = ";")
 	{
 		$this->cDelimiter = (strlen($delimiter)>1) ? substr($delimiter, 0, 1) : $delimiter;
 	}
 
-	public static function SetFirstHeader($first_header = false)
+	public function SetFirstHeader($first_header = false)
 	{
 		$this->bFirstHeader = $first_header;
 	}
 
-	public static function GetFirstHeader()
+	public function GetFirstHeader()
 	{
 		return $this->bFirstHeader;
 	}
 
-	public static function SetWidthMap($arMap)
+	public function SetWidthMap($arMap)
 	{
 		$this->arWidthMap = array();
 		for ($i = 0; $i < count($arMap); $i++)
@@ -69,7 +69,7 @@ class CCSVData
 		}
 	}
 
-	public static function FetchDelimiter()
+	public function FetchDelimiter()
 	{
 		$bInString = false;
 		$str = "";
@@ -156,7 +156,7 @@ class CCSVData
 			return $res_r;
 	}
 
-	public static function FetchWidth()
+	public function FetchWidth()
 	{
 		$str = "";
 		$ind = 1;
@@ -225,7 +225,7 @@ class CCSVData
 			return $res_r;
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		if ($this->cFieldsType=="R")
 		{
@@ -239,7 +239,7 @@ class CCSVData
 		}
 	}
 
-	public static function IncCurPos()
+	public function IncCurPos()
 	{
 		$this->iCurPos++;
 		$this->__buffer_pos++;
@@ -254,17 +254,17 @@ class CCSVData
 		}
 	}
 
-	public static function MoveFirst()
+	public function MoveFirst()
 	{
 		$this->SetPos(0);
 	}
 
-	public static function GetPos()
+	public function GetPos()
 	{
 		return $this->iCurPos;
 	}
 
-	public static function SetPos($iCurPos = 0)
+	public function SetPos($iCurPos = 0)
 	{
 		$iCurPos = IntVal($iCurPos);
 		if ($iCurPos<=$this->iFileLength)
@@ -285,7 +285,7 @@ class CCSVData
 		$this->__buffer_pos = 0;
 	}
 
-	public static function SaveFile($filename, $arFields)
+	public function SaveFile($filename, $arFields)
 	{
 		$this->sFileName = $filename;
 

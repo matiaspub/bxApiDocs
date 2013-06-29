@@ -19,14 +19,14 @@ class CAppleMessage
 
 	protected $_mCustomIdentifier; /**< @type mixed Custom message identifier. */
 
-	static public function __construct($sDeviceToken = null)
+	public function __construct($sDeviceToken = null)
 	{
 		if (isset($sDeviceToken)) {
 			$this->addRecipient($sDeviceToken);
 		}
 	}
 
-	static public function addRecipient($sDeviceToken)
+	public function addRecipient($sDeviceToken)
 	{
 		if (!preg_match('~^[a-f0-9]{64}$~i', $sDeviceToken)) {
 			throw new Exception(
@@ -36,7 +36,7 @@ class CAppleMessage
 		$this->_aDeviceTokens[] = $sDeviceToken;
 	}
 
-	static public function getRecipient($nRecipient = 0)
+	public function getRecipient($nRecipient = 0)
 	{
 		if (!isset($this->_aDeviceTokens[$nRecipient])) {
 			throw new Exception(
@@ -46,27 +46,27 @@ class CAppleMessage
 		return $this->_aDeviceTokens[$nRecipient];
 	}
 
-	static public function getRecipientsNumber()
+	public function getRecipientsNumber()
 	{
 		return count($this->_aDeviceTokens);
 	}
 
-	static public function getRecipients()
+	public function getRecipients()
 	{
 		return $this->_aDeviceTokens;
 	}
 
-	static public function setText($sText)
+	public function setText($sText)
 	{
 		$this->_sText = $sText;
 	}
 
-	static public function getText()
+	public function getText()
 	{
 		return $this->_sText;
 	}
 
-	static public function setBadge($nBadge)
+	public function setBadge($nBadge)
 	{
 		if (!is_int($nBadge)) {
 			throw new Exception(
@@ -76,22 +76,22 @@ class CAppleMessage
 		$this->_nBadge = $nBadge;
 	}
 
-	static public function getBadge()
+	public function getBadge()
 	{
 		return $this->_nBadge;
 	}
 
-	static public function setSound($sSound = 'default')
+	public function setSound($sSound = 'default')
 	{
 		$this->_sSound = $sSound;
 	}
 
-	static public function getSound()
+	public function getSound()
 	{
 		return $this->_sSound;
 	}
 
-	static public function setCustomProperty($sName, $mValue)
+	public function setCustomProperty($sName, $mValue)
 	{
 		if ($sName == self::APPLE_RESERVED_NAMESPACE) {
 			throw new Exception(
@@ -101,7 +101,7 @@ class CAppleMessage
 		$this->_aCustomProperties[trim($sName)] = $mValue;
 	}
 
-	static public function getCustomPropertyName()
+	public function getCustomPropertyName()
 	{
 		if (!is_array($this->_aCustomProperties)) {
 			return;
@@ -110,7 +110,7 @@ class CAppleMessage
 		return $aKeys[0];
 	}
 
-	static public function getCustomPropertyValue()
+	public function getCustomPropertyValue()
 	{
 		if (!is_array($this->_aCustomProperties)) {
 			return;
@@ -119,7 +119,7 @@ class CAppleMessage
 		return $this->_aCustomProperties[$aKeys[0]];
 	}
 
-	static public function getCustomPropertyNames()
+	public function getCustomPropertyNames()
 	{
 		if (!is_array($this->_aCustomProperties)) {
 			return array();
@@ -127,7 +127,7 @@ class CAppleMessage
 		return array_keys($this->_aCustomProperties);
 	}
 
-	static public function getCustomProperty($sName)
+	public function getCustomProperty($sName)
 	{
 		if (!array_key_exists($sName, $this->_aCustomProperties)) {
 			throw new Exception(
@@ -137,17 +137,17 @@ class CAppleMessage
 		return $this->_aCustomProperties[$sName];
 	}
 
-	static public function setAutoAdjustLongPayload($bAutoAdjust)
+	public function setAutoAdjustLongPayload($bAutoAdjust)
 	{
 		$this->_bAutoAdjustLongPayload = (boolean)$bAutoAdjust;
 	}
 
-	static public function getAutoAdjustLongPayload()
+	public function getAutoAdjustLongPayload()
 	{
 		return $this->_bAutoAdjustLongPayload;
 	}
 
-	static public function __toString()
+	public function __toString()
 	{
 		try {
 			$sJSONPayload = $this->getPayload();
@@ -180,7 +180,7 @@ class CAppleMessage
 		return $aPayload;
 	}
 
-	public static function getBatch()
+	public function getBatch()
 	{
 		$arTokens = $this->getRecipients();
 		$sPayload = $this->getPayload();
@@ -294,7 +294,7 @@ class CAppleMessage
 		}
 	}
 
-	static public function getPayload()
+	public function getPayload()
 	{
 		$sJSONPayload = str_replace(
 			'"' . self::APPLE_RESERVED_NAMESPACE . '":[]',
@@ -326,7 +326,7 @@ class CAppleMessage
 		return $sJSONPayload;
 	}
 
-	static public function setExpiry($nExpiryValue)
+	public function setExpiry($nExpiryValue)
 	{
 		if (!is_int($nExpiryValue)) {
 			throw new Exception(
@@ -336,17 +336,17 @@ class CAppleMessage
 		$this->_nExpiryValue = $nExpiryValue;
 	}
 
-	static public function getExpiry()
+	public function getExpiry()
 	{
 		return $this->_nExpiryValue;
 	}
 
-	static public function setCustomIdentifier($mCustomIdentifier)
+	public function setCustomIdentifier($mCustomIdentifier)
 	{
 		$this->_mCustomIdentifier = $mCustomIdentifier;
 	}
 
-	static public function getCustomIdentifier()
+	public function getCustomIdentifier()
 	{
 		return $this->_mCustomIdentifier;
 	}

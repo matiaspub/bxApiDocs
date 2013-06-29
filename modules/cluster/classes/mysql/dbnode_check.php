@@ -7,7 +7,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 	const WARNING = 0;
 	const ERROR = -1;
 
-	public static function MainNodeCommon($arMasterNode)
+	public function MainNodeCommon($arMasterNode)
 	{
 		if($arMasterNode["ID"] == 1)
 			global $DB;
@@ -67,7 +67,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		return $result;
 	}
 
-	public static function MainNodeForReplication($arMasterNode)
+	public function MainNodeForReplication($arMasterNode)
 	{
 		if($arMasterNode["ID"] == 1)
 			global $DB;
@@ -150,7 +150,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		return $result;
 	}
 
-	public static function MainNodeForSlave()
+	public function MainNodeForSlave()
 	{
 		global $DB;
 
@@ -432,7 +432,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		}
 	}
 
-	public static function SlaveNodeCommon($nodeDB)
+	public function SlaveNodeCommon($nodeDB)
 	{
 		$result = array();
 
@@ -538,7 +538,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		return $result;
 	}
 
-	public static function SlaveNodeForReplication($nodeDB)
+	public function SlaveNodeForReplication($nodeDB)
 	{
 		global $DB;
 
@@ -601,7 +601,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		return $result;
 	}
 
-	public static function SlaveNodeForMaster($nodeDB)
+	public function SlaveNodeForMaster($nodeDB)
 	{
 		global $DB;
 		$result = array();

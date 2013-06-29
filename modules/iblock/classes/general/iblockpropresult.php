@@ -7,7 +7,7 @@ class CIBlockPropertyResult extends CDBResult
 	protected $arPropertiesValues = array();
 	protected $lastRes = null;
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		global $DB;
 
@@ -149,7 +149,7 @@ class CIBlockPropertyResult extends CDBResult
 		}
 	}
 
-	public static function setIBlock($IBLOCK_ID)
+	public function setIBlock($IBLOCK_ID)
 	{
 		$this->VERSION = CIBlockElement::GetIBVersion($IBLOCK_ID);
 

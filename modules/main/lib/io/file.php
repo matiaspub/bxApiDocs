@@ -10,7 +10,7 @@ class File
 		parent::__construct($path);
 	}
 
-	static public function open($mode)
+	public function open($mode)
 	{
 		$fd = fopen($this->getPhysicalPath(), $mode."b");
 		if (!$fd)
@@ -19,13 +19,13 @@ class File
 		return $fd;
 	}
 
-	static public function isExists()
+	public function isExists()
 	{
 		$p = $this->getPhysicalPath();
 		return file_exists($p) && is_file($p);
 	}
 
-	static public function getContents()
+	public function getContents()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -33,7 +33,7 @@ class File
 		return file_get_contents($this->getPhysicalPath());
 	}
 
-	static public function putContents($data)
+	public function putContents($data)
 	{
 		$dir = $this->getDirectory();
 		if (!$dir->isExists())
@@ -45,7 +45,7 @@ class File
 		return file_put_contents($this->getPhysicalPath(), $data);
 	}
 
-	static public function getFileSize()
+	public function getFileSize()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -53,7 +53,7 @@ class File
 		return intval(filesize($this->getPhysicalPath()));
 	}
 
-	static public function isWritable()
+	public function isWritable()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -61,7 +61,7 @@ class File
 		return is_writable($this->getPhysicalPath());
 	}
 
-	static public function isReadable()
+	public function isReadable()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -69,7 +69,7 @@ class File
 		return is_readable($this->getPhysicalPath());
 	}
 
-	static public function readFile()
+	public function readFile()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -77,7 +77,7 @@ class File
 		return readfile($this->getPhysicalPath());
 	}
 
-	static public function getCreationTime()
+	public function getCreationTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -85,7 +85,7 @@ class File
 		return filectime($this->getPhysicalPath());
 	}
 
-	static public function getLastAccessTime()
+	public function getLastAccessTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -93,7 +93,7 @@ class File
 		return fileatime($this->getPhysicalPath());
 	}
 
-	static public function getModificationTime()
+	public function getModificationTime()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -101,7 +101,7 @@ class File
 		return filemtime($this->getPhysicalPath());
 	}
 
-	static public function markWritable()
+	public function markWritable()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -109,7 +109,7 @@ class File
 		@chmod($this->getPhysicalPath(), BX_FILE_PERMISSIONS);
 	}
 
-	static public function getPermissions()
+	public function getPermissions()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -117,7 +117,7 @@ class File
 		return fileperms($this->getPhysicalPath());
 	}
 
-	static public function delete()
+	public function delete()
 	{
 		if ($this->isExists())
 			return unlink($this->getPhysicalPath());

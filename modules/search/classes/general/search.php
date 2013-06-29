@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-if(!defined("START_EXEC_TIME"))
+//if(!defined("START_EXEC_TIME"))
 	// define("START_EXEC_TIME", getmicrotime());
 
 
@@ -35,12 +35,12 @@ class CAllSearch extends CDBResult
 	var $_opt_NO_WORD_LOGIC = false;
 	var $bUseRatingSort = false;
 
-	function __construct($strQuery=false, $SITE_ID=false, $MODULE_ID=false, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
+	public function __construct($strQuery=false, $SITE_ID=false, $MODULE_ID=false, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
 	{
 		return $this->CSearch($strQuery, $SITE_ID, $MODULE_ID, $ITEM_ID, $PARAM1, $PARAM2, $aSort, $aParamsEx, $bTagsCloud);
 	}
 
-	public static function CSearch($strQuery=false, $LID=false, $MODULE_ID=false, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
+	public function CSearch($strQuery=false, $LID=false, $MODULE_ID=false, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
 	{
 		if($strQuery===false)
 			return $this;
@@ -175,7 +175,7 @@ class CAllSearch extends CDBResult
 	 * <h4>Example</h4> 
 	 * <pre>
 	 * Расширение фильтров
-<li>MODULE_ID</li>
+	<li>MODULE_ID</li>
 	 *  
 	 *   <li>ITEM_ID</li>
 	 *  
@@ -207,11 +207,10 @@ class CAllSearch extends CDBResult
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php
 	 * @author Bitrix
 	 */
-	public static function Search($arParams, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
+	public function Search($arParams, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 
@@ -388,7 +387,7 @@ class CAllSearch extends CDBResult
 		parent::CDBResult($r);
 	}
 
-	public static function SetOptions($arOptions)
+	public function SetOptions($arOptions)
 	{
 		if(array_key_exists("ERROR_ON_EMPTY_STEM", $arOptions))
 			$this->_opt_ERROR_ON_EMPTY_STEM = $arOptions["ERROR_ON_EMPTY_STEM"] === true;
@@ -397,7 +396,7 @@ class CAllSearch extends CDBResult
 			$this->_opt_NO_WORD_LOGIC = $arOptions["NO_WORD_LOGIC"] === true;
 	}
 
-	public static function GetFilterMD5()
+	public function GetFilterMD5()
 	{
 		$perm = CSearch::CheckPermissions("sc.ID");
 		$sql = preg_replace("/(DATE_FROM|DATE_TO|DATE_CHANGE)(\\s+IS\\s+NOT\\s+NULL|\\s+IS\\s+NULL|\\s*[<>!=]+\\s*'.*?')/im", "", $this->strSqlWhere);
@@ -528,7 +527,7 @@ class CAllSearch extends CDBResult
 		return $arResult;
 	}
 
-	public static function Repl($strCond, $strType, $strWh)
+	public function Repl($strCond, $strType, $strWh)
 	{
 		$l=strlen($strCond);
 
@@ -592,7 +591,7 @@ class CAllSearch extends CDBResult
 		return $strWh;
 	}
 
-	public static function PrepareSearchResult($str)
+	public function PrepareSearchResult($str)
 	{
 		//$words - contains what we will highlight
 		$words = array();
@@ -754,7 +753,7 @@ class CAllSearch extends CDBResult
 		foreach ($arOtr as $borders)
 		{
 			$str_result .= ($borders[0]<=0? "": " ...")
-				.CUtil::BinSubstr($str, $borders[0], $borders[1] - $borders[0])
+				.CUtil::BinSubstr($str, $borders[0], $borders[1] - $borders[0] + 1)
 				.($borders[1] >= $str_len? "": "... ")
 			;
 		}
@@ -767,7 +766,7 @@ class CAllSearch extends CDBResult
 		return $str_result;
 	}
 
-	public static function NavStart($nPageSize=0, $bShowAll=true, $iNumPage=false)
+	public function NavStart($nPageSize=0, $bShowAll=true, $iNumPage=false)
 	{
 		parent::NavStart($nPageSize, $bShowAll, $iNumPage);
 		if(COption::GetOptionString("search", "stat_phrase") == "Y")
@@ -790,7 +789,6 @@ class CAllSearch extends CDBResult
 	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearch/search.php">CSearch::Search</a>. Если
 	 * достигнут конец выборки, возвращается false.</p>
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/fetch.php
 	 * @author Bitrix
 	 */
@@ -2159,7 +2157,7 @@ class CAllSearch extends CDBResult
 		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	function __PrepareFilter($arFilter, &$bIncSites, $strSearchContentAlias="sc.")
+	public static function __PrepareFilter($arFilter, &$bIncSites, $strSearchContentAlias="sc.")
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$arSql = array();
@@ -2338,7 +2336,7 @@ class CAllSearch extends CDBResult
 		return $strWhere;
 	}
 
-	function __PrepareSort($aSort=array(), $strSearchContentAlias="sc.", $bTagsCloud = false)
+	public function __PrepareSort($aSort=array(), $strSearchContentAlias="sc.", $bTagsCloud = false)
 	{
 		$arOrder = array();
 		if(!is_array($aSort))
@@ -2692,7 +2690,7 @@ class CAllSearch extends CDBResult
 		return sqrt($variance / count($arValues));
 	}
 
-	public static function normdev($words_count)
+	public function normdev($words_count)
 	{
 		$a = array();
 		while($words_count > 0)
@@ -2706,12 +2704,12 @@ class CSearchSQLHelper
 	var $bIncSites = false;
 	var $strSearchContentAlias = "";
 
-	function __construct($strSearchContentAlias)
+	public function __construct($strSearchContentAlias)
 	{
 		$this->strSearchContentAlias = $strSearchContentAlias;
 	}
 
-	function _CallbackURL($field_name, $operation, $field_value)
+	public function _CallbackURL($field_name, $operation, $field_value)
 	{
 		global $DB;
 
@@ -2763,7 +2761,7 @@ class CSearchSQLHelper
 			return "";
 	}
 
-	function _CallbackPARAMS($field_name, $operation, $field_value)
+	public static function _CallbackPARAMS($field_name, $operation, $field_value)
 	{
 		global $DB;
 
@@ -2816,12 +2814,12 @@ class CAllSearchQuery
 	var $bStemming = false;
 	var $bText = false;
 
-	function __construct($default_query_type = "and", $rus_bool_lang = "yes", $m_casematch = 0, $site_id = "")
+	public function __construct($default_query_type = "and", $rus_bool_lang = "yes", $m_casematch = 0, $site_id = "")
 	{
 		return $this->CSearchQuery($default_query_type, $rus_bool_lang, $m_casematch, $site_id);
 	}
 
-	public static function CSearchQuery($default_query_type = "and", $rus_bool_lang = "yes", $m_casematch = 0, $site_id = "")
+	public function CSearchQuery($default_query_type = "and", $rus_bool_lang = "yes", $m_casematch = 0, $site_id = "")
 	{
 		$this->m_query  = "";
 		$this->m_stemmed_words = array();
@@ -2840,7 +2838,7 @@ class CAllSearchQuery
 			$this->m_lang="en";
 	}
 
-	public static function GetQueryString($fields, $query, $bTagsSearch = false, $bUseStemming = true, $bErrorOnEmptyStem = false)
+	public function GetQueryString($fields, $query, $bTagsSearch = false, $bUseStemming = true, $bErrorOnEmptyStem = false)
 	{
 		$this->m_words = Array();
 		$this->m_fields = explode(",", $fields);
@@ -2876,7 +2874,7 @@ class CAllSearchQuery
 		return $query;
 	}
 
-	public static function CutKav($query)
+	public function CutKav($query)
 	{
 		if(preg_match_all("/([\"'])(.*?)(?<!\\\\)(\\1)/s", $query, $arQuotes))
 		{
@@ -2900,7 +2898,7 @@ class CAllSearchQuery
 		return $query;
 	}
 
-	public static function ParseQ($q)
+	public function ParseQ($q)
 	{
 		$q = trim($q);
 		if(strlen($q) <= 0)
@@ -2919,7 +2917,7 @@ class CAllSearchQuery
 		return $q;
 	}
 
-	public static function ParseStr($qwe)
+	public function ParseStr($qwe)
 	{
 		//Take alphabet into account
 		$arStemInfo = stemming_init($this->m_lang);
@@ -3041,7 +3039,7 @@ class CAllSearchQuery
 		return preg_replace("/([".$arStemInfo["pcre_letters"]."]+)/e".BX_UTF_PCRE_MODIFIER, "CAllSearchQuery::StemWord('\$1')", $q);
 	}
 
-	public static function PrepareQuery($q)
+	public function PrepareQuery($q)
 	{
 		$state = 0;
 		$qu = "";
@@ -3119,7 +3117,7 @@ class CSearchCallback
 	var $max_execution_time=0;
 	var $CNT=0;
 	var $SESS_ID = "";
-	public static function Index($arFields)
+	public function Index($arFields)
 	{
 		$ID = $arFields["ID"];
 		if($ID=="")

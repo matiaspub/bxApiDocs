@@ -293,7 +293,7 @@ class CDeliveryDHLUSA
 		return array('simple');
 	} 
 	
-	function __Write2Log($data)
+	public static function __Write2Log($data)
 	{
 		if (defined('DELIVERY_DHL_USA_WRITE_LOG') && DELIVERY_DHL_USA_WRITE_LOG === 1)
 		{

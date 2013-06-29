@@ -13,7 +13,7 @@ class CBitrixCloudCDNLocation
 	 * @return string
 	 *
 	 */
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
@@ -22,7 +22,7 @@ class CBitrixCloudCDNLocation
 	 * @return string
 	 *
 	 */
-	static public function getProto()
+	public function getProto()
 	{
 		return $this->proto;
 	}
@@ -31,7 +31,7 @@ class CBitrixCloudCDNLocation
 	 * @return array[int]string
 	 *
 	 */
-	static public function getPrefixes()
+	public function getPrefixes()
 	{
 		return $this->prefixes;
 	}
@@ -41,7 +41,7 @@ class CBitrixCloudCDNLocation
 	 * @return CBitrixCloudCDNLocation
 	 *
 	 */
-	static public function setPrefixes($prefixes)
+	public function setPrefixes($prefixes)
 	{
 		$this->prefixes = /*.(array[int]string).*/ array();
 		if (is_array($prefixes))
@@ -63,7 +63,7 @@ class CBitrixCloudCDNLocation
 	 * @return void
 	 *
 	 */
-	static public function __construct($name, $proto, $prefixes)
+	public function __construct($name, $proto, $prefixes)
 	{
 		$this->proto = $proto;
 		$this->name = $name;
@@ -74,7 +74,7 @@ class CBitrixCloudCDNLocation
 	 * @return array[int]CBitrixCloudCDNClass
 	 *
 	 */
-	static public function getClasses()
+	public function getClasses()
 	{
 		return $this->classes;
 	}
@@ -83,7 +83,7 @@ class CBitrixCloudCDNLocation
 	 * @return array[int]CBitrixCloudCDNServerGroup
 	 *
 	 */
-	static public function getServerGroups()
+	public function getServerGroups()
 	{
 		return $this->server_groups;
 	}
@@ -94,7 +94,7 @@ class CBitrixCloudCDNLocation
 	 * @return CBitrixCloudCDNLocation
 	 *
 	 */
-	static public function addService($file_class, $server_group)
+	public function addService($file_class, $server_group)
 	{
 		if (is_object($file_class) && $file_class instanceof CBitrixCloudCDNClass && is_object($server_group) && $server_group instanceof CBitrixCloudCDNServerGroup)
 		{
@@ -169,7 +169,7 @@ class CBitrixCloudCDNLocation
 	 * @return string
 	 *
 	 */
-	static public function getOptionValue()
+	public function getOptionValue()
 	{
 		$services = /*.(array[string]string).*/ array();
 		foreach ($this->classes as $i => $file_class)
@@ -194,7 +194,7 @@ class CBitrixCloudCDNLocation
 	 * @return string
 	 *
 	 */
-	static public function getServerNameByPrefixAndExtension($p_prefix, $p_extension, $p_link)
+	public function getServerNameByPrefixAndExtension($p_prefix, $p_extension, $p_link)
 	{
 		foreach ($this->prefixes as $prefix)
 		{
@@ -232,7 +232,7 @@ class CBitrixCloudCDNLocations implements Iterator
 	 * @return CBitrixCloudCDNLocations
 	 *
 	 */
-	static public function addLocation(CBitrixCloudCDNLocation $location)
+	public function addLocation(CBitrixCloudCDNLocation $location)
 	{
 		$this->locations[$location->getName()] = $location;
 		return $this;
@@ -243,7 +243,7 @@ class CBitrixCloudCDNLocations implements Iterator
 	 * @return CBitrixCloudCDNLocation
 	 *
 	 */
-	static public function getLocationByName($location_name)
+	public function getLocationByName($location_name)
 	{
 		return $this->locations[$location_name];
 	}
@@ -285,7 +285,7 @@ class CBitrixCloudCDNLocations implements Iterator
 	 * @return CBitrixCloudCDNLocations
 	 *
 	 */
-	static public function saveOption(CBitrixCloudOption $option)
+	public function saveOption(CBitrixCloudOption $option)
 	{
 		$locations = array();
 		foreach ($this->locations as $location_name => $location)
@@ -297,27 +297,27 @@ class CBitrixCloudCDNLocations implements Iterator
 		return $this;
 	}
 	
-	public static function rewind()
+	public function rewind()
 	{
 		reset($this->locations);
 	}
 	
-	public static function current()
+	public function current()
 	{
 		return current($this->locations);
 	}
 	
-	public static function key()
+	public function key()
 	{
 		return key($this->locations);
 	}
 	
-	public static function next()
+	public function next()
 	{
 		next($this->locations);
 	}
 	
-	public static function valid()
+	public function valid()
 	{
 		return key($this->locations) !== null;
 	}

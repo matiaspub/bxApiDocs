@@ -764,7 +764,7 @@ class CAllSocNetUserRelations
 			array(
 				"FIRST_USER_ID" => $senderUserID,
 				"SECOND_USER_ID" => $targetUserID
-				)
+			)
 		);
 
 		$ID = false;
@@ -773,8 +773,7 @@ class CAllSocNetUserRelations
 			if ($arResult["RELATION"] == SONET_RELATIONS_BAN && IsModuleInstalled("im"))
 				$ID = CSocNetUserRelations::Update($arResult["ID"], $arFields);
 		}
-
-		if (!$ID)
+		else
 			$ID = CSocNetUserRelations::Add($arFields);
 
 		if (!$ID)
@@ -1540,7 +1539,7 @@ class CAllSocNetUserRelations
 		return true;
 	}
 
-	function __SpeedFileCheckMessages($userID)
+	public static function __SpeedFileCheckMessages($userID)
 	{
 		$userID = IntVal($userID);
 		if ($userID <= 0)
@@ -1562,7 +1561,7 @@ class CAllSocNetUserRelations
 			CSocNetUserRelations::__SpeedFileDelete($userID);
 	}
 
-	function __SpeedFileCreate($userID)
+	public static function __SpeedFileCreate($userID)
 	{
 		global $CACHE_MANAGER;
 		
@@ -1584,7 +1583,7 @@ class CAllSocNetUserRelations
 */
 	}
 
-	function __SpeedFileDelete($userID)
+	public static function __SpeedFileDelete($userID)
 	{
 		global $CACHE_MANAGER;
 

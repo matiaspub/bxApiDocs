@@ -52,7 +52,7 @@ Class CIdeaManagment
     }
     
     /*************TOOLS**********/
-    static public function GetRSS($BlogCode, $type = "rss2.0", $numPosts = 10, $siteID = SITE_ID, $arPathTemplates = Array(), $arFilterExt = array())
+    public function GetRSS($BlogCode, $type = "rss2.0", $numPosts = 10, $siteID = SITE_ID, $arPathTemplates = Array(), $arFilterExt = array())
     {
         if(!$this->IsAvailable())
             return false;
@@ -302,7 +302,7 @@ Class CIdeaManagment
     
     //DEPRECATED!!! DON'T USE!!! Will Be Removed
     //Alias
-    static public function GetCategoryList($CategoryIB = false)
+    public function GetCategoryList($CategoryIB = false)
     {
         if($CategoryIB>0)
             $this->SetCategoryListId($CategoryIB);

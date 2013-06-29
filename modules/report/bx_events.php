@@ -8,7 +8,7 @@ class _CEventsReport {
 	/**
 	 * перед добавлением отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Add
 	 */
 	public static function OnBeforeReportAdd(){}
@@ -16,7 +16,7 @@ class _CEventsReport {
 	/**
 	 * перед удалением отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Delete
 	 */
 	public static function OnBeforeReportDelete(){}
@@ -24,7 +24,7 @@ class _CEventsReport {
 	/**
 	 * перед обновлением отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Update
 	 */
 	public static function OnBeforeReportUpdate(){}
@@ -32,7 +32,7 @@ class _CEventsReport {
 	/**
 	 * после добавления отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Add
 	 */
 	public static function OnReportAdd(){}
@@ -40,7 +40,7 @@ class _CEventsReport {
 	/**
 	 * после удаления отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Delete
 	 */
 	public static function OnReportDelete(){}
@@ -48,7 +48,7 @@ class _CEventsReport {
 	/**
 	 * после обновления отчета.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CReport::Update
 	 */
 	public static function OnReportUpdate(){}

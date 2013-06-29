@@ -10,7 +10,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CCheckList
 {
-	function __construct($ID = false)
+	public function __construct($ID = false)
 	{
 		$this->current_result = false;
 		$this->started = false;
@@ -77,7 +77,7 @@ class CCheckList
 			$this->started = true;
 	}
 
-	public static function GetSections($arFilter = array())
+	public function GetSections($arFilter = array())
 	{
 		$arSections = $this->checklist["CATEGORIES"];
 		$arResult = array();
@@ -90,7 +90,7 @@ class CCheckList
 	}
 
 	//getting sections statistic
-	public static function GetSectionStat($ID = false)
+	public function GetSectionStat($ID = false)
 	{
 		$arResult = array(
 			"CHECK" => 0,
@@ -169,7 +169,7 @@ class CCheckList
 		return $arResult;
 	}
 
-	public static function GetPoints($arSectionCode = false)
+	public function GetPoints($arSectionCode = false)
 	{
 		$arCheckList = $this->GetCurrentState();
 		$arResult = array();
@@ -188,7 +188,7 @@ class CCheckList
 		return $arResult;
 	}
 
-	public static function GetStructure()
+	public function GetStructure()
 	{ //build checklist stucture with section statistic & status info
 		$arSections = $this->GetSections();
 		foreach ($arSections as $key => $arSectionFields)
@@ -219,7 +219,7 @@ class CCheckList
 
 
 
-	public static function PointUpdate($arTestID, $arPointFields = array())
+	public function PointUpdate($arTestID, $arPointFields = array())
 	{//update test info in the object property
 		if (!$arTestID || empty($arPointFields) || $this->report_id)
 			return false;
@@ -252,7 +252,7 @@ class CCheckList
 	}
 
 
-	public static function Save()
+	public function Save()
 	{//saving current state
 		if (!$this->report_id)
 		{
@@ -264,7 +264,7 @@ class CCheckList
 		return false;
 	}
 
-	public static function GetCurrentState()
+	public function GetCurrentState()
 	{//getting current state
 		$arCheckList = $this->checklist;
 		$currentState = $this->current_result;
@@ -281,7 +281,7 @@ class CCheckList
 		return $arCheckList;
 	}
 
-	public static function AutoCheck($arTestID, $arParams = array())
+	public function AutoCheck($arTestID, $arParams = array())
 	{//execute point autotest
 		$arParams["TEST_ID"] = $arTestID;
 		$arPoints = $this->GetPoints();
@@ -342,7 +342,7 @@ class CCheckList
 		return $arResult;
 	}
 
-	public static function AddReport($arReportFields = array(), $errorCheck = false)
+	public function AddReport($arReportFields = array(), $errorCheck = false)
 	{//saving current state to a report
 		if ($this->report_id)
 			return false;
@@ -382,7 +382,7 @@ class CCheckList
 			return false;
 	}
 
-	public static function GetReportInfo()
+	public function GetReportInfo()
 	{//getting report information
 		if ($this->report_id)
 		{
@@ -1190,7 +1190,7 @@ class CAutoCheck
 
 class CCheckListTools
 {
-	function __scandir($pwd, &$arFiles, $arExept = false)
+	public static function __scandir($pwd, &$arFiles, $arExept = false)
 	{
 		$dir = scandir($pwd);
 		foreach ($dir as $file)

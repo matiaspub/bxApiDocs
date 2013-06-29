@@ -64,7 +64,7 @@ class CAllBlogUserGroupPerms
 		return True;
 	}
 
-	function __AutoSetPerms($ID)
+	public static function __AutoSetPerms($ID)
 	{
 		$ID = IntVal($ID);
 

@@ -330,7 +330,7 @@ class CRubric
 	}
 
 	//check fields before writing
-	public static function CheckFields($arFields)
+	public function CheckFields($arFields)
 	{
 		global $DB;
 		$this->LAST_ERROR = "";
@@ -482,11 +482,10 @@ class CRubric
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -541,11 +540,10 @@ class CRubric
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 		$ID = intval($ID);

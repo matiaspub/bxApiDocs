@@ -3,7 +3,7 @@
 // define("BX_SECURITY_SHOW_MESSAGE", true);
 // define('NO_AGENT_CHECK', true);
 
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
 global $USER;
 

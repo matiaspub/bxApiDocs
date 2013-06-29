@@ -12,7 +12,7 @@ class CTextParser
 	var $serverName = "";
 	var $preg;
 
-	public static function CTextParser()
+	public function CTextParser()
 	{
 		$this->pathToSmile = '';
 		$this->imageWidth = 800;
@@ -31,13 +31,15 @@ class CTextParser
 		$this->word_separator = "\\s.,;:!?\\#\\-\\*\\|\\[\\]\\(\\)\\{\\}";
 		$this->parser_nofollow = "N";
 		$this->link_target = "_blank";
-		$this->smiles = array();
 		$this->MaxAnchorLength = 40;
 		$this->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N", "ALIGN" => "Y");
 		$this->authorName = '';
+
+		$this->smiles = CSmile::getByType();
+		$this->smiles = CSmile::prepareForParser($this->smiles);
 	}
 
-	public static function convertText($text)
+	public function convertText($text)
 	{
 		$text = preg_replace("#([?&;])PHPSESSID=([0-9a-zA-Z]{32})#is", "\\1PHPSESSID1=", $text);
 
@@ -441,9 +443,12 @@ class CTextParser
 
 				$image = preg_quote(str_replace("'", "\\'", $row["IMAGE"]));
 				$description = preg_quote(htmlspecialcharsbx(str_replace(array("\x5C"), array("&#092;"), $row["DESCRIPTION"]), ENT_QUOTES), "/");
+				$width = intval($row["IMAGE_WIDTH"]);
+				$height = intval($row["IMAGE_HEIGHT"]);
+				$descriptionDecode = $row["DESCRIPTION_DECODE"] == 'Y'? true: false;
 
 				$arPattern[] = "/(?<=".$pre.")$patt(?=.\\W|\\W.|\\W$)/ei".BX_UTF_PCRE_MODIFIER;
-				$arReplace[] = "\$this->convert_emoticon('$code', '$image', '$description')";
+				$arReplace[] = "\$this->convert_emoticon('$code', '$image', '$description', '$width', '$height', '$descriptionDecode')";
 			}
 
 			if (!empty($arPattern))
@@ -462,7 +467,7 @@ class CTextParser
 		return trim($text);
 	}
 
-	public static function defended_tags($text, $tag = 'replace')
+	public function defended_tags($text, $tag = 'replace')
 	{
 		$text = str_replace("\\\"", "\"", $text);
 		switch ($tag)
@@ -583,17 +588,19 @@ class CTextParser
 		return false;
 	}
 
-	public static function convert_emoticon($code = "", $image = "", $description = "")
+	public function convert_emoticon($code = "", $image = "", $description = "", $width = "", $height = "", $descriptionDecode = false)
 	{
 		if (strlen($code)<=0 || strlen($image)<=0)
 			return '';
 		$code = stripslashes($code);
 		$description = stripslashes($description);
 		$image = stripslashes($image);
+		if ($descriptionDecode)
+			$description = htmlspecialcharsback($description);
 
 		$alt = "<\018#".$this->preg["counter"].">";
 		$this->preg["pattern"][] = $alt;
-		$this->preg["replace"][] = '<img src="'.$this->serverName.$this->pathToSmile.$image.'" border="0" alt="smile'.$code.'" title="'.$description.'" />';
+		$this->preg["replace"][] = '<img src="'.$this->serverName.$this->pathToSmile.$image.'" border="0" data-code="'.$code.'" alt="'.$code.'" '.(intval($width)>0? 'width="'.intval($width).'"':'').' '.(intval($height)>0? 'height="'.intval($height).'"':'').' title="'.$description.'" class="bx-smile" />';
 		$this->preg["counter"]++;
 
 		return $alt;
@@ -618,7 +625,7 @@ class CTextParser
 		return $text;
 	}
 
-	public static function convert_code_tag($text = "")
+	public function convert_code_tag($text = "")
 	{
 		if (strlen($text)<=0)
 			return '';
@@ -641,7 +648,7 @@ class CTextParser
 		return $text;
 	}
 
-	public static function convert_quote_tag($text = "")
+	public function convert_quote_tag($text = "")
 	{
 		if (strlen($text)<=0)
 			return '';
@@ -651,7 +658,7 @@ class CTextParser
 		return $this->convert_open_tag('quote').$text.$this->convert_close_tag('quote');
 	}
 
-	public static function convert_open_tag($marker = "quote")
+	public function convert_open_tag($marker = "quote")
 	{
 		$marker = (strtolower($marker) == "code" ? "code" : "quote");
 
@@ -661,7 +668,7 @@ class CTextParser
 		return "<div class='".$marker."'><table class='".$marker."'><tr><td>";
 	}
 
-	public static function convert_close_tag($marker = "quote")
+	public function convert_close_tag($marker = "quote")
 	{
 		$marker = (strtolower($marker) == "code" ? "code" : "quote");
 
@@ -677,7 +684,7 @@ class CTextParser
 		return "</td></tr></table></div>";
 	}
 
-	public static function convert_image_tag($url = "", $params = "")
+	public function convert_image_tag($url = "", $params = "")
 	{
 		$url = trim($url);
 		if (strlen($url)<=0)
@@ -717,8 +724,6 @@ class CTextParser
 			$strPar = " width=\"".$width."\"";
 		if($height > 0)
 			$strPar .= " height=\"".$height."\"";
-		if(strlen($this->authorName) > 0)
-			$strPar .= " data-bx-title=\"".$this->authorName."\"";
 
 		if(strlen($this->serverName) <= 0 || preg_match("/^(http|https|ftp)\\:\\/\\//i".BX_UTF_PCRE_MODIFIER, $url))
 			return '<img src="'.$url.'" border="0"'.$strPar.' data-bx-image="'.$url.'" />';
@@ -726,7 +731,7 @@ class CTextParser
 			return '<img src="'.$this->serverName.$url.'" border="0"'.$strPar.' data-bx-image="'.$this->serverName.$url.'" />';
 	}
 
-	public static function convert_font_attr($attr, $value = "", $text = "")
+	public function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0)
 			return "";
@@ -758,7 +763,7 @@ class CTextParser
 	}
 
 	// Only for public using
-	public static function wrap_long_words($text="")
+	public function wrap_long_words($text="")
 	{
 		if ($this->MaxStringLen > 0 && !empty($text))
 		{
@@ -769,7 +774,7 @@ class CTextParser
 		return $text;
 	}
 
-	public static function part_long_words($str)
+	public function part_long_words($str)
 	{
 		$word_separator = $this->word_separator;
 		if (($this->MaxStringLen > 0) && (strlen(trim($str)) > 0))
@@ -797,14 +802,14 @@ class CTextParser
 		return $str;
 	}
 
-	public static function cut_long_words($str)
+	public function cut_long_words($str)
 	{
 		if (($this->MaxStringLen > 0) && (strlen($str) > 0))
 			$str = preg_replace("/([^ \n\r\t\x01]{".$this->MaxStringLen."})/is".BX_UTF_PCRE_MODIFIER, "\\1<WBR/>&shy;", $str);
 		return $str;
 	}
 
-	public static function convert_anchor_tag($url, $text, $pref="")
+	public function convert_anchor_tag($url, $text, $pref="")
 	{
 		if(strlen(trim($text)) <= 0)
 			$text = $url;
@@ -990,7 +995,7 @@ class CTextParser
 		return $html;
 	}
 
-	public static function html_cut($html, $size)
+	public function html_cut($html, $size)
 	{
 		$symbols = strip_tags($html);
 		$symbols_len = strlen($symbols);

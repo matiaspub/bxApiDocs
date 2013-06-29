@@ -15,24 +15,24 @@ abstract class Request
 	protected $requestedFile = null;
 	protected $requestedFileDirectory = null;
 
-	static public function __construct(Server $server, array $request)
+	public function __construct(Server $server, array $request)
 	{
 		parent::__construct($request);
 
 		$this->server = $server;
 	}
 
-	static public function getPhpSelf()
+	public function getPhpSelf()
 	{
 		return $this->server->getPhpSelf();
 	}
 
-	static public function getScriptName()
+	public function getScriptName()
 	{
 		return $this->server->getScriptName();
 	}
 
-	static public function getRequestedPage()
+	public function getRequestedPage()
 	{
 		if ($this->requestedFile != null)
 			return $this->requestedFile;
@@ -47,7 +47,7 @@ abstract class Request
 		throw new SystemException("Script name is not valid");
 	}
 
-	static public function getRequestedPageDirectory()
+	public function getRequestedPageDirectory()
 	{
 		if ($this->requestedFileDirectory != null)
 			return $this->requestedFileDirectory;

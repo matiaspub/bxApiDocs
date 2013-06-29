@@ -17,7 +17,7 @@ class CBitrixCloudCDNQuota
 	 * @return float
 	 *
 	 */
-	static public function getAllowedSize()
+	public function getAllowedSize()
 	{
 		return $this->allowed;
 	}
@@ -26,7 +26,7 @@ class CBitrixCloudCDNQuota
 	 * @return float
 	 *
 	 */
-	static public function getTrafficSize()
+	public function getTrafficSize()
 	{
 		return $this->traffic;
 	}
@@ -36,7 +36,7 @@ class CBitrixCloudCDNQuota
 	 * @return bool
 	 *
 	 */
-	static public function isExpired()
+	public function isExpired()
 	{
 		return $this->expires < time();
 	}
@@ -46,7 +46,7 @@ class CBitrixCloudCDNQuota
 	 * @return CBitrixCloudCDNQuota
 	 *
 	 */
-	static public function setExpires($expires)
+	public function setExpires($expires)
 	{
 		$this->expires = intval($expires);
 		if ($this->expires < 0)
@@ -60,7 +60,7 @@ class CBitrixCloudCDNQuota
 	 * @return CBitrixCloudCDNQuota
 	 *
 	 */
-	static public function setAllowedSize($allowed)
+	public function setAllowedSize($allowed)
 	{
 		$this->allowed = doubleval($allowed);
 		if ($this->allowed < 0.0)
@@ -74,7 +74,7 @@ class CBitrixCloudCDNQuota
 	 * @return CBitrixCloudCDNQuota
 	 *
 	 */
-	static public function setTrafficSize($traffic)
+	public function setTrafficSize($traffic)
 	{
 		$this->traffic = doubleval($traffic);
 		if ($this->traffic < 0.0)
@@ -143,7 +143,7 @@ class CBitrixCloudCDNQuota
 	 * @return CBitrixCloudCDNQuota
 	 *
 	 */
-	static public function saveOption(CBitrixCloudOption $option)
+	public function saveOption(CBitrixCloudOption $option)
 	{
 		$values = array(
 			"expires" => (string)$this->expires,

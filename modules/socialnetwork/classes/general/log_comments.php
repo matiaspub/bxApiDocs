@@ -485,7 +485,7 @@ class CAllSocNetLogComments
 		}
 
 		CUserCounter::IncrementWithSelect(
-			CSocNetLogCounter::GetSubSelect($arLog["ID"], $arLog["ENTITY_TYPE"], $arLog["ENTITY_ID"], $arLogComment["EVENT_ID"], $arLogComment["USER_ID"], $arOfEntities, false, false, "Y", "LC")
+			CSocNetLogCounter::GetSubSelect($arLogComment["ID"], $arLog["ENTITY_TYPE"], $arLog["ENTITY_ID"], $arLogComment["EVENT_ID"], $arLogComment["USER_ID"], $arOfEntities, false, false, "Y", "LC")
 		);
 
 		return true;

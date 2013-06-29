@@ -134,12 +134,12 @@ class MssqlDbConnection
 		return new MssqlDbResult($this, $result, $trackerQuery);
 	}
 
-	static public function getIdentity($name = "")
+	public function getIdentity($name = "")
 	{
 		return $this->queryScalar("SELECT @@IDENTITY as ID");
 	}
 
-	static public function getAffectedRowsCount()
+	public function getAffectedRowsCount()
 	{
 		return sqlsrv_rows_affected($this->lastQueryResult);
 	}
@@ -147,7 +147,7 @@ class MssqlDbConnection
 	/*********************************************************
 	 * DDL
 	 *********************************************************/
-	static public function isTableExists($tableName)
+	public function isTableExists($tableName)
 	{
 		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
 		$tableName = Trim($tableName);
@@ -163,12 +163,12 @@ class MssqlDbConnection
 		return ($result > 0);
 	}
 
-	static public function isIndexExists($tableName, array $arColumns)
+	public function isIndexExists($tableName, array $arColumns)
 	{
 		return $this->getIndexName($tableName, $arColumns) !== null;
 	}
 
-	static public function getIndexName($tableName, array $arColumns, $strict = false)
+	public function getIndexName($tableName, array $arColumns, $strict = false)
 	{
 		if (!is_array($arColumns) || count($arColumns) <= 0)
 			return null;
@@ -209,7 +209,7 @@ class MssqlDbConnection
 		return null;
 	}
 
-	static public function getTableFields($tableName)
+	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
 		{
@@ -232,19 +232,19 @@ class MssqlDbConnection
 	/*********************************************************
 	 * Transaction
 	 *********************************************************/
-	static public function startTransaction()
+	public function startTransaction()
 	{
 		$this->connectInternal();
 		sqlsrv_begin_transaction($this->resource);
 	}
 
-	static public function commitTransaction()
+	public function commitTransaction()
 	{
 		$this->connectInternal();
 		sqlsrv_commit($this->resource);
 	}
 
-	static public function rollbackTransaction()
+	public function rollbackTransaction()
 	{
 		$this->connectInternal();
 		sqlsrv_rollback($this->resource);
@@ -258,7 +258,7 @@ class MssqlDbConnection
 		return "mssql";
 	}
 
-	static public function getVersion()
+	public function getVersion()
 	{
 		if ($this->version == null)
 		{

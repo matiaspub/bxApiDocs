@@ -20,7 +20,7 @@ IncludeModuleLangFile(__FILE__);
  */
 class Date extends Base
 {
-	static public function validate($value, $primary, array $row, Entity\Field $field)
+	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
 		if (CheckDateTime($value, FORMAT_DATE))
 		{

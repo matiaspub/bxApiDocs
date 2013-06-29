@@ -13,16 +13,16 @@ abstract class Page
 	/** @var \Bitrix\Main\HttpApplication */
 	protected $application;
 
-	public function __construct()
+	static public function __construct()
 	{
 	}
 
-	static public function setApplication(HttpApplication $application)
+	public function setApplication(HttpApplication $application)
 	{
 		$this->application = $application;
 	}
 
-	static public function startRequest()
+	public function startRequest()
 	{
 		$this->initializeRequest();
 
@@ -33,7 +33,7 @@ abstract class Page
 	{
 	}
 
-	static public function render()
+	public function render()
 	{
 		$text = ob_get_clean();
 		/* TODO: filters to output befor tag </body> */
@@ -43,7 +43,7 @@ abstract class Page
 	/**
 	 * @return Context
 	 */
-	static public function getContext()
+	public function getContext()
 	{
 		return $this->application->getContext();
 	}
@@ -51,7 +51,7 @@ abstract class Page
 	/**
 	 * @return HttpRequest
 	 */
-	static public function getRequest()
+	public function getRequest()
 	{
 		$context = $this->application->getContext();
 		return $context->getRequest();
@@ -60,7 +60,7 @@ abstract class Page
 	/**
 	 * @return HttpResponse
 	 */
-	static public function getResponse()
+	public function getResponse()
 	{
 		$context = $this->application->getContext();
 		return $context->getResponse();

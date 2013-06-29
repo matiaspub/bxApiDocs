@@ -41,7 +41,7 @@ class CWizardBase
 
 	var $package;
 
-	public static function CWizardBase($wizardName, $package)
+	public function CWizardBase($wizardName, $package)
 	{
 		$this->wizardName = $wizardName;
 		$this->package = $package;
@@ -74,7 +74,7 @@ class CWizardBase
 		$this->useAdminTemplate = true;
 	}
 
-	public static function AddStep($obStep, $stepID = null)
+	public function AddStep($obStep, $stepID = null)
 	{
 		if (!is_subclass_of($obStep, "CWizardStep"))
 		{
@@ -100,7 +100,7 @@ class CWizardBase
 			$this->SetFirstStep($stepID);
 	}
 
-	public static function AddSteps($arClasses)
+	public function AddSteps($arClasses)
 	{
 		if (!is_array($arClasses))
 			return false;
@@ -114,7 +114,7 @@ class CWizardBase
 		}
 	}
 
-	public static function SetTemplate($obStepTemplate, $stepID = null)
+	public function SetTemplate($obStepTemplate, $stepID = null)
 	{
 		if (!is_subclass_of($obStepTemplate, "CWizardTemplate"))
 			return;
@@ -127,23 +127,23 @@ class CWizardBase
 			$this->arTemplates[$stepID] = $obStepTemplate;
 	}
 
-	public static function DisableAdminTemplate()
+	public function DisableAdminTemplate()
 	{
 		$this->useAdminTemplate = false;
 	}
 
-	public static function SetFirstStep($stepID)
+	public function SetFirstStep($stepID)
 	{
 		$this->firstStepID = $stepID;
 	}
 
-	public static function SetCurrentStep($stepID)
+	public function SetCurrentStep($stepID)
 	{
 		if (array_key_exists($stepID, $this->wizardSteps))
 			$this->currentStepID = $stepID;
 	}
 
-	public static function GetCurrentStepID()
+	public function GetCurrentStepID()
 	{
 		return $this->currentStepID;
 	}
@@ -151,7 +151,7 @@ class CWizardBase
 	/**
 	 * @return CWizardStep
 	 */
-	public static function GetCurrentStep()
+	public function GetCurrentStep()
 	{
 		if (array_key_exists($this->currentStepID, $this->wizardSteps))
 			return $this->wizardSteps[$this->currentStepID];
@@ -159,12 +159,12 @@ class CWizardBase
 		return null;
 	}
 
-	public static function GetWizardSteps()
+	public function GetWizardSteps()
 	{
 		return $this->wizardSteps;
 	}
 
-	public static function GetVars($useDefault = false)
+	public function GetVars($useDefault = false)
 	{
 		$arVars = Array();
 		$prefix = $this->GetVarPrefix();
@@ -184,7 +184,7 @@ class CWizardBase
 		return $arVars;
 	}
 
-	public static function GetVar($varName, $useDefault = false)
+	public function GetVar($varName, $useDefault = false)
 	{
 		$varName = str_replace("[]", "", $varName);
 		$trueName = $this->GetRealName($varName);
@@ -205,7 +205,7 @@ class CWizardBase
 		return null;
 	}
 
-	public static function SetVar($varName, $varValue)
+	public function SetVar($varName, $varValue)
 	{
 		$trueName = $this->GetRealName($varName);
 
@@ -215,7 +215,7 @@ class CWizardBase
 			$this->__SetComplexVar($trueName, $varValue, $_REQUEST);
 	}
 
-	public static function UnSetVar($varName)
+	public function UnSetVar($varName)
 	{
 		$trueName = $this->GetRealName($varName);
 
@@ -225,7 +225,7 @@ class CWizardBase
 			$this->__UnSetComplexVar($trueName, $_REQUEST);
 	}
 
-	function __GetComplexVar($varName, &$arVars)
+	public static function __GetComplexVar($varName, &$arVars)
 	{
 		$tokens = explode("[", str_replace("]", "", $varName));
 		$arValues =& $arVars;
@@ -240,7 +240,7 @@ class CWizardBase
 		return $arValues;
 	}
 
-	function __SetComplexVar($varName, $value, &$arVars)
+	public static function __SetComplexVar($varName, $value, &$arVars)
 	{
 		$tokens = explode("[", str_replace("]", "", $varName));
 		$arValues =& $arVars;
@@ -254,7 +254,7 @@ class CWizardBase
 		$arValues[$tokens[0]] = $value;
 	}
 
-	function __UnSetComplexVar($varName, &$arVars)
+	public static function __UnSetComplexVar($varName, &$arVars)
 	{
 		$tokens = explode("[", str_replace("]", "", $varName));
 		$arValues =& $arVars;
@@ -268,22 +268,22 @@ class CWizardBase
 		unset($arValues[array_pop($tokens)]);
 	}
 
-	public static function GetRealName($varName)
+	public function GetRealName($varName)
 	{
 		return $this->GetVarPrefix().$varName;
 	}
 
-	public static function GetVarPrefix()
+	public function GetVarPrefix()
 	{
 		return $this->variablePrefix;
 	}
 
-	public static function SetVarPrefix($varPrefix)
+	public function SetVarPrefix($varPrefix)
 	{
 		$this->variablePrefix = $varPrefix;
 	}
 
-	public static function SetDefaultVar($varName, $varValue)
+	public function SetDefaultVar($varName, $varValue)
 	{
 		$varName = str_replace("[]", "", $varName);
 
@@ -293,7 +293,7 @@ class CWizardBase
 			$this->__SetComplexVar($varName, $varValue, $this->defaultVars);
 	}
 
-	public static function SetDefaultVars($arVars)
+	public function SetDefaultVars($arVars)
 	{
 		if (!is_array($arVars))
 			return;
@@ -302,7 +302,7 @@ class CWizardBase
 			$this->SetDefaultVar($varName, $varValue);
 	}
 
-	public static function GetDefaultVar($varName)
+	public function GetDefaultVar($varName)
 	{
 		$varName = str_replace("[]", "", $varName);
 
@@ -314,67 +314,67 @@ class CWizardBase
 		return null;
 	}
 
-	public static function GetDefaultVars()
+	public function GetDefaultVars()
 	{
 		return $this->defaultVars;
 	}
 
-	public static function GetWizardName()
+	public function GetWizardName()
 	{
 		return $this->wizardName;
 	}
 
-	public static function SetFormName($formName)
+	public function SetFormName($formName)
 	{
 		$this->formName = $formName;
 	}
 
-	public static function GetFormName()
+	public function GetFormName()
 	{
 		return $this->formName;
 	}
 
-	public static function SetFormActionScript($actionScript)
+	public function SetFormActionScript($actionScript)
 	{
 		$this->formActionScript = $actionScript;
 	}
 
-	public static function GetFormActionScript()
+	public function GetFormActionScript()
 	{
 		return $this->formActionScript;
 	}
 
-	public static function IsNextButtonClick()
+	public function IsNextButtonClick()
 	{
 		return ( isset($_REQUEST[$this->nextButtonID]) && isset($_REQUEST[$this->nextStepHiddenID]) );
 	}
 
-	public static function IsPrevButtonClick()
+	public function IsPrevButtonClick()
 	{
 		return ( isset($_REQUEST[$this->prevButtonID]) && isset($_REQUEST[$this->prevStepHiddenID]) );
 	}
 
-	public static function IsFinishButtonClick()
+	public function IsFinishButtonClick()
 	{
 		return ( isset($_REQUEST[$this->finishButtonID]) && isset($_REQUEST[$this->finishStepHiddenID]) );
 	}
 
-	public static function IsCancelButtonClick()
+	public function IsCancelButtonClick()
 	{
 		return ( isset($_REQUEST[$this->cancelButtonID]) && isset($_REQUEST[$this->cancelStepHiddenID]) );
 	}
 
-	public static function SetNextButtonID($buttonID)
+	public function SetNextButtonID($buttonID)
 	{
 		$this->nextButtonID = $buttonID;
 	}
 
-	public static function GetNextButtonID()
+	public function GetNextButtonID()
 	{
 		return $this->nextButtonID;
 	}
 
-	public static function GetNextStepID()
+	public function GetNextStepID()
 	{
 		if (isset($_REQUEST[$this->nextStepHiddenID]))
 			return $_REQUEST[$this->nextStepHiddenID];
@@ -382,17 +382,17 @@ class CWizardBase
 		return null;
 	}
 
-	public static function SetPrevButtonID($buttonID)
+	public function SetPrevButtonID($buttonID)
 	{
 		$this->prevButtonID = $buttonID;
 	}
 
-	public static function GetPrevButtonID()
+	public function GetPrevButtonID()
 	{
 		return $this->prevButtonID;
 	}
 
-	public static function GetPrevStepID()
+	public function GetPrevStepID()
 	{
 		if (isset($_REQUEST[$this->prevStepHiddenID]))
 			return $_REQUEST[$this->prevStepHiddenID];
@@ -400,17 +400,17 @@ class CWizardBase
 		return null;
 	}
 
-	public static function SetFinishButtonID($buttonID)
+	public function SetFinishButtonID($buttonID)
 	{
 		$this->finishButtonID = $buttonID;
 	}
 
-	public static function GetFinishButtonID()
+	public function GetFinishButtonID()
 	{
 		return $this->finishButtonID;
 	}
 
-	public static function GetFinishStepID()
+	public function GetFinishStepID()
 	{
 		if (isset($_REQUEST[$this->finishStepHiddenID]))
 			return $_REQUEST[$this->finishStepHiddenID];
@@ -418,17 +418,17 @@ class CWizardBase
 		return null;
 	}
 
-	public static function SetCancelButtonID($buttonID)
+	public function SetCancelButtonID($buttonID)
 	{
 		$this->cancelButtonID = $buttonID;
 	}
 
-	public static function GetCancelButtonID()
+	public function GetCancelButtonID()
 	{
 		return $this->cancelButtonID;
 	}
 
-	public static function GetCancelStepID()
+	public function GetCancelStepID()
 	{
 		if (isset($_REQUEST[$this->cancelStepHiddenID]))
 			return $_REQUEST[$this->cancelStepHiddenID];
@@ -436,17 +436,17 @@ class CWizardBase
 		return null;
 	}
 
-	public static function SetReturnOutput($mode = true)
+	public function SetReturnOutput($mode = true)
 	{
 		$this->returnOutput = (bool)$mode;
 	}
 
-	public static function GetPackage()
+	public function GetPackage()
 	{
 		return $this->package;
 	}
 
-	public static function Display()
+	public function Display()
 	{
 		$currentStep = &$this->currentStepID;
 
@@ -487,7 +487,7 @@ class CWizardBase
 		return $this->_DisplayStep();
 	}
 
-	function _DisplayStep()
+	public function _DisplayStep()
 	{
 		$oStep = $this->GetCurrentStep();
 		$oStep->ShowStep();
@@ -569,7 +569,7 @@ class CWizardBase
 			echo $output;
 	}
 
-	function __GetStepLayout()
+	public function __GetStepLayout()
 	{
 		if (defined("ADMIN_SECTION") && ADMIN_SECTION === true && $this->useAdminTemplate === true)
 		{
@@ -593,7 +593,7 @@ class CWizardBase
 		}
 	}
 
-	function __DisplayHiddenVars($arVars, $oStep, $concatString = null)
+	public function __DisplayHiddenVars($arVars, $oStep, $concatString = null)
 	{
 		$strReturn = "";
 
@@ -615,28 +615,28 @@ class CWizardBase
 		return $strReturn;
 	}
 
-	function __ShowError($errorMessage)
+	public static function __ShowError($errorMessage)
 	{
 		if (strlen($errorMessage) > 0)
 			echo '<span style="color:#FF0000">'.$errorMessage.'</span>';
 	}
 
 	/* Old  compatible Methods*/
-	public static function GetID()
+	public function GetID()
 	{
 		if ($this->package === null)
 			return "";
 		return $this->package->GetID();
 	}
 
-	public static function GetPath()
+	public function GetPath()
 	{
 		if ($this->package === null)
 			return "";
 		return $this->package->GetPath();
 	}
 
-	public static function GetSiteTemplateID()
+	public function GetSiteTemplateID()
 	{
 		if ($this->package === null)
 			return null;
@@ -644,7 +644,7 @@ class CWizardBase
 		return $this->package->GetSiteTemplateID();
 	}
 
-	public static function GetSiteGroupID()
+	public function GetSiteGroupID()
 	{
 		if ($this->package === null)
 			return null;
@@ -652,7 +652,7 @@ class CWizardBase
 		return $this->package->GetSiteGroupID();
 	}
 
-	public static function GetSiteID()
+	public function GetSiteID()
 	{
 		if ($this->package === null)
 			return null;
@@ -660,7 +660,7 @@ class CWizardBase
 		return $this->package->GetSiteID();
 	}
 
-	public static function GetSiteServiceID()
+	public function GetSiteServiceID()
 	{
 		if ($this->package === null)
 			return null;
@@ -695,7 +695,7 @@ class CWizardStep
 
 	var $autoSubmit;
 
-	public static function CWizardStep()
+	public function CWizardStep()
 	{
 		$this->stepTitle = "";
 		$this->stepSubTitle = "";
@@ -738,117 +738,117 @@ class CWizardStep
 		//should be overloaded
 	}
 
-	public static function SetTitle($title)
+	public function SetTitle($title)
 	{
 		$this->stepTitle = $title;
 	}
 
-	public static function GetTitle()
+	public function GetTitle()
 	{
 		return $this->stepTitle;
 	}
 
-	public static function SetSubTitle($stepSubTitle)
+	public function SetSubTitle($stepSubTitle)
 	{
 		$this->stepSubTitle = $stepSubTitle;
 	}
 
-	public static function GetSubTitle()
+	public function GetSubTitle()
 	{
 		return $this->stepSubTitle;
 	}
 
-	public static function SetStepID($stepID)
+	public function SetStepID($stepID)
 	{
 		$this->stepID = $stepID;
 	}
 
-	public static function GetStepID()
+	public function GetStepID()
 	{
 		return $this->stepID;
 	}
 
-	public static function SetNextStep($stepID)
+	public function SetNextStep($stepID)
 	{
 		$this->nextStepID = $stepID;
 	}
 
-	public static function GetNextStepID()
+	public function GetNextStepID()
 	{
 		return $this->nextStepID;
 	}
 
-	public static function SetNextCaption($caption)
+	public function SetNextCaption($caption)
 	{
 		$this->nextCaption = $caption;
 	}
 
-	public static function GetNextCaption()
+	public function GetNextCaption()
 	{
 		return $this->nextCaption;
 	}
 
-	public static function SetPrevStep($stepID)
+	public function SetPrevStep($stepID)
 	{
 		$this->prevStepID = $stepID;
 	}
 
-	public static function GetPrevStepID()
+	public function GetPrevStepID()
 	{
 		return $this->prevStepID;
 	}
 
-	public static function SetPrevCaption($caption)
+	public function SetPrevCaption($caption)
 	{
 		$this->prevCaption = $caption;
 	}
 
-	public static function GetPrevCaption()
+	public function GetPrevCaption()
 	{
 		return $this->prevCaption;
 	}
 
-	public static function SetFinishStep($stepID)
+	public function SetFinishStep($stepID)
 	{
 		$this->finishStepID = $stepID;
 	}
 
-	public static function GetFinishStepID()
+	public function GetFinishStepID()
 	{
 		return $this->finishStepID;
 	}
 
-	public static function SetFinishCaption($caption)
+	public function SetFinishCaption($caption)
 	{
 		$this->finishCaption = $caption;
 	}
 
-	public static function GetFinishCaption()
+	public function GetFinishCaption()
 	{
 		return $this->finishCaption;
 	}
 
-	public static function SetCancelStep($stepID)
+	public function SetCancelStep($stepID)
 	{
 		$this->cancelStepID = $stepID;
 	}
 
-	public static function GetCancelStepID()
+	public function GetCancelStepID()
 	{
 		return $this->cancelStepID;
 	}
 
-	public static function SetCancelCaption($caption)
+	public function SetCancelCaption($caption)
 	{
 		$this->cancelCaption = $caption;
 	}
 
-	public static function GetCancelCaption()
+	public function GetCancelCaption()
 	{
 		return $this->cancelCaption;
 	}
 
-	public static function SetDisplayVars($arVars)
+	public function SetDisplayVars($arVars)
 	{
 		if (!is_array($arVars))
 			return;
@@ -862,7 +862,7 @@ class CWizardStep
 		}
 	}
 
-	public static function DisplayVarExists($varName)
+	public function DisplayVarExists($varName)
 	{
 		$varName = str_replace("[]", "", $varName);
 
@@ -871,23 +871,23 @@ class CWizardStep
 		return null;
 	}
 
-	public static function GetDisplayVars()
+	public function GetDisplayVars()
 	{
 		return $this->displayVars;
 	}
 
-	public static function SetError($strError, $id = false)
+	public function SetError($strError, $id = false)
 	{
 		$this->stepErrors[] = Array($strError, $id);
 	}
 
-	public static function GetErrors()
+	public function GetErrors()
 	{
 		return $this->stepErrors;
 	}
 
 	//Text and textarea controls
-	public static function ShowInputField($type, $name, $arAttributes = Array())
+	public function ShowInputField($type, $name, $arAttributes = Array())
 	{
 		$strReturn = "";
 		$wizard = $this->GetWizard();
@@ -919,7 +919,7 @@ class CWizardStep
 	}
 
 	//Checkbox control
-	public static function ShowCheckboxField($name, $value, $arAttributes = Array())
+	public function ShowCheckboxField($name, $value, $arAttributes = Array())
 	{
 		$this->SetDisplayVars(Array($name));
 		$wizard = $this->GetWizard();
@@ -957,7 +957,7 @@ class CWizardStep
 	}
 
 	//Radio button control
-	public static function ShowRadioField($name, $value, $arAttributes = Array())
+	public function ShowRadioField($name, $value, $arAttributes = Array())
 	{
 		$this->SetDisplayVars(Array($name));
 		$wizard = $this->GetWizard();
@@ -990,7 +990,7 @@ class CWizardStep
 	}
 
 	//Dropdown and multiple controls
-	public static function ShowSelectField($name, $arValues = Array(), $arAttributes = Array())
+	public function ShowSelectField($name, $arValues = Array(), $arAttributes = Array())
 	{
 		$wizard = $this->GetWizard();
 		$this->SetDisplayVars(Array($name));
@@ -1025,7 +1025,7 @@ class CWizardStep
 	}
 
 	//Hidden control
-	public static function ShowHiddenField($name, $value, $arAttributes = Array())
+	public function ShowHiddenField($name, $value, $arAttributes = Array())
 	{
 		$wizard = $this->GetWizard();
 
@@ -1038,7 +1038,7 @@ class CWizardStep
 	}
 
 	//File control
-	public static function ShowFileField($name, $arAttributes = Array())
+	public function ShowFileField($name, $arAttributes = Array())
 	{
 		$wizard = $this->GetWizard();
 		$strReturn = "";
@@ -1093,7 +1093,7 @@ class CWizardStep
 
 	}
 
-	public static function SaveFile($name, $arRestriction = Array())
+	public function SaveFile($name, $arRestriction = Array())
 	{
 		$wizard = $this->GetWizard();
 		$deleteFile = $wizard->GetVar($name."_del");
@@ -1159,7 +1159,7 @@ class CWizardStep
 		return $fileID;
 	}
 
-	function _ShowAttributes($arAttributes)
+	public static function _ShowAttributes($arAttributes)
 	{
 		if (!is_array($arAttributes))
 			return "";
@@ -1176,22 +1176,22 @@ class CWizardStep
 	 *
 	 * @return CWizardBase
 	 */
-	public static function GetWizard()
+	public function GetWizard()
 	{
 		return $this->wizard;
 	}
 
-	function _SetWizard($wizard)
+	public function _SetWizard($wizard)
 	{
 		$this->wizard = $wizard;
 	}
 
-	public static function SetAutoSubmit($bool = true)
+	public function SetAutoSubmit($bool = true)
 	{
 		$this->autoSubmit = (bool)$bool;
 	}
 
-	public static function IsAutoSubmit()
+	public function IsAutoSubmit()
 	{
 		return (bool)$this->autoSubmit;
 	}
@@ -1202,7 +1202,7 @@ class CWizardTemplate
 {
 	var $wizard;
 
-	public static function GetLayout()
+	public function GetLayout()
 	{
 		$wizard = $this->GetWizard();
 		$obStep = $wizard->GetCurrentStep();
@@ -1417,12 +1417,12 @@ HTML;
 	 *
 	 * @return CWizardBase
 	 */
-	public static function GetWizard()
+	public function GetWizard()
 	{
 		return $this->wizard;
 	}
 
-	function _SetWizard($wizard)
+	public function _SetWizard($wizard)
 	{
 		$this->wizard = $wizard;
 	}
@@ -1433,7 +1433,7 @@ HTML;
 class CWizardAdminTemplate extends CWizardTemplate
 {
 
-	public static function GetLayout()
+	public function GetLayout()
 	{
 		$wizard = $this->GetWizard();
 

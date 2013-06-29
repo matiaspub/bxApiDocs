@@ -29,7 +29,7 @@ class MysqliDbResult
 		return $value;
 	}
 
-	static public function getSelectedRowsCount()
+	public function getSelectedRowsCount()
 	{
 		/** @var $r \mysqli_result */
 		$r = $this->resultResource;
@@ -37,7 +37,7 @@ class MysqliDbResult
 		return $r->num_rows;
 	}
 
-	static public function getFieldsCount()
+	public function getFieldsCount()
 	{
 		$con = $this->connection->getResource();
 		/** @var $con \mysqli */
@@ -45,7 +45,7 @@ class MysqliDbResult
 		return $con->field_count;
 	}
 
-	static public function getFieldName($column)
+	public function getFieldName($column)
 	{
 		/** @var $r \mysqli_result */
 		$r = $this->resultResource;
@@ -53,7 +53,7 @@ class MysqliDbResult
 		return $r->fetch_field_direct($column);
 	}
 
-	static public function getResultFields()
+	public function getResultFields()
 	{
 		if (empty($this->resultFields))
 		{

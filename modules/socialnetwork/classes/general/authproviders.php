@@ -3,12 +3,12 @@ IncludeModuleLangFile(__FILE__);
 
 class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterface
 {
-	static public function __construct()
+	public function __construct()
 	{
 		$this->id = 'socnetgroup';
 	}
 	
-	static public function UpdateCodes($USER_ID)
+	public function UpdateCodes($USER_ID)
 	{
 		global $DB;
 		$USER_ID = intval($USER_ID);
@@ -29,7 +29,7 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 		");
 	}
 	
-	static public function AjaxRequest($arParams=false)
+	public function AjaxRequest($arParams=false)
 	{
 		global $USER;
 
@@ -81,7 +81,7 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 		return $elements;
 	}
 	
-	static public function GetFormHtml($arParams=false)
+	public function GetFormHtml($arParams=false)
 	{
 		global $USER;
 
@@ -329,12 +329,12 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 
 class CSocNetUserAuthProvider extends CAuthProvider
 {
-	static public function __construct()
+	public function __construct()
 	{
 		$this->id = 'socnetuser';
 	}
 
-	static public function UpdateCodes($USER_ID)
+	public function UpdateCodes($USER_ID)
 	{
 		global $DB;
 		if(CSocNetUser::IsFriendsAllowed())

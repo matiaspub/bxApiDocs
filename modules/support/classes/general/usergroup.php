@@ -80,7 +80,7 @@ class CSupportUserGroup
 		return $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $APPLICATION;
 		if ($this->CheckFields($arFields))
@@ -90,7 +90,7 @@ class CSupportUserGroup
 		return false;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $APPLICATION;
 		$ID = intval($ID);

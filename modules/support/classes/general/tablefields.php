@@ -121,7 +121,7 @@ class CSupportTableFields
 		return $DEF_VAL;
 	}
 	
-	public static function SortMethod($a, $b)
+	public function SortMethod($a, $b)
 	{
 		foreach($this->_sortFields as $k => $name)
 		{
@@ -133,36 +133,36 @@ class CSupportTableFields
 		return 0;
 	}
 	
-	static public function __construct($f, $arOrTable = self::C_Array)
+	public function __construct($f, $arOrTable = self::C_Array)
 	{
 		$this->_arFieldsTypes = $f;
 		$this->_classType = $arOrTable;
 		$this->CleanVar();
 	}
 	
-	static public function checkRow($row)
+	public function checkRow($row)
 	{
 		if($this->_classType == self::C_Array || !array_key_exists($this->_currentRow, $this->_arFields)) $this->First();
 		if($row != null && array_key_exists($row, $this->_arFields)) return  $row;
 		return $this->_currentRow;
 	}
 		
-	static public function First()
+	public function First()
 	{
 		$this->_currentRow = 0;
 	}
 	
-	static public function Last()
+	public function Last()
 	{
 		$this->_currentRow = (count($this->_arFields) - 1);
 	}
 	
-	static public function ResetNext()
+	public function ResetNext()
 	{
 		$this->_resetNextF = true;
 	}
 		
-	static public function Next()
+	public function Next()
 	{
 		if($this->_resetNextF)
 		{
@@ -177,14 +177,14 @@ class CSupportTableFields
 		return true;
 	}
 	
-	static public function Previous()
+	public function Previous()
 	{
 		if($this->_currentRow <= 0) return false;
 		$this->_currentRow--;
 		return true;
 	}
 	
-	static public function Row($row)
+	public function Row($row)
 	{
 		$r = intval($row);
 		if((count($this->table) - 1) < $r) return false;
@@ -192,7 +192,7 @@ class CSupportTableFields
 		return true;
 	}
 	
-	static public function CleanVar($row = null, $removeExistingRows = false)
+	public function CleanVar($row = null, $removeExistingRows = false)
 	{
 		if($removeExistingRows) $this->RemoveExistingRows();
 		$row = $this->checkRow($row);
@@ -201,19 +201,19 @@ class CSupportTableFields
 		foreach($this->_arFieldsTypes as $key => $value) $this->Set($key, $value["DEF_VAL"], array(), $row, false);
 	}
 	
-	static public function RemoveExistingRows()
+	public function RemoveExistingRows()
 	{
 		$this->_arFields = array();
 		$this->_arModifiedFields = array();
 		$this->First();
 	}
 		
-	static public function __set($name, $value)
+	public function __set($name, $value)
 	{
 		$this->Set($name, $value);
 	}
 	
-	static public function AddRow()
+	public function AddRow()
 	{
 		$this->_arFields[] = array();
 		$this->_arModifiedFields[] = array();
@@ -224,7 +224,7 @@ class CSupportTableFields
 	/* заполнить поля из массива
 		$sf = "Имя поля,Имя поля2,..."
 		$sf = array("Имя поля", "Имя поля2",...) */
-	static public function SortRow($sf)
+	public function SortRow($sf)
 	{
 		$this->_sortFields = CSupportTools::prepareParamArray($sf);
 		$arr = $this->_arFields;
@@ -233,7 +233,7 @@ class CSupportTableFields
 	}
 		
 	//$notNull = array(self::NOT_NULL, self::MORE0, self::NOT_EMTY_STR)
-	static public function Set($name, $value, $notNull = array(), $row = null, $isModified = true)
+	public function Set($name, $value, $notNull = array(), $row = null, $isModified = true)
 	{
 		if(!array_key_exists($name, $this->_arFieldsTypes)) return;
 		$row = $this->checkRow($row);
@@ -253,7 +253,7 @@ class CSupportTableFields
 		$this->_arModifiedFields[$row][$name] = $isModified;
 	}
 	
-	static public function SetCurrentTime($name, $row = null)
+	public function SetCurrentTime($name, $row = null)
 	{
 		global $DB;
 		$row = $this->checkRow($row);
@@ -280,7 +280,7 @@ class CSupportTableFields
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)
 		$notNull = array(self::NOT_EMTY_STR, self::MORE0, self::NOT_EMTY_STR) */
-	static public function FromArray($arr, $fields = self::ALL, $notNull = array(), $row = null) //setFromArr
+	public function FromArray($arr, $fields = self::ALL, $notNull = array(), $row = null) //setFromArr
 	{
 		if(!is_array($arr)) return;
 		$row = $this->checkRow($row);
@@ -298,7 +298,7 @@ class CSupportTableFields
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)
 		$notNull = array(self::NOT_EMTY_STR, self::MORE0, self::NOT_EMTY_STR) */
-	static public function FromTable($table, $fields = self::ALL, $notNull = array(), $removeExistingRows = false) //setFromTable
+	public function FromTable($table, $fields = self::ALL, $notNull = array(), $removeExistingRows = false) //setFromTable
 	{
 		if($removeExistingRows)
 		{
@@ -315,12 +315,12 @@ class CSupportTableFields
 		}
 	}
 	
-	static public function __get($name)
+	public function __get($name)
 	{
 		return $this->Get($name);
 	}
 	
-	static public function Get($name, $row = null)
+	public function Get($name, $row = null)
 	{
 		if(!array_key_exists($name, $this->_arFieldsTypes)) return null;
 		$row = $this->checkRow($row);
@@ -333,7 +333,7 @@ class CSupportTableFields
 		$fields = "Имя поля,Имя поля2,..."
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)*/
-	static public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false, $row = null)  //getArr
+	public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false, $row = null)  //getArr
 	{
 		$row = $this->checkRow($row);
 		$res = array();		
@@ -366,7 +366,7 @@ class CSupportTableFields
 		return $res;
 	}
 		
-	static public function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
+	public function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
 	{
 		$row = $this->checkRow($row);
 		if(!array_key_exists($name, $this->_arFieldsTypes))
@@ -382,7 +382,7 @@ class CSupportTableFields
 		return self::ConvertForHTML($ft["TYPE"], $place, $value, $op);
 	}
 	
-	static public function GetColumn($name)
+	public function GetColumn($name)
 	{
 		$res = array();
 		if(!array_key_exists($name, $this->_arFieldsTypes))

@@ -299,7 +299,7 @@ class CLdapUtil
 		return $strResult;
 	}
 
-	function _Upper($str)
+	public static function _Upper($str)
 	{
 		global $DB;
 		return ($DB->type=="ORACLE"?"UPPER(".$str.")":$str);

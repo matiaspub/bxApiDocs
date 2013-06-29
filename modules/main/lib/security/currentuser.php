@@ -44,7 +44,7 @@ class CurrentUser
 		"LOGIN_ATTEMPTS" => 0,
 	);
 
-	static public function __construct($userId = null)
+	public function __construct($userId = null)
 	{
 		if (($userId !== null) && !Type\Int::isInteger($userId))
 			throw new Main\ArgumentOutOfRangeException("userId");
@@ -209,22 +209,22 @@ class CurrentUser
 			$this->policy["PASSWORD_LENGTH"] = 6;
 	}
 
-	static public function setAuthType($authType)
+	public function setAuthType($authType)
 	{
 		$this->authType = $authType;
 	}
 
-	static public function getAuthType()
+	public function getAuthType()
 	{
 		return $this->authType;
 	}
 
-	static public function setSessionHash($sessionHash)
+	public function setSessionHash($sessionHash)
 	{
 		$this->sessionHash = $sessionHash;
 	}
 
-	static public function getSessionHash()
+	public function getSessionHash()
 	{
 		if (!isset($this->sessionHash))
 			$this->sessionHash = md5(uniqid(rand(), true));
@@ -232,22 +232,22 @@ class CurrentUser
 		return $this->sessionHash;
 	}
 
-	static public function setStoredAuthId($storedAuthId)
+	public function setStoredAuthId($storedAuthId)
 	{
 		$this->storedAuthId = $storedAuthId;
 	}
 
-	static public function getStoredAuthId()
+	public function getStoredAuthId()
 	{
 		return $this->storedAuthId;
 	}
 
-	static public function isChecked()
+	public function isChecked()
 	{
 		return $this->checked;
 	}
 
-	static public function getUserGroups()
+	public function getUserGroups()
 	{
 		if (!isset($this->userGroups))
 			$this->loadUserGroups();
@@ -255,7 +255,7 @@ class CurrentUser
 		return $this->userGroups;
 	}
 
-	static public function getEmail()
+	public function getEmail()
 	{
 		if (!isset($this->email))
 			$this->loadUser();
@@ -263,7 +263,7 @@ class CurrentUser
 		return $this->email;
 	}
 
-	static public function getFirstName()
+	public function getFirstName()
 	{
 		if (!isset($this->firstName))
 			$this->loadUser();
@@ -271,17 +271,17 @@ class CurrentUser
 		return $this->firstName;
 	}
 
-	static public function isAdmin()
+	public function isAdmin()
 	{
 		return $this->isAdmin;
 	}
 
-	static public function isAuthenticated()
+	public function isAuthenticated()
 	{
 		return $this->isAuthenticated;
 	}
 
-	static public function isAutoTimezone()
+	public function isAutoTimezone()
 	{
 		if (!isset($this->isAutoTimezone))
 			$this->loadUser();
@@ -289,7 +289,7 @@ class CurrentUser
 		return $this->isAutoTimezone;
 	}
 
-	static public function getLastName()
+	public function getLastName()
 	{
 		if (!isset($this->lastName))
 			$this->loadUser();
@@ -297,7 +297,7 @@ class CurrentUser
 		return $this->lastName;
 	}
 
-	static public function getSecondName()
+	public function getSecondName()
 	{
 		if (!isset($this->secondName))
 			$this->loadUser();
@@ -305,7 +305,7 @@ class CurrentUser
 		return $this->secondName;
 	}
 
-	static public function getLogin()
+	public function getLogin()
 	{
 		if (!isset($this->login))
 			$this->loadUser();
@@ -313,7 +313,7 @@ class CurrentUser
 		return $this->login;
 	}
 
-	static public function getName()
+	public function getName()
 	{
 		if (!isset($this->name))
 		{
@@ -326,12 +326,12 @@ class CurrentUser
 		return $this->name;
 	}
 
-	static public function setTimezone($timezone)
+	public function setTimezone($timezone)
 	{
 		$this->timezone = $timezone;
 	}
 
-	static public function getTimezone()
+	public function getTimezone()
 	{
 		if (!isset($this->timezone))
 			$this->loadUser();
@@ -339,7 +339,7 @@ class CurrentUser
 		return $this->timezone;
 	}
 
-	static public function getPolicy()
+	public function getPolicy()
 	{
 		if (!isset($this->policy))
 			$this->loadUserSecurityPolicy();
@@ -347,12 +347,12 @@ class CurrentUser
 		return $this->policy;
 	}
 
-	static public function getUserId()
+	public function getUserId()
 	{
 		return $this->userId;
 	}
 
-	static public function isInGroup($groupId)
+	public function isInGroup($groupId)
 	{
 		if (empty($groupId))
 			throw new Main\ArgumentNullException("groupId");
@@ -405,7 +405,7 @@ class CurrentUser
 		return $user;
 	}
 
-	static public function exportToArray()
+	public function exportToArray()
 	{
 		$data = array(
 			"AUTHORIZED" => $this->isAuthenticated ? "Y" : "N",

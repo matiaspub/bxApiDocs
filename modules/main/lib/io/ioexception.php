@@ -16,7 +16,7 @@ class IoException
 	 * @param string $path Path that generated exception.
 	 * @param \Exception $previous
 	 */
-	static public function __construct($message = "", $path = "", \Exception $previous = null)
+	public function __construct($message = "", $path = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 120, '', '', $previous);
 		$this->path = $path;
@@ -27,7 +27,7 @@ class IoException
 	 *
 	 * @return string
 	 */
-	static public function getPath()
+	public function getPath()
 	{
 		return $this->path;
 	}

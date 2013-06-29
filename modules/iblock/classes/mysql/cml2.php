@@ -38,7 +38,7 @@ class CIBlockXMLFile
 
 	private $_get_xml_chunk_function = "_get_xml_chunk";
 
-	function __construct($table_name = "b_xml_tree")
+	public function __construct($table_name = "b_xml_tree")
 	{
 		$this->_table_name = strtolower($table_name);
 		if (defined("BX_UTF"))
@@ -54,7 +54,7 @@ class CIBlockXMLFile
 		}
 	}
 
-	public static function StartSession($sess_id)
+	public function StartSession($sess_id)
 	{
 		global $DB;
 
@@ -88,7 +88,7 @@ class CIBlockXMLFile
 		return $res;
 	}
 
-	public static function GetSessionRoot()
+	public function GetSessionRoot()
 	{
 		global $DB;
 		$rs = $DB->Query("SELECT ID MID from ".$this->_table_name." WHERE SESS_ID = '".$DB->ForSQL($this->_sessid)."' AND PARENT_ID = 0");
@@ -96,7 +96,7 @@ class CIBlockXMLFile
 		return $ar["MID"];
 	}
 
-	public static function EndSession()
+	public function EndSession()
 	{
 		global $DB;
 
@@ -227,7 +227,7 @@ class CIBlockXMLFile
 		}
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -259,7 +259,7 @@ class CIBlockXMLFile
 		return $DB->LastID();
 	}
 
-	public static function GetFilePosition()
+	public function GetFilePosition()
 	{
 		return $this->file_position;
 	}
@@ -314,11 +314,10 @@ class CIBlockXMLFile
 	 * </ul><br>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/readxmltodatabase.php
 	 * @author Bitrix
 	 */
-	public static function ReadXMLToDatabase($fp, &$NS, $time_limit=0, $read_size = 1024)
+	public function ReadXMLToDatabase($fp, &$NS, $time_limit=0, $read_size = 1024)
 	{
 		global $APPLICATION;
 
@@ -389,7 +388,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	function _get_xml_chunk($fp)
+	public function _get_xml_chunk($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -455,7 +454,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	function _get_xml_chunk_mb_orig($fp)
+	public function _get_xml_chunk_mb_orig($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -521,7 +520,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	function _get_xml_chunk_mb($fp)
+	public function _get_xml_chunk_mb($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -587,7 +586,7 @@ class CIBlockXMLFile
 	Internal function.
 	Stores an element into xml database tree.
 	*/
-	function _start_element($xmlChunk)
+	public function _start_element($xmlChunk)
 	{
 		global $DB;
 		static $search = array(
@@ -685,7 +684,7 @@ class CIBlockXMLFile
 	Internal function.
 	Winds tree stack back. Modifies (if neccessary) internal tree structure.
 	*/
-	function _end_element($xmlChunk)
+	public function _end_element($xmlChunk)
 	{
 		global $DB;
 
@@ -711,7 +710,7 @@ class CIBlockXMLFile
 			),
 		);
 	*/
-	public static function GetAllChildrenArray($arParent)
+	public function GetAllChildrenArray($arParent)
 	{
 		global $DB;
 
@@ -771,7 +770,7 @@ class CIBlockXMLFile
 		return $arResult;
 	}
 
-	public static function GetList($arOrder = array(), $arFilter = array(), $arSelect = array())
+	public function GetList($arOrder = array(), $arFilter = array(), $arSelect = array())
 	{
 		global $DB;
 
@@ -826,7 +825,7 @@ class CIBlockXMLFile
 		return $DB->Query($strSql);
 	}
 
-	public static function Delete($ID)
+	public function Delete($ID)
 	{
 		global $DB;
 		return $DB->Query("delete from ".$this->_table_name." where ID = ".intval($ID));

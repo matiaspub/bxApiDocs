@@ -26,7 +26,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	const PERSISTENT = 1;
 	const DEFERRED = 2;
 
-	static public function __construct($configuration)
+	public function __construct($configuration)
 	{
 		parent::__construct($configuration);
 
@@ -54,7 +54,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	/**
 	 * @return SqlHelper
 	 */
-	static public function getSqlHelper()
+	public function getSqlHelper()
 	{
 		if ($this->sqlHelper == null)
 			$this->sqlHelper = $this->createSqlHelper();
@@ -72,7 +72,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 * Connection and disconnection
 	 ***********************************************************/
 
-	static public function connect()
+	public function connect()
 	{
 		if (($this->dbOptions & self::DEFERRED) != 0)
 			return;
@@ -80,7 +80,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 		parent::connect();
 	}
 
-	static public function disconnect()
+	public function disconnect()
 	{
 		if (($this->dbOptions & self::PERSISTENT) != 0)
 			return;
@@ -117,7 +117,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 * @param int $limit Limit
 	 * @return DbResult
 	 */
-	static public function query($sql)
+	public function query($sql)
 	{
 		list($sql, $arBinds, $offset, $limit) = self::parseQueryFunctionArgs(func_get_args());
 
@@ -137,7 +137,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 * @param array $arBinds
 	 * @return string|null
 	 */
-	static public function queryScalar($sql, array $arBinds = null)
+	public function queryScalar($sql, array $arBinds = null)
 	{
 		$trackerQuery = null;
 		if ($this->trackSql)
@@ -159,7 +159,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 * @param string $sql
 	 * @param array $arBinds
 	 */
-	static public function queryExecute($sql, array $arBinds = null)
+	public function queryExecute($sql, array $arBinds = null)
 	{
 		$trackerQuery = null;
 		if ($this->trackSql)
@@ -220,7 +220,7 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 * @param string $identity For Oracle only
 	 * @return integer
 	 */
-	static public function add($tableName, array $data, $identity = "ID")
+	public function add($tableName, array $data, $identity = "ID")
 	{
 		$insert = $this->getSqlHelper()->prepareInsert($tableName, $data);
 
@@ -233,9 +233,9 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 		return $this->getIdentity();
 	}
 
-	static abstract public function getIdentity($name = "");
+	abstract public function getIdentity($name = "");
 
-	static public function executeSqlBatch($sqlBatch, $stopOnError = false)
+	public function executeSqlBatch($sqlBatch, $stopOnError = false)
 	{
 		$delimiter = $this->getSqlHelper()->getQueryDelimiter();
 
@@ -345,32 +345,32 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 *
 	 * @return int
 	 */
-	static abstract public function getAffectedRowsCount();
+	abstract public function getAffectedRowsCount();
 
 	/*********************************************************
 	 * DDL
 	 *********************************************************/
 
-	static abstract public function isTableExists($tableName);
-	static abstract public function isIndexExists($tableName, array $arColumns);
-	static abstract public function getIndexName($tableName, array $arColumns, $strict = false);
-	static abstract public function getTableFields($tableName);
+	abstract public function isTableExists($tableName);
+	abstract public function isIndexExists($tableName, array $arColumns);
+	abstract public function getIndexName($tableName, array $arColumns, $strict = false);
+	abstract public function getTableFields($tableName);
 
 
 	/*********************************************************
 	 * Transaction
 	 *********************************************************/
 
-	static abstract public function startTransaction();
-	static abstract public function commitTransaction();
-	static abstract public function rollbackTransaction();
+	abstract public function startTransaction();
+	abstract public function commitTransaction();
+	abstract public function rollbackTransaction();
 
 
 	/*********************************************************
 	 * Tracker
 	 *********************************************************/
 
-	static public function startTracker($reset = false)
+	public function startTracker($reset = false)
 	{
 		if ($this->sqlTracker == null)
 			$this->sqlTracker = new \Bitrix\Main\Diag\SqlTracker();
@@ -380,12 +380,12 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 		$this->trackSql = true;
 	}
 
-	static public function stopTracker()
+	public function stopTracker()
 	{
 		$this->trackSql = false;
 	}
 
-	static public function getTracker()
+	public function getTracker()
 	{
 		return $this->sqlTracker;
 	}
@@ -396,10 +396,10 @@ abstract class DbConnection extends \Bitrix\Main\Data\Connection
 	 *********************************************************/
 
 	abstract public function getType();
-	static abstract public function getVersion();
+	abstract public function getVersion();
 	abstract protected function getErrorMessage();
 
-	static public function clearCaches()
+	public function clearCaches()
 	{
 		$this->tableColumnsCache = array();
 	}

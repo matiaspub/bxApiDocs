@@ -15,19 +15,19 @@ class SqlTrackerQuery
 	 */
 	protected $tracker;
 
-	static public function __construct(SqlTracker $tracker)
+	public function __construct(SqlTracker $tracker)
 	{
 		$this->tracker = $tracker;
 	}
 
-	static public function startQuery($sql, array $arBinds = array())
+	public function startQuery($sql, array $arBinds = array())
 	{
 		$this->sql = $sql;
 		$this->arBinds = $arBinds;
 		$this->startTime = Helper::getCurrentMicrotime();
 	}
 
-	static public function finishQuery()
+	public function finishQuery()
 	{
 		$this->finishTime = Helper::getCurrentMicrotime();
 		$this->time = $this->finishTime - $this->startTime;
@@ -36,12 +36,12 @@ class SqlTrackerQuery
 		$this->tracker->addTime($this->time);
 	}
 
-	static public function restartQuery()
+	public function restartQuery()
 	{
 		$this->startTime = Helper::getCurrentMicrotime();
 	}
 
-	static public function refinishQuery()
+	public function refinishQuery()
 	{
 		$this->finishTime = Helper::getCurrentMicrotime();
 		$this->time += $this->finishTime - $this->startTime;

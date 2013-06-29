@@ -2,11 +2,11 @@
 
 class CSecurityTemporaryStorage
 {
-	const SESSION_DATA_KEY = "SECURITY_SITE_CHECKER";
+	const SESSION_DATA_KEY = "SECURITY_TEMPORARY_STORAGE";
 	const DEFAULT_DATA_KEY = "default";
 	protected $sessionData = array();
 
-	static public function __construct($pSessionKey = "", $pForceFlush = false)
+	public function __construct($pSessionKey = "", $pForceFlush = false)
 	{
 		$this->initializeSessionData($pSessionKey);
 		if($pForceFlush)
@@ -15,15 +15,18 @@ class CSecurityTemporaryStorage
 		}
 	}
 
-	/**
-	 *
+	/*
+	 * Destroy data in all temporary storage
 	 */
 	public static function clearAll()
 	{
-		unset($_SESSION[CSecuritySiteChecker::SESSION_DATA_KEY]);
+		unset($_SESSION[self::SESSION_DATA_KEY]);
 	}
 
-	static public function clearKey($pKey)
+	/**
+	 * @param string $pKey
+	 */
+	public function clearKey($pKey)
 	{
 		unset($this->sessionData[$pKey]);
 	}
@@ -42,7 +45,7 @@ class CSecurityTemporaryStorage
 		{
 			$sessionKey = self::DEFAULT_DATA_KEY;
 		}
-		$this->sessionData = &$_SESSION[CSecuritySiteChecker::SESSION_DATA_KEY][$sessionKey];
+		$this->sessionData = &$_SESSION[self::SESSION_DATA_KEY][$sessionKey];
 		if(!is_array($this->sessionData))
 		{
 			$this->sessionData = array();
@@ -50,10 +53,7 @@ class CSecurityTemporaryStorage
 		return true;
 	}
 
-	/**
-	 *
-	 */
-	static public function flushData()
+	public function flushData()
 	{
 		$this->sessionData = array();
 	}
@@ -62,7 +62,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @param mixed $pValue
 	 */
-	static public function setData($pKey, $pValue)
+	public function setData($pKey, $pValue)
 	{
 		$this->sessionData[$pKey] = $pValue;
 	}
@@ -71,7 +71,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return string
 	 */
-	static public function getString($pKey)
+	public function getString($pKey)
 	{
 		if(isset($this->sessionData[$pKey]) && is_string($this->sessionData[$pKey]))
 		{
@@ -87,7 +87,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return int
 	 */
-	static public function getInt($pKey)
+	public function getInt($pKey)
 	{
 		if(isset($this->sessionData[$pKey]) && is_numeric($this->sessionData[$pKey]))
 		{
@@ -103,7 +103,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return bool
 	 */
-	static public function getBool($pKey)
+	public function getBool($pKey)
 	{
 		if(isset($this->sessionData[$pKey]) && is_bool($this->sessionData[$pKey]))
 		{
@@ -119,7 +119,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return bool
 	 */
-	static public function isEmpty($pKey)
+	public function isEmpty($pKey)
 	{
 		if(!isset($this->sessionData[$pKey]) || empty($this->sessionData[$pKey]))
 		{
@@ -135,7 +135,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return bool
 	 */
-	static public function isExists($pKey)
+	public function isExists($pKey)
 	{
 		return isset($this->sessionData[$pKey]);
 	}
@@ -143,7 +143,7 @@ class CSecurityTemporaryStorage
 	/**
 	 * @param int|string $pKey
 	 */
-	static public function increment($pKey)
+	public function increment($pKey)
 	{
 		$this->setData($pKey, $this->getInt($pKey) + 1);
 	}
@@ -151,7 +151,7 @@ class CSecurityTemporaryStorage
 	/**
 	 * @param int|string $pKey
 	 */
-	static public function decrement($pKey)
+	public function decrement($pKey)
 	{
 		$this->setData($pKey, $this->getInt($pKey) - 1);
 	}
@@ -160,7 +160,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return bool|array
 	 */
-	static public function getArray($pKey)
+	public function getArray($pKey)
 	{
 		if(isset($this->sessionData[$pKey]) && is_array($this->sessionData[$pKey]))
 		{
@@ -176,7 +176,7 @@ class CSecurityTemporaryStorage
 	 * @param int|string $pKey
 	 * @return bool|mixed
 	 */
-	static public function getArrayPop($pKey)
+	public function getArrayPop($pKey)
 	{
 		if(isset($this->sessionData[$pKey]) && is_array($this->sessionData[$pKey]))
 		{

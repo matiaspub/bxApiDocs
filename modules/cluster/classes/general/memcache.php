@@ -76,7 +76,7 @@ $arList = array(
 		return $ar[$id];
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -114,7 +114,7 @@ $arList = array(
 		return true;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		$ID = intval($ID);
 		$arServerList = CClusterMemcache::LoadConfig();

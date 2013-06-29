@@ -25,7 +25,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getDocumentRoot()
+	public function getDocumentRoot()
 	{
 		return $this->get("DOCUMENT_ROOT");
 	}
@@ -36,7 +36,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getPersonalRoot()
+	public function getPersonalRoot()
 	{
 		$r = $this->get("BX_PERSONAL_ROOT");
 		if ($r == null || $r == "")
@@ -50,7 +50,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getHttpHost()
+	public function getHttpHost()
 	{
 		return $this->get("HTTP_HOST");
 	}
@@ -60,7 +60,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getServerName()
+	public function getServerName()
 	{
 		return $this->get("SERVER_NAME");
 	}
@@ -70,7 +70,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getServerAddr()
+	public function getServerAddr()
 	{
 		return $this->get("SERVER_ADDR");
 	}
@@ -80,7 +80,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getServerPort()
+	public function getServerPort()
 	{
 		return $this->get("SERVER_PORT");
 	}
@@ -91,7 +91,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getRequestUri()
+	public function getRequestUri()
 	{
 		return $this->get("REQUEST_URI");
 	}
@@ -101,7 +101,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getRequestMethod()
+	public function getRequestMethod()
 	{
 		return $this->get("REQUEST_METHOD");
 	}
@@ -112,7 +112,7 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getPhpSelf()
+	public function getPhpSelf()
 	{
 		return $this->get("PHP_SELF");
 	}
@@ -123,12 +123,12 @@ class Server
 	 *
 	 * @return string | null
 	 */
-	static public function getScriptName()
+	public function getScriptName()
 	{
 		return $this->get("SCRIPT_NAME");
 	}
 
-	static public function rewriteUri($url, $queryString, $redirectStatus = null)
+	public function rewriteUri($url, $queryString, $redirectStatus = null)
 	{
 		$this->arValues["REQUEST_URI"] = $url;
 		$this->arValues["QUERY_STRING"] = $queryString;
@@ -136,7 +136,7 @@ class Server
 			$this->arValues["REDIRECT_STATUS"] = $redirectStatus;
 	}
 
-	static public function transferUri($url, $queryString)
+	public function transferUri($url, $queryString)
 	{
 		$this->arValues["REAL_FILE_PATH"] = $url;
 		if ($queryString != "")

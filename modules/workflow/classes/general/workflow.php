@@ -986,7 +986,7 @@ class CAllWorkflow
 		}
 	}
 
-	function __CheckSite($site)
+	public static function __CheckSite($site)
 	{
 		if($site!==false)
 		{

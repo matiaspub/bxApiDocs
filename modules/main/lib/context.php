@@ -38,7 +38,7 @@ class Context
 	 *
 	 * @param Application $application
 	 */
-	static public function __construct(Application $application)
+	public function __construct(Application $application)
 	{
 		$this->application = $application;
 	}
@@ -51,7 +51,7 @@ class Context
 	 * @param Server $server
 	 * @param Environment $env
 	 */
-	static public function initialize(Request $request, Response $response, Server $server, Environment $env)
+	public function initialize(Request $request, Response $response, Server $server, Environment $env)
 	{
 		$this->request = $request;
 		$this->response = $response;
@@ -64,7 +64,7 @@ class Context
 	 *
 	 * @return Response
 	 */
-	static public function getResponse()
+	public function getResponse()
 	{
 		return $this->response;
 	}
@@ -74,7 +74,7 @@ class Context
 	 *
 	 * @return Request
 	 */
-	static public function getRequest()
+	public function getRequest()
 	{
 		return $this->request;
 	}
@@ -84,7 +84,7 @@ class Context
 	 *
 	 * @return Server
 	 */
-	static public function getServer()
+	public function getServer()
 	{
 		return $this->server;
 	}
@@ -94,7 +94,7 @@ class Context
 	 *
 	 * @return Application
 	 */
-	static public function getApplication()
+	public function getApplication()
 	{
 		return $this->application;
 	}
@@ -104,7 +104,7 @@ class Context
 	 *
 	 * @return \Bitrix\Main\Context\Culture
 	 */
-	static public function getCulture()
+	public function getCulture()
 	{
 		return $this->culture;
 	}
@@ -114,7 +114,7 @@ class Context
 	 *
 	 * @return string
 	 */
-	static public function getLanguage()
+	public function getLanguage()
 	{
 		return $this->language;
 	}
@@ -124,7 +124,7 @@ class Context
 	 *
 	 * @param \Bitrix\Main\Context\Culture $culture
 	 */
-	static public function setCulture(Context\Culture $culture)
+	public function setCulture(Context\Culture $culture)
 	{
 		$this->culture = $culture;
 	}
@@ -134,7 +134,7 @@ class Context
 	 *
 	 * @param string $language
 	 */
-	static public function setLanguage($language)
+	public function setLanguage($language)
 	{
 		$this->language = $language;
 	}

@@ -254,7 +254,7 @@ class Encoding
 		return $arCvTables;
 	}
 
-	static public function convert($sourceString, $charsetFrom, $charsetTo)
+	public function convert($sourceString, $charsetFrom, $charsetTo)
 	{
 		$this->clearErrors();
 
@@ -390,7 +390,7 @@ class Encoding
 		return $resultString;
 	}
 
-	static public function getErrors()
+	public function getErrors()
 	{
 		return $this->arErrors;
 	}

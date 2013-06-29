@@ -56,6 +56,9 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && $USER->CanDoOperation('edit_other_sett
 }
 
 $bEmailIndex = (COption::GetOptionString("main", "new_user_email_uniq_check", "N") !== "Y") && !$DB->IndexExists("b_user", array("EMAIL"));
+$arSmileSet = CSmileSet::getFormList(true);
+foreach ($arSmileSet as $key => $value)
+	$arSmileSet[$key] = htmlspecialcharsback($value);
 
 $arAllOptions = array(
 	"main" => Array(
@@ -67,6 +70,7 @@ $arAllOptions = array(
 		Array("error_reporting", GetMessage("MAIN_ERROR_REPORTING"), E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE, Array("selectbox", Array(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE=>GetMessage("MAIN_OPTION_ERROR1"), E_ALL^E_NOTICE=>GetMessage("MAIN_OPTION_ERROR2"), 0=>GetMessage("MAIN_OPTION_ERROR3")))),
 		Array("templates_visual_editor", GetMessage("main_options_use_editor"), "N", Array("checkbox", "Y")),
 		Array("use_hot_keys", GetMessage("main_options_use_hot_keys"), "Y", Array("checkbox", "Y")),
+		Array("smile_set_id", GetMessage("main_options_smile_set_id"), 0, Array("selectbox", $arSmileSet)),
 
 		GetMessage("main_options_mail"),
 		Array("all_bcc", GetMessage("MAIN_EMAIL"), "", Array("text", 30)),

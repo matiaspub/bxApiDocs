@@ -27,7 +27,7 @@ class HttpRequest
 	 */
 	protected $cookies;
 
-	static public function __construct(Server $server, array $queryString, array $postData, array $files, array $cookies)
+	public function __construct(Server $server, array $queryString, array $postData, array $files, array $cookies)
 	{
 		$request = array_merge($queryString, $postData);
 		parent::__construct($server, $request);
@@ -50,72 +50,72 @@ class HttpRequest
 		$this->cookies = new \Bitrix\Main\System\ReadonlyDictionary($cookiesNew);
 	}
 
-	static public function getQuery($name)
+	public function getQuery($name)
 	{
 		return $this->queryString->get($name);
 	}
 
-	static public function getQueryList()
+	public function getQueryList()
 	{
 		return $this->queryString;
 	}
 
-	static public function getPost($name)
+	public function getPost($name)
 	{
 		return $this->postData->get($name);
 	}
 
-	static public function getPostList()
+	public function getPostList()
 	{
 		return $this->postData;
 	}
 
-	static public function getFile($name)
+	public function getFile($name)
 	{
 		return $this->files->get($name);
 	}
 
-	static public function getFileList()
+	public function getFileList()
 	{
 		return $this->files;
 	}
 
-	static public function getCookie($name)
+	public function getCookie($name)
 	{
 		return $this->cookies->get($name);
 	}
 
-	static public function getCookieList()
+	public function getCookieList()
 	{
 		return $this->cookies;
 	}
 
-	static public function getRemoteAddress()
+	public function getRemoteAddress()
 	{
 		return $this->server->get("REMOTE_ADDR");
 	}
 
-	static public function getRequestUri()
+	public function getRequestUri()
 	{
 		return $this->server->getRequestUri();
 	}
 
-	static public function getRequestMethod()
+	public function getRequestMethod()
 	{
 		return $this->server->getRequestMethod();
 	}
 
-	static public function isPost()
+	public function isPost()
 	{
 		return ($this->getRequestMethod() == "POST");
 	}
 
-	static public function getUserAgent()
+	public function getUserAgent()
 	{
 		return $this->server->get("HTTP_USER_AGENT");
 	}
 
-	static public function getAcceptedLanguages()
+	public function getAcceptedLanguages()
 	{
 		static $acceptedLanguages = array();
 
@@ -133,7 +133,7 @@ class HttpRequest
 		return $acceptedLanguages;
 	}
 
-	static public function getRequestedPage()
+	public function getRequestedPage()
 	{
 		if ($this->requestedFile != null)
 			return $this->requestedFile;
@@ -150,7 +150,7 @@ class HttpRequest
 		return $this->requestedFile = $uri->convertToPath();
 	}
 
-	static public function getHttpHost($raw = true)
+	public function getHttpHost($raw = true)
 	{
 		if ($raw)
 			return $this->server->getHttpHost();
@@ -171,14 +171,14 @@ class HttpRequest
 		return $host;
 	}
 
-	static public function isHttps()
+	public function isHttps()
 	{
 		$port = $this->server->get("SERVER_PORT");
 		$https = $this->server->get("HTTPS");
 		return ($port == 443 || (($https != null) && (strtolower($https) == "on")));
 	}
 
-	static public function modifyByQueryString($queryString)
+	public function modifyByQueryString($queryString)
 	{
 		if ($queryString != "")
 		{

@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CClusterWebnode
 {
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -25,7 +25,7 @@ class CClusterWebnode
 		return $res;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 		$ID = intval($ID);
@@ -51,7 +51,7 @@ class CClusterWebnode
 		return true;
 	}
 
-	public static function CheckFields(&$arFields, $ID)
+	public function CheckFields(&$arFields, $ID)
 	{
 		global $APPLICATION;
 		$aMsg = array();

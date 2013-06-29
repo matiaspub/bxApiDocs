@@ -12,14 +12,14 @@ class CIBlockPropertyElementAutoComplete
 			"PROPERTY_TYPE" => "E",
 			"USER_TYPE" => BT_UT_AUTOCOMPLETE_CODE,
 			"DESCRIPTION" => GetMessage('BT_UT_EAUTOCOMPLETE_DESCR'),
-			"GetPropertyFieldHtml" => array("CIBlockPropertyElementAutoComplete", "GetPropertyFieldHtml"),
-			"GetPropertyFieldHtmlMulty" => array('CIBlockPropertyElementAutoComplete','GetPropertyFieldHtmlMulty'),
-			"GetAdminListViewHTML" => array("CIBlockPropertyElementAutoComplete","GetAdminListViewHTML"),
-			"GetPublicViewHTML" => array("CIBlockPropertyElementAutoComplete", "GetPublicViewHTML"),
-			"GetAdminFilterHTML" => array('CIBlockPropertyElementAutoComplete','GetAdminFilterHTML'),
-			"GetSettingsHTML" => array('CIBlockPropertyElementAutoComplete','GetSettingsHTML'),
-			"PrepareSettings" => array('CIBlockPropertyElementAutoComplete','PrepareSettings'),
-			"AddFilterFields" => array('CIBlockPropertyElementAutoComplete','AddFilterFields'),
+			"GetPropertyFieldHtml" => array(__CLASS__, "GetPropertyFieldHtml"),
+			"GetPropertyFieldHtmlMulty" => array(__CLASS__,'GetPropertyFieldHtmlMulty'),
+			"GetAdminListViewHTML" => array(__CLASS__,"GetAdminListViewHTML"),
+			"GetPublicViewHTML" => array(__CLASS__, "GetPublicViewHTML"),
+			"GetAdminFilterHTML" => array(__CLASS__,'GetAdminFilterHTML'),
+			"GetSettingsHTML" => array(__CLASS__,'GetSettingsHTML'),
+			"PrepareSettings" => array(__CLASS__,'PrepareSettings'),
+			"AddFilterFields" => array(__CLASS__,'AddFilterFields'),
 		);
 	}
 
@@ -190,7 +190,7 @@ class CIBlockPropertyElementAutoComplete
 
 		$strResult = '';
 
-		if (isset($strHTMLControlName['MODE']) && ('iblock_element_admin' == $strHTMLControlName['MODE']))
+		if (array_key_exists('MODE', $strHTMLControlName) && ('iblock_element_admin' == $strHTMLControlName['MODE']))
 		{
 			$mxElement = false;
 			$mxElement = self::GetPropertyValue($arProperty,$arValue);
@@ -309,7 +309,7 @@ class CIBlockPropertyElementAutoComplete
 		$arSymbols = self::GetSymbols($arSettings);
 
 		$strResult = '';
-		if (isset($strHTMLControlName['MODE']) && ('iblock_element_admin' == $strHTMLControlName['MODE']))
+		if (array_key_exists('MODE', $strHTMLControlName) && ('iblock_element_admin' == $strHTMLControlName['MODE']))
 		{
 			$arResult = false;
 			foreach ($arValues as $intPropertyValueID => $arOneValue)
@@ -466,12 +466,13 @@ class CIBlockPropertyElementAutoComplete
 				$arFilter["ACTIVE"] = "Y";
 				$arFilter["ACTIVE_DATE"] = "Y";
 				$arFilter["CHECK_PERMISSIONS"] = "Y";
+				$arFilter["MIN_PERMISSION"] = "R";
 				$rsElements = CIBlockElement::GetList(array(), $arFilter, false, false, array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL"));
 				$cache[$arValue['VALUE']] = $rsElements->GetNext(true,false);
 			}
 			if (is_array($cache[$arValue['VALUE']]))
 			{
-				if (isset($strHTMLControlName['MODE']) && 'CSV_EXPORT' == $strHTMLControlName['MODE'])
+				if (array_key_exists('MODE', $strHTMLControlName) && 'CSV_EXPORT' == $strHTMLControlName['MODE'])
 				{
 					$strResult = $cache[$arValue['VALUE']]['ID'];
 				}

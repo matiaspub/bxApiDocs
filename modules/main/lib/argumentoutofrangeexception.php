@@ -22,7 +22,7 @@ class ArgumentOutOfRangeException
 	 * @param null $upperLimit Upper limit of the allowable values
 	 * @param \Exception $previous
 	 */
-	static public function __construct($parameter, $lowerLimit = null, $upperLimit = null, \Exception $previous = null)
+	public function __construct($parameter, $lowerLimit = null, $upperLimit = null, \Exception $previous = null)
 	{
 		if (is_array($lowerLimit))
 			$message = sprintf("The value of an argument '%s' is outside the allowable range of values: %s", $parameter, implode(", ", $lowerLimit));
@@ -41,12 +41,12 @@ class ArgumentOutOfRangeException
 		parent::__construct($message, $parameter, $previous);
 	}
 
-	static public function getLowerLimitType()
+	public function getLowerLimitType()
 	{
 		return $this->lowerLimit;
 	}
 
-	static public function getUpperType()
+	public function getUpperType()
 	{
 		return $this->upperLimit;
 	}

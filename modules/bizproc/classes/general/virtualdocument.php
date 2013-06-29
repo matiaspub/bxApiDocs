@@ -151,6 +151,17 @@ class CBPVirtualDocument
 		if (!is_array($fieldValue) || is_array($fieldValue) && CBPHelper::IsAssociativeArray($fieldValue))
 			$fieldValue = array($fieldValue);
 
+		$customMethodName = "";
+		$customMethodNameMulty = "";
+		if (strpos($arFieldType["Type"], ":") !== false)
+		{
+			$ar = CIBlockProperty::GetUserType(substr($arFieldType["Type"], 2));
+			if (array_key_exists("GetPublicEditHTML", $ar))
+				$customMethodName = $ar["GetPublicEditHTML"];
+			if (array_key_exists("GetPublicEditHTMLMulty", $ar))
+				$customMethodNameMulty = $ar["GetPublicEditHTMLMulty"];
+		}
+
 		ob_start();
 
 		if ($arFieldType["Type"] == "L")
@@ -196,6 +207,69 @@ class CBPVirtualDocument
 		{
 			$fieldValue = CBPHelper::UsersArrayToString($fieldValue, null, array("bizproc", "CBPVirtualDocument", $documentType));
 			?><input type="text" size="40" id="id_<?= $arFieldName["Field"] ?>" name="<?= $arFieldName["Field"] ?>" value="<?= htmlspecialcharsbx($fieldValue) ?>"><input type="button" value="..." onclick="BPAShowSelector('id_<?= $arFieldName["Field"] ?>', 'user');"><?
+		}
+		elseif ((strpos($arFieldType["Type"], ":") !== false)
+			&& $arFieldType["Multiple"]
+			&& (
+				is_array($customMethodNameMulty) && count($customMethodNameMulty) > 0
+				|| !is_array($customMethodNameMulty) && strlen($customMethodNameMulty) > 0
+			)
+		)
+		{
+			if (!is_array($fieldValue))
+				$fieldValue = array();
+
+			if ($bAllowSelection)
+			{
+				$fieldValueTmp1 = array();
+				$fieldValueTmp2 = array();
+				foreach ($fieldValue as $v)
+				{
+					$vTrim = trim($v);
+					if (preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", $vTrim) || (substr($vTrim, 0, 1) == "="))
+						$fieldValueTmp1[] = $vTrim;
+					else
+						$fieldValueTmp2[] = $v;
+				}
+			}
+			else
+			{
+				$fieldValueTmp1 = array();
+				$fieldValueTmp2 = $fieldValue;
+			}
+
+			if (($arFieldType["Type"] == "S:employee") && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+				$fieldValueTmp2 = CBPHelper::StripUserPrefix($fieldValueTmp2);
+
+			foreach ($fieldValueTmp2 as &$fld)
+				$fld = array("VALUE" => $fld);
+
+			echo call_user_func_array(
+				$customMethodNameMulty,
+				array(
+					array("LINK_IBLOCK_ID" => $arFieldType["Options"]),
+					$fieldValueTmp2,
+					array(
+						"FORM_NAME" => $arFieldName["Form"],
+						"VALUE" => htmlspecialcharsbx($arFieldName["Field"])
+					),
+					true
+				)
+			);
+
+			if ($bAllowSelection)
+			{
+				?>
+				<br /><input type="text" id="id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text" name="<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text" value="<?
+				if (count($fieldValueTmp1) > 0)
+				{
+					$a = array_values($fieldValueTmp1);
+					echo htmlspecialcharsbx($a[0]);
+				}
+				?>">
+				<input type="button" value="..." onclick="BPAShowSelector('id_<?= htmlspecialcharsbx($arFieldName["Field"]) ?>_text', 'user');">
+				<?
+			}
 		}
 		else
 		{
@@ -258,14 +332,6 @@ class CBPVirtualDocument
 				<?
 			}
 
-			$customMethodName = "";
-			if (strpos($arFieldType["Type"], ":") !== false)
-			{
-				$ar = CIBlockProperty::GetUserType(substr($arFieldType["Type"], 2));
-				if (array_key_exists("GetPublicEditHTML", $ar))
-					$customMethodName = $ar["GetPublicEditHTML"];
-			}
-
 			if ($arFieldType["Multiple"])
 				echo '<table width="100%" border="0" cellpadding="2" cellspacing="2" id="CBPVirtualDocument_'.$arFieldName["Field"].'_Table">';
 
@@ -288,6 +354,9 @@ class CBPVirtualDocument
 						$value1 = null;
 					else
 						unset($fieldValueTmp[$key]);
+
+					if (($arFieldType["Type"] == "S:employee") && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+						$value1 = CBPHelper::StripUserPrefix($value1);
 
 					echo call_user_func_array(
 						$customMethodName,
@@ -596,6 +665,13 @@ class CBPVirtualDocument
 							if (strlen($value) == 0)
 								$value = null;
 						}
+
+						if (($value !== null)
+							&& ($arFieldType["Type"] == "S:employee")
+							&& COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+						{
+							$value = "user_".$value;
+						}
 					}
 					else
 					{
@@ -689,6 +765,9 @@ class CBPVirtualDocument
 
 		if (strpos($arFieldType['Type'], ":") !== false)
 		{
+			if ($arFieldType["Type"] == "S:employee")
+				$fieldValue = CBPHelper::StripUserPrefix($fieldValue);
+
 			$arCustomType = CIBlockProperty::GetUserType(substr($arFieldType['Type'], 2));
 			if (array_key_exists("GetPublicViewHTML", $arCustomType))
 			{
@@ -1161,7 +1240,8 @@ class CBPVirtualDocument
 			{
 				if (strlen($propertyValue["USER_TYPE"]) > 0)
 				{
-					if ($propertyValue["USER_TYPE"] == "UserID")
+					if ($propertyValue["USER_TYPE"] == "UserID"
+						|| $propertyValue["USER_TYPE"] == "employee" && (COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y"))
 					{
 						if (!is_array($propertyValue["VALUE"]))
 						{
@@ -1454,7 +1534,8 @@ class CBPVirtualDocument
 			{
 				$arResult[$key]["Type"] = "S:".$arProperty["USER_TYPE"];
 
-				if ($arProperty["USER_TYPE"] == "UserID")
+				if ($arProperty["USER_TYPE"] == "UserID"
+					|| $arProperty["USER_TYPE"] == "employee" && (COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y"))
 				{
 					$arResult[$key."_PRINTABLE"] = array(
 						"Name" => $arProperty["NAME"].GetMessage("BPVDX_FIELD_USERNAME_PROPERTY"),
@@ -1532,6 +1613,8 @@ class CBPVirtualDocument
 			$arResult[$t] = array("Name" => $ar["DESCRIPTION"], "BaseType" => "string");
 			if ($t == "S:UserID")
 				$arResult[$t]["BaseType"] = "user";
+			elseif ($t == "S:employee" && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
+				$arResult[$t]["BaseType"] = "user";
 			elseif ($t == "S:DateTime")
 				$arResult[$t]["BaseType"] = "datetime";
 			elseif ($t == "E:EList")
@@ -1565,6 +1648,9 @@ class CBPVirtualDocument
 			"IBLOCK_ID" => $iblockId,
 			"FILTRABLE" => "Y",
 		);
+
+		if (strpos("0123456789", substr($arFieldsTmp["CODE"], 0, 1))!==false)
+			unset($arFieldsTmp["CODE"]);
 
 		if (array_key_exists("additional_type_info", $arFields))
 			$arFieldsTmp["LINK_IBLOCK_ID"] = intval($arFields["additional_type_info"]);

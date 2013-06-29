@@ -128,7 +128,7 @@ class CWSSOAPResponser extends CSOAPServerResponser
     /// Contains a list over registered functions
     var $FunctionList;
     
-    public static function RegisterFunction( $name, $params=array() )
+    public function RegisterFunction( $name, $params=array() )
     {
         $this->FunctionList[] = $name;
         $this->TypensVars[$name] = $params;
@@ -140,13 +140,13 @@ class CWSSOAPResponser extends CSOAPServerResponser
 	/*
 	 * $complex = array( "typename" => array( paraname => array(type desc, valType)))
 	 */
-	public static function RegisterComplexType($complex)
+	public function RegisterComplexType($complex)
 	{
 		foreach ($complex as $complexTypeName => $declaration)
 			$this->TypensVars[$complexTypeName] = $declaration;
 	}
 	
-	public static function ProcessRequestBody(&$cserver, $body) 
+	public function ProcessRequestBody(&$cserver, $body) 
 	{
 		$functionName = $body->name();
 		$namespaceURI = $body->namespaceURI();
@@ -258,7 +258,7 @@ class CWSSOAPResponser extends CSOAPServerResponser
 		return true;
 	}
 	
-	public static function ShowResponse( &$cserver, $functionName, $namespaceURI, &$value )
+	public function ShowResponse( &$cserver, $functionName, $namespaceURI, &$value )
     {
     	global $APPLICATION;
         // Convert input data to XML
@@ -339,23 +339,23 @@ class CSOAPServer
     /// Consists of instances of CSOAPServerResponser
     var $OnRequestEvent = array();
     
-    public static function CSOAPServer()
+    public function CSOAPServer()
     {
         global $HTTP_RAW_POST_DATA;
         $this->RawPostData = $HTTP_RAW_POST_DATA;
     }
     
-    public static function GetRequestData()
+    public function GetRequestData()
     {
     	return $this->RawPostData;
     }
     
-    public static function GetResponseData()
+    public function GetResponseData()
     {
     	return $this->RawPayloadData;
     }
     
-    public static function AddServerResponser(&$respobject)
+    public function AddServerResponser(&$respobject)
     {
     	if (is_subclass_of($respobject, "CSOAPServerResponser"))
     	{
@@ -367,7 +367,7 @@ class CSOAPServer
     }
 
 	// $valueEncoded type of CXMLCreator
-	public static function ShowRawResponse( $valueEncoded, $wrapEnvelope = false )
+	public function ShowRawResponse( $valueEncoded, $wrapEnvelope = false )
     {
     	global $APPLICATION;
 
@@ -399,7 +399,7 @@ class CSOAPServer
         echo $payload;
     }
 
-    public static function ShowResponse( $functionName, $namespaceURI, $valueName, &$value )
+    public function ShowResponse( $functionName, $namespaceURI, $valueName, &$value )
     {
     	global $APPLICATION;
         // Convert input data to XML
@@ -443,7 +443,7 @@ class CSOAPServer
       Processes the SOAP request and prints out the
       propper response.
     */
-    public static function ProcessRequest()
+    public function ProcessRequest()
     {
         global $HTTP_SERVER_VARS, $APPLICATION;
 

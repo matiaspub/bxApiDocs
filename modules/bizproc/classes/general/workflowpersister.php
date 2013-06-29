@@ -20,7 +20,7 @@ class CBPAllWorkflowPersister
 		return time() + $this->ownershipDelta;
 	}
 
-	static public function LoadWorkflow($instanceId)
+	public function LoadWorkflow($instanceId)
 	{
 		$state = $this->RetrieveWorkflow($instanceId);
 		if (strlen($state) > 0)
@@ -49,7 +49,7 @@ class CBPAllWorkflowPersister
 		$p->InsertWorkflow($id, $buffer, 1, true);
 	}
 
-	static public function SaveWorkflow(CBPActivity $rootActivity, $bUnlocked)
+	public function SaveWorkflow(CBPActivity $rootActivity, $bUnlocked)
 	{
 		if ($rootActivity == null)
 			throw new Exception("rootActivity");
@@ -72,7 +72,7 @@ class CBPAllWorkflowPersister
 		return $buffer;
 	}
 
-	static public function UnlockWorkflow(CBPActivity $rootActivity)
+	public function UnlockWorkflow(CBPActivity $rootActivity)
 	{
 		global $DB;
 

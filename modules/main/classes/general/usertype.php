@@ -392,7 +392,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param bool $bCheckUserType
 	 * @return boolean false - если хоть одна проверка не прошла.
 	 */
-	public static function CheckFields($ID, $arFields, $bCheckUserType = true)
+	public function CheckFields($ID, $arFields, $bCheckUserType = true)
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $APPLICATION, $USER_FIELD_MANAGER;
@@ -481,7 +481,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param bool $bCheckUserType
 	 * @return integer - иднтификатор добавленного свойства, false - если свойство не было добавлено.
 	 */
-	public static function Add($arFields, $bCheckUserType = true)
+	public function Add($arFields, $bCheckUserType = true)
 	{
 		global $DB, $APPLICATION, $USER_FIELD_MANAGER, $CACHE_MANAGER;
 		if(!$this->CheckFields(0, $arFields, $bCheckUserType))
@@ -637,7 +637,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param array $arFields новые метаданные свойства
 	 * @return boolean - true в случае успешного обновления, false - в противном случае.
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER, $APPLICATION;
 		$ID = intval($ID);
@@ -743,7 +743,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param array $ID идентификатор свойства
 	 * @return CDBResult - результат выполнения последнего запроса функции.
 	 */
-	public static function Delete($ID)
+	public function Delete($ID)
 	{
 		global $DB, $CACHE_MANAGER, $USER_FIELD_MANAGER, $APPLICATION;
 		$ID = intval($ID);
@@ -836,7 +836,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param array $entity_id идентификатор сущности
 	 * @return CDBResult - результат выполнения последнего запроса функции.
 	 */
-	public static function DropEntity($entity_id)
+	public function DropEntity($entity_id)
 	{
 		global $DB, $CACHE_MANAGER, $USER_FIELD_MANAGER;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
@@ -919,7 +919,7 @@ class CAllUserTypeManager
 	var $arFieldsCache = array();
 	var $arRightsCache = array();
 
-	public static function CleanCache()
+	public function CleanCache()
 	{
 		$this->arFieldsCache = array();
 	}
@@ -934,7 +934,7 @@ class CAllUserTypeManager
 	 * @param string|bool $user_type_id необязательный. идентификатор типа свойства.
 	 * @return array|boolean
 	 */
-	public static function GetUserType($user_type_id = false)
+	public function GetUserType($user_type_id = false)
 	{
 		if(!is_array($this->arUserTypes))
 		{
@@ -956,7 +956,7 @@ class CAllUserTypeManager
 			return $this->arUserTypes;
 	}
 
-	public static function GetDBColumnType($arUserField)
+	public function GetDBColumnType($arUserField)
 	{
 		if($arType = $this->GetUserType($arUserField["USER_TYPE_ID"]))
 		{
@@ -966,7 +966,7 @@ class CAllUserTypeManager
 		return "";
 	}
 
-	public static function PrepareSettings($ID, $arUserField, $bCheckUserType = true)
+	public function PrepareSettings($ID, $arUserField, $bCheckUserType = true)
 	{
 		$user_type_id = $arUserField["USER_TYPE_ID"];
 		if($ID > 0)
@@ -1015,7 +1015,7 @@ class CAllUserTypeManager
 	 * <p>Важно! В $arUserField добалено поле ENTITY_VALUE_ID - это идентификатор экземпляра сущности
 	 * позволяющий отделить новые записи от старых и соответсвенно использовать значения по умолчанию.</p>
 	*/
-	public static function GetUserFields($entity_id, $value_id=0, $LANG=false)
+	public function GetUserFields($entity_id, $value_id=0, $LANG=false)
 	{
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
 		$value_id = intval($value_id);
@@ -1080,7 +1080,7 @@ class CAllUserTypeManager
 		return $result;
 	}
 
-	public static function GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
+	public function GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
 	{
 		global $DB;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
@@ -1135,7 +1135,7 @@ class CAllUserTypeManager
 		);
 	}
 
-	public static function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
+	public function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
 	{
 		global $APPLICATION;
 
@@ -1155,7 +1155,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function EditFormAddFields($entity_id, &$arFields)
+	public function EditFormAddFields($entity_id, &$arFields)
 	{
 		global $HTTP_POST_FILES;
 		$arUserFields = $this->GetUserFields($entity_id);
@@ -1258,7 +1258,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function AdminListAddFilterFields($entity_id, &$arFilterFields)
+	public function AdminListAddFilterFields($entity_id, &$arFilterFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1287,7 +1287,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function AdminListAddFilter($entity_id, &$arFilter)
+	public function AdminListAddFilter($entity_id, &$arFilter)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1309,7 +1309,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function AdminListPrepareFields($entity_id, &$arFields)
+	public function AdminListPrepareFields($entity_id, &$arFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1317,7 +1317,7 @@ class CAllUserTypeManager
 				unset($arFields[$FIELD_NAME]);
 	}
 
-	public static function AdminListAddHeaders($entity_id, &$arHeaders)
+	public function AdminListAddHeaders($entity_id, &$arHeaders)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1333,7 +1333,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function AddUserFields($entity_id, $arRes, &$row)
+	public function AddUserFields($entity_id, $arRes, &$row)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1341,7 +1341,7 @@ class CAllUserTypeManager
 				$this->AddUserField($arUserField, $arRes[$FIELD_NAME], $row);
 	}
 
-	public static function AddFindFields($entity_id, &$arFindFields)
+	public function AddFindFields($entity_id, &$arFindFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1354,7 +1354,7 @@ class CAllUserTypeManager
 			}
 	}
 
-	public static function AdminListShowFilter($entity_id)
+	public function AdminListShowFilter($entity_id)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1420,7 +1420,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public static function GetEditFormHTML($bVarsFromForm, $form_value, $arUserField)
+	public function GetEditFormHTML($bVarsFromForm, $form_value, $arUserField)
 	{
 		global $APPLICATION;
 
@@ -2138,7 +2138,7 @@ class CUserTypeSQL
 	/** @var CSQLWhere */
 	var $obWhere = false;
 
-	public static function SetEntity($entity_id, $ID)
+	public function SetEntity($entity_id, $ID)
 	{
 		global $USER_FIELD_MANAGER;
 
@@ -2209,12 +2209,12 @@ class CUserTypeSQL
 		$this->obWhere->SetFields($arFields);
 	}
 
-	public static function SetSelect($arSelect)
+	public function SetSelect($arSelect)
 	{
 		$this->obWhere->bDistinctReqired = false;
+		$this->select = array();
 		if(is_array($arSelect))
 		{
-			$this->select = array();
 			if(in_array("UF_*", $arSelect))
 			{
 				foreach($this->user_fields as $FIELD_NAME=>$arField)
@@ -2235,12 +2235,12 @@ class CUserTypeSQL
 		}
 	}
 
-	public static function GetDistinct()
+	public function GetDistinct()
 	{
 		return $this->obWhere->bDistinctReqired;
 	}
 
-	public static function GetSelect()
+	public function GetSelect()
 	{
 		global $USER_FIELD_MANAGER;
 		$result = "";
@@ -2254,7 +2254,7 @@ class CUserTypeSQL
 		return $result;
 	}
 
-	public static function GetJoin($ID)
+	public function GetJoin($ID)
 	{
 		$result = $this->obWhere->GetJoins();
 		if((count($this->select)>0 || count($this->order)>0) && strpos($result, "b_uts_")===false)
@@ -2262,7 +2262,7 @@ class CUserTypeSQL
 		return $result;
 	}
 
-	public static function SetOrder($arOrder)
+	public function SetOrder($arOrder)
 	{
 		if(is_array($arOrder))
 		{
@@ -2275,7 +2275,7 @@ class CUserTypeSQL
 		}
 	}
 
-	public static function GetOrder($field)
+	public function GetOrder($field)
 	{
 		$field = strtoupper($field);
 		if(isset($this->order[$field]))
@@ -2285,13 +2285,13 @@ class CUserTypeSQL
 		return $result;
 	}
 
-	public static function SetFilter($arFilter)
+	public function SetFilter($arFilter)
 	{
 		if(is_array($arFilter))
 			$this->filter = $arFilter;
 	}
 
-	public static function GetFilter()
+	public function GetFilter()
 	{
 		return $this->obWhere->GetQuery($this->filter);
 	}
@@ -2311,47 +2311,47 @@ class CAllSQLWhere
 	var $bDistinctReqired = false;
 
 	//must be extended
-	function _StringIN($field, $sql_values)
+	public static function _StringIN($field, $sql_values)
 	{
 		return "";
 	}
 	//must be extended
-	function _ExprEQ($field, CSQLWhereExpression $val)
+	public static function _ExprEQ($field, CSQLWhereExpression $val)
 	{
 		return "";
 	}
 	//must be extended
-	function _Empty($field)
+	public static function _Empty($field)
 	{
 		return "";
 	}
 	//must be extended
-	function _StringEQ($field, $sql_value)
+	public static function _StringEQ($field, $sql_value)
 	{
 		return "";
 	}
 	//must be extended
-	function _Upper($field)
+	public static function _Upper($field)
 	{
 		return "";
 	}
 	//must be extended
-	function _StringNotIN($field, $sql_values)
+	public static function _StringNotIN($field, $sql_values)
 	{
 		return "";
 	}
 	//must be extended
-	function _ExprNotEQ($field, CSQLWhereExpression $val)
+	public static function _ExprNotEQ($field, CSQLWhereExpression $val)
 	{
 		return "";
 	}
 	//must be extended
-	function _NotEmpty($field)
+	public static function _NotEmpty($field)
 	{
 		return "";
 	}
 	//must be extended
-	function _StringNotEQ($field, $sql_value)
+	public static function _StringNotEQ($field, $sql_value)
 	{
 		return "";
 	}
@@ -2381,7 +2381,7 @@ class CAllSQLWhere
 		"!"=>"N", // not field LIKE val
 	);
 
-	public static function AddFields($arFields)
+	public function AddFields($arFields)
 	{
 		if(is_array($arFields))
 		{
@@ -2406,7 +2406,7 @@ class CAllSQLWhere
 		}
 	}
 
-	public static function SetFields($arFields)
+	public function SetFields($arFields)
 	{
 		$this->fields = array();
 		$this->AddFields($arFields);
@@ -2431,7 +2431,7 @@ class CAllSQLWhere
 		return $all_operations[$code];
 	}
 
-	public static function GetQuery($arFilter)
+	public function GetQuery($arFilter)
 	{
 		$this->l_joins = array();
 		$this->c_joins = array();
@@ -2443,7 +2443,7 @@ class CAllSQLWhere
 		return $this->GetQueryEx($arFilter, $this->l_joins);
 	}
 
-	public static function GetQueryEx($arFilter, &$arJoins, $level=0)
+	public function GetQueryEx($arFilter, &$arJoins, $level=0)
 	{
 		global $DB;
 
@@ -2998,7 +2998,7 @@ class CAllSQLWhere
 			return "";
 	}
 
-	public static function GetJoins()
+	public function GetJoins()
 	{
 		$result = array();
 
@@ -3037,7 +3037,7 @@ class CSQLWhereExpression
 	protected
 		$DB;
 
-	static public function __construct($expression, $args = null)
+	public function __construct($expression, $args = null)
 	{
 		$this->expression = $expression;
 
@@ -3050,7 +3050,7 @@ class CSQLWhereExpression
 		$this->DB = $DB;
 	}
 
-	static public function compile()
+	public function compile()
 	{
 		$this->i = -1;
 
@@ -3152,11 +3152,10 @@ class CUserFieldEnum
 	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/setenumvalues.php
 	 * @author Bitrix
 	 */
-	public static function SetEnumValues($FIELD_ID, $values)
+	public function SetEnumValues($FIELD_ID, $values)
 	{
 		global $DB, $CACHE_MANAGER, $APPLICATION;
 		$aMsg = array();

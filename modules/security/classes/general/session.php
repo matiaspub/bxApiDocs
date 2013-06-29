@@ -1,13 +1,12 @@
 <?
-global $SECURITY_SESSION_OLD_ID;
-$SECURITY_SESSION_OLD_ID = false;
-
 class CSecuritySession
 {
+	protected static $oldSessionId = null;
+
 	public static function Init()
 	{
 		if(
-			defined("BX_SECURITY_SESSION_MEMCACHE_HOST")
+			CSecuritySessionMC::isStorageEnabled()
 			&& CSecuritySessionMC::Init()
 		)
 		{
@@ -46,7 +45,7 @@ class CSecuritySession
 		global $DB;
 		$maxlifetime = intval(ini_get("session.gc_maxlifetime"));
 
-		if($maxlifetime && !defined("BX_SECURITY_SESSION_MEMCACHE_HOST"))
+		if($maxlifetime && !CSecuritySessionMC::isStorageEnabled())
 		{
 			$strSql = "
 				delete from b_sec_session
@@ -63,19 +62,23 @@ class CSecuritySession
 
 	public static function UpdateSessID()
 	{
-		global $SECURITY_SESSION_OLD_ID;
-
-		$old_sess_id = session_id();
+		$oldSessionId = session_id();
 		session_regenerate_id();
-		if(!version_compare(phpversion(),"4.3.3",">="))
-		{
-			setcookie(session_name(), session_id(), ini_get("session.cookie_lifetime"), "/");
-		}
-		$new_sess_id = session_id();
+		$newSessionId = session_id();
 
 		//Delay database update to session write moment
-		if(!$SECURITY_SESSION_OLD_ID)
-			$SECURITY_SESSION_OLD_ID = $old_sess_id;
+		if(!self::$oldSessionId)
+			self::$oldSessionId = $oldSessionId;
+	}
+
+	public static function isOldSessionIdExist()
+	{
+		return self::$oldSessionId && self::CheckSessionId(self::$oldSessionId);
+	}
+
+	public static function getOldSessionId()
+	{
+		return self::$oldSessionId;
 	}
 
 	public static function CheckSessionId($id)
@@ -83,4 +86,3 @@ class CSecuritySession
 		return preg_match("/^[\da-z]{1,32}$/i", $id);
 	}
 }
-?>

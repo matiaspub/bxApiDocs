@@ -14,7 +14,7 @@ class CWikiParser
 	private $postUrl = "";
 	private $textType = "";
 
-	function __construct()
+	public static function __construct()
 	{
 
 	}
@@ -65,11 +65,10 @@ class CWikiParser
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/Parse.php
 	 * @author Bitrix
 	 */
-	public static function Parse($text, $type = 'text', $arFile = array(), $arParams = array())
+	public function Parse($text, $type = 'text', $arFile = array(), $arParams = array())
 	{
 		$type = $this->textType = ($type == 'html' ? 'html' : 'text');
 		$this->arNowiki = array();
@@ -245,7 +244,7 @@ class CWikiParser
 		return $text;
 	}
 
-	function _processFileCallback($matches)
+	public function _processFileCallback($matches)
 	{
 		static $sImageAlign = '';
 		$bLink = false;
@@ -331,7 +330,7 @@ class CWikiParser
 		return $sReturn;
 	}
 
-	function _processExternalLinkCallback($matches)
+	public static function _processExternalLinkCallback($matches)
 	{
 		$sLink = trim($matches[1]);
 		$sName = $sTitle = $sLink;
@@ -345,7 +344,7 @@ class CWikiParser
 		return $sReturn;
 	}
 
-	public static function processInternalLink($text)
+	public function processInternalLink($text)
 	{
 		global $APPLICATION, $arParams;
 		$text = preg_replace_callback('/\[\[(.+)(\|(.*))?\]\]/iU'.BX_UTF_PCRE_MODIFIER, array(&$this, '_processInternalLinkPrepareCallback'), $text);
@@ -373,7 +372,7 @@ class CWikiParser
 		return $text;
 	}
 
-	function _processInternalLinkPrepareCallback($matches)
+	public function _processInternalLinkPrepareCallback($matches)
 	{
 		$sLink = trim($matches[1]);
 		$sName = $sTitle = $sLink;
@@ -395,7 +394,7 @@ class CWikiParser
 		return $sReturn;
 	}
 
-	function _processInternalLinkCallback($matches)
+	public function _processInternalLinkCallback($matches)
 	{
 		global $arParams;
 
@@ -429,7 +428,7 @@ class CWikiParser
 		return $sReturn;
 	}
 
-	public static function processToc($text)
+	public function processToc($text)
 	{
 		$matches = array();
 		if (preg_match_all('/<H(\d{1})>(.*)<\/H\\1>/isU'.BX_UTF_PCRE_MODIFIER, $text, $matches, PREG_SET_ORDER))
@@ -539,7 +538,7 @@ class CWikiParser
 		return $text;
 	}
 
-	function _codeCallback($matches)
+	public function _codeCallback($matches)
 	{
 		$codeText = "";
 		$i = count($this->arCode);
@@ -553,7 +552,7 @@ class CWikiParser
 		return '##CODE'.$i.'##';
 	}
 
-	function _noWikiCallback($matches)
+	public function _noWikiCallback($matches)
 	{
 		$i = count($this->arNowiki);
 		$this->arNowiki[] = $matches[2];
@@ -561,17 +560,17 @@ class CWikiParser
 		return '##NOWIKI'.$i.'##';
 	}
 
-	function _codeReturnCallback($matches)
+	public function _codeReturnCallback($matches)
 	{
 		return '<pre><code>'.$this->arCode[$matches[2]].'</code></pre>';
 	}
 
-	function _noWikiReturnCallback($matches)
+	public function _noWikiReturnCallback($matches)
 	{
 		return $this->arNowiki[$matches[2]];
 	}
 
-	function _noWikiReturn2Callback($matches)
+	public function _noWikiReturn2Callback($matches)
 	{
 		return '<nowiki>'.htmlspecialcharsbx($this->arNowiki[$matches[2]]).'</nowiki>';
 

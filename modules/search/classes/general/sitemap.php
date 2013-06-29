@@ -50,11 +50,10 @@ class CAllSiteMap extends CDBResult
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csitemap/create.php
 	 * @author Bitrix
 	 */
-	public static function Create($site_id, $max_execution_time, $NS, $arOptions = array())
+	public function Create($site_id, $max_execution_time, $NS, $arOptions = array())
 	{
 		@set_time_limit(0);
 		if(!is_array($NS))

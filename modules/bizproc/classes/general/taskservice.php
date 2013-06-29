@@ -36,8 +36,7 @@ class CBPAllTaskService
 
 		CUserCounter::Decrement($userId, 'bp_tasks', '**');
 
-		$events = GetModuleEvents("bizproc", "OnTaskMarkCompleted");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("bizproc", "OnTaskMarkCompleted", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id, $userId));
 	}
 
@@ -49,13 +48,14 @@ class CBPAllTaskService
 		if ($id <= 0)
 			throw new Exception("id");
 
+		$dbRes = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
+		while ($arRes = $dbRes->Fetch())
+			CUserCounter::Decrement($arRes["USER_ID"], 'bp_tasks', '**');
+
 		$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ", true);
 		$DB->Query("DELETE FROM b_bp_task WHERE ID = ".intval($id)." ", true);
 
-		CUserCounter::ClearByTag($id, 'bp_tasks', '**');
-
-		$events = GetModuleEvents("bizproc", "OnTaskDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("bizproc", "OnTaskDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id));
 	}
 
@@ -74,17 +74,15 @@ class CBPAllTaskService
 		);
 		while ($arRes = $dbRes->Fetch())
 		{
-			$DB->Query(
-				"DELETE FROM b_bp_task_user ".
-				"WHERE TASK_ID = ".intval($arRes["ID"])." ",
-				true
-			);
+			$taskId = intval($arRes["ID"]);
+			$dbResUser = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".$taskId." ");
+			while ($arResUser = $dbResUser->Fetch())
+				CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
 
-			CUserCounter::ClearByTag($arRes["ID"], 'bp_tasks', '**');
+			$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".$taskId." ", true);
 
-			$events = GetModuleEvents("bizproc", "OnTaskDelete");
-			while ($arEvent = $events->Fetch())
-				ExecuteModuleEventEx($arEvent, array(intval($arRes["ID"])));
+			foreach (GetModuleEvents("bizproc", "OnTaskDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($taskId));
 		}
 
 		$DB->Query(
@@ -225,7 +223,7 @@ class CBPTaskResult extends CDBResult
 		return $res;
 	}
 
-	public static function GetNext()
+	public function GetNext()
 	{
 		$res = parent::GetNext();
 
@@ -238,7 +236,7 @@ class CBPTaskResult extends CDBResult
 		return $res;
 	}
 
-	public static function ConvertBBCode($text)
+	public function ConvertBBCode($text)
 	{
 		$text = preg_replace(
 			"'(?<=^|[\s.,;:!?\#\-\*\|\[\(\)\{\}]|\s)((http|https|news|ftp|aim|mailto)://[\.\-\_\:a-z0-9\@]([^\"\s\'\[\]\{\}])*)'is",

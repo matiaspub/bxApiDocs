@@ -72,47 +72,47 @@ class CUserTypeManager extends CAllUserTypeManager
 
 class CSQLWhere extends CAllSQLWhere
 {
-	function _Upper($field)
+	public static function _Upper($field)
 	{
 		return "UPPER(".$field.")";
 	}
 
-	function _Empty($field)
+	public static function _Empty($field)
 	{
 		return "(".$field." IS NULL OR ".$field." = '')";
 	}
 
-	function _NotEmpty($field)
+	public static function _NotEmpty($field)
 	{
 		return "(".$field." IS NOT NULL AND LENGTH(".$field.") > 0)";
 	}
 
-	function _StringEQ($field, $sql_value)
+	public static function _StringEQ($field, $sql_value)
 	{
 		return $field." = '".$sql_value."'";
 	}
 
-	function _StringNotEQ($field, $sql_value)
+	public static function _StringNotEQ($field, $sql_value)
 	{
 		return "(".$field." IS NULL OR ".$field." <> '".$sql_value."')";
 	}
 
-	function _StringIN($field, $sql_values)
+	public static function _StringIN($field, $sql_values)
 	{
 		return $field." in ('".implode("', '", $sql_values)."')";
 	}
 
-	function _StringNotIN($field, $sql_values)
+	public static function _StringNotIN($field, $sql_values)
 	{
 		return "(".$field." IS NULL OR ".$field." not in ('".implode("', '", $sql_values)."'))";
 	}
 
-	function _ExprEQ($field, CSQLWhereExpression $val)
+	public static function _ExprEQ($field, CSQLWhereExpression $val)
 	{
 		return $field." = ".$val->compile();
 	}
 
-	function _ExprNotEQ($field, CSQLWhereExpression $val)
+	public static function _ExprNotEQ($field, CSQLWhereExpression $val)
 	{
 		return "(".$field." IS NULL OR ".$field." <> ".$val->compile().")";
 	}

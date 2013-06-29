@@ -56,12 +56,12 @@ if (!class_exists("CCaptcha"))
 		var $codeCrypt;
 		var $sid;
 
-		function __construct()
+		public function __construct()
 		{
 			return $this->CCaptcha();
 		}
 
-		public static function CCaptcha()
+		public function CCaptcha()
 		{
 			$this->transparentTextPercent = COption::GetOptionInt("main", "CAPTCHA_transparentTextPercent", 10);
 			$this->bTransparentText = $this->transparentTextPercent > 0;
@@ -119,7 +119,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 		/* SET */
-		public static function SetImageSize($width, $height)
+		public function SetImageSize($width, $height)
 		{
 			$width = IntVal($width);
 			$height = IntVal($height);
@@ -131,7 +131,7 @@ if (!class_exists("CCaptcha"))
 				$this->imageHeight = $height;
 		}
 
-		public static function SetCodeLength($length)
+		public function SetCodeLength($length)
 		{
 			$length = IntVal($length);
 
@@ -139,7 +139,7 @@ if (!class_exists("CCaptcha"))
 				$this->codeLength = $length;
 		}
 
-		public static function SetTTFFontsPath($ttfFilesPath)
+		public function SetTTFFontsPath($ttfFilesPath)
 		{
 			if (strlen($ttfFilesPath) > 0)
 			{
@@ -150,12 +150,12 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function GetTTFFontsPath()
+		public function GetTTFFontsPath()
 		{
 			return $this->ttfFilesPath;
 		}
 
-		public static function SetTTFFonts($arFonts)
+		public function SetTTFFonts($arFonts)
 		{
 			if (!is_array($arFonts) || count($arFonts) <= 0)
 				$arFonts = array();
@@ -163,7 +163,7 @@ if (!class_exists("CCaptcha"))
 			$this->arTTFFiles = $arFonts;
 		}
 
-		public static function SetTextWriting($angleFrom, $angleTo, $startX, $distanceFrom, $distanceTo, $fontSize)
+		public function SetTextWriting($angleFrom, $angleTo, $startX, $distanceFrom, $distanceTo, $fontSize)
 		{
 			$angleFrom = IntVal($angleFrom);
 			$angleTo = IntVal($angleTo);
@@ -188,7 +188,7 @@ if (!class_exists("CCaptcha"))
 				$this->textFontSize = $fontSize;
 		}
 
-		public static function SetTextTransparent($bTransparentText, $transparentTextPercent = 10)
+		public function SetTextTransparent($bTransparentText, $transparentTextPercent = 10)
 		{
 			$this->bTransparentText = ($bTransparentText ? True : False);
 			$this->transparentTextPercent = IntVal($transparentTextPercent);
@@ -244,7 +244,7 @@ if (!class_exists("CCaptcha"))
 			return False;
 		}
 
-		public static function SetBGColor($arColor)
+		public function SetBGColor($arColor)
 		{
 			if ($arNewColor = $this->SetColor($arColor))
 			{
@@ -253,7 +253,7 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetBGColorRGB($color_1, $color_2)
+		public function SetBGColorRGB($color_1, $color_2)
 		{
 			if(preg_match("/^[0-9A-Fa-f]{6}$/", $color_1) && preg_match("/^[0-9A-Fa-f]{6}$/", $color_1))
 			{
@@ -266,13 +266,13 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetTextColor($arColor)
+		public function SetTextColor($arColor)
 		{
 			if ($arNewColor = $this->SetColor($arColor))
 				$this->arTextColor = $arNewColor;
 		}
 
-		public static function SetTextColorRGB($color_1, $color_2)
+		public function SetTextColorRGB($color_1, $color_2)
 		{
 			if(preg_match("/^[0-9A-Fa-f]{6}$/", $color_1) && preg_match("/^[0-9A-Fa-f]{6}$/", $color_1))
 			{
@@ -285,13 +285,13 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetEllipseColor($arColor)
+		public function SetEllipseColor($arColor)
 		{
 			if ($arNewColor = $this->SetColor($arColor))
 				$this->arEllipseColor = $arNewColor;
 		}
 
-		public static function SetEllipseColorRGB($color_1, $color_2)
+		public function SetEllipseColorRGB($color_1, $color_2)
 		{
 			if(preg_match("/^[0-9A-Fa-f]{6}$/", $color_1) && preg_match("/^[0-9A-Fa-f]{6}$/", $color_1))
 			{
@@ -304,13 +304,13 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetLineColor($arColor)
+		public function SetLineColor($arColor)
 		{
 			if ($arNewColor = $this->SetColor($arColor))
 				$this->arLineColor = $arNewColor;
 		}
 
-		public static function SetLineColorRGB($color_1, $color_2)
+		public function SetLineColorRGB($color_1, $color_2)
 		{
 			if(preg_match("/^[0-9A-Fa-f]{6}$/", $color_1) && preg_match("/^[0-9A-Fa-f]{6}$/", $color_1))
 			{
@@ -323,13 +323,13 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetBorderColor($arColor)
+		public function SetBorderColor($arColor)
 		{
 			if ($arNewColor = $this->SetColor($arColor))
 				$this->arBorderColor = $arNewColor;
 		}
 
-		public static function SetBorderColorRGB($color)
+		public function SetBorderColorRGB($color)
 		{
 			if(preg_match("/^[0-9A-Fa-f]{6}$/", $color))
 			{
@@ -342,33 +342,33 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function SetEllipsesNumber($num)
+		public function SetEllipsesNumber($num)
 		{
 			$this->numEllipses = IntVal($num);
 		}
 
-		public static function SetLinesNumber($num)
+		public function SetLinesNumber($num)
 		{
 			$this->numLines = IntVal($num);
 		}
 
-		public static function SetLinesOverText($bLinesOverText)
+		public function SetLinesOverText($bLinesOverText)
 		{
 			$this->bLinesOverText = ($bLinesOverText ? True : False);
 		}
 
-		public static function SetCodeChars($arChars)
+		public function SetCodeChars($arChars)
 		{
 			if (is_array($arChars) && count($arChars) > 0)
 				$this->arChars = $arChars;
 		}
 
-		public static function SetWaveTransformation($bWaveTransformation)
+		public function SetWaveTransformation($bWaveTransformation)
 		{
 			$this->bWaveTransformation = ($bWaveTransformation ? True : False);
 		}
 
-		public static function SetEmptyText($bEmptyText)
+		public function SetEmptyText($bEmptyText)
 		{
 			$this->bEmptyText = ($bEmptyText? True: False);
 		}
@@ -384,7 +384,7 @@ if (!class_exists("CCaptcha"))
 			return $arResult;
 		}
 
-		public static function InitImage($width = false, $height = false)
+		public function InitImage($width = false, $height = false)
 		{
 			if(!$width)
 				$width = $this->imageWidth;
@@ -400,7 +400,7 @@ if (!class_exists("CCaptcha"))
 			return $image;
 		}
 
-		public static function CreateImage()
+		public function CreateImage()
 		{
 			$this->image = $this->InitImage();
 
@@ -437,7 +437,7 @@ if (!class_exists("CCaptcha"))
 			imageline($this->image, 0, $this->imageHeight-1, $this->imageWidth-1, $this->imageHeight-1, $borderColor);
 		}
 
-		public static function CreateImageError($arMsg)
+		public function CreateImageError($arMsg)
 		{
 			$this->image = imagecreate($this->imageWidth, $this->imageHeight);
 			$bgColor = imagecolorallocate($this->image, 0, 0, 0);
@@ -465,7 +465,7 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function Wave()
+		public function Wave()
 		{
 			$img = $this->image;
 			$img2 = $this->InitImage();
@@ -556,7 +556,7 @@ if (!class_exists("CCaptcha"))
 			$this->image = $img2;
 		}
 
-		public static function EmptyText()
+		public function EmptyText()
 		{
 			$sx = imagesx($this->image)-1;
 			$sy = imagesy($this->image)-1;
@@ -602,17 +602,17 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function DestroyImage()
+		public function DestroyImage()
 		{
 			imagedestroy($this->image);
 		}
 
-		public static function ShowImage()
+		public function ShowImage()
 		{
 			imagejpeg($this->image);
 		}
 
-		public static function DrawText()
+		public function DrawText()
 		{
 			if ($this->bTransparentText)
 				$alpha = floor($this->transparentTextPercent / 100 * 127);
@@ -751,7 +751,7 @@ if (!class_exists("CCaptcha"))
 			return $x2;
 		}
 
-		public static function DrawEllipses()
+		public function DrawEllipses()
 		{
 			if ($this->numEllipses > 0)
 			{
@@ -764,7 +764,7 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public static function DrawLines()
+		public function DrawLines()
 		{
 			if ($this->numLines > 0)
 			{
@@ -778,7 +778,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 		/* OUTPUT */
-		public static function Output()
+		public function Output()
 		{
 			header("Expires: Sun, 1 Jan 2000 12:00:00 GMT");
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s")."GMT");
@@ -791,7 +791,7 @@ if (!class_exists("CCaptcha"))
 			$this->DestroyImage();
 		}
 
-		public static function OutputError()
+		public function OutputError()
 		{
 			header("Expires: Sun, 1 Jan 2000 12:00:00 GMT");
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s")."GMT");
@@ -813,7 +813,7 @@ if (!class_exists("CCaptcha"))
 
 
 		/* CODE */
-		public static function SetCode()
+		public function SetCode()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::SetCaptchaCode();
@@ -832,7 +832,7 @@ if (!class_exists("CCaptcha"))
 			$_SESSION["CAPTCHA_CODE"][$this->sid] = $this->code;
 		}
 
-		public static function SetCodeCrypt($password = "")
+		public function SetCodeCrypt($password = "")
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::SetCaptchaCode();
@@ -849,7 +849,7 @@ if (!class_exists("CCaptcha"))
 			$this->codeCrypt = $this->CryptData($this->code, "E", $_SESSION["CAPTCHA_PASSWORD"]);
 		}
 
-		public static function SetCaptchaCode($sid = false)
+		public function SetCaptchaCode($sid = false)
 		{
 			$max = count($this->arChars);
 
@@ -874,7 +874,7 @@ if (!class_exists("CCaptcha"))
 			return substr($prefix.md5(uniqid()), 0, 32);
 		}
 
-		public static function InitCaptchaCode($sid)
+		public function InitCaptchaCode($sid)
 		{
 			global $DB;
 
@@ -895,7 +895,7 @@ if (!class_exists("CCaptcha"))
 
 		}
 
-		public static function InitCode($sid)
+		public function InitCode($sid)
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::InitCaptchaCode($sid);
@@ -913,7 +913,7 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public static function InitCodeCrypt($codeCrypt, $password = "")
+		public function InitCodeCrypt($codeCrypt, $password = "")
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::InitCaptchaCode($codeCrypt);
@@ -931,12 +931,12 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public static function GetSID()
+		public function GetSID()
 		{
 			return $this->sid;
 		}
 
-		public static function GetCodeCrypt()
+		public function GetCodeCrypt()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return $this->sid;
@@ -989,7 +989,7 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public static function CheckCodeCrypt($userCode, $codeCrypt, $password = "", $bUpperCode = True)
+		public function CheckCodeCrypt($userCode, $codeCrypt, $password = "", $bUpperCode = True)
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::CheckCaptchaCode($userCode, $codeCrypt, $bUpperCode);
@@ -1068,7 +1068,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 
-		public static function Add($arFields)
+		public function Add($arFields)
 		{
 			global $DB;
 

@@ -8,12 +8,12 @@ class CSearchStatistic
 	var $_session_id = "";
 	var $_stat_sess_id = false;
 
-	function __construct($phrase = "", $tags = "")
+	public function __construct($phrase = "", $tags = "")
 	{
 		return $this->CSearchStatistic($phrase, $tags);
 	}
 
-	public static function CSearchStatistic($phrase = "", $tags = "")
+	public function CSearchStatistic($phrase = "", $tags = "")
 	{
 		$phrase = ToLower(trim($phrase, " \t\n\r"));
 		if($l = strlen($phrase))
@@ -53,7 +53,7 @@ class CSearchStatistic
 			$this->_stat_sess_id = intval($_SESSION["SESS_SESSION_ID"]);
 	}
 
-	public static function PhraseStat($result_count = 0, $page_num = 0)
+	public function PhraseStat($result_count = 0, $page_num = 0)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 

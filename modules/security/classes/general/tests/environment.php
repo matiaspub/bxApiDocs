@@ -18,13 +18,16 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 			"base_message_key" => "SECURITY_SITE_CHECKER_SESSION",
 			"critical" => CSecurityCriticalLevel::HIGHT
 		),
-//		"collectivePhpSession" => array(
-//			"method" => "checkCollectivePhpSession",
-//			"base_message_key" => "SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
-//			"critical" => CSecurityCriticalLevel::HIGHT
-//		),
+		"collectivePhpSession" => array(
+			"method" => "checkCollectivePhpSession",
+			"base_message_key" => "SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
 		"uploadScriptExecution" => array(
 			"method" => "checkUploadScriptExecution"
+		),
+		"uploadNegotiationEnabled" => array(
+			"method" => "checkUploadNegotiationEnabled"
 		),
 	);
 
@@ -35,7 +38,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 
 
 	/**
-	 * Check if any script executed in /upload dir and push those information to detail error
+	 * Check if any server-side script executed in /upload dir and push those information to detail error
 	 * @return bool
 	 */
 	protected function checkUploadScriptExecution()
@@ -86,6 +89,31 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		}
 
 		return !($isPhpExecutable || $isPhpDoubleExtensionExecutable || $isHtaccessOverrided || $isPythonCgiExecutable);
+	}
+
+	/**
+	 * Check if Apache Content Negotiation enabled in /upload dir and push those information to detail error
+	 * @return bool
+	 */
+	protected function checkUploadNegotiationEnabled()
+	{
+		$testingText = "test";
+		$testFileContent = "
+Content-language: ru
+Content-type: text/html;
+Body:----------ru--
+".$testingText."
+----------ru--
+
+";
+		$result = true;
+		if(self::isScriptExecutable("test.var.jpg", $testFileContent, $testingText))
+		{
+			$result = false;
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_NEGOTIATION", CSecurityCriticalLevel::MIDDLE);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -383,19 +411,21 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 
 	/**
 	 * Check minimal UID and GID
+	 * @param int $pMinUid
+	 * @param int $pMinGid
 	 * @return bool
 	 */
-	protected function checkUserAndGroup()
+	protected function checkUserAndGroup($pMinUid = self::MIN_UID, $pMinGid = self::MIN_GID)
 	{
 		if(self::isRunOnWin())
 			return true;
 
 		$result = true;
 		$uid = self::getCurrentUID();
-		if($uid !== false && $uid < self::MIN_UID)
+		if($uid !== false && $uid < $pMinUid)
 			$result = false;
 		$gid = self::getCurrentGID();
-		if($gid !== false && $gid < self::MIN_GID)
+		if($gid !== false && $gid < $pMinGid)
 			$result = false;
 		return $result;
 	}

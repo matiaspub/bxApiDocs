@@ -8,7 +8,7 @@ abstract class FileSystemEntry
 	protected $documentRoot = null;
 	protected $pathPhysical = null;
 
-	static public function __construct($path)
+	public function __construct($path)
 	{
 		if (empty($path))
 			throw new InvalidPathException($path);
@@ -21,7 +21,7 @@ abstract class FileSystemEntry
 			throw new InvalidPathException($path);
 	}
 
-	static public function isSystem()
+	public function isSystem()
 	{
 		$isSystem = false;
 
@@ -43,39 +43,39 @@ abstract class FileSystemEntry
 		return $isSystem;
 	}
 
-	static public function getName()
+	public function getName()
 	{
 		return Path::getName($this->path);
 	}
 
-	static public function getDirectoryName()
+	public function getDirectoryName()
 	{
 		return Path::getDirectory($this->path);
 	}
 
-	static public function getPath()
+	public function getPath()
 	{
 		return $this->path;
 	}
 
-	static public function getDirectory()
+	public function getDirectory()
 	{
 		return new Directory($this->getDirectoryName());
 	}
 
-	static abstract public function getCreationTime();
-	static abstract public function getLastAccessTime();
-	static abstract public function getModificationTime();
+	abstract public function getCreationTime();
+	abstract public function getLastAccessTime();
+	abstract public function getModificationTime();
 
 	abstract public function isExists();
 
-	static public abstract function isDirectory();
+	public abstract function isDirectory();
 	public abstract function isFile();
-	static public abstract function isLink();
+	public abstract function isLink();
 
 	public abstract function markWritable();
-	static public abstract function getPermissions();
-	static public abstract function delete();
+	public abstract function getPermissions();
+	public abstract function delete();
 
 	protected function getPhysicalPath()
 	{
@@ -85,7 +85,7 @@ abstract class FileSystemEntry
 		return $this->pathPhysical;
 	}
 
-	static public function rename($newPath)
+	public function rename($newPath)
 	{
 		$newPathNormalized = Path::normalize($newPath);
 

@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/t
 
 class CSearchTitle extends CAllSearchTitle
 {
-	public static function Search($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
+	public function Search($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$this->_arPhrase = stemming_split($phrase, LANGUAGE_ID);

@@ -42,7 +42,7 @@ class CCourseImport
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	static public function __construct($PACKAGE_DIR, $arSITE_ID)
+	public function __construct($PACKAGE_DIR, $arSITE_ID)
 	{
 		//Cut last slash
 		if (substr($PACKAGE_DIR,-1, 1) == "/")
@@ -560,11 +560,10 @@ class CCourseImport
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccourseimport/importpackage.php
 	 * @author Bitrix
 	 */
-	static public function ImportPackage()
+	public function ImportPackage()
 	{
 		if (!$this->CreateCourse())
 			return false;

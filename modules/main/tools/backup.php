@@ -7,28 +7,23 @@ if (ini_get('short_open_tag') == 0)
 error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 
 // define('START_TIME', time());
-@// define('LANGUAGE_ID', 'en');
-@// define('NOT_CHECK_PERMISSIONS', true);
+// define('LANGUAGE_ID', 'en');
+// define('NOT_CHECK_PERMISSIONS', true);
 
 if (defined('BX_CRONTAB')) // start from cron_events.php
 {
+	IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
+
 	if (!IntOption('dump_auto_enable'))
 		return;
 
-	$l = COption::GetOptionInt('main', 'last_backup_end_time', 0);
+	$l = COption::GetOptionInt('main', 'last_backup_start_time', 0);
 	if (time() - $l < IntOption('dump_auto_interval') * 86400)
 		return;
 
 	$min_left = IntOption('dump_auto_time') - date('H')*60 - date("i");
 	if ($min_left > 0 || $min_left < -60)
 		return;
-
-	$uniq = COption::GetOptionString("main", "server_uniq_id", "");
-	if(strlen($uniq)<=0)
-	{
-		$uniq = md5(uniqid(rand(), true));
-		COption::SetOptionString("main", "server_uniq_id", $uniq);
-	}
 
 	// define('LOCK_FILE', $_SERVER['DOCUMENT_ROOT'].'/bitrix/backup/auto_lock');
 
@@ -47,24 +42,42 @@ if (defined('BX_CRONTAB')) // start from cron_events.php
 		else
 		{
 			ShowBackupStatus('Warning! Last backup has failed');
+			CEventLog::Add(array(
+				"SEVERITY" => "WARNING",
+				"AUDIT_TYPE_ID" => "BACKUP_ERROR",
+				"MODULE_ID" => "main",
+				"ITEM_ID" => LOCK_FILE,
+				"DESCRIPTION" => GetMessage('AUTO_LOCK_EXISTS_ERR', array('#DATETIME#' => ConvertTimeStamp($time))),
+			));
 			unlink(LOCK_FILE) || RaiseErrorAndDie('Can\'t delete file: '.LOCK_FILE);
 		}
 	}
 
 	if (!file_put_contents(LOCK_FILE, time()))
 		RaiseErrorAndDie('Can\'t create file: '.LOCK_FILE);
+
+	COption::SetOptionInt('main', 'last_backup_start_time', time());
 }
 else
 {
 	$DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'] = realpath(dirname(__FILE__).'/../../../../');
 	require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_before.php');
-	if (!file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/backup'))
-		mkdir($_SERVER['DOCUMENT_ROOT'].'/bitrix/backup');
+	IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
 }
 if (!defined('DOCUMENT_ROOT'))
 	// define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
+
+if (!file_exists(DOCUMENT_ROOT.'/bitrix/backup'))
+	mkdir(DOCUMENT_ROOT.'/bitrix/backup');
+
+if (!file_exists(DOCUMENT_ROOT."/bitrix/backup/index.php"))
+{
+	$f = fopen(DOCUMENT_ROOT."/bitrix/backup/index.php","w");
+	fwrite($f,"<head><meta http-equiv=\"REFRESH\" content=\"0;URL=/bitrix/admin/index.php\"></head>");
+	fclose($f);
+}
+
 while(ob_end_flush());
-IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/backup.php");
 
 @set_time_limit(0);
@@ -88,8 +101,29 @@ $arParams = array(
 	'dump_old_cnt' => IntOption('dump_old_cnt'),
 	'dump_old_size' => IntOption('dump_old_size'),
 );
-$arParams['dump_encrypt_key'] = CPasswordStorage::Get('dump_temporary_cache');
 
+$arExpertBackupDefaultParams = array(
+	'dump_base' => 1,
+	'dump_base_skip_stat' => 0,
+	'dump_base_skip_search' => 0,
+	'dump_base_skip_log' => 0,
+
+	'dump_file_public' => 1,
+	'dump_file_kernel' => 1,
+	'dump_do_clouds' => 1,
+	'skip_mask' => 0,
+	'skip_mask_array' => array(),
+	'dump_max_file_size' => 0,
+	'skip_symlinks' => 0,
+);
+
+if (!is_array($arExpertBackupParams))
+	$arExpertBackupParams = array();
+	
+$arParams = array_merge($arExpertBackupDefaultParams, $arExpertBackupParams, $arParams);
+$skip_mask_array = $arParams['skip_mask_array'];
+
+$arParams['dump_encrypt_key'] = CPasswordStorage::Get('dump_temporary_cache');
 $dump_bucket_id = IntOption('dump_bucket_id');
 if ($dump_bucket_id == -1)
 {
@@ -116,21 +150,19 @@ $after_file = str_replace('.sql','_after_connect.sql',$NS['dump_name']);
 ShowBackupStatus('Backup started to file: '.$NS['arc_name']);
 
 // dump database
-if (IntOption('dump_base')) 
+if ($arParams['dump_base'])
 {
 	ShowBackupStatus('Dumping database');
-	$bres = CBackup::BaseDump($NS['dump_name'], 0, -1);
+	if (!CBackup::MakeDump($NS['dump_name'], $arState = ''))
+		RaiseErrorAndDie(GetMessage('DUMP_NO_PERMS', $NS['dump_name']));
 
-	if ($bres['end'])
-	{
-		$rs = $DB->Query('SHOW VARIABLES LIKE "character_set_results"');
-		if (($f = $rs->Fetch()) && array_key_exists ('Value', $f))
-			file_put_contents($after_file, "SET NAMES '".$f['Value']."';\n");
+	$rs = $DB->Query('SHOW VARIABLES LIKE "character_set_results"');
+	if (($f = $rs->Fetch()) && array_key_exists ('Value', $f))
+		file_put_contents($after_file, "SET NAMES '".$f['Value']."';\n");
 
-		$rs = $DB->Query('SHOW VARIABLES LIKE "collation_database"');
-		if (($f = $rs->Fetch()) && array_key_exists ('Value', $f))
-			file_put_contents($after_file, "ALTER DATABASE `<DATABASE>` COLLATE ".$f['Value'].";\n",8);
-	}
+	$rs = $DB->Query('SHOW VARIABLES LIKE "collation_database"');
+	if (($f = $rs->Fetch()) && array_key_exists ('Value', $f))
+		file_put_contents($after_file, "ALTER DATABASE `<DATABASE>` COLLATE ".$f['Value'].";\n",8);
 
 	ShowBackupStatus('Archiving database dump');
 	$tar = new CTar;
@@ -182,7 +214,7 @@ if ($arDumpClouds = CBackup::GetBucketList())
 $DB->Disconnect();
 
 // Tar files
-if (true)
+if ($arParams['dump_file_public'] || $arParams['dump_file_kernel'])
 {
 	ShowBackupStatus('Archiving files');
 	$DOCUMENT_ROOT_SITE = DOCUMENT_ROOT;
@@ -453,8 +485,9 @@ COption::SetOptionInt('main', 'last_backup_end_time', time());
 ########################### Functions ####
 function IntOption($name, $def = 0)
 {
-	if (in_array($name, array('dump_base', 'dump_file_public', 'dump_file_kernel', 'dump_do_clouds')))
-		return 1;
+	global $arParams;
+	if (isset($arParams[$name]))
+		return $arParams[$name];
 
 	static $CACHE;
 	$name .= '_auto';
@@ -466,7 +499,6 @@ function IntOption($name, $def = 0)
 
 function ShowBackupStatus($str)
 {
-	global $arParams;
 	static $time;
 	if (!$time)
 		$time = microtime(1);

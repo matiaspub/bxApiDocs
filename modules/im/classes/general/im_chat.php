@@ -6,7 +6,7 @@ class CIMChat
 	private $user_id = 0;
 	private $bHideLink = false;
 
-	function __construct($user_id = false, $arParams = Array())
+	public function __construct($user_id = false, $arParams = Array())
 	{
 		global $USER;
 		$this->user_id = intval($user_id);
@@ -16,7 +16,7 @@ class CIMChat
 			$this->bHideLink = true;
 	}
 
-	static public function GetMessage($ID)
+	public function GetMessage($ID)
 	{
 		global $DB;
 
@@ -30,7 +30,7 @@ class CIMChat
 		return false;
 	}
 
-	public static function GetLastMessage($toChatId, $fromUserId = false, $loadExtraData = false, $bTimeZone = true)
+	public function GetLastMessage($toChatId, $fromUserId = false, $loadExtraData = false, $bTimeZone = true)
 	{
 		global $DB;
 
@@ -111,7 +111,7 @@ class CIMChat
 		return $arResult;
 	}
 
-	static public function GetLastSendMessage($arParams)
+	public function GetLastSendMessage($arParams)
 	{
 		global $DB;
 
@@ -254,7 +254,7 @@ class CIMChat
 		return $result;
 	}
 
-	static public function SetReadMessage($chatId, $lastId = null)
+	public function SetReadMessage($chatId, $lastId = null)
 	{
 		global $DB;
 
@@ -304,7 +304,7 @@ class CIMChat
 		return false;
 	}
 
-	static public function GetUnreadMessage($arParams = Array())
+	public function GetUnreadMessage($arParams = Array())
 	{
 		global $DB;
 
@@ -494,7 +494,7 @@ class CIMChat
 		return $arResult;
 	}
 
-	static public function Rename($chatId, $title)
+	public function Rename($chatId, $title)
 	{
 		global $DB;
 		$chatId = intval($chatId);
@@ -551,7 +551,7 @@ class CIMChat
 		return false;
 	}
 
-	static public function Add($title = "", $userId)
+	public function Add($title = "", $userId)
 	{
 		global $DB;
 
@@ -627,7 +627,7 @@ class CIMChat
 		return CIMMessenger::Add($arFields);
 	}
 
-	static public function AddUser($chatId, $userId)
+	public function AddUser($chatId, $userId)
 	{
 		global $DB;
 		$chatId = intval($chatId);
@@ -704,7 +704,7 @@ class CIMChat
 				$strSql = "INSERT INTO b_im_relation (CHAT_ID, MESSAGE_TYPE, USER_ID, START_ID, LAST_ID, LAST_SEND_ID) VALUES (".$chatId.",'".IM_MESSAGE_GROUP."',".$userId.",".($maxId+1).",".$maxId.",".$maxId.")";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
-			$message = GetMessage("IM_CHAT_JOIN_".$arUsers[$this->user_id]['gender'], Array('#USER_1_NAME#' => $arUsers[$this->user_id]['name'], '#USER_2_NAME#' => implode(', ', $arUsersName)));
+			$message = GetMessage("IM_CHAT_JOIN_".$arUsers[$this->user_id]['gender'], Array('#USER_1_NAME#' => htmlspecialcharsback($arUsers[$this->user_id]['name']), '#USER_2_NAME#' => implode(', ', $arUsersName)));
 
 			if (CModule::IncludeModule("pull"))
 			{

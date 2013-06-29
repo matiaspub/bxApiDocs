@@ -4,7 +4,7 @@ class CRsaOpensslProvider extends CRsaProvider
 	//$_PRIV - secret key in PEM format
 	protected $_PRIV = '';
 
-	static public function SetKeys($arKeys)
+	public function SetKeys($arKeys)
 	{
 		parent::SetKeys($arKeys);
 		$this->_PRIV = $arKeys["PRIV"];
@@ -27,7 +27,7 @@ class CRsaOpensslProvider extends CRsaProvider
 		COption::SetOptionString("main", "~rsa_key_pem", $privKey);
 	}
 	
-	static public function Decrypt($data)
+	public function Decrypt($data)
 	{
 		$key = openssl_pkey_get_private($this->_PRIV);
 	

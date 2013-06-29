@@ -67,7 +67,7 @@ class CAllStopList
 		return $rs;
 	}
 
-	public static function CheckFields($ID, &$arFields)
+	public function CheckFields($ID, &$arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 
@@ -140,7 +140,7 @@ class CAllStopList
 		return true;
 	}
 
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 
@@ -153,7 +153,7 @@ class CAllStopList
 		return $ID;
 	}
 
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$ID = intval($ID);
@@ -173,7 +173,7 @@ class CAllStopList
 		return true;
 	}
 
-	public static function SetActive($ID, $active = "N")
+	public function SetActive($ID, $active = "N")
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$ID = intval($ID);

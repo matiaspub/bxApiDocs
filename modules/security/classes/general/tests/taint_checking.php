@@ -16,7 +16,7 @@ class CSecurityTaintCheckingTest extends CSecurityBaseTest
 	 * @param array $pParams
 	 * @return array
 	 */
-	static public function check($pParams)
+	public function check($pParams)
 	{
 		if(extension_loaded('tokenizer') !== true)
 		{

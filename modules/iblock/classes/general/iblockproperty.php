@@ -18,6 +18,8 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllIBlockProperty
 {
+	public $LAST_ERROR = "";
+
 	
 	/**
 	 * <p>Возвращает список свойств по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>. Функция учитывает права доступа. <br></p>
@@ -113,7 +115,6 @@ class CAllIBlockProperty
 			case "FILTRABLE":
 			case "IS_REQUIRED":
 			case "MULTIPLE":
-			case "FILTRABLE":
 				if($val=="Y" || $val=="N")
 					$arSqlSearch[] = "BP.".$key." = '".$val."'";
 				break;
@@ -228,6 +229,7 @@ class CAllIBlockProperty
 	 */
 	public static function Delete($ID)
 	{
+		/** @var CMain $APPLICATION */
 		global $DB, $APPLICATION;
 		$ID = IntVal($ID);
 
@@ -349,11 +351,10 @@ class CAllIBlockProperty
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -450,12 +451,16 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	// This one called before any Update or Add
 	///////////////////////////////////////////////////////////////////
-	public static function CheckFields(&$arFields, $ID=false, $bFormValidate=false)
+	public function CheckFields(&$arFields, $ID=false, $bFormValidate=false)
 	{
-		global $DB, $APPLICATION;
+		/** @var CMain $APPLICATION */
+		global $APPLICATION;
 		$this->LAST_ERROR = "";
-		if($ID===false && strlen($arFields["NAME"])<=0)
-			$this->LAST_ERROR .= GetMessage("IBLOCK_PROPERTY_BAD_NAME")."<br>";
+		if ($ID===false || array_key_exists("NAME", $arFields))
+		{
+			if (strlen($arFields["NAME"]) <= 0)
+				$this->LAST_ERROR .= GetMessage("IBLOCK_PROPERTY_BAD_NAME")."<br>";
+		}
 
 		if(array_key_exists("CODE", $arFields) && strlen($arFields["CODE"]))
 		{
@@ -574,11 +579,10 @@ class CAllIBlockProperty
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 		$ID = IntVal($ID);
@@ -1027,11 +1031,10 @@ class CAllIBlockProperty
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/updateenum.php
 	 * @author Bitrix
 	 */
-	public static function UpdateEnum($ID, $arVALUES, $bForceDelete = true)
+	public function UpdateEnum($ID, $arVALUES, $bForceDelete = true)
 	{
 		global $DB, $CACHE_MANAGER;
 		$ID = IntVal($ID);
@@ -1201,6 +1204,8 @@ class CAllIBlockProperty
 
 		if (defined("BX_COMP_MANAGED_CACHE"))
 			$CACHE_MANAGER->ClearByTag("iblock_property_enum_".$ID);
+
+		return true;
 	}
 
 	
@@ -1266,7 +1271,7 @@ class CAllIBlockProperty
 		return GetMessage("IBLOCK_PROPERTY_NOT_FOUND",array("#ID#"=>$ID));
 	}
 
-	function _DateTime_GetUserTypeDescription()
+	public static function _DateTime_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "S",
@@ -1287,7 +1292,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _XmlID_GetUserTypeDescription()
+	public static function _XmlID_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE"		=>"S",
@@ -1300,7 +1305,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _FileMan_GetUserTypeDescription()
+	public static function _FileMan_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE"		=>"S",
@@ -1314,7 +1319,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _HTML_GetUserTypeDescription()
+	public static function _HTML_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "S",
@@ -1332,7 +1337,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _ElementList_GetUserTypeDescription()
+	public static function _ElementList_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "E",
@@ -1349,7 +1354,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _Sequence_GetUserTypeDescription()
+	public static function _Sequence_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "N",
@@ -1365,7 +1370,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _ElementAutoComplete_GetUserTypeDescription()
+	public static function _ElementAutoComplete_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "E",
@@ -1382,7 +1387,7 @@ class CAllIBlockProperty
 		);
 	}
 
-	function _SKU_GetUserTypeDescription()
+	public static function _SKU_GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "E",
@@ -1397,6 +1402,21 @@ class CAllIBlockProperty
 			"AddFilterFields" => array('CIBlockPropertySKU','AddFilterFields'),
 			//"GetOffersFieldHtml" => array('CIBlockPropertySKU','GetOffersFieldHtml'),
 		);
+	}
+
+	public static function _Update($ID, $arFields)
+	{
+		return false;
+	}
+
+	public static function DropColumnSQL($strTable, $arColumns)
+	{
+		return array();
+	}
+
+	public static function _Add($ID, $arFields)
+	{
+		return false;
 	}
 }
 ?>

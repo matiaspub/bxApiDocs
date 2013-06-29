@@ -817,7 +817,7 @@ class __CControllerPacket
 
 	////////////////////////////////////////////////////
 	// General methods:
-	public static function Debug($sText)
+	public function Debug($sText)
 	{
 		if(!defined($this->debug_const) || constant($this->debug_const)!==true)
 			return;
@@ -848,7 +848,7 @@ class __CControllerPacket
 		ignore_user_abort(false);
 	}
 
-	function _decode(&$arParameters, $from ,$to)
+	public function _decode(&$arParameters, $from ,$to)
 	{
 		global $APPLICATION;
 
@@ -892,7 +892,7 @@ class __CControllerPacketRequest extends __CControllerPacket
 	///////////////////////////////////
 
 	// заполняет объект переменными, пришедшими в $_REQUEST
-	public static function InitFromRequest()
+	public function InitFromRequest()
 	{
 		global $APPLICATION;
 		//AddMessage2Log('InitFromRequest: '.print_r($_REQUEST, true));
@@ -930,7 +930,7 @@ class __CControllerPacketRequest extends __CControllerPacket
 	}
 
 	// проверяет целостность и безопасность пришедшего запроса
-	public static function Check()
+	public function Check()
 	{
 		global $APPLICATION;
 
@@ -957,7 +957,7 @@ class __CControllerPacketRequest extends __CControllerPacket
 	// Для работы в классах отправляющих запросы (CControllerClientRequestTo, CControllerServerRequestTo):
 	///////////////////////////////////////
 	// создает строку для отправки на принимающую сторону, с подписью пакета
-	public static function MakeRequestString()
+	public function MakeRequestString()
 	{
 		global $APPLICATION;
 		$result = "operation=".$this->operation.
@@ -978,14 +978,14 @@ class __CControllerPacketRequest extends __CControllerPacket
 	}
 
 	// подписывает пакет (напрямую не используется)
-	public static function Sign()
+	public function Sign()
 	{
 		$hash = md5($this->operation."|".serialize($this->arParameters)."|".$this->secret_id);
 		$this->hash = $hash;
 	}
 
 	// отправляет запрос в браузере через редирект на заданный урл
-	public static function RedirectRequest($url)
+	public function RedirectRequest($url)
 	{
 		if(strpos($url, "?")>0)
 			$url .= '&';
@@ -1000,7 +1000,7 @@ class __CControllerPacketRequest extends __CControllerPacket
 	}
 
 	// отправляет запрос на принимающую сторону
-	public static function Send($url, $page)
+	public function Send($url, $page)
 	{
 		$server_port = 80;
 		$server_name = strtolower(trim($url, "/ \r\n\t"));
@@ -1126,7 +1126,7 @@ class __CControllerPacketResponse extends __CControllerPacket
 {
 	var $status, $text;
 
-	function _InitFromRequest($oPacket, $arExclude = array('operation', 'arParameters'))
+	public function _InitFromRequest($oPacket, $arExclude = array('operation', 'arParameters'))
 	{
 		if(is_object($oPacket))
 		{
@@ -1142,7 +1142,7 @@ class __CControllerPacketResponse extends __CControllerPacket
 	//////////////////////////////////////////////
 
 	// Проверяет подлинность присланного результата
-	public static function Check()
+	public function Check()
 	{
 		$hash = $this->status."|".$this->text."|".$this->strParameters."|".$this->secret_id;
 		$md5hash = md5($hash);
@@ -1160,13 +1160,13 @@ class __CControllerPacketResponse extends __CControllerPacket
 	}
 
 	// Возвращает успешно ли выполнился запрос по статус его ответа
-	public static function OK()
+	public function OK()
 	{
 		return (substr($this->status, 0, 1)=="2");
 	}
 
 	// Разбирает строку ответа по полям объекта
-	public static function ParseResult($result)
+	public function ParseResult($result)
 	{
 		global $APPLICATION;
 
@@ -1225,7 +1225,7 @@ class __CControllerPacketResponse extends __CControllerPacket
 	///////////////////////////////////////
 
 	// возвращает отформатированную строку ответа в формате понятном для приема на сервере, с подписью
-	public static function GetResponseBody($log = false)
+	public function GetResponseBody($log = false)
 	{
 		$result = "status=".urlencode($this->status).
 			"&text=".urlencode($this->text).
@@ -1249,7 +1249,7 @@ class __CControllerPacketResponse extends __CControllerPacket
 	}
 
 	// подписывает пакет перед отправкой (не используется напрямую)
-	public static function Sign()
+	public function Sign()
 	{
 		$hash = $this->status."|".$this->text."|".serialize($this->arParameters)."|".$this->secret_id;
 		//AddMessage2Log("\r\n\r\n\r\n".md5($hash)."=\r\n".$hash."]");
@@ -1257,7 +1257,7 @@ class __CControllerPacketResponse extends __CControllerPacket
 	}
 
 	// отправляет ответ обратно
-	public static function Send()
+	public function Send()
 	{
 		$this->Debug("We send response back:\r\nPacket:\r\n".print_r($this, true)."\r\n".$this->GetResponseBody()."\r\n");
 		while (@ob_end_flush());
@@ -1271,7 +1271,7 @@ class CControllerClientRequestTo extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-	public static function CControllerClientRequestTo($operation, $arParameters = Array())
+	public function CControllerClientRequestTo($operation, $arParameters = Array())
 	{
 		$this->member_id = COption::GetOptionString("main", "controller_member_id", "");
 		$this->secret_id = COption::GetOptionString("main", "controller_member_secret_id", "");
@@ -1280,7 +1280,7 @@ class CControllerClientRequestTo extends __CControllerPacketRequest
 		$this->session_id = md5(uniqid(rand(), true));
 	}
 
-	public static function SendWithCheck($page="/bitrix/admin/controller_ws.php")
+	public function SendWithCheck($page="/bitrix/admin/controller_ws.php")
 	{
 		$oResponse = $this->Send($page);
 		if($oResponse===false)
@@ -1299,7 +1299,7 @@ class CControllerClientRequestTo extends __CControllerPacketRequest
 		return $oResponse;
 	}
 
-	public static function Send($page="/bitrix/admin/controller_ws.php")
+	public function Send($page="/bitrix/admin/controller_ws.php")
 	{
 		$this->Sign();
 		$oResponsePacket = parent::Send(COption::GetOptionString("main", "controller_url", ""), $page);
@@ -1318,7 +1318,7 @@ class CControllerClientResponseFrom extends __CControllerPacketResponse
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-	public static function CControllerClientResponseFrom($oPacket)
+	public function CControllerClientResponseFrom($oPacket)
 	{
 		$this->_InitFromRequest($oPacket, array());
 	}
@@ -1329,13 +1329,13 @@ class CControllerClientRequestFrom extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-	public static function CControllerClientRequestFrom()
+	public function CControllerClientRequestFrom()
 	{
 		$this->InitFromRequest();
 		$this->Debug('Request received from controller ('.($this->Check()?'checked':'check failed')."):\r\nPacket:\r\n".print_r($this, true));
 	}
 
-	public static function Check()
+	public function Check()
 	{
 		$member_id = COption::GetOptionString("main", "controller_member_id", "");
 		if(strlen($member_id)<=0 || $member_id != $this->member_id)
@@ -1359,7 +1359,7 @@ class CControllerClientResponseTo extends __CControllerPacketResponse
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-	public static function CControllerClientResponseTo($oPacket = false)
+	public function CControllerClientResponseTo($oPacket = false)
 	{
 		$this->_InitFromRequest($oPacket);
 	}

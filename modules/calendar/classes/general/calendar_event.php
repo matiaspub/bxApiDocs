@@ -316,10 +316,9 @@ class CCalendarEvent
 				}
 
 				$checkPermissionsForEvent = $userId != $event['CREATED_BY']; // It's creator
-
-				if ($event['CAL_TYPE'] == 'user' && $userId == $event['OWNER_ID']) // It's event in user's calendar
+				// It's event in user's calendar
+				if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && $userId == $event['OWNER_ID'])
 					$checkPermissionsForEvent = false;
-
 				if ($checkPermissionsForEvent && $event['IS_MEETING'] && $event['USER_MEETING'] && $event['USER_MEETING']['ATTENDEE_ID'] == $userId)
 					$checkPermissionsForEvent = false;
 
@@ -592,6 +591,10 @@ class CCalendarEvent
 
 		$fromTS = $evFromTS;
 
+		$offset = CCalendar::GetOffset();
+		if ($event['DT_SKIP_TIME'] == 'N' && $offset != 0)
+			$fromTS += $offset;
+
 		$event['~DT_FROM'] = $event['DT_FROM'];
 		$event['~DT_FROM_TS'] = $event['DT_FROM_TS'];
 		if ($event['DT_SKIP_TIME'] == 'Y') // All days events
@@ -647,6 +650,12 @@ class CCalendarEvent
 				{
 					if (($preciseLimits && $fromTS > $limitFromTSReal) || (!$preciseLimits && $fromTS > $limitFromTS - $h24))
 					{
+						if ($event['DT_SKIP_TIME'] == 'N' && $offset != 0)
+						{
+							$fromTS -= $offset;
+							$toTS -= $offset;
+						}
+
 						self::HandleREvent($res, $event, array(
 							'DT_FROM_TS' => $fromTS,
 							'DT_TO_TS' => $toTS,
@@ -669,6 +678,12 @@ class CCalendarEvent
 			{
 				if (($preciseLimits && $fromTS > $limitFromTSReal) || (!$preciseLimits && $fromTS > $limitFromTS - $h24))
 				{
+					if ($event['DT_SKIP_TIME'] == 'N' && $offset != 0)
+					{
+						$fromTS -= $offset;
+						$toTS -= $offset;
+					}
+
 					self::HandleREvent($res, $event, array(
 						'DT_FROM_TS' => $fromTS,
 						'DT_TO_TS' => $toTS,

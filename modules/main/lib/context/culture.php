@@ -15,7 +15,7 @@ class Culture
 {
 	protected $fields;
 
-	static public function __construct($fields = null)
+	public function __construct($fields = null)
 	{
 		if($fields !== null)
 		{
@@ -48,21 +48,21 @@ class Culture
 		return null;
 	}
 
-	static public function getDateTimeFormat()
+	public function getDateTimeFormat()
 	{
 		if(isset($this->fields["FORMAT_DATETIME"]))
 			return $this->fields["FORMAT_DATETIME"];
 		throw new Main\ObjectPropertyException("dateTimeFormat");
 	}
 
-	static public function getDateFormat()
+	public function getDateFormat()
 	{
 		if(isset($this->fields["FORMAT_DATE"]))
 			return $this->fields["FORMAT_DATE"];
 		throw new Main\ObjectPropertyException("dateFormat");
 	}
 
-	static public function getCharset()
+	public function getCharset()
 	{
 		if(isset($this->fields["CHARSET"]))
 			return $this->fields["CHARSET"];

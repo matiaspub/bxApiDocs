@@ -4,35 +4,35 @@ abstract class CBXVirtualFileBase
 {
 	protected $path = null;
 
-	static public function __construct($path)
+	public function __construct($path)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$this->path = $io->CombinePath($path);
 	}
 
-	static public function GetName()
+	public function GetName()
 	{
 		$io = CBXVirtualIo::GetInstance();
 		return $io->ExtractNameFromPath($this->path);
 	}
 
-	static public function GetPath()
+	public function GetPath()
 	{
 		$io = CBXVirtualIo::GetInstance();
 		return $io->ExtractPathFromPath($this->path);
 	}
 
-	static public function GetPathWithName()
+	public function GetPathWithName()
 	{
 		return $this->path;
 	}
 
 	public abstract function IsDirectory();
-	static public abstract function IsExists();
+	public abstract function IsExists();
 	public abstract function MarkWritable();
-	static public abstract function GetPermissions();
-	static public abstract function GetModificationTime();
-	static public abstract function GetLastAccessTime();
+	public abstract function GetPermissions();
+	public abstract function GetModificationTime();
+	public abstract function GetLastAccessTime();
 }
 
 abstract class CBXVirtualFile
@@ -43,23 +43,23 @@ abstract class CBXVirtualFile
 		return false;
 	}
 
-	static public function GetType()
+	public function GetType()
 	{
 		return GetFileType($this->path);
 	}
 
-	static public function GetExtension()
+	public function GetExtension()
 	{
 		return GetFileExtension($this->path);
 	}
 
-	static public abstract function Open($mode);
+	public abstract function Open($mode);
 	public abstract function GetContents();
-	static public abstract function PutContents($data);
+	public abstract function PutContents($data);
 	public abstract function GetFileSize();
-	static public abstract function IsWritable();
+	public abstract function IsWritable();
 	public abstract function IsReadable();
-	static public abstract function ReadFile();
+	public abstract function ReadFile();
 }
 
 abstract class CBXVirtualDirectory
@@ -74,6 +74,6 @@ abstract class CBXVirtualDirectory
 	 * @return CBXVirtualDirectoryFileSystem[] | CBXVirtualFileFileSystem[]
 	 */
 	public abstract function GetChildren();
-	static public abstract function Create();
+	public abstract function Create();
 }
 ?>

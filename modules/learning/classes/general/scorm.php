@@ -18,7 +18,7 @@ class CCourseSCORM
 
 
 	// 2012-04-19 Checked/modified for compatibility with new data model
-	static public function __construct($PACKAGE_DIR, $arSITE_ID)
+	public function __construct($PACKAGE_DIR, $arSITE_ID)
 	{
 		//Cut last slash
 		if (substr($PACKAGE_DIR,-1, 1) == "/")
@@ -189,7 +189,7 @@ class CCourseSCORM
 
 
 	// 2012-04-19 Checked/modified for compatibility with new data model
-	static public function ImportPackage()
+	public function ImportPackage()
 	{
 		$resources = $this->objXML->SelectNodes("/manifest/resources/");
 		$this->arResources = $resources->__toArray();

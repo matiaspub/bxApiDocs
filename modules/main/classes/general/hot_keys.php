@@ -7,12 +7,12 @@ class CHotKeysCode
 	private $arList;
 	protected $hkCacheTtl = 3600;
 
-	static public function GetByID($ID)
+	public function GetByID($ID)
 	{
 		return $this->GetList(array(),array("ID"=>$ID));
 	}
 
-	static public function GetCodeByClassName($className)
+	public function GetCodeByClassName($className)
 	{
 		$this->LoadToCache();
 
@@ -43,7 +43,7 @@ class CHotKeysCode
 		return $cleanUrl;
 	}
 
-	static public function GetByUrl($url)
+	public function GetByUrl($url)
 	{
 		$this->LoadToCache();
 
@@ -63,7 +63,7 @@ class CHotKeysCode
 		return $arRet;
 	}
 
-	static public function GetIDByTitleObj($strTitleObj)
+	public function GetIDByTitleObj($strTitleObj)
 	{
 		if($strTitleObj)
 		{
@@ -192,7 +192,7 @@ class CHotKeysCode
 		return "<br>Class: CHotKeysCode File: ".__FILE__."<br>";
 	}
 
-	static public function Delete($ID)
+	public function Delete($ID)
 	{
 		global $DB;
 
@@ -209,7 +209,7 @@ class CHotKeysCode
 		return $DB->Query($sql, false, $this->ErrOrig()." Line: ".__LINE__);
 	}
 
-	static public function Update($ID,$arFields)
+	public function Update($ID,$arFields)
 	{
 		if(!$this->CheckFields($arFields,$ID))
 			return false;
@@ -229,7 +229,7 @@ class CHotKeysCode
 		return true;
 	}
 
-	static public function Add($arFields)
+	public function Add($arFields)
 	{
 		if(!$this->CheckFields($arFields))
 			return false;
@@ -241,7 +241,7 @@ class CHotKeysCode
 		return $DB->Add("b_hot_keys_code",$arFields);
 	}
 
-	static public function GetList($aSort=array(), $arFilter=Array(), $showEmptyName=true)
+	public function GetList($aSort=array(), $arFilter=Array(), $showEmptyName=true)
 	{
 		global $DB;
 		$arSqlSearch = Array();
@@ -487,7 +487,7 @@ class CHotKeys
 		return false;
 	}
 
-	static public function GetUIDbyHID($hkID) //user id by hot-key id
+	public function GetUIDbyHID($hkID) //user id by hot-key id
 	{
 		$this->LoadToCache();
 
@@ -529,7 +529,7 @@ class CHotKeys
 		return $found;
 	}
 
-	static public function GetCodeByClassName($className, $name="",$code="")
+	public function GetCodeByClassName($className, $name="",$code="")
 	{
 		if(!self::$optUse)
 			return false;
@@ -555,7 +555,7 @@ class CHotKeys
 		return $arCodes;
 	}
 
-	static public function GetCodeByUrl($url)
+	public function GetCodeByUrl($url)
 	{
 		if(!self::$optUse)
 			return false;
@@ -572,7 +572,7 @@ class CHotKeys
 		return $arCodes;
 	}
 
-	static public function GetTitle($strTitleObj, $forHint=false)
+	public function GetTitle($strTitleObj, $forHint=false)
 	{
 		if(!self::$optUse)
 			return false;
@@ -589,7 +589,7 @@ class CHotKeys
 	}
 
 	//if obj has unique id = b_hot-keys_code.TITLE_OBJ
-	static public function SetTitle($className, $forHint=false)
+	public function SetTitle($className, $forHint=false)
 	{
 		$this->LoadToCache();
 		$arCodes = self::$codes->GetCodeByClassName($className);
@@ -691,7 +691,7 @@ class CHotKeys
 		return true;
 	}
 
-	static public function GetList($aSort=array(), $arFilter=Array())
+	public function GetList($aSort=array(), $arFilter=Array())
 	{
 		global $DB;
 		$arSqlSearch = Array();
@@ -748,7 +748,7 @@ class CHotKeys
 		return $res;
 	}
 
-	static public function Add($arFields)
+	public function Add($arFields)
 	{
 		if(!$this->CheckFields($arFields))
 			return false;
@@ -767,7 +767,7 @@ class CHotKeys
 		return $DB->Add("b_hot_keys",$arPrepFields);
 	}
 
-	static public function Update($ID,$arFields)
+	public function Update($ID,$arFields)
 	{
 		if(!$this->CheckFields($arFields,$ID))
 			return false;
@@ -788,7 +788,7 @@ class CHotKeys
 		return true;
 	}
 
-	static public function Delete($ID)
+	public function Delete($ID)
 	{
 		global $DB;
 
@@ -802,7 +802,7 @@ class CHotKeys
 	}
 
 	//sets (copy) keys_strings from user with id=0 to userID
-	static public function SetDefault($userID)
+	public function SetDefault($userID)
 	{
 		global $DB;
 
@@ -833,7 +833,7 @@ class CHotKeys
 		return ($delRes && !$insErr);
 	}
 
-	static public function ShowHKAsChar($hotKeysString)
+	public function ShowHKAsChar($hotKeysString)
 	{
 		if(!$this->CheckKeysString($hotKeysString))
 			return GetMessage("HK_WRONG_KS");
@@ -908,7 +908,7 @@ class CHotKeys
 	}
 
 	// Top panel buttons
-	static public function PrintTPButton(&$arPanelButton,$parent="")
+	public function PrintTPButton(&$arPanelButton,$parent="")
 	{
 		if(!self::$optUse)
 			return false;
@@ -986,7 +986,7 @@ class CHotKeys
 		return COption::SetOptionString("fileman", "stickers_use_hotkeys", "N");
 	}
 
-	static public function PrintGlobalUrlVar()
+	public function PrintGlobalUrlVar()
 	{
 
 		if(!$GLOBALS["APPLICATION"]->PanelShowed)
@@ -1011,7 +1011,7 @@ class CHotKeys
 	 * @param string $keysString - default combination of keys ("Ctrl+Shift+76")
 	 * @return int Count of users to wich adds hot-keys
 	 * */
-	static public function AddDefaultKeyToAll($codeID,$keysString)
+	public function AddDefaultKeyToAll($codeID,$keysString)
 	{
 		global $DB;
 
@@ -1060,7 +1060,7 @@ class CHotKeys
 	 * Exports current user's binded hot keys and using custom codes
 	 * @return string exported file name
 	 * */
-	static public function Export()
+	public function Export()
 	{
 		$this->LoadToCache();
 
@@ -1113,7 +1113,7 @@ class CHotKeys
 	 * @param int $userID - user's id wich recieves our hot-keys from file
 	 * @return int count added hot keys
 	 * */
-	static public function Import($fileName,$userID)
+	public function Import($fileName,$userID)
 	{
 		$fileContent = file_get_contents($fileName);
 

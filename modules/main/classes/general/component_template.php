@@ -39,7 +39,7 @@ class CBitrixComponentTemplate
 	var $__bInited = false;
 	private $__view = array();
 
-	public static function CBitrixComponentTemplate()
+	public function CBitrixComponentTemplate()
 	{
 		$this->__bInited = false;
 
@@ -67,11 +67,10 @@ class CBitrixComponentTemplate
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getname.php
 	 * @author Bitrix
 	 */
-	public static function GetName()
+	public function GetName()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -79,7 +78,7 @@ class CBitrixComponentTemplate
 		return $this->__name;
 	}
 
-	public static function GetPageName()
+	public function GetPageName()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -105,11 +104,10 @@ class CBitrixComponentTemplate
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfile.php
 	 * @author Bitrix
 	 */
-	public static function GetFile()
+	public function GetFile()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -135,11 +133,10 @@ class CBitrixComponentTemplate
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfolder.php
 	 * @author Bitrix
 	 */
-	public static function GetFolder()
+	public function GetFolder()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -165,11 +162,10 @@ class CBitrixComponentTemplate
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getsitetemplate.php
 	 * @author Bitrix
 	 */
-	public static function GetSiteTemplate()
+	public function GetSiteTemplate()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -177,7 +173,7 @@ class CBitrixComponentTemplate
 		return $this->__siteTemplate;
 	}
 
-	public static function IsInTheme()
+	public function IsInTheme()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -209,14 +205,14 @@ class CBitrixComponentTemplate
 	}
 
 	/***********  INIT  ***************/
-	public static function ApplyCachedData($arData)
+	public function ApplyCachedData($arData)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
 		if ($arData && is_array($arData))
 		{
-			if (array_key_exists("additionalCSS", $arData) && StrLen($arData["additionalCSS"]) > 0)
+			if (array_key_exists("additionalCSS", $arData) && strlen($arData["additionalCSS"]) > 0)
 			{
 				$APPLICATION->SetAdditionalCSS($arData["additionalCSS"]);
 
@@ -225,7 +221,7 @@ class CBitrixComponentTemplate
 					$this->__component->__parent->addChildCSS($this->__folder."/style.css");
 			}
 
-			if (array_key_exists("additionalJS", $arData) && StrLen($arData["additionalJS"]) > 0)
+			if (array_key_exists("additionalJS", $arData) && strlen($arData["additionalJS"]) > 0)
 			{
 				$APPLICATION->AddHeadScript($arData["additionalJS"]);
 
@@ -257,18 +253,18 @@ class CBitrixComponentTemplate
 				$arBXRuntimeTemplateEngines[$ext] = $engineID;
 	}
 
-	public static function Init(&$component, $siteTemplate = false, $customTemplatePath = "")
+	public function Init(&$component, $siteTemplate = false, $customTemplatePath = "")
 	{
 		global $arBXRuntimeTemplateEngines;
 
 		$this->__bInited = false;
 
-		if ($siteTemplate === false)
+		if ($siteTemplate === false && defined("SITE_TEMPLATE_ID"))
 			$this->__siteTemplate = SITE_TEMPLATE_ID;
 		else
 			$this->__siteTemplate = $siteTemplate;
 
-		if (StrLen($this->__siteTemplate) <= 0)
+		if (strlen($this->__siteTemplate) <= 0)
 			$this->__siteTemplate = ".default";
 
 		$this->__file = "";
@@ -284,17 +280,17 @@ class CBitrixComponentTemplate
 		$this->__component = &$component;
 
 		$this->__name = $this->__component->GetTemplateName();
-		if (StrLen($this->__name) <= 0)
+		if (strlen($this->__name) <= 0)
 			$this->__name = ".default";
 
 		$this->__name = preg_replace("'[\\\\/]+'", "/", $this->__name);
-		$this->__name = Trim($this->__name, "/");
+		$this->__name = trim($this->__name, "/");
 
 		if (!$this->CheckName($this->__name))
 			$this->__name = ".default";
 
 		$this->__page = $this->__component->GetTemplatePage();
-		if (StrLen($this->__page) <= 0)
+		if (strlen($this->__page) <= 0)
 			$this->__page = "template";
 
 		if (!$this->__SearchTemplate($customTemplatePath))
@@ -314,7 +310,7 @@ class CBitrixComponentTemplate
 
 	/***********  SEARCH  ***************/
 	// Search file by its path and name without extention
-	function __SearchTemplateFile($path, $fileName)
+	public function __SearchTemplateFile($path, $fileName)
 	{
 		global $arBXRuntimeTemplateEngines;
 
@@ -346,7 +342,7 @@ class CBitrixComponentTemplate
 		return false;
 	}
 
-	function __SearchTemplate($customTemplatePath = "")
+	public function __SearchTemplate($customTemplatePath = "")
 	{
 		$this->__file = "";
 		$this->__fileAlt = "";
@@ -360,52 +356,98 @@ class CBitrixComponentTemplate
 		$parentRelativePath = "";
 		$parentTemplateName = "";
 		$parentComponent = & $this->__component->GetParent();
+		$defSiteTemplate = ($this->__siteTemplate == ".default");
 		if ($parentComponent)
 		{
 			$parentRelativePath = $parentComponent->GetRelativePath();
 			$parentTemplateName = $parentComponent->GetTemplate()->GetName();
 
-			$arFolders[] = "/local/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
-			$arFolders[] = "/local/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
-			$arFolders[] = "/local/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath;
+			if(!$defSiteTemplate)
+			{
+				$arFolders[] = array(
+					"path" => "/local/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath,
+					"in_theme" => true,
+				);
+			}
+			$arFolders[] = array(
+				"path" => "/local/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath,
+				"in_theme" => true,
+				"site_template" => ".default",
+			);
+			$arFolders[] = array(
+				"path" => "/local/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath,
+				"in_theme" => true,
+				"site_template" => "",
+			);
 		}
-		$arFolders[] = "/local/templates/".$this->__siteTemplate."/components".$relativePath;
-		$arFolders[] = "/local/templates/.default/components".$relativePath;
-		$arFolders[] = "/local/components".$relativePath."/templates";
+		if(!$defSiteTemplate)
+		{
+			$arFolders[] = array(
+				"path" => "/local/templates/".$this->__siteTemplate."/components".$relativePath,
+			);
+		}
+		$arFolders[] = array(
+			"path" => "/local/templates/.default/components".$relativePath,
+			"site_template" => ".default",
+		);
+		$arFolders[] = array(
+			"path" => "/local/components".$relativePath."/templates",
+			"site_template" => "",
+		);
 
 		if ($parentComponent)
 		{
-			$arFolders[] = BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
-			$arFolders[] = BX_PERSONAL_ROOT."/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath;
-			$arFolders[] = "/bitrix/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath;
+			if(!$defSiteTemplate)
+			{
+				$arFolders[] = array(
+					"path" => BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$parentRelativePath."/".$parentTemplateName.$relativePath,
+					"in_theme" => true,
+				);
+			}
+			$arFolders[] = array(
+				"path" => BX_PERSONAL_ROOT."/templates/.default/components".$parentRelativePath."/".$parentTemplateName.$relativePath,
+				"in_theme" => true,
+				"site_template" => ".default",
+			);
+			$arFolders[] = array(
+				"path" => "/bitrix/components".$parentRelativePath."/templates/".$parentTemplateName.$relativePath,
+				"in_theme" => true,
+				"site_template" => "",
+			);
 		}
-		$arFolders[] = BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$relativePath;
-		$arFolders[] = BX_PERSONAL_ROOT."/templates/.default/components".$relativePath;
-		$arFolders[] = "/bitrix/components".$relativePath."/templates";
+		if(!$defSiteTemplate)
+		{
+			$arFolders[] = array(
+				"path" => BX_PERSONAL_ROOT."/templates/".$this->__siteTemplate."/components".$relativePath,
+			);
+		}
+		$arFolders[] = array(
+			"path" => BX_PERSONAL_ROOT."/templates/.default/components".$relativePath,
+			"site_template" => ".default",
+		);
+		$arFolders[] = array(
+			"path" => "/bitrix/components".$relativePath."/templates",
+			"site_template" => "",
+		);
 
 		if (strlen($customTemplatePath) > 0 && $templatePageFile = $this->__SearchTemplateFile($customTemplatePath, $this->__page))
 		{
 			$this->__fileAlt = $customTemplatePath."/".$templatePageFile;
 
-			for ($i = 0, $cnt = count($arFolders); $i < $cnt; $i++)
+			foreach ($arFolders as $folder)
 			{
-				if (file_exists($_SERVER["DOCUMENT_ROOT"].$arFolders[$i]."/".$this->__name)
-					&& is_dir($_SERVER["DOCUMENT_ROOT"].$arFolders[$i]."/".$this->__name))
+				if (is_dir($_SERVER["DOCUMENT_ROOT"].$folder["path"]."/".$this->__name))
 				{
-					$this->__file = $arFolders[$i]."/".$this->__name."/".$templatePageFile;
-					$this->__folder = $arFolders[$i]."/".$this->__name;
+					$this->__file = $folder["path"]."/".$this->__name."/".$templatePageFile;
+					$this->__folder = $folder["path"]."/".$this->__name;
 				}
 
-				if (StrLen($this->__file) > 0)
+				if (strlen($this->__file) > 0)
 				{
-					if ($i == 0 || $i == 3)
-						;
-					elseif ($i == 1 || $i == 4)
-						$this->__siteTemplate = ".default";
-					else
-						$this->__siteTemplate = "";
+					if(isset($folder["site_template"]))
+						$this->__siteTemplate = $folder["site_template"];
 
-					if ($parentComponent && $i < 3)
+					if(isset($folder["in_theme"]) && $folder["in_theme"] === true)
 						$this->__templateInTheme = true;
 					else
 						$this->__templateInTheme = false;
@@ -416,16 +458,13 @@ class CBitrixComponentTemplate
 			return (strlen($this->__file) > 0);
 		}
 
-		static $cache;
+		static $cache = array();
 		$cache_id = $relativePath."|".$this->__siteTemplate."|".$parentRelativePath."|".$parentTemplateName."|".$this->__page."|".$this->__name;
-		if (!isset($cache))
-			$cache = array();
 		if(!isset($cache[$cache_id]))
 		{
-			$i = 0;
 			foreach ($arFolders as $folder)
 			{
-				$fname = $folder."/".$this->__name;
+				$fname = $folder["path"]."/".$this->__name;
 				if (file_exists($_SERVER["DOCUMENT_ROOT"].$fname))
 				{
 					if (is_dir($_SERVER["DOCUMENT_ROOT"].$fname))
@@ -441,33 +480,28 @@ class CBitrixComponentTemplate
 					elseif (is_file($_SERVER["DOCUMENT_ROOT"].$fname))
 					{
 						$this->__file = $fname;
-						if (StrPos($this->__name, "/") !== false)
-							$this->__folder = $folder."/".SubStr($this->__name, 0, bxstrrpos($this->__name, "/"));
+						if (strpos($this->__name, "/") !== false)
+							$this->__folder = $folder["path"]."/".substr($this->__name, 0, bxstrrpos($this->__name, "/"));
 					}
 				}
 				else
 				{
-					if ($templatePageFile = $this->__SearchTemplateFile($folder, $this->__name))
-						$this->__file = $folder."/".$templatePageFile;
+					if ($templatePageFile = $this->__SearchTemplateFile($folder["path"], $this->__name))
+						$this->__file = $folder["path"]."/".$templatePageFile;
 				}
 
 				if ($this->__file != "")
 				{
-					if ($i == 0 || $i == 3)
-						;
-					elseif ($i == 1 || $i == 4)
-						$this->__siteTemplate = ".default";
-					else
-						$this->__siteTemplate = "";
+					if(isset($folder["site_template"]))
+						$this->__siteTemplate = $folder["site_template"];
 
-					if ($parentComponent && $i < 3)
+					if(isset($folder["in_theme"]) && $folder["in_theme"] === true)
 						$this->__templateInTheme = true;
 					else
 						$this->__templateInTheme = false;
 
 					break;
 				}
-				$i++;
 			}
 			$cache[$cache_id] = array(
 				$this->__folder,
@@ -487,12 +521,11 @@ class CBitrixComponentTemplate
 			$this->__hasCSS = $cache[$cache_id][4];
 			$this->__hasJS = $cache[$cache_id][5];
 		}
-
 		return ($this->__file != "");
 	}
 
 	/***********  INCLUDE  ***************/
-	function __IncludePHPTemplate(&$arResult, &$arParams, $parentTemplateFolder = "")
+	public function __IncludePHPTemplate(&$arResult, &$arParams, $parentTemplateFolder = "")
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB;
@@ -535,7 +568,7 @@ class CBitrixComponentTemplate
 		return null;
 	}
 
-	public static function IncludeTemplate(&$arResult)
+	public function IncludeTemplate(&$arResult)
 	{
 		global $arBXAvailableTemplateEngines;
 
@@ -566,7 +599,7 @@ class CBitrixComponentTemplate
 			$parentTemplateFolder = $parentTemplate->GetFolder();
 		}
 
-		if (StrLen($arBXAvailableTemplateEngines[$this->__engineID]["function"]) > 0
+		if (strlen($arBXAvailableTemplateEngines[$this->__engineID]["function"]) > 0
 			&& function_exists($arBXAvailableTemplateEngines[$this->__engineID]["function"]))
 		{
 			$result = call_user_func(
@@ -602,7 +635,7 @@ class CBitrixComponentTemplate
 		return $messCache[$path];
 	}
 
-	public static function IncludeLangFile($relativePath = "", $lang = false)
+	public function IncludeLangFile($relativePath = "", $lang = false)
 	{
 		$arLangMessages = array();
 
@@ -625,7 +658,7 @@ class CBitrixComponentTemplate
 		return $arLangMessages;
 	}
 
-	function __IncludeMutatorFile(&$arResult, &$arParams)
+	public function __IncludeMutatorFile(&$arResult, &$arParams)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB;
@@ -637,7 +670,7 @@ class CBitrixComponentTemplate
 		}
 	}
 
-	function __IncludeCSSFile()
+	public function __IncludeCSSFile()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -658,7 +691,7 @@ class CBitrixComponentTemplate
 		}
 	}
 
-	function __IncludeJSFile()
+	public function __IncludeJSFile()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -679,14 +712,14 @@ class CBitrixComponentTemplate
 	}
 
 	/***********  UTIL  ***************/
-	function __GetTemplateExtension($templateName)
+	public static function __GetTemplateExtension($templateName)
 	{
 		$templateName = trim($templateName, ". \r\n\t");
 		$arTemplateName = explode(".", $templateName);
 		return strtolower($arTemplateName[count($arTemplateName) - 1]);
 	}
 
-	function __GetTemplateEngine()
+	public function __GetTemplateEngine()
 	{
 		global $arBXRuntimeTemplateEngines;
 
@@ -701,7 +734,7 @@ class CBitrixComponentTemplate
 			$this->__engineID = "php";
 	}
 
-	public static function SetViewTarget($target, $pos = 500)
+	public function SetViewTarget($target, $pos = 500)
 	{
 		$this->EndViewTarget();
 		$view = &$this->__view;
@@ -713,7 +746,7 @@ class CBitrixComponentTemplate
 		ob_start();
 	}
 
-	public static function EndViewTarget()
+	public function EndViewTarget()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -764,12 +797,12 @@ class CBitrixComponentTemplate
 	$this->GetEditAreaId with the same id MUST be used for marking entry contaner or row, like this:
 	<tr id="<?=$this->GetEditAreaId('USER'.$arUser['ID']);?>">
 	*/
-	public static function GetEditAreaId($entryId)
+	public function GetEditAreaId($entryId)
 	{
 		return $this->__component->GetEditAreaId($entryId);
 	}
 
-	public static function AddEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
+	public function AddEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
 	{
 		$this->__component->addEditButton(array('AddEditAction', $entryId, $editLink, $editTitle, $arParams));
 	}
@@ -779,7 +812,7 @@ class CBitrixComponentTemplate
 	$arParams['CONFIRM'] = 'Text' - confirm with custom text;
 	no $arParams['CONFIRM'] at all - confirm with default text
 	*/
-	public static function AddDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
+	public function AddDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
 	{
 		$this->__component->addEditButton(array('AddDeleteAction', $entryId, $deleteLink, $deleteTitle, $arParams));
 	}

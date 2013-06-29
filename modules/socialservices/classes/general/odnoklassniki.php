@@ -41,7 +41,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 
 	}
 	
-	static public function Authorize()
+	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		$bSuccess = 1;
@@ -150,7 +150,7 @@ class COdnoklassnikiInterface
 	protected $refresh_token = '';
 	protected $userId = 0;
 	
-	static public function __construct($appID, $appSecret, $appKey, $code=false)
+	public function __construct($appID, $appSecret, $appKey, $code=false)
 	{
 		$this->httpTimeout = 10;
 		$this->appID = $appID;
@@ -159,7 +159,7 @@ class COdnoklassnikiInterface
 		$this->appKey = $appKey;
 	}
 
-	static public function GetAuthUrl($redirect_uri, $state='')
+	public function GetAuthUrl($redirect_uri, $state='')
 	{
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
@@ -168,7 +168,7 @@ class COdnoklassnikiInterface
 		//	($state <> ''? '&state='.urlencode($state):'');
 	}
 	
-	static public function GetAccessToken($redirect_uri)
+	public function GetAccessToken($redirect_uri)
 	{
 		if($this->code === false)
 			return false;
@@ -203,7 +203,7 @@ class COdnoklassnikiInterface
 		return false;
 	}
 	
-	static public function GetCurrentUser()
+	public function GetCurrentUser()
 	{
 		if($this->access_token === false)
 			return false;
@@ -215,7 +215,7 @@ class COdnoklassnikiInterface
 		return CUtil::JsObjectToPhp($result);
 	}
 
-	static public function SendFeed($socServUserId, $message, $getNewToken=true)
+	public function SendFeed($socServUserId, $message, $getNewToken=true)
 	{
 		if(!$this->access_token || intval($this->userId) < 1)
 			self::SetOauthKeys($socServUserId);

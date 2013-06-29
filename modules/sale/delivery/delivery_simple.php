@@ -84,7 +84,7 @@ class CDeliverySimple
 		return serialize($arSettings);
 	}
 
-	function __GetLocationPrice($LOCATION_ID, $arConfig)
+	public static function __GetLocationPrice($LOCATION_ID, $arConfig)
 	{
 		$dbLocationGroups = CSaleLocationGroup::GetLocationList(array("LOCATION_ID" => $LOCATION_ID));
 		

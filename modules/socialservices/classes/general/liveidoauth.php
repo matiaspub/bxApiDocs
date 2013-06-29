@@ -27,7 +27,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)" class="bx-ss-button liveid-button"></a><span class="bx-spacer"></span><span>'.GetMessage("MAIN_OPTION_COMMENT").'</span>';
 	}
 
-	static public function Authorize()
+	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		$bSuccess = 1;
@@ -119,7 +119,7 @@ class CLiveIDOAuthInterface
 	protected $code = false;
 	protected $access_token = false;
 	
-	static public function __construct($appID, $appSecret, $code=false)
+	public function __construct($appID, $appSecret, $code=false)
 	{
 		$this->httpTimeout = 10;
 		$this->appID = $appID;
@@ -127,7 +127,7 @@ class CLiveIDOAuthInterface
 		$this->code = $code;
 	}
 
-	static public function GetAuthUrl($redirect_uri, $state='')
+	public function GetAuthUrl($redirect_uri, $state='')
 	{
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
@@ -137,7 +137,7 @@ class CLiveIDOAuthInterface
 			($state <> ''? '&state='.urlencode($state):'');
 	}
 	
-	static public function GetAccessToken($redirect_uri)
+	public function GetAccessToken($redirect_uri)
 	{
 		if($this->code === false)
 			return false;
@@ -161,7 +161,7 @@ class CLiveIDOAuthInterface
 		return false;
 	}
 	
-	static public function GetCurrentUser()
+	public function GetCurrentUser()
 	{
 		if($this->access_token === false)
 			return false;

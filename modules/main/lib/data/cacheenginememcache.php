@@ -14,7 +14,7 @@ class CacheEngineMemcache
 	private $read = false;
 	// unfortunately is not available for memcache...
 
-	function __construct()
+	public function __construct()
 	{
 		if (self::$obMemcache == null)
 		{
@@ -58,7 +58,7 @@ class CacheEngineMemcache
 		return self::$isConnected;
 	}
 
-	public static function clean($baseDir, $initDir = false, $filename = false)
+	public function clean($baseDir, $initDir = false, $filename = false)
 	{
 		if(is_object(self::$obMemcache))
 		{
@@ -109,7 +109,7 @@ class CacheEngineMemcache
 		return false;
 	}
 
-	public static function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		if(!isset(self::$baseDirVersion[$baseDir]))
 			self::$baseDirVersion[$baseDir] = self::$obMemcache->get($this->sid.$baseDir);
@@ -136,7 +136,7 @@ class CacheEngineMemcache
 		return true;
 	}
 
-	public static function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
+	public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		if(!isset(self::$baseDirVersion[$baseDir]))
 			self::$baseDirVersion[$baseDir] = self::$obMemcache->get($this->sid.$baseDir);

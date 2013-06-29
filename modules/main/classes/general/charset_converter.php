@@ -180,7 +180,7 @@ class CharsetConverter
 		return $BX_CHARSET_TABLE_CACHE;
 	}
 
-	static public function Convert($sourceString, $charsetFrom, $charsetTo)
+	public function Convert($sourceString, $charsetFrom, $charsetTo)
 	{
 		$this->ClearErrors();
 
@@ -312,7 +312,7 @@ class CharsetConverter
 		return $resultString;
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}

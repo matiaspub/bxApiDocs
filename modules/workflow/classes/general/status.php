@@ -292,7 +292,7 @@ class CWorkflowStatus
 	}
 
 	//add
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		global $DB;
 
@@ -310,7 +310,7 @@ class CWorkflowStatus
 	}
 
 	//update
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB;
 		$ID = intval($ID);

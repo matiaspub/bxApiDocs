@@ -35,7 +35,7 @@ class XMLNode
 	var $name;
 	var $r;
 
-	public static function XMLNode(&$parent, $attributes, $name)
+	public function XMLNode(&$parent, $attributes, $name)
 	{
 		$this->r=rand();
 		$this->parent=$parent;
@@ -47,12 +47,12 @@ class XMLNode
 			$this->parent->childs[$name][]=$this;
 	}
 
-	public static function GetAttribute($name)
+	public function GetAttribute($name)
 	{
 		return $this->attributes[$name];
 	}
 
-	public static function XMLSetValue($new_val)
+	public function XMLSetValue($new_val)
 	{
 		$this->r=rand();
 //		echo " SetValue===".$this->name." [".$this->r."] = ".$new_val." \n";
@@ -96,7 +96,7 @@ class XMLParser
 	var $cur;
 	var $xml;
 
-	public static function Load($file)
+	public function Load($file)
 	{
 		if ($fd = fopen($file, "rb"))
 		{
@@ -109,7 +109,7 @@ class XMLParser
 		return false;
 	}
 
-	public static function LoadString(&$text)
+	public function LoadString(&$text)
 	{
 		if (strlen($text) > 0)
 		{
@@ -143,7 +143,7 @@ class XMLParser
 		return $str;
 	}
 
-	public static function parse(&$data)		//, $last
+	public function parse(&$data)		//, $last
 	{
 		$data = preg_replace("#<\!--.*?-->#s", "", $data);
 
@@ -187,7 +187,7 @@ class XMLParser
 	}
 
 
-	public static function startElement($name, $attrs)
+	public function startElement($name, $attrs)
 	{
 		$bTemp=false;
 		if($this->cur==NULL)
@@ -199,13 +199,13 @@ class XMLParser
 			$this->xml = $this->cur;
 	}
 
-	public static function endElement($name)
+	public function endElement($name)
 	{
 		if($this->cur->parent!=NULL)
 			$this->cur = $this->cur->parent;
 	}
 
-	public static function cdata($parser,$cdata)
+	public function cdata($parser,$cdata)
 	{
 		if(trim($cdata)!="")
 		{
@@ -213,7 +213,7 @@ class XMLParser
 		}
 	}
 
-	public static function select_nodes_attrib($str_node)
+	public function select_nodes_attrib($str_node)
 	{
 		$tmp=$this->select_nodes($str_node);
 		$result=array();
@@ -226,7 +226,7 @@ class XMLParser
 		return $result;
 	}
 
-	public static function select_nodes($str_node)
+	public function select_nodes($str_node)
 	{
 		if(!is_object($this->xml)) return array();
 		$result=array(0=>$this->xml);

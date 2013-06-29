@@ -67,7 +67,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static public function onIncludeComponentLang()
+	public function onIncludeComponentLang()
 	{
 		$this->includeComponentLang();
 	}
@@ -77,7 +77,7 @@ class CBitrixComponent
 	* @return mixed
 	*
 	*/
-	static public function executeComponent()
+	public function executeComponent()
 	{
 		return $this->__includeComponent();
 	}
@@ -86,7 +86,7 @@ class CBitrixComponent
 	 *
 	 * @param CBitrixComponent $component
 	 */
-	static public function __construct($component = null)
+	public function __construct($component = null)
 	{
 		if(is_object($component) && ($component instanceof cbitrixcomponent))
 		{
@@ -122,7 +122,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getName()
+	final public function getName()
 	{
 		if ($this->__bInited)
 			return $this->__name;
@@ -136,7 +136,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getRelativePath()
+	final public function getRelativePath()
 	{
 		if ($this->__bInited)
 			return $this->__relativePath;
@@ -150,7 +150,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getPath()
+	final public function getPath()
 	{
 		if ($this->__bInited)
 			return $this->__path;
@@ -164,7 +164,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getTemplateName()
+	final public function getTemplateName()
 	{
 		if ($this->__bInited)
 			return $this->__templateName;
@@ -179,7 +179,7 @@ class CBitrixComponent
 	* @return bool
 	*
 	*/
-	static final public function setTemplateName($templateName)
+	final public function setTemplateName($templateName)
 	{
 		if (!$this->__bInited)
 			return null;
@@ -194,7 +194,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getTemplatePage()
+	final public function getTemplatePage()
 	{
 		if ($this->__bInited)
 			return $this->__templatePage;
@@ -208,7 +208,7 @@ class CBitrixComponent
 	* @return CBitrixComponentTemplate
 	*
 	*/
-	static final public function getTemplate()
+	final public function getTemplate()
 	{
 		if ($this->__bInited && $this->__template)
 			return $this->__template;
@@ -222,7 +222,7 @@ class CBitrixComponent
 	* @return CBitrixComponent
 	*
 	*/
-	static final public function getParent()
+	final public function getParent()
 	{
 		if ($this->__bInited && $this->__parent)
 			return $this->__parent;
@@ -236,7 +236,7 @@ class CBitrixComponent
 	* @return array[string][int]string
 	*
 	*/
-	static final public function getTemplateCachedData()
+	final public function getTemplateCachedData()
 	{
 		if ($this->__bInited && $this->__template)
 			return $this->__template->GetCachedData();
@@ -251,7 +251,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function setTemplateCachedData($templateCachedData)
+	final public function setTemplateCachedData($templateCachedData)
 	{
 		if ($this->__bInited)
 			CBitrixComponentTemplate::ApplyCachedData($templateCachedData);
@@ -311,7 +311,7 @@ class CBitrixComponent
 	* @return bool
 	*
 	*/
-	static final public function initComponent($componentName, $componentTemplate = false)
+	final public function initComponent($componentName, $componentTemplate = false)
 	{
 		$this->__bInited = false;
 
@@ -395,7 +395,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function includeComponentLang($relativePath = "", $lang = false)
+	final public function includeComponentLang($relativePath = "", $lang = false)
 	{
 		static $messCache = array();
 
@@ -480,7 +480,7 @@ class CBitrixComponent
 	* @return mixed
 	*
 	*/
-	static final public function includeComponent($componentTemplate, $arParams, $parentComponent)
+	final public function includeComponent($componentTemplate, $arParams, $parentComponent)
 	{
 		if (!$this->__bInited)
 			return null;
@@ -501,7 +501,9 @@ class CBitrixComponent
 			$component->arParams = $component->onPrepareComponentParams($arParams);
 			$component->__prepareComponentParams($component->arParams);
 			$component->onIncludeComponentLang();
-			return $component->executeComponent();
+			$result = $component->executeComponent();
+			$this->__arIncludeAreaIcons = $component->__arIncludeAreaIcons;
+			return $result;
 		}
 		else
 		{
@@ -520,7 +522,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function includeComponentTemplate($templatePage = "", $customTemplatePath = "")
+	final public function includeComponentTemplate($templatePage = "", $customTemplatePath = "")
 	{
 		if (!$this->__bInited)
 			return null;
@@ -552,7 +554,7 @@ class CBitrixComponent
 	* @return bool
 	*
 	*/
-	static final public function initComponentTemplate($templatePage = "", $siteTemplate = false, $customTemplatePath = "")
+	final public function initComponentTemplate($templatePage = "", $siteTemplate = false, $customTemplatePath = "")
 	{
 		if (!$this->__bInited)
 			return null;
@@ -572,7 +574,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function showComponentTemplate()
+	final public function showComponentTemplate()
 	{
 		if (!$this->__bInited)
 			return null;
@@ -611,7 +613,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addIncludeAreaIcon($arIcon)
+	final public function addIncludeAreaIcon($arIcon)
 	{
 		if (!isset($this->__arIncludeAreaIcons) || !is_array($this->__arIncludeAreaIcons))
 			$this->__arIncludeAreaIcons = array();
@@ -625,7 +627,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addIncludeAreaIcons($arIcons)
+	final public function addIncludeAreaIcons($arIcons)
 	{
 		if(is_array($arIcons))
 			$this->__arIncludeAreaIcons = $arIcons;
@@ -636,7 +638,7 @@ class CBitrixComponent
 	* @return array[int][string]mixed
 	*
 	*/
-	static final public function getIncludeAreaIcons()
+	final public function getIncludeAreaIcons()
 	{
 		return $this->__arIncludeAreaIcons;
 	}
@@ -646,7 +648,7 @@ class CBitrixComponent
 	 * @param mixed $additionalCacheID
 	 * @return string
 	 */
-	static public function getCacheID($additionalCacheID = false)
+	public function getCacheID($additionalCacheID = false)
 	{
 		$cacheID = SITE_ID."|".LANGUAGE_ID.(defined("SITE_TEMPLATE_ID")? "|".SITE_TEMPLATE_ID:"")."|".$this->__name."|".$this->getTemplateName()."|";
 
@@ -671,7 +673,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function startResultCache($cacheTime = false, $additionalCacheID = false, $cachePath = false)
+	final public function startResultCache($cacheTime = false, $additionalCacheID = false, $cachePath = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $CACHE_MANAGER;
@@ -759,7 +761,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function endResultCache()
+	final public function endResultCache()
 	{
 		global $NavNum, $CACHE_MANAGER;
 
@@ -838,7 +840,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function abortResultCache()
+	final public function abortResultCache()
 	{
 		global $CACHE_MANAGER;
 
@@ -864,7 +866,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function clearResultCache($additionalCacheID = false, $cachePath = false)
+	final public function clearResultCache($additionalCacheID = false, $cachePath = false)
 	{
 		global $CACHE_MANAGER;
 
@@ -885,7 +887,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getCachePath()
+	final public function getCachePath()
 	{
 		return $this->__cachePath;
 	}
@@ -897,7 +899,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function setResultCacheKeys($arResultCacheKeys)
+	final public function setResultCacheKeys($arResultCacheKeys)
 	{
 		if ($this->arResultCacheKeys === false)
 			$this->arResultCacheKeys = $arResultCacheKeys;
@@ -911,7 +913,7 @@ class CBitrixComponent
 	* @return string
 	*
 	*/
-	static final public function getEditAreaId($entryId)
+	final public function getEditAreaId($entryId)
 	{
 		return 'bx_'.crc32($this->GetName()).'_'.$entryId;
 	}
@@ -925,7 +927,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
+	final public function addEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -983,7 +985,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
+	final public function addDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -1037,7 +1039,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function setTemplateEpilog($arEpilogInfo)
+	final public function setTemplateEpilog($arEpilogInfo)
 	{
 		$this->__component_epilog = $arEpilogInfo;
 		//Check if parent component exists and plug epilog it to it's "collection"
@@ -1051,7 +1053,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function includeComponentEpilog($arEpilogInfo)
+	final public function includeComponentEpilog($arEpilogInfo)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB;
@@ -1090,7 +1092,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addChildCSS($cssPath)
+	final public function addChildCSS($cssPath)
 	{
 		$this->__children_css[] = $cssPath;
 	}
@@ -1101,7 +1103,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addChildJS($jsPath)
+	final public function addChildJS($jsPath)
 	{
 		$this->__children_js[] = $jsPath;
 	}
@@ -1112,7 +1114,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addChildEpilog($epilogFile)
+	final public function addChildEpilog($epilogFile)
 	{
 		$this->__children_epilogs[] = $epilogFile;
 	}
@@ -1123,7 +1125,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addEditButton($arButton)
+	final public function addEditButton($arButton)
 	{
 		$this->__editButtons[] = $arButton;
 	}
@@ -1136,7 +1138,7 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
-	static final public function addViewTarget($target, $content, $pos)
+	final public function addViewTarget($target, $content, $pos)
 	{
 		if(!isset($this->__view[$target]))
 			$this->__view[$target] = array();

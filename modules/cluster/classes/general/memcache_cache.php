@@ -40,12 +40,12 @@ class CPHPCacheMemcacheCluster
 		return self::$arList;
 	}
 
-	function __construct()
+	public function __construct()
 	{
 		$this->CPHPCacheMemcache();
 	}
 
-	public static function CPHPCacheMemcache()
+	public function CPHPCacheMemcache()
 	{
 		if(!is_object(self::$obMemcache))
 		{
@@ -89,13 +89,13 @@ class CPHPCacheMemcacheCluster
 		return count(self::$arList) > 0;
 	}
 
-	public static function QueueRun($param1, $param2, $param3)
+	public function QueueRun($param1, $param2, $param3)
 	{
 		$this->bQueue = false;
 		$this->clean($param1, $param2, $param3);
 	}
 
-	public static function clean($basedir, $initdir = false, $filename = false)
+	public function clean($basedir, $initdir = false, $filename = false)
 	{
 		global $DB;
 		if(is_object(self::$obMemcache))
@@ -150,7 +150,7 @@ class CPHPCacheMemcacheCluster
 		return false;
 	}
 
-	public static function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function read(&$arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		$basedir_version = self::$obMemcache->get($this->sid.$basedir);
 		if($basedir_version === false || $basedir_version === '')
@@ -175,7 +175,7 @@ class CPHPCacheMemcacheCluster
 		return true;
 	}
 
-	public static function write($arAllVars, $basedir, $initdir, $filename, $TTL)
+	public function write($arAllVars, $basedir, $initdir, $filename, $TTL)
 	{
 		$basedir_version = self::$obMemcache->get($this->sid.$basedir);
 		if($basedir_version === false || $basedir_version === '')

@@ -590,7 +590,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleProduct',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 9,
 					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:6:{i:2;a:4:{s:4:"name";'.
@@ -613,7 +613,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleProduct',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 10,
 					'settings' => unserialize('a:12:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:2:{i:4;a:4:{s:4:"name";'.
@@ -631,7 +631,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleBasket',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_PROFIT__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_GOODS_PROFIT__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 11,
 					'settings' => unserialize('a:11:{s:6:"entity";s:18:"Bitrix\Sale\Basket";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:6:{i:6;a:2:{s:4:"name";'.
@@ -657,7 +657,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleBasket',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_CLIENTS_PROFIT__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_CLIENTS_PROFIT__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 12,
 					'settings' => unserialize('a:11:{s:6:"entity";s:18:"Bitrix\Sale\Basket";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:7:{i:9;a:2:{s:4:"name";'.
@@ -686,7 +686,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleProduct',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_MOB__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_MOB__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 13,
 					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:3:{i:2;a:4:{s:4:"name";'.
@@ -705,7 +705,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleProduct',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST_MOB__12_5'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST_MOB__12_5_DESCR'),
+					'description' => '',
 					'mark_default' => 14,
 					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:3:{i:4;a:4:{s:4:"name";'.
@@ -725,7 +725,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				array(
 					'owner' => 'sale_SaleProduct',
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_BY_STORE__12_5_1'),
-					'description' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_BY_STORE__12_5_1_DESCR'),
+					'description' => '',
 					'mark_default' => 15,
 					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:7:{i:16;a:2:{s:4:"name";'.

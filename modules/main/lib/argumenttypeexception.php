@@ -20,7 +20,7 @@ class ArgumentTypeException
 	 * @param string $requiredType Required type
 	 * @param \Exception $previous
 	 */
-	static public function __construct($parameter, $requiredType = "", \Exception $previous = null)
+	public function __construct($parameter, $requiredType = "", \Exception $previous = null)
 	{
 		if (!empty($requiredType))
 			$message = sprintf("The value of an argument '%s' must be of type %s", $parameter, $requiredType);
@@ -32,7 +32,7 @@ class ArgumentTypeException
 		parent::__construct($message, $parameter, $previous);
 	}
 
-	static public function getRequiredType()
+	public function getRequiredType()
 	{
 		return $this->requiredType;
 	}

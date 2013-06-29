@@ -223,11 +223,11 @@ class CSocNetLogRights
 					elseif ($entity_type == SONET_ENTITY_USER && $perm == SONET_RELATIONS_TYPE_NONE)
 						CSocNetLogRights::Add($logID, array("SA", "U".$entity_id));
 					elseif ($entity_type == SONET_ENTITY_GROUP && $perm == SONET_ROLES_AUTHORIZED)
-						CSocNetLogRights::Add($logID, array("SA", "S".$entity_type.$entity_id, "AU"));
+						CSocNetLogRights::Add($logID, array("SA", "S".$entity_type.$entity_id, "S".$entity_type.$entity_id."_".SONET_ROLES_USER, "AU"));
 					elseif ($entity_type == SONET_ENTITY_USER && $perm == SONET_RELATIONS_TYPE_AUTHORIZED)
 						CSocNetLogRights::Add($logID, array("SA", "AU"));
 					elseif ($entity_type == SONET_ENTITY_GROUP && $perm == SONET_ROLES_ALL)
-						CSocNetLogRights::Add($logID, array("SA", "S".$entity_type.$entity_id, "G2"));
+						CSocNetLogRights::Add($logID, array("SA", "S".$entity_type.$entity_id, "S".$entity_type.$entity_id."_".SONET_ROLES_USER, "G2"));
 					elseif ($entity_type == SONET_ENTITY_USER && $perm == SONET_RELATIONS_TYPE_ALL)
 						CSocNetLogRights::Add($logID, array("SA", "G2"));
 				}

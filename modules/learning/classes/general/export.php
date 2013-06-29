@@ -88,11 +88,10 @@ class CCoursePackage
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php
 	 * @author Bitrix
 	 */
-	public static function CCoursePackage($COURSE_ID)
+	public function CCoursePackage($COURSE_ID)
 	{
 		global $DB;
 		$this->ID = intval($COURSE_ID);
@@ -223,11 +222,10 @@ class CCoursePackage
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php
 	 * @author Bitrix
 	 */
-	public static function CreatePackage($PACKAGE_DIR)
+	public function CreatePackage($PACKAGE_DIR)
 	{
 		if (strlen($this->LAST_ERROR)>0)
 			return false;
@@ -332,11 +330,10 @@ class CCoursePackage
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php
 	 * @author Bitrix
 	 */
-	public static function CreateManifest()
+	public function CreateManifest()
 	{
 		if (strlen($this->LAST_ERROR)>0)
 			return false;
@@ -361,7 +358,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _GetCourseContent($parentLessonId, $DEPTH_LEVEL = 1)
+	public function _GetCourseContent($parentLessonId, $DEPTH_LEVEL = 1)
 	{
 		global $DB;
 
@@ -406,7 +403,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _CreateCourseToc()
+	public function _CreateCourseToc()
 	{
 		$str = "<"."?xml version=\"1.0\" encoding=\"".$this->charset."\"?".">\n";
 		$str .= "<coursetoc>";
@@ -458,7 +455,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _GetResourceFiles($res_id)
+	public function _GetResourceFiles($res_id)
 	{
 		$str = "";
 
@@ -473,7 +470,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _CreateContent($TYPE, $arParams, $res_id)
+	public function _CreateContent($TYPE, $arParams, $res_id)
 	{
 		$str = "<"."?xml version=\"1.0\" encoding=\"".$this->charset."\"?".">\n";
 		$str .= '<content type="'.$TYPE.'">';
@@ -526,7 +523,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _replace_img($m0, $m1,$m2,$m3,$m4, $m5, $res_id)
+	public function _replace_img($m0, $m1,$m2,$m3,$m4, $m5, $res_id)
 	{
 		$src = $m3;
 		if($src <> "" && is_file($_SERVER["DOCUMENT_ROOT"].$src))
@@ -542,7 +539,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	function _ReplaceImages($text, $res_id)
+	public function _ReplaceImages($text, $res_id)
 	{
 		return preg_replace(
 			"/(<.+?src\s*=\s*)([\"']?)(.*?)(\\2)(.*?>)/ise",
@@ -553,7 +550,7 @@ class CCoursePackage
 
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	public static function CreateQTI($arParams, $res_id = 1)
+	public function CreateQTI($arParams, $res_id = 1)
 	{
 		global $DB;
 
@@ -635,7 +632,7 @@ class CCoursePackage
 	}
 
 
-	public static function CreateTMK($arParams, $res_id = 1)
+	public function CreateTMK($arParams, $res_id = 1)
 	{
 		$str = "<"."?xml version=\"1.0\" encoding=\"".$this->charset."\"?".">\n"
 			. '<content type="TMK">'

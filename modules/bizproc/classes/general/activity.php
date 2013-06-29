@@ -46,19 +46,19 @@ abstract class CBPActivity
 
 	/************************  PROPERTIES  ************************************************/
 
-	static public function GetDocumentId()
+	public function GetDocumentId()
 	{
 		$rootActivity = $this->GetRootActivity();
 		return $rootActivity->GetDocumentId();
 	}
 
-	static public function SetDocumentId($documentId)
+	public function SetDocumentId($documentId)
 	{
 		$rootActivity = $this->GetRootActivity();
 		$rootActivity->SetDocumentId($documentId);
 	}
 
-	static public function GetDocumentType()
+	public function GetDocumentType()
 	{
 		$rootActivity = $this->GetRootActivity();
 		if (!is_array($rootActivity->documentType) || count($rootActivity->documentType) <= 0)
@@ -69,25 +69,25 @@ abstract class CBPActivity
 		return $rootActivity->documentType;
 	}
 
-	static public function SetDocumentType($documentType)
+	public function SetDocumentType($documentType)
 	{
 		$rootActivity = $this->GetRootActivity();
 		$rootActivity->documentType = $documentType;
 	}
 
-	static public function GetWorkflowStatus()
+	public function GetWorkflowStatus()
 	{
 		$rootActivity = $this->GetRootActivity();
 		return $rootActivity->GetWorkflowStatus();
 	}
 
-	static public function SetWorkflowStatus($status)
+	public function SetWorkflowStatus($status)
 	{
 		$rootActivity = $this->GetRootActivity();
 		$rootActivity->SetWorkflowStatus($status);
 	}
 
-	static public function SetFieldTypes($arFieldTypes = array())
+	public function SetFieldTypes($arFieldTypes = array())
 	{
 		if (count($arFieldTypes) > 0)
 		{
@@ -122,13 +122,13 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function GetPropertyBaseType($propertyName)
+	public function GetPropertyBaseType($propertyName)
 	{
 		$rootActivity = $this->GetRootActivity();
 		return $rootActivity->arFieldTypes[$rootActivity->arPropertiesTypes[$propertyName]["Type"]]["BaseType"];
 	}
 
-	static public function SetProperties($arProperties = array())
+	public function SetProperties($arProperties = array())
 	{
 		if (count($arProperties) > 0)
 		{
@@ -137,7 +137,7 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function SetPropertiesTypes($arPropertiesTypes = array())
+	public function SetPropertiesTypes($arPropertiesTypes = array())
 	{
 		if (count($arPropertiesTypes) > 0)
 		{
@@ -171,13 +171,13 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function GetVariableBaseType($variableName)
+	public function GetVariableBaseType($variableName)
 	{
 		$rootActivity = $this->GetRootActivity();
 		return $rootActivity->arFieldTypes[$rootActivity->arVariablesTypes[$variableName]["Type"]]["BaseType"];
 	}
 
-	static public function SetVariables($arVariables = array())
+	public function SetVariables($arVariables = array())
 	{
 		if (count($arVariables) > 0)
 		{
@@ -187,7 +187,7 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function SetVariablesTypes($arVariablesTypes = array())
+	public function SetVariablesTypes($arVariablesTypes = array())
 	{
 		if (count($arVariablesTypes) > 0)
 		{
@@ -197,13 +197,13 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function SetVariable($name, $value)
+	public function SetVariable($name, $value)
 	{
 		$rootActivity = $this->GetRootActivity();
 		$rootActivity->arVariables[$name] = $value;
 	}
 
-	static public function GetVariable($name)
+	public function GetVariable($name)
 	{
 		$rootActivity = $this->GetRootActivity();
 
@@ -215,7 +215,7 @@ abstract class CBPActivity
 		//	throw new Exception(str_replace("#NAME#", htmlspecialcharsbx($name), GetMessage("BPSWA_EMPTY_NAME")));
 	}
 
-	static public function IsVariableExists($name)
+	public function IsVariableExists($name)
 	{
 		$rootActivity = $this->GetRootActivity();
 		return array_key_exists($name, $rootActivity->arVariables);
@@ -231,11 +231,10 @@ abstract class CBPActivity
 	 *
 	 * @return string <p>Строка, содержащая имя действия.</p>
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetName.php
 	 * @author Bitrix
 	 */
-	static public function GetName()
+	public function GetName()
 	{
 		return $this->name;
 	}
@@ -269,7 +268,7 @@ abstract class CBPActivity
 		return $p;
 	}
 
-	static public function SetWorkflow(CBPWorkflow $workflow)
+	public function SetWorkflow(CBPWorkflow $workflow)
 	{
 		$this->workflow = $workflow;
 	}
@@ -290,16 +289,15 @@ abstract class CBPActivity
 	 * </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetWorkflowInstanceId.php
 	 * @author Bitrix
 	 */
-	static public function GetWorkflowInstanceId()
+	public function GetWorkflowInstanceId()
 	{
 		return $this->workflow->GetInstanceId();
 	}
 
-	static public function SetStatusTitle($title = '')
+	public function SetStatusTitle($title = '')
 	{
 		$rootActivity = $this->GetRootActivity();
 		$stateService = $this->workflow->GetService("StateService");
@@ -329,7 +327,7 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function AddStatusTitle($title = '')
+	public function AddStatusTitle($title = '')
 	{
 		if ($title == '')
 			return;
@@ -342,7 +340,7 @@ abstract class CBPActivity
 		$stateService->SetStateTitle($this->GetWorkflowInstanceId(), $mainTitle);
 	}
 
-	static public function DeleteStatusTitle($title = '')
+	public function DeleteStatusTitle($title = '')
 	{
 		if ($title == '')
 			return;
@@ -579,13 +577,13 @@ abstract class CBPActivity
 		return $result;
 	}
 
-	static public function ParseValue($value)
+	public function ParseValue($value)
 	{
 		list($t, $r) = $this->GetPropertyValueRecursive($value);
 		return $r;
 	}
 
-	function __get($name)
+	public function __get($name)
 	{
 		if (array_key_exists($name, $this->arProperties))
 		{
@@ -599,7 +597,7 @@ abstract class CBPActivity
 		}
 	}
 
-	function __set($name, $val)
+	public function __set($name, $val)
 	{
 		if (array_key_exists($name, $this->arProperties))
 			$this->arProperties[$name] = $val;
@@ -607,7 +605,7 @@ abstract class CBPActivity
 			//throw new Exception(str_replace("#NAME#", htmlspecialcharsbx($name), GetMessage("BPCGACT_NO_PROPERTY")));
 	}
 
-	static public function IsPropertyExists($name)
+	public function IsPropertyExists($name)
 	{
 		return array_key_exists($name, $this->arProperties);
 	}
@@ -619,14 +617,14 @@ abstract class CBPActivity
 
 	/************************  CONSTRUCTORS  *****************************************************/
 
-	static public function __construct($name)
+	public function __construct($name)
 	{
 		$this->name = $name;
 	}
 
 	/************************  DEBUG  ***********************************************************/
 
-	static public function ToString()
+	public function ToString()
 	{
 		return $this->name.
 			" [".get_class($this)."] (status=".
@@ -638,7 +636,7 @@ abstract class CBPActivity
 			")";
 	}
 
-	static public function Dump($level = 3)
+	public function Dump($level = 3)
 	{
 		$result = str_repeat("	", $level).$this->ToString()."\n";
 
@@ -768,11 +766,10 @@ abstract class CBPActivity
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php
 	 * @author Bitrix
 	 */
-	static public function AddStatusChangeHandler($event, $eventHandler)
+	public function AddStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
 			$this->arStatusChangeHandlers = array();
@@ -810,11 +807,10 @@ abstract class CBPActivity
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php
 	 * @author Bitrix
 	 */
-	static public function RemoveStatusChangeHandler($event, $eventHandler)
+	public function RemoveStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
 			$this->arStatusChangeHandlers = array();
@@ -839,7 +835,7 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function SetStatus($newStatus, $arEventParameters = array())
+	public function SetStatus($newStatus, $arEventParameters = array())
 	{
 		$this->executionStatus = $newStatus;
 		$this->FireStatusChangedEvents(self::StatusChangedEvent, $arEventParameters);
@@ -897,7 +893,7 @@ abstract class CBPActivity
 		return call_user_func_array(array($classname, $method), $arParameters);
 	}
 
-	static public function InitializeFromArray($arParams)
+	public function InitializeFromArray($arParams)
 	{
 		if (is_array($arParams))
 		{
@@ -911,7 +907,7 @@ abstract class CBPActivity
 
 	/************************  MARK  ****************************************************************/
 
-	static public function MarkCanceled($arEventParameters = array())
+	public function MarkCanceled($arEventParameters = array())
 	{
 		if ($this->executionStatus != CBPActivityExecutionStatus::Closed)
 		{
@@ -923,13 +919,13 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function MarkCompleted($arEventParameters = array())
+	public function MarkCompleted($arEventParameters = array())
 	{
 		$this->executionResult = CBPActivityExecutionResult::Succeeded;
 		$this->MarkClosed($arEventParameters);
 	}
 
-	static public function MarkFaulted($arEventParameters = array())
+	public function MarkFaulted($arEventParameters = array())
 	{
 		$this->executionResult = CBPActivityExecutionResult::Faulted;
 		$this->MarkClosed($arEventParameters);

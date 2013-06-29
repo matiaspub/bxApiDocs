@@ -53,7 +53,7 @@ class CAllSaleDeliveryHandler
 	}
 
 	// private: get full info for all loaded handlers
-	function __getHandlersData($arFullHandlersList, $SITE_ID = false)
+	public static function __getHandlersData($arFullHandlersList, $SITE_ID = false)
 	{
 		global $DB;
 
@@ -190,7 +190,7 @@ WHERE HID IN (".$strKeys.")";
 	}
 
 	// private: get all handlers
-	function __getRegisteredHandlers()
+	public static function __getRegisteredHandlers()
 	{
 		$arHandlersList = array();
 		foreach(GetModuleEvents("sale", "onSaleDeliveryHandlersBuildList", true) as $arHandler)
@@ -199,7 +199,7 @@ WHERE HID IN (".$strKeys.")";
 		return $arHandlersList;
 	}
 
-	function __sortList(&$arHandlersList, $arSort)
+	public static function __sortList(&$arHandlersList, $arSort)
 	{
 		if (!is_array($arSort) || count($arSort) <= 0) return;
 		if (!is_array($arHandlersList) || count($arHandlersList) <= 0) return;
@@ -1004,7 +1004,7 @@ WHERE
 		return;
 	}
 
-	function __executeCalculateEvents($SID, $profile, $arOrder, $arReturn)
+	public static function __executeCalculateEvents($SID, $profile, $arOrder, $arReturn)
 	{
 		$arEventsList = array(
 			"onSaleDeliveryHandlerCalculate",

@@ -32,7 +32,7 @@ class LearnException extends Exception
 	// nextID = 0x0080000
 
 	// Redefine the exception to log exceptions
-		static public function __construct($message = null, $code = 0)
+		public function __construct($message = null, $code = 0)
 		{
 			//$trace = debug_backtrace();
 			// $trace = $this->trace;

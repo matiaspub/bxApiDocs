@@ -7,7 +7,7 @@ class CList
 	var $new_ids = array();
 	protected $iblock_id = 0;
 
-	function __construct($iblock_id)
+	public function __construct($iblock_id)
 	{
 		$this->iblock_id = intval($iblock_id);
 		$this->fields = new CListFieldList($iblock_id);
@@ -18,7 +18,7 @@ class CList
 		return CListFieldTypeList::IsField($type_id);
 	}
 
-	public static function is_readonly($field_id)
+	public function is_readonly($field_id)
 	{
 		$obField = $this->fields->GetByID($field_id);
 		if(is_object($obField))
@@ -27,7 +27,7 @@ class CList
 			return false;
 	}
 
-	public static function GetFields()
+	public function GetFields()
 	{
 		$arFields = array();
 
@@ -42,7 +42,7 @@ class CList
 		return CListFieldTypeList::GetTypesNames();
 	}
 
-	public static function GetAvailableTypes($ID = "")
+	public function GetAvailableTypes($ID = "")
 	{
 		$arTypeNames = CListFieldTypeList::GetTypesNames();
 		foreach($this->fields->GetFields() as $FIELD_ID)
@@ -51,22 +51,22 @@ class CList
 		return $arTypeNames;
 	}
 
-	public static function DeleteField($field_id)
+	public function DeleteField($field_id)
 	{
 		return $this->fields->DeleteField($field_id);
 	}
 
-	public static function AddField($arFields)
+	public function AddField($arFields)
 	{
 		return $this->fields->AddField($arFields);
 	}
 
-	public static function GetNewID($TEMP_ID)
+	public function GetNewID($TEMP_ID)
 	{
 		return $this->new_ids[$TEMP_ID];
 	}
 
-	public static function UpdateField($field_id, $arFields)
+	public function UpdateField($field_id, $arFields)
 	{
 		$arFields["NAME"] = trim($arFields["NAME"], " \n\r\t");
 		$this->new_ids[$field_id] = $this->fields->UpdateField($field_id, $arFields);
@@ -115,7 +115,7 @@ class CList
 		}
 	}
 
-	public static function ActualizeDocumentAdminPage($url)
+	public function ActualizeDocumentAdminPage($url)
 	{
 		global $DB;
 		static $urlCache = array();

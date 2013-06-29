@@ -66,7 +66,7 @@ class CCrypt
 	var $errorMessage = "";
 
 
-	public static function CCrypt($blockCipherMode = CRYPT_MODE_CBC, $cipher = "blowfish", $key = "", $iv = "")
+	public function CCrypt($blockCipherMode = CRYPT_MODE_CBC, $cipher = "blowfish", $key = "", $iv = "")
 	{
 		$cipher = strtolower($cipher);
 
@@ -99,7 +99,7 @@ class CCrypt
 	}
 
 
-	public static function CreateIV()
+	public function CreateIV()
 	{
 		$ivSize = $this->cipher->blockSize;
 		$ivSize = IntVal($ivSize);
@@ -112,7 +112,7 @@ class CCrypt
 	}
 
 
-	public static function Encrypt($text)
+	public function Encrypt($text)
 	{
 		if (empty($text))
 		{
@@ -139,7 +139,7 @@ class CCrypt
 	}
 
 
-	public static function Decrypt($cipher)
+	public function Decrypt($cipher)
 	{
 		if (empty($cipher))
 		{
@@ -166,7 +166,7 @@ class CCrypt
 	}
 
 
-	function __EncryptECB($text)
+	public function __EncryptECB($text)
 	{
 		$blockSize = $this->cipher->blockSize;
 		$cipher = "";
@@ -193,7 +193,7 @@ class CCrypt
 	}
 
 
-	function __DecryptECB($cipher)
+	public function __DecryptECB($cipher)
 	{
 		$blockSize = $this->cipher->blockSize;
 		$text = ""; 
@@ -221,7 +221,7 @@ class CCrypt
 	}
     
 
-	function __EncryptCBC($text)
+	public function __EncryptCBC($text)
 	{
 		$blockSize = $this->cipher->blockSize;
 		$cipher = "";
@@ -251,7 +251,7 @@ class CCrypt
 	}
     
 
-	function __DecryptCBC($cipher)
+	public function __DecryptCBC($cipher)
 	{
 		$blockSize = $this->cipher->blockSize;
 		$text = '';
@@ -304,12 +304,12 @@ class CSteganos
 	var $offset;
 
 
-	function CSteganos()
+	static function CSteganos()
 	{
 	}
 
 
-	public static function HideData($containerFile, $data, $resultFile, $level = 2)
+	public function HideData($containerFile, $data, $resultFile, $level = 2)
 	{
 		if (!file_exists($containerFile) || !is_file($containerFile) || !is_readable($containerFile))
 		{
@@ -367,7 +367,7 @@ class CSteganos
 	}
 
 
-	public static function ShowData($containerFile)
+	public function ShowData($containerFile)
 	{
 		if (!file_exists($containerFile) || !is_file($containerFile) || !is_readable($containerFile))
 		{
@@ -410,7 +410,7 @@ class CSteganos
 	}
 
 
-	function __CompressData()
+	public function __CompressData()
 	{
 		if (function_exists("gzcompress"))
 		{
@@ -419,7 +419,7 @@ class CSteganos
 		}
 	}
 
-	function __UnCompressData()
+	public function __UnCompressData()
 	{
 		if (function_exists("gzuncompress"))
 		{
@@ -430,7 +430,7 @@ class CSteganos
 	}
 
 
-	function __CheckContainer()
+	public function __CheckContainer()
 	{
 		if ($this->containerType == "bmp")
 		{
@@ -452,7 +452,7 @@ class CSteganos
 		return True;
 	}
 
-	function __OpenContainer()
+	public function __OpenContainer()
 	{
 		if (function_exists("file_get_contents"))
 		{
@@ -467,7 +467,7 @@ class CSteganos
 	}
 
 
-	function __SaveResult()
+	public function __SaveResult()
 	{
 		$fp = fopen($this->resultFile, "wb");
 		fwrite($fp, $this->containerData);
@@ -477,7 +477,7 @@ class CSteganos
 	}
 
 
-	function __HideData()
+	public function __HideData()
 	{
 		if ($this->containerType == "bmp")
 		{
@@ -525,7 +525,7 @@ class CSteganos
 		}
 	}
 
-	function __ConvertToBitString($bite)
+	public static function __ConvertToBitString($bite)
 	{
 		$mask = 0x80;
 		$bitString = "";
@@ -537,7 +537,7 @@ class CSteganos
 		return $bitString;
 	}
 
-	function __ShowData()
+	public function __ShowData()
 	{
 		if ($this->containerType == "bmp")
 		{
@@ -579,7 +579,7 @@ class CSteganos
 	}
 
 
-	function __GetHiddenInfo()
+	public function __GetHiddenInfo()
 	{
 		if ($this->containerType == "bmp")
 		{
@@ -702,7 +702,7 @@ class CSteganos
 		return True;
 	}
 
-	function __ConvertBitStringToBinary($bitStr)
+	public function __ConvertBitStringToBinary($bitStr)
 	{
 		$mask = 0x80;
 		$b = 0;
@@ -954,7 +954,7 @@ class CCryptblowfish
 	var $blockSize = 8;
 
 
-	public static function CCryptblowfish($key)
+	public function CCryptblowfish($key)
 	{
 		$this->arSubkeys = array(
 			"P" => $this->arrP,
@@ -969,7 +969,7 @@ class CCryptblowfish
 	}
 
 
-	function __F($x)
+	public function __F($x)
 	{
 		// Divide xL into four eight-bit quarters: a, b, c, and d
 		// F(xL) = ((S1[a] + S2[b] mod 232) XOR S3[c]) + S4[d] mod 232
@@ -989,7 +989,7 @@ class CCryptblowfish
 	}
 
 
-	function __BlowfishCrypt(&$Xl, &$Xr)
+	public function __BlowfishCrypt(&$Xl, &$Xr)
 	{
 		// Blowfish is a Feistel network consisting of 16 rounds (see Figure 1). 
 		// The input is a 64-bit data element, x
@@ -1024,7 +1024,7 @@ class CCryptblowfish
 	}
 
 
-	function __BlowfishDecrypt(&$Xl, &$Xr)
+	public function __BlowfishDecrypt(&$Xl, &$Xr)
 	{
 		for ($i = 17; $i >= 2 ; $i--)
 		{
@@ -1045,7 +1045,7 @@ class CCryptblowfish
 	}
 
 
-	function __Init($key)
+	public function __Init($key)
 	{
 		$key = array_values(unpack("C*", $key));
 		$keyLength = count($key);
@@ -1094,7 +1094,7 @@ class CCryptblowfish
 	}
 
 
-	function __Encrypt($block)
+	public function __Encrypt($block)
 	{
 		$data = array_values(unpack('N*', $block));
 		$this->__BlowfishCrypt($data[0], $data[1]);
@@ -1102,7 +1102,7 @@ class CCryptblowfish
 	}
 
 
-	function __Decrypt($block)
+	public function __Decrypt($block)
 	{
 		$data = array_values(unpack('N*', $block));
 		$this->__BlowfishDecrypt($data[0], $data[1]);
@@ -1121,13 +1121,13 @@ class CCryptrc4
 	var $blockSize = 0;
 
 
-	public static function CCryptrc4($key)
+	public function CCryptrc4($key)
 	{
 		$this->__Init($key);
 	}
 
 
-	function __Init($key)
+	public function __Init($key)
 	{
 		$this->arKey[] = "";
 		$this->arBox[] = "";
@@ -1149,7 +1149,7 @@ class CCryptrc4
 		}
 	}
 
-	function __Process($block)
+	public function __Process($block)
 	{
 		$data = "";
 		$blockLength = strlen($block);
@@ -1171,13 +1171,13 @@ class CCryptrc4
 	}
 
 
-	function __Encrypt($block)
+	public static function __Encrypt($block)
 	{
 		return __Process($block);
 	}
 
 
-	function __Decrypt($block)
+	public static function __Decrypt($block)
 	{
 		return __Process($block);
 	}

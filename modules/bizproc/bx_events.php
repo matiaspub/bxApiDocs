@@ -8,7 +8,7 @@ class _CEventsBizproc {
 	/**
 	 * перед добавлением записи в историю.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPHistoryService::AddHistory
 	 */
 	public static function OnAddToHistory(){}
@@ -16,7 +16,7 @@ class _CEventsBizproc {
 	/**
 	 * перед удалением файла из истории.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPAllHistoryService::DeleteHistory
 	 */
 	public static function OnBeforeDeleteFileFromHistory(){}
@@ -24,7 +24,7 @@ class _CEventsBizproc {
 	/**
 	 * при создании экземпляра бизнес-процесса.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPRuntime::CreateWorkflow
 	 */
 	public static function OnCreateWorkflow(){}
@@ -32,7 +32,7 @@ class _CEventsBizproc {
 	/**
 	 * при создании задания бизнес-процесса.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPTaskService::Add
 	 */
 	public static function OnTaskAdd(){}
@@ -40,7 +40,7 @@ class _CEventsBizproc {
 	/**
 	 * при удалении задания бизнес-процесса.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPAllTaskService::DeleteByWorkflow
 	 */
 	public static function OnTaskDelete(){}
@@ -48,7 +48,7 @@ class _CEventsBizproc {
 	/**
 	 * при завершении задания бизнес-процесса.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPAllTaskService::MarkCompleted
 	 */
 	public static function OnTaskMarkCompleted(){}
@@ -56,7 +56,7 @@ class _CEventsBizproc {
 	/**
 	 * при обновлении задания бизнес-процесса.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CBPTaskService::Update
 	 */
 	public static function OnTaskUpdate(){}

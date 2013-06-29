@@ -33,7 +33,7 @@ class CSocNetTextParser
 		6 => 140, //"x-large"
 		7 => 160); //"xx-large"
 
-	public static function CSocNetTextParser($strLang = False, $pathToSmile = false)
+	public function CSocNetTextParser($strLang = False, $pathToSmile = false)
 	{
 		global $DB, $CACHE_MANAGER;
 		if ($strLang===False)
@@ -91,11 +91,10 @@ class CSocNetTextParser
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert.php
 	 * @author Bitrix
 	 */
-	public static function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N")) //, "KEEP_AMP" => "N"
+	public function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N")) //, "KEEP_AMP" => "N"
 	{
 		global $DB;
 
@@ -377,7 +376,7 @@ class CSocNetTextParser
 		return $text;
 	}
 
-	public static function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
+	public function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
 	{
 		if (strlen($code)<=0 || strlen($image)<=0) return;
 		$code = stripslashes($code);
@@ -419,7 +418,7 @@ class CSocNetTextParser
 		return "\n====code====\n".$text."\n===========\n";
 	}
 
-	public static function convert_quote_tag($text = "")
+	public function convert_quote_tag($text = "")
 	{
 		if (strlen($text)<=0) return;
 		$txt = $text;
@@ -438,7 +437,7 @@ class CSocNetTextParser
 		}
 	}
 
-	public static function convert_quote_tag_rss($text = "")
+	public function convert_quote_tag_rss($text = "")
 	{
 		if (strlen($text)<=0) return;
 		$txt = $text;
@@ -457,19 +456,19 @@ class CSocNetTextParser
 		}
 	}
 
-	public static function convert_open_quote_tag()
+	public function convert_open_quote_tag()
 	{
 		$this->quote_open++;
 		return '<br /><div class="socnet-quote"><span class="socnet-quote-title">'.GetMessage("SONET_QUOTE").'<br /></span>';
 	}
 
-	public static function convert_open_3_tag_rss()
+	public function convert_open_3_tag_rss()
 	{
 		$this->quote_open++;
 		return "\n====quote====\n";
 	}
 
-	public static function convert_close_quote_tag()
+	public function convert_close_quote_tag()
 	{
 		if ($this->quote_open == 0)
 		{
@@ -480,7 +479,7 @@ class CSocNetTextParser
 		return '</div><br style="clear:both" />';
 	}
 
-	public static function convert_close_quote_tag_rss()
+	public function convert_close_quote_tag_rss()
 	{
 		if ($this->quote_open == 0)
 		{
@@ -491,7 +490,7 @@ class CSocNetTextParser
 		return "\n===========\n";
 	}
 
-	public static function convert_image_tag($url = "")
+	public function convert_image_tag($url = "")
 	{
 		if (strlen($url)<=0) return;
 		$url = trim($url);
@@ -518,7 +517,7 @@ class CSocNetTextParser
 		return "<img src='$url' border='0'>";
 	}
 
-	public static function convert_font_attr($attr, $value = "", $text = "")
+	public function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0) return "";
 		if (strlen($value)<=0) return $text;
@@ -543,7 +542,7 @@ class CSocNetTextParser
 		}
 	}
 
-	public static function part_long_words($str1, $str2, $str3)
+	public function part_long_words($str1, $str2, $str3)
 	{
 		$str2 = str_replace(chr(1), "", $str2);
 		$str2 = str_replace(chr(2), "", $str2);
@@ -614,7 +613,7 @@ class CSocNetTextParser
 		return $pref."<a href='".$url."' target='_blank'>".$text."</a>".$end;
 	}
 
-	public static function convert_to_rss($text, $arImages = Array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N")) //, "KEEP_AMP" => "N"
+	public function convert_to_rss($text, $arImages = Array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N")) //, "KEEP_AMP" => "N"
 	{
 		global $DB;
 

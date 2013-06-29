@@ -1,4 +1,9 @@
 <?
+/**
+ * @global $USER_FIELD_MANAGER CUserTypeManager
+ */
+global $USER_FIELD_MANAGER;
+
 // 2012-04-14 Checked/modified for compatibility with new data model
 
 /**
@@ -13,7 +18,7 @@
  * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php
  * @author Bitrix
  */
-class CAllTestAttempt
+abstract class CAllTestAttempt
 {
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function CheckFields(&$arFields, $ID = false)
@@ -226,11 +231,10 @@ class CAllTestAttempt
 	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields)
+	public function Update($ID, $arFields)
 	{
 		global $DB, $USER_FIELD_MANAGER;
 
@@ -306,7 +310,7 @@ class CAllTestAttempt
 	 */
 	public static function Delete($ID)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$ID = intval($ID);
 		if ($ID < 1) return false;
@@ -321,7 +325,7 @@ class CAllTestAttempt
 		if (!$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__))
 			return false;
 
-		$GLOBALS["USER_FIELD_MANAGER"]->Delete("LEARN_ATTEMPT", $ID);
+		$USER_FIELD_MANAGER->Delete("LEARN_ATTEMPT", $ID);
 
 		return true;
 	}
@@ -369,7 +373,6 @@ class CAllTestAttempt
 					$arSqlSearch[] = GetFilterQuery("U.ID, U.LOGIN, U.NAME, U.LAST_NAME",$val);
 					break;
 			}
-
 		}
 
 		return $arSqlSearch;
@@ -403,7 +406,10 @@ class CAllTestAttempt
 	 */
 	public static function GetByID($ID)
 	{
-		return CTestAttempt::GetList(Array(), Array("ID" => $ID));
+		if ((int) $ID > 0)
+			return CTestAttempt::GetList(array(), array("ID" => (int) $ID));
+		else
+			return (new CDBResult());
 	}
 
 
@@ -660,11 +666,10 @@ class CAllTestAttempt
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/attemptfinished.php
 	 * @author Bitrix
 	 */
-	public static function AttemptFinished($ATTEMPT_ID)
+	public function AttemptFinished($ATTEMPT_ID)
 	{
 		global $DB;
 
@@ -785,9 +790,113 @@ class CAllTestAttempt
 
 
 	// 2012-04-13 Checked/modified for compatibility with new data model
-	protected static function _GetList($arOrder=array(), $arFilter=array(), $arSelect = array(), $arCallbackSqlFormer)
+	
+	/**
+	 * <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
+	 * сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
+	 * сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
+	 * попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li> <b>STUDENT_ID</b> -
+	 * идентификатор студента ; </li> <li> <b>DATE_START</b> - дата начала попытки; </li>
+	 * <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>STATUS</b> - статус
+	 * попытки; </li> <li> <b>SCORE</b> - количество баллов; </li> <li> <b>MAX_SCORE</b> -
+	 * максимальное количество баллов; </li> <li> <b>COMPLETED</b> - тест пройден; </li>
+	 * <li> <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>USER_NAME</b> - имя студента ;
+	 * </li> <li> <b>TEST_NAME</b> - название теста. </li> </ul>Направление сортировки
+	 * может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
+	 * <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
+	 * фильтруется по убыванию идентификатора попытки.
+	 *
+	 *
+	 *
+	 * @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	 * Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
+	 * идентификатор попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li>
+	 * <b>STUDENT_ID</b> - идентификатор студента; </li> <li> <b>SCORE</b> - количество
+	 * баллов; </li> <li> <b>MAX_SCORE</b> - максимальное количество баллов; </li> <li>
+	 * <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>STATUS</b> - статус попытки (B -
+	 * тестирование началось, D - тест прерван, F - тест закончен.); </li> <li>
+	 * <b>COMPLETED</b> - тест пройден (Y|N); </li> <li> <b>DATE_START</b> - дата начала попытки;
+	 * </li> <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>USER</b> -
+	 * пользователь (возможны сложные условия по полям пользователя ID,
+	 * LOGIN, NAME, LAST_NAME); </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
+	 * умолчанию "R". Список прав доступа см. в <a
+	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li> <li>
+	 * <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
+	 * значение "N" - права доступа не проверяются. </li> </ul>Перед названием
+	 * фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
+	 * </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
+	 * </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" -
+	 * одиночное значение или массив.<br><br>Необязательный. По умолчанию
+	 * записи не фильтруются.
+	 *
+	 *
+	 *
+	 * @return CDBResult <p>Возвращается объект <a
+	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * if (CModule::IncludeModule("learning"))
+	 * {
+	 *     $TEST_ID = 45;
+	 *     $res = CTestAttempt::GetList(
+	 *         Array("ID" =&gt; "ASC"), 
+	 *         Array("TEST_ID" =&gt; $TEST_ID)
+	 *     );
+	 * 
+	 *     while ($arAttempt = $res-&gt;GetNext())
+	 *     {
+	 *         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
+	 *     }
+	 * }
+	 * 
+	 * ?&gt;
+	 * 
+	 * &lt;?
+	 * 
+	 * if (CModule::IncludeModule("learning"))
+	 * {
+	 *     $TEST_ID = 45;
+	 *     $STUDENT_ID = 3;
+	 * 
+	 *     $res = CTestAttempt::GetList(
+	 *         Array("SCORE" =&gt; "DESC"), 
+	 *         Array("CHECK_PERMISSIONS" =&gt; "N", "TEST_ID" =&gt; $TEST_ID, "STUDENT_ID" =&gt; $STUDENT_ID)
+	 *     );
+	 * 
+	 *     while ($arAttempt = $res-&gt;GetNext())
+	 *     {
+	 *         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
+	 *     }
+	 * }
+	 * 
+	 * ?&gt;
+	 * </pre>
+	 *
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
+	 * name="examples"></a>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getlist.php
+	 * @author Bitrix
+	 */
+	public static function GetList($arOrder=array(), $arFilter=array(), $arSelect = array(), $arNavParams = array())
 	{
-		global $DB, $USER, $APPLICATION, $USER_FIELD_MANAGER;
+		global $DB, $USER, $USER_FIELD_MANAGER;
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("LEARN_ATTEMPT", "A.ID");
@@ -844,7 +953,7 @@ class CAllTestAttempt
 
 		$bCheckPerm = 'ORPHANED VAR';
 
-		$strSql = call_user_func($arCallbackSqlFormer, $sSelect, $obUserFieldsSql, $bCheckPerm, $USER, $arFilter, $strSqlSearch);
+		$strSql = static::_GetListSQLFormer($sSelect, $obUserFieldsSql, $bCheckPerm, $USER, $arFilter, $strSqlSearch);
 
 		if (!is_array($arOrder))
 			$arOrder = Array();
@@ -856,24 +965,34 @@ class CAllTestAttempt
 			if ($order!="asc")
 				$order = "desc";
 
-			if ($by == "id") $arSqlOrder[] = " A.ID ".$order." ";
-			elseif ($by == "test_id") $arSqlOrder[] = " A.TEST_ID ".$order." ";
-			elseif ($by == "student_id") $arSqlOrder[] = " A.STUDENT_ID ".$order." ";
-			elseif ($by == "date_start") $arSqlOrder[] = " A.DATE_START ".$order." ";
-			elseif ($by == "date_end") $arSqlOrder[] = " A.DATE_END ".$order." ";
-			elseif ($by == "status") $arSqlOrder[] = " A.STATUS ".$order." ";
-			elseif ($by == "score") $arSqlOrder[] = " A.SCORE ".$order." ";
-			elseif ($by == "max_score") $arSqlOrder[] = " A.MAX_SCORE ".$order." ";
-			elseif ($by == "completed") $arSqlOrder[] = " A.COMPLETED ".$order." ";
-			elseif ($by == "questions") $arSqlOrder[] = " A.QUESTIONS ".$order." ";
-			elseif ($by == "user_name") $arSqlOrder[] = " USER_NAME ".$order." ";
-			elseif ($by == "test_name") $arSqlOrder[] = " TEST_NAME ".$order." ";
-			elseif ($s = $obUserFieldsSql->GetOrder($by)) $arSqlOrder[$by] = " ".$s." ".$order." ";
-			else
-			{
+			if ($by == "id")
 				$arSqlOrder[] = " A.ID ".$order." ";
-				$by = "id";
-			}
+			elseif ($by == "test_id")
+				$arSqlOrder[] = " A.TEST_ID ".$order." ";
+			elseif ($by == "student_id")
+				$arSqlOrder[] = " A.STUDENT_ID ".$order." ";
+			elseif ($by == "date_start")
+				$arSqlOrder[] = " A.DATE_START ".$order." ";
+			elseif ($by == "date_end")
+				$arSqlOrder[] = " A.DATE_END ".$order." ";
+			elseif ($by == "status")
+				$arSqlOrder[] = " A.STATUS ".$order." ";
+			elseif ($by == "score")
+				$arSqlOrder[] = " A.SCORE ".$order." ";
+			elseif ($by == "max_score")
+				$arSqlOrder[] = " A.MAX_SCORE ".$order." ";
+			elseif ($by == "completed")
+				$arSqlOrder[] = " A.COMPLETED ".$order." ";
+			elseif ($by == "questions")
+				$arSqlOrder[] = " A.QUESTIONS ".$order." ";
+			elseif ($by == "user_name")
+				$arSqlOrder[] = " USER_NAME ".$order." ";
+			elseif ($by == "test_name")
+				$arSqlOrder[] = " TEST_NAME ".$order." ";
+			elseif ($s = $obUserFieldsSql->GetOrder($by))
+				$arSqlOrder[$by] = " ".$s." ".$order." ";
+			else
+				$arSqlOrder[] = " A.ID ".$order." ";
 		}
 
 		$strSqlOrder = "";
@@ -891,7 +1010,8 @@ class CAllTestAttempt
 
 		$strSql .= $strSqlOrder;
 
-		//echo $strSql;
+		if (isset($arNavParams['NAV_PARAMS']['nPageTop']) && ($arNavParams['NAV_PARAMS']['nPageTop'] > 0))
+			$strSql = $DB->TopSql($strSql, $arNavParams['NAV_PARAMS']['nPageTop']);
 
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields("LEARN_ATTEMPT"));
@@ -903,7 +1023,7 @@ class CAllTestAttempt
 	// 2012-04-14 Checked/modified for compatibility with new data model
 	protected static function _CreateAttemptQuestions($arCallbackSqlFormer, $ATTEMPT_ID)
 	{
-		global $APPLICATION, $DB, $DBType;
+		global $APPLICATION, $DB;
 
 		$ATTEMPT_ID = intval($ATTEMPT_ID);
 

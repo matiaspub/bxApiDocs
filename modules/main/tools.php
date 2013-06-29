@@ -4042,7 +4042,7 @@ function GetScriptFileExt()
 	if($FILEMAN_SCRIPT_EXT !== false)
 		return $FILEMAN_SCRIPT_EXT;
 
-	$script_files = COption::GetOptionString("fileman", "~script_files", "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht");
+	$script_files = COption::GetOptionString("fileman", "~script_files", "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp");
 	$arScriptFiles = array();
 	foreach(explode(",", strtolower($script_files)) as $ext)
 		if(($e = trim($ext)) != "")
@@ -4304,8 +4304,8 @@ function GetPagePath($page=false, $get_index_page=null)
 	if(substr($sPath, -1, 1) == "/" && $get_index_page)
 		$sPath .= GetDirectoryIndex($sPath);
 
-	static $aSearch = array("<", ">", "\"", "'");
-	static $aReplace = array("&lt;", "&gt;", "&quot;", "&#039;");
+	static $aSearch = array("<", ">", "\"", "'", "%", "\r", "\n", "\t");
+	static $aReplace = array("&lt;", "&gt;", "&quot;", "&#039;", "%25", "%0d", "%0a", "%09");
 	$sPath = str_replace($aSearch, $aReplace, $sPath);
 
 	return Rel2Abs("/", $sPath);
@@ -4484,9 +4484,6 @@ function _normalizePath($strPath)
 	if($strPath <> '')
 	{
 		$strPath = str_replace("\\", "/", $strPath);
-
-		while(strpos($strPath, ".../") !== false)
-			$strPath = str_replace(".../", "../", $strPath);
 
 		$arPath = explode('/', $strPath);
 		$nPath = count($arPath);
@@ -6896,7 +6893,7 @@ class CJSCore
 
 class CUtil
 {
-	function addslashes($s)
+	public static function addslashes($s)
 	{
 		static $aSearch = array("\\", "\"", "'");
 		static $aReplace = array("\\\\", '\\"', "\\'");
@@ -6928,15 +6925,15 @@ class CUtil
 		return $html;
 	}
 
-	function JSEscape($s)
+	public static function JSEscape($s)
 	{
 		static $aSearch = array("\xe2\x80\xa9", "\\", "'", "\"", "\r\n", "\r", "\n", "\xe2\x80\xa8", "*/");
 		static $aReplace = array(" ", "\\\\", "\\'", '\\"', "\n", "\n", "\\n'+\n'", "\\n'+\n'", "*'+'/");
-		$val =  str_replace($aSearch, $aReplace, $s);
+		$val = str_replace($aSearch, $aReplace, $s);
 		return preg_replace("'</script'i", "</s'+'cript", $val);
 	}
 
-	function JSUrlEscape($s)
+	public static function JSUrlEscape($s)
 	{
 		static $aSearch = array("%27", "%5C", "%0A", "%0D", "%", "&#039;", "&#39;", "&#x27;", "&apos;");
 		static $aReplace = array("\\'", "\\\\", "\\n", "\\r", "%25", "\\'", "\\'", "\\'", "\\'");
@@ -7566,7 +7563,7 @@ class CHTTP
 	private $redirectMax = 20;
 	private $redirectsMade = 0;
 
-	public static function CHTTP()
+	public function CHTTP()
 	{
 		$this->user_agent = 'BitrixSM ' . __CLASS__ . ' class';
 	}
@@ -7598,7 +7595,7 @@ class CHTTP
 	}
 
 
-	public static function Download($url, $file)
+	public function Download($url, $file)
 	{
 		CheckDirPath($file);
 		$this->fp = fopen($file, "wb");
@@ -7614,7 +7611,7 @@ class CHTTP
 		return false;
 	}
 
-	public static function Get($url)
+	public function Get($url)
 	{
 		if ($this->HTTPQuery('GET', $url))
 		{
@@ -7623,7 +7620,7 @@ class CHTTP
 		return false;
 	}
 
-	public static function Post($url, $arPostData)
+	public function Post($url, $arPostData)
 	{
 		$postdata = '';
 		if (is_array($arPostData))
@@ -7645,7 +7642,7 @@ class CHTTP
 		return false;
 	}
 
-	public static function HTTPQuery($method, $url, $postdata = '')
+	public function HTTPQuery($method, $url, $postdata = '')
 	{
 		$arUrl = false;
 		if(is_resource($this->fp))
@@ -7694,7 +7691,7 @@ class CHTTP
 		return true;
 	}
 
-	public static function Query($method, $host, $port, $path, $postdata = false, $proto = '', $post_content_type = 'N')
+	public function Query($method, $host, $port, $path, $postdata = false, $proto = '', $post_content_type = 'N')
 	{
 		$this->status = 0;
 		$this->result = '';
@@ -7795,7 +7792,7 @@ class CHTTP
 		return false;
 	}
 
-	public static function SetAuthBasic($user, $pass)
+	public function SetAuthBasic($user, $pass)
 	{
 		$this->additional_headers['Authorization'] = "Basic ".base64_encode($user.":".$pass);
 	}
@@ -7858,7 +7855,7 @@ class CHTTP
 		return $arUrl;
 	}
 
-	static public function ParseHeaders($strHeaders)
+	public function ParseHeaders($strHeaders)
 	{
 		$arHeaders = explode("\n", $strHeaders);
 		foreach ($arHeaders as $k => $header)
@@ -7894,12 +7891,12 @@ class CHTTP
 		}
 	}
 
-	static public function setFollowRedirect($follow)
+	public function setFollowRedirect($follow)
 	{
 		$this->follow_redirect = $follow;
 	}
 
-	static public function setRedirectMax($n)
+	public function setRedirectMax($n)
 	{
 		$this->redirectMax = $n;
 	}
@@ -7918,7 +7915,7 @@ class CHTTP
 		return $ob->Post($url, $arPostData);
 	}
 
-	public static function SetAdditionalHeaders($arHeader=array())
+	public function SetAdditionalHeaders($arHeader=array())
 	{
 		foreach($arHeader as $name => $value)
 		{
@@ -8592,7 +8589,7 @@ class CSpacer
 	var $iMaxChar;
 	var $symbol;
 
-	function __construct($iMaxChar, $symbol)
+	public function __construct($iMaxChar, $symbol)
 	{
 		$this->iMaxChar = $iMaxChar;
 		$this->symbol = $symbol;
@@ -8603,7 +8600,7 @@ class CSpacer
 		return preg_replace_callback('/(^|>)([^<>]+)(<|$)/', array($this, "__InsertSpacesCallback"), $string);
 	}
 
-	function __InsertSpacesCallback($arMatch)
+	public function __InsertSpacesCallback($arMatch)
 	{
 		return $arMatch[1].preg_replace("/([^() \\n\\r\\t%!?{}\\][-]{".$this->iMaxChar."})/".BX_UTF_PCRE_MODIFIER,"\\1".$this->symbol, $arMatch[2]).$arMatch[3];
 	}
@@ -8704,4 +8701,22 @@ function getLocalPath($path, $baseFolder = "/bitrix")
 		return $baseFolder."/".$path;
 	}
 	return false;
+}
+
+
+/**
+ * Set session expired, e.g. if you want to destroy session after this hit
+ * @param bool $pIsExpired
+ */
+function setSessionExpired($pIsExpired = true)
+{
+	$_SESSION["IS_EXPIRED"] = $pIsExpired;
+}
+
+/**
+ * @return bool
+ */
+function isSessionExpired()
+{
+	return isset($_SESSION["IS_EXPIRED"]) && $_SESSION["IS_EXPIRED"] === true;
 }

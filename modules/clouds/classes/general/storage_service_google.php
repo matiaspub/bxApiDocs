@@ -10,7 +10,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 	protected $result = '';
 	protected $new_end_point;
 
-	public static function GetLastRequestStatus()
+	public function GetLastRequestStatus()
 	{
 		return $this->status;
 	}
@@ -38,7 +38,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		);
 	}
 
-	public static function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
+	public function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
 	{
 		if($bVarsFromForm)
 			$arSettings = $_POST["SETTINGS"][$this->GetID()];
@@ -71,7 +71,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return $result;
 	}
 
-	public static function CheckSettings($arBucket, &$arSettings)
+	public function CheckSettings($arBucket, &$arSettings)
 	{
 		global $APPLICATION;
 		$aMsg = array();
@@ -105,7 +105,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return true;
 	}
 
-	public static function CreateBucket($arBucket)
+	public function CreateBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -141,7 +141,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function DeleteBucket($arBucket)
+	public function DeleteBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -176,7 +176,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function IsEmptyBucket($arBucket)
+	public function IsEmptyBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -250,7 +250,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return $proto."://$host/".CCloudUtil::URLEncode($URI, "UTF-8");
 	}
 
-	public static function FileExists($arBucket, $filePath)
+	public function FileExists($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -285,7 +285,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function FileCopy($arBucket, $arFile, $filePath)
+	public function FileCopy($arBucket, $arFile, $filePath)
 	{
 		global $APPLICATION;
 
@@ -321,7 +321,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function DownloadToFile($arBucket, $arFile, $filePath)
+	public function DownloadToFile($arBucket, $arFile, $filePath)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$obRequest = new CHTTP;
@@ -329,7 +329,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return $obRequest->Download($this->GetFileSRC($arBucket, $arFile), $io->GetPhysicalName($filePath));
 	}
 
-	public static function DeleteFile($arBucket, $filePath)
+	public function DeleteFile($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -360,7 +360,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function SaveFile($arBucket, $filePath, $arFile)
+	public function SaveFile($arBucket, $filePath, $arFile)
 	{
 		global $APPLICATION;
 
@@ -397,7 +397,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		}
 	}
 
-	public static function ListFiles($arBucket, $filePath, $bRecursive = false)
+	public function ListFiles($arBucket, $filePath, $bRecursive = false)
 	{
 		global $APPLICATION;
 
@@ -488,7 +488,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return $result;
 	}
 
-	public static function InitiateMultipartUpload($arBucket, &$NS, $filePath, $fileSize, $ContentType)
+	public function InitiateMultipartUpload($arBucket, &$NS, $filePath, $fileSize, $ContentType)
 	{
 		$filePath = '/'.trim($filePath, '/');
 		if($arBucket["PREFIX"])
@@ -539,7 +539,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return 5*1024*1024; //5MB
 	}
 
-	public static function UploadPart($arBucket, &$NS, $data)
+	public function UploadPart($arBucket, &$NS, $data)
 	{
 		global $APPLICATION;
 
@@ -600,7 +600,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 		return true;
 	}
 
-	public static function SendRequest($access_key, $secret_key, $verb, $bucket, $file_name='/', $params='', $content='', $additional_headers=array())
+	public function SendRequest($access_key, $secret_key, $verb, $bucket, $file_name='/', $params='', $content='', $additional_headers=array())
 	{
 		global $APPLICATION;
 		$this->status = 0;

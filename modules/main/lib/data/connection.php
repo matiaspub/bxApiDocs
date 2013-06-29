@@ -17,12 +17,12 @@ abstract class Connection
 	protected $configuration;
 
 
-	static public function __construct($configuration)
+	public function __construct($configuration)
 	{
 		$this->configuration = $configuration;
 	}
 
-	static public function connect()
+	public function connect()
 	{
 		if ($this->isConnected)
 		{
@@ -32,7 +32,7 @@ abstract class Connection
 		$this->connectInternal();
 	}
 
-	static public function disconnect()
+	public function disconnect()
 	{
 		if (!$this->isConnected)
 		{
@@ -42,7 +42,7 @@ abstract class Connection
 		$this->disconnectInternal();
 	}
 
-	static public function getResource()
+	public function getResource()
 	{
 		$this->connectInternal();
 		return $this->resource;
@@ -51,7 +51,7 @@ abstract class Connection
 	abstract protected function connectInternal();
 	abstract protected function disconnectInternal();
 
-	static public function getConfiguration()
+	public function getConfiguration()
 	{
 		return $this->configuration;
 	}

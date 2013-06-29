@@ -102,7 +102,7 @@ class OracleSqlHelper
 		return "TO_CHAR(".$fieldName.", 'YYYY-MM-DD HH24:MI:SS')";
 	}
 
-	public static function prepareInsert($tableName, $arFields)
+	public function prepareInsert($tableName, $arFields)
 	{
 		$strInsert1 = "";
 		$strInsert2 = "";
@@ -135,7 +135,7 @@ class OracleSqlHelper
 		return array($strInsert1, $strInsert2, $arBinds);
 	}
 
-	public static function prepareUpdate($tableName, $arFields)
+	public function prepareUpdate($tableName, $arFields)
 	{
 		$arBinds = array();
 		$strUpdate = "";

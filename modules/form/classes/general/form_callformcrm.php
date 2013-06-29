@@ -6,7 +6,7 @@ abstract class CAllFormCrm
 
 	private static $_ob;
 
-	abstract public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array());
+	abstract public function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array());
 
 	public static function GetByID($ID)
 	{
@@ -1130,7 +1130,7 @@ class CFormCrmSender
 
 	private $lastResult = null;
 
-	static public function __construct($ID, $arAuth = null)
+	public function __construct($ID, $arAuth = null)
 	{
 		$this->ID = intval($ID);
 		if ($this->ID > 0)
@@ -1145,12 +1145,12 @@ class CFormCrmSender
 		}
 	}
 
-	static public function AddLead($arLeadFields)
+	public function AddLead($arLeadFields)
 	{
 		return $this->_query('lead.add', $arLeadFields);
 	}
 
-	static public function GetFields($bReload = false)
+	public function GetFields($bReload = false)
 	{
 		global $CACHE_MANAGER;
 
@@ -1189,12 +1189,12 @@ class CFormCrmSender
 		return $this->arCRMFields;
 	}
 
-	static public function GetAuthHash()
+	public function GetAuthHash()
 	{
 		return $this->authHash;
 	}
 
-	static public function GetLastResult()
+	public function GetLastResult()
 	{
 		return $this->lastResult;
 	}
@@ -1278,30 +1278,30 @@ class _CFormCrmSenderResult
 	private $result_code;
 	private $result_error;
 
-	static public function __construct($result_text)
+	public function __construct($result_text)
 	{
 		$this->result_text = trim($result_text);
 	}
 
-	static public function code()
+	public function code()
 	{
 		$this->_process();
 		return $this->result_code;
 	}
 
-	static public function data()
+	public function data()
 	{
 		$this->_process();
 		return $this->result;
 	}
 
-	static public function error()
+	public function error()
 	{
 		$this->_process();
 		return $this->result_error;
 	}
 
-	static public function field($field)
+	public function field($field)
 	{
 		$this->_process();
 		return $this->result[$field];

@@ -124,7 +124,7 @@ class CAllFormValidator
 		return CFormValidator::__getList($arFilter, $by, $order);
 	}
 
-	function __getList($arFilter = array(), &$by, &$order)
+	public static function __getList($arFilter = array(), &$by, &$order)
 	{
 		global $DB;
 		

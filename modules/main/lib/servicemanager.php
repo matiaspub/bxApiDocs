@@ -8,17 +8,17 @@ final class ServiceManager
 
 	const DB = "DB";
 
-	public function __construct()
+	static public function __construct()
 	{
 	}
 
-	static public function loadServices()
+	public function loadServices()
 	{
 		$this->register("cache", "CacheManager");
 		// событие на регистрацию сервисов
 	}
 
-	static public function register($name, $tool)
+	public function register($name, $tool)
 	{
 		if (!isset($this->tools[$name]))
 			$this->tools[$name] = array();
@@ -26,7 +26,7 @@ final class ServiceManager
 		array_unshift($this->tools[$name], $tool);
 	}
 
-	static public function unregister($name)
+	public function unregister($name)
 	{
 		if (!isset($this->tools[$name]))
 			$this->tools[$name] = array();
@@ -34,7 +34,7 @@ final class ServiceManager
 		array_shift($this->tools[$name]);
 	}
 
-	static public function get($name)
+	public function get($name)
 	{
 		if (isset($this->tools[$name]) && count($this->tools[$name]) > 0)
 		{
@@ -63,37 +63,37 @@ final class ServiceManager
 		return null;
 	}
 
-	static public function offsetExists($name)
+	public function offsetExists($name)
 	{
 		return isset($this->tools[$name]) && count($this->tools[$name]) > 0;
 	}
 
-	static public function offsetGet($name)
+	public function offsetGet($name)
 	{
 		return $this->get($name);
 	}
 
-	static public function offsetSet($name, $tool)
+	public function offsetSet($name, $tool)
 	{
 		$this->register($name, $tool);
 	}
 
-	static public function offsetUnset($name)
+	public function offsetUnset($name)
 	{
 		$this->unregister($name);
 	}
 
-	static public function __set($name, $tool)
+	public function __set($name, $tool)
 	{
 		$this->register($name, $tool);
 	}
 
-	static public function __get($name)
+	public function __get($name)
 	{
 		return $this->get($name);
 	}
 
-	static public function getToolDb()
+	public function getToolDb()
 	{
 		return $this->get("DB");
 	}

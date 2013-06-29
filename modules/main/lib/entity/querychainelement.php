@@ -24,7 +24,7 @@ class QueryChainElement
 	 * @param array $parameters
 	 * @throws \Exception
 	 */
-	static public function __construct($element, $parameters = array())
+	public function __construct($element, $parameters = array())
 	{
 		if ($element instanceof ReferenceField)
 		{
@@ -57,22 +57,22 @@ class QueryChainElement
 	/**
 	 * @return array|Base|ExpressionField|ReferenceField|ScalarField
 	 */
-	static public function getValue()
+	public function getValue()
 	{
 		return $this->value;
 	}
 
-	static public function getParameter($name)
+	public function getParameter($name)
 	{
 		return $this->parameters[$name];
 	}
 
-	static public function setParameter($name, $value)
+	public function setParameter($name, $value)
 	{
 		$this->parameters[$name] = $value;
 	}
 
-	static public function getDefinitionFragment()
+	public function getDefinitionFragment()
 	{
 		if (is_null($this->definition_fragment))
 		{
@@ -122,7 +122,7 @@ class QueryChainElement
 		return $this->definition_fragment;
 	}
 
-	static public function getAliasFragment()
+	public function getAliasFragment()
 	{
 		if (is_null($this->alias_fragment))
 		{
@@ -170,7 +170,7 @@ class QueryChainElement
 		return $this->alias_fragment;
 	}
 
-	static public function getSqlDefinition()
+	public function getSqlDefinition()
 	{
 		if (is_array($this->value) || $this->value instanceof ReferenceField || $this->value instanceof Base)
 		{
@@ -200,12 +200,12 @@ class QueryChainElement
 		return $sql;
 	}
 
-	static public function isBackReference()
+	public function isBackReference()
 	{
 		return $this->type === 3;
 	}
 
-	static public function dump()
+	public function dump()
 	{
 		echo gettype($this->value).' ';
 

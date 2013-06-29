@@ -88,7 +88,7 @@ class CAllSalePersonType
 		return False;
 	}
 
-	public static function CheckFields($ACTION, &$arFields, $ID=false)
+	public function CheckFields($ACTION, &$arFields, $ID=false)
 	{
 		global $DB, $USER;
 

@@ -41,7 +41,7 @@ class CSOAPEnvelope
 	var $Header;
 	var $Body;
 
-	public static function CSOAPEnvelope() 
+	public function CSOAPEnvelope() 
 	{
 		$this->Header = new CSOAPHeader();
 		$this->Body = new CSOAPBody();
@@ -53,18 +53,18 @@ class CSOAPParameter
     var $Name;
     var $Value;
     
-    public static function CSOAPParameter( $name, $value)
+    public function CSOAPParameter( $name, $value)
     {
         $this->Name = $name;
         $this->Value = $value;
     }
 
-    public static function setName( $name )
+    public function setName( $name )
     {
         $this->Name = $name;
     }
 
-    public static function name()
+    public function name()
     {
         return $this->Name;
     }
@@ -73,7 +73,7 @@ class CSOAPParameter
     {
 
     }
-    public static function value()
+    public function value()
     {
         return $this->Value;
     }
@@ -110,21 +110,21 @@ class CSOAPFault
 	var $FaultString;
 	var $detail;
 	
-	public static function CSOAPFault($faultCode = "", $faultString = "", $detail = '') {
+	public function CSOAPFault($faultCode = "", $faultString = "", $detail = '') {
 		$this->FaultCode = $faultCode;
 		$this->FaultString = $faultString;
 		$this->detail = $detail;
 	}
 
-	public static function faultCode() {
+	public function faultCode() {
 		return $this->FaultCode;
 	}
 
-	public static function faultString() {
+	public function faultString() {
 		return $this->FaultString;
 	}
 
-	public static function detail() {
+	public function detail() {
 		return $this->detail;
 	}
 }

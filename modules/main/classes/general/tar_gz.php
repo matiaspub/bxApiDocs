@@ -3,10 +3,10 @@
 IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/tar_gz.php");
 include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/archive.php");
 
-if (!defined("BX_DIR_PERMISSIONS"))
+//if (!defined("BX_DIR_PERMISSIONS"))
 	// define("BX_DIR_PERMISSIONS", 0700);
 
-if (!defined("BX_FILE_PERMISSIONS"))
+//if (!defined("BX_FILE_PERMISSIONS"))
 	// define("BX_FILE_PERMISSIONS", 0600);
 
 class CArchiver implements IBXArchive
@@ -33,7 +33,7 @@ class CArchiver implements IBXArchive
 
 	private static $bMbstring = false;
 
-	static public function __construct($strArchiveName, $bCompress = false, $start_time = -1, $max_exec_time = -1, $pos = 0, $stepped = false)
+	public function __construct($strArchiveName, $bCompress = false, $start_time = -1, $max_exec_time = -1, $pos = 0, $stepped = false)
 	{
 		$this->io = CBXVirtualIo::GetInstance();
 
@@ -81,7 +81,7 @@ class CArchiver implements IBXArchive
 	* @param string $startFile - if specified then all files before it won't be packed during the traversing of $arFileList. Can be used for multi-step archivation
 	* @return mixed false or 0 if error, 1 if success, 2 if the next step should be performed. Errors can be seen using GetErrors() method
 	*/
-	static public function Pack($arFileList, $startFile = "")
+	public function Pack($arFileList, $startFile = "")
 	{
 
 		$this->_arErrors = array();
@@ -158,7 +158,7 @@ class CArchiver implements IBXArchive
 	* @param string $strPath - path to the directory to unpack archive to
 	* @return mixed false if error, array if success. Errors can be seen using GetErrors() method
 	*/
-	static public function Unpack($strPath)
+	public function Unpack($strPath)
 	{
 		if (strpos($strPath, $_SERVER["DOCUMENT_ROOT"]) === false)
 			return false;
@@ -185,7 +185,7 @@ class CArchiver implements IBXArchive
 	* Called from the archive object it returns the name of the file for the next step during multi-step archivation. Call if Pack method returned 2
 	* @return string path to file
 	*/
-	static public function GetStartFile()
+	public function GetStartFile()
 	{
 		return $this->startFile;
 	}
@@ -320,7 +320,7 @@ class CArchiver implements IBXArchive
 	* @param array $arOptions an array with the options' names and their values
 	* @return nothing
 	*/
-	static public function SetOptions($arOptions)
+	public function SetOptions($arOptions)
 	{
 		if (array_key_exists("COMPRESS", $arOptions))
 			$this->_bCompress = $arOptions["COMPRESS"] === true;
@@ -360,7 +360,7 @@ class CArchiver implements IBXArchive
 	* Returns an array of packing/unpacking options and their current values
 	* @return array
 	*/
-	static public function GetOptions()
+	public function GetOptions()
 	{
 		$arOptions = array(
 			"COMPRESS"			=> $this->_bCompress,
@@ -385,7 +385,7 @@ class CArchiver implements IBXArchive
 	* @param string $strRemovePath - if specified contains path to remove from each packed file/folder
 	* @return mixed 0 or false if error, array with the list of packed files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function Add($vFileList, $strAddPath = false, $strRemovePath = false)
+	public function Add($vFileList, $strAddPath = false, $strRemovePath = false)
 	{
 		$this->_arErrors = array();
 
@@ -432,7 +432,7 @@ class CArchiver implements IBXArchive
 	* @param string $strRemovePath - if specified contains path to remove from each packed file/folder
 	* @return mixed 0 or false if error, array with the list of packed files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function addFile($strFilename, $strAddPath, $strRemovePath)
+	public function addFile($strFilename, $strAddPath, $strRemovePath)
 	{
 		$v_result = true;
 		$arHeaders = array();
@@ -466,7 +466,7 @@ class CArchiver implements IBXArchive
 	* @param string $strFileContent - file content
 	* @return mixed 0 or false if error, array with the list of packed files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function addString($strFilename, $strFileContent)
+	public function addString($strFilename, $strFileContent)
 	{
 		$this->_arErrors = array();
 
@@ -494,7 +494,7 @@ class CArchiver implements IBXArchive
 	* @param array $vFileList if specified - array of files to be extracted, else - all files will be extracted
 	* @return mixed 0 or false if error, array with the list of unpacked files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function extractFiles($strPath, $vFileList = false)
+	public function extractFiles($strPath, $vFileList = false)
 	{
 		$this->_arErrors = array();
 
@@ -522,7 +522,7 @@ class CArchiver implements IBXArchive
 	* Extract content of the archive
 	* @return mixed 0 or false if error, array with the list of unpacked files and folders if success. Errors can be seen using GetErrors() method
 	*/
-	static public function extractContent()
+	public function extractContent()
 	{
 		$this->_arErrors = array();
 
@@ -545,7 +545,7 @@ class CArchiver implements IBXArchive
 	* Returns an array containing error codes and messages. Call this method after Pack or Unpack
 	* @return array
 	*/
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->_arErrors;
 	}
@@ -718,7 +718,7 @@ class CArchiver implements IBXArchive
 	* Returns the position of the file for the next step
 	* @return
 	*/
-	static public function getFilePos()
+	public function getFilePos()
 	{
 		return $this->file_pos;
 	}
@@ -890,10 +890,12 @@ class CArchiver implements IBXArchive
 
 				if ($v_extract_file)
 				{
+					$logicalFilename = $this->io->GetLogicalName($v_header['filename']);
+
 					if ((HasScriptExtension($v_header['filename'])
 						|| IsFileUnsafe($v_header['filename'])
-						|| !$this->io->ValidatePathString($v_header['filename'])
-						|| !$this->io->ValidateFilenameString(GetFileName($v_header['filename'])))
+						|| !$this->io->ValidatePathString($logicalFilename)
+						|| !$this->io->ValidateFilenameString(GetFileName($logicalFilename)))
 						&& $this->CheckBXPermissions == true)
 					{
 						$this->_jumpBlock(ceil(($v_header['size']/512)));

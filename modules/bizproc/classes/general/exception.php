@@ -6,13 +6,13 @@ class CBPArgumentException
 {
     private $paramName = "";
 
-	static public function __construct($message, $paramName = "")
+	public function __construct($message, $paramName = "")
 	{
 		parent::__construct($message, 10001);
 		$this->paramName = $paramName;
 	}
 
-	static public function GetParamName()
+	public function GetParamName()
 	{
 		return $this->paramName;
 	}
@@ -21,7 +21,7 @@ class CBPArgumentException
 class CBPArgumentNullException
 	extends CBPArgumentException
 {
-	static public function __construct($paramName, $message = "")
+	public function __construct($paramName, $message = "")
 	{
 		if (strlen($message) <= 0)
 			$message = str_replace("#PARAM#", htmlspecialcharsbx($paramName), GetMessage("BPCGERR_NULL_ARG"));
@@ -37,7 +37,7 @@ class CBPArgumentOutOfRangeException
 {
 	private $actualValue = null;
 
-	static public function __construct($paramName, $actualValue = null, $message = "")
+	public function __construct($paramName, $actualValue = null, $message = "")
 	{
 		if (strlen($message) <= 0)
 		{
@@ -53,7 +53,7 @@ class CBPArgumentOutOfRangeException
 		$this->actualValue = $actualValue;
 	}
 
-	static public function GetActualValue()
+	public function GetActualValue()
 	{
 		return $this->actualValue;
 	}
@@ -64,7 +64,7 @@ class CBPArgumentTypeException
 {
 	private $correctType = null;
 
-	static public function __construct($paramName, $correctType = null, $message = "")
+	public function __construct($paramName, $correctType = null, $message = "")
 	{
 		if (strlen($message) <= 0)
 		{
@@ -80,7 +80,7 @@ class CBPArgumentTypeException
 		$this->correctType = $correctType;
 	}
 
-	static public function GetCorrectType()
+	public function GetCorrectType()
 	{
 		return $this->correctType;
 	}
@@ -98,7 +98,7 @@ class CBPInvalidOperationException
 class CBPNotSupportedException
 	extends Exception
 {
-	static public function __construct($message = "")
+	public function __construct($message = "")
 	{
 		parent::__construct($message, 10004);
 	}

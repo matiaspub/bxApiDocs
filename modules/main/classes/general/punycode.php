@@ -81,7 +81,7 @@ class CBXPunycode
 		return $converter->IsEncoded($domainName);
 	}
 
-	static public function __construct($encoding = null)
+	public function __construct($encoding = null)
 	{
 		if (self::$utfMode === null)
 			self::$utfMode = defined('BX_UTF');
@@ -117,7 +117,7 @@ class CBXPunycode
 	 * @param   string  $domainName Validated string
 	 * @return  bool
 	 */
-	static public function IsEncoded($domainName)
+	public function IsEncoded($domainName)
 	{
 		$this->ClearErrors();
 
@@ -152,7 +152,7 @@ class CBXPunycode
 	 * @param   string  $domainName String to be decoded
 	 * @return  string              Decoded form the the given string
 	 */
-	static public function Decode($domainName)
+	public function Decode($domainName)
 	{
 		$this->ClearErrors();
 
@@ -202,7 +202,7 @@ class CBXPunycode
 	 * @param   string  $domainName String to be encoded
 	 * @return  string              Encoded form of the given string
 	 */
-	static public function Encode($domainName)
+	public function Encode($domainName)
 	{
 		$this->ClearErrors();
 
@@ -728,7 +728,7 @@ class CBXPunycode
 		$this->arErrors[] = (!is_null($errorCode) ? "[".$errorCode."] " : "").$error;
 	}
 
-	static public function GetErrors()
+	public function GetErrors()
 	{
 		return $this->arErrors;
 	}

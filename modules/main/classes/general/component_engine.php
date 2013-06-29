@@ -17,7 +17,7 @@ class CComponentEngine
 	 * <p>Takes component as parameter and initializing the object.</p>
 	 * @param CBitrixComponent $component
 	 */
-	function __construct($component = null)
+	public function __construct($component = null)
 	{
 		if ($component instanceof CBitrixComponent)
 			$this->component = $component;
@@ -28,7 +28,7 @@ class CComponentEngine
 	 * @return CBitrixComponent
 	 *
 	 */
-	static public function getComponent()
+	public function getComponent()
 	{
 		return $this->component;
 	}
@@ -39,7 +39,7 @@ class CComponentEngine
 	 * @return void
 	 *
 	 */
-	static public function addGreedyPart($part)
+	public function addGreedyPart($part)
 	{
 		$part = trim($part, " \t\n\r#");
 		if ($part != "")
@@ -52,7 +52,7 @@ class CComponentEngine
 	 * @return void
 	 *
 	 */
-	static public function setResolveCallback($resolveCallback)
+	public function setResolveCallback($resolveCallback)
 	{
 		if (is_callable($resolveCallback))
 			$this->resolveCallback = $resolveCallback;
@@ -101,7 +101,7 @@ class CComponentEngine
 	 * @return bool
 	 *
 	 */
-	static public function hasGreedyParts($pageTemplate)
+	public function hasGreedyParts($pageTemplate)
 	{
 		if (
 			!empty($this->greedyParts)
@@ -207,7 +207,7 @@ class CComponentEngine
 	 * @return string
 	 *
 	 */
-	static public function guessComponentPath($folder404, $arUrlTemplates, &$arVariables, $requestURL = false)
+	public function guessComponentPath($folder404, $arUrlTemplates, &$arVariables, $requestURL = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;

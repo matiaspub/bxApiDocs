@@ -28,7 +28,7 @@ class Event
 	 * @param array $parameters
 	 * @param null|string|string[] $filter Filter of module names, mail event names and component names of the event handlers
 	 */
-	static public function __construct($moduleId, $type, $parameters = array(), $filter = null)
+	public function __construct($moduleId, $type, $parameters = array(), $filter = null)
 	{
 		$this->moduleId = $moduleId;
 		$this->type = $type;
@@ -39,17 +39,17 @@ class Event
 		$this->results = null;
 	}
 
-	static public function getModuleId()
+	public function getModuleId()
 	{
 		return $this->moduleId;
 	}
 
-	static public function getEventType()
+	public function getEventType()
 	{
 		return $this->type;
 	}
 
-	static public function setParameters($parameters)
+	public function setParameters($parameters)
 	{
 		if (!is_array($parameters))
 			throw new ArgumentTypeException("parameter", "array");
@@ -57,12 +57,12 @@ class Event
 		$this->parameters = $parameters;
 	}
 
-	static public function getParameters()
+	public function getParameters()
 	{
 		return $this->parameters;
 	}
 
-	static public function setParameter($key, $value)
+	public function setParameter($key, $value)
 	{
 		if (!is_array($this->parameters))
 			$this->parameters = array();
@@ -70,7 +70,7 @@ class Event
 		$this->parameters[$key] = $value;
 	}
 
-	static public function getParameter($key)
+	public function getParameter($key)
 	{
 		if (isset($this->parameters[$key]))
 			return $this->parameters[$key];
@@ -78,7 +78,7 @@ class Event
 		return null;
 	}
 
-	static public function setFilter($filter)
+	public function setFilter($filter)
 	{
 		if (!is_array($filter))
 		{
@@ -91,17 +91,17 @@ class Event
 		$this->filter = $filter;
 	}
 
-	static public function getFilter()
+	public function getFilter()
 	{
 		return $this->filter;
 	}
 
-	static public function getResults()
+	public function getResults()
 	{
 		return $this->results;
 	}
 
-	static public function addResult(EventResult $result)
+	public function addResult(EventResult $result)
 	{
 		if (!is_array($this->results))
 			$this->results = array();
@@ -109,18 +109,18 @@ class Event
 		$this->results[] = $result;
 	}
 
-	static public function getSender()
+	public function getSender()
 	{
 		return $this->sender;
 	}
 
-	static public function send($sender = null)
+	public function send($sender = null)
 	{
 		$this->sender = $sender;
 		EventManager::getInstance()->send($this);
 	}
 
-	static public function addException(\Exception $exception)
+	public function addException(\Exception $exception)
 	{
 		if (!is_array($this->exceptions))
 			$this->exceptions = array();
@@ -128,22 +128,22 @@ class Event
 		$this->exceptions[] = $exception;
 	}
 
-	static public function getExceptions()
+	public function getExceptions()
 	{
 		return $this->exceptions;
 	}
 
-	static public function turnDebugOn()
+	public function turnDebugOn()
 	{
 		$this->debugMode = true;
 	}
 
-	static public function isDebugOn()
+	public function isDebugOn()
 	{
 		return $this->debugMode;
 	}
 
-	static public function addDebugInfo($ar)
+	public function addDebugInfo($ar)
 	{
 		if (!$this->debugMode)
 			return;
@@ -151,7 +151,7 @@ class Event
 		$this->debugInfo[] = $ar;
 	}
 
-	static public function getDebugInfo()
+	public function getDebugInfo()
 	{
 		return $this->debugInfo;
 	}

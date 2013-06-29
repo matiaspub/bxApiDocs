@@ -32,6 +32,10 @@ class CIBlockPropertyFileMan
 			return CFileInput::ShowMultiple($inputName, $strHTMLControlName["VALUE"]."[n#IND#][VALUE]", array(
 				"PATH" => "Y",
 				"IMAGE" => "N",
+				"MAX_SIZE" => array(
+					"W" => COption::GetOptionString("iblock", "detail_image_size"),
+					"H" => COption::GetOptionString("iblock", "detail_image_size"),
+				),
 			), false, array(
 				'upload' => false,
 				'medialib' => true,
@@ -91,6 +95,10 @@ class CIBlockPropertyFileMan
 				array(
 					"PATH" => "Y",
 					"IMAGE" => "N",
+					"MAX_SIZE" => array(
+						"W" => COption::GetOptionString("iblock", "detail_image_size"),
+						"H" => COption::GetOptionString("iblock", "detail_image_size"),
+					),
 				), array(
 					'upload' => false,
 					'medialib' => true,

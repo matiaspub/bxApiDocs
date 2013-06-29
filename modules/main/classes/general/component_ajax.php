@@ -40,7 +40,7 @@ class CComponentAjax
 
 	var $__nav_params = null;
 
-	public static function CComponentAjax($componentName, $componentTemplate, &$arParams, $parentComponent)
+	public function CComponentAjax($componentName, $componentTemplate, &$arParams, $parentComponent)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
@@ -119,7 +119,7 @@ class CComponentAjax
 	 * @param CBitrixComponent $parent
 	 * @return bool
 	 */
-	function _checkParent($parent)
+	public function _checkParent($parent)
 	{
 		if ('Y' == $parent->arParams['AJAX_MODE'])
 			return true;
@@ -129,18 +129,18 @@ class CComponentAjax
 		return false;
 	}
 
-	function __BufferDelimiter()
+	public static function __BufferDelimiter()
 	{
 		return '';
 	}
 
-	function __removeHandlers()
+	public function __removeHandlers()
 	{
 		RemoveEventHandler('main', 'OnBeforeRestartBuffer', $this->RestartBufferHandlerId);
 		RemoveEventHandler('main', 'OnBeforeLocalRedirect', $this->LocalRedirectHandlerId);
 	}
 
-	public static function RestartBufferHandler()
+	public function RestartBufferHandler()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -154,7 +154,7 @@ class CComponentAjax
 		$this->__removeHandlers();
 	}
 
-	public static function LocalRedirectHandler(&$url)
+	public function LocalRedirectHandler(&$url)
 	{
 		if (!$this->bAjaxSession) return;
 
@@ -184,7 +184,7 @@ class CComponentAjax
 		$this->__removeHandlers();
 	}
 
-	public static function CheckSession()
+	public function CheckSession()
 	{
 		if ($this->componentID = CAjax::GetComponentID($this->componentName, $this->componentTemplate, $this->arParams['AJAX_OPTION_ADDITIONAL']))
 		{
@@ -205,7 +205,7 @@ class CComponentAjax
 		return false;
 	}
 
-	function __GetSEFRealUrl($url)
+	public static function __GetSEFRealUrl($url)
 	{
 		$arResult = CUrlRewriter::GetList(array('QUERY' => $url));
 
@@ -215,7 +215,7 @@ class CComponentAjax
 			return false;
 	}
 
-	function __isAjaxURL($url)
+	public function __isAjaxURL($url)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -296,7 +296,7 @@ class CComponentAjax
 		return false;
 	}
 
-	function _checkPcreLimit($data)
+	public static function _checkPcreLimit($data)
 	{
 		$pcre_backtrack_limit = intval(ini_get("pcre.backtrack_limit"));
 		$text_len = function_exists('mb_strlen') ? mb_strlen($data, 'latin1') : strlen($data);
@@ -311,11 +311,11 @@ class CComponentAjax
 		return $pcre_backtrack_limit >= $text_len;
 	}
 
-	function __PrepareLinks(&$data)
+	public function __PrepareLinks(&$data)
 	{
 		$add_param = CAjax::GetSessionParam($this->componentID);
 
-		$regexp_links = '/(<a[^>]*?>.*?<\/a>)/i'.BX_UTF_PCRE_MODIFIER;
+		$regexp_links = '/(<a[^>]*?>.*?<\/a>)/is'.BX_UTF_PCRE_MODIFIER;
 		$regexp_params = '/([\w]+)\s*=\s*([\"\'])(.*?)\2/is'.BX_UTF_PCRE_MODIFIER;
 
 		$this->_checkPcreLimit($data);
@@ -336,7 +336,7 @@ class CComponentAjax
 
 		for($iData = 1; $iData < $cData; $iData += 2)
 		{
-			if(!preg_match('/^<a([^>]*?)>(.*?)<\/a>$/i'.BX_UTF_PCRE_MODIFIER, $arData[$iData], $match))
+			if(!preg_match('/^<a([^>]*?)>(.*?)<\/a>$/is'.BX_UTF_PCRE_MODIFIER, $arData[$iData], $match))
 				continue;
 
 			$params = $match[1];
@@ -394,7 +394,7 @@ class CComponentAjax
 			$data = implode('', $arData);
 	}
 
-	function __PrepareForms(&$data)
+	public function __PrepareForms(&$data)
 	{
 		$this->_checkPcreLimit($data);
 		$arData = preg_split('/(<form([^>]*)>)/i'.BX_UTF_PCRE_MODIFIER, $data, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -443,7 +443,7 @@ class CComponentAjax
 			$data = implode('', $arData);
 	}
 
-	function __prepareScripts(&$data)
+	public function __prepareScripts(&$data)
 	{
 		$regexp = '/(<script(?:[^>]*)?>)(.*?)<\/script>/is'.BX_UTF_PCRE_MODIFIER;
 

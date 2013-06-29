@@ -8,7 +8,7 @@ class _CEventsLdap {
 	/**
 	 * перед логином пользователя.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CLDAP::OnUserLogin
 	 */
 	public static function OnBeforeUserLogin(){}
@@ -16,7 +16,7 @@ class _CEventsLdap {
 	/**
 	 * перед синхронизацией с сервером LDAP.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CLdapServer::Sync
 	 */
 	public static function OnLdapBeforeSync(){}
@@ -24,7 +24,7 @@ class _CEventsLdap {
 	/**
 	 * после преобразования атрибутов AD/LDAP в пользовательские свойства.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CLDAP::GetUserFields
 	 */
 	public static function OnLdapUserFields(){}

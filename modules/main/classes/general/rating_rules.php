@@ -455,7 +455,7 @@ class CAllRatingRulesMain
 	}
 
 	// check input values, if value does not validate, set the default value
-	function __CheckFields($entityId, $arConfigs)
+	public static function __CheckFields($entityId, $arConfigs)
 	{
 		$arDefaultConfig = CRatingRulesMain::__AssembleConfigDefault($entityId);
 
@@ -524,7 +524,7 @@ class CAllRatingRulesMain
 	}
 
 	// assemble config default value
-	function __AssembleConfigDefault($objectType = null)
+	public static function __AssembleConfigDefault($objectType = null)
 	{
 		$arConfigs = array();
 		$arRatingRuleConfigs = CRatingRulesMain::OnGetRatingRuleConfigs();

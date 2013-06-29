@@ -6,7 +6,7 @@ class CSecurityFilterXssAuditor extends CSecurityFilterBaseAuditor
 
 	protected $name = "XSS";
 
-	function __construct($pChar = "")
+	public function __construct($pChar = "")
 	{
 		$this->setSplittingChar($pChar);
 	}
@@ -15,7 +15,7 @@ class CSecurityFilterXssAuditor extends CSecurityFilterBaseAuditor
 	 * @param string $pString
 	 * @return bool
 	 */
-	static public function process($pString)
+	public function process($pString)
 	{
 		if(!preg_match("/[(){}\\[\\]=+&%<>]?/", $pString))
 			return false;

@@ -1452,12 +1452,12 @@ class CAllForumMessage
 class _CMessageDBResult extends CDBResult
 {
 	var $sNameTemplate = '';
-	function _CMessageDBResult($res, $params = array())
+	public function _CMessageDBResult($res, $params = array())
 	{
 		$this->sNameTemplate = (!empty($params["sNameTemplate"]) ? $params["sNameTemplate"] : '');
 		parent::CDBResult($res);
 	}
-	public static function Fetch()
+	public function Fetch()
 	{
 		global $DB;
 		$arFields = array();

@@ -111,11 +111,10 @@ class CUser extends CAllUser
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php
 	 * @author Bitrix
 	 */
-	static public function Add($arFields)
+	public function Add($arFields)
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
@@ -150,10 +149,10 @@ class CUser extends CAllUser
 				$arFields["EMAIL"] = strtolower($arFields["EMAIL"]);
 
 			if(is_set($arFields, "WORK_COUNTRY"))
-				$arFields["WORK_COUNTRY"] = IntVal($arFields["WORK_COUNTRY"]);
+				$arFields["WORK_COUNTRY"] = intval($arFields["WORK_COUNTRY"]);
 
 			if(is_set($arFields, "PERSONAL_COUNTRY"))
-				$arFields["PERSONAL_COUNTRY"] = IntVal($arFields["PERSONAL_COUNTRY"]);
+				$arFields["PERSONAL_COUNTRY"] = intval($arFields["PERSONAL_COUNTRY"]);
 
 			if (
 				array_key_exists("PERSONAL_PHOTO", $arFields)
@@ -415,11 +414,6 @@ class CUser extends CAllUser
 		$online_interval = (array_key_exists("ONLINE_INTERVAL", $arParams) && intval($arParams["ONLINE_INTERVAL"]) > 0 ? $arParams["ONLINE_INTERVAL"] : 120);
 		if (isset($arParams['FIELDS']) && is_array($arParams['FIELDS']) && count($arParams['FIELDS']) > 0 && !in_array("*", $arParams['FIELDS']))
 		{
-			foreach ($arOrder as $field => $dir)
-			{
-				if (in_array(strtoupper($field), $arFields_all))
-					$arParams['FIELDS'][] = $field;
-			}
 			foreach ($arParams['FIELDS'] as $field)
 			{
 				$field = strtoupper($field);
@@ -668,6 +662,7 @@ class CUser extends CAllUser
 			}
 			elseif($field == "IS_ONLINE")
 			{
+				$arSelectFields[$field] = "IF(U.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL ".$online_interval." SECOND), 'Y', 'N') IS_ONLINE";
 				$arSqlOrder[$field] = "IS_ONLINE ".$dir;
 			}
 			elseif(in_array($field,$arFields_all))
@@ -680,7 +675,7 @@ class CUser extends CAllUser
 			}
 			elseif(preg_match('/^RATING_(\d+)$/i', $field, $matches))
 			{
-				$ratingId = IntVal($matches[1]);
+				$ratingId = intval($matches[1]);
 				if ($ratingId > 0)
 				{
 					$arSqlOrder[$field] = $field."_ISNULL ASC, ".$field." ".$dir;
@@ -719,7 +714,7 @@ class CUser extends CAllUser
 			{
 				if(preg_match('/^RATING_(\d+)$/i', $column, $matches))
 				{
-					$ratingId = IntVal($matches[1]);
+					$ratingId = intval($matches[1]);
 					if ($ratingId > 0 && !in_array($ratingId, $arRatingInSelect))
 					{
 						$sSelect .= ", RR".$ratingId.".CURRENT_POSITION IS NULL as RATING_".$ratingId."_ISNULL";
@@ -812,11 +807,11 @@ class CUser extends CAllUser
 	{
 		global $DB;
 
-		$id = IntVal($id);
+		$id = intval($id);
 		if ($id <= 0)
 			return false;
 
-		$interval = IntVal($interval);
+		$interval = intval($interval);
 		if ($interval <= 0)
 			$interval = 120;
 
@@ -876,11 +871,10 @@ class CGroup extends CAllGroup
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php
 	 * @author Bitrix
 	 */
-	public static function Add($arFields)
+	public function Add($arFields)
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -924,8 +918,8 @@ class CGroup extends CAllGroup
 				$arTmp = array();
 				foreach ($arFields["USER_ID"] as $userId)
 				{
-					if (IntVal($userId["USER_ID"]) > 0
-						&& !in_array(IntVal($userId["USER_ID"]), $arTmp))
+					if (intval($userId["USER_ID"]) > 0
+						&& !in_array(intval($userId["USER_ID"]), $arTmp))
 					{
 						$arInsert = $DB->PrepareInsert("b_user_group", $userId);
 
@@ -934,7 +928,7 @@ class CGroup extends CAllGroup
 							"VALUES(".$ID.", ".$arInsert[1].")";
 						$DB->Query($strSql);
 
-						$arTmp[] = IntVal($userId["USER_ID"]);
+						$arTmp[] = intval($userId["USER_ID"]);
 					}
 				}
 			}
@@ -1434,10 +1428,10 @@ class CGroup extends CAllGroup
 						{
 							if ($arFields[$key]["TYPE"] == "int")
 							{
-								if (IntVal($val) <= 0)
+								if (intval($val) <= 0)
 									$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL OR ".$arFields[$key]["FIELD"]." <= 0)";
 								else
-									$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".IntVal($val)." )";
+									$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".intval($val)." )";
 							}
 							elseif ($arFields[$key]["TYPE"] == "double")
 							{
@@ -1610,7 +1604,7 @@ class CGroup extends CAllGroup
 		if (strlen($arSqls["ORDERBY"]) > 0)
 			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
 
-		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"])<=0)
+		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
 		{
 			$strSql_tmp =
 				"SELECT COUNT('x') as CNT ".

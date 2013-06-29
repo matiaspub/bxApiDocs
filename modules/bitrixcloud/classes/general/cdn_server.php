@@ -8,7 +8,7 @@ class CBitrixCloudCDNServerGroup
 	 * @return string
 	 *
 	 */
-	static public function getName()
+	public function getName()
 	{
 		return $this->name;
 	}
@@ -17,7 +17,7 @@ class CBitrixCloudCDNServerGroup
 	 * @return array[int]string
 	 *
 	 */
-	static public function getServers()
+	public function getServers()
 	{
 		return $this->servers;
 	}
@@ -27,7 +27,7 @@ class CBitrixCloudCDNServerGroup
 	 * @return CBitrixCloudCDNServerGroup
 	 *
 	 */
-	static public function setServers($servers)
+	public function setServers($servers)
 	{
 		$this->servers = /*.(array[int]string).*/ array();
 		if (is_array($servers))
@@ -48,7 +48,7 @@ class CBitrixCloudCDNServerGroup
 	 * @return void
 	 *
 	 */
-	static public function __construct($name, $servers)
+	public function __construct($name, $servers)
 	{
 		$this->name = $name;
 		$this->setServers($servers);
@@ -81,7 +81,7 @@ class CBitrixCloudCDNServerGroups
 	 * @return CBitrixCloudCDNServerGroups
 	 *
 	 */
-	static public function addGroup(CBitrixCloudCDNServerGroup $group)
+	public function addGroup(CBitrixCloudCDNServerGroup $group)
 	{
 		$this->groups[$group->getName()] = $group;
 		return $this;
@@ -92,7 +92,7 @@ class CBitrixCloudCDNServerGroups
 	 * @return CBitrixCloudCDNServerGroup
 	 *
 	 */
-	static public function getGroup($group_name)
+	public function getGroup($group_name)
 	{
 		return $this->groups[$group_name];
 	}
@@ -132,7 +132,7 @@ class CBitrixCloudCDNServerGroups
 	 * @return CBitrixCloudCDNServerGroups
 	 *
 	 */
-	static public function saveOption(CBitrixCloudOption $option)
+	public function saveOption(CBitrixCloudOption $option)
 	{
 		$groups = /*.(array[string]string).*/ array();
 		foreach ($this->groups as $group_name => $group)

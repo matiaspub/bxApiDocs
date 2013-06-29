@@ -3,23 +3,23 @@ Class CIdeaManagmentIdeaComment
 {
     private $CommentId = false;
     
-    function __construct($CommentId = false)
+    public function __construct($CommentId = false)
     {
         $this->SetId($CommentId);
     }
     
-    static public function IsAvailable()
+    public function IsAvailable()
     {
         return $this->CommentId>0 && CModule::IncludeModule('blog');
     }
     
-    static public function SetID($StatusId)
+    public function SetID($StatusId)
     {
         $this->CommentId = $StatusId;
         return $this;
     }
     
-    static public function Get()
+    public function Get()
     {
         if(!$this->IsAvailable())
             return false;
@@ -30,7 +30,7 @@ Class CIdeaManagmentIdeaComment
         )->Fetch();
     }
     
-    static public function Bind()
+    public function Bind()
     {
         if(!$this->IsAvailable())
             return false;
@@ -64,7 +64,7 @@ Class CIdeaManagmentIdeaComment
         return false;
     }
     
-    static public function UnBind()
+    public function UnBind()
     {
         if(!$this->IsAvailable())
             return false;

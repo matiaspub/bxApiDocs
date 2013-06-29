@@ -136,7 +136,7 @@ class MysqliDbConnection
 		return $result;
 	}
 
-	static public function getIdentity($name = "")
+	public function getIdentity($name = "")
 	{
 		$con = $this->getResource();
 
@@ -154,7 +154,7 @@ class MysqliDbConnection
 		return new MysqliDbResult($this, $result, $trackerQuery);
 	}
 
-	static public function getAffectedRowsCount()
+	public function getAffectedRowsCount()
 	{
 		/** @var $con \mysqli */
 		$con = $this->getResource();
@@ -166,7 +166,7 @@ class MysqliDbConnection
 	 * DDL
 	 *********************************************************/
 
-	static public function isTableExists($tableName)
+	public function isTableExists($tableName)
 	{
 		$tableName = preg_replace("/[^a-z0-9%_]+/i", "", $tableName);
 		$tableName = trim($tableName);
@@ -181,12 +181,12 @@ class MysqliDbConnection
 			return false;
 	}
 
-	static public function isIndexExists($tableName, array $arColumns)
+	public function isIndexExists($tableName, array $arColumns)
 	{
 		return $this->getIndexName($tableName, $arColumns) !== null;
 	}
 
-	static public function getIndexName($tableName, array $arColumns, $strict = false)
+	public function getIndexName($tableName, array $arColumns, $strict = false)
 	{
 		if (!is_array($arColumns) || empty($arColumns))
 			return null;
@@ -222,7 +222,7 @@ class MysqliDbConnection
 		return null;
 	}
 
-	static public function getTableFields($tableName)
+	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
 		{
@@ -247,17 +247,17 @@ class MysqliDbConnection
 	 * Transaction
 	 *********************************************************/
 
-	static public function startTransaction()
+	public function startTransaction()
 	{
 		$this->query("START TRANSACTION");
 	}
 
-	static public function commitTransaction()
+	public function commitTransaction()
 	{
 		$this->query("COMMIT");
 	}
 
-	static public function rollbackTransaction()
+	public function rollbackTransaction()
 	{
 		$this->query("ROLLBACK");
 	}
@@ -272,7 +272,7 @@ class MysqliDbConnection
 		return "mysql";
 	}
 
-	static public function getVersion()
+	public function getVersion()
 	{
 		if ($this->version == null)
 		{

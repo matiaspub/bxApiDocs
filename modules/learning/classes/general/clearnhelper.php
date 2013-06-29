@@ -267,6 +267,7 @@ class CLearnHelper
 		for($i=0; $i<count($vals); $i++)
 		{
 			$val = $vals[$i];
+
 			if(!$bSkipEmpty || strlen($val)>0 || (is_bool($val) && $val===false))
 			{
 				switch ($type)

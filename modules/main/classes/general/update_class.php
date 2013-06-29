@@ -19,7 +19,7 @@ if (!function_exists("file_get_contents"))
 	}
 }
 
-if (!defined("US_SHARED_KERNEL_PATH"))
+//if (!defined("US_SHARED_KERNEL_PATH"))
 	// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 class CUpdateSystem
@@ -3959,7 +3959,7 @@ class CUpdatesXMLNode
 	var $children;			// Subnodes
 	var $attributes;		// Attributes
 
-	public static function CUpdatesXMLNode()
+	public function CUpdatesXMLNode()
 	{
 	}
 
@@ -4069,7 +4069,7 @@ class CUpdatesXMLDocument
 	var $children;
 	var $root;
 
-	public static function CUpdatesXMLDocument()
+	public function CUpdatesXMLDocument()
 	{
 	}
 
@@ -4117,13 +4117,13 @@ class CUpdatesXML
 	var $tree;
 	var $TrimWhiteSpace;
 
-	public static function CUpdatesXML($TrimWhiteSpace = True)
+	public function CUpdatesXML($TrimWhiteSpace = True)
 	{
 		$this->TrimWhiteSpace = ($TrimWhiteSpace ? True : False);
 		$this->tree = False;
 	}
 
-	public static function Load($file)
+	public function Load($file)
 	{
 		unset($this->tree);
 		$this->tree = False;
@@ -4138,7 +4138,7 @@ class CUpdatesXML
 		return false;
 	}
 
-	public static function LoadString($text)
+	public function LoadString($text)
 	{
 		unset($this->tree);
 		$this->tree = False;
@@ -4414,7 +4414,7 @@ class CUpdatesXML
 		return $oXMLDocument;
 	}
 
-	function __stripComments(&$str)
+	public static function __stripComments(&$str)
 	{
 		$str = &preg_replace("#<\!--.*?-->#s", "", $str);
 		return $str;
@@ -4470,7 +4470,7 @@ class CUpdater
 	var $callType; // Прямой вызов (ALL - все, KERNEL - ядро, PERSONAL - персональные файлы, DATABASE - база данных  // DB=PERSONAL+DATABASE)
 	var $kernelPath; // Путь к ядру
 
-	public static function Init($curPath, $dbType, $updater, $curDir, $moduleID, $callType = "ALL")
+	public function Init($curPath, $dbType, $updater, $curDir, $moduleID, $callType = "ALL")
 	{
 		$this->errorMessage = array();
 		$this->curPath = $curPath;
@@ -4517,7 +4517,7 @@ class CUpdater
 
 	// Устанавливает все компоненты
 	// $arDeleteFiles = array("component.name" => array("/images/1.gif", "/templates/.default/style.css"), "component.name1" => array("/style.css"));
-	public static function InstallComponents($arDeleteFiles = array())
+	public function InstallComponents($arDeleteFiles = array())
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4563,7 +4563,7 @@ class CUpdater
 		return $bFlag;
 	}
 
-	function __MakeComponentPath($componentName)
+	public static function __MakeComponentPath($componentName)
 	{
 		if (StrLen($componentName) <= 0 || !preg_match("#^([A-Za-z0-9_.-]+:)?([A-Za-z0-9_-]+\\.)*([A-Za-z0-9_-]+)$#i", $componentName))
 			return "";
@@ -4573,7 +4573,7 @@ class CUpdater
 
 	// Устанавливает компонент по его имени
 	// $arDeleteFiles - удаляет файлы из массива ( Array("/images/1.gif", "/templates/.default/style.css") )
-	public static function InstallComponent($componentName, $arDeleteFiles = array())
+	public function InstallComponent($componentName, $arDeleteFiles = array())
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4614,7 +4614,7 @@ class CUpdater
 
 	// Устанавливает все мастера
 	// $arDeleteFiles = array("component.name" => array("/images/1.gif", "/templates/.default/style.css"), "component.name1" => array("/style.css"));
-	public static function InstallWizards($arDeleteFiles = array())
+	public function InstallWizards($arDeleteFiles = array())
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4662,7 +4662,7 @@ class CUpdater
 
 	// Устанавливает мастер по его имени
 	// $arDeleteFiles - удаляет файлы из массива ( Array("/images/1.gif", "/templates/.default/style.css") )
-	public static function InstallWizard($wizardName, $arDeleteFiles = array())
+	public function InstallWizard($wizardName, $arDeleteFiles = array())
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4700,7 +4700,7 @@ class CUpdater
 		return $this->CopyDirFiles($this->curModulePath."/install/wizards".$wizardPath, US_SHARED_KERNEL_PATH."/wizards".$wizardPath);
 	}
 
-	public static function CopyFiles($fromDir, $toDir)
+	public function CopyFiles($fromDir, $toDir)
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4725,7 +4725,7 @@ class CUpdater
 		return $result;
 	}
 
-	public static function CopyDirFiles($fromDir, $toDir)
+	public function CopyDirFiles($fromDir, $toDir)
 	{
 		if (!in_array("KERNEL", $this->callType))
 			return True;
@@ -4747,7 +4747,7 @@ class CUpdater
 		return $result;
 	}
 
-	public static function Query($query, $tableName = "")
+	public function Query($query, $tableName = "")
 	{
 		if (!in_array("DATABASE", $this->callType))
 			return False;
@@ -4796,7 +4796,7 @@ class CUpdater
 		return $result;
 	}
 
-	public static function QueryBatch($queryPath, $tableName = "")
+	public function QueryBatch($queryPath, $tableName = "")
 	{
 		if (!in_array("DATABASE", $this->callType))
 			return False;
@@ -4855,7 +4855,7 @@ class CUpdater
 		return ($arError ? False : True);
 	}
 
-	public static function TableExists($tableName)
+	public function TableExists($tableName)
 	{
 		if (!in_array("DATABASE", $this->callType))
 			return False;
@@ -4881,17 +4881,17 @@ class CUpdater
 			return False;
 	}
 
-	public static function CanUpdateDatabase()
+	public function CanUpdateDatabase()
 	{
 		return (in_array("DATABASE", $this->callType));
 	}
 
-	public static function CanUpdateKernel()
+	public function CanUpdateKernel()
 	{
 		return (in_array("KERNEL", $this->callType));
 	}
 
-	public static function CanUpdatePersonalFiles()
+	public function CanUpdatePersonalFiles()
 	{
 		return (in_array("PERSONAL", $this->callType));
 	}

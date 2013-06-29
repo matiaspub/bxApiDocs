@@ -812,7 +812,7 @@ class CAllSocNetGroup
 	/***************************************/
 	/*************  UTILITIES  *************/
 	/***************************************/
-	function __ValidateID($ID)
+	public static function __ValidateID($ID)
 	{
 		if (IntVal($ID)."|" == $ID."|")
 			return true;

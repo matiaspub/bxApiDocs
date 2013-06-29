@@ -253,7 +253,7 @@ class CAllBPWorkflowTemplateLoader
 		}
 	}
 
-	static public function LoadWorkflow($workflowTemplateId)
+	public function LoadWorkflow($workflowTemplateId)
 	{
 		$workflowTemplateId = intval($workflowTemplateId);
 		if ($workflowTemplateId <= 0)
@@ -852,7 +852,7 @@ class CBPWorkflowTemplateResult extends CDBResult
 {
 	private $useGZipCompression = false;
 
-	static public function __construct($res, $useGZipCompression)
+	public function __construct($res, $useGZipCompression)
 	{
 		$this->useGZipCompression = $useGZipCompression;
 		parent::CDBResult($res);
@@ -880,7 +880,7 @@ class CBPWorkflowTemplateResult extends CDBResult
 		return $value;
 	}
 
-	public static function Fetch()
+	public function Fetch()
 	{
 		$res = parent::Fetch();
 
@@ -911,7 +911,7 @@ class CBPWorkflowTemplateUser
 
 	private $isAdmin = false;
 
-	static public function __construct($userId = null)
+	public function __construct($userId = null)
 	{
 		$this->isAdmin = false;
 
@@ -929,7 +929,7 @@ class CBPWorkflowTemplateUser
 		}
 	}
 
-	static public function IsAdmin()
+	public function IsAdmin()
 	{
 		return $this->isAdmin;
 	}

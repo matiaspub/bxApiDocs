@@ -80,12 +80,12 @@ class CLearnPath implements ILearnPath
 	const DELIMITER = '.';
 	protected $arPath = array();
 
-	static public function __construct ()
+	public function __construct ()
 	{
 		$this->_SetPath (func_get_args());
 	}
 
-	static public function SetPath ()
+	public function SetPath ()
 	{
 		$this->_SetPath (func_get_args());
 	}
@@ -117,7 +117,7 @@ class CLearnPath implements ILearnPath
 		}
 	}
 
-	static public function SetPathFromArray($arPath)
+	public function SetPathFromArray($arPath)
 	{
 		$this->_SetPath ($arPath);
 	}
@@ -135,7 +135,7 @@ class CLearnPath implements ILearnPath
 	}
 
 
-	static public function ImportUrlencoded($str)
+	public function ImportUrlencoded($str)
 	{
 		$tmp = urldecode($str);
 		if (strlen($tmp) == 0)
@@ -155,17 +155,17 @@ class CLearnPath implements ILearnPath
 		$this->arPath = $arPath;
 	}
 
-	static public function GetPathAsArray()
+	public function GetPathAsArray()
 	{
 		return ($this->arPath);
 	}
 
-	static public function ExportUrlencoded()
+	public function ExportUrlencoded()
 	{
 		return (urlencode(implode(self::DELIMITER, $this->arPath)));
 	}
 
-	static public function GetTop()
+	public function GetTop()
 	{
 		if ( ! isset($this->arPath[0]) )
 			return (false);
@@ -173,7 +173,7 @@ class CLearnPath implements ILearnPath
 		return ($this->arPath[0]);
 	}
 
-	static public function GetBottom()
+	public function GetBottom()
 	{
 		$count = count ($this->arPath);
 		if ( ! isset($this->arPath[$count - 1]) )
@@ -183,7 +183,7 @@ class CLearnPath implements ILearnPath
 	}
 
 
-	static public function PopBottom()
+	public function PopBottom()
 	{
 		$popped = array_pop ($this->arPath);
 
@@ -195,7 +195,7 @@ class CLearnPath implements ILearnPath
 	}
 
 
-	static public function ShiftTop()
+	public function ShiftTop()
 	{
 		$shifted = array_shift ($this->arPath);
 
@@ -207,7 +207,7 @@ class CLearnPath implements ILearnPath
 	}
 
 
-	static public function GetPathAsHumanReadableString($delimiter = ' / ', $pattern = '#NAME#')
+	public function GetPathAsHumanReadableString($delimiter = ' / ', $pattern = '#NAME#')
 	{
 		$arHumanReadablePath = array();
 		foreach ($this->arPath as $lessonId)
@@ -233,7 +233,7 @@ class CLearnPath implements ILearnPath
 	}
 
 
-	static public function Count()
+	public function Count()
 	{
 		return (count($this->arPath));
 	}

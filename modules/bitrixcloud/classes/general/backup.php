@@ -78,7 +78,7 @@ class CBitrixCloudBackup
 	 * @return array[int][string]string
 	 *
 	 */
-	static public function listFiles() /*. throws CBitrixCloudException .*/
+	public function listFiles() /*. throws CBitrixCloudException .*/
 	{
 		$this->_getInformation();
 		return $this->files;
@@ -89,7 +89,7 @@ class CBitrixCloudBackup
 	 * @return float
 	 *
 	 */
-	static public function getQuota() /*. throws CBitrixCloudException .*/
+	public function getQuota() /*. throws CBitrixCloudException .*/
 	{
 		$this->_getInformation();
 		return $this->quota;
@@ -100,7 +100,7 @@ class CBitrixCloudBackup
 	 * @return float
 	 *
 	 */
-	static public function getUsage() /*. throws CBitrixCloudException .*/
+	public function getUsage() /*. throws CBitrixCloudException .*/
 	{
 		$this->_getInformation();
 		return $this->total_size;
@@ -111,7 +111,7 @@ class CBitrixCloudBackup
 	 * @return int
 	 *
 	 */
-	static public function getLastTimeBackup() /*. throws CBitrixCloudException .*/
+	public function getLastTimeBackup() /*. throws CBitrixCloudException .*/
 	{
 		$this->_getInformation();
 		return $this->last_backup_time;
@@ -159,7 +159,7 @@ class CBitrixCloudBackup
 	 * @return CBitrixCloudBackupBucket
 	 *
 	 */
-	static public function getBucketToReadFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function getBucketToReadFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
 	{
 		return $this->_getBucket("read", $check_word, $file_name);
 	}
@@ -170,7 +170,7 @@ class CBitrixCloudBackup
 	 * @return CBitrixCloudBackupBucket
 	 *
 	 */
-	static public function getBucketToWriteFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function getBucketToWriteFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
 	{
 		return $this->_getBucket("write", $check_word, $file_name);
 	}
@@ -190,7 +190,7 @@ class CBitrixCloudBackup
 	 *
 	 * @return CBitrixCloudBackup
 	 */
-	static public function saveToOptions()
+	public function saveToOptions()
 	{
 		$this->_getInformation();
 		$arFiles = array();
@@ -209,7 +209,7 @@ class CBitrixCloudBackup
 	 *
 	 * @return CBitrixCloudBackup
 	 */
-	static public function loadFromOptions()
+	public function loadFromOptions()
 	{
 		$this->files = array();
 		foreach(CBitrixCloudOption::getOption("backup_files")->getArrayValue() as $FILE_NAME => $FILE_SIZE)

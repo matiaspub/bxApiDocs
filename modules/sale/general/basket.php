@@ -418,9 +418,25 @@ class CAllSaleBasket
 					);
 				}
 
-				if (isset($arShoppingCartItem["CUSTOM_PRICE"]) && $arShoppingCartItem["CUSTOM_PRICE"] == "Y")
+				if (array_key_exists('CUSTOM_PRICE', $arShoppingCartItem) && 'Y' == $arShoppingCartItem["CUSTOM_PRICE"])
 				{
-					unset($arFieldsTmp["PRICE"]);
+					if ($arShoppingCartItem['CURRENCY'] != $arFieldsTmp["CURRENCY"])
+					{
+						$arFieldsTmp["PRICE"] = CCurrencyRates::ConvertCurrency($arFieldsTmp["PRICE"], $arFieldsTmp["CURRENCY"], $arShoppingCartItem['CURRENCY']);
+						if (array_key_exists('DISCOUNT_PRICE', $arFieldsTmp))
+						{
+							$arFieldsTmp["DISCOUNT_PRICE"] = CCurrencyRates::ConvertCurrency($arFieldsTmp["DISCOUNT_PRICE"], $arFieldsTmp["CURRENCY"], $arShoppingCartItem['CURRENCY']);
+						}
+						else
+						{
+							$arFieldsTmp["DISCOUNT_PRICE"] = 0.0;
+						}
+						$arFieldsTmp['CURRENCY'] = $arShoppingCartItem['CURRENCY'];
+					}
+
+					$dblFullPrice = $arFieldsTmp["PRICE"] + $arFieldsTmp["DISCOUNT_PRICE"];
+					$arFieldsTmp["PRICE"] = $arShoppingCartItem['PRICE'];
+					$arFieldsTmp["DISCOUNT_PRICE"] = $dblFullPrice - $arFieldsTmp["PRICE"];
 				}
 
 				if ($arFieldsTmp && is_array($arFieldsTmp) && (count($arFieldsTmp) > 0))
@@ -433,6 +449,10 @@ class CAllSaleBasket
 
 				if (array_key_exists("ID", $arShoppingCartItem) && (intval($arShoppingCartItem["ID"]) > 0))
 				{
+					if (array_key_exists('CUSTOM_PRICE', $arShoppingCartItem) && 'Y' == $arShoppingCartItem["CUSTOM_PRICE"])
+					{
+						unset($arFieldsTmp["PRICE"]);
+					}
 					$arFieldsTmp["IGNORE_CALLBACK_FUNC"] = "Y";
 
 					CSaleBasket::Update($arShoppingCartItem["ID"], $arFieldsTmp);
@@ -493,7 +513,8 @@ class CAllSaleBasket
 				$arResult[] = $arShoppingCartItem;
 			}
 		}
-		unset($arShoppingCartItem);
+		if (isset($arShoppingCartItem))
+			unset($arShoppingCartItem);
 
 		if (is_array($arCoupons) && (count($arCoupons) > 0))
 		{
@@ -957,49 +978,52 @@ class CAllSaleBasket
 			$arFields["PRODUCT_ID"] = IntVal($arFields["PRODUCT_ID"]);
 		if ((is_set($arFields, "PRODUCT_ID") || $ACTION=="ADD") && IntVal($arFields["PRODUCT_ID"])<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty product field", "EMPTY_PRODUCT_ID");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_PRODUCT_ID_ABSENT'), "PRODUCT_ID");
 			return false;
 		}
 
-		if ((is_set($arFields, "CALLBACK_FUNC") && strlen($arFields["CALLBACK_FUNC"]) > 0)
-			|| (is_set($arFields, "PRODUCT_PROVIDER_CLASS") && strlen($arFields["PRODUCT_PROVIDER_CLASS"]) > 0)
-			&& (!is_set($arFields, "IGNORE_CALLBACK_FUNC") || $arFields["IGNORE_CALLBACK_FUNC"] != "Y"))
+		if (!array_key_exists('IGNORE_CALLBACK_FUNC', $arFields) || 'Y' != $arFields['IGNORE_CALLBACK_FUNC'])
 		{
-			/** @var $productProvider IBXSaleProductProvider */
-			if ($productProvider = CSaleBasket::GetProductProvider(array("MODULE" => $arFields["MODULE"], "PRODUCT_PROVIDER_CLASS" => $arFields["PRODUCT_PROVIDER_CLASS"])))
+			if ((is_set($arFields, "CALLBACK_FUNC") && strlen($arFields["CALLBACK_FUNC"]) > 0)
+				|| (is_set($arFields, "PRODUCT_PROVIDER_CLASS") && strlen($arFields["PRODUCT_PROVIDER_CLASS"]) > 0)
+				)
 			{
-				$arPrice = $productProvider::GetProductData(array(
-					"PRODUCT_ID" => $arFields["PRODUCT_ID"],
-					"QUANTITY"   => $arFields["QUANTITY"],
-					"RENEWAL"    => $arFields["RENEWAL"],
-					"USER_ID"    => $arFields["USER_ID"],
-					"SITE_ID"    => $arFields["LID"]
-				));
-			}
-			else
-			{
-				$arPrice = CSaleBasket::ExecuteCallbackFunction(
-					$arFields["CALLBACK_FUNC"],
-					$arFields["MODULE"],
-					$arFields["PRODUCT_ID"],
-					$arFields["QUANTITY"],
-					$arFields["RENEWAL"],
-					$arFields["USER_ID"],
-					$arFields["LID"]
-				);
-			}
+				/** @var $productProvider IBXSaleProductProvider */
+				if ($productProvider = CSaleBasket::GetProductProvider(array("MODULE" => $arFields["MODULE"], "PRODUCT_PROVIDER_CLASS" => $arFields["PRODUCT_PROVIDER_CLASS"])))
+				{
+					$arPrice = $productProvider::GetProductData(array(
+						"PRODUCT_ID" => $arFields["PRODUCT_ID"],
+						"QUANTITY"   => $arFields["QUANTITY"],
+						"RENEWAL"    => $arFields["RENEWAL"],
+						"USER_ID"    => $arFields["USER_ID"],
+						"SITE_ID"    => $arFields["LID"]
+					));
+				}
+				else
+				{
+					$arPrice = CSaleBasket::ExecuteCallbackFunction(
+						$arFields["CALLBACK_FUNC"],
+						$arFields["MODULE"],
+						$arFields["PRODUCT_ID"],
+						$arFields["QUANTITY"],
+						$arFields["RENEWAL"],
+						$arFields["USER_ID"],
+						$arFields["LID"]
+					);
+				}
 
-			if (is_array($arPrice) && count($arPrice)>0)
-			{
-				$arFields["PRICE"] = $arPrice["PRICE"];
-				$arFields["CURRENCY"] = $arPrice["CURRENCY"];
-				$arFields["CAN_BUY"] = "Y";
-				$arFields["PRODUCT_PRICE_ID"] = $arPrice["PRODUCT_PRICE_ID"];
-				$arFields["NOTES"] = $arPrice["NOTES"];
-			}
-			else
-			{
-				$arFields["CAN_BUY"] = "N";
+				if (!empty($arPrice) && is_array($arPrice))
+				{
+					$arFields["PRICE"] = $arPrice["PRICE"];
+					$arFields["CURRENCY"] = $arPrice["CURRENCY"];
+					$arFields["CAN_BUY"] = "Y";
+					$arFields["PRODUCT_PRICE_ID"] = $arPrice["PRODUCT_PRICE_ID"];
+					$arFields["NOTES"] = $arPrice["NOTES"];
+				}
+				else
+				{
+					$arFields["CAN_BUY"] = "N";
+				}
 			}
 		}
 
@@ -1023,19 +1047,19 @@ class CAllSaleBasket
 
 		if ((is_set($arFields, "CURRENCY") || $ACTION=="ADD") && strlen($arFields["CURRENCY"])<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty currency field", "EMPTY_CURRENCY");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_CURRENCY_ABSENT'), "CURRENCY");
 			return false;
 		}
 
 		if ((is_set($arFields, "LID") || $ACTION=="ADD") && strlen($arFields["LID"])<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty site field", "EMPTY_SITE");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_SITE_ID_ABSENT'), "LID");
 			return false;
 		}
 
 		if ($ACTION!="ADD" && IntVal($ID)<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty ID field", "EMPTY_ID");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_ID_ABSENT'), "ID");
 			return false;
 		}
 
@@ -1043,7 +1067,7 @@ class CAllSaleBasket
 		{
 			if (!($arOrder = CSaleOrder::GetByID($arFields["ORDER_ID"])))
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["ORDER_ID"], GetMessage("SKGB_NO_ORDER")), "ERROR_NO_ORDER");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["ORDER_ID"], GetMessage("SKGB_NO_ORDER")), "ORDER_ID");
 				return false;
 			}
 		}
@@ -1052,7 +1076,7 @@ class CAllSaleBasket
 		{
 			if (!($arCurrency = CCurrency::GetByID($arFields["CURRENCY"])))
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["CURRENCY"], GetMessage("SKGB_NO_CURRENCY")), "ERROR_NO_CURRENCY");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["CURRENCY"], GetMessage("SKGB_NO_CURRENCY")), "CURRENCY");
 				return false;
 			}
 		}
@@ -1062,7 +1086,7 @@ class CAllSaleBasket
 			$dbSite = CSite::GetByID($arFields["LID"]);
 			if (!$dbSite->Fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["LID"], GetMessage("SKGB_NO_SITE")), "ERROR_NO_SITE");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["LID"], GetMessage("SKGB_NO_SITE")), "LID");
 				return false;
 			}
 		}
@@ -1110,7 +1134,7 @@ class CAllSaleBasket
 
 		if ((is_set($arFields, "NAME") || $ACTION=="ADD") && strlen($arFields["NAME"])<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty name field", "EMPTY_NAME");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_NAME_ABSENT'), "NAME");
 			return false;
 		}
 
@@ -1119,14 +1143,14 @@ class CAllSaleBasket
 
 		if ((is_set($arFields, "FUSER_ID") || $ACTION=="ADD") && IntVal($arFields["FUSER_ID"])<=0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("Empty basket user field", "EMPTY_FUSER_ID");
+			$APPLICATION->ThrowException(GetMessage('BT_MOD_SALE_BASKET_ERR_FUSER_ID_ABSENT'), "FUSER_ID");
 			return false;
 		}
 
 		return true;
 	}
 
-	function _Update($ID, &$arFields)
+	public static function _Update($ID, &$arFields)
 	{
 		global $DB;
 
@@ -1720,11 +1744,28 @@ class CAllSaleBasket
 
 		$orderID = IntVal($orderID);
 		if ($orderID <= 0)
-			return False;
+			return false;
 
 		$fuserID = IntVal($fuserID);
-		if ($fuserID <= 0/* || $APPLICATION->GetGroupRight("sale") < "W"*/)
+		if ($fuserID <= 0)
 			$fuserID = CSaleBasket::GetBasketUserID();
+
+		$arOrder = array();
+
+		if (empty($arOrder))
+		{
+			$rsOrders = CSaleOrder::GetList(
+				array(),
+				array('ID' => $orderID),
+				false,
+				false,
+				array('ID', 'USER_ID', 'RECURRING_ID', 'LID')
+			);
+			if (!($arOrder = $rsOrders->Fetch()))
+				return false;
+			$arOrder['RECURRING_ID'] = intval($arOrder['RECURRING_ID']);
+		}
+		$boolRecurring = 0 < $arOrder['RECURRING_ID'];
 
 		$dbBasketList = CSaleBasket::GetList(
 				array("PRICE" => "DESC"),
@@ -1732,42 +1773,56 @@ class CAllSaleBasket
 			);
 		while ($arBasket = $dbBasketList->Fetch())
 		{
-			/*
-			if (strlen($arBasket["CALLBACK_FUNC"]) > 0)
+			$arFields = array();
+			if ($arBasket["DELAY"]=="N" && $arBasket["CAN_BUY"]=="Y")
 			{
-				CSaleBasket::UpdatePrice($arBasket["ID"], $arBasket["CALLBACK_FUNC"], $arBasket["MODULE"], $arBasket["PRODUCT_ID"], $arBasket["QUANTITY"]);
-				$arBasket = CSaleBasket::GetByID($arBasket["ID"]);
-			}
-			*/
-			$arFields = Array();
-			if (/*$arBasket && */$arBasket["DELAY"]=="N" && $arBasket["CAN_BUY"]=="Y")
-			{
-				if (strlen($arBasket["ORDER_CALLBACK_FUNC"]) > 0 || strlen($arBasket["PRODUCT_PROVIDER_CLASS"]))
+				if (!empty($arBasket["ORDER_CALLBACK_FUNC"]) || !empty($arBasket["PRODUCT_PROVIDER_CLASS"]))
 				{
 					/** @var $productProvider IBXSaleProductProvider */
 					if ($productProvider = CSaleBasket::GetProductProvider($arBasket))
 					{
-						$arFields = $productProvider::OrderProduct(array(
+						$arQuery = array(
 							"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
-							"QUANTITY"   => $arBasket["QUANTITY"]
-						));
+							"QUANTITY"   => $arBasket["QUANTITY"],
+						);
+						if ($boolRecurring)
+						{
+							$arQuery['RENEWAL'] = 'Y';
+							$arQuery['USER_ID'] = $arOrder['USER_ID'];
+							$arQuery['SITE_ID'] = $strLang;
+						}
+						$arFields = $productProvider::OrderProduct($arQuery);
 					}
 					else
 					{
-						$arFields = CSaleBasket::ExecuteCallbackFunction(
-							$arBasket["ORDER_CALLBACK_FUNC"],
-							$arBasket["MODULE"],
-							$arBasket["PRODUCT_ID"],
-							$arBasket["QUANTITY"],
-							$orderID
-						);
+						if ($boolRecurring)
+						{
+							$arFields = CSaleBasket::ExecuteCallbackFunction(
+								$arBasket["ORDER_CALLBACK_FUNC"],
+								$arBasket["MODULE"],
+								$arBasket["PRODUCT_ID"],
+								$arBasket["QUANTITY"],
+								'Y',
+								$arOrder['USER_ID'],
+								$strLang
+							);
+						}
+						else
+						{
+							$arFields = CSaleBasket::ExecuteCallbackFunction(
+								$arBasket["ORDER_CALLBACK_FUNC"],
+								$arBasket["MODULE"],
+								$arBasket["PRODUCT_ID"],
+								$arBasket["QUANTITY"]
+							);
+						}
 					}
 
-					if ($arFields && is_array($arFields) && count($arFields) > 0)
+					if ($arFields && is_array($arFields) && !empty($arFields))
 					{
 						$arFields["CAN_BUY"] = "Y";
 					}
-					elseif(is_array($arFields) && count($arFields) <= 0)
+					elseif(is_array($arFields) && empty($arFields))
 					{
 						UnSet($arFields);
 						$arFields["CAN_BUY"] = "N";
@@ -1777,8 +1832,6 @@ class CAllSaleBasket
 				if($arFields["CAN_BUY"] == "Y" || (empty($arFields) && $arBasket["CAN_BUY"]=="Y"))
 				{
 					$arFields["ORDER_ID"] = $orderID;
-					//if ($arDiscounts && is_array($arDiscounts) && count($arDiscounts) > 0)
-						//$arFields["DISCOUNT_PRICE"] = $arDiscounts[IntVal($arBasket["ID"])];
 				}
 
 				if(!empty($arFields))
@@ -1798,7 +1851,6 @@ class CAllSaleBasket
 				return false;
 		}
 
-		//$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID] = 0;
 		foreach(GetModuleEvents("sale", "OnBasketOrder", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($orderID, $fuserID, $strLang, $arDiscounts));
 	}
@@ -2033,7 +2085,6 @@ class CAllSaleBasket
 							CSaleBasket::Update($arBasket["ID"], array("RESERVED" => "N"));
 						}
 
-						//TODO: possible bug
 						if ($ex = $GLOBALS["APPLICATION"]->GetException())
 						{
 							if (defined("SALE_DEBUG") && SALE_DEBUG)
@@ -2742,6 +2793,39 @@ function TmpDumpToFile($txt)
 
 class CAllSaleUser
 {
+	public static function GetAnonymousUserID()
+	{
+		$anonUserID = COption::GetOptionInt("sale", "anonymous_user_id", 0);
+
+		if (intval($anonUserID) <= 0)
+		{
+			$anonUserEmail = "anonymous_".randString(9)."@example.com";
+			$anonUserID = CSaleUser::DoAutoRegisterUser($anonUserEmail, array("NAME" => GetMessage("SU_ANONYMOUS_USER_NAME")), SITE_ID, $arErrors);
+
+			if ($anonUserID > 0)
+			{
+				COption::SetOptionInt("sale", "anonymous_user_id", $anonUserID);
+			}
+			else
+			{
+				$errorMessage = "";
+				if (count($arErrors) > 0)
+				{
+					$errorMessage = " ";
+					foreach ($arErrors as $value)
+					{
+						$errorMessage .= $value["TEXT"]."<br>";
+					}
+				}
+
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SU_ANONYMOUS_USER_CREATE", array("#ERROR#" => $errorMessage)), "ANONYMOUS_USER_CREATE_ERROR");
+				return 0;
+			}
+		}
+
+		return $anonUserID;
+	}
+
 	public static function DoAutoRegisterUser($autoEmail, $payerName, $siteId, &$arErrors, $arOtherFields = null)
 	{
 		$autoEmail = trim($autoEmail);
@@ -2924,7 +3008,7 @@ class CAllSaleUser
 		return true;
 	}
 
-	function _Update($ID, $arFields)
+	public static function _Update($ID, $arFields)
 	{
 		global $DB;
 

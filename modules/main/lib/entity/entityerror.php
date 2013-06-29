@@ -16,18 +16,18 @@ class EntityError
 	/** @var string */
 	protected $message;
 
-	static public function __construct($message, $code=0)
+	public function __construct($message, $code=0)
 	{
 		$this->message = $message;
 		$this->code = $code;
 	}
 
-	static public function getCode()
+	public function getCode()
 	{
 		return $this->code;
 	}
 
-	static public function getMessage()
+	public function getMessage()
 	{
 		return $this->message;
 	}

@@ -10,9 +10,9 @@ IncludeModuleLangFile(__FILE__);
 
 class CComponentUtil
 {
-	function __IncludeLang($filePath, $fileName, $lang = False)
+	public static function __IncludeLang($filePath, $fileName, $lang = false)
 	{
-		if ($lang === False)
+		if ($lang === false)
 			$lang = LANGUAGE_ID;
 
 		if ($lang != "en" && $lang != "ru")
@@ -73,13 +73,13 @@ class CComponentUtil
 		}
 	}
 
-	function __ShowError($errorMessage)
+	public static function __ShowError($errorMessage)
 	{
 		if (strlen($errorMessage) > 0)
 			echo "<font color=\"#FF0000\">".$errorMessage."</font>";
 	}
 
-	function __BuildTree($arPath, &$arTree, &$arComponent, $level = 1)
+	public static function __BuildTree($arPath, &$arTree, &$arComponent, $level = 1)
 	{
 		$arBXTopComponentCatalogLevel = array("content", "service", "communication", "e-store", "utility");
 		$arBXTopComponentCatalogLevelSort = array(600, 700, 800, 900, 1000);
@@ -137,7 +137,7 @@ class CComponentUtil
 		return false;
 	}
 
-	function __GetComponentsTree($filterNamespace = False, $arNameFilter = False)
+	public static function __GetComponentsTree($filterNamespace = false, $arNameFilter = false)
 	{
 		$arTree = array();
 		$io = CBXVirtualIo::GetInstance();
@@ -160,9 +160,9 @@ class CComponentUtil
 						if (CComponentUtil::isComponent($componentFolder."/".$file))
 						{
 							// It's component
-							if ($filterNamespace !== False && strlen($filterNamespace) > 0)
+							if ($filterNamespace !== false && strlen($filterNamespace) > 0)
 								continue;
-							if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file, $arNameFilter))
+							if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file, $arNameFilter))
 								continue;
 
 							if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php"))
@@ -213,7 +213,7 @@ class CComponentUtil
 						else
 						{
 							// It's not a component
-							if ($filterNamespace !== False && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
+							if ($filterNamespace !== false && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
 								continue;
 
 							if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
@@ -227,7 +227,7 @@ class CComponentUtil
 									{
 										if (CComponentUtil::isComponent($componentFolder."/".$file."/".$file1))
 										{
-											if ($arNameFilter !== False && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
+											if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
 												continue;
 											// It's component
 											if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php"))
@@ -288,7 +288,7 @@ class CComponentUtil
 		return $arTree;
 	}
 
-	function __TreeFolderCompare($a, $b)
+	public static function __TreeFolderCompare($a, $b)
 	{
 		if ($a["@"]["SORT"] < $b["@"]["SORT"] || $a["@"]["SORT"] == $b["@"]["SORT"] && StrToLower($a["@"]["NAME"]) < StrToLower($b["@"]["NAME"]))
 			return -1;
@@ -298,7 +298,7 @@ class CComponentUtil
 			return 0;
 	}
 
-	function __TreeItemCompare($a, $b)
+	public static function __TreeItemCompare($a, $b)
 	{
 		if ($a["COMPLEX"] == "Y" && $b["COMPLEX"] == "Y" || $a["COMPLEX"] != "Y" && $b["COMPLEX"] != "Y")
 		{
@@ -319,7 +319,7 @@ class CComponentUtil
 		return 0;
 	}
 
-	function __SortComponentsTree(&$arTree)
+	public static function __SortComponentsTree(&$arTree)
 	{
 		uasort($arTree, array("CComponentUtil", "__TreeFolderCompare"));
 		foreach ($arTree as $key => $value)
@@ -331,7 +331,7 @@ class CComponentUtil
 		}
 	}
 
-	public static function GetComponentsTree($filterNamespace = False, $arNameFilter = False)
+	public static function GetComponentsTree($filterNamespace = false, $arNameFilter = false)
 	{
 		$arTree = CComponentUtil::__GetComponentsTree($filterNamespace, $arNameFilter);
 
@@ -415,7 +415,7 @@ class CComponentUtil
 		return $arComponentDescription;
 	}
 
-	function __GroupParamsCompare($a, $b)
+	public static function __GroupParamsCompare($a, $b)
 	{
 		if ($a["SORT"] < $b["SORT"])
 			return -1;
@@ -431,16 +431,16 @@ class CComponentUtil
 
 		$componentName = trim($componentName);
 		if (strlen($componentName) <= 0)
-			return False;
+			return false;
 
 		$path2Comp = CComponentEngine::MakeComponentPath($componentName);
 		if (strlen($path2Comp) <= 0)
-			return False;
+			return false;
 
 		$componentPath = getLocalPath("components".$path2Comp);
 		if(!CComponentUtil::isComponent($componentPath))
 		{
-			return False;
+			return false;
 		}
 
 		if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentPath."/.parameters.php"))
@@ -451,7 +451,7 @@ class CComponentUtil
 			include($_SERVER["DOCUMENT_ROOT"].$componentPath."/.parameters.php");
 
 			if (!array_key_exists("PARAMETERS", $arComponentParameters) || !is_array($arComponentParameters["PARAMETERS"]))
-				return False;
+				return false;
 
 			if (!array_key_exists("GROUPS", $arComponentParameters) || !is_array($arComponentParameters["GROUPS"]))
 				$arComponentParameters["GROUPS"] = array();
@@ -826,7 +826,7 @@ class CComponentUtil
 		return $arTemplateParameters;
 	}
 
-	public static function GetTemplatesList($componentName, $currentTemplate = False)
+	public static function GetTemplatesList($componentName, $currentTemplate = false)
 	{
 		$arTemplatesList = array();
 
@@ -928,7 +928,7 @@ class CComponentUtil
 		return $arTemplatesList;
 	}
 
-	public static function CopyComponent($componentName, $newNamespace, $newName = False, $bRewrite = False)
+	public static function CopyComponent($componentName, $newNamespace, $newName = false, $bRewrite = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -967,9 +967,9 @@ class CComponentUtil
 		}
 
 		if (strlen($newName) <= 0)
-			$newName = False;
+			$newName = false;
 
-		if ($newName !== False)
+		if ($newName !== false)
 		{
 			if (!preg_match("#^([A-Za-z0-9_-]+\\.)*([A-Za-z0-9_-]+)$#i", $newName))
 			{
@@ -980,20 +980,20 @@ class CComponentUtil
 
 		$namespace = "";
 		$name = $componentName;
-		if (($pos = strpos($componentName, ":")) !== False)
+		if (($pos = strpos($componentName, ":")) !== false)
 		{
 			$namespace = substr($componentName, 0, $pos);
 			$name = substr($componentName, $pos + 1);
 		}
 
 		if ($namespace == $newNamespace
-			&& ($newName === False || $newName !== False && $name == $newName))
+			&& ($newName === false || $newName !== false && $name == $newName))
 		{
 			$APPLICATION->ThrowException(GetMessage("comp_util_err5"), "ERROR_DUPL1");
 			return false;
 		}
 
-		if ($newName !== False)
+		if ($newName !== false)
 			$componentNameNew = $newNamespace.":".$newName;
 		else
 			$componentNameNew = $newNamespace.":".$name;
@@ -1022,12 +1022,12 @@ class CComponentUtil
 
 		CheckDirPath($_SERVER["DOCUMENT_ROOT"].$componentPathNew);
 
-		CopyDirFiles($_SERVER["DOCUMENT_ROOT"].$componentPath, $_SERVER["DOCUMENT_ROOT"].$componentPathNew, True, True, False);
+		CopyDirFiles($_SERVER["DOCUMENT_ROOT"].$componentPath, $_SERVER["DOCUMENT_ROOT"].$componentPathNew, true, true, false);
 
 		return null;
 	}
 
-	public static function CopyTemplate($componentName, $templateName, $siteTemplate, $newSiteTemplate, $newName = False, $bRewrite = False)
+	public static function CopyTemplate($componentName, $templateName, $siteTemplate, $newSiteTemplate, $newName = false, $bRewrite = false)
 	{
 		global $APPLICATION;
 
@@ -1135,9 +1135,9 @@ class CComponentUtil
 			}
 		}
 
-		CopyDirFiles($_SERVER["DOCUMENT_ROOT"].$path, $_SERVER["DOCUMENT_ROOT"].$pathNew, True, True, False);
+		CopyDirFiles($_SERVER["DOCUMENT_ROOT"].$path, $_SERVER["DOCUMENT_ROOT"].$pathNew, true, true, false);
 
-		return True;
+		return true;
 	}
 
 	public static function CheckComponentName($name, $arFilter)

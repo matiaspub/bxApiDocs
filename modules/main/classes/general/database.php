@@ -28,12 +28,12 @@ class CAllDatabase
 	var $cntQuery = 0;
 	var $timeQuery = 0;
 
-	public static function StartUsingMasterOnly()
+	public function StartUsingMasterOnly()
 	{
 		$this->bMasterOnly++;
 	}
 
-	public static function StopUsingMasterOnly()
+	public function StopUsingMasterOnly()
 	{
 		$this->bMasterOnly--;
 	}
@@ -719,7 +719,7 @@ class CAllDatabase
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 * @return CDBResult
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -853,11 +853,10 @@ class CAllDatabase
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php
 	 * @author Bitrix
 	 */
-	public static function QueryBind($strSql, $arBinds, $bIgnoreErrors=false)
+	public function QueryBind($strSql, $arBinds, $bIgnoreErrors=false)
 	{
 		//is extended
 		return $this->Query($strSql, $bIgnoreErrors);
@@ -1101,11 +1100,10 @@ class CAllDatabase
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/parsesqlbatch.php
 	 * @author Bitrix
 	 */
-	public static function ParseSqlBatch($strSql, $bIncremental = False)
+	public function ParseSqlBatch($strSql, $bIncremental = False)
 	{
 		if(strtolower($this->type)=="mysql")
 			$delimiter = ";";
@@ -1218,7 +1216,7 @@ class CAllDatabase
 		return $ret;
 	}
 
-	public static function RunSQLBatch($filepath, $bIncremental = False)
+	public function RunSQLBatch($filepath, $bIncremental = False)
 	{
 		if(!file_exists($filepath) || !is_file($filepath))
 			return array("File $filepath is not found.");
@@ -1306,7 +1304,7 @@ class CAllDatabase
 		return CheckDateTime($value, $format);
 	}
 
-	public static function GetErrorMessage()
+	public function GetErrorMessage()
 	{
 		if(is_object($this->obSlave) && strlen($this->obSlave->db_Error))
 			return $this->obSlave->db_Error;
@@ -1316,7 +1314,7 @@ class CAllDatabase
 			return '';
 	}
 
-	public static function GetErrorSQL()
+	public function GetErrorSQL()
 	{
 		if(is_object($this->obSlave) && strlen($this->obSlave->db_ErrorSQL))
 			return $this->obSlave->db_ErrorSQL;
@@ -1326,7 +1324,7 @@ class CAllDatabase
 			return '';
 	}
 
-	public static function DDL($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
+	public function DDL($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
 	{
 		$res = $this->Query($strSql, $bIgnoreErrors, $error_position, $arOptions);
 
@@ -1336,7 +1334,7 @@ class CAllDatabase
 		return $res;
 	}
 
-	public static function addDebugQuery($strSql, $exec_time)
+	public function addDebugQuery($strSql, $exec_time)
 	{
 		$this->cntQuery++;
 		$this->timeQuery += $exec_time;
@@ -1374,7 +1372,7 @@ class CAllDatabase
 		);
 	}
 
-	public static function addDebugTime($index, $exec_time)
+	public function addDebugTime($index, $exec_time)
 	{
 		if (isset($this->arQueryDebug[$index]))
 			$this->arQueryDebug[$index]["TIME"] += $exec_time;
@@ -1413,7 +1411,7 @@ class CAllDBResult
 	var $nEndPage = 0;
 
 
-	public static function CAllDBResult($res=NULL)
+	public function CAllDBResult($res=NULL)
 	{
 		if(is_object($res) && is_subclass_of($res, "CAllDBResult"))
 		{
@@ -1695,11 +1693,11 @@ class CAllDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
 	 * @author Bitrix
 	 */
-	function FieldName($iCol)
+	static function FieldName($iCol)
 	{
 	}
 
-	public static function NavContinue()
+	public function NavContinue()
 	{
 		if (count($this->arResultAdd) > 0)
 		{
@@ -1745,11 +1743,10 @@ class CAllDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php
 	 * @author Bitrix
 	 */
-	public static function IsNavPrint()
+	public function IsNavPrint()
 	{
 		if ($this->NavRecordCount == 0 || ($this->NavPageCount == 1 && $this->NavShowAll == false))
 			return false;
@@ -1865,16 +1862,15 @@ class CAllDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php
 	 * @author Bitrix
 	 */
-	public static function NavPrint($title, $show_allways=false, $StyleText="text", $template_path=false)
+	public function NavPrint($title, $show_allways=false, $StyleText="text", $template_path=false)
 	{
 		echo $this->GetNavPrint($title, $show_allways, $StyleText, $template_path);
 	}
 
-	public static function GetNavPrint($title, $show_allways=false, $StyleText="text", $template_path=false, $arDeleteParam=false)
+	public function GetNavPrint($title, $show_allways=false, $StyleText="text", $template_path=false, $arDeleteParam=false)
 	{
 		$res = '';
 		$add_anchor = $this->add_anchor;
@@ -2119,16 +2115,15 @@ class CAllDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php
 	 * @author Bitrix
 	 */
-	public static function ExtractFields($strPrefix="str_", $bDoEncode=true)
+	public function ExtractFields($strPrefix="str_", $bDoEncode=true)
 	{
 		return $this->NavNext(true, $strPrefix, $bDoEncode);
 	}
 
-	public static function ExtractEditFields($strPrefix="str_")
+	public function ExtractEditFields($strPrefix="str_")
 	{
 		return $this->NavNext(true, $strPrefix, true, false);
 	}
@@ -2180,11 +2175,10 @@ class CAllDBResult
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php
 	 * @author Bitrix
 	 */
-	public static function GetNext($bTextHtmlAuto=true, $use_tilda=true)
+	public function GetNext($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		if($arRes = $this->Fetch())
 		{
@@ -2325,26 +2319,34 @@ class CAllDBResult
 		$bDescPageNumbering = false; //it can be extracted from $nPageSize
 
 		if(is_array($nPageSize))
+		{
+			//$iNumPage
+			//$nPageSize
+			//$bDescPageNumbering
+			//$bShowAll
+			//$NavShowAll
+			//$sNavID
 			extract($nPageSize);
+		}
 
 		$nPageSize = intval($nPageSize);
 		$NavNum = intval($NavNum);
 
-		$PAGEN_NAME="PAGEN_".($NavNum+1);
-		$SHOWALL_NAME="SHOWALL_".($NavNum+1);
+		$PAGEN_NAME = "PAGEN_".($NavNum+1);
+		$SHOWALL_NAME = "SHOWALL_".($NavNum+1);
 
-		global $$PAGEN_NAME, $$SHOWALL_NAME;
+		global ${$PAGEN_NAME}, ${$SHOWALL_NAME};
 		$md5Path = md5(
 			(isset($sNavID)? $sNavID: $APPLICATION->GetCurPage())
 			.(is_object($this) && isset($this->sSessInitAdd)? $this->sSessInitAdd: "")
 		);
 
-		if($iNumPage===false)
-			$PAGEN = $$PAGEN_NAME;
+		if($iNumPage === false)
+			$PAGEN = ${$PAGEN_NAME};
 		else
 			$PAGEN = $iNumPage;
 
-		$SHOWALL = $$SHOWALL_NAME;
+		$SHOWALL = ${$SHOWALL_NAME};
 
 		$SESS_PAGEN = $md5Path."SESS_PAGEN_".($NavNum+1);
 		$SESS_ALL = $md5Path."SESS_ALL_".($NavNum+1);
@@ -2360,7 +2362,7 @@ class CAllDBResult
 
 		//Number of records on a page
 		$SIZEN = $nPageSize;
-		if(intval($SIZEN)<1)
+		if(intval($SIZEN) < 1)
 			$SIZEN = 10;
 
 		//Show all records
@@ -2377,16 +2379,16 @@ class CAllDBResult
 		{
 			$_SESSION[$SESS_PAGEN] = $PAGEN;
 			$_SESSION[$SESS_ALL] = $SHOW_ALL;
-			$res["SESS_PAGEN"]=$SESS_PAGEN;
-			$res["SESS_ALL"]=$SESS_ALL;
+			$res["SESS_PAGEN"] = $SESS_PAGEN;
+			$res["SESS_ALL"] = $SESS_ALL;
 		}
 
 		return $res;
 	}
 
-	public static function InitNavStartVars($nPageSize=0, $bShowAll=true, $iNumPage=false)
+	public function InitNavStartVars($nPageSize=0, $bShowAll=true, $iNumPage=false)
 	{
-		if(is_array($nPageSize) && is_set($nPageSize, "bShowAll"))
+		if(is_array($nPageSize) && isset($nPageSize["bShowAll"]))
 			$this->bShowAll = $nPageSize["bShowAll"];
 		else
 			$this->bShowAll = $bShowAll;
@@ -2466,11 +2468,10 @@ class CAllDBResult
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php
 	 * @author Bitrix
 	 */
-	public static function NavStart($nPageSize=0, $bShowAll=true, $iNumPage=false)
+	public function NavStart($nPageSize=0, $bShowAll=true, $iNumPage=false)
 	{
 		if($this->bFromLimited)
 			return;
@@ -2589,11 +2590,10 @@ class CAllDBResult
 	 * </pre>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/initfromarray.php
 	 * @author Bitrix
 	 */
-	public static function InitFromArray($arr)
+	public function InitFromArray($arr)
 	{
 		if(is_array($arr))
 			reset($arr);
@@ -2651,11 +2651,10 @@ class CAllDBResult
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php
 	 * @author Bitrix
 	 */
-	public static function NavNext($bSetGlobalVars=true, $strPrefix="str_", $bDoEncode=true, $bSkipEntities=true)
+	public function NavNext($bSetGlobalVars=true, $strPrefix="str_", $bDoEncode=true, $bSkipEntities=true)
 	{
 		$arr = $this->Fetch();
 		if($arr && $bSetGlobalVars)
@@ -2681,12 +2680,12 @@ class CAllDBResult
 		return $arr;
 	}
 
-	public static function GetPageNavString($navigationTitle, $templateName = "", $showAlways=false)
+	public function GetPageNavString($navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
-		return $this->GetPageNavStringEx($dummy, $navigationTitle, $templateName, $showAlways);
+		return $this->GetPageNavStringEx($dummy, $navigationTitle, $templateName, $showAlways, $parentComponent);
 	}
 
-	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false)
+	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -2696,12 +2695,12 @@ class CAllDBResult
 		$navComponentObject = $APPLICATION->IncludeComponent(
 			"bitrix:system.pagenavigation",
 			$templateName,
-			Array(
+			array(
 				"NAV_TITLE"=> $navigationTitle,
 				"NAV_RESULT" => $this,
 				"SHOW_ALWAYS" => $showAlways
 			),
-			null,
+			$parentComponent,
 			array(
 				"HIDE_ICONS" => "Y"
 			)
@@ -2713,7 +2712,7 @@ class CAllDBResult
 		return $result;
 	}
 
-	public static function SetUserFields($arUserFields)
+	public function SetUserFields($arUserFields)
 	{
 		$this->arUserMultyFields = array();
 		if(is_array($arUserFields))

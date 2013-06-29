@@ -3780,7 +3780,7 @@ class CAllForm extends CForm_old
 
 	}
 
-	function __check_PushError(&$container, $MESSAGE, $key = false)
+	public static function __check_PushError(&$container, $MESSAGE, $key = false)
 	{
 		if (is_array($container))
 		{

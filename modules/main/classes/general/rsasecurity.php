@@ -9,7 +9,7 @@ abstract class CRsaProvider
 	protected $_D = '';
 	protected $_chunk = 0;
 
-	static public function SetKeys($arKeys)
+	public function SetKeys($arKeys)
 	{
 		$this->_M = $arKeys["M"];
 		$this->_E = $arKeys["E"];
@@ -17,15 +17,15 @@ abstract class CRsaProvider
 		$this->_chunk = $arKeys["chunk"];
 	}
 
-	static public function GetPublicKey()
+	public function GetPublicKey()
 	{
 		return array("M"=>$this->_M, "E"=>$this->_E, "chunk"=>$this->_chunk);
 	}
 
 	abstract public function LoadKeys();
-	static abstract public function SaveKeys($arKeys);
+	abstract public function SaveKeys($arKeys);
 	abstract public function Decrypt($data);
-	static abstract public function Keygen($keylen=false);
+	abstract public function Keygen($keylen=false);
 }
 
 class CRsaSecurity
@@ -45,7 +45,7 @@ class CRsaSecurity
 	protected $provider = false;
 	protected $lib = '';
 
-	static public function __construct($lib=false)
+	public function __construct($lib=false)
 	{
 		if(extension_loaded('openssl') && ($lib == false || $lib == 'openssl'))
 		{
@@ -64,13 +64,13 @@ class CRsaSecurity
 		return (extension_loaded('openssl') || extension_loaded('bcmath'));
 	}
 
-	static public function SetKeys($arKeys)
+	public function SetKeys($arKeys)
 	{
 		if($this->provider)
 			$this->provider->SetKeys($arKeys);
 	}
 
-	static public function LoadKeys()
+	public function LoadKeys()
 	{
 		if($this->provider)
 		{
@@ -81,20 +81,20 @@ class CRsaSecurity
 		return false;
 	}
 
-	static public function SaveKeys($arKeys)
+	public function SaveKeys($arKeys)
 	{
 		if($this->provider)
 			$this->provider->SaveKeys($arKeys);
 	}
 
-	static public function Keygen($keylen=false)
+	public function Keygen($keylen=false)
 	{
 		if($this->provider)
 			return $this->provider->Keygen($keylen);
 		return false;
 	}
 
-	static public function AddToForm($formid, $arParams)
+	public function AddToForm($formid, $arParams)
 	{
 		if(!$this->provider)
 			return;
@@ -125,7 +125,7 @@ top.BX.defer(top.rsasec_form_bind)('.CUtil::PhpToJSObject($arData).');
 ';
 	}
 
-	static public function AcceptFromForm($arParams)
+	public function AcceptFromForm($arParams)
 	{
 		if(!$this->provider)
 			return self::ERROR_NO_LIBRARY; //no crypto library found
@@ -179,7 +179,7 @@ top.BX.defer(top.rsasec_form_bind)('.CUtil::PhpToJSObject($arData).');
 		return 0; //OK
 	}
 
-	static public function GetLib()
+	public function GetLib()
 	{
 		return $this->lib;
 	}

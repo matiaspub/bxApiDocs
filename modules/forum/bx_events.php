@@ -6,7 +6,7 @@
  */
 class _CEventsForum {
 	/**
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CEventForum::GetAuditTypes
 	 */
 	public static function GetAuditTypesForum(){}
@@ -14,7 +14,7 @@ class _CEventsForum {
 	/**
 	 * после удаления форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/delete.php">CForumNew::Delete</a>
 	 */
 	public static function OnAfterForumDelete(){}
@@ -22,7 +22,7 @@ class _CEventsForum {
 	/**
 	 * после добавления форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/add.php">CForumNew::Add</a>
 	 */
 	public static function onAfterForumAdd(){}
@@ -30,7 +30,7 @@ class _CEventsForum {
 	/**
 	 * после редактирования форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php">CForumNew::Update</a>
 	 */
 	public static function onAfterForumUpdate(){}
@@ -38,7 +38,7 @@ class _CEventsForum {
 	/**
 	 * после добавления группы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/add.php">CForumGroup::Add</a>
 	 */
 	public static function onAfterGroupForumsAdd(){}
@@ -46,7 +46,7 @@ class _CEventsForum {
 	/**
 	 * после редактирования группы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/update.php">CForumGroup::Update</a>
 	 */
 	public static function onAfterGroupForumsUpdate(){}
@@ -54,7 +54,7 @@ class _CEventsForum {
 	/**
 	 * после добавления сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/add.php">CForumMessage::Add</a>
 	 */
 	public static function onAfterMessageAdd(){}
@@ -62,7 +62,7 @@ class _CEventsForum {
 	/**
 	 * после удаления сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/delete.php">CForumMessage::Delete</a>
 	 */
 	public static function onAfterMessageDelete(){}
@@ -70,7 +70,7 @@ class _CEventsForum {
 	/**
 	 * после редактирования сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php">CForumMessage::Update</a>
 	 */
 	public static function onAfterMessageUpdate(){}
@@ -78,7 +78,7 @@ class _CEventsForum {
 	/**
 	 * после копирования персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CForumPrivateMessage::Copy
 	 */
 	public static function onAfterPMCopy(){}
@@ -86,7 +86,7 @@ class _CEventsForum {
 	/**
 	 * после окончательного удаления персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/delete.php">CForumPrivateMessage::Delete</a>
 	 */
 	public static function onAfterPMDelete(){}
@@ -94,7 +94,7 @@ class _CEventsForum {
 	/**
 	 * после отправки персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CForumPrivateMessage::Send
 	 */
 	public static function onAfterPMSend(){}
@@ -102,7 +102,7 @@ class _CEventsForum {
 	/**
 	 * после удаления персонального сообщения в корзину.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/delete.php">CForumPrivateMessage::Delete</a>
 	 */
 	public static function onAfterPMTrash(){}
@@ -110,7 +110,7 @@ class _CEventsForum {
 	/**
 	 * после добавления темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/add.php">CForumTopic::Add</a>
 	 */
 	public static function onAfterTopicAdd(){}
@@ -118,7 +118,7 @@ class _CEventsForum {
 	/**
 	 * после удаления темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/delete.php">CForumTopic::Delete</a>
 	 */
 	public static function onAfterTopicDelete(){}
@@ -126,7 +126,7 @@ class _CEventsForum {
 	/**
 	 * после редактирования темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/update.php">CForumTopic::Update</a>
 	 */
 	public static function onAfterTopicUpdate(){}
@@ -134,7 +134,7 @@ class _CEventsForum {
 	/**
 	 * после добавления пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/add.php">CForumUser::Add</a>
 	 */
 	public static function onAfterUserAdd(){}
@@ -142,7 +142,7 @@ class _CEventsForum {
 	/**
 	 * после удаления пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/delete.php">CForumUser::Delete</a>
 	 */
 	public static function onAfterUserDelete(){}
@@ -150,7 +150,7 @@ class _CEventsForum {
 	/**
 	 * после редактирования пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/update.php">CForumUser::Update</a>
 	 */
 	public static function onAfterUserUpdate(){}
@@ -158,7 +158,7 @@ class _CEventsForum {
 	/**
 	 * перед добавлением форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/add.php">CForumNew::Add</a>
 	 */
 	public static function onBeforeForumAdd(){}
@@ -166,7 +166,7 @@ class _CEventsForum {
 	/**
 	 * перед удалением форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/delete.php">CForumNew::Delete</a>
 	 */
 	public static function OnBeforeForumDelete(){}
@@ -174,7 +174,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php">CForumNew::Update</a>
 	 */
 	public static function onBeforeForumUpdate(){}
@@ -182,7 +182,7 @@ class _CEventsForum {
 	/**
 	 * перед созданием группы форумов.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/add.php">CForumGroup::Add</a>
 	 */
 	public static function onBeforeGroupForumsAdd(){}
@@ -190,7 +190,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием группы форумов.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/update.php">CForumGroup::Update</a>
 	 */
 	public static function onBeforeGroupForumsUpdate(){}
@@ -198,7 +198,7 @@ class _CEventsForum {
 	/**
 	 * перед добавлением сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/add.php">CForumMessage::Add</a>
 	 */
 	public static function onBeforeMessageAdd(){}
@@ -206,7 +206,7 @@ class _CEventsForum {
 	/**
 	 * перед удалением сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/delete.php">CForumMessage::Delete</a>
 	 */
 	public static function onBeforeMessageDelete(){}
@@ -214,7 +214,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием сообщения форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php">CForumMessage::Update</a>
 	 */
 	public static function onBeforeMessageUpdate(){}
@@ -222,7 +222,7 @@ class _CEventsForum {
 	/**
 	 * перед копированием персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CForumPrivateMessage::Copy
 	 */
 	public static function onBeforePMCopy(){}
@@ -230,7 +230,7 @@ class _CEventsForum {
 	/**
 	 * перед удалением персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/delete.php">CForumPrivateMessage::Delete</a>
 	 */
 	public static function onBeforePMDelete(){}
@@ -238,7 +238,7 @@ class _CEventsForum {
 	/**
 	 * перед чтением персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CForumPrivateMessage::MakeRead
 	 */
 	public static function onBeforePMMakeRead(){}
@@ -246,7 +246,7 @@ class _CEventsForum {
 	/**
 	 * перед отправкой персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/send.php">CForumPrivateMessage::Send</a>
 	 */
 	public static function onBeforePMSend(){}
@@ -254,7 +254,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием персонального сообщения.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/update.php">CForumPrivateMessage::Update</a>
 	 */
 	public static function onBeforePMUpdate(){}
@@ -262,7 +262,7 @@ class _CEventsForum {
 	/**
 	 * перед добавлением темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/add.php">CForumTopic::Add</a>
 	 */
 	public static function onBeforeTopicAdd(){}
@@ -270,7 +270,7 @@ class _CEventsForum {
 	/**
 	 * перед удалением темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/delete.php">CForumTopic::Delete</a>
 	 */
 	public static function onBeforeTopicDelete(){}
@@ -278,7 +278,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием темы форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/update.php">CForumTopic::Update</a>
 	 */
 	public static function onBeforeTopicUpdate(){}
@@ -286,7 +286,7 @@ class _CEventsForum {
 	/**
 	 * перед добавлением пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/add.php">CForumUser::Add</a>
 	 */
 	public static function onBeforeUserAdd(){}
@@ -294,7 +294,7 @@ class _CEventsForum {
 	/**
 	 * перед удалением пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/delete.php">CForumUser::Delete</a>
 	 */
 	public static function onBeforeUserDelete(){}
@@ -302,7 +302,7 @@ class _CEventsForum {
 	/**
 	 * перед редактированием пользователя форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/update.php">CForumUser::Update</a>
 	 */
 	public static function onBeforeUserUpdate(){}
@@ -310,7 +310,7 @@ class _CEventsForum {
 	/**
 	 * при удалении форума.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/delete.php">CForumNew::Delete</a>
 	 */
 	public static function OnForumDelete(){}

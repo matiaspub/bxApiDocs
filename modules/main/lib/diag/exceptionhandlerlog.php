@@ -40,7 +40,7 @@ abstract class ExceptionHandlerLog
 		}
 	}
 
-	static abstract public function write(\Exception $exception, $logType);
+	abstract public function write(\Exception $exception, $logType);
 
-	static abstract public function initialize(array $options);
+	abstract public function initialize(array $options);
 }

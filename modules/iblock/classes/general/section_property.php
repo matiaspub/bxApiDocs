@@ -199,7 +199,7 @@ class CIBlockSectionPropertyLink
 		return $result;
 	}
 
-	function _sort($a, $b)
+	public static function _sort($a, $b)
 	{
 		if($a["SORT"] > $b["SORT"])
 			return 1;

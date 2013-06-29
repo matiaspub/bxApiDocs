@@ -8,12 +8,12 @@ Class CIdeaManagmentSonetNotify
     private $Notify = NULL;
     private static $Enable = true;
     
-    static public function __construct($parent)
+    public function __construct($parent)
     {
         $this->Notify = $parent;
     }
     
-    static public function IsAvailable()
+    public function IsAvailable()
     {
         return CModule::IncludeModule('socialnetwork') && CModule::IncludeModule('blog') && NULL!=$this->Notify && self::$Enable;
     }
@@ -247,7 +247,7 @@ Class CIdeaManagmentSonetNotify
         return $LogCommentID>0;
     }
     
-    static public function Send()
+    public function Send()
     {
         if(!$this->IsAvailable())
             return false;
@@ -311,7 +311,7 @@ Class CIdeaManagmentSonetNotify
             CSocNetLog::Delete($arLogMessage["ID"]);
     }
     
-    static public function Remove()
+    public function Remove()
     {
         if(!$this->IsAvailable())
             return false;

@@ -22,7 +22,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 * @param array $pParams
 	 * @return array
 	 */
-	static public function check($pParams)
+	public function check($pParams)
 	{
 		$this->initializeParams($pParams);
 		$testID = $this->getParam("TEST_ID", $this->internalName);

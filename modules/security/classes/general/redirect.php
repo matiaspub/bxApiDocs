@@ -129,12 +129,14 @@ class CSecurityRedirect
 					}
 					$html_mess = str_replace("+", "&#43;", htmlspecialcharsbx($mess));
 
-					$html_url = '<nobr><a href="'.htmlspecialcharsbx($url).'">'.htmlspecialcharsbx($url).'</a></nobr>';
+					$url = htmlspecialcharsbx($url);
+					$html_url = '<nobr><a href="'.$url.'">'.$url.'</a></nobr>';
 					$html_mess = str_replace("#URL#", $html_url, $html_mess);
 		?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?echo $charset?>" />
+<meta http-equiv="Refresh" content="<?=$timeout?>; URL=<?=$url?>">
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />
 </head>

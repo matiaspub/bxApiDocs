@@ -24,7 +24,7 @@ class HttpContext
 	 *
 	 * @param Security\CurrentUser $user
 	 */
-	static public function setUser(\Bitrix\Main\Security\CurrentUser $user)
+	public function setUser(\Bitrix\Main\Security\CurrentUser $user)
 	{
 		$this->user = $user;
 	}
@@ -34,17 +34,17 @@ class HttpContext
 	 *
 	 * @return \Bitrix\Main\Security\CurrentUser
 	 */
-	static public function getUser()
+	public function getUser()
 	{
 		return $this->user;
 	}
 
-	static public function getSession()
+	public function getSession()
 	{
 		return $this->session;
 	}
 
-	static public function rewriteUri($url, $queryString, $redirectStatus = null)
+	public function rewriteUri($url, $queryString, $redirectStatus = null)
 	{
 		/** @var $request HttpRequest */
 		$request = $this->request;
@@ -53,7 +53,7 @@ class HttpContext
 		$this->server->rewriteUri($url, $queryString, $redirectStatus);
 	}
 
-	static public function transferUri($url, $queryString)
+	public function transferUri($url, $queryString)
 	{
 		/** @var $request HttpRequest */
 		$request = $this->request;

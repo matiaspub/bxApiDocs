@@ -90,7 +90,7 @@ class SiteTable extends Entity\DataManager
 				AND L.ACTIVE = 'Y'
 			ORDER BY
 				IF((L.DOMAIN_LIMITED = 'Y' AND LD.LID IS NOT NULL) OR L.DOMAIN_LIMITED <> 'Y',
-					IF('".$domainForSql."' LIKE CONCAT(L.DIR, '%'), 3, 1),
+					IF('".$pathForSql."' LIKE CONCAT(L.DIR, '%'), 3, 1),
 					IF('".$pathForSql."' LIKE CONCAT(L.DIR, '%'), 2, 0)
 				) DESC,
 				LENGTH(L.DIR) DESC,

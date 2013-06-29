@@ -9,16 +9,16 @@ abstract class FileEntry
 		parent::__construct($path);
 	}
 
-	static public function getExtension()
+	public function getExtension()
 	{
 		return Path::getExtension($this->path);
 	}
 
 	public abstract function getContents();
-	static public abstract function putContents($data);
-	static public abstract function getFileSize();
+	public abstract function putContents($data);
+	public abstract function getFileSize();
 	public abstract function isWritable();
-	static public abstract function isReadable();
+	public abstract function isReadable();
 	public abstract function readFile();
 
 	static public function isDirectory()

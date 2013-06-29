@@ -12,7 +12,7 @@ class CSecurityCloudMonitorRequest
 	protected $response = array();
 	protected $checkingToken = "";
 
-	static public function __construct($pAction, $pToken = "")
+	public function __construct($pAction, $pToken = "")
 	{
 		if(!in_array($pAction, self::$mValidActions))
 			return null;
@@ -23,7 +23,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @param string $pCheckingToken
 	 */
-	static public function setCheckingToken($pCheckingToken)
+	public function setCheckingToken($pCheckingToken)
 	{
 		$this->checkingToken = $pCheckingToken;
 	}
@@ -31,7 +31,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @return string
 	 */
-	static public function getCheckingToken()
+	public function getCheckingToken()
 	{
 		return $this->checkingToken;
 	}
@@ -41,7 +41,7 @@ class CSecurityCloudMonitorRequest
 	 * @param array $pAction
 	 * @return array|bool
 	 */
-	static public function receiveData($pAction)
+	public function receiveData($pAction)
 	{
 		$payload = $this->getPayload($pAction, false);
 		if(!$payload)
@@ -72,7 +72,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @return bool
 	 */
-	static public function isOk()
+	public function isOk()
 	{
 		return 	$this->checkStatus(self::REMOTE_STATUS_OK);
 	}
@@ -80,7 +80,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @return bool
 	 */
-	static public function isFatalError()
+	public function isFatalError()
 	{
 		return 	$this->checkStatus(self::REMOTE_STATUS_FATAL_ERROR);
 	}
@@ -88,7 +88,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @return bool
 	 */
-	static public function isError()
+	public function isError()
 	{
 		return 	$this->checkStatus(self::REMOTE_STATUS_ERROR);
 	}
@@ -96,7 +96,7 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * @return bool
 	 */
-	static public function isSuccess()
+	public function isSuccess()
 	{
 		return 	(isset($this->response["status"]));
 	}
@@ -105,7 +105,7 @@ class CSecurityCloudMonitorRequest
 	 * @param string $pkey
 	 * @return string
 	 */
-	static public function getValue($pkey)
+	public function getValue($pkey)
 	{
 		if(isset($this->response[$pkey]))
 		{

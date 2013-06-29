@@ -42,11 +42,10 @@ class CAdminPage
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/init.php
 	 * @author Bitrix
 	 */
-	public static function Init()
+	public function Init()
 	{
 		if($this->bInit)
 			return;
@@ -78,11 +77,10 @@ class CAdminPage
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showpopupcss.php
 	 * @author Bitrix
 	 */
-	public static function ShowPopupCSS()
+	public function ShowPopupCSS()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -126,11 +124,10 @@ class CAdminPage
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showcss.php
 	 * @author Bitrix
 	 */
-	public static function ShowCSS()
+	public function ShowCSS()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -157,7 +154,7 @@ class CAdminPage
 		return $s;
 	}
 
-	public static function GetModulesCSS($module_id='')
+	public function GetModulesCSS($module_id='')
 	{
 		global $CACHE_MANAGER;
 		$rel_theme_path = ADMIN_THEMES_PATH."/".ADMIN_THEME_ID."/";
@@ -308,11 +305,10 @@ var phpVars = {
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsectionindex.php
 	 * @author Bitrix
 	 */
-	public static function ShowSectionIndex($menu_id, $module_id=false, $mode=false)
+	public function ShowSectionIndex($menu_id, $module_id=false, $mode=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -425,11 +421,11 @@ class CAdminMenu
 	var $aGlobalMenu, $aActiveSections=array(), $aOpenedSections=array();
 	var $bInit = false;
 
-	function CAdminMenu()
+	static function CAdminMenu()
 	{
 	}
 
-	public static function Init($modules)
+	public function Init($modules)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB, $MESS;
@@ -668,14 +664,14 @@ class CAdminMenu
 				break;
 	}
 
-	function _sort($a, $b)
+	public static function _sort($a, $b)
 	{
 		if($a["sort"] == $b["sort"])
 			return 0;
 		return ($a["sort"] < $b["sort"]? -1 : 1);
 	}
 
-	function _IncludeMenu($fname)
+	public static function _IncludeMenu($fname)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB, $MESS;
@@ -723,7 +719,7 @@ class CAdminMenu
 		return false;
 	}
 
-	function _SetActiveItems(&$aMenu, $aSections=array())
+	public function _SetActiveItems(&$aMenu, $aSections=array())
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -859,7 +855,7 @@ class CAdminMenu
 		return $this->_get_menu_item_width($level) + $ADDED_MAGIC_NUMBER;
 	}
 
-	public static function Show($aMenu, $level=0)
+	public function Show($aMenu, $level=0)
 	{
 		$scripts = '';
 
@@ -1004,14 +1000,14 @@ class CAdminMenu
 ';
 	}
 
-	public static function ShowSubmenu($menu_id, $mode="menu")
+	public function ShowSubmenu($menu_id, $mode="menu")
 	{
 		foreach($this->aGlobalMenu as $key=>$menu)
 			if($this->_ShowSubmenu($this->aGlobalMenu[$key], $menu_id, $mode))
 				break;
 	}
 
-	function _ShowSubmenu(&$aMenu, $menu_id, $mode, $level=0)
+	public function _ShowSubmenu(&$aMenu, $menu_id, $mode, $level=0)
 	{
 		$bSubmenu = (is_array($aMenu["items"]) && count($aMenu["items"])>0);
 		if($bSubmenu)
@@ -1047,7 +1043,7 @@ class CAdminMenu
 		return false;
 	}
 
-	public static function ActiveSection()
+	public function ActiveSection()
 	{
 		if(!empty($this->aActiveSections))
 			foreach($this->aActiveSections as $menu)
@@ -1059,7 +1055,7 @@ class CAdminMenu
 		return null;
 	}
 
-	public static function ActiveIcon()
+	public function ActiveIcon()
 	{
 		if(!empty($this->aActiveSections))
 		{
@@ -1071,7 +1067,7 @@ class CAdminMenu
 		return "default_page_icon";
 	}
 
-	public static function AddOpenedSections($sections)
+	public function AddOpenedSections($sections)
 	{
 		$aSect = explode(",", $sections);
 		foreach($aSect as $sect)
@@ -1079,12 +1075,12 @@ class CAdminMenu
 				$this->aOpenedSections[] = trim($sect);
 	}
 
-	public static function IsSectionActive($section)
+	public function IsSectionActive($section)
 	{
 		return in_array($section, $this->aOpenedSections);
 	}
 
-	public static function GetOpenedSections()
+	public function GetOpenedSections()
 	{
 		return implode(",", $this->aOpenedSections);
 	}
@@ -1098,7 +1094,7 @@ class CAdminPopup
 	var $items;
 	var $params;
 
-	public static function CAdminPopup($name, $id, $items=false, $params=false)
+	public function CAdminPopup($name, $id, $items=false, $params=false)
 	{
 		//SEPARATOR, ID, ONCLICK, ICONCLASS, TEXT, DEFAULT=>true|false, DISABLED=>true|false
 		$this->name = $name;
@@ -1107,7 +1103,7 @@ class CAdminPopup
 		$this->params = $params;
 	}
 
-	public static function Show($bReturnValue=false)
+	public function Show($bReturnValue=false)
 	{
 		$s = '';
 		if(!isset($_REQUEST["mode"]) || $_REQUEST["mode"] != "frame")
@@ -1254,7 +1250,7 @@ class CAdminPopupEx extends CAdminPopup
 {
 	protected $element_id;
 
-	static public function __construct($element_id, $items=false, $params=false)
+	public function __construct($element_id, $items=false, $params=false)
 	{
 //SEPARATOR, ID, ONCLICK|LINK, ICONCLASS, TEXT, DEFAULT=>true|false, MENU
 		$this->element_id = $element_id;
@@ -1262,7 +1258,7 @@ class CAdminPopupEx extends CAdminPopup
 		$this->params = $params;
 	}
 
-	static public function Show($bReturnValue=false)
+	public function Show($bReturnValue=false)
 	{
 		$s = '';
 		if((!isset($_REQUEST["mode"]) || $_REQUEST["mode"] != "frame") && is_array($this->items))
@@ -1301,7 +1297,7 @@ class CAdminFilter
 	private $tableId=false;
 	const   SESS_PARAMS_NAME = "main.adminFilter";
 
-	static public function __construct($id, $popup=false, $arExtraParams=array())
+	public function __construct($id, $popup=false, $arExtraParams=array())
 	{
 		global $USER;
 
@@ -1506,7 +1502,7 @@ class CAdminFilter
 	 * @param str rows - rows identificators separated by commas ("rowid_1, rowid_2, ...")
 	 * @return bool
 	 */
-	static public function SetDefaultRows($rows)
+	public function SetDefaultRows($rows)
 	{
 		if(is_array($rows))
 			$outRows = implode(",",$rows);
@@ -1567,7 +1563,7 @@ class CAdminFilter
 	 *							)
 	 * @return bool
 	 */
-	static public function AddPreset($arFields)
+	public function AddPreset($arFields)
 	{
 		if(!isset($arFields["NAME"]) || empty($arFields["NAME"]))
 			return false;
@@ -1810,7 +1806,7 @@ class CAdminFilter
 		return ($a["SORT"] < $b["SORT"]) ? -1 : 1;
 	}
 
-	static public function Begin()
+	public function Begin()
 	{
 		uasort($this->arItems, "CAdminFilter::Cmp");
 
@@ -1842,7 +1838,7 @@ class CAdminFilter
 						<table cellspacing="0" class="adm-filter-content-table" id="'.$this->id.'">';
 	}
 
-	static public function Buttons($aParams=false)
+	public function Buttons($aParams=false)
 	{
 		$hkInst = CHotKeys::getInstance();
 
@@ -1893,7 +1889,7 @@ class CAdminFilter
 		}
 	}
 
-	static public function End()
+	public function End()
 	{
 
 		echo '
@@ -2093,7 +2089,7 @@ class CAdminContextMenu
 	var $bMenuAdded = false;
 	var $bRightBarAdded = false;
 
-	public static function CAdminContextMenu($items, $additional_items = array())
+	public function CAdminContextMenu($items, $additional_items = array())
 	{
 		//array(
 		//	array("NEWBAR"=>true),
@@ -2108,7 +2104,7 @@ class CAdminContextMenu
 		$this->additional_items = $additional_items;
 	}
 
-	public static function Show()
+	public function Show()
 	{
 		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
 			return;
@@ -2315,7 +2311,7 @@ class CAdminSorting
 	var $by_initial;
 	var $order_initial;
 
-	public static function CAdminSorting($table_id, $by_initial=false, $order_initial=false, $by_name="by", $ord_name="order")
+	public function CAdminSorting($table_id, $by_initial=false, $order_initial=false, $by_name="by", $ord_name="order")
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -2357,7 +2353,7 @@ class CAdminSorting
 		}
 	}
 
-	public static function Show($text, $sort_by, $alt_title = false, $baseCssClass = "")
+	public function Show($text, $sort_by, $alt_title = false, $baseCssClass = "")
 	{
 		$ord = "asc";
 		$class = "";
@@ -2410,13 +2406,13 @@ class CAdminResult extends CDBResult
 	var $nInitialSize;
 	var $table_id;
 
-	public static function CAdminResult($res, $table_id)
+	public function CAdminResult($res, $table_id)
 	{
 		parent::CDBResult($res);
 		$this->table_id = $table_id;
 	}
 
-	public static function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
+	public function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
 	{
 		$nSize = CAdminResult::GetNavSize($this->table_id, $nPageSize);
 
@@ -2494,7 +2490,7 @@ class CAdminTabControl
 
 	var $AUTOSAVE = null;
 
-	public static function CAdminTabControl($name, $tabs, $bCanExpand = true, $bDenyAutoSave = false)
+	public function CAdminTabControl($name, $tabs, $bCanExpand = true, $bDenyAutoSave = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -2518,7 +2514,7 @@ class CAdminTabControl
 		}
 	}
 
-	public static function SetPublicMode($jsObject = false)
+	public function SetPublicMode($jsObject = false)
 	{
 		$this->bPublicMode = true;
 		$this->bShowSettings = false;
@@ -2532,7 +2528,7 @@ class CAdminTabControl
 	/**
 	 * @param CAdminTabEngine $customTabber
 	 */
-	public static function AddTabs(&$customTabber)
+	public function AddTabs(&$customTabber)
 	{
 		$this->customTabber = $customTabber;
 
@@ -2568,7 +2564,7 @@ class CAdminTabControl
 		}
 	}
 
-	public static function Begin()
+	public function Begin()
 	{
 		$hkInst = CHotKeys::getInstance();
 
@@ -2626,7 +2622,7 @@ class CAdminTabControl
 		}
 	}
 
-	public static function ShowTabButtons()
+	public function ShowTabButtons()
 	{
 		$s = '';
 		if (!$this->bPublicMode)
@@ -2639,7 +2635,7 @@ class CAdminTabControl
 		return $s;
 	}
 
-	public static function BeginNextTab()
+	public function BeginNextTab()
 	{
 		if ($this->AUTOSAVE)
 			$this->AUTOSAVE->Init();
@@ -2687,7 +2683,7 @@ echo '
 		}
 	}
 
-	public static function EndTab()
+	public function EndTab()
 	{
 		if(
 			$this->tabIndex < 1
@@ -2706,7 +2702,7 @@ echo '
 		$this->tabs[$this->tabIndex-1]["_closed"] = true;
 	}
 
-	public static function Buttons($aParams=false)
+	public function Buttons($aParams=false)
 	{
 		$hkInst = CHotKeys::getInstance();
 
@@ -2779,7 +2775,7 @@ echo '
 		}
 	}
 
-	public static function ButtonsPublic($arJSButtons = false)
+	public function ButtonsPublic($arJSButtons = false)
 	{
 		while ($this->tabIndex < count($this->tabs))
 			$this->BeginNextTab();
@@ -2819,7 +2815,7 @@ echo '
 		}
 	}
 
-	public static function End()
+	public function End()
 	{
 		$hkInst = CHotKeys::getInstance();
 
@@ -2909,14 +2905,14 @@ echo '
 		}
 	}
 
-	public static function ActiveTabParam()
+	public function ActiveTabParam()
 	{
 		return $this->name."_active_tab=".urlencode($this->selectedTab);
 	}
 
 	// this method is temporarily disabled!
 	//string, CAdminException, array("id"=>"name", ...)
-	public static function ShowWarnings($form, $messages, $aFields=false)
+	public function ShowWarnings($form, $messages, $aFields=false)
 	{
 /*
 		if(!$messages)
@@ -2949,7 +2945,7 @@ class CAdminViewTabControl
 	var $selectedTab;
 	var $tabIndex = 0;
 
-	public static function CAdminViewTabControl($name, $tabs)
+	public function CAdminViewTabControl($name, $tabs)
 	{
 		//array(array("DIV"=>"", "TAB"=>"", "ICON"=>, "TITLE"=>"", "ONSELECT"=>"javascript"), ...)
 		$this->tabs = $tabs;
@@ -2960,7 +2956,7 @@ class CAdminViewTabControl
 			$this->selectedTab = $tabs[0]["DIV"];
 	}
 
-	public static function Begin()
+	public function Begin()
 	{
 		echo '
 <div class="adm-detail-subtabs-block">
@@ -2975,7 +2971,7 @@ class CAdminViewTabControl
 echo '</div>';
 	}
 
-	public static function BeginNextTab()
+	public function BeginNextTab()
 	{
 		//end previous tab
 		$this->EndTab();
@@ -2991,7 +2987,7 @@ echo '</div>';
 		$this->tabIndex++;
 	}
 
-	public static function EndTab()
+	public function EndTab()
 	{
 		if($this->tabIndex < 1 || $this->tabIndex > count($this->tabs))
 			return;
@@ -3001,7 +2997,7 @@ echo '</div>';
 ';
 	}
 
-	public static function End()
+	public function End()
 	{
 		$this->EndTab();
 		echo '
@@ -3059,14 +3055,14 @@ class CAdminList
 	var $onLoadScript;
 	var $arEditedRows;
 
-	public static function CAdminList($table_id, $sort=false)
+	public function CAdminList($table_id, $sort=false)
 	{
 		$this->table_id = $table_id;
 		$this->sort = $sort;
 	}
 
 	//id, name, content, sort, default
-	public static function AddHeaders($aParams)
+	public function AddHeaders($aParams)
 	{
 		if (isset($_REQUEST['showallcol']) && $_REQUEST['showallcol'])
 			$_SESSION['SHALL'] = ($_REQUEST['showallcol'] == 'Y');
@@ -3130,7 +3126,7 @@ class CAdminList
 		die();
 	}
 
-	public static function AddVisibleHeaderColumn($id)
+	public function AddVisibleHeaderColumn($id)
 	{
 		if (isset($this->aHeaders[$id]) && !isset($this->aVisibleHeaders[$id]))
 		{
@@ -3139,12 +3135,12 @@ class CAdminList
 		}
 	}
 
-	public static function GetVisibleHeaderColumns()
+	public function GetVisibleHeaderColumns()
 	{
 		return $this->arVisibleColumns;
 	}
 
-	public static function AddAdminContextMenu($aContext=array(), $bShowExcel=true, $bShowSettings=true)
+	public function AddAdminContextMenu($aContext=array(), $bShowExcel=true, $bShowSettings=true)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -3249,7 +3245,7 @@ class CAdminList
 		return false;
 	}
 
-	public static function GroupAction()
+	public function GroupAction()
 	{
 		//AddMessage2Log("GroupAction");
 		if(!empty($_REQUEST['action_button']))
@@ -3301,7 +3297,7 @@ class CAdminList
 		return "BX.adminPanel.Redirect([], '".CUtil::AddSlashes($url)."', event);";
 	}
 
-	public static function ActionAjaxReload($url)
+	public function ActionAjaxReload($url)
 	{
 		if(strpos($url, "lang=")===false)
 		{
@@ -3314,7 +3310,7 @@ class CAdminList
 		return $this->table_id.".GetAdminList('".CUtil::AddSlashes($url)."');";
 	}
 
-	public static function ActionPost($url = false, $action_name = false, $action_value = 'Y')
+	public function ActionPost($url = false, $action_name = false, $action_value = 'Y')
 	{
 		$res = '';
 		if($url)
@@ -3340,14 +3336,14 @@ class CAdminList
 			return $res.'; BX.submit(document.forms.form_'.$this->table_id.');';
 	}
 
-	public static function ActionDoGroup($id, $action_id, $add_params='')
+	public function ActionDoGroup($id, $action_id, $add_params='')
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 		return $this->table_id.".GetAdminList('".CUtil::AddSlashes($APPLICATION->GetCurPage())."?ID=".CUtil::AddSlashes($id)."&action=".CUtil::AddSlashes($action_id)."&lang=".LANGUAGE_ID."&".bitrix_sessid_get().($add_params<>""?"&".CUtil::AddSlashes($add_params):"")."');";
 	}
 
-	public static function InitFilter($arFilterFields)
+	public function InitFilter($arFilterFields)
 	{
 		$sTableID = $this->table_id;
 		global $del_filter, $set_filter, $save_filter;
@@ -3366,7 +3362,7 @@ class CAdminList
 			InitFilterEx($arFilterFields, $sTableID, "get");
 	}
 
-	public static function IsDefaultFilter()
+	public function IsDefaultFilter()
 	{
 		global $set_default;
 		$sTableID = $this->table_id;
@@ -3394,17 +3390,17 @@ class CAdminList
 		return $row;
 	}
 
-	public static function AddFooter($aFooter)
+	public function AddFooter($aFooter)
 	{
 		$this->aFooter = $aFooter;
 	}
 
-	public static function NavText($sNavText)
+	public function NavText($sNavText)
 	{
 		$this->sNavText = $sNavText;
 	}
 
-	public static function Display()
+	public function Display()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -3554,7 +3550,7 @@ class CAdminList
 		echo $this->sNavText;
 	}
 
-	public static function DisplayExcel()
+	public function DisplayExcel()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -3644,7 +3640,7 @@ class CAdminList
 	}
 
 
-	public static function AddGroupActionTable($arActions, $arParams=array())
+	public function AddGroupActionTable($arActions, $arParams=array())
 	{
 		//array("action"=>"text", ...)
 		//OR array(array("action" => "custom JS", "value" => "action", "type" => "button", "title" => "", "name" => ""), ...)
@@ -3653,7 +3649,7 @@ class CAdminList
 		$this->arActionsParams = $arParams;
 	}
 
-	public static function ShowActionTable()
+	public function ShowActionTable()
 	{
 		if(count($this->arActions)<=0 && !$this->bCanBeEdited)
 			return;
@@ -3758,7 +3754,7 @@ class CAdminList
 <?
 	}
 
-	public static function DisplayList($arParams = array())
+	public function DisplayList($arParams = array())
 	{
 		$menu = new CAdminPopup($this->table_id."_menu", $this->table_id."_menu");
 		$menu->Show();
@@ -3789,9 +3785,10 @@ class CAdminList
 			$arParams['FIX_HEADER'] = true;
 		if (!isset($arParams['FIX_FOOTER']))
 			$arParams['FIX_FOOTER'] = true;
-
 		if (!isset($arParams['context_ctrl']))
-			$arParams['context_ctrl'] = $aUserOpt["context_ctrl"] == "Y";
+			$arParams['context_ctrl'] = ($aUserOpt["context_ctrl"] == "Y");
+		if (!isset($arParams['context_menu']))
+			$arParams['context_menu'] = ($aUserOpt["context_menu"] <> "N");
 
 		$tbl = CUtil::JSEscape($this->table_id);
 ?>
@@ -3806,24 +3803,24 @@ BX.adminChain.addItems("<?=$tbl?>_navchain_div");
 		echo '</div>';
 	}
 
-	public static function AddUpdateError($strError, $id = false)
+	public function AddUpdateError($strError, $id = false)
 	{
 		$this->arUpdateErrors[] = Array($strError, $id);
 		$this->arUpdateErrorIDs[] = $id;
 	}
 
-	public static function AddGroupError($strError, $id = false)
+	public function AddGroupError($strError, $id = false)
 	{
 		$this->arGroupErrors[] = Array($strError, $id);
 		$this->arGroupErrorIDs[] = $id;
 	}
 
-	public static function AddActionSuccessMessage($strMessage)
+	public function AddActionSuccessMessage($strMessage)
 	{
 		$this->arActionSuccess[] = $strMessage;
 	}
 
-	public static function AddFilterError($strError)
+	public function AddFilterError($strError)
 	{
 		$this->arFilterErrors[] = $strError;
 	}
@@ -3833,7 +3830,7 @@ BX.adminChain.addItems("<?=$tbl?>_navchain_div");
 		ob_start();
 	}
 
-	public static function EndPrologContent()
+	public function EndPrologContent()
 	{
 		$this->sPrologContent .= ob_get_contents();
 		ob_end_clean();
@@ -3844,7 +3841,7 @@ BX.adminChain.addItems("<?=$tbl?>_navchain_div");
 		ob_start();
 	}
 
-	public static function EndEpilogContent()
+	public function EndEpilogContent()
 	{
 		$this->sEpilogContent = ob_get_contents();
 		ob_end_clean();
@@ -3855,13 +3852,13 @@ BX.adminChain.addItems("<?=$tbl?>_navchain_div");
 		ob_start();
 	}
 
-	public static function EndCustomContent()
+	public function EndCustomContent()
 	{
 		$this->sContent = ob_get_contents();
 		ob_end_clean();
 	}
 
-	public static function CreateChain()
+	public function CreateChain()
 	{
 		return new CAdminChain($this->table_id."_navchain_div", false);
 	}
@@ -3869,14 +3866,14 @@ BX.adminChain.addItems("<?=$tbl?>_navchain_div");
 	/**
 	 * @param CAdminChain $chain
 	 */
-	public static function ShowChain($chain)
+	public function ShowChain($chain)
 	{
 		$this->BeginPrologContent();
 		$chain->Show();
 		$this->EndPrologContent();
 	}
 
-	public static function CheckListMode()
+	public function CheckListMode()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -3958,20 +3955,20 @@ class CAdminListRow
 	var $pList;
 
 
-	public static function CAdminListRow(&$aHeaders, $table_id)
+	public function CAdminListRow(&$aHeaders, $table_id)
 	{
 		$this->aHeaders = $aHeaders;
 		$this->aHeadersID = array_keys($aHeaders);
 		$this->table_id = $table_id;
 	}
 
-	public static function SetFeatures($aFeatures)
+	public function SetFeatures($aFeatures)
 	{
 		//array("footer"=>true)
 		$this->aFeatures = $aFeatures;
 	}
 
-	public static function AddField($id, $text, $edit=false)
+	public function AddField($id, $text, $edit=false)
 	{
 		$this->aFields[$id] = array();
 		if($edit !== false)
@@ -3982,7 +3979,7 @@ class CAdminListRow
 		$this->aFields[$id]["view"] = Array("type"=>"html", "value"=>$text);
 	}
 
-	public static function AddCheckField($id, $arAttributes = Array())
+	public function AddCheckField($id, $arAttributes = Array())
 	{
 		if($arAttributes!==false)
 		{
@@ -3992,7 +3989,7 @@ class CAdminListRow
 		$this->aFields[$id]["view"] = Array("type"=>"checkbox");
 	}
 
-	public static function AddSelectField($id, $arValues = Array(), $arAttributes = Array())
+	public function AddSelectField($id, $arValues = Array(), $arAttributes = Array())
 	{
 		if($arAttributes!==false)
 		{
@@ -4002,7 +3999,7 @@ class CAdminListRow
 		$this->aFields[$id]["view"] = Array("type"=>"select", "values"=>$arValues);
 	}
 
-	public static function AddInputField($id, $arAttributes = Array())
+	public function AddInputField($id, $arAttributes = Array())
 	{
 		if($arAttributes!==false)
 		{
@@ -4011,7 +4008,7 @@ class CAdminListRow
 		}
 	}
 
-	public static function AddCalendarField($id, $arAttributes = Array())
+	public function AddCalendarField($id, $arAttributes = Array())
 	{
 		if($arAttributes!==false)
 		{
@@ -4020,18 +4017,18 @@ class CAdminListRow
 		}
 	}
 
-	public static function AddViewField($id, $sHTML)
+	public function AddViewField($id, $sHTML)
 	{
 		$this->aFields[$id]["view"] = Array("type"=>"html", "value"=>$sHTML);
 	}
 
-	public static function AddEditField($id, $sHTML)
+	public function AddEditField($id, $sHTML)
 	{
 		$this->aFields[$id]["edit"] = Array("type"=>"html", "value"=>$sHTML);
 		$this->pList->bCanBeEdited = true;
 	}
 
-	public static function AddViewFileField($id, $showInfo = false)
+	public function AddViewFileField($id, $showInfo = false)
 	{
 		static $fileman = 0;
 		if (!($fileman++))
@@ -4051,7 +4048,7 @@ class CAdminListRow
 		);
 	}
 
-	public static function AddFileField($id, $showInfo = false, $inputs = array())
+	public function AddFileField($id, $showInfo = false, $inputs = array())
 	{
 		$this->aFields[$id]["edit"] = array(
 			"type" => "file",
@@ -4062,12 +4059,12 @@ class CAdminListRow
 		$this->AddViewFileField($id, $showInfo);
 	}
 
-	public static function AddActions($aActions)
+	public function AddActions($aActions)
 	{
 		$this->aActions = $aActions;
 	}
 
-	function __AttrGen($attr)
+	public static function __AttrGen($attr)
 	{
 		$res = '';
 		foreach($attr as $name=>$val)
@@ -4076,12 +4073,12 @@ class CAdminListRow
 		return $res;
 	}
 
-	public static function VarsFromForm()
+	public function VarsFromForm()
 	{
 		return ($this->bEditMode && is_array($this->pList->arUpdateErrorIDs) && in_array($this->id, $this->pList->arUpdateErrorIDs));
 	}
 
-	public static function Display()
+	public function Display()
 	{
 		$sDefAction = $sDefTitle = "";
 		if(!$this->bEditMode)
@@ -4112,10 +4109,8 @@ class CAdminListRow
 		$sMenuItems = "";
 		if(!empty($this->aActions))
 			$sMenuItems = htmlspecialcharsbx(CAdminPopup::PhpToJavaScript($this->aActions));
-
-		$aUserOpt = CUserOptions::GetOption("global", "settings");
 ?>
-<tr class="adm-list-table-row<?=(isset($this->aFeatures["footer"]) && $this->aFeatures["footer"] == true? ' footer':'')?><?=$this->bEditMode?' adm-table-row-active' : ''?>"<?=($sMenuItems <> "" && $aUserOpt["context_menu"]<>"N"? ' oncontextmenu="return '.$sMenuItems.';"':'');?><?=($sDefAction <> ""? ' ondblclick="'.$sDefAction.'"'.(!empty($sDefTitle)? ' title="'.GetMessage("admin_lib_list_double_click").' '.$sDefTitle.'"':''):'')?>>
+<tr class="adm-list-table-row<?=(isset($this->aFeatures["footer"]) && $this->aFeatures["footer"] == true? ' footer':'')?><?=$this->bEditMode?' adm-table-row-active' : ''?>"<?=($sMenuItems <> ""? ' oncontextmenu="return '.$sMenuItems.';"':'');?><?=($sDefAction <> ""? ' ondblclick="'.$sDefAction.'"'.(!empty($sDefTitle)? ' title="'.GetMessage("admin_lib_list_double_click").' '.$sDefTitle.'"':''):'')?>>
 <?
 
 		if(count($this->pList->arActions)>0 || $this->pList->bCanBeEdited):
@@ -4277,7 +4272,7 @@ class CAdminMessage
 	 * @param string|array $message
 	 * @param CAdminException|bool $exception
 	 */
-	public static function CAdminMessage($message, $exception=false)
+	public function CAdminMessage($message, $exception=false)
 	{
 		//array("MESSAGE"=>"", "TYPE"=>("ERROR"|"OK"|"PROGRESS"), "DETAILS"=>"", "HTML"=>true)
 		if(!is_array($message))
@@ -4288,7 +4283,7 @@ class CAdminMessage
 		$this->exception = $exception;
 	}
 
-	public static function Show()
+	public function Show()
 	{
 		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
 		{
@@ -4351,7 +4346,7 @@ class CAdminMessage
 		return $s;
 	}
 
-	function _getProgressHtml()
+	public function _getProgressHtml()
 	{
 		$w = isset($this->message['PROGRESS_WIDTH']) ? intval($this->message['PROGRESS_WIDTH']) : 500;
 		$p = 0;
@@ -4378,7 +4373,7 @@ class CAdminMessage
 		return $s;
 	}
 
-	function _getButtonsHtml()
+	public function _getButtonsHtml()
 	{
 		$s = '';
 		if(isset($this->message["BUTTONS"]) && is_array($this->message["BUTTONS"]))
@@ -4389,7 +4384,7 @@ class CAdminMessage
 		return $s;
 	}
 
-	function _formatHTML($html)
+	public function _formatHTML($html)
 	{
 		if($this->message["HTML"])
 			return $html;
@@ -4397,7 +4392,7 @@ class CAdminMessage
 			return _ShowHtmlspec($html);
 	}
 
-	public static function GetMessages()
+	public function GetMessages()
 	{
 		if($this->exception && method_exists($this->exception, 'GetMessages'))
 			return $this->exception->GetMessages();
@@ -4434,19 +4429,19 @@ class CAdminChain
 	var $items = array();
 	var $id, $bVisible;
 
-	public static function CAdminChain($id=false, $bVisible=true)
+	public function CAdminChain($id=false, $bVisible=true)
 	{
 		$this->id = $id;
 		$this->bVisible = $bVisible;
 	}
 
-	public static function AddItem($item)
+	public function AddItem($item)
 	{
 		//array("TEXT"=>"", "LINK"=>"", "ONCLICK"=>"", "MENU"=>array(array("TEXT"=>"", "LINK"=>"", "CLASS"=>""), ...))
 		$this->items[] = $item;
 	}
 
-	public static function Show()
+	public function Show()
 	{
 		if(empty($this->items))
 			return null;
@@ -4524,12 +4519,12 @@ class CAdminMainChain extends CAdminChain
 {
 	var $bInit = false;
 
-	public static function CAdminMainChain($id=false, $bVisible=true)
+	public function CAdminMainChain($id=false, $bVisible=true)
 	{
 		$this->CAdminChain($id, $bVisible);
 	}
 
-	public static function Init()
+	public function Init()
 	{
 		/** @global CAdminPage $adminPage */
 		global $adminPage;
@@ -4551,7 +4546,7 @@ class CAdminMainChain extends CAdminChain
 		}
 	}
 
-	public static function AddItem($item)
+	public function AddItem($item)
 	{
 		$this->Init();
 		parent::AddItem($item);
@@ -4637,7 +4632,7 @@ class CAdminCalendar
 		// component can't set 'size' param
 		return '
 	<div class="adm-input-wrap adm-input-wrap-calendar">
-		<input class="adm-input adm-input-calendar" type="text" name="'.$sFieldName.'" size="'.($size+3).'" value="'.htmlspecialcharsbx($sValue).'">
+		<input class="adm-input adm-input-calendar" type="text" name="'.$sFieldName.'" size="'.(intval($size)+3).'" value="'.htmlspecialcharsbx($sValue).'">
 		<span class="adm-calendar-icon" title="'.GetMessage("admin_lib_calend_title").'" onclick="BX.calendar({node:this, field:\''.$sFieldName.'\', form: \'\', bTime: '.($bTime ? 'true' : 'false').', bHideTime: false});"></span>
 	</div>';
 
@@ -4659,6 +4654,7 @@ class CAdminCalendar
 
 	private function GetPeriodHtml($sFromName, $sToName, $sFromVal="", $sToVal="", $bSelectShow=false, $size="10", $bTime=false, $arPeriod)
 	{
+		$size = intval($size);
 
 		$s = '
 		<div class="adm-calendar-block adm-filter-alignment">
@@ -4765,7 +4761,13 @@ class CAdminTheme
 	{
 		$aUserOpt = CUserOptions::GetOption("global", "settings");
 		if($aUserOpt["theme_id"] <> "")
-			return $aUserOpt["theme_id"];
+		{
+			$theme = preg_replace("/[^a-z0-9_.-]/i", "", $aUserOpt["theme_id"]);
+			if($theme <> "")
+			{
+				return $theme;
+			}
+		}
 
 		return ".default";
 	}
@@ -4781,7 +4783,7 @@ class CAdminTabEngine
 	var $arArgs = array();
 	var $bVarsFromForm = False;
 
-	public static function CAdminTabEngine($name, $arArgs = array())
+	public function CAdminTabEngine($name, $arArgs = array())
 	{
 		$this->bInited = False;
 		$this->name = $name;
@@ -4796,17 +4798,17 @@ class CAdminTabEngine
 		}
 	}
 
-	public static function SetErrorState($bVarsFromForm = False)
+	public function SetErrorState($bVarsFromForm = False)
 	{
 		$this->bVarsFromForm = $bVarsFromForm;
 	}
 
-	public static function SetArgs($arArgs = array())
+	public function SetArgs($arArgs = array())
 	{
 		$this->arArgs = $arArgs;
 	}
 
-	public static function Check()
+	public function Check()
 	{
 		if (!$this->bInited)
 			return True;
@@ -4826,7 +4828,7 @@ class CAdminTabEngine
 		return $result;
 	}
 
-	public static function Action()
+	public function Action()
 	{
 		if (!$this->bInited)
 			return True;
@@ -4846,7 +4848,7 @@ class CAdminTabEngine
 		return $result;
 	}
 
-	public static function GetTabs()
+	public function GetTabs()
 	{
 		if (!$this->bInited)
 			return False;
@@ -4870,7 +4872,7 @@ class CAdminTabEngine
 		return $arTabs;
 	}
 
-	public static function ShowTab($divName)
+	public function ShowTab($divName)
 	{
 		if (!$this->bInited)
 			return False;
@@ -4908,7 +4910,7 @@ class CJSPopup
 		'ARGS' => 'param1=values1&param2=value2', // additional GET arguments for POST query
 	)
 	*/
-	public static function CJSPopup($title = '', $arConfig = array())
+	public function CJSPopup($title = '', $arConfig = array())
 	{
 		if ($title != '') $this->SetTitle($title);
 		if (is_set($arConfig, 'TITLE')) $this->SetTitle($arConfig['TITLE']);
@@ -4916,7 +4918,7 @@ class CJSPopup
 		if (is_set($arConfig, 'SUFFIX') && strlen($arConfig['SUFFIX']) > 0) $this->SetSuffix($arConfig['SUFFIX']);
 	}
 
-	public static function InitSystem()
+	public function InitSystem()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -4934,7 +4936,7 @@ class CJSPopup
 		}
 	}
 
-	function _InitSystem()
+	public static function _InitSystem()
 	{
 		$adminPage = new CAdminPage();
 
@@ -4943,7 +4945,7 @@ class CJSPopup
 
 	}
 
-	public static function InitScripts()
+	public function InitScripts()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -4956,29 +4958,29 @@ class CJSPopup
 		}
 	}
 
-	public static function SetAdditionalArgs($additional_args = '')
+	public function SetAdditionalArgs($additional_args = '')
 	{
 		$this->post_args = $additional_args;
 	}
 
-	public static function SetTitle($title = '')
+	public function SetTitle($title = '')
 	{
 		$this->title = trim($title);
 	}
 
-	public static function GetFormName()
+	public function GetFormName()
 	{
 		return $this->__form_name;
 	}
 
-	public static function SetSuffix($suffix)
+	public function SetSuffix($suffix)
 	{
 		$this->suffix = '_'.trim($suffix);
 		//$this->jsPopup .= $this->suffix;
 		$this->__form_name .= $this->suffix;
 	}
 
-	public static function ShowTitlebar($title = '')
+	public function ShowTitlebar($title = '')
 	{
 		$this->InitSystem();
 
@@ -4989,7 +4991,7 @@ class CJSPopup
 <?
 	}
 
-	public static function StartDescription($icon = false, $additional = '')
+	public function StartDescription($icon = false, $additional = '')
 	{
 		$this->InitSystem();
 
@@ -5209,7 +5211,7 @@ class CAdminForm extends CAdminTabControl
 
 	var $bShowSettings = true;
 
-	public static function CAdminForm($name, $tabs, $bCanExpand = true, $bDenyAutosave = false)
+	public function CAdminForm($name, $tabs, $bCanExpand = true, $bDenyAutosave = false)
 	{
 		parent::CAdminTabControl($name, $tabs, $bCanExpand, $bDenyAutosave);
 		$this->tabIndex = 0;
@@ -5239,7 +5241,7 @@ class CAdminForm extends CAdminTabControl
 		ob_start();
 	}
 
-	public static function SetShowSettings($v)
+	public function SetShowSettings($v)
 	{
 		$this->bShowSettings = $v;
 	}
@@ -5260,13 +5262,13 @@ class CAdminForm extends CAdminTabControl
 		die();
 	}
 
-	public static function SetFieldsValues($bVarsFromForm, $db_record, $default_values)
+	public function SetFieldsValues($bVarsFromForm, $db_record, $default_values)
 	{
 		foreach($default_values as $key=>$value)
 			$this->SetFieldValue($key, $bVarsFromForm, $db_record, $value);
 	}
 
-	public static function SetFieldValue($field_name, $bVarsFromForm, $db_record, $default_value = false)
+	public function SetFieldValue($field_name, $bVarsFromForm, $db_record, $default_value = false)
 	{
 		if($bVarsFromForm)
 		{
@@ -5284,27 +5286,27 @@ class CAdminForm extends CAdminTabControl
 		}
 	}
 
-	public static function GetFieldValue($field_name)
+	public function GetFieldValue($field_name)
 	{
 		return $this->arFieldValues[$field_name];
 	}
 
-	public static function GetHTMLFieldValue($field_name)
+	public function GetHTMLFieldValue($field_name)
 	{
 		return htmlspecialcharsbx($this->arFieldValues[$field_name]);
 	}
 
-	public static function GetHTMLFieldValueEx($field_name)
+	public function GetHTMLFieldValueEx($field_name)
 	{
 		return htmlspecialcharsex($this->arFieldValues[$field_name]);
 	}
 
-	public static function GetFieldLabel($id)
+	public function GetFieldLabel($id)
 	{
 		return $this->arFields[$id]["content"];
 	}
 
-	public static function ShowTabButtons()
+	public function ShowTabButtons()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -5367,7 +5369,7 @@ class CAdminForm extends CAdminTabControl
 		return $s.parent::ShowTabButtons();
 	}
 
-	public static function Begin($arParams = array())
+	public function Begin($arParams = array())
 	{
 		$this->tabIndex = -1;
 		if(is_array($arParams))
@@ -5376,7 +5378,7 @@ class CAdminForm extends CAdminTabControl
 			$this->arParams = array();
 	}
 
-	public static function BeginNextFormTab()
+	public function BeginNextFormTab()
 	{
 		if($this->tabIndex >= count($this->tabs))
 			return;
@@ -5392,7 +5394,7 @@ class CAdminForm extends CAdminTabControl
 		}
 	}
 
-	public static function Show()
+	public function Show()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -5647,17 +5649,17 @@ class CAdminForm extends CAdminTabControl
 		echo '</form>';
 	}
 
-	public static function GetName()
+	public function GetName()
 	{
 		return $this->name;
 	}
 
-	public static function GetFormName()
+	public function GetFormName()
 	{
 		return $this->name."_form";
 	}
 
-	public static function GetCustomLabel($id, $content)
+	public function GetCustomLabel($id, $content)
 	{
 		$bColumnNeeded = substr($content, -1)==":";
 
@@ -5669,7 +5671,7 @@ class CAdminForm extends CAdminTabControl
 			return $content;
 	}
 
-	public static function GetCustomLabelHTML($id = false, $content = "")
+	public function GetCustomLabelHTML($id = false, $content = "")
 	{
 		$bColumnNeeded = substr($content, -1)==":";
 
@@ -5681,7 +5683,7 @@ class CAdminForm extends CAdminTabControl
 			return ($this->tabs[$this->tabIndex]["FIELDS"][$id]["required"]? '<span class="adm-required-field">'.htmlspecialcharsex($content).'</span>': htmlspecialcharsex($content));
 	}
 
-	public static function ShowWarnings($form, $messages, $aFields=false)
+	public function ShowWarnings($form, $messages, $aFields=false)
 	{
 		parent::ShowWarnings($this->name.'_form', $messages, $aFields);
 	}
@@ -5691,7 +5693,7 @@ class CAdminForm extends CAdminTabControl
 		ob_start();
 	}
 
-	public static function EndPrologContent()
+	public function EndPrologContent()
 	{
 		$this->sPrologContent = ob_get_contents();
 		ob_end_clean();
@@ -5702,13 +5704,13 @@ class CAdminForm extends CAdminTabControl
 		ob_start();
 	}
 
-	public static function EndEpilogContent()
+	public function EndEpilogContent()
 	{
 		$this->sEpilogContent = ob_get_contents();
 		ob_end_clean();
 	}
 
-	public static function AddFieldGroup($id, $content, $arFields, $bAjax = false)
+	public function AddFieldGroup($id, $content, $arFields, $bAjax = false)
 	{
 		$this->group = $id;
 		$this->group_ajax = $bAjax;
@@ -5720,7 +5722,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddSection($id, $content, $required = false)
+	public function AddSection($id, $content, $required = false)
 	{
 		$this->tabs[$this->tabIndex]["FIELDS"][$id] = array(
 			"id" => $id,
@@ -5731,7 +5733,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddViewField($id, $content, $html, $required=false)
+	public function AddViewField($id, $content, $html, $required=false)
 	{
 		$this->tabs[$this->tabIndex]["FIELDS"][$id] = array(
 			"id" => $id,
@@ -5741,7 +5743,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddDropDownField($id, $content, $required, $arSelect, $value=false, $arParams=array())
+	public function AddDropDownField($id, $content, $required, $arSelect, $value=false, $arParams=array())
 	{
 		if($value === false)
 			$value = $this->arFieldValues[$id];
@@ -5764,7 +5766,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddEditField($id, $content, $required, $arParams = array(), $value = false)
+	public function AddEditField($id, $content, $required, $arParams = array(), $value = false)
 	{
 		if($value === false)
 			$value = htmlspecialcharsbx($this->arFieldValues[$id]);
@@ -5784,7 +5786,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddTextField($id, $label, $value, $arParams=array(), $required=false)
+	public function AddTextField($id, $label, $value, $arParams=array(), $required=false)
 	{
 		$html = '<textarea name="'.$id.'"';
 		if(intval($arParams["cols"]) > 0)
@@ -5803,7 +5805,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddCalendarField($id, $label, $value, $required=false)
+	public function AddCalendarField($id, $label, $value, $required=false)
 	{
 		$html = CalendarDate($id, $value, $this->GetFormName());
 
@@ -5816,7 +5818,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddCheckBoxField($id, $content, $required, $value, $checked, $arParams=array())
+	public function AddCheckBoxField($id, $content, $required, $value, $checked, $arParams=array())
 	{
 		$html = '<input type="checkbox" name="'.$id.'" value="'.htmlspecialcharsbx($value).'"'.($checked? ' checked': '');
 		foreach($arParams as $param)
@@ -5832,7 +5834,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function AddFileField($id, $label, $value, $arParams=array(), $required=false)
+	public function AddFileField($id, $label, $value, $arParams=array(), $required=false)
 	{
 		$arDefParams = array("iMaxW"=>150, "iMaxH"=>150, "sParams"=>"border=0", "strImageUrl"=>"", "bPopup"=>true, "sPopupTitle"=>false);
 		foreach($arDefParams as $key=>$val)
@@ -5853,7 +5855,7 @@ class CAdminForm extends CAdminTabControl
 		);
 	}
 
-	public static function BeginCustomField($id, $content, $required = false)
+	public function BeginCustomField($id, $content, $required = false)
 	{
 		$this->sCurrentLabel = $this->GetCustomLabel($id, $content);
 		$this->bCurrentReq = $required;
@@ -5866,7 +5868,7 @@ class CAdminForm extends CAdminTabControl
 		ob_start();
 	}
 
-	public static function EndCustomField($id, $hidden = "")
+	public function EndCustomField($id, $hidden = "")
 	{
 		$html = ob_get_contents();
 		ob_end_clean();
@@ -5875,7 +5877,7 @@ class CAdminForm extends CAdminTabControl
 		$this->tabs[$this->tabIndex]["FIELDS"][$id]["hidden"] = $hidden;
 	}
 
-	public static function ShowUserFields($PROPERTY_ID, $ID, $bVarsFromForm)
+	public function ShowUserFields($PROPERTY_ID, $ID, $bVarsFromForm)
 	{
 		/**
 		 * @global CMain $APPLICATION
@@ -5933,7 +5935,7 @@ class CAdminForm extends CAdminTabControl
 		}
 	}
 
-	public static function Buttons($aParams=false, $additional_html="")
+	public function Buttons($aParams=false, $additional_html="")
 	{
 		if($aParams === false)
 			$this->arButtonsParams = false;
@@ -5942,7 +5944,7 @@ class CAdminForm extends CAdminTabControl
 		$this->sButtonsContent = $additional_html;
 	}
 
-	public static function ButtonsPublic($arJSButtons = false)
+	public function ButtonsPublic($arJSButtons = false)
 	{
 		if ($this->bPublicMode)
 		{

@@ -17,7 +17,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	/**
 	 * @return int
 	*/
-	public static function GetLastRequestStatus()
+	public function GetLastRequestStatus()
 	{
 		return $this->status;
 	}
@@ -62,7 +62,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param bool $bVarsFromForm
 	 * @return string
 	*/
-	public static function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
+	public function GetSettingsHTML($arBucket, $bServiceSet, $cur_SERVICE_ID, $bVarsFromForm)
 	{
 		$arSettings =/*.(array[string]string).*/array();
 
@@ -97,7 +97,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $arSettings
 	 * @return bool
 	*/
-	public static function CheckSettings($arBucket, &$arSettings)
+	public function CheckSettings($arBucket, &$arSettings)
 	{
 		global $APPLICATION;
 		$aMsg =/*.(array[int][string]string).*/array();
@@ -152,7 +152,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $additional_headers
 	 * @return array[string]string
 	*/
-	public static function SignRequest($arSettings, $verb, $bucket, $file_name, $ContentType, $additional_headers)
+	public function SignRequest($arSettings, $verb, $bucket, $file_name, $ContentType, $additional_headers)
 	{
 		$result = array();
 
@@ -188,7 +188,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $additional_headers
 	 * @return mixed
 	*/
-	public static function SendRequest($arSettings, $verb, $bucket, $file_name='/', $params='', $content='', $additional_headers=/*.(array[string]string).*/array())
+	public function SendRequest($arSettings, $verb, $bucket, $file_name='/', $params='', $content='', $additional_headers=/*.(array[string]string).*/array())
 	{
 		global $APPLICATION;
 		$this->status = 0;
@@ -324,7 +324,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $arBucket
 	 * @return bool
 	*/
-	public static function CreateBucket($arBucket)
+	public function CreateBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -363,7 +363,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $arBucket
 	 * @return bool
 	*/
-	public static function DeleteBucket($arBucket)
+	public function DeleteBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -401,7 +401,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param array[string]string $arBucket
 	 * @return bool
 	*/
-	public static function IsEmptyBucket($arBucket)
+	public function IsEmptyBucket($arBucket)
 	{
 		global $APPLICATION;
 
@@ -488,7 +488,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	 * @param string $filePath
 	 * @return bool
 	*/
-	public static function FileExists($arBucket, $filePath)
+	public function FileExists($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -525,7 +525,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 	}
 
-	public static function FileCopy($arBucket, $arFile, $filePath)
+	public function FileCopy($arBucket, $arFile, $filePath)
 	{
 		global $APPLICATION;
 
@@ -562,7 +562,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 	}
 
-	public static function DownloadToFile($arBucket, $arFile, $filePath)
+	public function DownloadToFile($arBucket, $arFile, $filePath)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$obRequest = new CHTTP;
@@ -570,7 +570,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		return $obRequest->Download($this->GetFileSRC($arBucket, $arFile), $io->GetPhysicalName($filePath));
 	}
 
-	public static function DeleteFile($arBucket, $filePath)
+	public function DeleteFile($arBucket, $filePath)
 	{
 		global $APPLICATION;
 
@@ -600,7 +600,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 	}
 
-	public static function SaveFile($arBucket, $filePath, $arFile)
+	public function SaveFile($arBucket, $filePath, $arFile)
 	{
 		global $APPLICATION;
 
@@ -642,7 +642,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 	}
 
-	public static function ListFiles($arBucket, $filePath, $bRecursive = false)
+	public function ListFiles($arBucket, $filePath, $bRecursive = false)
 	{
 		global $APPLICATION;
 
@@ -732,7 +732,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		return $result;
 	}
 
-	public static function InitiateMultipartUpload($arBucket, &$NS, $filePath, $fileSize, $ContentType)
+	public function InitiateMultipartUpload($arBucket, &$NS, $filePath, $fileSize, $ContentType)
 	{
 		$filePath = '/'.trim($filePath, '/');
 		if($arBucket["PREFIX"])
@@ -790,7 +790,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		return 5*1024*1024; //5MB
 	}
 
-	public static function UploadPart($arBucket, &$NS, $data)
+	public function UploadPart($arBucket, &$NS, $data)
 	{
 		$filePath = '/'.trim($NS["filePath"], '/');
 		if($arBucket["PREFIX"])
@@ -820,7 +820,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 	}
 
-	public static function CompleteMultipartUpload($arBucket, &$NS)
+	public function CompleteMultipartUpload($arBucket, &$NS)
 	{
 		$filePath = '/'.trim($NS["filePath"], '/');
 		if($arBucket["PREFIX"])
@@ -846,22 +846,22 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		return $this->status == 200;
 	}
 
-	public static function setPublic($state = true)
+	public function setPublic($state = true)
 	{
 		$this->_public = $state !== false;
 	}
 
-	public static function setHeader($key, $value)
+	public function setHeader($key, $value)
 	{
 		$this->set_headers[$key] = $value;
 	}
 
-	public static function unsetHeader($key)
+	public function unsetHeader($key)
 	{
 		unset($this->set_headers[$key]);
 	}
 
-	public static function getHeaders()
+	public function getHeaders()
 	{
 		return $this->headers;
 	}

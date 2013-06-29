@@ -29,12 +29,12 @@ class CPHPCache
 	var $bStarted = false;
 	var $bInit = "NO";
 
-	function __construct()
+	public function __construct()
 	{
 		$this->CPHPCache();
 	}
 
-	public static function CPHPCache()
+	public function CPHPCache()
 	{
 		$this->_cache = $this->_new_cache_object();
 	}
@@ -155,7 +155,7 @@ class CPHPCache
 		}
 	}
 
-	public static function CleanDir($initdir = false, $basedir = "cache")
+	public function CleanDir($initdir = false, $basedir = "cache")
 	{
 		$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
 		return $this->_cache->clean($basedir, $initdir);
@@ -242,11 +242,10 @@ class CPHPCache
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php
 	 * @author Bitrix
 	 */
-	public static function InitCache($TTL, $uniq_str, $initdir=false, $basedir = "cache")
+	public function InitCache($TTL, $uniq_str, $initdir=false, $basedir = "cache")
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
@@ -366,11 +365,10 @@ class CPHPCache
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/output.php
 	 * @author Bitrix
 	 */
-	public static function Output()
+	public function Output()
 	{
 		echo $this->content;
 	}
@@ -438,11 +436,10 @@ class CPHPCache
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/getvars.php
 	 * @author Bitrix
 	 */
-	public static function GetVars()
+	public function GetVars()
 	{
 		return $this->vars;
 	}
@@ -542,11 +539,10 @@ class CPHPCache
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php
 	 * @author Bitrix
 	 */
-	public static function StartDataCache($TTL=false, $uniq_str=false, $initdir=false, $vars=Array(), $basedir = "cache")
+	public function StartDataCache($TTL=false, $uniq_str=false, $initdir=false, $vars=Array(), $basedir = "cache")
 	{
 		$narg = func_num_args();
 		if($narg<=0)
@@ -574,7 +570,7 @@ class CPHPCache
 		return true;
 	}
 
-	public static function AbortDataCache()
+	public function AbortDataCache()
 	{
 		if(!$this->bStarted)
 			return;
@@ -589,7 +585,7 @@ class CPHPCache
 	 * @param mixed $vars
 	 * @return void
 	 */
-	public static function EndDataCache($vars=false)
+	public function EndDataCache($vars=false)
 	{
 		if(!$this->bStarted)
 			return;
@@ -682,7 +678,7 @@ class CPageCache
 	var $basedir;
 	var $initdir = false;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->_cache = CPHPCache::_new_cache_object();
 	}
@@ -708,7 +704,7 @@ class CPageCache
 		}
 	}
 
-	public static function CleanDir($initdir = false, $basedir = "cache")
+	public function CleanDir($initdir = false, $basedir = "cache")
 	{
 		$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
 		return $this->_cache->clean($basedir, $initdir);
@@ -749,11 +745,10 @@ class CPageCache
 	 * </li> </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php
 	 * @author Bitrix
 	 */
-	public static function InitCache($TTL, $uniq_str, $initdir = false, $basedir = "cache")
+	public function InitCache($TTL, $uniq_str, $initdir = false, $basedir = "cache")
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
@@ -811,11 +806,10 @@ class CPageCache
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/output.php
 	 * @author Bitrix
 	 */
-	public static function Output()
+	public function Output()
 	{
 		echo $this->content;
 	}
@@ -882,11 +876,10 @@ class CPageCache
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php
 	 * @author Bitrix
 	 */
-	public static function StartDataCache($TTL, $uniq_str=false, $initdir=false, $basedir = "cache")
+	public function StartDataCache($TTL, $uniq_str=false, $initdir=false, $basedir = "cache")
 	{
 		if($this->InitCache($TTL, $uniq_str, $initdir, $basedir))
 		{
@@ -902,7 +895,7 @@ class CPageCache
 		return true;
 	}
 
-	public static function AbortDataCache()
+	public function AbortDataCache()
 	{
 		if(!$this->bStarted)
 			return;
@@ -955,11 +948,10 @@ class CPageCache
 	 * </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/enddatacache.php
 	 * @author Bitrix
 	 */
-	public static function EndDataCache()
+	public function EndDataCache()
 	{
 		if(!$this->bStarted)
 			return;
@@ -1151,7 +1143,7 @@ function BXClearCache($full=false, $initdir="")
 class CCacheManager
 {
 	private $isMySql;
-	static public function __construct()
+	public function __construct()
 	{
 		global $DB;
 		$this->isMySql = ($DB->type == "MYSQL");
@@ -1165,7 +1157,7 @@ class CCacheManager
 	// Tries to read cached variable value from the file
 	// Returns true on success
 	// overwise returns false
-	public static function Read($ttl, $uniqid, $table_id=false)
+	public function Read($ttl, $uniqid, $table_id=false)
 	{
 		global $DB;
 		if(isset($this->CACHE[$uniqid]))
@@ -1182,7 +1174,7 @@ class CCacheManager
 	}
 	// This method is used to read the variable value
 	// from the cache after successfull Read
-	public static function Get($uniqid)
+	public function Get($uniqid)
 	{
 		if(array_key_exists($uniqid, $this->VARS))
 			return $this->VARS[$uniqid];
@@ -1192,13 +1184,13 @@ class CCacheManager
 			return false;
 	}
 	// Sets new value to the variable
-	public static function Set($uniqid, $val)
+	public function Set($uniqid, $val)
 	{
 		if(isset($this->CACHE[$uniqid]))
 			$this->VARS[$uniqid]=$val;
 	}
 
-	public static function SetImmediate($uniqid, $val)
+	public function SetImmediate($uniqid, $val)
 	{
 		if(isset($this->CACHE[$uniqid]))
 		{
@@ -1212,7 +1204,7 @@ class CCacheManager
 		}
 	}
 	// Marks cache entry as invalid
-	public static function Clean($uniqid, $table_id=false)
+	public function Clean($uniqid, $table_id=false)
 	{
 		global $DB;
 		$obCache = new CPHPCache;
@@ -1225,7 +1217,7 @@ class CCacheManager
 		}
 	}
 	// Marks cache entries associated with the table as invalid
-	public static function CleanDir($table_id)
+	public function CleanDir($table_id)
 	{
 		global $DB;
 		$strPath = $DB->type."/".$table_id;
@@ -1242,7 +1234,7 @@ class CCacheManager
 		$obCache->CleanDir($DB->type."/".$table_id, "managed_cache");
 	}
 	// Clears all managed_cache
-	public static function CleanAll()
+	public function CleanAll()
 	{
 		$this->CACHE = array();
 		$this->CACHE_PATH = array();
@@ -1256,7 +1248,7 @@ class CCacheManager
 	}
 	// Use it to flush cache to the files.
 	// Caution: only at the end of all operations!
-	function _Finalize()
+	public static function _Finalize()
 	{
 		global $CACHE_MANAGER;
 		$obCache = new CPHPCache;
@@ -1277,30 +1269,27 @@ class CCacheManager
 	var $DBCacheTags = array();
 	var $bWasTagged = false;
 
-	public static function InitDBCache($path)
+	public function InitDBCache($path)
 	{
 		global $DB;
 		if (!isset($this->DBCacheTags[$path]))
 		{
 			$this->DBCacheTags[$path] = array();
-			if (!$this->isMySql)
+			$rs = $DB->Query("
+				SELECT TAG
+				FROM b_cache_tag
+				WHERE SITE_ID = '".$DB->ForSQL(SITE_ID, 2)."'
+				AND CACHE_SALT = '".$DB->ForSQL($this->SALT, 4)."'
+				AND RELATIVE_PATH = '".$DB->ForSQL($path, 4)."'
+			");
+			while($ar = $rs->Fetch())
 			{
-				$rs = $DB->Query("
-					SELECT TAG
-					FROM b_cache_tag
-					WHERE SITE_ID = '".$DB->ForSQL(SITE_ID, 2)."'
-					AND CACHE_SALT = '".$DB->ForSQL($this->SALT, 4)."'
-					AND RELATIVE_PATH = '".$DB->ForSQL($path, 4)."'
-				");
-				while($ar = $rs->Fetch())
-				{
-					$this->DBCacheTags[$path][$ar["TAG"]] = true;
-				}
+				$this->DBCacheTags[$path][$ar["TAG"]] = true;
 			}
 		}
 	}
 
-	public static function InitCompSalt()
+	public function InitCompSalt()
 	{
 		if($this->SALT === false)
 		{
@@ -1315,7 +1304,7 @@ class CCacheManager
 		}
 	}
 
-	public static function GetCompCachePath($relativePath)
+	public function GetCompCachePath($relativePath)
 	{
 		global $BX_STATE;
 		$this->InitCompSalt();
@@ -1329,12 +1318,12 @@ class CCacheManager
 		return $path;
 	}
 
-	public static function StartTagCache($relativePath)
+	public function StartTagCache($relativePath)
 	{
 		array_unshift($this->comp_cache_stack, array($relativePath, array()));
 	}
 
-	public static function EndTagCache()
+	public function EndTagCache()
 	{
 		global $DB;
 		$this->InitCompSalt();
@@ -1383,12 +1372,12 @@ class CCacheManager
 		array_shift($this->comp_cache_stack);
 	}
 
-	public static function AbortTagCache()
+	public function AbortTagCache()
 	{
 		array_shift($this->comp_cache_stack);
 	}
 
-	public static function RegisterTag($tag)
+	public function RegisterTag($tag)
 	{
 		if(count($this->comp_cache_stack))
 		{
@@ -1397,7 +1386,7 @@ class CCacheManager
 		}
 	}
 
-	public static function ClearByTag($tag)
+	public function ClearByTag($tag)
 	{
 		global $DB;
 
@@ -1450,7 +1439,7 @@ class CStackCacheEntry
 	var $cleanGet = true;
 	var $cleanSet = true;
 
-	function __construct($entity, $length = 0, $ttl = 0)
+	public function __construct($entity, $length = 0, $ttl = 0)
 	{
 		$this->entity = $entity;
 
@@ -1461,7 +1450,7 @@ class CStackCacheEntry
 			$this->ttl = intval($ttl);
 	}
 
-	public static function SetLength($length)
+	public function SetLength($length)
 	{
 		if($length > 0)
 			$this->len = intval($length);
@@ -1473,13 +1462,13 @@ class CStackCacheEntry
 		}
 	}
 
-	public static function SetTTL($ttl)
+	public function SetTTL($ttl)
 	{
 		if($ttl > 0)
 			$this->ttl = intval($ttl);
 	}
 
-	public static function Load()
+	public function Load()
 	{
 		global $DB;
 		$objCache = new CPHPCache;
@@ -1491,7 +1480,7 @@ class CStackCacheEntry
 		}
 	}
 
-	public static function DeleteEntry($id)
+	public function DeleteEntry($id)
 	{
 		if(array_key_exists($id, $this->values))
 		{
@@ -1500,7 +1489,7 @@ class CStackCacheEntry
 		}
 	}
 
-	public static function Clean()
+	public function Clean()
 	{
 		global $DB;
 
@@ -1512,7 +1501,7 @@ class CStackCacheEntry
 		$this->cleanSet = true;
 	}
 
-	public static function Get($id)
+	public function Get($id)
 	{
 		if(array_key_exists($id, $this->values))
 		{
@@ -1534,7 +1523,7 @@ class CStackCacheEntry
 		}
 	}
 
-	public static function Set($id, $value)
+	public function Set($id, $value)
 	{
 		if(array_key_exists($id, $this->values))
 		{
@@ -1551,7 +1540,7 @@ class CStackCacheEntry
 		$this->cleanSet = false;
 	}
 
-	public static function Save()
+	public function Save()
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1586,7 +1575,7 @@ class CStackCacheManager
 	var $cacheTTL = array();
 	var $eventHandlerAdded = false;
 
-	public static function SetLength($entity, $length)
+	public function SetLength($entity, $length)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1597,7 +1586,7 @@ class CStackCacheManager
 			$this->cacheLen[$entity] = $length;
 	}
 
-	public static function SetTTL($entity, $ttl)
+	public function SetTTL($entity, $ttl)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1608,7 +1597,7 @@ class CStackCacheManager
 			$this->cacheTTL[$entity] = $ttl;
 	}
 
-	public static function Init($entity, $length = 0, $ttl = 0)
+	public function Init($entity, $length = 0, $ttl = 0)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1629,7 +1618,7 @@ class CStackCacheManager
 			$this->cache[$entity] = new CStackCacheEntry($entity, $length, $ttl);
 	}
 
-	public static function Load($entity)
+	public function Load($entity)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1641,7 +1630,7 @@ class CStackCacheManager
 	}
 
 	//NO ONE SHOULD NEVER EVER USE INTEGER $id HERE
-	public static function Clear($entity, $id = False)
+	public function Clear($entity, $id = False)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1656,7 +1645,7 @@ class CStackCacheManager
 	}
 
 	// Clears all managed_cache
-	public static function CleanAll()
+	public function CleanAll()
 	{
 		$this->cache = array();
 
@@ -1665,7 +1654,7 @@ class CStackCacheManager
 	}
 
 	//NO ONE SHOULD NEVER EVER USE INTEGER $id HERE
-	public static function Exist($entity, $id)
+	public function Exist($entity, $id)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return False;
@@ -1677,7 +1666,7 @@ class CStackCacheManager
 	}
 
 	//NO ONE SHOULD NEVER EVER USE INTEGER $id HERE
-	public static function Get($entity, $id)
+	public function Get($entity, $id)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return False;
@@ -1689,7 +1678,7 @@ class CStackCacheManager
 	}
 
 	//NO ONE SHOULD NEVER EVER USE INTEGER $id HERE
-	public static function Set($entity, $id, $value)
+	public function Set($entity, $id, $value)
 	{
 		if (defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
@@ -1700,7 +1689,7 @@ class CStackCacheManager
 		$this->cache[$entity]->Set($id, $value);
 	}
 
-	public static function Save($entity)
+	public function Save($entity)
 	{
 		if(defined("BITRIX_SKIP_STACK_CACHE") && BITRIX_SKIP_STACK_CACHE)
 			return;
