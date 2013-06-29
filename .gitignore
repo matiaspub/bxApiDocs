@@ -1,5 +1,6 @@
 .git
 .idea
 *.rar
+*.zip
 /vendor/
 modules_*
