@@ -30,13 +30,14 @@ File -> Settings -> Project Settings -> PHP
 ## Брюки превращаются. Брюююки прррревращаются.....
 
 ### Основные синглтоны $APPLICATION, $DB, $USER, $USER_FIELD_MANAGER с подсказками
-<img src="http://clip2net.com/clip/m31506/1367219441-clip-75kb.png" alt="Синглтоны"/>
+<img style="float:left" src="http://clip2net.com/clip/m31506/1374563017-clip-19kb.png" alt="Синглтоны: $APPLICATION"/>
+<img style="float:right" src="http://clip2net.com/clip/m31506/1374563229-clip-17kb.png" alt="Синглтоны: $DB"/>
 ### Максимально полные доки по методам и классам
-<img src="http://clip2net.com/clip/m31506/1367219722-clip-80kb.png" alt="Доки по методам и классам"/>
+<img src="http://clip2net.com/clip/m31506/1374563424-clip-62kb.png" alt="Доки по методам и классам"/>
 ### Посмотреть события модуля и почитать как его использовать можно так
-<img src="http://clip2net.com/clip/m31506/1367220475-clip-65kb.png" alt="События модуля с доками"/>
+<img src="http://clip2net.com/clip/m31506/1374563929-clip-40kb.png" alt="События модуля с доками"/>
 ## Константы с доками
-<img src="http://clip2net.com/clip/m31506/1367220822-clip-38kb.png" alt="Константы с доками"/>
+<img src="http://clip2net.com/clip/m31506/1374564062-clip-29kb.png" alt="Константы с доками"/>
 
 
 ## Да, согласен
