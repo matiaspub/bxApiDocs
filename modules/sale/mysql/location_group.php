@@ -187,7 +187,7 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	 * группы местоположений.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td>
 	 * </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>LID</td> <td>Язык
-	 * названия.</td> </tr> </table><p>  </p>
+	 * названия.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getbyid.33dc4ad9.php

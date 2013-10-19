@@ -882,6 +882,50 @@ class CBitrixComponent
 		CPHPCache::clean($this->__cacheID, $this->__cachePath);
 	}
 	/**
+	* Function clears entire component cache.
+	*
+	* <p>Note: parameters must exactly match to startResultCache call.</p>
+	* @param string $componentName
+	* @param string $siteId
+	* @return void
+	*
+	*/
+	final public static function clearComponentCache($componentName, $siteId = "")
+	{
+		/** @global CCacheManager $CACHE_MANAGER */
+		global $CACHE_MANAGER;
+
+		$componentRelativePath = CComponentEngine::MakeComponentPath($componentName);
+		if ($componentRelativePath != "")
+		{
+			$obCache = new CPHPCache;
+			$obCache->CleanDir($componentRelativePath, "cache");
+			BXClearCache(true, $componentRelativePath);
+
+			if ($siteId == "")
+			{
+				$rsSite = CSite::GetList(($by="sort"),($order="asc"));
+				while ($site = $rsSite->Fetch())
+				{
+					$componentCachePath = "/".$site["ID"].$componentRelativePath;
+					$obCache = new CPHPCache;
+					$obCache->CleanDir($componentCachePath, "cache");
+					BXClearCache(true, $componentCachePath);
+				}
+			}
+			else
+			{
+				$componentCachePath = "/".$siteId.$componentRelativePath;
+				$obCache = new CPHPCache;
+				$obCache->CleanDir($componentCachePath, "cache");
+				BXClearCache(true, $componentCachePath);
+			}
+
+			if(defined("BX_COMP_MANAGED_CACHE"))
+				$CACHE_MANAGER->ClearByTag($componentName);
+		}
+	}
+	/**
 	* Function returns component cache path.
 	*
 	* @return string
@@ -899,6 +943,37 @@ class CBitrixComponent
 	* @return void
 	*
 	*/
+	
+	/**
+	 * <p><code>$arResultCacheKeys</code> - это список ключей массива <b>$arResult</b>, которые должны кэшироваться при использовании встроенного кэширования компонентов.</p> <a name="example"></a>
+	 *
+	 *
+	 *
+	 *
+	 * @param $arResultCacheKey $s  
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * $this-&gt;SetResultCacheKeys(array(
+	 *    "IBLOCK_ID",
+	 *    "ID",
+	 *    "IBLOCK_SECTION_ID",
+	 *    "NAME",
+	 *    "PROPERTIES",
+	 *    "SECTION",
+	 * ));
+	 * $this-&gt;IncludeComponentTemplate();
+	 * </pre>
+	 *
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponent/setresultcachekeys.php
+	 * @author Bitrix
+	 */
 	final public function setResultCacheKeys($arResultCacheKeys)
 	{
 		if ($this->arResultCacheKeys === false)

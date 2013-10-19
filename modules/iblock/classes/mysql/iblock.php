@@ -65,7 +65,7 @@ class CIBlock extends CAllIBlock
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult.</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -76,8 +76,9 @@ class CIBlock extends CAllIBlock
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblock">Поля CIBlock</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля CIBlock</a> </li> </ul><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * @static

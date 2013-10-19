@@ -55,7 +55,7 @@ class CAllSocNetUser
 	public static function OnBeforeUserUpdate(&$arFields)
 	{
 		$rsUser = CUser::GetByID($arFields["ID"]);
-//		if ($arUser = $rsUser->Fetch())
+		if ($arUser = $rsUser->Fetch())
 			// define("GLOBAL_ACTIVE_VALUE", $arUser["ACTIVE"]);
 	}
 

@@ -59,9 +59,9 @@ class CPosting extends CPostingGeneral
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/cposting/cpostingfields.php">поля объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingfields.php">поля объекта
 	 * "Выпуск"</a>, за исключением полей типа text. <br><br> Если поля фильтра
 	 * содержат ошибку, то переменная LAST_ERROR класса содержит сообщение
 	 * об ошибке. </p><a name="examples"></a>
@@ -255,7 +255,7 @@ class CPosting extends CPostingGeneral
 	 * случае возвращается false. Если блокировку не удалось получить
 	 * из-за ошибки базы данных, то функция возвращает false и возбуждает
 	 * исключение (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p><a
 	 * name="examples"></a>
 	 *
 	 *

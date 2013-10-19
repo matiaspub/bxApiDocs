@@ -5,6 +5,16 @@ class CAllCatalogStoreBarCode
 {
 	protected function CheckFields($action, &$arFields)
 	{
+		if((($action == 'ADD') || isset($arFields["PRODUCT_ID"])) && intval($arFields["PRODUCT_ID"]) <= 0)
+		{
+			return false;
+		}
+
+		if((($action == 'ADD') || isset($arFields["BARCODE"])) && strlen($arFields["BARCODE"]) <= 0)
+		{
+			return false;
+		}
+
 		return true;
 	}
 

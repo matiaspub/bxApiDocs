@@ -53,7 +53,7 @@ class CSocServFacebook extends CSocServAuth
 				if($fb->GetAccessToken($redirect_uri) !== false)
 				{
 					$arFBUser = $fb->GetCurrentUser();
-					if(isset($arFBUser["id"]))
+					if(is_array($arFBUser) && isset($arFBUser["id"]))
 					{
 						$email = ($arFBUser["email"] != '') ? $arFBUser["email"] : '';
 						$arFields = array(
@@ -64,18 +64,17 @@ class CSocServFacebook extends CSocServAuth
 							'NAME'=> $arFBUser["first_name"],
 							'LAST_NAME'=> $arFBUser["last_name"],
 						);
-
 						if(isset($arFBUser['picture']['data']['url']) && self::CheckPhotoURI($arFBUser['picture']['data']['url']))
-							if ($arPic = CFile::MakeFileArray($arFBUser['picture']['data']['url']))
+							if($arPic = CFile::MakeFileArray($arFBUser['picture']['data']['url']))
 								$arFields["PERSONAL_PHOTO"] = $arPic;
 						if(isset($arFBUser['birthday']))
-							if ($date = MakeTimeStamp($arFBUser['birthday'], "MM/DD/YYYY"))
+							if($date = MakeTimeStamp($arFBUser['birthday'], "MM/DD/YYYY"))
 								$arFields["PERSONAL_BIRTHDAY"] = ConvertTimeStamp($date);
 						if(isset($arFBUser['gender']) && $arFBUser['gender'] != '')
 						{
-							if ($arFBUser['gender'] == 'male')
+							if($arFBUser['gender'] == 'male')
 								$arFields["PERSONAL_GENDER"] = 'M';
-							elseif ($arFBUser['gender'] == 'female')
+							elseif($arFBUser['gender'] == 'female')
 								$arFields["PERSONAL_GENDER"] = 'F';
 						}
 						$arFields["PERSONAL_WWW"] = "http://www.facebook.com/".$arFBUser["id"];
@@ -88,7 +87,7 @@ class CSocServFacebook extends CSocServAuth
 		}
 		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
 		$url = $GLOBALS['APPLICATION']->GetCurPageParam(($bSuccess === true ? '' : 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
-		if(CModule::IncludeModule("socialnetwork"))
+		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
 			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
 		echo '
 <script type="text/javascript">
@@ -123,7 +122,7 @@ class CFacebookInterface
 
 	public function __construct($appID, $appSecret, $code=false)
 	{
-		$this->httpTimeout = 10;
+		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->code = $code;

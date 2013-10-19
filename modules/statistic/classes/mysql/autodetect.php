@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#user_agent">UserAgent'ов</a>.
+ * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>.
  *
  *
  *
@@ -16,7 +16,7 @@ class CAutoDetect
 {
 	
 	/**
-	 * <p>Возвращает список незнакомых <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#user_agent">UserAgent'ов</a>. Функция анализирует список сессий, и собирает все UserAgent'ы которые не принадлежат ни одной <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковой системе</a> и ни одному браузеру (UserAgent'ы браузеров задаются в настройках модуля "Статистика").</p>
+	 * <p>Возвращает список незнакомых <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>. Функция анализирует список сессий, и собирает все UserAgent'ы которые не принадлежат ни одной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a> и ни одному браузеру (UserAgent'ы браузеров задаются в настройках модуля "Статистика").</p>
 	 *
 	 *
 	 *
@@ -41,7 +41,7 @@ class CAutoDetect
 	 * начальное значение интервала для поля "количество сессий"; </li> <li>
 	 * <b>COUNTER2</b> - конечное значение интервала для поля "количество
 	 * сессий". </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *

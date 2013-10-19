@@ -100,14 +100,14 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
-//		$arControls = CSaleCondCtrlBasketGroup::GetControlID();
-		$arControls = array(
-			'CondBsktCntGroup',
-			'CondBsktAmtGroup',
-			'CondBsktProductGroup',
-			'CondBsktRowGroup',
-			'CondBsktSubGroup',
-		);
+		if (!empty($arControls))
+		{
+			$strDisableKey = CSaleCondCtrlGroup::GetControlID();
+			$arControlsMap = array_fill_keys($arControls, true);
+			if (array_key_exists($strDisableKey, $arControlsMap))
+				unset($arControlsMap[$strDisableKey]);
+			$arControls = array_keys($arControlsMap);
+		}
 		return $arControls;
 	}
 
@@ -128,6 +128,7 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_iblock_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -150,6 +151,7 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -366,14 +368,14 @@ class CCatalogCondCtrlBasketProductProps extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
-//		$arControls = CSaleCondCtrlBasketGroup::GetControlID();
-		$arControls = array(
-			'CondBsktCntGroup',
-			'CondBsktAmtGroup',
-			'CondBsktProductGroup',
-			'CondBsktRowGroup',
-			'CondBsktSubGroup',
-		);
+		if (!empty($arControls))
+		{
+			$strDisableKey = CSaleCondCtrlGroup::GetControlID();
+			$arControlsMap = array_fill_keys($arControls, true);
+			if (array_key_exists($strDisableKey, $arControlsMap))
+				unset($arControlsMap[$strDisableKey]);
+			$arControls = array_keys($arControlsMap);
+		}
 		return $arControls;
 	}
 
@@ -478,7 +480,8 @@ class CCatalogCondCtrlBasketProductProps extends CGlobalCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);
@@ -492,7 +495,8 @@ class CCatalogCondCtrlBasketProductProps extends CGlobalCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);

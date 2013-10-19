@@ -21,10 +21,19 @@ class CIMNotifySchema
 				{
 					foreach($ar as $moduleId => $arNotifyType)
 					{
-						foreach($arNotifyType as $notifyEvent => $arConfig)
+						self::$arNotifySchema[$moduleId]['NAME'] = isset($arNotifyType['NOTIFY']) && isset($arNotifyType['NAME'])? $arNotifyType['NAME']: '';
+
+						$arNotify = $arNotifyType;
+						if (isset($arNotifyType['NOTIFY']))
+							$arNotify = $arNotifyType['NOTIFY'];
+
+						foreach($arNotify as $notifyEvent => $arConfig)
 						{
-							$arConfig['ID'] = $notifyEvent;
-							self::$arNotifySchema[$moduleId][$notifyEvent] = $arConfig;
+							$arConfig['SITE'] = true;
+							$arConfig['MAIL'] = true;
+							$arConfig['XMPP'] = true;
+
+							self::$arNotifySchema[$moduleId]['NOTIFY'][$notifyEvent] = $arConfig;
 						}
 					}
 				}
@@ -35,41 +44,35 @@ class CIMNotifySchema
 
 	public static function CheckEnableFeature($moduleId, $notifyEvent, $feature)
 	{
-		$feature = strtoupper($feature);
-		if ($feature == IM_FEATURE_XMPP || $feature == IM_FEATURE_MAIL)
-		{
-			$arNotifySchema = self::GetNotifySchema();
-			if (isset($arNotifySchema[$moduleId][$notifyEvent][$feature]) && $arNotifySchema[$moduleId][$notifyEvent][$feature] === false)
-				return false;
-			elseif (isset($arNotifySchema["im"]["default"][$feature]))
-				return $arNotifySchema["im"]["default"][$feature] === true? true: false;
-
-		}
-		return false;
+		return true;
 	}
 
 	public static function OnGetNotifySchema()
 	{
 		return array(
 			"im" => array(
-				"default" => Array(
-					"NAME" => GetMessage('IM_NS_DEFAULT'),
-					"MAIL" => true,
-					"XMPP" => true,
+				"NOTIFY" => Array(
+					"message" => Array(
+						"NAME" => GetMessage('IM_NS_MESSAGE'),
+					),
+					"default" => Array(
+						"NAME" => GetMessage('IM_NS_DEFAULT'),
+					),
 				),
 			),
 			"main" => array(
-				"rating_vote" => Array(
-					"NAME" => GetMessage('IM_NS_MAIN_RATING_VOTE'),
-					"MAIL" => true,
-					"XMPP" => false,
+				"NAME" => GetMessage('IM_NS_MAIN'),
+				"NOTIFY" => Array(
+					"rating_vote" => Array(
+						"NAME" => GetMessage('IM_NS_MAIN_RATING_VOTE'),
+					),
 				),
 			),
 			"bizproc" => array(
-				"activity" => Array(
-					"NAME" => GetMessage('IM_NS_BIZPROC_ACTIVITY'),
-					"MAIL" => true,
-					"XMPP" => true,
+				"NOTIFY" => Array(
+					"activity" => Array(
+						"NAME" => GetMessage('IM_NS_BIZPROC_ACTIVITY'),
+					),
 				),
 			),
 		);

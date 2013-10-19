@@ -63,7 +63,7 @@ class CLAnswer
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">всех полей</a> ответа.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">всех полей</a> ответа.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -107,9 +107,9 @@ class CLAnswer
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">Поля ответа</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -146,7 +146,7 @@ class CLAnswer
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">всех полей</a> ответа.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">всех полей</a> ответа.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -188,9 +188,9 @@ class CLAnswer
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/add.php">Add</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/update.php
@@ -298,7 +298,7 @@ class CLAnswer
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -321,10 +321,10 @@ class CLAnswer
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -411,7 +411,7 @@ class CLAnswer
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -512,10 +512,10 @@ class CLAnswer
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clanswer/getbyid.php">GetByID</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#answer">Поля ответа</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/getbyid.php">GetByID</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

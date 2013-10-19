@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path">путях</a> по сайту.
+ * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту.
  *
  *
  *
@@ -16,7 +16,7 @@ class CPath
 {
 	
 	/**
-	 * <p>Возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
+	 * <p>Возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
 	 *
 	 *
 	 *
@@ -55,7 +55,7 @@ class CPath
 	 * ID сайта первой страницы пути; </li> <li> <b>FIRST_PAGE_SITE_ID_EXACT_MATCH</b> - если
 	 * значение равно "N", то при фильтрации по <b>FIRST_PAGE_SITE_ID</b> будет
 	 * искаться вхождение; </li> <li> <b>FIRST_PAGE_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на первой странице
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на первой странице
 	 * пути, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> - не была. </li>
 	 * </ul> </li> <li> <b>LAST_PAGE</b>* - последняя страница пути; </li> <li>
 	 * <b>LAST_PAGE_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
@@ -63,27 +63,27 @@ class CPath
 	 * ID сайта последней страницы пути; </li> <li> <b>LAST_PAGE_SITE_ID_EXACT_MATCH</b> - если
 	 * значение равно "N", то при фильтрации по <b>LAST_PAGE_SITE_ID</b> будет
 	 * искаться вхождение; </li> <li> <b>LAST_PAGE_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на последней
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на последней
 	 * странице пути, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> -
 	 * не была. </li> </ul> </li> <li> <b>PAGE</b>* - произвольная страница пути </li> <li>
 	 * <b>PAGE_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>PAGE</b>
 	 * будет искаться вхождение </li> <li> <b>PAGE_SITE_ID</b> - ID сайта произвольной
 	 * страницы пути </li> <li> <b>PAGE_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на произвольной
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на произвольной
 	 * странице пути, возможные значения: <ul> <li> <b>Y</b> - была </li> <li> <b>N</b> - не
 	 * была. </li> </ul> </li> <li> <b>ADV</b>* - ID рекламной кампании, по посетителям
 	 * которой надо получить данные; </li> <li> <b>ADV_EXACT_MATCH</b> - если значение
 	 * равно "N", то при фильтрации по <b>ADV</b> будет искаться вхождение; </li>
 	 * <li> <b>ADV_DATA_TYPE</b> - флаг типа данных для рекламной кампании,
 	 * возможные значения: <ul> <li> <b>P</b> - только по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямым заходам</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямым заходам</a> по
 	 * рекламной кампании; </li> <li> <b>B</b> - только по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возвратам</a> по рекламной
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возвратам</a> по рекламной
 	 * кампании; </li> <li> <b>S</b> - сумма по прямым заходам и возвратам. </li> </ul>
 	 * </li> <li> <b>STEPS1</b> - начальное значение интервала для поля "количество
 	 * страниц в пути"; </li> <li> <b>STEPS2</b> - конечное значение интервала для
 	 * поля "количество страниц в пути". </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -125,8 +125,8 @@ class CPath
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path">Термин "Полный путь"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path_step">Термин "Отрезок
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">Термин "Полный путь"</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
 	 * пути"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -299,7 +299,7 @@ class CPath
 
 	
 	/**
-	 * <p>По указанному ID записи, функция возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
+	 * <p>По указанному ID записи, функция возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
 	 *
 	 *
 	 *
@@ -327,8 +327,8 @@ class CPath
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path">Термин "Полный путь"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#path_step">Термин "Отрезок
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">Термин "Полный путь"</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
 	 * пути"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

@@ -159,7 +159,7 @@ class CAllSalePersonType
 	 *
 	 *
 	 * @return int <p>Возвращается код обновленного типа плательщика или <i>false</i> - в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__update.c02002e6.php
@@ -241,7 +241,7 @@ class CAllSalePersonType
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__delete.c2566ed3.php

@@ -50,9 +50,9 @@ class CRubric
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
 	 * "Рассылка"</a>.</p><a name="examples"></a>
 	 *
 	 *
@@ -170,9 +170,9 @@ class CRubric
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
 	 * "Рассылка"</a>.</p><a name="examples"></a>
 	 *
 	 *
@@ -275,7 +275,7 @@ class CRubric
 	 *
 	 *
 	 * @return mixed <p>В случае успешного удаления возвращается результат типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
 	 * случает возвращается false.</p><a name="examples"></a>
 	 *
 	 *
@@ -456,7 +456,7 @@ class CRubric
 	 *
 	 *
 	 * @param array $arFields  Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
 	 * "Рассылка"</a>.
 	 *
 	 *
@@ -512,7 +512,7 @@ class CRubric
 	 *
 	 *
 	 * @param array $arFields  Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
 	 * "Рассылка"</a>.
 	 *
 	 *

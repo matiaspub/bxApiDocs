@@ -3,11 +3,14 @@ IncludeModuleLangFile(__FILE__);
 
 class CAllTicketSLA
 {
+	const SLA_SITE = 1;
+	const SITE_SLA = 2;
+
 	public static function err_mess()
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CAllTicketSLA<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CAllTicketSLA<br>File: ".__FILE__;
 	}
 
 	// add new or modify exist SLA
@@ -17,10 +20,13 @@ class CAllTicketSLA
 		global $DB, $USER, $APPLICATION;
 		$id = intval($id);
 		$table = "b_ticket_sla";
+		$isDemo = $isSupportClient = $isSupportTeam = $isAdmin = $isAccess = $userID = null;
 		CTicket::GetRoles($isDemo, $isSupportClient, $isSupportTeam, $isAdmin, $isAccess, $userID, $checkRights);
 		if ($isAdmin)
 		{
-			if (CTicket::CheckFields($arFields, $id, array("NAME")))
+			$validDeadlineSource = !isset($arFields['DEADLINE_SOURCE']) || in_array($arFields['DEADLINE_SOURCE'], array('', 'DATE_CREATE'), true);
+
+			if (CTicket::CheckFields($arFields, $id, array("NAME","TIMETABLE_ID")) && $validDeadlineSource)
 			{
 				$arFields_i = CTicket::PrepareFields($arFields, $table, $id);
 				if (intval($id)>0)
@@ -58,7 +64,8 @@ class CAllTicketSLA
 						{
 							foreach($arFields["arSITES"] as $siteID)
 							{
-								if (strlen($FIRST_SITE_ID)<=0) $FIRST_SITE_ID = $siteID;
+								//if (strlen($FIRST_SITE_ID)<=0) $FIRST_SITE_ID = $siteID;
+								$FIRST_SITE_ID = $siteID;
 								$siteID = $DB->ForSql($siteID);
 								$strSql = "INSERT INTO b_ticket_sla_2_site (SLA_ID, SITE_ID) VALUES ($id, '$siteID')";
 								$DB->Query($strSql, false, $err_mess.__LINE__);
@@ -179,6 +186,7 @@ class CAllTicketSLA
 			$APPLICATION->ThrowException(GetMessage("SUP_ERROR_SLA_1"));
 			return false;
 		}
+		$isDemo = $isSupportClient = $isSupportTeam = $isAdmin = $isAccess = $userID = null;
 		CTicket::GetRoles($isDemo, $isSupportClient, $isSupportTeam, $isAdmin, $isAccess, $userID, $checkRights);
 		if ($isAdmin)
 		{
@@ -195,7 +203,7 @@ class CAllTicketSLA
 				$DB->Query("DELETE FROM b_ticket_sla_2_holidays WHERE SLA_ID = $id", false, $err_mess.__LINE__);
 				
 				$DB->Query("DELETE FROM b_ticket_sla WHERE ID = $id", false, $err_mess.__LINE__);
-				CSupportTimetableCache::toCache();
+				$DB->Query("DELETE FROM b_ticket_timetable_cache WHERE SLA_ID = $id", false, $err_mess . __LINE__);
 				return true;
 			}
 			else
@@ -216,6 +224,7 @@ class CAllTicketSLA
 		$id = intval($id);
 		if ($id<=0) return false;
 		$arFilter = array("ID" => $id, "ID_EXACT_MATCH" => "Y");
+		$arSort = $is_filtered = null;
 		$rs = CTicketSLA::GetList($arSort, $arFilter, $is_filtered);
 		return $rs;
 	}
@@ -280,6 +289,23 @@ class CAllTicketSLA
 		return $arResult;
 	}
 
+	public static function GetGroupArrayForAllSLA()
+	{
+		global $DB;
+
+		$err_mess = (CAllTicketSLA::err_mess())."<br>Function: GetGroupArray<br>Line: ";
+		$arResult = array();
+		$strSql = "SELECT SLA_ID, GROUP_ID FROM b_ticket_sla_2_user_group";
+		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
+
+		while($ar = $rs->Fetch())
+		{
+			$arResult[$ar['SLA_ID']][] = $ar["GROUP_ID"];
+		}
+
+		return $arResult;
+	}
+
 	public static function GetSiteArray($slaID)
 	{
 		$err_mess = (CAllTicketSLA::err_mess())."<br>Function: GetSiteArray<br>Line: ";
@@ -293,6 +319,35 @@ class CAllTicketSLA
 			while($ar = $rs->Fetch()) $arResult[] = $ar["SITE_ID"];
 		}
 		return $arResult;
+	}
+
+	public static function GetSiteArrayForAllSLA($p = self::SLA_SITE) //self::SITE_SLA
+	{
+		static $GetSiteArrayForAllSLACache;
+		if($p !== self::SITE_SLA)
+		{
+			$p = self::SLA_SITE;
+		}
+		if(!is_array($GetSiteArrayForAllSLACache))
+		{
+			$err_mess = (CAllTicketSLA::err_mess())."<br>Function: GetSiteArrayForAllSLA<br>Line: ";
+			global $DB;
+			$GetSiteArrayForAllSLACache = array();
+			$strSql = "
+				SELECT
+					SS.SITE_ID,
+					SS.SLA_ID
+				FROM
+					b_ticket_sla_2_site SS
+				";
+			$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
+			while ($ar = $rs->Fetch())
+			{
+				$GetSiteArrayForAllSLACache[self::SLA_SITE][$ar["SLA_ID"]][] = $ar["SITE_ID"];
+				$GetSiteArrayForAllSLACache[self::SITE_SLA][$ar["SITE_ID"]][] = $ar["SLA_ID"];
+			}
+		}
+		return $GetSiteArrayForAllSLACache[$p];
 	}
 
 	public static function GetCategoryArray($slaID)
@@ -342,8 +397,12 @@ class CAllTicketSLA
 
 	public static function GetDropDown($siteID="")
 	{
-		if (strlen($siteID)>0 && strtoupper($siteID)!="ALL") $arFilter = array("SITE" => $siteID);
+		if (strlen($siteID)>0 && strtoupper($siteID)!="ALL")
+		{
+			$arFilter = array("SITE" => $siteID);
+		}
 		$arSort = array("FIRST_SITE_ID" => "ASC", "PRIORITY" => "ASC");
+		$is_filtered = null;
 		$rs = CTicketSLA::GetList($arSort, $arFilter, $is_filtered);
 		return $rs;
 	}
@@ -397,17 +456,28 @@ class CAllTicketSLA
 	{
 		global $DB;
 		$err_mess = (CAllTicketSLA::err_mess())."<br>Function: GetSLA<br>Line: ";
+
+		$userID = intval($userID);
 			
 		if( strlen( $coupon ) > 0 )
 		{
 			$rsCoupon = CSupportSuperCoupon::GetList( false, array( 'COUPON' => $coupon ) );
-			if( $arCoupon = $rsCoupon->Fetch() && intval( $arCoupon['SLA_ID'] ) > 0 ) return intval( $arCoupon['SLA_ID'] );
+			if($arCoupon = $rsCoupon->Fetch())
+			{
+				if(intval($arCoupon['SLA_ID'] ) > 0)
+				{
+					return intval( $arCoupon['SLA_ID'] );
+				}
+			}
 		}
 		
 		$slaID = COption::GetOptionString( "support", "SUPPORT_DEFAULT_SLA_ID" );
-		
+
 		$OLD_FUNCTIONALITY = COption::GetOptionString( "support", "SUPPORT_OLD_FUNCTIONALITY", "Y" );
-		if( $OLD_FUNCTIONALITY == "Y" ) $categoryID = null;
+		if( $OLD_FUNCTIONALITY == "Y" )
+		{
+			$categoryID = null;
+		}
 		
 		$JOIN = "";
 		$fields = "1";
@@ -423,7 +493,18 @@ class CAllTicketSLA
 						ON S.ID = SC.SLA_ID
 							AND ( SC.CATEGORY_ID = 0 OR SC.CATEGORY_ID = $categoryID )";
 		}
-					
+
+		if ($userID === 0)
+		{
+			// guest: default site sla for usergroup #2
+			$groupJoin = "UG.GROUP_ID = 2";
+		}
+		else
+		{
+			// sla for this user
+			$groupJoin = "(UG.USER_ID = $userID OR UG.GROUP_ID = 2)";
+		}
+
 		$strSql = "
 			SELECT
 				PZ.SLA_ID
@@ -442,7 +523,8 @@ class CAllTicketSLA
 						ON S.ID = SG.SLA_ID
 					INNER JOIN b_user_group UG
 						ON SG.GROUP_ID = UG.GROUP_ID
-							AND UG.USER_ID = $userID $JOIN
+							AND $groupJoin
+					$JOIN
 			) PZ
 			GROUP BY
 				PZ.SLA_ID, PZ.PRIORITY1, PZ.PRIORITY2
@@ -452,14 +534,16 @@ class CAllTicketSLA
 		";
 		
 		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
-		if( $ar = $rs->Fetch() ) if( is_array( $ar ) && array_key_exists( "SLA_ID", $ar ) ) $slaID = $ar["SLA_ID"];
-			
+		if( $ar = $rs->Fetch() )
+		{
+			if( is_array( $ar ) && array_key_exists( "SLA_ID", $ar ) )
+			{
+				$slaID = $ar["SLA_ID"];
+			}
+		}
+
 		return $slaID;
 	}
-	
-	
-	
-	
 }
 
 ?>

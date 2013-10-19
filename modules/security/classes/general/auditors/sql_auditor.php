@@ -4,11 +4,6 @@ class CSecurityFilterSqlAuditor extends CSecurityFilterBaseAuditor
 {
 	protected $name = "SQL";
 
-	public function __construct($pChar = "")
-	{
-		$this->setSplittingChar($pChar);
-	}
-
 	/**
 	 * @return array
 	 */

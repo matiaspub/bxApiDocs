@@ -32,7 +32,7 @@ class CSaleTax extends CAllSaleTax
 	 *
 	 *
 	 * @return int <p>Возвращается код добавленного налога или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__add.b22a6ac6.php

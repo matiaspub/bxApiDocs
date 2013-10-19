@@ -14,7 +14,7 @@ class CPHPCacheMemcache implements ICacheBackend
 		$this->CPHPCacheMemcache();
 	}
 
-	public static function CPHPCacheMemcache()
+	public function CPHPCacheMemcache()
 	{
 		if(!is_object(self::$obMemcache))
 			self::$obMemcache = new Memcache;

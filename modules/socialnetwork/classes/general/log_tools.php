@@ -1108,6 +1108,7 @@ class CSocNetLogTools
 						array(),
 						array(
 							"HTML" => "Y",
+							"ALIGN" => "Y",
 							"ANCHOR" => "Y", "BIU" => "Y",
 							"IMG" => "Y", "LOG_IMG" => "N",
 							"QUOTE" => "Y", "LOG_QUOTE" => "N",
@@ -1126,6 +1127,7 @@ class CSocNetLogTools
 				$arResult["EVENT_FORMATTED"]["MESSAGE"],
 				array(
 					"HTML" => "N",
+					"ALIGN" => "Y",
 					"ANCHOR" => "Y", "BIU" => "Y",
 					"IMG" => "Y", "QUOTE" => "Y",
 					"CODE" => "Y", "FONT" => "Y",
@@ -1235,6 +1237,7 @@ class CSocNetLogTools
 						array(),
 						array(
 							"HTML" => "Y",
+							"ALIGN" => "Y",
 							"ANCHOR" => "Y", "BIU" => "Y",
 							"IMG" => "Y", "LOG_IMG" => "N",
 							"QUOTE" => "Y", "LOG_QUOTE" => "N",
@@ -1253,6 +1256,7 @@ class CSocNetLogTools
 				$arResult["EVENT_FORMATTED"]["MESSAGE"],
 				array(
 					"HTML" => "N",
+					"ALIGN" => "Y",
 					"ANCHOR" => "Y", "BIU" => "Y",
 					"IMG" => "Y", "QUOTE" => "Y",
 					"CODE" => "Y", "FONT" => "Y",
@@ -4579,7 +4583,7 @@ class CSocNetLogTools
 
 		if (!function_exists("__DestinationRightsSort"))
 		{
-			function __DestinationRightsSort($a, $b)
+			public static function __DestinationRightsSort($a, $b)
 			{
 				if ($a == $b)
 					return 0;
@@ -5057,6 +5061,9 @@ class CSocNetLogTools
 				$log_type = "comment";
 				$log_event_id = array("bitrix24_new_user_comment");
 				break;
+			case "LOG_ENTRY":
+				$log_type = "log_entry";
+				break;
 			default:
 		}
 
@@ -5067,6 +5074,24 @@ class CSocNetLogTools
 				array(
 					"EVENT_ID" => $log_event_id,
 					"SOURCE_ID" => $rating_entity_id
+				),
+				false,
+				false,
+				array("ID"),
+				array(
+					"CHECK_RIGHTS" => "Y",
+					"USE_SUBSCRIBE" => "N"
+				)
+			);
+			if ($arLogSrc = $rsLogSrc->Fetch())
+				$log_id = $arLogSrc["ID"];
+		}
+		elseif ($log_type == "log_entry")
+		{
+			$rsLogSrc = CSocNetLog::GetList(
+				array(),
+				array(
+					"ID" => $rating_entity_id
 				),
 				false,
 				false,
@@ -5665,7 +5690,7 @@ class logTextParser extends CTextParser
 				}
 			}
 
-			function sonet_sortlen($a, $b) {
+			public function sonet_sortlen($a, $b) {
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
 

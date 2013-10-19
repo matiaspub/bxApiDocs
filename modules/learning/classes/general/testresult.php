@@ -477,7 +477,7 @@ class CTestResult
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -502,7 +502,7 @@ class CTestResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="index.php">CTestResult</a>::<a href="getbyid.php">GetByID</a> </li> <li><a
 	 * href="../../fields.php#test_result">Поля плана тестирования</a></li> </ul><a name="examples"></a>
 	 *
@@ -617,7 +617,7 @@ class CTestResult
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -642,7 +642,7 @@ class CTestResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="../../fields.php#test_result">Поля плана тестирования</a> </li> <li> <a
 	 * href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
 	 *

@@ -238,7 +238,7 @@ class CAdvContract extends CAdvContract_all
 			if (is_array($arFilter))
 			{
 				$filter_keys = array_keys($arFilter);
-				for ($i=0; $i<count($filter_keys); $i++)
+				for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 				{
 					$key = $filter_keys[$i];
 					$val = $arFilter[$filter_keys[$i]];
@@ -369,8 +369,8 @@ class CAdvContract extends CAdvContract_all
 					$lamp LAMP,
 					C.ID, C.ACTIVE, C.NAME, C.DESCRIPTION, C.ADMIN_COMMENTS, C.WEIGHT, C.SORT, C.MAX_SHOW_COUNT,	C.SHOW_COUNT, C.EMAIL_COUNT, C.CREATED_BY, C.MODIFIED_BY, C.MAX_CLICK_COUNT, C.CLICK_COUNT, C.DEFAULT_STATUS_SID, C.MAX_VISITOR_COUNT, C.VISITOR_COUNT, C.KEYWORDS,
 					if(C.SHOW_COUNT<=0,0,round((C.CLICK_COUNT*100)/C.SHOW_COUNT,2))	CTR,
-					".$DB->DateToCharFunction("C.DATE_SHOW_FROM","SHORT")."		DATE_SHOW_FROM,
-					".$DB->DateToCharFunction("C.DATE_SHOW_TO","SHORT")."		DATE_SHOW_TO,
+					".$DB->DateToCharFunction("C.DATE_SHOW_FROM")."		DATE_SHOW_FROM,
+					".$DB->DateToCharFunction("C.DATE_SHOW_TO")."		DATE_SHOW_TO,
 					".$DB->DateToCharFunction("C.DATE_CREATE")."				DATE_CREATE,
 					".$DB->DateToCharFunction("C.DATE_MODIFY")."				DATE_MODIFY,
 					count(distinct B.ID)								BANNER_COUNT
@@ -396,8 +396,8 @@ class CAdvContract extends CAdvContract_all
 					$lamp LAMP,
 					C.ID, C.ACTIVE, C.NAME, C.DESCRIPTION, C.ADMIN_COMMENTS, C.WEIGHT, C.SORT, C.MAX_SHOW_COUNT, 	C.SHOW_COUNT, C.MAX_CLICK_COUNT, C.CLICK_COUNT, C.EMAIL_COUNT, C.CREATED_BY, C.MODIFIED_BY, C.DEFAULT_STATUS_SID, C.MAX_VISITOR_COUNT, C.VISITOR_COUNT, C.KEYWORDS,
 					if(C.SHOW_COUNT<=0,0,round((C.CLICK_COUNT*100)/C.SHOW_COUNT,2))	CTR,
-					".$DB->DateToCharFunction("C.DATE_SHOW_FROM","SHORT")."		DATE_SHOW_FROM,
-					".$DB->DateToCharFunction("C.DATE_SHOW_TO","SHORT")."		DATE_SHOW_TO,
+					".$DB->DateToCharFunction("C.DATE_SHOW_FROM")."		DATE_SHOW_FROM,
+					".$DB->DateToCharFunction("C.DATE_SHOW_TO")."		DATE_SHOW_TO,
 					".$DB->DateToCharFunction("C.DATE_CREATE")."				DATE_CREATE,
 					".$DB->DateToCharFunction("C.DATE_MODIFY")."				DATE_MODIFY,
 					count(distinct B.ID)										BANNER_COUNT
@@ -810,7 +810,7 @@ class CAdvBanner extends CAdvBanner_all
 			if (is_array($arFilter))
 			{
 				$filter_keys = array_keys($arFilter);
-				for ($i=0; $i<count($filter_keys); $i++)
+				for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 				{
 					$key = $filter_keys[$i];
 					$val = $arFilter[$filter_keys[$i]];
@@ -1011,9 +1011,9 @@ class CAdvBanner extends CAdvBanner_all
 					if(B.SHOW_COUNT<=0,0,round((B.CLICK_COUNT*100)/B.SHOW_COUNT,2))		CTR,
 					".$DB->DateToCharFunction("B.DATE_LAST_SHOW")."						DATE_LAST_SHOW,
 					".$DB->DateToCharFunction("B.DATE_LAST_CLICK")."					DATE_LAST_CLICK,
-					".$DB->DateToCharFunction("B.DATE_SHOW_FROM", "SHORT")."			DATE_SHOW_FROM,
-					".$DB->DateToCharFunction("B.DATE_SHOW_TO", "SHORT")."				DATE_SHOW_TO,
-					".$DB->DateToCharFunction("B.DATE_SHOW_FIRST", "FULL")."			DATE_SHOW_FIRST,
+					".$DB->DateToCharFunction("B.DATE_SHOW_FROM")."			DATE_SHOW_FROM,
+					".$DB->DateToCharFunction("B.DATE_SHOW_TO")."				DATE_SHOW_TO,
+					".$DB->DateToCharFunction("B.DATE_SHOW_FIRST")."			DATE_SHOW_FIRST,
 					".$DB->DateToCharFunction("B.DATE_CREATE")."						DATE_CREATE,
 					".$DB->DateToCharFunction("B.DATE_MODIFY")."						DATE_MODIFY,
 					C.NAME																CONTRACT_NAME,
@@ -1039,9 +1039,9 @@ class CAdvBanner extends CAdvBanner_all
 					if(B.SHOW_COUNT<=0,0,round((B.CLICK_COUNT*100)/B.SHOW_COUNT,2))		CTR,
 					".$DB->DateToCharFunction("B.DATE_LAST_SHOW")."						DATE_LAST_SHOW,
 					".$DB->DateToCharFunction("B.DATE_LAST_CLICK")."					DATE_LAST_CLICK,
-					".$DB->DateToCharFunction("B.DATE_SHOW_FROM", "SHORT")."			DATE_SHOW_FROM,
-					".$DB->DateToCharFunction("B.DATE_SHOW_TO", "SHORT")."				DATE_SHOW_TO,
-					".$DB->DateToCharFunction("B.DATE_SHOW_FIRST", "FULL")."			DATE_SHOW_FIRST,
+					".$DB->DateToCharFunction("B.DATE_SHOW_FROM")."			DATE_SHOW_FROM,
+					".$DB->DateToCharFunction("B.DATE_SHOW_TO")."				DATE_SHOW_TO,
+					".$DB->DateToCharFunction("B.DATE_SHOW_FIRST")."			DATE_SHOW_FIRST,
 					".$DB->DateToCharFunction("B.DATE_CREATE")."						DATE_CREATE,
 					".$DB->DateToCharFunction("B.DATE_MODIFY")."						DATE_MODIFY,
 					C.NAME																CONTRACT_NAME,

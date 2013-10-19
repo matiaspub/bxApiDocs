@@ -91,7 +91,7 @@ class CAllSocNetMessages
 
 	
 	/**
-	 * <p>Метод удаляет сообщение из базы данных. Используется для физического удаления записи. Для логического удаления согласно алгоритму работы модуля социальной сети следует использовать метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/DeleteMessage.php">CSocNetMessages::DeleteMessage</a>.</p> <p><b>Примечание</b>: при удалении записи вызываются события <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnBeforeSocNetMessagesDelete.php">OnBeforeSocNetMessagesDelete</a> и <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnSocNetMessagesDelete.php">OnSocNetMessagesDelete</a>.</p>
+	 * <p>Метод удаляет сообщение из базы данных. Используется для физического удаления записи. Для логического удаления согласно алгоритму работы модуля социальной сети следует использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/DeleteMessage.php">CSocNetMessages::DeleteMessage</a>.</p> <p><b>Примечание</b>: при удалении записи вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesDelete.php">OnBeforeSocNetMessagesDelete</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesDelete.php">OnSocNetMessagesDelete</a>.</p>
 	 *
 	 *
 	 *
@@ -133,7 +133,7 @@ class CAllSocNetMessages
 
 	
 	/**
-	 * <p>Метод для логического удаления сообщения. Метод принимает на вход код пользователя - отправителя или получателя сообщения. Сообщение помечается как удаленное для этого пользователя. Для второго пользователя это сообщение не является удаленным и доступно как обычно. Физическое удаление сообщения происходит после логического удаления сообщения вторым пользователем.</p> <p><b>Примечание</b>: при физическом удалении используется метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/Delete.php">CSocNetMessages::Delete</a>.</p>
+	 * <p>Метод для логического удаления сообщения. Метод принимает на вход код пользователя - отправителя или получателя сообщения. Сообщение помечается как удаленное для этого пользователя. Для второго пользователя это сообщение не является удаленным и доступно как обычно. Физическое удаление сообщения происходит после логического удаления сообщения вторым пользователем.</p> <p><b>Примечание</b>: при физическом удалении используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Delete.php">CSocNetMessages::Delete</a>.</p>
 	 *
 	 *
 	 *
@@ -309,7 +309,7 @@ class CAllSocNetMessages
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/GetList.php">CSocNetMessages::GetList</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetList.php">CSocNetMessages::GetList</a></li>
 	 * </ul>
 	 *
 	 *
@@ -473,7 +473,7 @@ class CAllSocNetMessages
 
 	
 	/**
-	 * <p>Вспомогательный метод для отправки персонального сообщения от одного пользователя социальной сети другому.</p> <p><b>Примечание</b>: для отправки системного сообщения используется метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
+	 * <p>Вспомогательный метод для отправки персонального сообщения от одного пользователя социальной сети другому.</p> <p><b>Примечание</b>: для отправки системного сообщения используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
 	 *
 	 *
 	 *
@@ -509,7 +509,7 @@ class CAllSocNetMessages
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#phrase">поисковым фразам</a>.
+ * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>.
  *
  *
  *
@@ -16,7 +16,7 @@ class CPhrase
 {
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#phrase">поисковых фраз</a> с возможностью группировки по поисковое фразе или <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковой системе</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковых фраз</a> с возможностью группировки по поисковое фразе или <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a>.</p>
 	 *
 	 *
 	 *
@@ -29,16 +29,16 @@ class CPhrase
 	 * поисковой системе (<i>filter</i>["<b>GROUP</b>"]="S"): <ul> <li> <b>s_name</b> - поисковая
 	 * система; </li> <li> <b>s_quantity</b> - количество заходов с данной поисковой
 	 * системы; </li> <li> <b>s_average_hits</b> - среднее количество <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a> производимое
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> производимое
 	 * посетителями заходящим с той или иной поисковой системы. </li> </ul>
 	 * </li> <li>когда группировка не установлена: <ul> <li> <b>s_id</b> - ID записи; </li>
 	 * <li> <b>s_counter</b> - счетчик; </li> <li> <b>s_site_id</b> - ID сайта на который пришли;
 	 * </li> <li> <b>s_phrase</b> - поисковая фраза; </li> <li> <b>s_searcher_id</b> - ID поисковой
 	 * системы; </li> <li> <b>s_referer_id</b> - ID записи из таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">ссылающихся сайтов
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов
 	 * (страниц)</a>; </li> <li> <b>s_date_hit</b> - дата захода; </li> <li> <b>s_url_to</b> -
 	 * страница на которую пришли; </li> <li> <b>s_session_id</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессии</a>. </li> </ul> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>. </li> </ul> </li> </ul>
 	 *
 	 *
 	 *
@@ -67,13 +67,13 @@ class CPhrase
 	 * <b>TO</b>* - страница на которую пришли; </li> <li> <b>TO_EXACT_MATCH</b> - если
 	 * значение равно "Y", то при фильтрации по <b>TO</b> будет искаться
 	 * точное совпадение; </li> <li> <b>TO_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на странице на
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на странице на
 	 * которую пришли, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> -
 	 * не была. </li> </ul> </li> <li> <b>SITE_ID</b> - ID сайта, на который пришли; </li> <li>
 	 * <b>GROUP</b> - группировка результирующего списка, возможные значения:
 	 * <ul> <li> <b>P</b> - группировка по поисковой фразе; </li> <li> <b>S</b> -
 	 * группировка по поисковой системе. </li> </ul> </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -109,8 +109,8 @@ class CPhrase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#phrase">Термин "Поисковая
-	 * фраза"</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">Термин
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">Термин "Поисковая
+	 * фраза"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин
 	 * "Поисковая система"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

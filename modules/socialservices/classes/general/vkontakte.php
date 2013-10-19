@@ -31,7 +31,8 @@ class CSocServVKontakte extends CSocServAuth
 		else
 		{
 			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
-			$state = 'site_id='.SITE_ID.'&backurl='.($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl")));
+			$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage(true).'?auth_service_id='.self::ID;
+			$state = urlencode('site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))));
 		}
 
 		$url = $gAuth->GetAuthUrl($redirect_uri, $state);
@@ -45,14 +46,14 @@ class CSocServVKontakte extends CSocServAuth
 	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
-		$bSuccess = 1;
+		$bSuccess = SOCSERV_AUTHORISATION_ERROR;
 
 		if((isset($_REQUEST["code"]) && $_REQUEST["code"] <> '') && CSocServAuthManager::CheckUniqueKey())
 		{
 			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 			else
-				$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code", "state", "backurl", "check_key"));
+				$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage(true).'?auth_service_id='.self::ID;
 			$appID = trim(self::GetOption("vkontakte_appid"));
 			$appSecret = trim(self::GetOption("vkontakte_appsecret"));
 
@@ -61,7 +62,7 @@ class CSocServVKontakte extends CSocServAuth
 			{
 				$arVkUser = $gAuth->GetCurrentUser();
 
-				if($arVkUser['response']['0']['uid'] <> '')
+				if(is_array($arVkUser) && ($arVkUser['response']['0']['uid'] <> ''))
 				{
 					$first_name = $last_name = $gender = "";
 					if($arVkUser['response']['0']['first_name'] <> '')
@@ -105,7 +106,8 @@ class CSocServVKontakte extends CSocServAuth
 			}
 		}
 
-		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "/auth/" : $GLOBALS["APPLICATION"]->GetCurDir();
+		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "" : $GLOBALS["APPLICATION"]->GetCurDir();
+		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
 
 		if(isset($_REQUEST["state"]))
 		{
@@ -113,18 +115,33 @@ class CSocServVKontakte extends CSocServAuth
 			parse_str($_REQUEST["state"], $arState);
 
 			if(isset($arState['backurl']))
-				$url = parse_url($arState['backurl'], PHP_URL_PATH);
-		}
+			{
+				$parseUrl = parse_url($arState['backurl']);
+				$urlPath = $parseUrl["path"];
+				$arUrlQuery = explode('&', $parseUrl["query"]);
 
-		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
-		if($bSuccess === 2)
+				foreach($arUrlQuery as $key => $value)
+				{
+					foreach($aRemove as $param)
+					{
+						if(strpos($value, $param."=") === 0)
+						{
+							unset($arUrlQuery[$key]);
+							break;
+						}
+					}
+				}
+				$url = (!empty($arUrlQuery)) ? $urlPath.'?'.implode("&", $arUrlQuery) : $urlPath;
+			}
+		}
+		if($bSuccess === SOCSERV_REGISTRATION_DENY)
 		{
 			$url = (preg_match("/\?/", $url)) ? $url.'&' : $url.'?';
 			$url .= 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess;
 		}
 		elseif($bSuccess !== true)
-			$url = (isset($parseUrl)) ? $parseUrl.'?auth_service_id='.self::ID.'&auth_service_error='.$bSuccess : $GLOBALS['APPLICATION']->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
-		if(CModule::IncludeModule("socialnetwork"))
+			$url = (isset($urlPath)) ? $urlPath.'?auth_service_id='.self::ID.'&auth_service_error='.$bSuccess : $GLOBALS['APPLICATION']->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
+		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
 			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
 
 		echo '
@@ -152,7 +169,7 @@ class CVKontakteOAuthInterface
 
 	public function __construct($appID, $appSecret, $code=false)
 	{
-		$this->httpTimeout = 10;
+		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->code = $code;
@@ -181,6 +198,7 @@ class CVKontakteOAuthInterface
 		), array(), $this->httpTimeout);
 
 		$arResult = CUtil::JsObjectToPhp($result);
+
 		if((isset($arResult["access_token"]) && $arResult["access_token"] <> '') && isset($arResult["user_id"]) && $arResult["user_id"] <> '')
 		{
 			$this->access_token = $arResult["access_token"];

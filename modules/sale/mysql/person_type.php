@@ -286,7 +286,7 @@ class CSalePersonType extends CAllSalePersonType
 	 *
 	 *
 	 * @return Int <p>Возвращается код добавленного типа плательщика или <i>false</i> - в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__add.a7f60787.php

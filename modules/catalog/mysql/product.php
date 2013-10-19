@@ -18,7 +18,7 @@ class CCatalogProduct extends CAllCatalogProduct
 {
 	
 	/**
-	 * <p>Функция добавляет (или обновляет) параметры товара к элементу каталога </p>
+	 * <p>Функция добавляет (или обновляет) параметры товара к элементу каталога.</p>
 	 *
 	 *
 	 *
@@ -36,9 +36,10 @@ class CCatalogProduct extends CAllCatalogProduct
 	 * товара, для которого данный товар является пробным;</li> <li>
 	 * <b>WITHOUT_ORDER</b> - флаг "Продление подписки без оформления заказа";</li>
 	 * <li> <b>VAT_ID</b> - код НДС;</li> <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в
-	 * цену;</li> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить покупку при
-	 * отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b>
-	 * "разрешить отрицательное количество товара".</li> </ul>
+	 * цену;</li> <li> <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> -
+	 * валюта закупочной цены;</li> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить
+	 * покупку при отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг
+	 * (Y/N/D)<b>*</b> "разрешить отрицательное количество товара".</li> </ul>
 	 *
 	 *
 	 *
@@ -49,6 +50,21 @@ class CCatalogProduct extends CAllCatalogProduct
 	 *
 	 * @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
 	 * <i>false</i> в противном случае. </p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * $arFields = array(
+	 *                   "ID" =&gt; $PRODUCT_ID, 
+	 *                   "VAT_ID" =&gt; 1, //выставляем тип ндс (задается в админке)  
+	 *                   "VAT_INCLUDED" =&gt; "Y" //НДС входит в стоимость
+	 *                   );
+	 * if(CCatalogProduct::Add($arFields))
+	 *     echo "Добавили параметры товара к элементу каталога ".$PRODUCT_ID.'&lt;br&gt;';
+	 * else
+	 *     echo 'Ошибка добавления параметров&lt;br&gt;';
+	 * </pre>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php
@@ -80,29 +96,30 @@ class CCatalogProduct extends CAllCatalogProduct
 		}
 		else
 		{
-			$db_events = GetModuleEvents("catalog", "OnBeforeProductAdd");
-			while ($arEvent = $db_events->Fetch())
+			foreach (GetModuleEvents("catalog", "OnBeforeProductAdd", true) as $arEvent)
+			{
 				if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
 					return false;
+			}
 
 			if (!CCatalogProduct::CheckFields("ADD", $arFields, 0))
 				return false;
 
 			$arInsert = $DB->PrepareInsert("b_catalog_product", $arFields);
 
-			$strSql =
-				"INSERT INTO b_catalog_product(".$arInsert[0].") ".
-				"VALUES(".$arInsert[1].")";
+			$strSql = "INSERT INTO b_catalog_product(".$arInsert[0].") VALUES(".$arInsert[1].")";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			$events = GetModuleEvents("catalog", "OnProductAdd");
-			while ($arEvent = $events->Fetch())
+			foreach (GetModuleEvents("catalog", "OnProductAdd", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, array($arFields["ID"], $arFields));
+			}
 
 			// strange copy-paste bug
-			$events = GetModuleEvents("sale", "OnProductAdd");
-			while ($arEvent = $events->Fetch())
+			foreach (GetModuleEvents("sale", "OnProductAdd", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, array($arFields["ID"], $arFields));
+			}
 		}
 
 		return true;
@@ -110,7 +127,7 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	 * <p>Функция обновляет параметры товара, относящиеся к товару как к таковому</p>
+	 * <p>Функция обновляет параметры товара, относящиеся к товару как к таковому.</p>
 	 *
 	 *
 	 *
@@ -130,14 +147,27 @@ class CCatalogProduct extends CAllCatalogProduct
 	 * год);</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина периода подписки;</li> <li>
 	 * <b>TRIAL_PRICE_ID</b> - код товара, для которого данный товар является
 	 * пробным;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Продление подписки без
-	 * оформления заказа";</li> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить
-	 * покупку при отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг
-	 * (Y/N/D)<b>*</b> "разрешить отрицательное количество товара".</li> </ul>
+	 * оформления заказа";</li> <li> <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li>
+	 * <b>PURCHASING_CURRENCY</b> - валюта закупочной цены;</li> <li> <b>CAN_BUY_ZERO</b> - флаг
+	 * (Y/N/D)<b>*</b> "разрешить покупку при отсутствии товара";</li> <li>
+	 * <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b> "разрешить отрицательное
+	 * количество товара".</li> </ul>
 	 *
 	 *
 	 *
 	 * @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
 	 * <i>false</i> в противном случае.</p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * Обновление зарезервированного количества товара
+	 * Cmodule::IncludeModule('catalog');
+	 * $PRODUCT_ID = 51; // id товара
+	 * $arFields = array('QUANTITY_RESERVED' =&gt; 11);// зарезервированное количество
+	 * CCatalogProduct::Update($PRODUCT_ID, $arFields);
+	 * </pre>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php
@@ -146,19 +176,19 @@ class CCatalogProduct extends CAllCatalogProduct
 	static public function Update($ID, $arFields)
 	{
 		global $DB;
-		global $CATALOG_PRODUCT_CACHE;
 
 		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 
 		if (array_key_exists('ID', $arFields))
 			unset($arFields["ID"]);
-		if ($ID <= 0)
-			return false;
 
-		$db_events = GetModuleEvents("catalog", "OnBeforeProductUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnBeforeProductUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
+		}
 
 		if (!CCatalogProduct::CheckFields("UPDATE", $arFields, $ID))
 			return false;
@@ -175,7 +205,6 @@ class CCatalogProduct extends CAllCatalogProduct
 				{
 					$strQuery = 'select ID, QUANTITY from b_catalog_product where ID = '.$ID;
 					$rsProducts = $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					//$rsProducts = CCatalogProduct::GetList(array(),array('ID' => $ID), false, false, array('ID', 'QUANTITY'));
 					if ($arProduct = $rsProducts->Fetch())
 					{
 						$arFields["OLD_QUANTITY"] = doubleval($arProduct['QUANTITY']);
@@ -190,13 +219,21 @@ class CCatalogProduct extends CAllCatalogProduct
 			$strSql = "UPDATE b_catalog_product SET ".$strUpdate." WHERE ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			if (is_array($CATALOG_PRODUCT_CACHE) && array_key_exists($ID,$CATALOG_PRODUCT_CACHE))
-				unset($CATALOG_PRODUCT_CACHE[$ID]);
+			if (array_key_exists($ID, self::$arProductCache))
+			{
+				unset(self::$arProductCache[$ID]);
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $CATALOG_PRODUCT_CACHE;
+					$CATALOG_PRODUCT_CACHE = self::$arProductCache;
+				}
+			}
 		}
 
-		$events = GetModuleEvents("catalog", "OnProductUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnProductUpdate", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+		}
 
 		//call subscribe
 		if ($boolSubscribe && CModule::IncludeModule('sale'))
@@ -219,7 +256,7 @@ class CCatalogProduct extends CAllCatalogProduct
 	 *
 	 *
 	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * противном случае </p>
+	 * противном случае </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__delete.ed301fc8.php
@@ -228,35 +265,24 @@ class CCatalogProduct extends CAllCatalogProduct
 	public static function Delete($ID)
 	{
 		global $DB;
-		global $CATALOG_PRODUCT_CACHE;
 
 		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 
 		$DB->Query("DELETE FROM b_catalog_price WHERE PRODUCT_ID = ".$ID, true);
 		$DB->Query("DELETE FROM b_catalog_product2group WHERE PRODUCT_ID = ".$ID, true);
 
-		if (is_array($CATALOG_PRODUCT_CACHE) && array_key_exists($ID,$CATALOG_PRODUCT_CACHE))
-			unset($CATALOG_PRODUCT_CACHE[$ID]);
-
-		return $DB->Query("DELETE FROM b_catalog_product WHERE ID = ".$ID, true);
-	}
-
-	public static function ParseQueryBuildField($field)
-	{
-		$field = strtoupper($field);
-		if(substr($field, 0, 8)!=="CATALOG_")
-			return false;
-
-		$iNum = 0;
-		$field = substr($field, 8);
-		$p = strrpos($field, "_");
-		if($p>0)
+		if (array_key_exists($ID, self::$arProductCache))
 		{
-			$iNum = IntVal(substr($field, $p+1));
-			if($iNum>0)
-				$field = substr($field, 0, $p);
+			unset(self::$arProductCache[$ID]);
+			if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+			{
+				global $CATALOG_PRODUCT_CACHE;
+				$CATALOG_PRODUCT_CACHE = self::$arProductCache;
+			}
 		}
-		return Array("FIELD"=>$field, "NUM"=>$iNum);
+		return $DB->Query("DELETE FROM b_catalog_product WHERE ID = ".$ID, true);
 	}
 
 	public static function GetQueryBuildArrays($arOrder, $arFilter, $arSelect)
@@ -264,23 +290,42 @@ class CCatalogProduct extends CAllCatalogProduct
 		global $DB, $USER;
 		global $stackCacheManager;
 
+		$strDefQuantityTrace = COption::GetOptionString('catalog','default_quantity_trace','N');
+		if ('Y' != $strDefQuantityTrace)
+			$strDefQuantityTrace = 'N';
+		$strDefCanBuyZero = COption::GetOptionString('catalog','default_can_buy_zero','N');
+		if ('Y' != $strDefCanBuyZero)
+			$strDefCanBuyZero = 'N';
+		$strDefNegAmount = COption::GetOptionString('catalog','allow_negative_amount','N');
+		if ('Y' != $strDefNegAmount)
+			$strDefNegAmount = 'N';
+
 		$sResSelect = "";
 		$sResFrom = "";
 		$sResWhere = "";
 		$arResOrder = array();
-		$arJoinGroup = Array();
+		$arJoinGroup = array();
 
-		$arOrderTmp = Array();
-		foreach ($arOrder as $key=>$val)
+		$arSensID = array(
+			'PRODUCT_ID' => true,
+			'CATALOG_GROUP_ID' => true,
+			'CURRENCY' => true,
+			'SHOP_QUANTITY' => true,
+			'PRICE' => true
+		);
+
+		$arOrderTmp = array();
+		foreach ($arOrder as $key => $val)
 		{
-			foreach ($val as $by=>$order)
+			foreach ($val as $by => $order)
 			{
-				if($arField = CCatalogProduct::ParseQueryBuildField($by))
+				if ($arField = CCatalogProduct::ParseQueryBuildField($by))
 				{
 					$inum = $arField["NUM"];
 					$by = $arField["FIELD"];
+					$res = '';
 
-					if (0 >= $inum && $by != 'QUANTITY' && $by != 'WEIGHT')
+					if (0 >= $inum && array_key_exists($by, $arSensID))
 						continue;
 
 					if ($by == "PRICE")
@@ -301,28 +346,28 @@ class CCatalogProduct extends CAllCatalogProduct
 						$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.WEIGHT", $order, "asc", false)." ";
 						continue;
 					}
+					elseif ($by == 'AVAILABLE')
+					{
+						$arResOrder[$key] = " ".CIBlock::_Order("CATALOG_AVAILABLE", $order, "desc", false)." ";
+						continue;
+					}
 					else
 					{
 						$res = " ".CIBlock::_Order("CAT_P".$inum.".ID", $order, "asc", false)." ";
 					}
 
-					if(!is_array($arOrderTmp[$inum]))
-						$arOrderTmp[$inum] = Array();
+					if (!array_key_exists($inum, $arOrderTmp))
+						$arOrderTmp[$inum] = array();
 					$arOrderTmp[$inum][$key] = $res;
-					$arJoinGroup[] = $inum;
+					$arJoinGroup[$inum] = true;
 				}
 			}
 		}
 
-		$arWhereTmp = Array();
+		$arWhereTmp = array();
 		$arAddJoinOn = array();
 
-		$arSensID = array('PRODUCT_ID', 'CATALOG_GROUP_ID', 'CURRENCY', 'SHOP_QUANTITY', 'PRICE');
-
-		if (!is_array($arFilter))
-			$filter_keys = Array();
-		else
-			$filter_keys = array_keys($arFilter);
+		$filter_keys = (!is_array($arFilter) ? array() : array_keys($arFilter));
 
 		for ($i=0, $cnt = count($filter_keys); $i < $cnt; $i++)
 		{
@@ -333,12 +378,12 @@ class CCatalogProduct extends CAllCatalogProduct
 			$key = $res["FIELD"];
 			$cOperationType = $res["OPERATION"];
 
-			if($arField = CCatalogProduct::ParseQueryBuildField($key))
+			if ($arField = CCatalogProduct::ParseQueryBuildField($key))
 			{
 				$key = $arField["FIELD"];
 				$inum = $arField["NUM"];
 
-				if (0 >= $inum && in_array($key, $arSensID))
+				if (0 >= $inum && array_key_exists($key, $arSensID))
 					continue;
 
 				$res = "";
@@ -357,7 +402,7 @@ class CCatalogProduct extends CAllCatalogProduct
 					$res = ' 1=1 ';
 					$arAddJoinOn[$inum] =
 						(($cOperationType=="N") ? " NOT " : " ").
-						" ((CAT_P".$inum.".QUANTITY_FROM <= ".IntVal($val)." OR CAT_P".$inum.".QUANTITY_FROM IS NULL) AND (CAT_P".$inum.".QUANTITY_TO >= ".IntVal($val)." OR CAT_P".$inum.".QUANTITY_TO IS NULL)) ";
+						" ((CAT_P".$inum.".QUANTITY_FROM <= ".intval($val)." OR CAT_P".$inum.".QUANTITY_FROM IS NULL) AND (CAT_P".$inum.".QUANTITY_TO >= ".intval($val)." OR CAT_P".$inum.".QUANTITY_TO IS NULL)) ";
 					break;
 				case "PRICE":
 					$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE", $val, "number", $cOperationType);
@@ -366,51 +411,59 @@ class CCatalogProduct extends CAllCatalogProduct
 					$res = CIBlock::FilterCreate("CAT_PR.QUANTITY", $val, "number", $cOperationType);
 					break;
 				case "AVAILABLE":
+					if ('N' !== $val)
+						$val = 'Y';
 					$res =
-						(($cOperationType=="N") ? " NOT " : " ").
-						" (CAT_PR.CAN_BUY_ZERO='Y' OR (CAT_PR.QUANTITY>0 OR CAT_PR.QUANTITY_TRACE<>'Y')) ";
+						" (IF (
+				CAT_PR.QUANTITY > 0 OR
+				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
+				IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
+				'Y', 'N'
+				) ".(($cOperationType=="N") ? "<>" : "=")." '".$val."') ";
 					break;
 				case "WEIGHT":
 					$res = CIBlock::FilterCreate("CAT_PR.WEIGHT", $val, "number", $cOperationType);
 					break;
 				}
 
-				if($res!="")
-				{
-					if(!is_array($arWhereTmp[$inum]))
-						$arWhereTmp[$inum] = Array();
-					$arWhereTmp[$inum][] = $res;
-					$arJoinGroup[] = $inum;
-				}
+				if ('' == $res)
+					continue;
+
+				if (!array_key_exists($inum, $arWhereTmp))
+					$arWhereTmp[$inum] = array();
+				$arWhereTmp[$inum][] = $res;
+				$arJoinGroup[$inum] = true;
 			}
 		}
 
 		$strSubWhere = "";
-		for ($i = 0, $cnt = count($arSelect); $i < $cnt; $i++)
+		if (!empty($arSelect))
 		{
-			$val = strtoupper($arSelect[$i]);
-			$num = IntVal(substr($val, 14));
-			if (substr($val, 0, 14)=="CATALOG_GROUP_" && $num>0)
-				$strSubWhere .= ",".$num;
+			foreach ($arSelect as &$strOneSelect)
+			{
+				$val = strtoupper($strOneSelect);
+				if (0 != strncmp($val, 'CATALOG_GROUP_', 14))
+					continue;
+				$num = intval(substr($val, 14));
+				if (0 < $num)
+					$arJoinGroup[$num] = true;
+			}
+			if (isset($strOneSelect))
+				unset($strOneSelect);
 		}
 
-		$cnt = count($arJoinGroup);
-		if ($cnt > 0)
+		if (!empty($arJoinGroup))
 		{
-			for($i=0; $i < $cnt; $i++)
-				$strSubWhere .= ",".IntVal($arJoinGroup[$i]);
-		}
+			$strSubWhere = implode(',', array_keys($arJoinGroup));
 
-		if (strlen($strSubWhere) > 0)
-		{
-			$strCacheKey = "P";
-			$strCacheKey .= "_".$USER->GetGroups();
+			$strUserGroups = $USER->GetGroups();
+			$strCacheKey = "P_".$strUserGroups;
 			$strCacheKey .= "_".$strSubWhere;
 			$strCacheKey .= "_".LANGUAGE_ID;
 
 			$cacheTime = CATALOG_CACHE_DEFAULT_TIME;
 			if (defined("CATALOG_CACHE_TIME"))
-				$cacheTime = IntVal(CATALOG_CACHE_TIME);
+				$cacheTime = intval(CATALOG_CACHE_TIME);
 
 			$stackCacheManager->SetLength("catalog_GetQueryBuildArrays", 50);
 			$stackCacheManager->SetTTL("catalog_GetQueryBuildArrays", $cacheTime);
@@ -424,11 +477,11 @@ class CCatalogProduct extends CAllCatalogProduct
 					"	IF(CAT_CGG.ID IS NULL, 'N', 'Y') as CATALOG_CAN_ACCESS, ".
 					"	IF(CAT_CGG1.ID IS NULL, 'N', 'Y') as CATALOG_CAN_BUY ".
 					"FROM b_catalog_group CAT_CG ".
-					"	LEFT JOIN b_catalog_group2group CAT_CGG ON (CAT_CG.ID = CAT_CGG.CATALOG_GROUP_ID AND CAT_CGG.GROUP_ID IN (".$USER->GetGroups().") AND CAT_CGG.BUY <> 'Y') ".
-					"	LEFT JOIN b_catalog_group2group CAT_CGG1 ON (CAT_CG.ID = CAT_CGG1.CATALOG_GROUP_ID AND CAT_CGG1.GROUP_ID IN (".$USER->GetGroups().") AND CAT_CGG1.BUY = 'Y') ".
+					"	LEFT JOIN b_catalog_group2group CAT_CGG ON (CAT_CG.ID = CAT_CGG.CATALOG_GROUP_ID AND CAT_CGG.GROUP_ID IN (".$strUserGroups.") AND CAT_CGG.BUY <> 'Y') ".
+					"	LEFT JOIN b_catalog_group2group CAT_CGG1 ON (CAT_CG.ID = CAT_CGG1.CATALOG_GROUP_ID AND CAT_CGG1.GROUP_ID IN (".$strUserGroups.") AND CAT_CGG1.BUY = 'Y') ".
 					"	LEFT JOIN b_catalog_group_lang CAT_CGL ON (CAT_CG.ID = CAT_CGL.CATALOG_GROUP_ID AND CAT_CGL.LID = '".LANGUAGE_ID."') ".
-					($strSubWhere!="" ? " WHERE CAT_CG.ID IN (".substr($strSubWhere, 1).") " : "" ).
-					"GROUP BY CAT_CG.ID ";
+					" WHERE CAT_CG.ID IN (".$strSubWhere.") ".
+					" GROUP BY CAT_CG.ID ";
 				$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$arResult = array();
 				while ($arRes = $dbRes->Fetch())
@@ -439,18 +492,16 @@ class CCatalogProduct extends CAllCatalogProduct
 
 			$arCatGroups = array();
 
-			foreach ($arResult as $key => $row)
+			foreach ($arResult as &$row)
 			{
-				$i = IntVal($row["ID"]);
+				$i = intval($row["ID"]);
 
-				if(is_array($arWhereTmp[$i]))
+				if (!empty($arWhereTmp[$i]) && is_array($arWhereTmp[$i]))
 				{
-					foreach($arWhereTmp[$i] as $k=>$v)
-						if(strlen($v)>0)
-							$sResWhere .= " AND ".$v;
+					$sResWhere .= ' AND '.implode(' AND ',$arWhereTmp[$i]);
 				}
 
-				if(is_array($arOrderTmp[$i]))
+				if (!empty($arOrderTmp[$i]) && is_array($arOrderTmp[$i]))
 				{
 					foreach($arOrderTmp[$i] as $k=>$v)
 						$arResOrder[$k] = $v;
@@ -472,13 +523,21 @@ class CCatalogProduct extends CAllCatalogProduct
 				if (isset($arAddJoinOn[$i]))
 					$sResFrom .= ' AND '.$arAddJoinOn[$i];
 			}
+			if (isset($row))
+				unset($row);
 		}
 
 		$sResSelect .= ", CAT_PR.QUANTITY as CATALOG_QUANTITY, ".
-			" IF (CAT_PR.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAT_PR.QUANTITY_TRACE) as CATALOG_QUANTITY_TRACE, ".
+			" IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) as CATALOG_QUANTITY_TRACE, ".
 			" CAT_PR.QUANTITY_TRACE as CATALOG_QUANTITY_TRACE_ORIG, ".
-			" IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAT_PR.CAN_BUY_ZERO) as CATALOG_CAN_BUY_ZERO, ".
-			" IF (CAT_PR.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CAT_PR.NEGATIVE_AMOUNT_TRACE) as CATALOG_NEGATIVE_AMOUNT_TRACE, ".
+			" IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) as CATALOG_CAN_BUY_ZERO, ".
+			" IF (CAT_PR.NEGATIVE_AMOUNT_TRACE = 'D', '".$strDefNegAmount."', CAT_PR.NEGATIVE_AMOUNT_TRACE) as CATALOG_NEGATIVE_AMOUNT_TRACE, ".
+			" IF (
+				CAT_PR.QUANTITY > 0 OR
+				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
+				IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
+				'Y', 'N'
+			) as CATALOG_AVAILABLE, ".
 			" CAT_PR.WEIGHT as CATALOG_WEIGHT, ".
 			" CAT_VAT.RATE as CATALOG_VAT, ".
 			" CAT_PR.VAT_INCLUDED as CATALOG_VAT_INCLUDED, ".
@@ -494,11 +553,9 @@ class CCatalogProduct extends CAllCatalogProduct
 		$sResFrom .= " LEFT JOIN b_catalog_iblock CAT_IB ON ((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0) AND CAT_IB.IBLOCK_ID = BE.IBLOCK_ID) ";
 		$sResFrom .= " LEFT JOIN b_catalog_vat CAT_VAT ON (CAT_VAT.ID = IF((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0), CAT_IB.VAT_ID, CAT_PR.VAT_ID)) ";
 
-		if (is_array($arWhereTmp[0]))
+		if (!empty($arWhereTmp[0]) && is_array($arWhereTmp[0]))
 		{
-			foreach($arWhereTmp[0] as $k=>$v)
-				if(strlen($v)>0)
-					$sResWhere .= " AND ".$v;
+			$sResWhere .= ' AND '.implode(' AND ', $arWhereTmp[0]);
 		}
 
 		return array(
@@ -507,89 +564,6 @@ class CCatalogProduct extends CAllCatalogProduct
 			"WHERE" => $sResWhere,
 			"ORDER" => $arResOrder
 		);
-	}
-
-	
-	/**
-	 * <p>Функция по коду товара ID возвращает массив параметров товара (которые относятся к товару как к таковому)</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код товара.
-	 *
-	 *
-	 *
-	 * @return array <p>Ассоциативный массив параметров товара с ключами</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * товара.</td> </tr> <tr> <td>QUANTITY</td> <td>Количество на складе.</td> </tr> <tr>
-	 * <td>QUANTITY_TRACE</td> <td>Флаг (Y/N/D - значение берется из настроек модуля)
-	 * "уменьшать количество при оформлении заказа"</td> </tr> <tr> <td>WEIGHT</td>
-	 * <td>Вес единицы товара.</td> </tr> <tr> <td>PRICE_TYPE</td> <td>Тип цены (S -
-	 * одноразовый платеж, R - регулярные платежи, T - пробная подписка).</td>
-	 * </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип периода подписки ("H" - час, "D" - сутки, "W" -
-	 * неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год).</td> </tr> <tr>
-	 * <td>RECUR_SCHEME_LENGTH</td> <td>Длина периода подписки.</td> </tr> <tr> <td>VAT_ID</td>
-	 * <td>Идентификатор ставки НДС, привязанной к товару.</td> </tr> <tr>
-	 * <td>VAT_INCLUDED</td> <td>Включен ли НДС в цену или нет.</td> </tr> <tr> <td>TRIAL_PRICE_ID</td>
-	 * <td>Код товара, для которого данный товар является пробным.</td> </tr>
-	 * <tr> <td>WITHOUT_ORDER</td> <td>Флаг "Продление подписки без оформления
-	 * заказа".</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего изменения
-	 * записи.</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Флаг (Y/N/D - значение берется из
-	 * настроек модуля) "разрешить покупку при отсутствии товара".</td> </tr>
-	 * <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Флаг (Y/N/D - значение берется из настроек
-	 * модуля) "разрешить отрицательное количество товара".</td> </tr> </table><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ID = 5;
-	 * $ar_res = CCatalogProduct::GetByID($ID);
-	 * echo "&lt;br&gt;Товар с кодом ".$ID." имеет следующие параметры:&lt;pre&gt;";
-	 * print_r($ar_res);
-	 * echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getbyid.cc16046d.php
-	 * @author Bitrix
-	 */
-	public static function GetByID($ID)
-	{
-		global $DB;
-		global $CATALOG_PRODUCT_CACHE;
-
-		$ID = intval($ID);
-
-		if (isset($CATALOG_PRODUCT_CACHE[$ID]) && is_array($CATALOG_PRODUCT_CACHE[$ID]) && isset($CATALOG_PRODUCT_CACHE[$ID]["ID"]))
-		{
-			return $CATALOG_PRODUCT_CACHE[$ID];
-		}
-		else
-		{
-			$strSql =
-				"SELECT ID, QUANTITY, QUANTITY_RESERVED, IF (QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', QUANTITY_TRACE) as QUANTITY_TRACE, WEIGHT, PRICE_TYPE, RECUR_SCHEME_TYPE, RECUR_SCHEME_LENGTH, ".
-				"	VAT_ID, VAT_INCLUDED, ".
-				"   IF (CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAN_BUY_ZERO) as CAN_BUY_ZERO, ".
-				"   QUANTITY_TRACE as QUANTITY_TRACE_ORIG, CAN_BUY_ZERO as CAN_BUY_ZERO_ORIG, NEGATIVE_AMOUNT_TRACE as NEGATIVE_AMOUNT_TRACE_ORIG, ".
-				"   IF (NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', NEGATIVE_AMOUNT_TRACE) as NEGATIVE_AMOUNT_TRACE, ".
-				"	TRIAL_PRICE_ID, WITHOUT_ORDER, SELECT_BEST_PRICE, TMP_ID, PURCHASING_PRICE, PURCHASING_CURRENCY, BARCODE_MULTI, ".
-				"	".$DB->DateToCharFunction("TIMESTAMP_X", "FULL")." as TIMESTAMP_X ".
-				"FROM b_catalog_product WHERE ID = ".$ID;
-
-			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($res = $db_res->Fetch())
-			{
-				$CATALOG_PRODUCT_CACHE[$ID] = $res;
-				return $res;
-			}
-		}
-
-		return false;
 	}
 
 	
@@ -625,34 +599,29 @@ class CCatalogProduct extends CAllCatalogProduct
 	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
 	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
 	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
-	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
-	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле товара.<br><br>
-	 * Пример фильтра: <pre class="syntax">array("SUBSCRIPTION" =&gt; "Y")</pre> Этот фильтр
-	 * означает "выбрать все записи, в которых значение в поле SUBSCRIPTION
-	 * (флаг "Продажа контента") равно Y".<br><br> Значение по умолчанию -
-	 * пустой массив array() - означает, что результат отфильтрован не
-	 * будет.
+	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
+	 * значение поля меньше или равно передаваемой в фильтр
+	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
+	 * фильтр величины;</b></li> <li> <b>@</b> - значение поля находится в
+	 * передаваемом в фильтр разделенном запятой списке значений;</li> <li>
+	 * <b>~</b> - значение поля проверяется на соответствие передаваемому в
+	 * фильтр шаблону;</li> <li> <b>%</b> - значение поля проверяется на
+	 * соответствие передаваемой в фильтр строке в соответствии с
+	 * языком запросов.</li> </ul> В качестве "название_поляX" может стоять
+	 * любое поле товара.<br><br> Пример фильтра: <pre class="syntax">array("SUBSCRIPTION" =&gt;
+	 * "Y")</pre> Этот фильтр означает "выбрать все записи, в которых
+	 * значение в поле SUBSCRIPTION (флаг "Продажа контента") равно Y".<br><br>
+	 * Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи типов товара. Массив
-	 * имеет вид: <pre class="syntax">array("название_поля1", "группирующая_функция2"
-	 * =&gt; "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле типов товара. В качестве группирующей функции
-	 * могут стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> -
-	 * вычисление среднего значения;</li> <li> <b>MIN</b> - вычисление
-	 * минимального значения;</li> <li> <b> MAX</b> - вычисление максимального
-	 * значения;</li> <li> <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой,
-	 * то функция вернет число записей, удовлетворяющих фильтру.<br><br>
-	 * Значение по умолчанию - <i>false</i> - означает, что результат
-	 * группироваться не будет.
+	 * имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
+	 * качестве "название_поля<i>N</i>" может стоять любое поле типов
+	 * товара. <br><br> Если массив пустой, то функция вернет число записей,
+	 * удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
+	 * означает, что результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -686,12 +655,14 @@ class CCatalogProduct extends CAllCatalogProduct
 	 * периода подписки.</td> </tr> <tr> <td>TRIAL_PRICE_ID</td> <td>Код товара, для
 	 * которого данный товар является пробным.</td> </tr> <tr> <td>WITHOUT_ORDER</td>
 	 * <td>Флаг "Продление подписки без оформления заказа"</td> </tr> <tr>
-	 * <td>VAT_ID</td> <td>Идентификатор ставки НДС</td> </tr> <tr> <td>VAT_INCLUDED</td>
-	 * <td>Признак включённости НДС в цену (Y/N).</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Флаг
-	 * (Y/N/D - значение берется из настроек модуля) "разрешить покупку при
-	 * отсутствии товара".</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Флаг (Y/N/D -
-	 * значение берется из настроек модуля) "разрешить отрицательное
-	 * количество товара".</td> </tr> </table><a name="examples"></a>
+	 * <td>VAT_ID</td> <td>Идентификатор ставки НДС.</td> </tr> <tr> <td>VAT_INCLUDED</td>
+	 * <td>Признак включённости НДС в цену (Y/N).</td> </tr> <tr> <td>PURCHASING_PRICE</td>
+	 * <td>Величина закупочной цены.</td> </tr> <tr> <td>PURCHASING_CURRENCY</td> <td>Валюта
+	 * закупочной цены.</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Флаг (Y/N/D - значение
+	 * берется из настроек модуля) "разрешить покупку при отсутствии
+	 * товара".</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Флаг (Y/N/D - значение берется из
+	 * настроек модуля) "разрешить отрицательное количество товара".</td>
+	 * </tr> </table><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -727,7 +698,7 @@ class CCatalogProduct extends CAllCatalogProduct
 		{
 			$arOrder = strval($arOrder);
 			$arFilter = strval($arFilter);
-			if (strlen($arOrder) > 0 && strlen($arFilter) > 0)
+			if ('' != $arOrder && '' != $arFilter)
 				$arOrder = array($arOrder => $arFilter);
 			else
 				$arOrder = array();
@@ -739,45 +710,45 @@ class CCatalogProduct extends CAllCatalogProduct
 		}
 
 		$arFields = array(
-				"ID" => array("FIELD" => "CP.ID", "TYPE" => "int"),
-				"QUANTITY" => array("FIELD" => "CP.QUANTITY", "TYPE" => "double"),
-				"QUANTITY_RESERVED" => array("FIELD" => "CP.QUANTITY_RESERVED", "TYPE" => "double"),
-				"QUANTITY_TRACE_ORIG" => array("FIELD" => "CP.QUANTITY_TRACE", "TYPE" => "char"),
-				"CAN_BUY_ZERO_ORIG" => array("FIELD" => "CP.CAN_BUY_ZERO", "TYPE" => "char"),
-				"NEGATIVE_AMOUNT_TRACE_ORIG" => array("FIELD" => "CP.NEGATIVE_AMOUNT_TRACE", "TYPE" => "char"),
-				"QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char"),
-				"CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char"),
-				"NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char"),
-				"WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "double"),
-				"TIMESTAMP_X" => array("FIELD" => "CP.TIMESTAMP_X", "TYPE" => "datetime"),
-				"PRICE_TYPE" => array("FIELD" => "CP.PRICE_TYPE", "TYPE" => "char"),
-				"RECUR_SCHEME_TYPE" => array("FIELD" => "CP.RECUR_SCHEME_TYPE", "TYPE" => "char"),
-				"RECUR_SCHEME_LENGTH" => array("FIELD" => "CP.RECUR_SCHEME_LENGTH", "TYPE" => "int"),
-				"TRIAL_PRICE_ID" => array("FIELD" => "CP.TRIAL_PRICE_ID", "TYPE" => "int"),
-				"WITHOUT_ORDER" => array("FIELD" => "CP.WITHOUT_ORDER", "TYPE" => "char"),
-				"SELECT_BEST_PRICE" => array("FIELD" => "CP.SELECT_BEST_PRICE", "TYPE" => "char"),
-				"VAT_ID" => array("FIELD" => "CP.VAT_ID", "TYPE" => "int"),
-				"VAT_INCLUDED" => array("FIELD" => "CP.VAT_INCLUDED", "TYPE" => "char"),
-				"TMP_ID" => array("FIELD" => "CP.TMP_ID", "TYPE" => "char"),
-				"PURCHASING_PRICE" => array("FIELD" => "CP.PURCHASING_PRICE", "TYPE" => "double"),
-				"PURCHASING_CURRENCY" => array("FIELD" => "CP.PURCHASING_CURRENCY", "TYPE" => "string"),
-				"BARCODE_MULTI" => array("FIELD" => "CP.BARCODE_MULTI", "TYPE" => "char"),
-				"ELEMENT_IBLOCK_ID" => array("FIELD" => "I.IBLOCK_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
-				"ELEMENT_XML_ID" => array("FIELD" => "I.XML_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
-				"ELEMENT_NAME" => array("FIELD" => "I.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)")
-			);
+			"ID" => array("FIELD" => "CP.ID", "TYPE" => "int"),
+			"QUANTITY" => array("FIELD" => "CP.QUANTITY", "TYPE" => "double"),
+			"QUANTITY_RESERVED" => array("FIELD" => "CP.QUANTITY_RESERVED", "TYPE" => "double"),
+			"QUANTITY_TRACE_ORIG" => array("FIELD" => "CP.QUANTITY_TRACE", "TYPE" => "char"),
+			"CAN_BUY_ZERO_ORIG" => array("FIELD" => "CP.CAN_BUY_ZERO", "TYPE" => "char"),
+			"NEGATIVE_AMOUNT_TRACE_ORIG" => array("FIELD" => "CP.NEGATIVE_AMOUNT_TRACE", "TYPE" => "char"),
+			"QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char"),
+			"CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char"),
+			"NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char"),
+			"WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "double"),
+			"TIMESTAMP_X" => array("FIELD" => "CP.TIMESTAMP_X", "TYPE" => "datetime"),
+			"PRICE_TYPE" => array("FIELD" => "CP.PRICE_TYPE", "TYPE" => "char"),
+			"RECUR_SCHEME_TYPE" => array("FIELD" => "CP.RECUR_SCHEME_TYPE", "TYPE" => "char"),
+			"RECUR_SCHEME_LENGTH" => array("FIELD" => "CP.RECUR_SCHEME_LENGTH", "TYPE" => "int"),
+			"TRIAL_PRICE_ID" => array("FIELD" => "CP.TRIAL_PRICE_ID", "TYPE" => "int"),
+			"WITHOUT_ORDER" => array("FIELD" => "CP.WITHOUT_ORDER", "TYPE" => "char"),
+			"SELECT_BEST_PRICE" => array("FIELD" => "CP.SELECT_BEST_PRICE", "TYPE" => "char"),
+			"VAT_ID" => array("FIELD" => "CP.VAT_ID", "TYPE" => "int"),
+			"VAT_INCLUDED" => array("FIELD" => "CP.VAT_INCLUDED", "TYPE" => "char"),
+			"TMP_ID" => array("FIELD" => "CP.TMP_ID", "TYPE" => "char"),
+			"PURCHASING_PRICE" => array("FIELD" => "CP.PURCHASING_PRICE", "TYPE" => "double"),
+			"PURCHASING_CURRENCY" => array("FIELD" => "CP.PURCHASING_CURRENCY", "TYPE" => "string"),
+			"BARCODE_MULTI" => array("FIELD" => "CP.BARCODE_MULTI", "TYPE" => "char"),
+			"ELEMENT_IBLOCK_ID" => array("FIELD" => "I.IBLOCK_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
+			"ELEMENT_XML_ID" => array("FIELD" => "I.XML_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
+			"ELEMENT_NAME" => array("FIELD" => "I.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)")
+		);
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product CP ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product CP ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -786,21 +757,27 @@ class CCatalogProduct extends CAllCatalogProduct
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product CP ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product CP ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_product CP ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_product CP ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -820,17 +797,21 @@ class CCatalogProduct extends CAllCatalogProduct
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		return $dbRes;
 	}
 
-	// Do not use this function - it is depricated
-	public static function GetListEx($arOrder=Array("SORT"=>"ASC"), $arFilter=Array())
+/*
+* @deprecated deprecated since catalog 8.5.1
+* @see CCatalogProduct::GetList()
+*/
+	public static function GetListEx($arOrder=array("SORT"=>"ASC"), $arFilter=array())
 	{
 		return false;
 		global $DB, $USER;
@@ -922,7 +903,7 @@ class CCatalogProduct extends CAllCatalogProduct
 				"	".$strSqlSearch." ";
 		}
 
-		$arSqlOrder = Array();
+		$arSqlOrder = array();
 		foreach($arOrder as $by=>$order)
 		{
 			$by = strtoupper($by);
@@ -938,14 +919,14 @@ class CCatalogProduct extends CAllCatalogProduct
 			elseif ($by == "ACTIVE_FROM")	$arSqlOrder[] = " BE.ACTIVE_FROM ".$order." ";
 			elseif ($by == "ACTIVE_TO")	$arSqlOrder[] = " BE.ACTIVE_TO ".$order." ";
 			elseif ($by == "SORT")			$arSqlOrder[] = " BE.SORT ".$order." ";
-			elseif (substr($by, 0, 5) == "PRICE" && IntVal(substr($by, 5))<=$maxInd)
+			elseif (substr($by, 0, 5) == "PRICE" && intval(substr($by, 5))<=$maxInd)
 			{
-				$indx = IntVal(substr($by, 5));
+				$indx = intval(substr($by, 5));
 				$arSqlOrder[] = " P".$indx.".PRICE ".$order." ";
 			}
-			elseif (substr($by, 0, 8) == "CURRENCY" && IntVal(substr($by, 8))<=$maxInd)
+			elseif (substr($by, 0, 8) == "CURRENCY" && intval(substr($by, 8))<=$maxInd)
 			{
-				$indx = IntVal(substr($by, 8));
+				$indx = intval(substr($by, 8));
 				$arSqlOrder[] = " P".$indx.".CURRENCY ".$order." ";
 			}
 			else

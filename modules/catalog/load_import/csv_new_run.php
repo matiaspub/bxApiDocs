@@ -254,6 +254,13 @@ $IMAGE_RESIZE = (isset($IMAGE_RESIZE) && 'Y' == $IMAGE_RESIZE ? 'Y' : 'N');
 
 if (strlen($strImportErrorMessage) <= 0)
 {
+	$boolUseStoreControl = 'Y' == COption::GetOptionString('catalog', 'default_use_store_control', 'N');
+	$arDisableFields = array(
+		'CP_QUANTITY' => true,
+		'CP_PURCHASING_PRICE' => true,
+		'CP_PURCHASING_CURRENCY' => true,
+	);
+
 	$csvFile->SetPos($CUR_FILE_POS);
 	$arRes = $csvFile->Fetch();
 	if ($CUR_FILE_POS<=0 && $bFirstHeaderTmp)
@@ -362,6 +369,9 @@ if (strlen($strImportErrorMessage) <= 0)
 		$arAvailPriceFields_names = array();
 		for ($i = 0, $intCount = count($arAvailPriceFields), $intCount2 = count($arCatalogAvailPriceFields); $i < $intCount; $i++)
 		{
+			if ($boolUseStoreControl && array_key_exists($arAvailPriceFields[$i], $arDisableFields))
+				continue;
+
 			for ($j = 0; $j < $intCount2; $j++)
 			{
 				if ($arCatalogAvailPriceFields[$j]["value"]==$arAvailPriceFields[$i])
@@ -527,53 +537,63 @@ if (strlen($strImportErrorMessage) <= 0)
 				{
 					$LAST_GROUP_CODE = $arr["ID"];
 					$res = $bs->Update($LAST_GROUP_CODE, $arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
+					if (!$res)
+					{
+						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_UPDATE_SECT")." ".$bs->LAST_ERROR."<br>";
+					}
 				}
 				else
 				{
 					$arGroupsTmp[$i]["IBLOCK_ID"] = $IBLOCK_ID;
 					if ($arGroupsTmp[$i]["ACTIVE"]!="N") $arGroupsTmp[$i]["ACTIVE"] = "Y";
 					$LAST_GROUP_CODE = $bs->Add($arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
+					if (!$LAST_GROUP_CODE)
+					{
+						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_ADD_SECT")." ".$bs->LAST_ERROR."<br>";
+					}
 				}
 			}
 
-			$arLoadProductArray = Array(
-				"MODIFIED_BY"		=>	$USER->GetID(),
-				"IBLOCK_ID"			=>	$IBLOCK_ID,
-				"TMP_ID"				=> $tmpid
-				);
-			foreach ($arAvailProdFields_names as $key => $value)
+			if (empty($strErrorR))
 			{
-
-				$ind = -1;
-				for ($i_tmp = 0; $i_tmp < $NUM_FIELDS; $i_tmp++)
+				$arLoadProductArray = Array(
+					"MODIFIED_BY"		=>	$USER->GetID(),
+					"IBLOCK_ID"			=>	$IBLOCK_ID,
+					"TMP_ID"				=> $tmpid
+					);
+				foreach ($arAvailProdFields_names as $key => $value)
 				{
-					if (${"field_".$i_tmp} == $key)
+					$ind = -1;
+					for ($i_tmp = 0; $i_tmp < $NUM_FIELDS; $i_tmp++)
 					{
-						$ind = $i_tmp;
-						break;
+						if (${"field_".$i_tmp} == $key)
+						{
+							$ind = $i_tmp;
+							break;
+						}
+					}
+
+					if ($ind>-1)
+					{
+						$arLoadProductArray[$value["field"]] = Trim($arRes[$ind]);
 					}
 				}
 
-				if ($ind>-1)
+				$arFilter = array("IBLOCK_ID"=>$IBLOCK_ID);
+				if (strlen($arLoadProductArray["XML_ID"])>0)
 				{
-					$arLoadProductArray[$value["field"]] = Trim($arRes[$ind]);
-				}
-			}
-
-			$arFilter = array("IBLOCK_ID"=>$IBLOCK_ID);
-			if (strlen($arLoadProductArray["XML_ID"])>0)
-			{
-				$arFilter["=XML_ID"] = $arLoadProductArray["XML_ID"];
-			}
-			else
-			{
-				if (strlen($arLoadProductArray["NAME"])>0)
-				{
-					$arFilter["=NAME"] = $arLoadProductArray["NAME"];
+					$arFilter["=XML_ID"] = $arLoadProductArray["XML_ID"];
 				}
 				else
 				{
-					$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_NOIDNAME")."<br>";
+					if (strlen($arLoadProductArray["NAME"])>0)
+					{
+						$arFilter["=NAME"] = $arLoadProductArray["NAME"];
+					}
+					else
+					{
+						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_NOIDNAME")."<br>";
+					}
 				}
 			}
 
@@ -635,7 +655,13 @@ if (strlen($strImportErrorMessage) <= 0)
 					}
 				}
 
-				$res = CIBlockElement::GetList(Array(), $arFilter);
+				$res = CIBlockElement::GetList(
+					array(),
+					$arFilter,
+					false,
+					false,
+					array('ID', 'PREVIEW_PICTURE', 'DETAIL_PICTURE')
+				);
 				if ($arr = $res->Fetch())
 				{
 					$PRODUCT_ID = $arr["ID"];
@@ -702,10 +728,10 @@ if (strlen($strImportErrorMessage) <= 0)
 							if ($arIBlockProperty[$cur_prop_id]["PROPERTY_TYPE"]=="L")
 							{
 								$res2 = CIBlockProperty::GetPropertyEnum(
-										$cur_prop_id,
-										array(),
-										array("IBLOCK_ID" => $IBLOCK_ID, "VALUE" => Trim($arRes[$i]))
-									);
+									$cur_prop_id,
+									array(),
+									array("IBLOCK_ID" => $IBLOCK_ID, "VALUE" => Trim($arRes[$i]))
+								);
 								if ($arRes2 = $res2->Fetch())
 								{
 									$arRes[$i] = $arRes2["ID"];
@@ -713,12 +739,12 @@ if (strlen($strImportErrorMessage) <= 0)
 								else
 								{
 									$arRes[$i] = CIBlockPropertyEnum::Add(
-											array(
-													"PROPERTY_ID" => $cur_prop_id,
-													"VALUE" => Trim($arRes[$i]),
-													"TMP_ID" => $tmpid
-												)
-										);
+										array(
+											"PROPERTY_ID" => $cur_prop_id,
+											"VALUE" => Trim($arRes[$i]),
+											"TMP_ID" => $tmpid
+										)
+									);
 								}
 							}
 							elseif ($arIBlockProperty[$cur_prop_id]["PROPERTY_TYPE"]=="F")
@@ -867,7 +893,9 @@ if (strlen($strImportErrorMessage) <= 0)
 	{
 		$res = CIBlockSection::GetList(
 			array(),
-			array("IBLOCK_ID" => $IBLOCK_ID, "TMP_ID" => $tmpid, "ACTIVE" => "N")
+			array("IBLOCK_ID" => $IBLOCK_ID, "TMP_ID" => $tmpid, "ACTIVE" => "N"),
+			false,
+			array('ID', 'NAME')
 		);
 		while($arr = $res->Fetch())
 		{
@@ -881,11 +909,14 @@ if (strlen($strImportErrorMessage) <= 0)
 	{
 		$res = CIBlockElement::GetList(
 			array(),
-			array("IBLOCK_ID" => $IBLOCK_ID, "TMP_ID" => $tmpid, "ACTIVE" => "N")
+			array("IBLOCK_ID" => $IBLOCK_ID, "TMP_ID" => $tmpid, "ACTIVE" => "N"),
+			false,
+			false,
+			array('ID')
 		);
 		while($arr = $res->Fetch())
 		{
-			$el->Update($arr["ID"], Array("ACTIVE" => "Y"));
+			$el->Update($arr["ID"], array("ACTIVE" => "Y"));
 
 			if (!($bAllLinesLoaded = CSVCheckTimeout($max_execution_time))) break;
 		}
@@ -896,7 +927,9 @@ if (strlen($strImportErrorMessage) <= 0)
 	{
 		$res = CIBlockSection::GetList(
 			array(),
-			array("IBLOCK_ID" => $IBLOCK_ID, "!TMP_ID" => $tmpid)
+			array("IBLOCK_ID" => $IBLOCK_ID, "!TMP_ID" => $tmpid),
+			false,
+			array('ID', 'NAME')
 		);
 
 		while($arr = $res->Fetch())
@@ -911,7 +944,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			else // H or M
 			{
 				$bDeactivationStarted = true;
-				$bs->Update($arr["ID"], Array("NAME"=>$arr["NAME"], "ACTIVE" => "N", "TMP_ID" => $tmpid));
+				$bs->Update($arr["ID"], array("NAME"=>$arr["NAME"], "ACTIVE" => "N", "TMP_ID" => $tmpid));
 			}
 
 			if (!($bAllLinesLoaded = CSVCheckTimeout($max_execution_time))) break;
@@ -929,7 +962,10 @@ if (strlen($strImportErrorMessage) <= 0)
 		);
 		$res = CIBlockElement::GetList(
 			array(),
-			array("IBLOCK_ID" => $IBLOCK_ID, "!TMP_ID" => $tmpid)
+			array("IBLOCK_ID" => $IBLOCK_ID, "!TMP_ID" => $tmpid),
+			false,
+			false,
+			array('ID')
 		);
 		while($arr = $res->Fetch())
 		{
@@ -950,7 +986,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			else // H
 			{
 				$bDeactivationStarted = true;
-				$el->Update($arr["ID"], Array("ACTIVE" => "N", "TMP_ID" => $tmpid));
+				$el->Update($arr["ID"], array("ACTIVE" => "N", "TMP_ID" => $tmpid));
 				$killed_lines++;
 			}
 

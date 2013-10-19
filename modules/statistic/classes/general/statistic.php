@@ -1132,7 +1132,7 @@ class CAllStatistics extends CKeepStatistics
 	 *
 	 *
 	 *
-	 * @param string $date = "" Дата в <a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#format_date">формате
+	 * @param string $date = "" Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_date">формате
 	 * текущего сайта</a> (или языка) до которой (включительно) необходимо
 	 * очистить статистику. Если в данном параметре не указать дату, то
 	 * будут очищены все накопленные данные статистики.

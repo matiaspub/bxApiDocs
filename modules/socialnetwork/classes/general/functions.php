@@ -73,7 +73,7 @@ class CSocNetTextParser
 				}
 			}
 
-			function sonet_sortlen($a, $b) {
+			public function sonet_sortlen($a, $b) {
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"])) {
 					return 0;
 				}

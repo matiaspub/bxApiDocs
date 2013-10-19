@@ -39,7 +39,7 @@ class CSecuritySessionDB
 			return "";
 
 		if(!CSecurityDB::Lock($id, 60/*TODO: timelimit from php.ini?*/))
-			die('Unable to get session lock within 60 seconds.');
+			CSecuritySession::triggerFatalError('Unable to get session lock within 60 seconds.');
 
 		$rs = CSecurityDB::Query("
 			select SESSION_DATA

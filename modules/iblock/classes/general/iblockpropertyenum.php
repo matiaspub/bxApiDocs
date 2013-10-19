@@ -60,7 +60,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -71,8 +71,8 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля варианта значений
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля варианта значений
 	 * свойства типа "список"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -194,7 +194,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 * @param array $fields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
 	 * значения свойства.
 	 *
 	 *
@@ -216,8 +216,8 @@ class CIBlockPropertyEnum
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/update.php">CIBlockPropertyEnum::Update</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">Поля вариантов
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php">CIBlockPropertyEnum::Update</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
 	 * значения свойств типа "список" </a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -267,7 +267,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
 	 * значения свойства.
 	 *
 	 *
@@ -288,8 +288,8 @@ class CIBlockPropertyEnum
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/add.php">CIBlockPropertyEnum::Add</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">Поля свойства</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php">CIBlockPropertyEnum::Add</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля свойства</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -376,7 +376,7 @@ class CIBlockPropertyEnum
 
 	
 	/**
-	 * <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта значения свойства типа "список".Или false если такой вариант отсутствует. <br></p>
+	 * <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта значения свойства типа "список".Или false если такой вариант отсутствует. <br></p>
 	 *
 	 *
 	 *
@@ -389,7 +389,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fpropertyenum">Поля вариантов
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
 	 * значения свойств типа "список" </a> </li> </ul><br>
 	 *
 	 *

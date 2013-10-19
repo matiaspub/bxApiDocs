@@ -40,7 +40,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	 *
 	 *
 	 * @return int <p>Возвращается код добавленной ставки налога или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__add.40a40d86.php

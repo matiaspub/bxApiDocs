@@ -162,7 +162,6 @@ class CAllClusterDBNode
 		$rsOfflineNodes = CClusterDBNode::GetList(array(), array("=STATUS" => "OFFLINE"), array("ID"));
 		if($arNode = $rsOfflineNodes->Fetch())
 		{
-			$i++;
 			ob_start();
 			$nodeDB = CDatabase::GetDBNodeConnection($arNode["ID"], true, false);
 			ob_end_clean();
@@ -171,6 +170,7 @@ class CAllClusterDBNode
 
 			return "CClusterDBNode::BringOnline();";
 		}
+		return "";
 	}
 
 	public static function GetList($arOrder=false, $arFilter=false, $arSelect=false)

@@ -20,6 +20,31 @@ class CAllCatalogDiscountCoupon
 	const TYPE_ONE_ORDER = 'O';
 	const TYPE_NO_LIMIT = 'N';
 
+	protected static $arOneOrderCoupons = array();
+
+	
+	/**
+	 * <p>Возвращает массив имеющихся на сайте типов купонов.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param boolean $boolFull = false Параметр определяет в каком виде возвращать массив типов
+	 * купонов: в кратком (<i>false</i>) или в развернутом (<i>true</i>).
+	 *
+	 *
+	 *
+	 * @return array <p>Возвращает массив типов купонов:</p><ul> <li>если <b>$boolFull == false</b>, то
+	 * вернется массив, содержащий типы купонов в качестве элементов
+	 * массива;<br><br> </li> <li>если <b>$boolFull == true</b>, типы купонов будут ключами
+	 * массива, а значениями - названия типов: <ul> [Y] =&gt; Купон на одну
+	 * позицию заказа <br> [O] =&gt; Купон на один заказ <br> [N] =&gt; Многоразовый
+	 * купон</ul> </li> </ul><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getcouponttypes.php
+	 * @author Bitrix
+	 */
 	static public function GetCoupontTypes($boolFull = false)
 	{
 		$boolFull = (true == $boolFull);
@@ -38,6 +63,68 @@ class CAllCatalogDiscountCoupon
 		);
 	}
 
+	
+	/**
+	 * <p>Метод служит для проверки (и корректировки, если это возможно) параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php">CCatalogDiscountCoupon::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $ACTION  указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>;</li>
+	 * <li> <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php">CCatalogDiscountCoupon::Update</a>.</li>
+	 * </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров купона. Массив передается по
+	 * ссылке и его значения могут быть изменены функцией. <br> Допустимые
+	 * ключи: <ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки;</li> <li> <b>ACTIVE</b> - флаг
+	 * активности купона (Y/N);</li> <li> <b>ONE_TIME</b> - флаг однократного
+	 * использования купона (Y|N);</li> <li> <b>COUPON</b> - код купона;</li> <li>
+	 * <b>DATE_APPLY</b> - дата применения купона;</li> <li> <b>DESCRIPTION</b> -
+	 * комментарий.</li> </ul>
+	 *
+	 *
+	 *
+	 * @param int $ID = 0 код (ID) купона (только для CCatalogDiscountCoupon::Update).
+	 *
+	 *
+	 *
+	 * @return boolean <p> В случае корректности переданных параметров возвращает true,
+	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	 * можно получить текст ошибок.</p><p><b>Обязательные проверки</b></p><ul>
+	 * <li>для <b>CCatalogDiscountCoupon::Add</b> <ul> <li>поле DISCOUNT_ID присутствует и содержит
+	 * код (ID) существующей скидки;</li> <li>если поле ACTIVE не существует или
+	 * не равно N, ему присваивается значение Y;</li> <li>если поле ONE_TIME не
+	 * существует или не равно N, ему присваивается значение Y;</li> <li>поле
+	 * COUPON существует и содержит уникальный код, отсутствующий в списке
+	 * купонов;</li> <li>если поле DATE_APPLY не существует или не содержит
+	 * корректную дату, ему присваивается значение false.</li> </ul> <br> </li>
+	 * <li>для <b>CCatalogDiscountCoupon::Update</b> <ul> <li>если поле DISCOUNT_ID присутствует, оно
+	 * должно содержать код (ID) существующей скидки;</li> <li>если поле ACTIVE
+	 * существует и не равно N, ему присваивается значение Y;</li> <li>если
+	 * поле ONE_TIME существует и не равно N, ему присваивается значение Y;</li>
+	 * <li>если поле COUPON существует, оно содержит уникальный код, заданный
+	 * только для этого купона (с таким ID);</li> <li>если поле DATE_APPLY
+	 * существует и содержит некорректную дату, ему присваивается
+	 * значение false.</li> </ul> </li> </ul>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php">CCatalogDiscountCoupon::Update</a></li>
+	 * </ul><br><br>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php
+	 * @author Bitrix
+	 */
 	static public function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $DB;

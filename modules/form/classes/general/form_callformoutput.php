@@ -5,7 +5,7 @@
  */
 
 /**
- * <p>Если не предполагается использование страниц редактирования результата формы или просмотра списка результатов, то имеет смысл вставить в шаблон ответ веб-формы в обход основного шаблона:</p> <pre class="syntax" id="xmp4A9A280C"><buttononclick> &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt; &lt;?if($FORM-&gt;isFormNote()):?&gt; &lt;?=$FORM-&gt;ShowFormNote()?&gt; &lt;?else:?&gt; &lt;!-- здесь остальной шаблон веб-формы --&gt; &lt;?endif?&gt; </buttononclick></pre>
+ * <p>Если не предполагается использование страниц редактирования результата формы или просмотра списка результатов, то имеет смысл вставить в шаблон ответ веб-формы в обход основного шаблона:</p> <pre class="syntax" id="xmp4A9A280C"><buttononclick> &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt; &lt;?if($FORM-&gt;isFormNote()):?&gt; &lt;?=$FORM-&gt;ShowFormNote()?&gt; &lt;?else:?&gt; &lt;!-- здесь остальной шаблон веб-формы --&gt; &lt;?endif?&gt; </buttononclick></pre> <br><br>
  *
  *
  *
@@ -312,12 +312,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformerrors.php
@@ -350,12 +350,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformerrors.php">CFormOutput::isFormErrors</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformerrors.php">CFormOutput::isFormErrors</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrors.php
@@ -396,12 +396,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
+	 * <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a> </li>
-	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformerrors.php">CFormOutput::isFormErrors</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a>
+	 * </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformerrors.php">CFormOutput::isFormErrors</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrorstext.php
@@ -434,11 +434,11 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformnotetext.php">CFormOutput::ShowFormNoteText</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformnote.php">CFormOutput::isFormNote</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnotetext.php">CFormOutput::ShowFormNoteText</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformnote.php">CFormOutput::isFormNote</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnote.php
@@ -472,11 +472,11 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformnote.php">CFormOutput::ShowFormNoteText</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformnote.php">CFormOutput::isFormNote</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnote.php">CFormOutput::ShowFormNoteText</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformnote.php">CFormOutput::isFormNote</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnotetext.php
@@ -500,14 +500,31 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * @return bool <p><i>true</i>, если у есть текстовые заметки. <i>false</i> в противном
-	 * случае.</p><a name="examples"></a><h4>Использование</h4><pre
-	 * class="syntax">&lt;?if($FORM-&gt;isFormNote()):?&gt;Ответ: &lt;?=$FORM-&gt;ShowFormNote()?&gt;&lt;?endif?&gt;
+	 * случае.</p><a name="examples"></a>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?if($FORM-&gt;isFormNote()):?&gt;Ответ: &lt;?=$FORM-&gt;ShowFormNote()?&gt;&lt;?endif?&gt;
+	 * 
+	 * \\ способ проверить, отправлена ли форма, а затем вывести сообщение об успешной отправке
+	 * &lt;? if($FORM-&gt;isFormNote()) //т.е. если сообщение есть, значит нужно его показать, т.е. форма отправлена
+	 * {
+	 * $FORM-&gt;ShowFormNote();?&gt; //выводим сообщение "Ваша заявка успешно отправлена"
+	 *  }
+	 * else //в противном случает выводим саму форму для заполнения
+	 * {
+	 * 
+	 * шаблон формы
+	 * ;}
+	 * ?&gt;
 	 * </pre>
 	 *
 	 *
+	 *
 	 * <h4>See Also</h4> 
-	 * <p><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a><br><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformnote.php">CFormOutput::ShowFormNote</a></p>
+	 * <p><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a><br><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformnote.php">CFormOutput::ShowFormNote</a></p>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformnote.php
@@ -541,12 +558,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrors.php">CFormOutput::ShowFormErrors</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformerrorstext.php">CFormOutput::ShowFormErrorsText</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showerrormsg.php
@@ -577,10 +594,10 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformfooter.php">CFormOutput::ShowFormFooter</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformfooter.php">CFormOutput::ShowFormFooter</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformheader.php
@@ -635,10 +652,10 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
+	 * <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
 	 * </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformheader.php">CFormOutput::ShowFormHeader</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformheader.php">CFormOutput::ShowFormHeader</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @static
@@ -753,11 +770,11 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php
@@ -902,13 +919,13 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isinputcaptionimage.php">CFormOutput::isInputCaptionImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isinputcaptionimage.php">CFormOutput::isInputCaptionImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaptionimage.php
@@ -971,13 +988,13 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isinputcaptionimage.php
@@ -1021,12 +1038,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaptionimage.php">CFormOutput::ShowInputCaptionImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php
@@ -1340,14 +1357,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
+	 * <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a> </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a> </li> <li>
 	 * <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a>
 	 * </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php
@@ -1377,13 +1394,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php
@@ -1416,13 +1434,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptcha.php">CFormOutput::ShowCaptcha</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php
@@ -1452,14 +1471,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptcha.php
@@ -1504,12 +1523,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showapplybutton.php">CFormOutput::ShowApplyButton</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showapplybutton.php">CFormOutput::ShowApplyButton</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showresetbutton.php">CFormOutput::ShowResetButton</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showresetbutton.php">CFormOutput::ShowResetButton</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showsubmitbutton.php
@@ -1555,12 +1574,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showresetbutton.php">CFormOutput::ShowResetButton</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showresetbutton.php">CFormOutput::ShowResetButton</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showsubmitbutton.php">CFormOutput::ShowSubmitButton</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showsubmitbutton.php">CFormOutput::ShowSubmitButton</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showapplybutton.php
@@ -1606,12 +1625,12 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showapplybutton.php">CFormOutput::ShowApplyButton</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showapplybutton.php">CFormOutput::ShowApplyButton</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showsubmitbutton.php">CFormOutput::ShowSubmitButton</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showsubmitbutton.php">CFormOutput::ShowSubmitButton</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @static
@@ -1630,6 +1649,42 @@ class CAllFormOutput extends CFormOutput_old
 	 * Use: <?=$FORM->ShowFormDescription()?>
 	 *
 	 * @return string
+	 */
+	
+	/**
+	 * <p>Вывод описательного текста формы</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param  $string  CSS-класс который нужно применить к выводимому тексту.
+	 * Необязательный параметр. Если для описания формы выставлено
+	 * значение "HTML", то параметр игнорируется.
+	 *
+	 *
+	 *
+	 * @param CSSClas $s = "" 
+	 *
+	 *
+	 *
+	 * @return string <p>Возвращает описательный текст формы</p><a
+	 * name="examples"></a><h4>Использование</h4><pre class="syntax">
+	 * &lt;?=$FORM-&gt;ShowFormDescription("form-description-text")?&gt; </pre>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformtitle.php">CFormOutput::ShowFormTitle</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformimage.php">CFormOutput::ShowFormImage</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformdescription.php">CFormOutput::isFormDescription</a></li>
+	 * </menu><br><br>
+	 *
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformdescription.php
+	 * @author Bitrix
 	 */
 	public function ShowFormDescription($css_style = "")
 	{
@@ -1659,8 +1714,8 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <p><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a><br><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></p>
+	 * <p><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a><br><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></p><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformdescription.php
@@ -1750,13 +1805,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformtitle.php">CFormOutput::ShowFormTitle</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformimage.php">CFormOutput::isFormImage</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformtitle.php">CFormOutput::ShowFormTitle</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformimage.php">CFormOutput::isFormImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformimage.php
@@ -1810,10 +1866,10 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformimage.php">CFormOutput::ShowFormImage</a></li>
-	 * </menu>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformimage.php">CFormOutput::ShowFormImage</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformimage.php
@@ -1851,13 +1907,14 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformdescription.php">CFormOutput::ShowFormDescription</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformimage.php">CFormOutput::ShowFormImage</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/isformtitle.php">CFormOutput::isFormTitle</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformimage.php">CFormOutput::ShowFormImage</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformtitle.php">CFormOutput::isFormTitle</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformtitle.php
@@ -1890,10 +1947,10 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showformtitle.php">CFormOutput::ShowFormTitle</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showformtitle.php">CFormOutput::ShowFormTitle</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isformtitle.php
@@ -1958,7 +2015,7 @@ class CAllFormOutput extends CFormOutput_old
 	 */
 	
 	/**
-	 * <p>Вывод пометки "обязательное поле" - <span style="font-family: Verdana, Arial, Helvetica, sans-serif; color:red; font-size:12px; ">*</span>. При выводе подписи к полю посредством <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a> пометка вставаляется автоматически.</p>
+	 * <p>Вывод пометки "обязательное поле" - <span style="font-family: Verdana, Arial, Helvetica, sans-serif; color:red; font-size:12px; ">*</span>. При выводе подписи к полю посредством <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a> пометка вставаляется автоматически.</p>
 	 *
 	 *
 	 *
@@ -1970,11 +2027,11 @@ class CAllFormOutput extends CFormOutput_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <menu> <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li>
+	 * <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinput.php">CFormOutput::ShowInput</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
-	 * </menu>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a></li>
+	 * </menu><br><br>
 	 *
 	 *
 	 * @static

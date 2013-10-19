@@ -49,12 +49,12 @@ class CForumUser extends CAllForumUser
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -564,43 +564,8 @@ class CForumUser extends CAllForumUser
 		$template = $DB->ForSql(str_replace("*", "%", $template));
 		$arAddParams = (is_array($arAddParams) ? $arAddParams : array($arAddParams));
 		$arAddParams["sNameTemplate"] = (is_set($arAddParams, "nameTemplate") ? $arAddParams["nameTemplate"] : $arAddParams["sNameTemplate"]);
-		$strSql =
-			"SELECT U.ID, U.NAME, U.SECOND_NAME, U.LAST_NAME, U.LOGIN, F.SHOW_NAME,
-				CASE
-					WHEN (F.SHOW_NAME = 'Y' AND LENGTH(TRIM(CONCAT_WS('',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."))) > 0)
-					THEN TRIM(REPLACE(CONCAT_WS(' ',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."), '  ', ' '))
-					ELSE U.LOGIN
-				END AS SHOW_ABC
-			FROM b_user U
-				LEFT JOIN b_forum_user F ON (F.USER_ID = U.ID)
-			WHERE ";
-		if (substr($template, 0, 1) == '%')
-			$strSql .=
-			"(
-				(
-					F.SHOW_NAME = 'Y'
-					AND
-					LENGTH(TRIM(CONCAT_WS('',U.NAME,U.LAST_NAME))) > 0
-					AND
-					REPLACE(CONCAT_WS(' ',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."), '  ', ' ') LIKE '".$template."'
-				)
-				OR
-				(
-					(
-						F.SHOW_NAME = 'N' OR F.SHOW_NAME = '' OR (F.SHOW_NAME IS NULL)
-						OR
-						(
-							F.SHOW_NAME = 'Y'
-							AND
-							LENGTH(TRIM(CONCAT_WS('',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."))) <= 0
-						)
-					)
-					AND
-					U.LOGIN LIKE '".$template."'
-				)
-			)";
-		else 
-			$strSql .=
+
+		$strSqlSearch =
 			"(
 				F.SHOW_NAME = 'Y' AND LENGTH(U.NAME) > 0 AND U.NAME LIKE '".$template."'
 			)
@@ -624,9 +589,62 @@ class CForumUser extends CAllForumUser
 				AND
 				U.LOGIN LIKE '".$template."'
 			)";
-		$strSql .= "ORDER BY SHOW_ABC";
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $dbRes;
+		if (substr($template, 0, 1) == '%')
+			$strSqlSearch =
+			"(
+				(
+					F.SHOW_NAME = 'Y'
+					AND
+					LENGTH(TRIM(CONCAT_WS('',U.NAME,U.LAST_NAME))) > 0
+					AND
+					REPLACE(CONCAT_WS(' ',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."), '  ', ' ') LIKE '".$template."'
+				)
+				OR
+				(
+					(
+						F.SHOW_NAME = 'N' OR F.SHOW_NAME = '' OR (F.SHOW_NAME IS NULL)
+						OR
+						(
+							F.SHOW_NAME = 'Y'
+							AND
+							LENGTH(TRIM(CONCAT_WS('',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."))) <= 0
+						)
+					)
+					AND
+					U.LOGIN LIKE '".$template."'
+				)
+			)";
+
+		$iCnt = 0;
+		if ($arAddParams["bCount"] || is_set($arAddParams, "bDescPageNumbering"))
+		{
+			$strSql = "SELECT COUNT(U.ID) AS CNT FROM b_user U LEFT JOIN b_forum_user F ON (F.USER_ID = U.ID) WHERE ".$strSqlSearch;
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$iCnt = ($db_res && ($res = $db_res->Fetch()) ? intval($res["CNT"]) : 0);
+			if ($arAddParams["bCount"])
+				return $iCnt;
+		}
+
+		$strSql =
+			"SELECT U.ID, U.NAME, U.SECOND_NAME, U.LAST_NAME, U.LOGIN, F.SHOW_NAME,
+				CASE
+					WHEN (F.SHOW_NAME = 'Y' AND LENGTH(TRIM(CONCAT_WS('',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."))) > 0)
+					THEN TRIM(REPLACE(CONCAT_WS(' ',".self::GetNameFieldsForQuery($arAddParams["sNameTemplate"])."), '  ', ' '))
+					ELSE U.LOGIN
+				END AS SHOW_ABC
+			FROM b_user U
+				LEFT JOIN b_forum_user F ON (F.USER_ID = U.ID)
+			WHERE ".$strSqlSearch."\n"."ORDER BY SHOW_ABC";
+		if (is_set($arAddParams, "bDescPageNumbering")) {
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
+		} else {
+			if ($arAddParams["nTopCount"] > 0)
+				$strSql .= " LIMIT 0,".$arAddParams["nTopCount"];
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+
+		return $db_res;
 	}
 
 	/**
@@ -637,37 +655,46 @@ class CForumUser extends CAllForumUser
 	*/
 	public static function GetNameFieldsForQuery($sNameTemplate, $userTablePrefix = "U.")
 	{
+		global $DB;
 		$sNameTemplate = (empty($sNameTemplate) ? CSite::GetDefaultNameFormat() : $sNameTemplate);
+		if (!preg_match("/(#NAME#)|(#LAST_NAME#\,)|(#LAST_NAME#)|(#SECOND_NAME#)|(#NAME_SHORT#)|(#SECOND_NAME_SHORT#)/".BX_UTF_PCRE_MODIFIER, $sNameTemplate, $matches))
+			$sNameTemplate = CSite::GetDefaultNameFormat();
+		if (strpos($sNameTemplate, "#NOBR#") !== false)
+			$sNameTemplate = preg_replace("/\#NOBR\#(.+?)\#\/NOBR\#/".BX_UTF_PCRE_MODIFIER, "\\1", $sNameTemplate);
 
-		//make sure the data is safe
-		if (!preg_match_all("/(#NAME#)|(#LAST_NAME#)|(#SECOND_NAME#)|(#NAME_SHORT#)|(#SECOND_NAME_SHORT#)|\s|\,/".BX_UTF_PCRE_MODIFIER, $sNameTemplate, $matches))
-			preg_match_all("/(#NAME#)|(#LAST_NAME#)|(#SECOND_NAME#)|(#NAME_SHORT#)|(#SECOND_NAME_SHORT#)|\s|\,/".BX_UTF_PCRE_MODIFIER, CSite::GetDefaultNameFormat(), $matches);
+		preg_match_all("/(#NAME#)|(#LAST_NAME#\,)|(#LAST_NAME#)|(#SECOND_NAME#)|(#NAME_SHORT#)|(#SECOND_NAME_SHORT#)/".BX_UTF_PCRE_MODIFIER, $sNameTemplate, $matches);
 
-		// Switching spaces to *** is necessary to save original spaces
-		$res = str_replace(
-			array(
-				" ",
-				"#NAME#",
-				"#LAST_NAME#,",
-				"#LAST_NAME#",
-				"#SECOND_NAME#",
-				"#NAME_SHORT#",
-				"#SECOND_NAME_SHORT#",
-				"***"
-			),
-			array(
-				"***",
-				$userTablePrefix."NAME",
-				"IF (LENGTH(TRIM(".$userTablePrefix."LAST_NAME)) <= 0, '', CONCAT(".$userTablePrefix."LAST_NAME, ','))",
-				$userTablePrefix."LAST_NAME",
-				$userTablePrefix."SECOND_NAME", 
-				"IF (LENGTH(TRIM(".$userTablePrefix."NAME)) <= 0,'',CONCAT(SUBSTRING(".$userTablePrefix."NAME,1,1),'.'))", 
-				"IF (LENGTH(TRIM(".$userTablePrefix."SECOND_NAME)) <= 0,'',CONCAT(SUBSTRING(".$userTablePrefix."SECOND_NAME,1,1),'.'))",
-				","
-			),
-			implode("", $matches[0])
-		);
-		return $res;
+		$tmp = array();
+		foreach($matches[0] as $val) {
+			$pos = strpos($sNameTemplate, $val);
+			if ($pos > 0) {
+				$tmp[] = "'".$DB->ForSql(substr($sNameTemplate, 0, $pos))."'";
+			}
+			$tmp[] = str_replace(
+				array(
+					"#NAME#",
+					"#LAST_NAME#,",
+					"#LAST_NAME#",
+					"#SECOND_NAME#",
+					"#NAME_SHORT#",
+					"#SECOND_NAME_SHORT#"
+				),
+				array(
+					$userTablePrefix."NAME",
+					"IF (LENGTH(TRIM(".$userTablePrefix."LAST_NAME)) <= 0, '', CONCAT(".$userTablePrefix."LAST_NAME, ','))",
+					$userTablePrefix."LAST_NAME",
+					$userTablePrefix."SECOND_NAME",
+					"IF (LENGTH(TRIM(".$userTablePrefix."NAME)) <= 0,'',CONCAT(SUBSTRING(".$userTablePrefix."NAME,1,1),'.'))",
+					"IF (LENGTH(TRIM(".$userTablePrefix."SECOND_NAME)) <= 0,'',CONCAT(SUBSTRING(".$userTablePrefix."SECOND_NAME,1,1),'.'))"
+				),
+				$val
+			);
+			$sNameTemplate = substr($sNameTemplate, ($pos + strlen($val)));
+		}
+		if (!empty($sNameTemplate))
+			$tmp[] = "'".$DB->ForSql($sNameTemplate)."'";
+		$res = implode(",", $tmp);
+		return (!empty($res) ? $res : "''");
 	}
 
 	public static function GetFormattedNameFieldsForSelect($arParams = array(), $bReturnAll = true)

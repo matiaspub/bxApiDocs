@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * 
+ * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть».
  *
  *
  *
@@ -331,7 +331,8 @@ class CWikiSocnet
 			'EVENT' => $arFields,
 			'CREATED_BY' => array(),
 			'ENTITY' => array(),
-			'EVENT_FORMATTED' => array()
+			'EVENT_FORMATTED' => array(),
+			"CACHED_CSS_PATH" => array("/bitrix/themes/.default/wiki_sonet_log.css")
 		);
 
 		$arResult['CREATED_BY'] = CSocNetLogTools::FormatEvent_GetCreatedBy($arFields, $arParams, $bMail);
@@ -423,17 +424,15 @@ class CWikiSocnet
 		}
 		else
 		{
-
-
 			$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
 
 			//$arAllow = array("HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "Y", "MULTIPLE_BR" => "Y", "VIDEO" => "Y", "LOG_VIDEO" => "N");
 			//$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
 
-
 			if ($arParams["MOBILE"] != "Y")
 			{
 				$GLOBALS['APPLICATION']->SetAdditionalCSS('/bitrix/components/bitrix/wiki.show/templates/.default/style.css');
+				$arResult["CACHED_CSS_PATH"][] = "/bitrix/components/bitrix/wiki.show/templates/.default/style.css";
 
 				if($arParams["NEW_TEMPLATE"] != "Y")
 				{
@@ -539,12 +538,15 @@ class CWikiSocnet
 		if (!CModule::IncludeModule('socialnetwork'))
 			return false;
 
+		$ufFileID = array();
+		$ufDocID = array();
+
 		$dbResult = CSocNetLog::GetList(
 			array('ID' => 'DESC'),
 			array('TMP_ID' => $arFields['LOG_ID']),
 			false,
 			false,
-			array('ID', 'SOURCE_ID', 'PARAMS')
+			array('ID', 'SOURCE_ID', 'PARAMS', 'URL')
 		);
 
 		$bFound = false;
@@ -609,12 +611,92 @@ class CWikiSocnet
 						'USE_SMILES' => 'Y',
 						'PARAM2' => $arElement['ID']
 					);
+
+					$GLOBALS["USER_FIELD_MANAGER"]->EditFormAddFields("SONET_COMMENT", $arTmp);
+					if (is_array($arTmp))
+					{
+						if (array_key_exists("UF_SONET_COM_DOC", $arTmp))
+							$GLOBALS["UF_FORUM_MESSAGE_DOC"] = $arTmp["UF_SONET_COM_DOC"];
+						elseif (array_key_exists("UF_SONET_COM_FILE", $arTmp))
+						{
+							$arFieldsMessage["FILES"] = array();
+							foreach($arTmp["UF_SONET_COM_FILE"] as $file_id)
+								$arFieldsMessage["FILES"][] = array("FILE_ID" => $file_id);
+						}
+					}
+
 					$messageID = ForumAddMessage('REPLY', $FORUM_ID, $TOPIC_ID, 0, $arFieldsMessage, $sError, $sNote);
 
 					if (!$messageID)
 						$strError = GetMessage('SONET_ADD_COMMENT_SOURCE_ERROR');
 					else
+					{
+						$dbAddedMessageFiles = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => $messageID));
+						while ($arAddedMessageFiles = $dbAddedMessageFiles->Fetch())
+							$ufFileID[] = $arAddedMessageFiles["FILE_ID"];
+
+						$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $messageID, LANGUAGE_ID);
+					
 						CSocNetLogTools::AddComment_Review_UpdateElement($arElement, $TOPIC_ID, $bNewTopic);
+
+						$userID = $GLOBALS["USER"]->GetID();
+
+						if (
+							CModule::IncludeModule("im")
+							&& intval($arElement["CREATED_BY"]) > 0
+							&& $arElement["CREATED_BY"] != $userID
+						)
+						{
+							$rsUnFollower = CSocNetLogFollow::GetList(
+								array(
+									"USER_ID" => $arElement["CREATED_BY"],
+									"CODE" => "L".$arLog["ID"],
+									"TYPE" => "N"
+								),
+								array("USER_ID")
+							);
+
+							$arUnFollower = $rsUnFollower->Fetch();
+							if (!$arUnFollower)
+							{
+								$arMessageFields = array(
+									"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+									"TO_USER_ID" => $arElement["CREATED_BY"],
+									"FROM_USER_ID" => $userID,
+									"LOG_ID" => $arLog["ID"],
+									"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+									"NOTIFY_MODULE" => "wiki",
+									"NOTIFY_EVENT" => "comment",
+								);
+
+								$arParams["TITLE"] = str_replace(Array("\r\n", "\n"), " ", $arElement["NAME"]);
+								$arParams["TITLE"] = TruncateText($arParams["TITLE"], 100);
+								$arParams["TITLE_OUT"] = TruncateText($arParams["TITLE"], 255);
+
+								$arTmp = CWikiSocnet::__ProcessPath(array("ELEMENT_URL" => $arLog["URL"]), $arElement["CREATED_BY"]);
+								$serverName = $arTmp["SERVER_NAME"];
+								$url = $arTmp["URLS"]["ELEMENT_URL"];
+
+								$arMessageFields["NOTIFY_TAG"] = "WIKI|COMMENT|".$arElement['ID'];
+								$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("WIKI_SONET_FROM_LOG_IM_COMMENT", Array(
+									"#title#" => (
+										strlen($url) > 0 
+											? "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+											: htmlspecialcharsbx($arParams["TITLE"])
+									)
+								));
+
+								$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("WIKI_SONET_FROM_LOG_IM_COMMENT", Array(
+									"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+								)).(strlen($url) > 0 
+									? " (".$serverName.$url.")"
+									: ""
+								);
+
+								CIMNotify::Add($arMessageFields);
+							}
+						}
+					}
 				}
 				else
 					$strError = GetMessage('SONET_ADD_COMMENT_SOURCE_ERROR');
@@ -630,7 +712,11 @@ class CWikiSocnet
 			'RATING_TYPE_ID' => 'FORUM_POST',
 			'RATING_ENTITY_ID' => $messageID,
 			'ERROR' => $strError,
-			'NOTES' => ''
+			'NOTES' => '',
+			"UF" => array(
+				"FILE" => $ufFileID,
+				"DOC" => $ufDocID
+			)
 		);
 	}
 
@@ -682,6 +768,71 @@ class CWikiSocnet
 		$retText = "<div class='wiki_post_feed'>".$text."</div>";
 
 		return $retText;
+	}
+
+	public static function __ProcessPath($arUrl, $user_id)
+	{
+		static $arIntranetUsers, $arSiteData, $extranet_site_id, $intranet_site_id;
+
+		if (!is_array($arUrl))
+			$arUrl = array($arUrl);
+
+		if (
+			CModule::IncludeModule("extranet")
+			&& !$arIntranetUsers
+		)
+		{
+			$extranet_site_id = CExtranet::GetExtranetSiteID();
+			$intranet_site_id = CSite::GetDefSite();
+			$arIntranetUsers = CExtranet::GetIntranetUsers();
+		}
+
+		if (!$arSiteData)
+		{
+			$rsSite = CSite::GetList($by="sort", $order="desc", Array("ACTIVE" => "Y"));
+			while ($arSite = $rsSite->Fetch())
+			{
+				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
+				$arSiteData[$arSite["ID"]] = array(
+					"GROUPS_PATH" => COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]),
+					"SERVER_NAME" => (
+						strlen($serverName) > 0
+							? $serverName
+							: (
+								defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0
+									? SITE_SERVER_NAME
+									: COption::GetOptionString("main", "server_name", "")
+							)
+					)
+				);
+			}
+		}
+
+		$user_site_id = (
+			IsModuleInstalled("extranet") 
+				? (
+					(!in_array($user_id, $arIntranetUsers) && $extranet_site_id) 
+						? $extranet_site_id 
+						: $intranet_site_id
+				)
+				: SITE_ID
+		);
+
+		$server_name = (CMain::IsHTTPS() ? "https" : "http")."://".$arSiteData[$user_site_id]["SERVER_NAME"];
+
+		$arUrl = str_replace(
+			array("#SERVER_NAME#", "#GROUPS_PATH#"),
+			array(
+				$server_name,
+				$arSiteData[$user_site_id]["GROUPS_PATH"]
+			),
+			$arUrl
+		);
+
+		return array(
+			"SERVER_NAME" => $server_name, 
+			"URLS" => $arUrl
+		);
 	}
 }
 ?>

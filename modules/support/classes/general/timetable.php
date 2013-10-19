@@ -27,7 +27,7 @@ class CSupportTimetable
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/" . $module_id . "/install/version.php");
-		return "<br>Module: " . $module_id . " (" . $arModuleVersion["VERSION"] . ")<br>Class: CSupportTimetable<br>File: " . __FILE__;
+		return "<br>Module: " . $module_id . " <br>Class: CSupportTimetable<br>File: " . __FILE__;
 	}
 	
 	public static function Set($arFields, $arFieldsShedule) //$arFields, $arFieldsShedule = array(0 => array("ID" => 1 ...), 1 => array("ID" => 3 ...) ...)
@@ -120,9 +120,9 @@ class CSupportTimetable
 		{
 			$a = array(
 				"SLA_ID" => 0,
-				"TIMETABLE_ID" =>  $id,
-				"WEEKDAY_NUMBER" => $i,
-				"OPEN_TIME" => "CLOSED",
+				"TIMETABLE_ID" =>  intval($id),
+				"WEEKDAY_NUMBER" => intval($i),
+				"OPEN_TIME" => "'CLOSED'",
 				"MINUTE_FROM" => null,
 				"MINUTE_TILL" => null
 			);
@@ -131,14 +131,23 @@ class CSupportTimetable
 				$DB->Insert($table_shedule, $a, $err_mess . __LINE__);
 			}
 		}
-		
-		CSupportTimetableCache::toCache();
-		
+
+		// recalculate only affected sla
+		$affected_sla = array();
+
+		$res = $DB->Query("SELECT ID FROM b_ticket_sla WHERE TIMETABLE_ID = $id");
+		while ($row = $res->Fetch())
+		{
+			$affected_sla[] = $row['ID'];
+		}
+
+		CSupportTimetableCache::toCache(array('SLA_ID' => $affected_sla));
+
 		return $id;
 	}
 
 	// get Timetable list
-	public static function GetList($arSort, $arFilter)
+	public static function GetList($arSort = null, $arFilter = null)
 	{
 		$err_mess = (self::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $USER, $APPLICATION;
@@ -174,6 +183,10 @@ class CSupportTimetable
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
 
 		$arSort = is_array($arSort) ? $arSort : array();
+		if(isset($arSort["DESCRIPTION"]))
+		{
+			unset($arSort["DESCRIPTION"]);
+		}
 		if(count($arSort) > 0)
 		{
 			$ar1 = array_merge($DB->GetTableFieldsList($table), array());
@@ -273,13 +286,12 @@ class CSupportTimetable
 		}
 		
 		
-		$strSql = "SELECT DISTINCT 'x' FROM b_ticket WHERE SLA_ID = $id";
+		$strSql = "SELECT DISTINCT 'x' FROM b_ticket_sla WHERE TIMETABLE_ID = $id";
 		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
 		if (!$rs->Fetch())
 		{
 				$DB->Query("DELETE FROM $table WHERE ID = $id", false, $err_mess . __LINE__);
 				$DB->Query("DELETE FROM $tableShedule WHERE TIMETABLE_ID = $id", false, $err_mess . __LINE__);
-				CSupportTimetableCache::toCache();
 				return true;
 		}
 		else
@@ -287,7 +299,7 @@ class CSupportTimetable
 		
 		return false;
 	}
-	
-		
+
+
 }
 ?>

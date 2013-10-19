@@ -155,6 +155,33 @@ class CPHPCache
 		}
 	}
 
+	
+	/**
+	 * <p>Функция очищает кеш по параметру <b>basedir</b>. Она подходит для сброса memcached-данных.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param $initdi $r = false По умолчанию <i>false</i>
+	 *
+	 *
+	 *
+	 * @param $basedi $r = "cache" Директория с кешем.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * $obCache = new CPHPCache(); ... $obCache-&gt;CleanDir();
+	 * </pre>
+	 *
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/cleandir.php
+	 * @author Bitrix
+	 */
 	public function CleanDir($initdir = false, $basedir = "cache")
 	{
 		$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
@@ -237,8 +264,8 @@ class CPHPCache
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	 * >Кеширование</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/output.php">CPHPCache::Output</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/output.php">CPHPCache::Output</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -360,8 +387,8 @@ class CPHPCache
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89607]Кеширование[/link]</li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -431,8 +458,8 @@ class CPHPCache
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89607]Кеширование[/link]</li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -453,7 +480,7 @@ class CPHPCache
 	 *
 	 * @param int $cache_life_time = false Время жизни кеша в секундах.<br> Необязательный. По умолчанию -
 	 * время жизни кеша предварительно заданное в функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">InitCache</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">InitCache</a>.
 	 *
 	 *
 	 *
@@ -461,7 +488,7 @@ class CPHPCache
 	 * входить все параметры которые могут повлиять на результат
 	 * исполнения кешируемого кода.<br> Необязательный. По умолчанию -
 	 * уникальный идентификатор кеша предварительно заданный в функции
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
 	 *
 	 *
 	 *
@@ -469,7 +496,7 @@ class CPHPCache
 	 * <i>/bitrix/cache/</i>. Если значение - "/", то кеш будет действительным для
 	 * всех каталогов сайта.<br> Необязательный. По умолчанию - имя
 	 * каталога предварительно заданное в функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
 	 *
 	 *
 	 *
@@ -477,7 +504,7 @@ class CPHPCache
 	 * "ИМЯ ПЕРЕМЕННОЙ 1" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 1", "ИМЯ ПЕРЕМЕННОЙ 2" =&gt;
 	 * "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 2", ...)</pre> Непосредственно запись переменных
 	 * в файл кеша осуществляется функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a>.<br>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a>.<br>
 	 * Необязательный. По умолчанию - пустой массив.
 	 *
 	 *
@@ -533,9 +560,9 @@ class CPHPCache
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89607]Кеширование[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a> </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a> </li> <li>
 	 * <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -584,6 +611,79 @@ class CPHPCache
 	 *
 	 * @param mixed $vars
 	 * @return void
+	 */
+	
+	/**
+	 * <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске вместе с заданным массивом переменных в файл кеша.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param mixed $vars = false Массив переменных, значения которых необходимо записать в файл
+	 * кэша, вида: <pre>array( "ИМЯ ПЕРЕМЕННОЙ 1" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 1", "ИМЯ
+	 * ПЕРЕМЕННОЙ 2" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 2", ...)</pre>Необязательный. По
+	 * умолчанию - массив переменных предварительно заданный в функции
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a>.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * // создаем объект
+	 * $obCache = new CPHPCache; 
+	 * 
+	 * // время кеширования - 30 минут
+	 * $life_time = 30*60; 
+	 * 
+	 * // формируем идентификатор кеша в зависимости от всех параметров 
+	 * // которые могут повлиять на результирующий HTML
+	 * $cache_id = $ELEMENT_ID.$SECTION_ID.$USER-&gt;GetUserGroupString(); 
+	 * 
+	 * // если кэш есть и он ещё не истек то
+	 * if($obCache-&gt;InitCache($life_time, $cache_id, "/") :
+	 *     // получаем закешированные переменные
+	 *     $vars = $obCache-&gt;GetVars();
+	 *     $SECTION_TITLE = $vars["SECTION_TITLE"];
+	 * else :
+	 *     // иначе обращаемся к базе
+	 *     $arSection = GetIBlockSection($SECTION_ID);
+	 *     $SECTION_TITLE = $arSection["NAME"];
+	 * endif;
+	 * 
+	 * // добавляем пункт меню в навигационную цепочку
+	 * $APPLICATION-&gt;AddChainItem($SECTION_TITLE, $SECTION_URL."SECTION_ID=".$SECTION_ID);
+	 * 
+	 * // начинаем буферизирование вывода
+	 * if($obCache-&gt;StartDataCache()):
+	 * 
+	 *     // выбираем из базы параметры элемента инфо-блока
+	 *     if($arIBlockElement = GetIBlockElement($ELEMENT_ID, $IBLOCK_TYPE)):
+	 *         echo "&lt;pre&gt;"; print_r($arIBlockElement); echo "&lt;/pre&gt;";
+	 *     endif;
+	 * 
+	 *     // записываем предварительно буферизированный вывод в файл кеша
+	 *     // вместе с дополнительной переменной
+	 *     <b>$obCache-&gt;EndDataCache</b>(array(
+	 *         "SECTION_TITLE"    =&gt; $SECTION_TITLE
+	 *         )); 
+	 * endif;
+	 * ?&gt;
+	 * </pre>
+	 *
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li>[link=89607]Кеширование[/link] </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a> </li>
+	 * </ul><a name="examples"></a>
+	 *
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php
+	 * @author Bitrix
 	 */
 	public function EndDataCache($vars=false)
 	{
@@ -644,8 +744,8 @@ class CPHPCache
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89607]Кеширование[/link]</li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -740,8 +840,8 @@ class CPageCache
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	 * >Кеширование</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/output.php">CPageCache::Output</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/output.php">CPageCache::Output</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -790,7 +890,7 @@ class CPageCache
 
 	
 	/**
-	 * <p>Выводит содержимое кеша. HTML-содержимое кэша доступно, только если файл кеша существует и предварительно был вызван метод <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a> или <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>.</p>
+	 * <p>Выводит содержимое кеша. HTML-содержимое кэша доступно, только если файл кеша существует и предварительно был вызван метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>.</p>
 	 *
 	 *
 	 *
@@ -801,8 +901,8 @@ class CPageCache
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	 * >Кеширование</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a></li>
 	 * </ul>
 	 *
 	 *
@@ -870,9 +970,9 @@ class CPageCache
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89607]Кеширование[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/enddatacache.php">CPageCache::EndDataCache</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/enddatacache.php">CPageCache::EndDataCache</a> </li>
 	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -906,7 +1006,7 @@ class CPageCache
 
 	
 	/**
-	 * <p>Выводит <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске в файл кеша.</p>
+	 * <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске в файл кеша.</p>
 	 *
 	 *
 	 *
@@ -944,8 +1044,8 @@ class CPageCache
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	 * >Кеширование</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/enddatacache.php
@@ -1008,8 +1108,8 @@ class CPageCache
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	 * >Кеширование</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

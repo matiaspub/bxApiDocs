@@ -294,7 +294,7 @@ class CAllSaleTax
 	 *
 	 *
 	 * @return int <p>Функция возвращает код измененного налога или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__update.6e2c0ff3.php
@@ -329,7 +329,7 @@ class CAllSaleTax
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__delete.6efc76a6.php
@@ -437,7 +437,7 @@ class CAllSaleTax
 	 * <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
 	 * <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
 	 * <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего
-	 * изменения записи.</td> </tr> </table>
+	 * изменения записи.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getlist.726e1309.php
@@ -676,7 +676,7 @@ class CAllSaleTax
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__addexempt.a94a2922.php
@@ -717,7 +717,7 @@ class CAllSaleTax
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__deleteexempt.071034ae.php

@@ -54,18 +54,26 @@ class CCatalogStoreProduct
 	public static function Add($arFields)
 	{
 		global $DB;
+
+		foreach(GetModuleEvents("catalog", "OnBeforeStoreProductAdd", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+				return false;
+
 		if (!self::CheckFields('ADD',$arFields))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_catalog_store_product", $arFields);
-		$strSql =
-			"INSERT INTO b_catalog_store_product (".$arInsert[0].") ".
-				"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_catalog_store_product (".$arInsert[0].") VALUES(".$arInsert[1].")";
 
-		$res=$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$res = $DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if(!$res)
 			return false;
+
 		$lastId = intval($DB->LastID());
+
+		foreach(GetModuleEvents("catalog", "OnStoreProductAdd", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($lastId, $arFields));
+
 		return $lastId;
 	}
 
@@ -104,31 +112,28 @@ class CCatalogStoreProduct
 	 * - значение поля строго больше передаваемой в фильтр величины;</li>
 	 * <li> <b>&lt;=</b> - значение поля меньше или равно передаваемой в фильтр
 	 * величины;</li> <li> <b>&lt;</b> - значение поля строго меньше передаваемой
-	 * в фильтр величины;</li> <li> <b>@</b> - значение поля находится в
-	 * передаваемом в фильтр разделенном запятой списке значений;</li> <li>
-	 * <b>~</b> - значение поля проверяется на соответствие передаваемому в
-	 * фильтр шаблону;</li> <li> <b>%</b> - значение поля проверяется на
-	 * соответствие передаваемой в фильтр строке в соответствии с
-	 * языком запросов.</li> </ul> В качестве "название_поляX" может стоять
-	 * любое поле. <br><br> Пример фильтра: <pre class="syntax">array("ACTIVE" =&gt; "Y")</pre> Этот
-	 * фильтр означает "выбрать все записи, в которых значение в поле ACTIVE
-	 * (флаг "Активность склада") равно Y". <br><br> Значение по умолчанию -
-	 * пустой массив array() - означает, что результат отфильтрован не
-	 * будет.
+	 * в фильтр величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле. <br><br> Пример фильтра: <pre class="syntax">array("ACTIVE"
+	 * =&gt; "Y")</pre> Этот фильтр означает "выбрать все записи, в которых
+	 * значение в поле ACTIVE (флаг "Активность склада") равно Y". <br><br>
+	 * Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле. В качестве группирующей функции могут стоять:
-	 * <ul> <li> <b>COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b>MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру. <br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле. <br><br> Если массив
+	 * пустой, то функция вернет число записей, удовлетворяющих фильтру.
+	 * <br><br> Значение по умолчанию - <i>false</i> - означает, что результат
+	 * группироваться не будет.
 	 *
 	 *
 	 *
@@ -150,8 +155,39 @@ class CCatalogStoreProduct
 	 *
 	 *
 	 * @return mixed <p>Возвращает объект класса <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
-	 * коллекцию ассоциативных массивов с ключами.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
+	 * коллекцию ассоциативных массивов с ключами.</p><br><br>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * Список возможных полей<tbody>
+	<tr>
+	<th width="15%">Поля</th>
+	<th width="404">Описание</th> </tr>
+	<tr>
+	<td><b>ID</b></td> 	<td> ID записи</td> </tr>
+	<tr>
+	<td><b>PRODUCT_ID</b></td> 	<td>ID  элемента</td> </tr>
+	<tr>
+	<td><b>AMOUNT</b></td> 	<td>количество</td> </tr>
+	<tr>
+	<td><b>STORE_ID</b></td> 	<td>ID склада</td> </tr>
+	<tr>
+	<td><b>STORE_NAME</b></td> 	<td>название склада</td> </tr>
+	<tr>
+	<td><b>STORE_ADDR</b></td> 	<td>адрес склада</td> </tr>
+	<tr>
+	<td><b>STORE_DESCR</b></td> 	<td>описание склада</td> </tr>
+	<tr>
+	<td><b>STORE_GPS_N</b></td> 	<td>широта</td> </tr>
+	<tr>
+	<td><b>STORE_GPS_S</b></td> 	<td>долгота</td> </tr>
+	<tr>
+	<td><b>STORE_IMAGE</b></td> 	<td>картинка склада</td> </tr>
+	</tbody>
+	 * </pre>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstoreproduct/getlist.php
@@ -177,16 +213,13 @@ class CCatalogStoreProduct
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-					"FROM b_catalog_store_product CP ".
-					"	".$arSqls["FROM"]." ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store_product CP ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -194,32 +227,31 @@ class CCatalogStoreProduct
 			else
 				return false;
 		}
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_catalog_store_product CP ".
-				"	".$arSqls["FROM"]." ";
-		if (strlen($arSqls["WHERE"]) > 0)
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-		if (strlen($arSqls["GROUPBY"]) > 0)
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-		if (strlen($arSqls["ORDERBY"]) > 0)
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store_product CP ".$arSqls["FROM"];
+		if (!empty($arSqls["WHERE"]))
+			$strSql .= " WHERE ".$arSqls["WHERE"];
+		if (!empty($arSqls["GROUPBY"]))
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+		if (!empty($arSqls["ORDERBY"]))
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-					"FROM b_catalog_store_product CP ".
-					"	".$arSqls["FROM"]." ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_store_product CP ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
-			if (strlen($arSqls["GROUPBY"]) <= 0)
+			if (empty($arSqls["GROUPBY"]))
 			{
 				if ($arRes = $dbRes->Fetch())
 					$cnt = $arRes["CNT"];
@@ -235,9 +267,10 @@ class CCatalogStoreProduct
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 		return $dbRes;

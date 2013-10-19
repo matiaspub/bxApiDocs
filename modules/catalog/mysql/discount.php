@@ -51,9 +51,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			$arInsert[1] .= ', '.implode(', ',array_values($arFields1));
 		}
 
-		$strSql =
-			"INSERT INTO b_catalog_discount(".$arInsert[0].") ".
-			"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_catalog_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$ID = intval($DB->LastID());
@@ -146,7 +144,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.delete.php
@@ -206,7 +204,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * процентах, F - фиксированная величина);</li> <li> <b>VALUE</b> - величина
 	 * скидки;</li> <li> <b>CURRENCY</b> - валюта;</li> <li> <b>RENEWAL</b> - флаг "Скидка на
 	 * продление";</li> <li> <b>ACTIVE_FROM</b> - дата начала действия скидки;</li> <li>
-	 * <b>ACTIVE_TO</b> - дата окончания действия скидки.</li> </ul>
+	 * <b>ACTIVE_TO</b> - дата окончания действия скидки.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getbyid.php
@@ -305,31 +303,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
 	 * значение поля меньше или равно передаваемой в фильтр
 	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
-	 * фильтр величины;</b></li> <li> <b>@</b> - значение поля находится в
-	 * передаваемом в фильтр разделенном запятой списке значений;</li> <li>
-	 * <b>~</b> - значение поля проверяется на соответствие передаваемому в
-	 * фильтр шаблону;</li> <li> <b>%</b> - значение поля проверяется на
-	 * соответствие передаваемой в фильтр строке в соответствии с
-	 * языком запросов.</li> </ul> В качестве "название_поляX" может стоять
-	 * любое поле скидки.<br><br> Пример фильтра: <pre class="syntax">array("!DISCOUNT_ID" =&gt;
-	 * 15)</pre> Этот фильтр означает "выбрать все записи, в которых значение
-	 * в поле DISCOUNT_ID (код скидки) не равно 15".<br><br> Значение по умолчанию -
-	 * пустой массив array() - означает, что результат отфильтрован не
-	 * будет.
+	 * фильтр величины;</b></li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле скидки.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле DISCOUNT_ID (код скидки) не равно
+	 * 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются скидки. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле скидки. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле скидки.<br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -461,13 +456,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount CD ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount CD ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -476,21 +471,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount CD ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount CD ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount CD ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount CD ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -510,9 +511,10 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -554,30 +556,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
 	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
 	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле записи.<br><br>
-	 * Пример фильтра: <pre class="syntax">array("!GROUP_ID" =&gt; 5)</pre> Этот фильтр означает
-	 * "выбрать все записи, в которых значение в поле GROUP_ID (код группы
-	 * пользователей) не равно 5".<br><br> Значение по умолчанию - пустой
-	 * массив array() - означает, что результат отфильтрован не будет.
+	 * величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле записи.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("!GROUP_ID" =&gt; 5)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле GROUP_ID (код группы пользователей)
+	 * не равно 5".<br><br> Значение по умолчанию - пустой массив array() -
+	 * означает, что результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле записи. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -603,7 +603,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>GROUP_ID</b> - код группы
 	 * пользователей.</li> </ul><p>Если в качестве параметра arGroupBy передается
 	 * пустой массив, то функция вернет число записей, удовлетворяющих
-	 * фильтру.</p>
+	 * фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountgroupslist.php
@@ -649,30 +649,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
 	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
 	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле записи.<br><br>
-	 * Пример фильтра: <pre class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр
-	 * означает "выбрать все записи, в которых значение в поле DISCOUNT_ID (код
-	 * скидки) не равно 15".<br><br> Значение по умолчанию - пустой массив array()
-	 * - означает, что результат отфильтрован не будет.
+	 * величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле записи.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле DISCOUNT_ID (код скидки) не равно
+	 * 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле записи. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -697,7 +695,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * ассоциативных массивов с ключами:</p><ul> <li>ID - код записи;</li>
 	 * <li>DISCOUNT_ID - код скидки;</li> <li>CATALOG_GROUP_ID - код типа цены.</li> </ul><p>Если в
 	 * качестве параметра arGroupBy передается пустой массив, то функция
-	 * вернет число записей, удовлетворяющих фильтру.</p>
+	 * вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountcatslist.php
@@ -708,6 +706,9 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		return self::__GetDiscountEntityList($arOrder, $arFilter, $arGroupBy, $arNavStartParams, $arSelectFields);
 	}
 
+/*
+* @deprecated deprecated since catalog 12.0.0
+*/
 	
 	/**
 	 * <p>Функция возвращает результат выборки записей с информацией о привязке скидок к товарам в соответствии со своими параметрами.</p>
@@ -743,30 +744,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
 	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
 	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле записи.<br><br>
-	 * Пример фильтра: <pre class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр
-	 * означает "выбрать все записи, в которых значение в поле DISCOUNT_ID (код
-	 * скидки) не равно 15".<br><br> Значение по умолчанию - пустой массив array()
-	 * - означает, что результат отфильтрован не будет.
+	 * величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле записи.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле DISCOUNT_ID (код скидки) не равно
+	 * 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле записи. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -791,7 +790,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * ассоциативных массивов с ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li>
 	 * <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>PRODUCT_ID</b> - код товара.</li> </ul><p>Если в
 	 * качестве параметра arGroupBy передается пустой массив, то функция
-	 * вернет число записей, удовлетворяющих фильтру.</p>
+	 * вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountproductslist.php
@@ -811,13 +810,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2product DG ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2product DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -826,21 +825,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2product DG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2product DG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2product DG ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2product DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -860,15 +865,19 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		return $dbRes;
 	}
 
+/*
+* @deprecated deprecated since catalog 12.0.0
+*/
 	
 	/**
 	 * <p>Функция возвращает результат выборки записей с информацией о привязке скидок к группам товаров в соответствии со своими параметрами.</p>
@@ -904,30 +913,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
 	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
 	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле записи.<br><br>
-	 * Пример фильтра: <pre class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр
-	 * означает "выбрать все записи, в которых значение в поле DISCOUNT_ID (код
-	 * скидки) не равно 15".<br><br> Значение по умолчанию - пустой массив array()
-	 * - означает, что результат отфильтрован не будет.
+	 * величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле записи.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле DISCOUNT_ID (код скидки) не равно
+	 * 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле записи. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -952,7 +959,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	 * ассоциативных массивов с ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li>
 	 * <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>PRODUCT_ID</b> - код товара.</li> </ul><p>Если в
 	 * качестве параметра arGroupBy передается пустой массив, то функция
-	 * вернет число записей, удовлетворяющих фильтру.</p>
+	 * вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountsectionslist.php
@@ -972,13 +979,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2section DG ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2section DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -987,21 +994,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2section DG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2section DG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2section DG ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2section DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -1021,15 +1034,19 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		return $dbRes;
 	}
 
+/*
+* @deprecated deprecated since catalog 12.0.0
+*/
 	static public function GetDiscountIBlocksList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -1044,13 +1061,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2iblock DG ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2iblock DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -1059,21 +1076,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2iblock DG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount2iblock DG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2iblock DG ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount2iblock DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -1093,9 +1116,10 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -1119,14 +1143,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount_cond DC ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount_cond DC ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -1135,21 +1158,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount_cond DC ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_discount_cond DC ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount_cond DC ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_discount_cond DC ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -1169,15 +1198,19 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		return $dbRes;
 	}
 
+/*
+* @deprecated deprecated since catalog 12.0.0
+*/
 	static public function SaveFilterOptions()
 	{
 		COption::SetOptionString("catalog", "do_use_discount_product", 'Y');
@@ -1397,6 +1430,41 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			),
 			$boolUpdate
 		);
+	}
+
+	protected function __FillArrays($intDiscountID, &$arFields, $strEntityID)
+	{
+		$boolResult = false;
+		$intDiscountID = intval($intDiscountID);
+		if (0 >= $intDiscountID)
+			return $boolResult;
+		$strEntityID = trim(strval($strEntityID));
+		if (!empty($strEntityID) && ('GROUP_IDS' == $strEntityID || 'CATALOG_GROUP_IDS' == $strEntityID))
+		{
+			$boolCheck = false;
+			$strEntityResult = ('GROUP_IDS' == $strEntityID ? 'USER_GROUP_ID' : 'PRICE_TYPE_ID');
+			$arValues = array();
+			$rsDiscounts = self::__GetDiscountEntityList(
+				array(),
+				array('DISCOUNT_ID' => $intDiscountID),
+				false,
+				false,
+				array('ID', 'DISCOUNT_ID', $strEntityResult)
+			);
+			while ($arDiscount = $rsDiscounts->Fetch())
+			{
+				$boolCheck = true;
+				$intValue = intval($arDiscount[$strEntityResult]);
+				if (0 < $intValue)
+					$arValues[$intValue] = true;
+			}
+			if ($boolCheck)
+			{
+				$arFields[$strEntityID] = (!empty($arValues) ? array_keys($arValues) : array());
+				$boolResult = true;
+			}
+		}
+		return $boolResult;
 	}
 }
 ?>

@@ -234,7 +234,7 @@ class CSecurityIPRule
 		return true;
 	}
 
-	public function UpdateRuleIPs($IPRULE_ID, $arInclIPs=false, $arExclIPs=false)
+	public static function UpdateRuleIPs($IPRULE_ID, $arInclIPs=false, $arExclIPs=false)
 	{
 		global $DB, $CACHE_MANAGER;
 		$IPRULE_ID = intval($IPRULE_ID);
@@ -254,8 +254,8 @@ class CSecurityIPRule
 					if($ip && !array_key_exists($ip, $added))
 					{
 						$ar = explode("-", $ip);
-						$ip1 = $this->ip2number($ar[0]);
-						$ip2 = $this->ip2number($ar[1]);
+						$ip1 = self::ip2number($ar[0]);
+						$ip2 = self::ip2number($ar[1]);
 						if($ip2 <= 0)
 							$ip2 = $ip1;
 						$arIP = array(
@@ -291,8 +291,8 @@ class CSecurityIPRule
 					if($ip && !array_key_exists($ip, $added))
 					{
 						$ar = explode("-", $ip);
-						$ip1 = $this->ip2number($ar[0]);
-						$ip2 = $this->ip2number($ar[1]);
+						$ip1 = self::ip2number($ar[0]);
+						$ip2 = self::ip2number($ar[1]);
 						if($ip2 <= 0)
 							$ip2 = $ip1;
 						$arIP = array(
@@ -318,7 +318,7 @@ class CSecurityIPRule
 		return true;
 	}
 
-	public static function ip2number($ip)
+	protected static function ip2number($ip)
 	{
 		$ip = trim($ip);
 		if(strlen($ip) > 0)
@@ -334,7 +334,7 @@ class CSecurityIPRule
 
 		$bFound = false;
 
-		$ip2check = $this->ip2number($_SERVER["REMOTE_ADDR"]);
+		$ip2check = self::ip2number($_SERVER["REMOTE_ADDR"]);
 		if($ip2check > 0 && is_array($arInclIPs))
 		{
 			foreach($arInclIPs as $id => $ip)
@@ -343,8 +343,8 @@ class CSecurityIPRule
 				if($ip)
 				{
 					$ar = explode("-", $ip);
-					$ip1 = $this->ip2number($ar[0]);
-					$ip2 = $this->ip2number($ar[1]);
+					$ip1 = self::ip2number($ar[0]);
+					$ip2 = self::ip2number($ar[1]);
 					if($ip2 <= 0)
 						$ip2 = $ip1;
 					if($ip2check >= $ip1 && $ip2check <= $ip2)
@@ -364,8 +364,8 @@ class CSecurityIPRule
 				if($ip)
 				{
 					$ar = explode("-", $ip);
-					$ip1 = $this->ip2number($ar[0]);
-					$ip2 = $this->ip2number($ar[1]);
+					$ip1 = self::ip2number($ar[0]);
+					$ip2 = self::ip2number($ar[1]);
 					if($ip2 <= 0)
 						$ip2 = $ip1;
 					if($ip2check >= $ip1 && $ip2check <= $ip2)
@@ -454,12 +454,12 @@ class CSecurityIPRule
 				if($ip)
 				{
 					$ar = explode("-", $ip);
-					$ip1 = $this->ip2number($ar[0]);
+					$ip1 = self::ip2number($ar[0]);
 					if($ip1 <= 0)
 						$aMsg[] = array("id"=>"INCL_IPS[".htmlspecialcharsex($id)."]", "text"=>GetMessage("SECURITY_IPRULE_ERROR_WONG_IP", array("#IP#" => htmlspecialcharsex($ar[0]))));
 					if(count($ar) > 1)
 					{
-						$ip2 = $this->ip2number($ar[1]);
+						$ip2 = self::ip2number($ar[1]);
 						if($ip2 <= 0)
 							$aMsg[] = array("id"=>"INCL_IPS[".htmlspecialcharsex($id)."]", "text"=>GetMessage("SECURITY_IPRULE_ERROR_WONG_IP", array("#IP#" => htmlspecialcharsex($ar[1]))));
 						elseif($ip2 < $ip1)
@@ -478,12 +478,12 @@ class CSecurityIPRule
 				if($ip)
 				{
 					$ar = explode("-", $ip);
-					$ip1 = $this->ip2number($ar[0]);
+					$ip1 = self::ip2number($ar[0]);
 					if($ip1 <= 0)
 						$aMsg[] = array("id"=>"EXCL_IPS[".htmlspecialcharsex($id)."]", "text"=>GetMessage("SECURITY_IPRULE_ERROR_WONG_IP", array("#IP#" => htmlspecialcharsex($ar[0]))));
 					if(count($ar) > 1)
 					{
-						$ip2 = $this->ip2number($ar[1]);
+						$ip2 = self::ip2number($ar[1]);
 						if($ip2 <= 0)
 							$aMsg[] = array("id"=>"EXCL_IPS[".htmlspecialcharsex($id)."]", "text"=>GetMessage("SECURITY_IPRULE_ERROR_WONG_IP", array("#IP#" => htmlspecialcharsex($ar[1]))));
 						elseif($ip2 < $ip1)
@@ -625,7 +625,7 @@ class CSecurityIPRule
 		return $res;
 	}
 
-	public function GetList($arSelect, $arFilter, $arOrder)
+	public static function GetList($arSelect, $arFilter, $arOrder)
 	{
 		global $DB;
 
@@ -783,7 +783,7 @@ class CSecurityIPRule
 		$strIPJoin = "";
 		if(array_key_exists("IP", $arFilter))
 		{
-			$ip = $this->ip2number($arFilter["IP"]);
+			$ip = self::ip2number($arFilter["IP"]);
 			if($ip > 0)
 			{
 				$bDistinct = true;

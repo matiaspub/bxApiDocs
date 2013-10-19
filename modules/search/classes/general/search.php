@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-//if(!defined("START_EXEC_TIME"))
+if(!defined("START_EXEC_TIME"))
 	// define("START_EXEC_TIME", getmicrotime());
 
 
@@ -58,7 +58,7 @@ class CAllSearch extends CDBResult
 	//returns recordset with search results
 	
 	/**
-	 * <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа).</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/search/events/onsearch.php">OnSearch</a>.</p>
+	 * <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа).</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearch.php">OnSearch</a>.</p>
 	 *
 	 *
 	 *
@@ -203,7 +203,21 @@ class CAllSearch extends CDBResult
 	 *      "=MODULE_ID" =&gt; "forum", 
 	 *      "&gt;=DATE_CHANGE" =&gt; ConvertTimeStamp(time()-24*60*60, "FULL"), 
 	 *    ) 
-	 *  ) Поиск в форумах текущего сайта указанной строки&lt;?<br>$q = "жареная рыба или селедка";<br>$module_id = "forum";<br>$obSearch = new CSearch;<br>$obSearch-&gt;Search(array(<br>	"QUERY" =&gt; $q,<br>	"SITE_ID" =&gt; LANG,<br>	"MODULE_ID" =&gt; $module_id,<br>));<br>if ($obSearch-&gt;errorno!=0):<br>	?&gt;<br>	&lt;font class="text"&gt;В поисковой фразе обнаружена ошибка:&lt;/font&gt;<br>	&lt;?echo ShowError($obSearch-&gt;error);?&gt;<br>	&lt;font class="text"&gt;Исправьте поисковую фразу и повторите поиск.&lt;/font&gt;<br>	&lt;?<br>else:<br>	while($arResult = $obSearch-&gt;GetNext())<br>	{?&gt;<br>		&lt;a href="&lt;?echo $arResult["URL"]?&gt;"&gt;&lt;?echo $arResult["TITLE_FORMATED"]?&gt;&lt;/a&gt;<br>		&lt;?echo $arResult["BODY_FORMATED"]?&gt;<br>	&lt;hr size="1" color="#DFDFDF"&gt;<br>	&lt;?}<br>endif;<br>?&gt;<br>
+	 *  ) &lt;?<br>$q = "жареная рыба или селедка";<br>$module_id = "forum";<br>$obSearch = new CSearch;<br>$obSearch-&gt;Search(array(<br>	"QUERY" =&gt; $q,<br>	"SITE_ID" =&gt; LANG,<br>	"MODULE_ID" =&gt; $module_id,<br>));<br>if ($obSearch-&gt;errorno!=0):<br>	?&gt;<br>	&lt;font class="text"&gt;В поисковой фразе обнаружена ошибка:&lt;/font&gt;<br>	&lt;?echo ShowError($obSearch-&gt;error);?&gt;<br>	&lt;font class="text"&gt;Исправьте поисковую фразу и повторите поиск.&lt;/font&gt;<br>	&lt;?<br>else:<br>	while($arResult = $obSearch-&gt;GetNext())<br>	{?&gt;<br>		&lt;a href="&lt;?echo $arResult["URL"]?&gt;"&gt;&lt;?echo $arResult["TITLE_FORMATED"]?&gt;&lt;/a&gt;<br>		&lt;?echo $arResult["BODY_FORMATED"]?&gt;<br>	&lt;hr size="1" color="#DFDFDF"&gt;<br>	&lt;?}<br>endif;<br>?&gt;<br>
+	
+	 *    $obSearch = new CSearch;
+	 *    $obSearch-&gt;Search(array(
+	 *       'QUERY' =&gt; $_REQUEST['q'],
+	 *       'SITE_ID' =&gt; LANG,
+	 *       'MODULE_ID' =&gt; 'iblock',
+	 *    ));
+	 *    $obSearch-&gt;NavStart();
+	 *    while ($arSearch = $obSearch-&gt;Fetch()) {
+	 *       echo($arSearch);
+	 *    }
+	 * Примечание: такой вызов NavStart() породит дополнительный PAGEN_. Если он мешает, то можно заменить NavStart на такую конструкцию:
+	 * $obSearch-&gt;Statistic = new CSearchStatistic($obSearch-&gt;strQueryText, $obSearch-&gt;strTagsText);
+	 * $obSearch-&gt;Statistic-&gt;PhraseStat($obSearch-&gt;NavRecordCount, $obSearch-&gt;NavPageNomer);
 	 * </pre>
 	 *
 	 *
@@ -780,14 +794,14 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает следующий найденный элемент.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
+	 * <p>Возвращает следующий найденный элемент.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @return array <p>Смотри описание возвращаемого значения метода <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearch/search.php">CSearch::Search</a>. Если
-	 * достигнут конец выборки, возвращается false.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php">CSearch::Search</a>. Если
+	 * достигнут конец выборки, возвращается false.</p><br><br>
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/fetch.php
 	 * @author Bitrix
@@ -985,7 +999,7 @@ class CAllSearch extends CDBResult
 	//       = false - add new ones. update changed and delete deleted.
 	
 	/**
-	 * <p>Функция пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ruapi_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	 * <p>Функция пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	 *
 	 *
 	 *
@@ -1020,7 +1034,7 @@ class CAllSearch extends CDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1205,7 +1219,7 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	 * <p>Функция инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ruapi_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться функцией <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	 * <p>Функция инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	 *
 	 *
 	 *
@@ -1231,7 +1245,7 @@ class CAllSearch extends CDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1286,7 +1300,7 @@ class CAllSearch extends CDBResult
 	//combination of ($MODULE_ID, $ITEM_ID) is used to determine the documents
 	
 	/**
-	 * <p>Функция переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
+	 * <p>Функция переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
 	 *
 	 *
 	 *

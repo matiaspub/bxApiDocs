@@ -4,13 +4,8 @@
 /**    MODIFICATION OF THIS FILE WILL ENTAIL SITE FAILURE            **/
 /**********************************************************************/
 
-
 //TODO: СИСТЕМА ОБНОВЛЕНИЙ, module.php, module_admin.php, 
 //все файлы с CModule::CreateModuleObject ИЗМЕНЕНЫ!
-
-
-if (!defined("BX_DIR_PERMISSIONS"))
-	// define("BX_DIR_PERMISSIONS", 0700);
 
 define("DEFAULT_UPDATE_SERVER", "www.bitrixsoft.com");
 //// define("DEFAULT_UPDATE_SERVER", "mysql.smn");

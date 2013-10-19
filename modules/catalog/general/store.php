@@ -16,6 +16,47 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllCatalogStore
 {
+	
+	/**
+	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $action  Указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>;</li> <li>
+	 * <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</li> </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров склада. Допустимые ключи: <ul>
+	 * <li>TITLE - название склада;</li> <li>ACTIVE - активность склада('Y' - активен, 'N'
+	 * - не активен);</li> <li>ADDRESS - адрес склада;</li> <li>DESCRIPTION - описание
+	 * склада;</li> <li>GPS_N - GPS координата(широта);</li> <li>GPS_S - GPS
+	 * координата(долгота);</li> <li>IMAGE_ID - ID картинки склада;</li> <li>PHONE -
+	 * телефон;</li> <li>SCHEDULE - расписание работы склада;</li> <li>XML_ID - XML_ID
+	 * склада для экспорта\импорта из 1С;</li> </ul>
+	 *
+	 *
+	 *
+	 * @return bool <p> В случае корректности переданных параметров возвращает true,
+	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	 * можно получить текст ошибок.</p>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a></li>
+	 * </ul><br><br>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/checkfields.php
+	 * @author Bitrix
+	 */
 	protected function CheckFields($action, &$arFields)
 	{
 		if (is_set($arFields["ADDRESS"]) && strlen($arFields["ADDRESS"])<=0)
@@ -97,6 +138,15 @@ class CAllCatalogStore
 	{
 		global $DB;
 		$id = intval($id);
+		if (0 >= $id)
+			return false;
+
+		foreach (GetModuleEvents("catalog", "OnBeforeCatalogStoreUpdate", true) as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array($id, &$arFields))===false)
+			return false;
+		}
+
 		$bNeedConversion = false;
 		if(array_key_exists('DATE_CREATE',$arFields))
 			unset($arFields['DATE_CREATE']);
@@ -130,6 +180,9 @@ class CAllCatalogStore
 		{
 			self::recalculateStoreBalances($id);
 		}
+
+		foreach(GetModuleEvents("catalog", "OnCatalogStoreUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 
 		return $id;
 	}
@@ -165,6 +218,12 @@ class CAllCatalogStore
 		$id = intval($id);
 		if ($id > 0)
 		{
+			foreach (GetModuleEvents("catalog", "OnBeforeCatalogStoreDelete", true) as $arEvent)
+			{
+				if (ExecuteModuleEventEx($arEvent, array($id))===false)
+				return false;
+			}
+
 			$dbDocs = $DB->Query("SELECT ID FROM b_catalog_docs_element WHERE STORE_FROM = ".$id." OR STORE_TO = ".$id." ", true);
 			if($bStoreHaveDocs = $dbDocs->Fetch())
 			{
@@ -176,7 +235,7 @@ class CAllCatalogStore
 			$DB->Query("DELETE FROM b_catalog_store WHERE ID = ".$id." ", true);
 
 			foreach(GetModuleEvents("catalog", "OnCatalogStoreDelete", true) as $arEvent)
-				ExecuteModuleEventEx($arEvent, array(intval($id)));
+				ExecuteModuleEventEx($arEvent, array($id));
 
 			self::recalculateStoreBalances($id);
 			return true;

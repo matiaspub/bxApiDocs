@@ -10,11 +10,6 @@ define('BX_SECURITY_AV_AFTER_EPILOG', true);
 define('BX_SECURITY_LOCAL_REDIRECT', true);
 
 /**
- * BX_SECURITY_SYNC_WINDOW
- */
-define('BX_SECURITY_SYNC_WINDOW', 15000);
-
-/**
  * CACHED_b_sec_iprule
  */
 define('CACHED_b_sec_iprule', 36000);

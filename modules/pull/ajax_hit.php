@@ -13,7 +13,44 @@ else if (!defined('BX_SKIP_PULL_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_R
 	CJSCore::Init(array('pull'));
 
 	global $APPLICATION;
-	$jsMsg = '<script type="text/javascript">BX.PULL.start('.(defined('BX_PULL_SKIP_LS')? "{LOCAL_STORAGE: 'N'}": '').');</script>';
+
+	$pullConfig = Array();
+
+	if (defined('BX_PULL_SKIP_LS'))
+		$pullConfig['LOCAL_STORAGE'] = 'N';
+
+	$pullNginxStatus = CPullOptions::GetNginxStatus();
+	if ($pullNginxStatus)
+	{
+		$pullChannel = CPullChannel::Get($GLOBALS['USER']->GetId());
+		if (is_array($pullChannel))
+		{
+			$pullWebSocketStatus = CPullOptions::GetWebSocketStatus();
+
+			$pullChannels = Array($pullChannel['CHANNEL_ID']);
+			if ($pullNginxStatus)
+			{
+				$pullChannelShared = CPullChannel::GetShared();
+				if (is_array($pullChannelShared))
+				{
+					$pullChannels[] = $pullChannelShared['CHANNEL_ID'];
+					if ($pullChannel['CHANNEL_DT'] > $pullChannelShared['CHANNEL_DT'])
+						$pullChannel['CHANNEL_DT'] = $pullChannelShared['CHANNEL_DT'];
+				}
+			}
+
+			$pullConfig = $pullConfig+Array(
+				'CHANNEL_ID' => implode('/', $pullChannels),
+				'LAST_ID' => $pullChannel['LAST_ID'],
+				'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
+				'PATH' => ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE'),
+				'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
+				'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
+			);
+		}
+	}
+
+	$jsMsg = '<script type="text/javascript">BX.PULL.start('.CUtil::PhpToJsObject($pullConfig).');</script>';
 	if($GLOBALS['APPLICATION']->IsJSOptimized())
 		$APPLICATION->AddAdditionalJS($jsMsg);
 	else

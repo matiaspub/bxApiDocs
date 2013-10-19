@@ -20,11 +20,6 @@ define('CACHED_b_iblock_type', 36000);
 define('CACHED_b_iblock', 36000);
 
 /**
- * CACHED_b_iblock_count
- */
-define('CACHED_b_iblock_count', 300);
-
-/**
  * CACHED_b_iblock_bucket_size
  */
 define('CACHED_b_iblock_bucket_size', 20);

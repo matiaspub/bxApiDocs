@@ -12,21 +12,32 @@ class CSecurityTaintCheckingTest extends CSecurityBaseTest
 	}
 
 	/**
+	 * Check test requirements (e.g. max_execution_time)
+	 *
+	 * @param array $pParams
+	 * @throws CSecurityRequirementsException
+	 * @return bool
+	 */
+	static public function checkRequirements($pParams = array())
+	{
+		if(extension_loaded('tokenizer') !== true)
+			throw new CSecurityRequirementsException(GetMessage("SECURITY_SITE_CHECKER_TAINT_TOKENIZER_NOT_FOUND"));
+		$maxExecutionTime = ini_get("max_execution_time");
+		if($maxExecutionTime > 0 && $maxExecutionTime <= 20)
+			throw new CSecurityRequirementsException(GetMessage("SECURITY_SITE_CHECKER_TAINT_EXECUTION_TIME"));
+		$memoryLimit = CUtil::Unformat(ini_get("memory_limit"));
+		if($memoryLimit > 0 && $memoryLimit <= 250 * 1024 * 1024)
+			throw new CSecurityRequirementsException(GetMessage("SECURITY_SITE_CHECKER_TAINT_MEMORY_LIMIT"));
+		return true;
+	}
+
+	/**
 	 * Run test and return results
 	 * @param array $pParams
 	 * @return array
 	 */
 	public function check($pParams)
 	{
-		if(extension_loaded('tokenizer') !== true)
-		{
-			return array(
-				"name" => $this->getName(),
-				"status" => true,
-				"fatal_error_text" => GetMessage("SECURITY_SITE_CHECKER_TAINT_TOKENIZER_NOT_FOUND")
-			);
-		}
-
 		$dirtyResults = CQAACheckListTests::checkVulnerabilities($pParams);
 		$result = $this->formatResults($dirtyResults);
 		return $result;

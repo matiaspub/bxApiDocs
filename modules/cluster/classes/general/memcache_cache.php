@@ -3,6 +3,7 @@ class CPHPCacheMemcacheCluster
 {
 	private static $obMemcache;
 	private static $arOtherGroups = array();
+	var $bQueue = null;
 	var $sid;
 	//cache stats
 	var $written = false;
@@ -97,7 +98,6 @@ class CPHPCacheMemcacheCluster
 
 	public function clean($basedir, $initdir = false, $filename = false)
 	{
-		global $DB;
 		if(is_object(self::$obMemcache))
 		{
 			if(

@@ -122,7 +122,7 @@ class CRatingsComponentsForum extends CAllRatingsComponentsForum
 					AUTHOR_ID as ENTITY_ID,
 					SUM(IF(TO_DAYS(POST_DATE) > TO_DAYS(NOW())-1, 1, 0))*".floatval($arConfigs['CONFIG']['TODAY_POST_COEF'])." +
 					SUM(IF(TO_DAYS(POST_DATE) > TO_DAYS(NOW())-7, 1, 0))*".floatval($arConfigs['CONFIG']['WEEK_POST_COEF'])."+
-					COUNT(*)*".$DB->ForSql($arConfigs['CONFIG']['MONTH_POST_COEF'])." as CURRENT_VALUE
+					COUNT(*)*".floatval($arConfigs['CONFIG']['MONTH_POST_COEF'])." as CURRENT_VALUE
 				FROM b_forum_message
 				WHERE POST_DATE  > DATE_SUB(NOW(), INTERVAL 30 DAY)
 				GROUP BY AUTHOR_ID
@@ -134,7 +134,7 @@ class CRatingsComponentsForum extends CAllRatingsComponentsForum
 					USER_START_ID as ENTITY_ID,
 					SUM(IF(TO_DAYS(START_DATE) > TO_DAYS(NOW())-1, 1, 0))*".floatval($arConfigs['CONFIG']['TODAY_TOPIC_COEF'])." +
 					SUM(IF(TO_DAYS(START_DATE) > TO_DAYS(NOW())-7, 1, 0))*".floatval($arConfigs['CONFIG']['WEEK_TOPIC_COEF'])." +
-					COUNT(*)*".$DB->ForSql($arConfigs['CONFIG']['MONTH_TOPIC_COEF'])." as CURRENT_VALUE
+					COUNT(*)*".floatval($arConfigs['CONFIG']['MONTH_TOPIC_COEF'])." as CURRENT_VALUE
 				FROM b_forum_topic
 				WHERE START_DATE  > DATE_SUB(NOW(), INTERVAL 30 DAY)
 				GROUP BY USER_START_ID

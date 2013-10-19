@@ -5,9 +5,7 @@
 # http://www.bitrixsoft.com                  #
 # mailto:admin@bitrixsoft.com                #
 ##############################################
-///////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////
+
 global $MESS;
 include(GetLangFileName($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/mail/lang/", "/classes/general/mail.php"));
 
@@ -108,7 +106,7 @@ class CAllMailBox
 			$arFilter = Array();
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$val = $arFilter[$filter_keys[$i]];
 			if (strlen($val)<=0) continue;
@@ -142,7 +140,7 @@ class CAllMailBox
 
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
 		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
@@ -184,7 +182,9 @@ class CAllMailBox
 
 		$strSqlOrder = "";
 		$arSqlOrder = array_unique($arSqlOrder);
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -229,7 +229,7 @@ class CAllMailBox
 			$mbx[] = $mailbox_id;
 
 		$bNoErrors = true;
-		for($i=0; $i<count($mbx); $i++)
+		for($i = 0, $n = count($mbx); $i < $n; $i++)
 		{
 			$mb = new CMailbox();
 			if(!$mb->Connect($mbx[$i]))
@@ -376,9 +376,6 @@ class CAllMailBox
 		return $ID;
 	}
 
-
-	/*********************************************************************
-	*********************************************************************/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -468,8 +465,6 @@ class CAllMailBox
 		$CACHE_MANAGER->Set($cache_id, true);
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function SendCommand($command)
 	{
 		fputs($this->pop3_conn, $command."\r\n");
@@ -487,8 +482,6 @@ class CAllMailBox
 		$this->resp = true;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function GetResponse($bMultiline = false, $bSkipFirst = true)
 	{
 		if(!$this->resp) return false;
@@ -577,8 +570,6 @@ class CAllMailBox
 		return array(true, $arStat[1]);
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function Connect($mailbox_id)
 	{
 		global $DB;
@@ -671,7 +662,7 @@ class CAllMailBox
 				preg_match_all("'([0-9]+)[ ]+?(.+)'", $list, $arLIST_temp, PREG_SET_ORDER);
 
 				$arLIST = Array();
-				for($i=0; $i<count($arLIST_temp); $i++)
+				for($i = 0, $n = count($arLIST_temp); $i < $n; $i++)
 					$arLIST[IntVal($arLIST_temp[$i][1])] = IntVal($arLIST_temp[$i][2]);
 			}
 
@@ -742,8 +733,6 @@ class CAllMailBox
 		return true;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function GetMessage($mailbox_id, $msgnum, $msguid, $session_id)
 	{
 		global $DB;
@@ -795,8 +784,6 @@ class CMailHeader
 	var $bMultipart = false;
 	var $content_type, $boundary, $charset, $filename, $MultipartType="mixed";
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function ConvertHeader($encoding, $type, $str, $charset)
 	{
 		if(strtoupper($type)=="B")
@@ -809,8 +796,6 @@ class CMailHeader
 		return $str;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function DecodeHeader($str, $charset_to, $charset_document)
 	{
 		while(preg_match('/(=\?[^?]+\?(Q|B)\?[^?]*\?=)(\s)+=\?/i', $str))
@@ -826,8 +811,6 @@ class CMailHeader
 		return $str;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function Parse($message_header, $charset)
 	{
 		if(preg_match("'content-type:.*?charset=([^\r\n;]+)'is", $message_header, $res))
@@ -839,7 +822,7 @@ class CMailHeader
 
 		$n = -1;
 		$bConvertSubject = false;
-		for($i=0; $i<count($ar_message_header_tmp); $i++)
+		for($i = 0, $num = count($ar_message_header_tmp); $i < $num; $i++)
 		{
 			$line = $ar_message_header_tmp[$i];
 			if(($line[0]==" " || $line[0]=="\t") && $n>=0)
@@ -862,7 +845,7 @@ class CMailHeader
 		}
 
 		$this->arHeader = Array();
-		for($i=0; $i<count($this->arHeaderLines); $i++)
+		for($i = 0, $num = count($this->arHeaderLines); $i < $num; $i++)
 		{
 			$p = strpos($this->arHeaderLines[$i], ":");
 			if($p>0)
@@ -911,29 +894,21 @@ class CMailHeader
 		return true;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function IsMultipart()
 	{
 		return $this->bMultipart;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function MultipartType()
 	{
 		return strtolower($this->MultipartType);
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function GetBoundary()
 	{
 		return $this->boundary;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public function GetHeader($type)
 	{
 		return $this->arHeader[strtoupper($type)];
@@ -946,8 +921,6 @@ class CMailHeader
 ///////////////////////////////////////////////////////////////////////////////////
 class CAllMailMessage
 {
-	/*********************************************************************
-	*********************************************************************/
 	public static function GetList($arOrder = Array(), $arFilter = Array(), $bCnt = false)
 	{
 		global $DB;
@@ -970,7 +943,7 @@ class CAllMailMessage
 
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$key = $filter_keys[$i];
 			$val = $arFilter[$key];
@@ -1059,12 +1032,14 @@ class CAllMailMessage
 
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
+		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
 				$strSqlSearch .= " AND  (".$arSqlSearch[$i].") ";
 				$is_filtered = true;
 			}
+		}
 		$arSqlOrder = Array();
 		foreach($arOrder as $by=>$order)
 		{
@@ -1095,7 +1070,9 @@ class CAllMailMessage
 
 		$strSqlOrder = "";
 		$arSqlOrder = array_unique($arSqlOrder);
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -1112,8 +1089,6 @@ class CAllMailMessage
 		return $dbr;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function GetByID($ID)
 	{
 		return CMailMessage::GetList(Array(), Array("=ID"=>$ID));
@@ -1139,8 +1114,6 @@ class CAllMailMessage
 	}
 
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function ParseHeader($message_header, $charset)
 	{
 		$h = new CMailHeader();
@@ -1148,8 +1121,6 @@ class CAllMailMessage
 		return $h;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function AddMessage($mailbox_id, $message, $charset)
 	{
 		global $DB;
@@ -1175,7 +1146,7 @@ class CAllMailMessage
 			$arMessagePartsTmp = preg_split("/".preg_quote("--".$obHeader->GetBoundary(), "/")."(--|\r\n)/s", $message_body);
 
 			$message_body = "";
-			for($i=0; $i<count($arMessagePartsTmp); $i++)
+			for($i = 0, $n = count($arMessagePartsTmp); $i < $n; $i++)
 			{
 				if(strlen($arMessagePartsTmp[$i])<=0)
 					continue;
@@ -1187,7 +1158,7 @@ class CAllMailMessage
 				$p = strpos($message_part, "\r\n\r\n");
 
 				$message_part_header = substr($message_part, 0, $p);
-				if(strlen(trim($message_part_header))<=0 && count($arMessagePartsTmp)>1)
+				if(strlen(trim($message_part_header))<=0 && $n > 1)
 					continue;
 
 				$message_part_body = substr($message_part, $p+4);
@@ -1206,7 +1177,7 @@ class CAllMailMessage
 					$arMessagePartsRelTmp = preg_split("/".preg_quote("--".$obMPHeader->GetBoundary(), "/")."(--|\r\n)/s", $message_part_body);
 					$bFound = false;
 					$obMPHeaderHTML = false;
-					for($j=0; $j<count($arMessagePartsRelTmp); $j++)
+					for($j = 0, $num = count($arMessagePartsRelTmp); $j < $num; $j++)
 					{
 						if(strlen(trim($arMessagePartsRelTmp[$j]))<=0)
 							continue;
@@ -1257,15 +1228,15 @@ class CAllMailMessage
 					$message_part_body_converted = $message_part_body;
 
 				$arMessageParts[] = Array(
-						"CONTENT-TYPE"	=>	$content_type,
-						"CONTENT-ID"	=>	$obMPHeader->content_id,
-						"CHARSET"	=>	$charset,
-						"BODY"		=>	$message_part_body_converted,
-						"FILENAME"	=>	$filename
-						);
+					"CONTENT-TYPE"	=>	$content_type,
+					"CONTENT-ID"	=>	$obMPHeader->content_id,
+					"CHARSET"	=>	$charset,
+					"BODY"		=>	$message_part_body_converted,
+					"FILENAME"	=>	$filename
+				);
 			} //for($i=0; $i<count($arMessagePartsTmp); $i++)
 
-			for($i=0; $i<count($arMessageParts); $i++)
+			for($i = 0, $n = count($arMessageParts); $i < $n; $i++)
 			{
 				if(strlen($arMessageParts[$i]["FILENAME"])<=0 && strpos(strtolower($arMessageParts[$i]["CONTENT-TYPE"]), "text/")===0)
 				{
@@ -1389,8 +1360,6 @@ class CAllMailMessage
 
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -1417,9 +1386,6 @@ class CAllMailMessage
 		return $ID;
 	}
 
-
-	/*********************************************************************
-	*********************************************************************/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -1516,7 +1482,7 @@ class CMailAttachment
 
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$key = $filter_keys[$i];
 			$val = $arFilter[$key];
@@ -1567,12 +1533,14 @@ class CMailAttachment
 
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
+		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
 				$strSqlSearch .= " AND  (".$arSqlSearch[$i].") ";
 				$is_filtered = true;
 			}
+		}
 		$arSqlOrder = Array();
 		foreach($arOrder as $by=>$order)
 		{
@@ -1595,7 +1563,9 @@ class CMailAttachment
 
 		$strSqlOrder = "";
 		$arSqlOrder = array_unique($arSqlOrder);
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -1612,8 +1582,6 @@ class CMailAttachment
 		return $dbr;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function GetByID($ID)
 	{
 		return CMailAttachment::GetList(Array(), Array("=ID"=>$ID));
@@ -1628,13 +1596,8 @@ class CMailAttachment
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////
 class CAllMailUtil
 {
-	/*********************************************************************
-	*********************************************************************/
 	public static function ConvertCharset($str, $from, $to)
 	{
 		$from = trim(strtolower($from));
@@ -1801,7 +1764,7 @@ class CAllMailUtil
 		$bWasLeftJoin = false;
 
 		$res = Array();
-		for($i=0; $i<count($vals); $i++)
+		for($i = 0, $n = count($vals); $i < $n; $i++)
 		{
 			$val = $vals[$i];
 			if(!$bSkipEmpty || strlen($val)>0 || (is_bool($val) && $val===false))
@@ -1843,7 +1806,7 @@ class CAllMailUtil
 					break;
 				}
 
-				// при таких условиях нужно делать INNER JOIN
+				// INNER JOIN on such conditions
 				if(strlen($val)>0 && $cOperationType!="N")
 					$bFullJoin = true;
 				else
@@ -1852,7 +1815,7 @@ class CAllMailUtil
 		}
 
 		$strResult = "";
-		for($i=0; $i<count($res); $i++)
+		for($i = 0, $n = count($res); $i < $n; $i++)
 		{
 			if($i>0)
 				$strResult .= ($cOperationType=="N"?" AND ":" OR ");
@@ -1888,8 +1851,8 @@ class CAllMailUtil
 		$str = base64_decode($str);
 		while($str)
 		{
-			$m = substr($str, 0, 16);
-			$str = substr($str, 16);
+			$m = CUtil::BinSubstr($str, 0, 16);
+			$str = CUtil::BinSubstr($str, 16);
 			$m = CMailUtil::ByteXOR($m, $key1, 16);
 			$res .= $m;
 			$key1 = CMailUtil::BinMD5($key.$key1.$m);
@@ -1904,8 +1867,8 @@ class CAllMailUtil
 		$key1 = CMailUtil::BinMD5($key);
 		while($str)
 		{
-			$m = substr($str, 0, 16);
-			$str = substr($str, 16);
+			$m = CUtil::BinSubstr($str, 0, 16);
+			$str = CUtil::BinSubstr($str, 16);
 			$res .= CMailUtil::ByteXOR($m, $key1, 16);
 			$key1 = CMailUtil::BinMD5($key.$key1.$m);
 		}
@@ -1940,9 +1903,6 @@ global $BX_MAIL_FILTER_CACHE, $BX_MAIL_SPAM_CNT;
 $BX_MAIL_FILTER_CACHE = Array();
 $BX_MAIL_SPAM_CNT = Array();
 
-///////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////
 class CMailFilter
 {
 	public static function GetList($arOrder=Array(), $arFilter=Array(), $bCnt=false)
@@ -1965,7 +1925,7 @@ class CMailFilter
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
 
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$val = $arFilter[$filter_keys[$i]];
 			if (strlen($val)<=0) continue;
@@ -1998,12 +1958,14 @@ class CMailFilter
 
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
+		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
 				$strSqlSearch .= " AND  (".$arSqlSearch[$i].") ";
 				$is_filtered = true;
 			}
+		}
 
 		$arSqlOrder = Array();
 		foreach($arOrder as $by=>$order)
@@ -2038,7 +2000,9 @@ class CMailFilter
 
 		$strSqlOrder = "";
 		$arSqlOrder = array_unique($arSqlOrder);
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -2055,8 +2019,6 @@ class CMailFilter
 		return $res;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -2129,8 +2091,6 @@ class CMailFilter
 		//return ($err_cnt == CMailError::ErrCount());
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -2164,8 +2124,6 @@ class CMailFilter
 	}
 
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -2307,7 +2265,7 @@ class CMailFilter
 					if($arCondition["COMPARE_TYPE"]=="NOT_EQUAL" || $arCondition["COMPARE_TYPE"]=="NOT_CONTAIN")
 					{
 						$bCondOK = true;
-						for($i=0; $i<count($arStrings); $i++)
+						for($i = 0, $n = count($arStrings); $i < $n; $i++)
 						{
 							$str = strtoupper(Trim($arStrings[$i], "\r"));
 							switch($arCondition["COMPARE_TYPE"])
@@ -2328,7 +2286,7 @@ class CMailFilter
 					}
 					else
 					{
-						for($i=0; $i<count($arStrings); $i++)
+						for($i = 0, $n = count($arStrings); $i < $n; $i++)
 						{
 							$str = strtoupper(Trim($arStrings[$i], "\r"));
 							switch($arCondition["COMPARE_TYPE"])
@@ -2361,7 +2319,7 @@ class CMailFilter
 						$bCondOK = true;
 						while($arr_att = $db_att->Fetch())
 						{
-							for($i=0; $i<count($arStrings); $i++)
+							for($i = 0, $n = count($arStrings); $i < $n; $i++)
 							{
 								$str = strtoupper(Trim($arStrings[$i], "\r"));
 								switch($arCondition["COMPARE_TYPE"])
@@ -2382,7 +2340,7 @@ class CMailFilter
 					}
 					else
 					{
-						for($i=0; $i<count($arStrings); $i++)
+						for($i = 0, $n = count($arStrings); $i < $n; $i++)
 						{
 							$str = strtoupper(Trim($arStrings[$i], "\r"));
 							while($arr_att = $db_att->Fetch())
@@ -2595,19 +2553,12 @@ class CMailFilter
 	{
 		global $DB;
 
-		$message = Trim($message);
-		if(strlen($message)<=0)
+		$arWords = CMailFilter::getWords($message, 1000);
+
+		if (empty($arWords))
 			return 0;
 
-		// разбиваем на слова
-		$arWords = preg_split("/[\x01-\x23\x25-\x3F\x5B-\x5E}{~]+/s", $message);
-
-		// выбираем только уникальные
-		$arWords = array_unique($arWords);
-		if(count($arWords)>999)
-			$arWords = array_slice($arWords, 0, 999);
-
-		// для каждого слова находим оценку Si
+		// for every word find Si
 		$strWords = "''";
 		foreach($arWords as $word)
 			$strWords .= ",'".md5($word)."'";
@@ -2628,8 +2579,8 @@ class CMailFilter
 
 		$CNT_WORDS = COption::GetOptionInt("mail", "spam_word_count", B_MAIL_WORD_CNT);
 		$MIN_COUNT =  COption::GetOptionInt("mail", "spam_min_count", B_MAIL_MIN_CNT);
-		// выбираем $CNT_WORDS слов с наибольшей по |Si - 0.5|
-		// если слово встречалось меньше xxx (5) раз, то игнорируем
+		// select $CNT_WORDS words with max |Si - 0.5|
+		// if the word placed less then xxx (5) times, then ignore
 		$strSql =
 			"SELECT SW.*, ".
 			"	(BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) / (2*GOOD_CNT/".$BX_MAIL_SPAM_CNT["G"].".0 + BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) as RATING, ".
@@ -2660,15 +2611,41 @@ class CMailFilter
 			}
 			else
 			{
-				// если слова нет, то оценка Si = 0.4
+				//if there is no word then weight Si = 0.4
 				$a = $a * 0.4;
 				$b = $b * (1 - 0.4);
 			}
 		}
-		// считаем из них по Байесу оценку для всего письма
+		// calculate Bayes for the whole message
 		$rating = $a/($a+$b) * 100;
 
 		return Array("RATING"=>$rating, "WORDS"=>$words);
+	}
+
+	public static function getWords($message, $max_words)
+	{
+		static $tok = null;
+		if (!isset($tok))
+		{
+			$tok = "}{~";
+			for($i = ord("\x01"); $i < ord("\x23"); $i++)
+				$tok .= chr($i);
+			for($i = ord("\x25"); $i < ord("\x3F"); $i++)
+				$tok .= chr($i);
+			for($i = ord("\x5B"); $i < ord("\x5E"); $i++)
+				$tok .= chr($i);
+		}
+
+		$arWords = array();
+		$word = strtok($message, $tok);
+		while($word !== false)
+		{
+			$arWords[$word] = $word;
+			if (count($arWords) >= $max_words)
+				break;
+			$word = strtok($tok);
+		}
+		return $arWords;
 	}
 
 	public static function DoPHPAction($id, $action, &$arMessageFields)
@@ -2715,26 +2692,16 @@ class CMailFilter
 
 		@set_time_limit(30);
 
-		// разбиваем на слова
-		$message = Trim($message);
-		if(strlen($message)<=0)
-			return 0;
-		if(strlen($message)>102400)
-			$message = substr($message, 0, 102400);
+		// split to words
+		$arWords = CMailFilter::getWords($message, 1000);
 
-		// разбиваем на слова
-		$arWords = preg_split("/[\x01-\x23\x25-\x3F\x5B-\x5E}{~]+/s", $message);
-
-		// выбираем только уникальные
-		$arWords = array_unique($arWords);
-
-		// для каждого слова находим оценку Si
+		// for every word find Si
 		$strWords = "''";
 		foreach($arWords as $word)
 		{
 			$word_md5 = md5($word);
 
-			// изменяем у них оценку
+			// change weight
 			$strSql =
 				"INSERT INTO b_mail_spam_weight(WORD_ID, WORD_REAL, GOOD_CNT, BAD_CNT, TOTAL_CNT) ".
 				"VALUES('".$word_md5."', '".$DB->ForSql($word, 40)."', ".($bIsSPAM?0:1).", ".($bIsSPAM?1:0).", 1)";
@@ -2808,9 +2775,6 @@ class CMailFilter
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////
-//
-///////////////////////////////////////////////////////////////////////////////////
 class CMailFilterCondition
 {
 	public static function GetList($arOrder=Array(), $arFilter=Array())
@@ -2824,7 +2788,7 @@ class CMailFilterCondition
 			$arFilter = Array();
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$val = $arFilter[$filter_keys[$i]];
 			if (strlen($val)<=0) continue;
@@ -2844,9 +2808,11 @@ class CMailFilterCondition
 		}
 
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
+		{
 			if(strlen($arSqlSearch[$i])>0)
 				$strSqlSearch .= " AND  (".$arSqlSearch[$i].") ";
+		}
 
 		$arSqlOrder = Array();
 		foreach($arOrder as $by=>$order)
@@ -2872,7 +2838,9 @@ class CMailFilterCondition
 
 		$strSqlOrder = "";
 		$arSqlOrder = array_unique($arSqlOrder);
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -2889,8 +2857,6 @@ class CMailFilterCondition
 		return $res;
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -2945,8 +2911,6 @@ class CMailFilterCondition
 		}
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -2959,8 +2923,6 @@ class CMailFilterCondition
 	}
 
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -3024,7 +2986,7 @@ class CMailLog
 			$arFilter = Array();
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
 		{
 			$val = $arFilter[$filter_keys[$i]];
 			if (strlen($val)<=0) continue;
@@ -3056,12 +3018,14 @@ class CMailLog
 
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+		for($i = 0, $n = count($arSqlSearch); $i < $n; $i++)
+		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
 				$strSqlSearch .= " AND  (".$arSqlSearch[$i].") ";
 				$is_filtered = true;
 			}
+		}
 
 		$arSqlOrder = Array();
 		foreach($arOrder as $by=>$order)
@@ -3098,7 +3062,7 @@ class CMailLog
 		$arSqlOrder = array_unique($arSqlOrder);
 		DelDuplicateSort($arSqlOrder);
 
-		for ($i=0; $i<count($arSqlOrder); $i++)
+		for ($i = 0, $n = count($arSqlOrder); $i < $n; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";

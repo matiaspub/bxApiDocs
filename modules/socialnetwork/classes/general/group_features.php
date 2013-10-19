@@ -288,7 +288,7 @@ class CAllSocNetFeatures
 
 	
 	/**
-	 * <p>Метод устанавливает настройки дополнительного функционала для группы или пользователя. Если запись для функционала существует, то она изменяется. Иначе создается новая запись.</p> <p><b>Примечание</b>: новая запись создается методом <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a>.</p>
+	 * <p>Метод устанавливает настройки дополнительного функционала для группы или пользователя. Если запись для функционала существует, то она изменяется. Иначе создается новая запись.</p> <p><b>Примечание</b>: новая запись создается методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a>.</p>
 	 *
 	 *
 	 *
@@ -319,9 +319,9 @@ class CAllSocNetFeatures
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a></li>
 	 * </ul>
 	 *
 	 *

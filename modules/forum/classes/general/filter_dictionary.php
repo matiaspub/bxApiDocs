@@ -46,8 +46,8 @@ class CAllFilterDictionary
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. Обязательные
-	 * поля должны быть заполнены.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
+	 * Обязательные поля должны быть заполнены.
 	 *
 	 *
 	 *
@@ -72,7 +72,7 @@ class CAllFilterDictionary
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>поля таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -105,7 +105,7 @@ class CAllFilterDictionary
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
 	 *
 	 *
 	 *
@@ -114,7 +114,7 @@ class CAllFilterDictionary
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>поля таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -268,7 +268,7 @@ class CAllFilterLetter
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
 	 * Обязательные поля должны быть заполнены.
 	 *
 	 *
@@ -277,7 +277,7 @@ class CAllFilterLetter
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь
+	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
 	 * транслита"</a> </li> </ul>
 	 *
 	 *
@@ -317,7 +317,7 @@ class CAllFilterLetter
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
 	 *
 	 *
 	 *
@@ -325,7 +325,7 @@ class CAllFilterLetter
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь
+	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
 	 * транслита"</a> </li> </ul>
 	 *
 	 *
@@ -543,7 +543,7 @@ class CAllFilterUnquotableWords
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
 	 * Обязательные поля должны быть заполнены.
 	 *
 	 *
@@ -553,7 +553,8 @@ class CAllFilterUnquotableWords
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	 * </ul>
 	 *
 	 *
 	 * @static
@@ -595,7 +596,7 @@ class CAllFilterUnquotableWords
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
 	 *
 	 *
 	 *
@@ -604,7 +605,8 @@ class CAllFilterUnquotableWords
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	 * </ul>
 	 *
 	 *
 	 * @static

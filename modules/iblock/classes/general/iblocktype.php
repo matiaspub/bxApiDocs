@@ -41,6 +41,7 @@ class CIBlockType
 	 * 		<ul>
 	 * 		<li>SORT - by SORT field.
 	 * 		<li>ID - by ID field.
+	 * 		<li>NAME - by language depended NAME field (must be used with LANGUAGE_ID in the filter).
 	 * 		</ul>
 	 * 	values are case insensitive:
 	 * 		<ul>
@@ -54,6 +55,7 @@ class CIBlockType
 	 * 		<li>=ID - when contains string uses <i>strict equal</i> operator.
 	 * 		<li>=ID - when contains array[]string uses <i>in</i> operator.
 	 * 		<li>NAME - uses <i>like</i> operator and is <i>case insensitive</i>.
+	 * 		<li>LANGUAGE_ID - uses <i>strict equal</i> operator and is <i>case sensitive</i>.
 	 * 		</ul>
 	 * 	values with zero string length are ignored.
 	 * @return CDBResult
@@ -67,21 +69,21 @@ class CIBlockType
 	 *
 	 * @param array $arrayarOrder = Array("SORT"=>"ASC") Массив полей для сортировки, содержащий пары "поле
 	 * сортировки"=&gt;"направление сортировки". <br> Поля сортировки могут
-	 * принимать значения <br>     <i>id</i> - код типа; <br>     <i>sort</i> - индекс
-	 * сортировки; <br>
+	 * принимать значения: <br>    <i>id</i> - код типа; <br>    <i>sort</i> - индекс
+	 * сортировки; <br>    <i>NAME</i> - название типа. <br>
 	 *
 	 *
 	 *
 	 * @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]) <br> может
-	 * принимать значения <br>     <i>ID</i> - регистронезависимый по
-	 * подстроке в коде типа; <br>     <i>=ID</i> - точное совпадение с кодом
-	 * типа; <br>     <i>NAME</i> - регистронезависимый по подстроке в названии
+	 * принимать значения: <br>    <i>ID</i> - регистронезависимый по
+	 * подстроке в коде типа; <br>    <i>=ID</i> - точное совпадение с кодом
+	 * типа; <br>    <i>NAME</i> - регистронезависимый по подстроке в названии
 	 * типа (для всех языков); <br> Необязательное. По умолчанию записи не
-	 * фильтруются.
+	 * фильтруются. <br>    <i>LANGUAGE_ID</i> - код языка. <br>
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -92,8 +94,8 @@ class CIBlockType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -108,6 +110,7 @@ class CIBlockType
 		/** @global CCacheManager $CACHE_MANAGER */
 		global $CACHE_MANAGER;
 		$bLang = false;
+		$bNameSort = false;
 		$strSqlSearch = "1=1\n";
 
 		foreach ($arFilter as $key => $val)
@@ -140,6 +143,10 @@ class CIBlockType
 				$strSqlSearch .= "AND UPPER(TL.NAME) LIKE UPPER('%".$DB->ForSql($val)."%')\n";
 				$bLang = true;
 				break;
+			case "LANGUAGE_ID":
+				$strSqlSearch .= "AND TL.LID = '".$DB->ForSql($val)."'\n";
+				$bLang = true;
+				break;
 			}
 		}
 
@@ -147,8 +154,16 @@ class CIBlockType
 		foreach ($arOrder as $by => $order)
 		{
 			$by = strtoupper($by);
-			if ($by != "ID")
-				$by = "SORT";
+			if ($by == "ID")
+				$by = "T.ID";
+			elseif ($by == "NAME")
+			{
+				$by = "TL.NAME";
+				$bLang = true;
+				$bNameSort = true;
+			}
+			else
+				$by = "T.SORT";
 
 			$order = strtolower($order);
 			if ($order != "desc")
@@ -159,11 +174,11 @@ class CIBlockType
 			else
 				$strSqlOrder .= ', ';
 
-			$strSqlOrder .= "T.".$by." ".$order;
+			$strSqlOrder .= $by." ".$order;
 		}
 
 		$strSql = "
-			SELECT ".($bLang ? "DISTINCT" : "")." T.*
+			SELECT ".($bLang ? "DISTINCT" : "")." T.*".($bNameSort ? ",TL.NAME" : "")."
 			FROM b_iblock_type T
 			".($bLang ? " LEFT JOIN b_iblock_type_lang TL ON TL.IBLOCK_TYPE_ID = T.ID " : "")."
 			WHERE ".$strSqlSearch.$strSqlOrder;
@@ -260,12 +275,12 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocktype/index.php">CIBlockType</a></li> </ul>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a></li> </ul>
 	 *
 	 *
 	 * @static
@@ -342,8 +357,8 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * @return mixed <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">полей</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktypelang">параметров</a>
+	 * @return mixed <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">полей</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">параметров</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -354,8 +369,8 @@ class CIBlockType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktypelang">Языкозависимые поля
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">Языкозависимые поля
 	 * CIBlockType</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -440,7 +455,7 @@ class CIBlockType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/delete.php">CIBlock::Delete</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/delete.php">CIBlock::Delete</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -558,10 +573,10 @@ class CIBlockType
 	 *
 	 *
 	 * @param array $arFields  Массив поле=&gt;значение... Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">полей типа информационных
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">полей типа информационных
 	 * блоков</a>. В элементе массива arFields["LANG"] должен содержаться
 	 * ассоциативный массив <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktypelang">языковых свойств</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">языковых свойств</a>
 	 * типа.Ключами этого массива служат идентификаторы языков. <br>
 	 *
 	 *
@@ -577,9 +592,9 @@ class CIBlockType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocktype/update.php">Update()</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">Поля типа информационных
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/update.php">Update()</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля типа информационных
 	 * блоков</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -636,10 +651,10 @@ class CIBlockType
 	 *
 	 *
 	 * @param array $arFields  Массив поле=&gt;значение... Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">полей типа информационных
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">полей типа информационных
 	 * блоков</a>. В элементе массива arFields["LANG"] должен содержаться
 	 * ассоциативный массив <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktypelang">языковых свойств</a> типа.
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">языковых свойств</a> типа.
 	 * Ключами этого массива служат идентификаторы языков.
 	 *
 	 *
@@ -656,9 +671,9 @@ class CIBlockType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocktype/add.php">Add()</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocktype">Поля типа информационных
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/add.php">Add()</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля типа информационных
 	 * блоков</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

@@ -7,7 +7,7 @@ class CLdapServer
 {
 	var $arFields;
 	/**
-	 * 
+	 *
 	 * @param $arOrder
 	 * @param $arFilter
 	 * @return __CLDAPServerDBResult
@@ -23,9 +23,12 @@ class CLdapServer
 
 		if(!is_array($arFilter))
 			$arFilter = Array();
+
 		$arSqlSearch = Array();
 		$filter_keys = array_keys($arFilter);
-		for($i=0; $i<count($filter_keys); $i++)
+		$fkCount = count($filter_keys);
+
+		for($i=0; $i<$fkCount; $i++)
 		{
 			$val = $arFilter[$filter_keys[$i]];
 			$key=$filter_keys[$i];
@@ -42,6 +45,7 @@ class CLdapServer
 					break;
 				case "ID":
 				case "PORT":
+				case "MAX_PAX_SIZE":
 					$arSqlSearch[] = CLdapUtil::FilterCreate("ls.".$key, $val, "number", $cOperationType);
 					break;
 				case "TIMESTAMP_X":
@@ -71,10 +75,11 @@ class CLdapServer
 					break;
 			}
 		}
-		
+
 		$is_filtered = false;
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
+
+		for($i=0, $ssCount=count($arSqlSearch); $i<$ssCount; $i++)
 		{
 			if(strlen($arSqlSearch[$i])>0)
 			{
@@ -117,6 +122,7 @@ class CLdapServer
 				case "USER_EMAIL_ATTR":
 				case "USER_GROUP_ATTR":
 				case "USER_GROUP_ACCESSORY":
+				case "MAX_PAX_SIZE":
 					$arSqlOrder[] = " ls.".$by." ".$order." ";
 					break;
 				default:
@@ -143,7 +149,7 @@ class CLdapServer
 	}
 
 	/**
-	 * 
+	 *
 	 * @param $ID
 	 * @return __CLDAPServerDBResult
 	 */
@@ -220,9 +226,9 @@ class CLdapServer
 
 		if(is_set($arFields, "CONVERT_UTF8") && $arFields["CONVERT_UTF8"]!="Y")
 			$arFields["CONVERT_UTF8"]="N";
-			
+
 		if(is_set($arFields, "USER_GROUP_ACCESSORY") && $arFields["USER_GROUP_ACCESSORY"]!="Y")
-			$arFields["USER_GROUP_ACCESSORY"]="N";			
+			$arFields["USER_GROUP_ACCESSORY"]="N";
 
 		if(!CLdapServer::CheckFields($arFields))
 			return false;
@@ -274,7 +280,7 @@ class CLdapServer
 		$APPLICATION->ResetException();
 
 		$ID = IntVal($ID);
-		
+
 		if(is_set($arFields, "ACTIVE") && $arFields["ACTIVE"]!="Y")
 			$arFields["ACTIVE"]="N";
 
@@ -283,13 +289,13 @@ class CLdapServer
 
 		if(is_set($arFields, "CONVERT_UTF8") && $arFields["CONVERT_UTF8"]!="Y")
 			$arFields["CONVERT_UTF8"]="N";
-			
+
 		if(is_set($arFields, "USER_GROUP_ACCESSORY") && $arFields["USER_GROUP_ACCESSORY"]!="Y")
-			$arFields["USER_GROUP_ACCESSORY"]="N";			
-			
+			$arFields["USER_GROUP_ACCESSORY"]="N";
+
 		if(is_set($arFields, "IMPORT_STRUCT") && $arFields["IMPORT_STRUCT"]!="Y")
 			$arFields["IMPORT_STRUCT"]="N";
-			
+
 		if(is_set($arFields, "STRUCT_HAVE_DEFAULT") && $arFields["STRUCT_HAVE_DEFAULT"]!="Y")
 			$arFields["STRUCT_HAVE_DEFAULT"]="N";
 
@@ -373,8 +379,8 @@ class CLdapServer
 		$ID = IntVal($ID);
 		return $DB->Query("SELECT LDAP_GROUP_ID FROM b_ldap_group WHERE LDAP_SERVER_ID=".$ID." AND GROUP_ID=-1");
 	}
-	
-	
+
+
 	public static function SetGroupMap($ID, $arFields)
 	{
 		global $DB, $APPLICATION;
@@ -407,12 +413,12 @@ class CLdapServer
 	public static function Sync($ldap_server_id)
 	{
 		global $DB, $USER, $APPLICATION;
-		
+
 		if(!is_object($USER))
 		{
 			$USER = new CUser();
-			$bUSERGen = true;		
-		}		
+			$bUSERGen = true;
+		}
 
 		$dbLdapServers = CLdapServer::GetById($ldap_server_id);
 		if(!($oLdapServer = $dbLdapServers->GetNextServer()))
@@ -438,16 +444,19 @@ class CLdapServer
 					$APPLICATION->ThrowException("Unknown error");
 				return false;
 			}
-		}	
+		}
 
 		// select all users from LDAP
-		$arLdapUsers = Array();
+		$arLdapUsers = array();
 		$ldapLoginAttr = strtolower($oLdapServer->arFields["~USER_ID_ATTR"]);
+
+		$APPLICATION->ResetException();
 		$dbLdapUsers = $oLdapServer->GetUserList();
+		$ldpEx = $APPLICATION->GetException();
+
 		while($arLdapUser = $dbLdapUsers->Fetch())
 			$arLdapUsers[strtolower($arLdapUser[$ldapLoginAttr])] = $arLdapUser;
 		unset($dbLdapUsers);
-
 
 		// select all Bitrix CMS users for this LDAP
 		$arUsers = Array();
@@ -460,15 +469,16 @@ class CLdapServer
 			$arUsers[strtolower($arUser["LOGIN"])] = $arUser;
 		unset($dbUsers);
 
-		$arDelLdapUsers = array_diff(array_keys($arUsers), array_keys($arLdapUsers));
-		
+		if(!$ldpEx || $ldpEx->msg != 'LDAP_SEARCH_ERROR')
+			$arDelLdapUsers = array_diff(array_keys($arUsers), array_keys($arLdapUsers));
+
 		if(strlen($oLdapServer->arFields["SYNC_LAST"])>0)
 			$syncTime = MakeTimeStamp($oLdapServer->arFields["SYNC_LAST"]);
 		else
 			$syncTime = 0;
 
 		$arCache = array();
-			
+
 		$cnt = 0;
 		// have to update $oLdapServer->arFields["FIELD_MAP"] for user fields
 		// for each one of them looking for similar in user list
@@ -503,19 +513,19 @@ class CLdapServer
 		foreach ($arDelLdapUsers as $userLogin)
 		{
 			$USER = new CUser();
-			if (isset($arUsers[$userLogin]) && $arUsers[$userLogin]['ACTIVE'] == 'Y') 
+			if (isset($arUsers[$userLogin]) && $arUsers[$userLogin]['ACTIVE'] == 'Y')
 			{
 				$ID = intval($arUsers[$userLogin]["ID"]);
-				$USER->Update($ID, array('ACTIVE' => 'N'));				
+				$USER->Update($ID, array('ACTIVE' => 'N'));
 			}
-		}		
-		
+		}
+
 		$oLdapServer->Disconnect();
 		CLdapServer::Update($ldap_server_id, Array("~SYNC_LAST"=>$DB->CurrentTimeFunction()));
 
 		if($bUSERGen)
-			unset($USER);		
-		
+			unset($USER);
+
 		return $cnt;
 	}
 }

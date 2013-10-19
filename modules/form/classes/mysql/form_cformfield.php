@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CFormField</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросами</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полями</a>.
+ * <b>CFormField</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a>.
  *
  *
  *

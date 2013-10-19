@@ -146,7 +146,7 @@ class CAllCurrencyLang
 	 *
 	 *
 	 * @return bool <p>Функция возвращает True в случае успешного удаления и False - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__delete.819c044d.php
@@ -225,7 +225,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	 * <p>Функция возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Функция аналогична функции <a href="http://dev.1c-bitrix.ruapi_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в функции CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов функции с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. </p>
+	 * <p>Функция возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Функция аналогична функции <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в функции CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов функции с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. </p>
 	 *
 	 *
 	 *

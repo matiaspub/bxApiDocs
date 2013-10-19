@@ -164,8 +164,12 @@ class CIBlockPropertyElementList
 
 	public static function GetAdminFilterHTML($arProperty, $strHTMLControlName)
 	{
-		if(isset($_REQUEST[$strHTMLControlName["VALUE"]]) && is_array($_REQUEST[$strHTMLControlName["VALUE"]]))
-			$values = $_REQUEST[$strHTMLControlName["VALUE"]];
+		$lAdmin = new CAdminList($strHTMLControlName["TABLE_ID"]);
+		$lAdmin->InitFilter(array($strHTMLControlName["VALUE"]));
+		$filterValue = $GLOBALS[$strHTMLControlName["VALUE"]];
+
+		if(isset($filterValue) && is_array($filterValue))
+			$values = $filterValue;
 		else
 			$values = array();
 

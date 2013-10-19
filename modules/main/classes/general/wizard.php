@@ -1297,8 +1297,8 @@ STYLES;
 
 		$BX_ROOT = BX_ROOT;
 
-		$alertText = GetMessage("MAIN_WIZARD_WANT_TO_CANCEL");
-		$loadingText = GetMessage("MAIN_WIZARD_WAIT_WINDOW_TEXT");
+		$alertText = GetMessageJS("MAIN_WIZARD_WANT_TO_CANCEL");
+		$loadingText = GetMessageJS("MAIN_WIZARD_WAIT_WINDOW_TEXT");
 
 		return <<<HTML
 
@@ -1482,25 +1482,18 @@ class CWizardAdminTemplate extends CWizardTemplate
 		if ($obStep->IsAutoSubmit())
 			$autoSubmit = 'setTimeout("AutoSubmit();", 500);';
 
-		$alertText = GetMessage("MAIN_WIZARD_WANT_TO_CANCEL");
-		$loadingText = GetMessage("MAIN_WIZARD_WAIT_WINDOW_TEXT");
+		$alertText = GetMessageJS("MAIN_WIZARD_WANT_TO_CANCEL");
+		$loadingText = GetMessageJS("MAIN_WIZARD_WAIT_WINDOW_TEXT");
 
 		$package = $wizard->GetPackage();
 
-		if ($package !== null)
-		{
-			$wizardPath = $package->GetPath();
-			$arDescription = $package->GetDescription();
-			$masterIcon = "";
-			if (isset($arDescription["ICON"]) && strlen($arDescription["ICON"]) > 0)
-				$masterIcon = ' style="background-image:url('.$wizardPath.'/'.$arDescription["ICON"].')"';
-		}
-		$themeID = ADMIN_THEME_ID;
-
 		return <<<HTML
-<html>
+<!DOCTYPE html>
+<html id="bx-admin-prefix">
+<head>
 	<head>
 		<title>{$wizardName}</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta http-equiv="Content-Type" content="text/html; charset={$charset}">
 		{$ajaxScripts}
 		<style type="text/css">
@@ -1508,73 +1501,118 @@ class CWizardAdminTemplate extends CWizardTemplate
 			{
 				margin:0;
 				padding:0;
-				background-color: #DDE8F1;
-				font-family:Verdana,Arial,helvetica,sans-serif;
-				font-size:75%;
+				font-size: 13px;
+				font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 			}
 			table {font-size:100%;}
-			form {margin:0;}
+			form {margin:0; padding:0; }
 
-			#border-box
-			{
-				margin:2px 2px 0 2px;
-				border:1px solid #A9BBC8;
+			a {
+				color: #2675D7;
+				text-decoration: underline;
 			}
 
-			#step_info
-			{
-				height:45px;
-				padding:8px 30px 8px 55px;
-				border-bottom:1px solid #ccc;
-				box-sizing:border-box;
-				-moz-box-sizing:border-box;
-				overflow:hidden;
-				background:#F2F5F9 url(/bitrix/themes/{$themeID}/images/wizard/wizard.gif) 10px center no-repeat;
 
+			.step-content {
+				border: solid 1px #DCE7ED;
+				background-color: #F5F9F9;
+				height: 347px;
+				overflow: auto;
 			}
 
-			#step_title
+			.step-header {
+				border-bottom: 1px solid #DCE7ED;
+				font-size: 12px;
+				padding: 6px 30px 9px 9px;
+				margin-bottom: 12px;
+			}
+
+			.step-title { font-size: 16px; }
+			.step-subtitle { font-size: 13px; }
+
+			.step-body {
+				padding: 0 10px;
+			}
+
+			.step-buttons
 			{
+				padding-top: 12px;
+				padding-left: 2px;
+			}
+
+			.step-buttons input {
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				border:none;
+				border-top:1px solid #fff;
+				-webkit-box-shadow: 0 0 1px rgba(0,0,0,.11), 0 1px 1px rgba(0,0,0,.3), inset 0 1px #fff, inset 0 0 1px rgba(255,255,255,.5);
+				box-shadow: 0 0 1px rgba(0,0,0,.3), 0 1px 1px rgba(0,0,0,.3), inset 0 1px #fff, inset 0 0 1px rgba(255,255,255,.5);
+				background-image: -webkit-linear-gradient(bottom, #d7e3e7, #fff)!important;
+				background-image: -moz-linear-gradient(bottom, #d7e3e7, #fff)!important;
+				background-image: -ms-linear-gradient(bottom, #d7e3e7, #fff)!important;
+				background-image: -o-linear-gradient(bottom, #d7e3e7, #fff)!important;
+				background-image: linear-gradient(bottom, #d7e3e7, #fff)!important;
+				color:#3f4b54;
+				cursor:pointer;
+				display:inline-block;
+				font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
 				font-weight:bold;
+				font-size:13px;
+				height: 29px;
+				text-shadow:0 1px rgba(255,255,255,0.7);
+				text-decoration:none;
+				position:relative;
+				vertical-align:middle;
+				-webkit-font-smoothing: antialiased;
+				padding: 0 13px 2px;
+				margin-right: 3px;
 			}
 
-			#step_description
-			{
-				font-size:95%;
-				margin-left:10px;
+			.step-buttons input:hover {
+				text-decoration: none;
+				background:#f3f6f7!important;
+				background-image: -webkit-linear-gradient(top, #f8f8f9, #f2f6f8)!important;
+				background-image: -moz-linear-gradient(top, #f8f8f9, #f2f6f8)!important;
+				background-image: -ms-linear-gradient(top, #f8f8f9, #f2f6f8)!important;
+				background-image: -o-linear-gradient(top, #f8f8f9, #f2f6f8)!important;
+				background-image: linear-gradient(top, #f8f8f9, #f2f6f8)!important;
 			}
 
-			#step_content
-			{
-				padding:20px 20px;
-				box-sizing:border-box;
-				-moz-box-sizing:border-box;
-				float:left;
-			}
-			#step_buttons
-			{
-				height:50px;
-				text-align:right;
-				padding-right:20px;
-				padding-top:5px;
-				overflow:hidden;
-				box-sizing:border-box;
-				-moz-box-sizing:border-box;
+			.step-buttons input:active {
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				background-color: #b7c4c9!important;
+				-webkit-box-shadow: inset 0 1px 1px 1px rgba(103,109,123,.78);
+				box-shadow: inset 0 1px 1px 1px rgba(103,109,123,.78);
+				background-image: -webkit-linear-gradient(top, rgba(179,194,200,.96), rgba(202,215,219,.96))!important;
+				background-image: -moz-linear-gradient(top, rgba(179,194,200,.96), rgba(202,215,219,.96))!important;
+				background-image: -ms-linear-gradient(top, rgba(179,194,200,.96), rgba(202,215,219,.96))!important;
+				background-image: -o-linear-gradient(top, rgba(179,194,200,.96), rgba(202,215,219,.96))!important;
+				background-image: linear-gradient(top, rgba(179,194,200,.96), rgba(202,215,219,.96))!important;
+				border-top:transparent;
+				height: 29px;
+				outline:none;
+				padding:2px 13px 1px;
 			}
 
-			#step_content_container
-			{
-				height:290px;
-				overflow:auto;
-				background:#fff;
+			.bx-ie8 .step-buttons input,
+			.bx-ie9 .step-buttons input {
+				border-radius:4px;
+				background:url("/bitrix/panel/main/images/bx-admin-sprite-small-1.png") repeat-x 0 -3554px;
+				box-shadow:0 0 0 1px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 0 #FFFFFF inset, 0 0 1px rgba(255, 255, 255, 0.5) inset !important;
+				line-height:16px;
+				height:31px!important;
+				padding-top:6px!important;
+				padding-bottom:6px!important;
+				margin-right: 3px !important;
 			}
+
+			.bx-ie8 .step-buttons input {border:1px solid #959c9d !important;}
 
 			#step_error
 			{
 				color:red;
-				background:white;
-				border-bottom:1px solid #ccc;
-				padding:2px 30px;
+				padding:0 0 12px 0;
 			}
 
 			#hidden-layer
@@ -1592,55 +1630,22 @@ class CWizardAdminTemplate extends CWizardTemplate
 			}
 
 			/*Data table*/
-			table.wizard-data-table
-			{
-				border:1px solid #B2C4DD;
-				border-collapse:collapse;
-			}
-
-			/*Any cell*/
-			table.wizard-data-table td
-			{
-				border:1px solid #B2C4DD;
-				background-color:#FFFFFF;
-				padding:3px 5px;
-			}
-
-			/*Head cell*/
-			table.wizard-data-table thead td, table.wizard-data-table th
-			{
+			table.wizard-data-table { border:1px solid #B2C4DD; border-collapse:collapse;}
+			table.wizard-data-table td { border:1px solid #B2C4DD; background-color:#FFFFFF; padding:3px 5px; }
+			table.wizard-data-table thead td, table.wizard-data-table th {
 				background-color:#E4EDF5;
 				font-weight:normal;
 				background-image:none;
 				border:1px solid #B2C4DD;
 				padding:4px;
 			}
+			table.wizard-data-table tbody td { background-color:#FFF; background-image:none; }
+			table.wizard-data-table tfoot td { background-color:#F2F5F9; padding:4px; }
 
-			/*Body cell*/
-			table.wizard-data-table tbody td
-			{
-				background-color:#FFF;
-				background-image:none;
-			}
+			.wizard-note-box { background:#FEFDEA; padding:7px; border:1px solid #D7D6BA; }
+			.wizard-required { color:red; }
 
-			/*Foot cell*/
-			table.wizard-data-table tfoot td
-			{
-				background-color:#F2F5F9;
-				padding:4px;
-			}
-
-			.wizard-note-box
-			{
-				background:#FEFDEA;
-				padding:7px;
-				border:1px solid #D7D6BA;
-			}
-
-			.wizard-required
-			{
-				color:red;
-			}
+			.bx-session-message { display: none !important;}
 
 		</style>
 
@@ -1648,11 +1653,13 @@ class CWizardAdminTemplate extends CWizardTemplate
 
 		<script type="text/javascript">
 
+			top.BX.message({"ADMIN_WIZARD_EXIT_ALERT" : "{$alertText}"});
+
 			function OnLoad()
 			{
-				var title = self.parent.window.document.getElementById("wizard_dialog_title");
-				if (title)
-					title.innerHTML = "{$wizardName}";
+				var dialog = top.BX.WindowManager.Get();
+				if (dialog)
+					dialog.SetTitle('{$wizardName}');
 
 				var form = document.forms["{$formName}"];
 
@@ -1665,9 +1672,14 @@ class CWizardAdminTemplate extends CWizardTemplate
 				var finishButton = document.forms["{$formName}"].elements["{$finishButtonID}"];
 
 				if (cancelButton && !nextButton && !prevButton && !finishButton)
+				{
+					top.WizardWindow.isClosed = true;
 					cancelButton.onclick = CloseWindow;
+				}
 				else if(cancelButton)
+				{
 					cancelButton.onclick = ConfirmCancel;
+				}
 
 				{$autoSubmit}
 			}
@@ -1683,7 +1695,7 @@ class CWizardAdminTemplate extends CWizardTemplate
 				var nextButton = document.forms["{$formName}"].elements["{$nextButtonID}"];
 				if (nextButton)
 				{
-					var wizard = self.parent.window.WizardWindow;
+					var wizard = top.WizardWindow;
 					if (wizard)
 					{
 						wizard.messLoading = "{$loadingText}";
@@ -1745,11 +1757,8 @@ class CWizardAdminTemplate extends CWizardTemplate
 
 			function EnterKeyPress(event)
 			{
-				if (!document.getElementById)
-					return;
 
-				if (window.event)
-					event = window.event;
+				event = event || window.event;
 
 				if (!event.ctrlKey)
 					return;
@@ -1786,20 +1795,18 @@ class CWizardAdminTemplate extends CWizardTemplate
 	<body onload="OnLoad();">
 
 		{#FORM_START#}
-		<div id="border-box">
-			<div id="step_info"{$masterIcon}>
-				<div id="step_title">{$stepTitle}</div>
-				<div id="step_description">{$stepSubTitle}</div>
+		<div class="step-content">
+			<div class="step-header">
+				<div class="step-title">{$stepTitle}</div>
+				<div class="step-subtitle">{$stepSubTitle}</div>
 			</div>
-
-			<div id="step_content_container">
+			<div class="step-body">
 				{$strError}
-				<div id="step_content">{#CONTENT#}</div>
+				{#CONTENT#}
 			</div>
+
 		</div>
-
-		<div id="step_buttons">{#BUTTONS#}</div>
-
+		<div class="step-buttons">{#BUTTONS#}</div>
 		{#FORM_END#}
 		{$strJsError}
 

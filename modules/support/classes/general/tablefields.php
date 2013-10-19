@@ -4,8 +4,10 @@ class CSupportTableFields
 	const VT_NUMBER		= "number";					
 	const VT_STRING		= "string";
 	const VT_Y_N		= "Y_N";
+	const VT_Y_N_NULL	= "Y_N_NULL";
 	const VT_DATE		= "date";
 	const VT_DATE_TIME	= "datetime";
+
 	
 	const JS_HREF		= 1;
 	const JS_HREF_ALERT	= 2;
@@ -58,14 +60,19 @@ class CSupportTableFields
 			case self::VT_STRING:
 				$res = ($maxStrLen == 0 ? $value : substr($value, 0, $maxStrLen)) ;
 				break;
+			case self::VT_Y_N_NULL:
+				$res = ($value == "Y") ? "Y" : ($value === null ? null : "N");
+				break;
 			case self::VT_Y_N:
 				$res = ($value == "Y") ? "Y" : "N";
 				break;
 			case self::VT_DATE:
 				$res = (is_int($value) || $value===null) ? $value : MakeTimeStamp($value , FORMAT_DATE);
+				$res = (is_int($res) || $res===null) ? $res : null;
 				break;
 			case self::VT_DATE_TIME:
 				$res = (is_int($value) || $value===null) ? $value : MakeTimeStamp($value , FORMAT_DATETIME);
+				$res = (is_int($res) || $res===null) ? $res : null;
 				break;
 		}
 		if($list != null) $res = (in_array($res, $list) ? $res : $defVal);
@@ -84,6 +91,7 @@ class CSupportTableFields
 			case self::VT_NUMBER:		return (is_float($value)) ? floatval($value) : intval($value);
 			
 			case self::VT_Y_N:
+			case self::VT_Y_N_NULL:
 			case self::VT_STRING:		return "'" . $DB->ForSql($value) . "'";
 			
 			case self::VT_DATE:			$sf = "SHORT";
@@ -263,12 +271,12 @@ class CSupportTableFields
 			if(!array_key_exists($n, $this->_arFieldsTypes)) return;
 			if($this->_arFieldsTypes[$n]["TYPE"] == self::VT_DATE)
 			{
-				$this->_arFields[$row][$n] = $DB->CurrentDateFunction();
+				$this->_arFields[$row][$n] = time() + CTimeZone::GetOffset();
 				$this->_arModifiedFields[$row][$n] = true;
 			}
 			elseif($this->_arFieldsTypes[$n]["TYPE"] == self::VT_DATE_TIME)
 			{
-				$this->_arFields[$row][$n] = $DB->GetNowFunction();
+				$this->_arFields[$row][$n] = time() + CTimeZone::GetOffset();
 				$this->_arModifiedFields[$row][$n] = true;
 			}
 		}

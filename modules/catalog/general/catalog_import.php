@@ -1,6 +1,68 @@
 <?
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/index.php
+ * @author Bitrix
+ */
 class CAllCatalogImport
 {
+	
+	/**
+	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a>;</li> <li>
+	 * <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a>.</li> </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров профиля импорта. Допустимые
+	 * ключи: <ul> <li> <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li>
+	 * <b>MODIFIED_BY</b> - ID пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> -
+	 * время последнего изменения профиля в формате сайта;</li> <li>
+	 * <b>DATE_CREATE</b> - дата создания профиля в формате сайта;</li> <li> <b>FILE_NAME</b> -
+	 * имя файла профиля со скриптом, осуществляющего импорт. Ключ
+	 * является обязательным, если $ACTION = 'ADD';</li> <li> <b>NAME</b> - название
+	 * профиля импорта. Ключ является обязательным, если $ACTION = 'ADD';</li> <li>
+	 * <b>IN_MENU</b> - [Y|N] флаг отображения профиля в административном меню;</li>
+	 * <li> <b>DEFAULT_PROFILE</b> - [Y|N] признак использования профиля по
+	 * умолчанию;</li> <li> <b>IN_AGENT</b> - [Y|N] флаг наличия агента,
+	 * осуществляющего автоматическое выполнение профиля импорта; </li>
+	 * <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите <i>cron</i> для
+	 * автоматической периодической выгрузки (только для Unix-систем);</li>
+	 * <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
+	 * пор, пока профиль не будет отредактирован, он выполняться не
+	 * будет). </li> </ul>
+	 *
+	 *
+	 *
+	 * @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
+	 * иначе - <i>false</i>.</p>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a></li>
+	 * </ul><br><br>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/checkfields.php
+	 * @author Bitrix
+	 */
 	public static function CheckFields($ACTION, &$arFields)
 	{
 		if ((is_set($arFields, "FILE_NAME") || $ACTION=="ADD") && strlen($arFields["FILE_NAME"])<=0)
@@ -24,6 +86,24 @@ class CAllCatalogImport
 		return true;
 	}
 
+	
+	/**
+	 * <p>Функция удаляет профиль импорта с кодом ID. </p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  Код удаляемого профиля импорта.
+	 *
+	 *
+	 *
+	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
+	 * противном случае.</p><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/delete.php
+	 * @author Bitrix
+	 */
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -34,24 +114,74 @@ class CAllCatalogImport
 
 	
 	/**
-	 * <p>Развернутое описание функции.</p> <p><b>Примечание</b>: .</p>
+	 * <p>Возвращает список профилей импорта по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed <p>описание возвращаемого значения.</p>
+	 * @param array $arOrder = array("ID"=>"ASC") Массив, в соответствии с которым сортируются результирующие
+	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	 * "направление_сортировки1", "название_поля2" =&gt;
+	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	 * могут использоваться: <ul> <li> <i>NAME</i> - название профиля импорта;</li>
+	 * <li> <i>FILE_NAME</i> - имя файла профиля со скриптом, осуществляющего
+	 * импорт;</li> <li> <i>DEFAULT_PROFILE</i> - Y|N] флаг использования профиля по
+	 * умолчанию;</li> <li> <i>IN_MENU</i> - [Y|N] флаг отображения профиля в
+	 * административном меню;</li> <li> <i>LAST_USE</i> - дата и время последнего
+	 * выполнения профиля в формате базы;</li> <li> <i>IN_AGENT</i> -[Y|N] флаг наличия
+	 * агента, осуществляющего автоматическое выполнение профиля
+	 * импорта;</li> <li> <i>IN_CRON</i> - [Y|N] флаг привязки профиля к утилите <i>cron</i>
+	 * для автоматической периодической выгрузки;</li> <li> <i>NEED_EDIT</i> - [Y|N]
+	 * флаг означает неполную настройку профиля (до тех пор, пока
+	 * профиль не будет отредактирован, он выполняться не будет).</li> </ul>
+	 * Попытка сортировки по остальным полям профиля приведет к
+	 * сортировке по <i>ID</i>.<br><br> В качестве "направление_сортировки<i>X</i>"
+	 * могут быть значения "<i>ASC</i>" (по возрастанию) и "<i>DESC</i>" (по
+	 * убыванию).<br><br> Если массив сортировки имеет несколько элементов,
+	 * то результирующий набор сортируется последовательно по каждому
+	 * элементу (т.е. сначала сортируется по первому элементу, потом
+	 * результат сортируется по второму и т.д.).
 	 *
 	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>Пару строчек примера<br>желательно имеющего не только академическую ценность<br>?&gt;
-	 * </pre>
+	 *
+	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи профилей
+	 * импорта. Массив имеет вид: <pre class="syntax">array(
+	 * "[модификатор]название_поля1" =&gt; "значение1",
+	 * "[модификатор]название_поля2" =&gt; "значение2", . . . )</pre>
+	 * Удовлетворяющие фильтру записи возвращаются в результате, а
+	 * записи, которые не удовлетворяют условиям фильтра,
+	 * отбрасываются.<br><br> Допустимым является следующий модификатор:
+	 * <ul> <li> <b> !</b> - отрицание;</li> </ul> В качестве "название_поляX" может
+	 * стоять любое поле профиля импорта, кроме <i>SETUP_VARS</i>, <i>TIMESTAMP_X</i> и
+	 * <i>DATE_CREATE</i>.
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> </li> </ul><a name="examples"></a>
+	 * @param bool $bCount = false Если параметр равен <i>true</i>, то возвращается только количество
+	 * профилей, которое соответствует установленному фильтру.
+	 * Необязательный. По умолчанию равен <i>false</i>.
 	 *
+	 *
+	 *
+	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий коллекцию
+	 * ассоциативных массивов с ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li>
+	 * <b>FILE_NAME</b> - имя файла профиля со скриптом, осуществляющего
+	 * импорт;</li> <li> <b>NAME</b> - название профиля импорта;</li> <li> <b>IN_MENU</b> - [Y|N]
+	 * флаг отображения профиля в административном меню;</li> <li> <b>IN_AGENT</b>
+	 * -[Y|N] флаг наличия агента, осуществляющего автоматическое
+	 * выполнение профиля импорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки
+	 * профиля к утилите <i>cron</i> для автоматической периодической
+	 * выгрузки;</li> <li> <b>SETUP_VARS</b> - параметры настройки профиля в виде
+	 * url-строки;</li> <li> <b>DEFAULT_PROFILE</b> - [Y|N] флаг использования профиля по
+	 * умолчанию;</li> <li> <b>LAST_USE</b> - дата и время последнего выполнения
+	 * профиля в формате базы;</li> <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную
+	 * настройку профиля (до тех пор, пока профиль не будет
+	 * отредактирован, он выполняться не будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата
+	 * и время последнего использования профиля в формате сайта;</li> <li>
+	 * <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID
+	 * пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время
+	 * последнего изменения профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> -
+	 * дата и время создания профиля в формате сайта.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/gelist.php
@@ -194,24 +324,34 @@ class CAllCatalogImport
 
 	
 	/**
-	 * <p>Развернутое описание функции.</p> <p><b>Примечание</b>: .</p>
+	 * <p>Метод возвращает информацию о профиле импорта с заданным ID.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed <p>описание возвращаемого значения.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>Пару строчек примера<br>желательно имеющего не только академическую ценность<br>?&gt;
-	 * </pre>
+	 * @param int $ID  Код записи.
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> </li> </ul><a name="examples"></a>
-	 *
+	 * @return array <p>Метод возвращает ассоциативный массив параметров профиля с
+	 * ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li> <b>FILE_NAME</b> - имя файла
+	 * профиля со скриптом, осуществляющего импорт;</li> <li> <b>NAME</b> -
+	 * название профиля импортп;</li> <li> <b>IN_MENU</b> - [Y|N] флаг отображения
+	 * профиля в административном меню;</li> <li> <b>IN_AGENT</b> -[Y|N] флаг наличия
+	 * агента, осуществляющего автоматическое выполнение профиля
+	 * импорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите <i>cron</i>
+	 * для автоматической периодической выгрузки;</li> <li> <b>SETUP_VARS</b> -
+	 * параметры настройки профиля в виде url-строки;</li> <li> <b>DEFAULT_PROFILE</b> -
+	 * [Y|N] флаг использования профиля по умолчанию;</li> <li> <b>LAST_USE</b> - дата
+	 * и время последнего выполнения профиля в формате базы;</li> <li>
+	 * <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
+	 * пор, пока профиль не будет отредактирован, он выполняться не
+	 * будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата и время последнего использования
+	 * профиля в формате сайта;</li> <li> <b>CREATED_BY</b> - ID пользователя,
+	 * создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID пользователя, изменившего
+	 * профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время последнего изменения
+	 * профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> - дата и время создания
+	 * профиля в формате сайта.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/getbyid.php
@@ -238,27 +378,36 @@ class CAllCatalogImport
 		return false;
 	}
 
+	
+	/**
+	 * <p>Метод выполняет профиль <i>profile_id</i> на агенте.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $profile_id  Код выполняемого профиля.
+	 *
+	 *
+	 *
+	 * @return mixed <p>В случае успешного выполнения профиля импорта метод возвращает
+	 * строку для следующего вызова агента. В противном случае метод
+	 * вернет <i>false</i>.</p><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/pregenerateimport.php
+	 * @author Bitrix
+	 */
 	public static function PreGenerateImport($profile_id)
 	{
 		global $DB;
 
-		$profile_id = IntVal($profile_id);
+		$profile_id = intval($profile_id);
 		if ($profile_id <= 0)
 			return false;
 
 		$ar_profile = CCatalogImport::GetByID($profile_id);
 		if ((!$ar_profile) || ('Y' == $ar_profile['NEED_EDIT']))
 			return false;
-
-		if ($ar_profile["DEFAULT_PROFILE"] != "Y")
-			parse_str($ar_profile["SETUP_VARS"]);
-
-		$bFirstLoadStep = True;
-
-		if (!defined("CATALOG_LOAD_NO_STEP"))
-			// define("CATALOG_LOAD_NO_STEP", true);
-
-		CCatalogDiscountSave::Disable();
 
 		$strFile = CATALOG_PATH2IMPORTS.$ar_profile["FILE_NAME"]."_run.php";
 		if (!file_exists($_SERVER["DOCUMENT_ROOT"].$strFile))
@@ -271,16 +420,35 @@ class CAllCatalogImport
 			}
 		}
 
+		$bFirstLoadStep = true;
+
+		if (!defined("CATALOG_LOAD_NO_STEP"))
+			// define("CATALOG_LOAD_NO_STEP", true);
+
 		$strImportErrorMessage = "";
 		$strImportOKMessage = "";
 
-		$bAllDataLoaded = True;
+		$bAllDataLoaded = true;
 
-		@include($_SERVER["DOCUMENT_ROOT"].$strFile);
+		$arSetupVars = array();
+		$intSetupVarsCount = 0;
+		if ('Y' != $ar_profile["DEFAULT_PROFILE"])
+		{
+			parse_str($ar_profile["SETUP_VARS"], $arSetupVars);
+			if (!empty($arSetupVars) && is_array($arSetupVars))
+			{
+				$intSetupVarsCount = extract($arSetupVars, EXTR_SKIP);
+			}
+		}
+
+		CCatalogDiscountSave::Disable();
+		include($_SERVER["DOCUMENT_ROOT"].$strFile);
 		CCatalogDiscountSave::Enable();
+
 		CCatalogImport::Update($profile_id, array(
 			"=LAST_USE" => $DB->GetNowFunction()
-			));
+			)
+		);
 
 		return "CCatalogImport::PreGenerateImport(".$profile_id.");";
 	}

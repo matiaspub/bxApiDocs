@@ -6,7 +6,7 @@
 
 
 /**
- * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статусами</a>.
+ * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>.
  *
  *
  *
@@ -29,12 +29,12 @@ class CAllFormStatus
 	// права на статус по группам
 	
 	/**
-	 * <p> Возвращает массивы групп пользователей, имеющих определённые <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">права</a> на указанный <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a>.</p>
+	 * <p> Возвращает массивы групп пользователей, имеющих определённые <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">права</a> на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>.
+	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
 	 *
 	 *
 	 *
@@ -92,11 +92,11 @@ class CAllFormStatus
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">Права на результат</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getpermission.php">CForm::GetPermission</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -138,12 +138,12 @@ class CAllFormStatus
 	// права на статус
 	
 	/**
-	 * <p> Возвращает массив <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">прав</a> текущего пользователя на указанный <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a>. В качестве значений данного массива допустимы: </p> <ul> <li> <b>VIEW</b> - право на просмотр <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> в данном статусе; </li> <li> <b>MOVE</b> - право на перевод результатов в данный статус; </li> <li> <b>EDIT</b> - право на редактирование результатов в данном статусе; </li> <li> <b>DELETE</b> - право на удаление результатов в данном статусе. </li> </ul>
+	 * <p> Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">прав</a> текущего пользователя на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. В качестве значений данного массива допустимы: </p> <ul> <li> <b>VIEW</b> - право на просмотр <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> в данном статусе; </li> <li> <b>MOVE</b> - право на перевод результатов в данный статус; </li> <li> <b>EDIT</b> - право на редактирование результатов в данном статусе; </li> <li> <b>DELETE</b> - право на удаление результатов в данном статусе. </li> </ul>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>.
+	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
 	 *
 	 *
 	 *
@@ -175,11 +175,11 @@ class CAllFormStatus
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">Права на результат</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getpermission.php">CForm::GetPermission</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -283,56 +283,56 @@ class CAllFormStatus
 	// добавление/обновление статуса
 	
 	/**
-	 * <p>Добавляет новый <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
+	 * <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $fields  Массив значений, в качестве ключей массива допустимы: <ul> <li>
 	 * <b>FORM_ID</b><font color="red">*</font> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>; </li> <li> <b>TITLE</b><font
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <b>TITLE</b><font
 	 * color="red">*</font> - заголовок <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>; </li> <li> <b>C_SORT</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>C_SORT</b> -
 	 * порядок сортировки; </li> <li> <b>ACTIVE</b> - флаг активности; допустимы
 	 * следующие значения: <ul> <li> <b>Y</b> - ответ активен; </li> <li> <b>N</b> - ответ
 	 * не активен (по умолчанию). </li> </ul> </li> <li> <b>DESCRIPTION</b> - описание <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>; </li> <li> <b>CSS</b> - имя CSS
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>CSS</b> - имя CSS
 	 * класса для вывода заголовка <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>; </li> <li> <b>HANDLER_OUT</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>HANDLER_OUT</b> -
 	 * путь относительно корня к <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/status_processing.php">обработчику</a>, вызываемому
-	 * при смене у <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>
-	 * данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> на какой
+	 * href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
+	 * при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
+	 * данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на какой
 	 * либо другой; </li> <li> <b>HANDLER_IN</b> - путь относительно корня к <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/status_processing.php">обработчику</a>, вызываемому
-	 * при смене у <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>
-	 * какого либо <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> на
+	 * href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
+	 * при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
+	 * какого либо <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на
 	 * данный; </li> <li> <b>DEFAULT_VALUE</b> - флаг установки <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> по умолчанию,
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> по умолчанию,
 	 * допустимы следующие значения: <ul> <li> <b>Y</b> - статус будет
 	 * устанавливаться; </li> <li> <b>N</b> - статус не будет устанавливаться (по
 	 * умолчанию). </li> </ul> </li> <li> <b>arPERMISSION_VIEW</b>* - массив ID групп
 	 * пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">право</a> "Просмотр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Просмотр
 	 * результатов в данном статусе"; </li> <li> <b>arPERMISSION_MOVE</b>* - массив ID
 	 * групп пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">право</a> "Перевод результатов
-	 * в данный статус"; </li> <li> <b>arPERMISSION_EDIT</b>* - массив ID групп
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Перевод
+	 * результатов в данный статус"; </li> <li> <b>arPERMISSION_EDIT</b>* - массив ID групп
 	 * пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">право</a> "Редактирование
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Редактирование
 	 * результатов в данном статусе"; </li> <li> <b>arPERMISSION_DELETE</b>* - массив ID
 	 * групп пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">право</a> "Удаление
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Удаление
 	 * результатов в данном статусе". </li> </ul> <br><font color="red">*</font> -
 	 * обязательно к заполнению. <br>* - в данных массивах может быть
 	 * элемент со значением "0", означающий создателя <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
 	 *
 	 *
 	 *
-	 * @param mixed $status_id = false ID обновляемого <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>.<br>
+	 * @param mixed $status_id = false ID обновляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.<br>
 	 * Параметр необязательный. По умолчанию - "false" (добавление нового <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>).
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>).
 	 *
 	 *
 	 *
@@ -384,7 +384,7 @@ class CAllFormStatus
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/index.php">Поля CFormStatus</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">Поля CFormStatus</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -554,21 +554,21 @@ class CAllFormStatus
 	// удаляет статус
 	
 	/**
-	 * <p>Удаляет <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p> <p class="note"><b>Примечание</b><br>Статусы, в которых находится хотя бы один <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результат</a>, невозможно удалить.</p>
+	 * <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p> <p class="note"><b>Примечание</b><br>Статусы, в которых находится хотя бы один <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a>, невозможно удалить.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $status_id  ID удаляемого <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>.
+	 * @param int $status_id  ID удаляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
 	 *
 	 *
 	 *
 	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions">прав</a> текущего
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
 	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
 	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
 	 * </ul> Для успешного выполнения удаления необходимо иметь <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
 	 * доступ</b> на веб-форму, к которой принадлежит <i>status_id</i>. <br>Параметр
 	 * необязательный. По умолчанию - "Y" (права необходимо проверить).
 	 *
@@ -598,10 +598,10 @@ class CAllFormStatus
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -648,23 +648,23 @@ class CAllFormStatus
 	// копирует статус
 	
 	/**
-	 * <p>Копирует <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
+	 * <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> который
+	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> который
 	 * необходимо скопировать.
 	 *
 	 *
 	 *
 	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions">прав</a> текущего
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
 	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
 	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	 * </ul> Для копирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>
+	 * </ul> Для копирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>
 	 * необходимо обладать нижеследующими <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions#module">правами</a>: <ol> <li> <b>[25]
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#module">правами</a>: <ol> <li> <b>[25]
 	 * просмотр параметров веб-формы</b> на ту веб-форму, из которой идет
 	 * копирование; </li> <li> <b>[30] полный доступ</b> на ту веб-форму, в которую
 	 * копируется. </li> </ol> Параметр необязательный. По умолчанию - "Y"
@@ -672,11 +672,11 @@ class CAllFormStatus
 	 *
 	 *
 	 *
-	 * @param mixed $form_id = false ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a> в который
+	 * @param mixed $form_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в который
 	 * необходимо скопировать <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статус</a>.<br> Необязательный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.<br> Необязательный
 	 * параметр. По умолчанию - "false" (текущая <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форма</a>).
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форма</a>).
 	 *
 	 *
 	 *
@@ -704,9 +704,9 @@ class CAllFormStatus
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/copy.php">CForm::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/copy.php">CForm::Copy</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

@@ -310,7 +310,7 @@ class CAllSocNetUserRelations
 	 *
 	 *
 	 * @return CDBResult <p>Метод возвращает объект типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
 	 * список связей указанного типа.</p>
 	 *
 	 *
@@ -334,7 +334,7 @@ class CAllSocNetUserRelations
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

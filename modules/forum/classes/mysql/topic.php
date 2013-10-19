@@ -63,7 +63,7 @@ class CForumTopic extends CAllForumTopic
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -83,8 +83,8 @@ class CForumTopic extends CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -328,13 +328,13 @@ class CForumTopic extends CAllForumTopic
 	 *
 	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]). Подробное
 	 * описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
 	 *
 	 *
 	 *
 	 * @param  $array  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]). <br>
 	 * Подробное описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
 	 *
 	 *
 	 *
@@ -366,7 +366,7 @@ class CForumTopic extends CAllForumTopic
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -377,8 +377,8 @@ class CForumTopic extends CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

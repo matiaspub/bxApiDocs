@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событиями</a>.
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.
  *
  *
  *
@@ -20,7 +20,7 @@ class CAllStatEvent
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">события</a> в функциях <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p>Значение данного параметра формируется на основе нижеследующих данных текущего <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителя</a>: </p> <ul> <li>краткий идентификатор портала (из настроек модуля "Статистика"); </li> <li>ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессии</a>; </li> <li>ID посетителя; </li> <li>двухсимвольный идентификатор страны; </li> <li>ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a>; </li> <li>флаг <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямого захода</a>, либо <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврата</a> по рекламной кампании; </li> <li>двухсимвольный идентификатор сайта. </li> </ul> В зависимости от значения настройки "Кодировать дополнительный параметр #EVENT_GID# для событий" модуля "Статистика" возвращаемый параметр может быть как в открытом виде, так и в base64-кодированном виде.
+	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> в функциях <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p>Значение данного параметра формируется на основе нижеследующих данных текущего <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>: </p> <ul> <li>краткий идентификатор портала (из настроек модуля "Статистика"); </li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li> <li>ID посетителя; </li> <li>двухсимвольный идентификатор страны; </li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>; </li> <li>флаг <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямого захода</a>, либо <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврата</a> по рекламной кампании; </li> <li>двухсимвольный идентификатор сайта. </li> </ul> В зависимости от значения настройки "Кодировать дополнительный параметр #EVENT_GID# для событий" модуля "Статистика" возвращаемый параметр может быть как в открытом виде, так и в base64-кодированном виде.
 	 *
 	 *
 	 *
@@ -55,9 +55,10 @@ class CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/decodegid.php">CStatEvent::DecodeGID</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">Термин "Специальный
-	 * параметр события"</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/decodegid.php">CStatEvent::DecodeGID</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный параметр
+	 * события"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -96,7 +97,7 @@ class CAllStatEvent
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Добавляет <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событие</a> используя текущие параметры <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителя</a>. Если <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типа события</a> с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификаторами</a> <i>event1</i>, <i>event2</i> не существует, то он будет автоматически создан с указанными идентификаторами.</p>
+	 * <p>Добавляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a> используя текущие параметры <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>. Если <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a> с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторами</a> <i>event1</i>, <i>event2</i> не существует, то он будет автоматически создан с указанными идентификаторами.</p>
 	 *
 	 *
 	 *
@@ -109,7 +110,7 @@ class CAllStatEvent
 	 *
 	 *
 	 *
-	 * @param string $event3 = "" <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Дополнительный параметр
+	 * @param string $event3 = "" <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Дополнительный параметр
 	 * event3</a> события.
 	 *
 	 *
@@ -187,10 +188,10 @@ class CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин "Событие"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Термин "Дополнительный
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин "Дополнительный
 	 * параметр события (event3)"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -507,7 +508,7 @@ class CAllStatEvent
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#handler">обработчиков CSV файлов</a> для вывода его в выпадающем списке с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, либо в списке множественного выбора с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a>.</p> <p>Обработчики CSV файлов могут быть как <i>пользовательские</i> (путь к ним указывается в параметре "Путь к дополнительным обработчикам при ручной загрузке событий" в настройках модуля "Статистика"), так и <i>стандартные</i> - входящие в дистрибутив модуля (хранятся в каталоге <b>/bitrix/modules/statistic/loading/</b>).</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#handler">обработчиков CSV файлов</a> для вывода его в выпадающем списке с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, либо в списке множественного выбора с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a>.</p> <p>Обработчики CSV файлов могут быть как <i>пользовательские</i> (путь к ним указывается в параметре "Путь к дополнительным обработчикам при ручной загрузке событий" в настройках модуля "Статистика"), так и <i>стандартные</i> - входящие в дистрибутив модуля (хранятся в каталоге <b>/bitrix/modules/statistic/loading/</b>).</p>
 	 *
 	 *
 	 *
@@ -570,11 +571,11 @@ class CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>
-	 * <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка событий</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
+	 * </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
+	 * событий</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	 * "Событие"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -632,7 +633,7 @@ class CAllStatEvent
 	// decodes EVENT_GID into array
 	
 	/**
-	 * <p>Декодирует <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">события</a> в функциях <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p class="note">Функция успешно декодирует параметр как в открытом виде, так и в base64-кодированном.</p>
+	 * <p>Декодирует <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> в функциях <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p class="note">Функция успешно декодирует параметр как в открытом виде, так и в base64-кодированном.</p>
 	 *
 	 *
 	 *
@@ -644,8 +645,8 @@ class CAllStatEvent
 	 * @return array <p>Функция возвращает массив вида: </p><br><pre class="syntax">Array ( [SESSION_ID] =&gt; ID
 	 * сессии [GUEST_ID] =&gt; ID посетителя [COUNTRY_ID] =&gt; ID страны [ADV_ID] =&gt; ID
 	 * рекламной кампании [ADV_BACK] =&gt; Y - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврат</a> по рекламной
-	 * кампании; N - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямой
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по рекламной
+	 * кампании; N - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой
 	 * заход</a> [SITE_ID] =&gt; ID сайта )</pre><p></p>
 	 *
 	 *
@@ -663,8 +664,8 @@ class CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/getgid.php">CStatEvent::GetGID</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">Термин "Специальный
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getgid.php">CStatEvent::GetGID</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный
 	 * параметр события"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

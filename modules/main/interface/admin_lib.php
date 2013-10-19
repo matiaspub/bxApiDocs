@@ -286,23 +286,34 @@ var phpVars = {
 
 	
 	/**
-	 * 
+	 * <p>Функция выводит страницу админки со списком подразделов.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed <p></p>
+	 * @param $menu_i $d  ID пункта меню, подразделы которого будут в списке (т.е. то, что
+	 * указано в items_id)
+	 *
+	 *
+	 *
+	 * @param $module_i $d = false ID модуля, для которого строится список
+	 *
+	 *
+	 *
+	 * @param $mod $e = false Режим: <ul> <li> <b>icon</b> - значки,</li> <li> <b>list</b> - список,</li> <li> <b>table</b> -
+	 * таблица</li> </ul> Если не указан режим, отображаются значки или то,
+	 * что было выбрано пользователем при предыдущем открытии страницы.
+	 *
+	 *
+	 *
+	 * @return mixed 
 	 *
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <br><br>
+	 * &lt;?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");define("HELP_FILE", "subscribe/index.php");IncludeModuleLangFile(__FILE__);$POST_RIGHT = $APPLICATION-&gt;GetGroupRight("subscribe");if($POST_RIGHTAuthForm(GetMessage("ACCESS_DENIED"));$APPLICATION-&gt;SetTitle(GetMessage("subscr_index_title"));if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");$adminPage-&gt;ShowSectionIndex("menu_subscribe", "subscribe");if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");?&gt;
+	<b>Примечание</b> В приведённом примере указаны страницы, которых нет в админке с версии 12.0.
 	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsectionindex.php
@@ -3221,20 +3232,22 @@ class CAdminList
 	{
 		if($_SERVER['REQUEST_METHOD']=='POST' && isset($_REQUEST['save'])  && check_bitrix_sessid())
 		{
-			if(is_array($GLOBALS["FIELDS"]))
+			$arrays = array(&$_POST, &$_REQUEST, &$GLOBALS);
+			foreach($arrays as $i => $array)
 			{
-				foreach($GLOBALS["FIELDS"] as $id=>$fields)
+				if(is_array($array["FIELDS"]))
 				{
-					if(is_array($fields))
+					foreach($array["FIELDS"] as $id=>$fields)
 					{
-						$keys = array_keys($fields);
-						foreach($keys as $key)
+						if(is_array($fields))
 						{
-							if(($c = substr($key, 0, 1)) == '~' || $c == '=')
+							$keys = array_keys($fields);
+							foreach($keys as $key)
 							{
-								unset($_POST["FIELDS"][$id][$key]);
-								unset($_REQUEST["FIELDS"][$id][$key]);
-								unset($GLOBALS["FIELDS"][$id][$key]);
+								if(($c = substr($key, 0, 1)) == '~' || $c == '=')
+								{
+									unset($arrays[$i]["FIELDS"][$id][$key]);
+								}
 							}
 						}
 					}
@@ -5978,6 +5991,53 @@ class CAdminForm extends CAdminTabControl
 			}
 			$this->sButtonsContent .= ob_get_clean();
 		}
+	}
+}
+
+class CAdminUtil
+{
+	public static function dumpVars($vars, $arExclusions = array())
+	{
+		$result = "";
+		if (is_array($vars))
+		{
+			foreach ($vars as $varName => $varValue)
+			{
+				if (in_array($varName, $arExclusions))
+					continue;
+
+				$result .= self::dumpVar($varName, $varValue);
+			}
+		}
+
+		return $result;
+	}
+
+	private static function dumpVar($varName, $varValue, $varStack = array())
+	{
+		$result = "";
+		if (is_array($varValue))
+		{
+			foreach ($varValue as $key => $value)
+			{
+				$result .= self::dumpVar($key, $value, array_merge($varStack ,array($varName)));
+			}
+		}
+		else
+		{
+			$htmlName = $varName;
+			if (count($varStack) > 0)
+			{
+				$htmlName = $varStack[0];
+				for ($i = 1, $intCount = count($varStack); $i < $intCount; $i++)
+					$htmlName .= "[".$varStack[$i]."]";
+				$htmlName .= "[".$varName."]";
+			}
+
+			return '<input type="hidden" name="'.htmlspecialcharsbx($htmlName).'" value="'.htmlspecialcharsbx($varValue).'">';
+		}
+
+		return $result;
 	}
 }
 

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессиях</a>.
+ * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>.
  *
  *
  *
@@ -16,7 +16,7 @@ class CUserOnline
 {
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>, проявивших активность на сайте (совершивших <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хит</a>) за определённый интервал времени. Данный интервал времени задается в настройках модуля "Статистика" в параметре "Интервал посетителей в online (сек.)".</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность на сайте (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) за определённый интервал времени. Данный интервал времени задается в настройках модуля "Статистика" в параметре "Интервал посетителей в online (сек.)".</p>
 	 *
 	 *
 	 *
@@ -35,7 +35,7 @@ class CUserOnline
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -65,14 +65,14 @@ class CUserOnline
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>, проявивших активность (совершивших <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хит</a>) на сайте за определённый интервал времени.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) на сайте за определённый интервал времени.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param function $GetList  Ссылка на переменную, которая после выполнения функции будет
 	 * содержать количество <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#online">посетителей в online</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a>.
 	 *
 	 *
 	 *

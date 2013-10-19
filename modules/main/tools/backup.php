@@ -7,8 +7,8 @@ if (ini_get('short_open_tag') == 0)
 error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 
 // define('START_TIME', time());
-// define('LANGUAGE_ID', 'en');
-// define('NOT_CHECK_PERMISSIONS', true);
+@// define('LANGUAGE_ID', 'en');
+@// define('NOT_CHECK_PERMISSIONS', true);
 
 if (defined('BX_CRONTAB')) // start from cron_events.php
 {

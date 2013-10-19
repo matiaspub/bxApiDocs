@@ -26,9 +26,6 @@ class CSecuritySessionMC
 		return CSecuritySessionMC::Init();
 	}
 
-	/**
-	 *
-	 */
 	public static function close()
 	{
 		if(!self::isConnected() || !self::isValidId(self::$sessionId))
@@ -61,7 +58,7 @@ class CSecuritySessionMC
 			usleep($waitStep);
 			$lockWait -= $waitStep;
 			if($lockWait < 0)
-				die('Unable to get session lock within 60 seconds.');
+				CSecuritySession::triggerFatalError('Unable to get session lock within 60 seconds.');
 
 			if($waitStep < 1000000)
 				$waitStep *= 2;

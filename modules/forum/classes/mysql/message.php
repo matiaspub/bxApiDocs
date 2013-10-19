@@ -25,7 +25,7 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">списке
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
 	 * полей сообщения</a>. Обязательные поля должны быть заполнены. <br><br>
 	 * Для первого сообщения в теме форума - обязательно передать
 	 * параметр "NEW_TOPIC" =&gt; "Y".
@@ -40,10 +40,10 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 * @return int <b>False</b><h4>Примечания</h4><p>Перед добавлением сообщения следует
 	 * проверить возможность добавления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>.</p><p>Для
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>.</p><p>Для
 	 * добавления и изменения сообщения и темы рекомендуется
 	 * пользоваться высокоуровневой функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -54,8 +54,8 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -107,8 +107,7 @@ class CForumMessage extends CAllForumMessage
 			$POST_MESSAGE = $parser->convert($POST_MESSAGE, $allow, "html", $arFiles);
 		$arFields["POST_MESSAGE_HTML"] = $POST_MESSAGE;
 /***************** Event onBeforeMessageAdd ************************/
-		$events = GetModuleEvents("forum", "onBeforeMessageAdd");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("forum", "onBeforeMessageAdd", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields, &$strUploadDir)) === false)
 				return false;
@@ -136,9 +135,10 @@ class CForumMessage extends CAllForumMessage
 /***************** Attach/******************************************/
 /***************** Quota *******************************************/
 		$_SESSION["SESS_RECOUNT_DB"] = "Y";
+
+		$GLOBALS["USER_FIELD_MANAGER"]->Update("FORUM_MESSAGE", $ID, $arFields);
 /***************** Events onAfterMessageAdd ************************/
-		$events = GetModuleEvents("forum", "onAfterMessageAdd");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("forum", "onAfterMessageAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields));
 /***************** /Events *****************************************/
 		if ($arParams["SKIP_STATISTIC"] == "Y" && $arParams["SKIP_INDEXING"] == "Y")
@@ -166,12 +166,12 @@ class CForumMessage extends CAllForumMessage
 					"DEFAULT_URL" => "/");
 
 				$arGroups = CForumNew::GetAccessPermissions($arMessage["FORUM_ID"]);
-				for ($i = 0; $i < count($arGroups); $i++)
+				foreach($arGroups as $arGroup)
 				{
-					if ($arGroups[$i][1] >= "E")
+					if ($arGroup[1] >= "E")
 					{
-						$arParams["PERMISSION"][] = $arGroups[$i][0];
-						if ($arGroups[$i][0] == 2)
+						$arParams["PERMISSION"][] = $arGroup[0];
+						if ($arGroup[0] == 2)
 							break;
 					}
 				}
@@ -269,7 +269,7 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -287,8 +287,8 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -403,39 +403,80 @@ class CForumMessage extends CAllForumMessage
 
 		if ($bCount || (is_array($arAddParams) && is_set($arAddParams, "bDescPageNumbering") && (intVal($arAddParams["nTopCount"])<=0)))
 		{
+			// This code was changed because of http://bugs.mysql.com/bug.php?id=64002
 			if ($bCount === "cnt_not_approved")
 			{
+				$ar_res = false;
 				$strSql =
-					"SELECT COUNT(FM.ID) as CNT, MAX(FM.ID) AS ABS_LAST_MESSAGE_ID,
-						MIN(FM.ID) AS ABS_FIRST_MESSAGE_ID,
-						MIN(CASE WHEN FM.NEW_TOPIC='Y' THEN FM.ID ELSE NULL END) AS FIRST_MESSAGE_ID,
-						SUM(CASE WHEN FM.APPROVED!='Y' THEN 1 ELSE 0 END) as CNT_NOT_APPROVED,
-						MAX(CASE WHEN FM.APPROVED='Y' THEN FM.ID ELSE 0 END) AS LAST_MESSAGE_ID
-					FROM b_forum_message FM
-					WHERE 1 = 1 ".$strSqlSearch;
-				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				if ($db_res && $ar_res = $db_res->Fetch()):
-					return $ar_res;
-				endif;
-				return false;
+					"SELECT COUNT(FM.ID) as CNT, MAX(FM.ID) AS ABS_LAST_MESSAGE_ID, MIN(FM.ID) AS ABS_FIRST_MESSAGE_ID, \n\t".
+						"MIN(CASE WHEN FM.NEW_TOPIC='Y' THEN FM.ID ELSE NULL END) AS FIRST_MESSAGE_ID, \n\t".
+						"SUM(CASE WHEN FM.APPROVED!='Y' THEN 1 ELSE 0 END) as CNT_NOT_APPROVED,\n\t".
+						"MAX(CASE WHEN FM.APPROVED='Y' THEN FM.ID ELSE 0 END) AS LAST_MESSAGE_ID \n".
+					"FROM b_forum_message FM\n".
+					"WHERE 1 = 1 ".$strSqlSearch;
+
+				if (array_intersect_key($arFilter, array("FORUM_ID" => null)) ==  $arFilter && $arFilter["FORUM_ID"] > 0) { // High-usage
+					$db_res = $DB->Query($strSql . "\nGROUP BY FM.FORUM_ID", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$ar_res = $db_res->Fetch();
+				} else if (array_intersect_key($arFilter, array("TOPIC_ID" => null)) ==  $arFilter && $arFilter["TOPIC_ID"] > 0) { // High-usage
+					$db_res = $DB->Query($strSql . "\nGROUP BY FM.TOPIC_ID", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$ar_res = $db_res->Fetch();
+				} else {
+					$strSql = "SELECT COUNT(FM.ID) as CNT \nFROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+					$db_res = $DB->Query($strSql , false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($db_res && $ar_res = $db_res->Fetch()) {
+						$strSql =
+							"SELECT MAX(FM.ID) AS ABS_LAST_MESSAGE_ID, MIN(FM.ID) AS ABS_FIRST_MESSAGE_ID, \n\t".
+							"MIN(CASE WHEN FM.NEW_TOPIC='Y' THEN FM.ID ELSE NULL END) AS FIRST_MESSAGE_ID, \n\t".
+							"SUM(CASE WHEN FM.APPROVED!='Y' THEN 1 ELSE 0 END) as CNT_NOT_APPROVED,\n\t".
+							"MAX(CASE WHEN FM.APPROVED='Y' THEN FM.ID ELSE 0 END) AS LAST_MESSAGE_ID \n".
+							"FROM b_forum_message FM\n".
+							"WHERE 1 = 1 ".$strSqlSearch;
+						$db_res = $DB->Query($strSql , false, "File: ".__FILE__."<br>Line: ".__LINE__);
+						if ($db_res && $ar_res1 = $db_res->Fetch()) {
+							$ar_res = array_merge($ar_res1, $ar_res);
+						}
+					}
+				}
+
+				return $ar_res;
+			}
+			else if ($bCount === "cnt_and_last_mid")
+			{
+				$ar_res = array();
+				if (array_intersect_key($arFilter, array("AUTHOR_ID" => null, "APPROVED" => null)) == $arFilter && $arFilter["AUTHOR_ID"] > 0) // High-usage
+				{
+					$strSql = "SELECT COUNT(FM.ID) as CNT, MAX(FM.ID) as LAST_MESSAGE_ID \n FROM b_forum_message FM ".
+						"\nWHERE 1 = 1 ".$strSqlSearch." \nGROUP BY FM.AUTHOR_ID"; // explain the same as without "GROUP BY"
+					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($db_res)
+						$ar_res = $db_res->Fetch();
+				}
+				else
+				{
+					$strSql = "SELECT COUNT(FM.ID) as CNT \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($db_res && $ar_res = $db_res->Fetch()) {
+						$strSql = "SELECT MAX(FM.ID) as LAST_MESSAGE_ID \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+						$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+						if ($db_res && $ar_res1 = $db_res->Fetch()) {
+							$ar_res["LAST_MESSAGE_ID"] = $ar_res1["LAST_MESSAGE_ID"];
+						}
+					}
+				}
+				return $ar_res;
 			}
 			else
 			{
-				$strSql = "SELECT COUNT(FM.ID) as CNT".(
-					$bCount === "cnt_and_last_mid" ? ", MAX(FM.ID) as LAST_MESSAGE_ID" : "")."
-					FROM b_forum_message FM
-					WHERE 1 = 1 ".$strSqlSearch;
+				$strSql = "SELECT COUNT(FM.ID) as CNT \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
 				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$iCnt = 0;
-				$ar_res = array();
 				if ($db_res && $ar_res = $db_res->Fetch())
 					$iCnt = intVal($ar_res["CNT"]);
-				if ($bCount === "cnt_and_last_mid"):
-					return $ar_res;
-				elseif ($bCount):
+				if ($bCount)
 					return $iCnt;
-				endif;
 			}
+			// /This code was changed because of http://bugs.mysql.com/bug.php?id=64002
 		}
 
 		foreach ($arOrder as $by=>$order)
@@ -545,7 +586,7 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -565,8 +606,8 @@ class CForumMessage extends CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -775,18 +816,32 @@ class CForumMessage extends CAllForumMessage
 					".$strSqlFrom."
 				WHERE 1 = 1
 					".$strSqlSearch;
-
-			if ($bCount === 3)
+			if ($bCount === 3) {
 				$strSql .= "GROUP BY FM.TOPIC_ID";
-			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($bCount === 3)
-				return $db_res;
-			$iCnt = 0; $iLAST_MESSAGE_ID = 0;
-			if ($ar_res = $db_res->Fetch())
-			{
-				$iCnt = intVal($ar_res["CNT"]);
-				$iLAST_MESSAGE_ID = intVal($ar_res["LAST_MESSAGE_ID"]);
+				return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
+			// This code exists because of http://bugs.mysql.com/bug.php?id=64002
+			$iCnt = 0; $iLAST_MESSAGE_ID = 0;
+			if ((array_intersect_key($arFilter, array("TOPIC_ID" => null, "APPROVED" => null)) == $arFilter ||
+				array_intersect_key($arFilter, array("TOPIC_ID" => null)) == $arFilter) && $arFilter["TOPIC_ID"] > 0) // high-usage
+			{
+				$strSql .= "GROUP BY FM.TOPIC_ID"; // explane the same as without "GROUP BY"
+				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if ($ar_res = $db_res->Fetch()) {
+					$iCnt = intVal($ar_res["CNT"]);
+					$iLAST_MESSAGE_ID = intVal($ar_res["LAST_MESSAGE_ID"]);
+				}
+			} else {
+				$strSql = "SELECT COUNT(FM.ID) as CNT \nFROM b_forum_message FM ".$strSqlFrom."\nWHERE 1 = 1 ".$strSqlSearch;
+				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if ($ar_res = $db_res->Fetch()) {
+					$iCnt = intVal($ar_res["CNT"]); }
+				$strSql = "SELECT MAX(FM.ID) AS LAST_MESSAGE_ID \nFROM b_forum_message FM ".$strSqlFrom."\nWHERE 1 = 1 ".$strSqlSearch;
+				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if ($ar_res = $db_res->Fetch()) {
+					$iLAST_MESSAGE_ID = intVal($ar_res["LAST_MESSAGE_ID"]); }
+			}
+			// / This code exists because of http://bugs.mysql.com/bug.php?id=64002
 			if ($bCount === 4)
 				return array("CNT" => $iCnt, "LAST_MESSAGE_ID" => $iLAST_MESSAGE_ID);
 

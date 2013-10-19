@@ -50,12 +50,17 @@ class CAllIBlockProperty
 	 * отрицания, указав <i>!EXTERNAL_ID</i>;</li> <li> <b>PROPERTY_TYPE</b> - по типу свойства:
 	 * <ul> <li> <b>S</b> - строка</li> <li> <b>N</b> - число</li> <li> <b>L</b> - список</li> <li> <b>F</b> -
 	 * файл</li> <li> <b>G</b> - привязка к разделу</li> <li> <b>E</b> - привязка к
-	 * элементу</li> <li> <b>S:UserID</b> - Привязка к пользователю</li> <li> <b>S:DateTime</b> -
-	 * Дата/Время</li> <li> <b>E:EList</b> - Привязка к элементам в виде списка</li> <li>
-	 * <b>S:FileMan</b> - Привязка к файлу (на сервере)</li> <li> <b>S:map_yandex</b> - Привязка
-	 * к Яndex.Карте</li> <li> <b>S:HTML</b> - HTML/текст</li> <li> <b>S:map_google</b> - Привязка к
-	 * карте Google Maps</li> <li> <b>S:ElementXmlID</b> - Привязка к элементам по XML_ID</li> </ul>
-	 * </li> <li> <b>USER_TYPE</b> - по пользовательскому типу свойства; </li> <li>
+	 * элементу</li> </ul> </li> <li> <b>USER_TYPE</b> - по пользовательскому типу
+	 * свойства; <ul> <li> <b>UserID</b> - Привязка к пользователю</li> <li> <b>DateTime</b> -
+	 * Дата/Время</li> <li> <b>EList</b> - Привязка к элементам в виде списка</li> <li>
+	 * <b>FileMan</b> - Привязка к файлу (на сервере)</li> <li> <b>map_yandex</b> - Привязка к
+	 * Яndex.Карте</li> <li> <b>HTML</b> - HTML/текст</li> <li> <b>map_google</b> - Привязка к карте
+	 * Google Maps</li> <li> <b>ElementXmlID</b> - Привязка к элементам по XML_ID</li> <li> <b>Sequence</b>
+	 * - Счетчик</li> <li> <b>EAutocomplete</b> - Привязка к элементам с
+	 * автозаполнением</li> <li> <b>SKU</b> - Привязка к товарам (SKU)</li> <li> <b>video</b> -
+	 * Видео</li> <li> <b>TopicID</b> - Привязка к теме форума</li> </ul> Кроме того,
+	 * можно использовать идентификаторы пользовательских типов
+	 * свойств инфоблока, добавленных сторонними модулями. </li> <li>
 	 * <b>SEARCHABLE</b> - по признаку участия значения свойства в поиске (Y|N); </li>
 	 * <li> <b>FILTRABLE</b> - по признаку участия свойства в фильре на странице
 	 * списка элементов (Y|N);</li> <li> <b>VERSION</b> - по флагу хранения значений
@@ -72,7 +77,7 @@ class CAllIBlockProperty
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -83,8 +88,8 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля свойства</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойства</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -315,19 +320,19 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Функция добавляет новое свойство.Отменить добавление или изменить поля свойства можно в обработчике события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a>. После добавления нового свойства вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a>.</p>
+	 * <p>Функция добавляет новое свойство.Отменить добавление или изменить поля свойства можно в обработчике события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a>. После добавления нового свойства вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $fields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">всех полей</a> свойства. Кроме
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">всех полей</a> свойства. Кроме
 	 * того, с помощью поля "VALUES", значением которого должен быть массив
 	 * структуры array(array("VALUE"=&gt;"значение", "DEF"=&gt;"по умолчанию (Y/N)",
 	 * "SORT"=&gt;"индекс сортировки"),...), можно установить варианты выбора
 	 * для свойств типа "список" (подробнее смотрите метод <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
 	 *
 	 *
 	 *
@@ -343,11 +348,11 @@ class CAllIBlockProperty
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a> </li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля свойства</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a> </li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойства</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -391,9 +396,22 @@ class CAllIBlockProperty
 						$arFields["DEFAULT_VALUE"] = false;
 				}
 				if(array_key_exists("PrepareSettings", $arUserType))
-					$arFields["USER_TYPE_SETTINGS"] = serialize(call_user_func_array($arUserType["PrepareSettings"], array($arFields)));
+				{
+					$arFieldsResult = call_user_func_array($arUserType["PrepareSettings"], array($arFields));
+					if (is_array($arFieldsResult) && array_key_exists('USER_TYPE_SETTINGS', $arFieldsResult))
+					{
+						$arFields = array_merge($arFields, $arFieldsResult);
+						$arFields["USER_TYPE_SETTINGS"] = serialize($arFields["USER_TYPE_SETTINGS"]);
+					}
+					else
+					{
+						$arFields["USER_TYPE_SETTINGS"] = serialize($arFieldsResult);
+					}
+				}
 				else
+				{
 					$arFields["USER_TYPE_SETTINGS"] = false;
+				}
 			}
 			else
 			{
@@ -539,7 +557,7 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Функция изменяет параметры свойства с кодом <i>ID</i>. Перед изменением параметров вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a> из которых можно отменить изменения или переопределить поля. А после изменения параметром вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a>.</p>
+	 * <p>Функция изменяет параметры свойства с кодом <i>ID</i>. Перед изменением параметров вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a> из которых можно отменить изменения или переопределить поля. А после изменения параметром вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a>.</p>
 	 *
 	 *
 	 *
@@ -549,13 +567,13 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">всех полей</a> изменяемого
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">всех полей</a> изменяемого
 	 * свойства. Кроме того, с помощью поля "VALUES", значением которого
 	 * должен быть массив вида Array(Array("VALUE"=&gt;"значение", "DEF"=&gt;"по
 	 * умолчанию (Y/N)", "SORT"=&gt;"индекс сортировки"),...), можно установить
 	 * варианты выбора для свойств типа "список" (подробнее смотрите
-	 * метод <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
+	 * метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
 	 *
 	 *
 	 *
@@ -570,12 +588,12 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a>
-	 * </li> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля свойства</a></li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a>
+	 * </li> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойства</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -624,9 +642,22 @@ class CAllIBlockProperty
 				}
 
 				if(array_key_exists("PrepareSettings", $arUserType))
-					$arFields["USER_TYPE_SETTINGS"] = serialize(call_user_func_array($arUserType["PrepareSettings"], array($arFields)));
+				{
+					$arFieldsResult = call_user_func_array($arUserType["PrepareSettings"], array($arFields));
+					if (is_array($arFieldsResult) && array_key_exists('USER_TYPE_SETTINGS', $arFieldsResult))
+					{
+						$arFields = array_merge($arFields, $arFieldsResult);
+						$arFields["USER_TYPE_SETTINGS"] = serialize($arFields["USER_TYPE_SETTINGS"]);
+					}
+					else
+					{
+						$arFields["USER_TYPE_SETTINGS"] = serialize($arFieldsResult);
+					}
+				}
 				else
+				{
 					$arFields["USER_TYPE_SETTINGS"] = false;
+				}
 			}
 			else
 			{
@@ -707,7 +738,7 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * @return CDBResult <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a><h4>Примечание</h4><p>Если
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><h4>Примечание</h4><p>Если
 	 * заданы оба значения <i>IBLOCK_ID</i> и <i>IBLOCK_CODE</i>, то будет производиться
 	 * попытка найти свойство в одном из них (логика "или").</p>
 	 *
@@ -723,8 +754,8 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля свойства</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойства</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -890,8 +921,8 @@ class CAllIBlockProperty
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblockpropertyenum">полей вариантов
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockpropertyenum">полей вариантов
 	 * свойства</a>
 	 *
 	 *
@@ -903,10 +934,10 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblockpropertyenum">Поля вариантов
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockpropertyenum">Поля вариантов
 	 * свойства</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropertyEnum</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/getlist.php">GetList() </a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropertyEnum</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/getlist.php">GetList() </a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1021,13 +1052,13 @@ class CAllIBlockProperty
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblockpropertyenum">Поля значений
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockpropertyenum">Поля значений
 	 * свойства типа "список</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/index.php#flds">" </a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropetyEnum</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/update.php">Update()</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropetyEnum</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockpropertyenum/add.php">Add()</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php#flds">" </a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropetyEnum</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php">Update()</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/index.php">CIBlockPropetyEnum</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php">Add()</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1224,9 +1255,9 @@ class CAllIBlockProperty
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/user_properties/index.php">Пользовательские
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/index.php">Пользовательские
 	 * свойства</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/user_properties/GetUserTypeDescription.php">GetUserTypeDescription</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/GetUserTypeDescription.php">GetUserTypeDescription</a></li>
 	 * </ul>
 	 *
 	 *
@@ -1394,13 +1425,13 @@ class CAllIBlockProperty
 			"USER_TYPE" =>"SKU",
 			"DESCRIPTION" => GetMessage('IBLOCK_PROP_SKU_DESC'),
 			"GetPropertyFieldHtml" => array("CIBlockPropertySKU", "GetPropertyFieldHtml"),
+			"GetPropertyFieldHtmlMulty" => array("CIBlockPropertySKU", "GetPropertyFieldHtml"),
 			"GetPublicViewHTML" => array("CIBlockPropertySKU", "GetPublicViewHTML"),
 			"GetAdminListViewHTML" => array("CIBlockPropertySKU","GetAdminListViewHTML"),
 			"GetAdminFilterHTML" => array('CIBlockPropertySKU','GetAdminFilterHTML'),
 			"GetSettingsHTML" => array('CIBlockPropertySKU','GetSettingsHTML'),
 			"PrepareSettings" => array('CIBlockPropertySKU','PrepareSettings'),
 			"AddFilterFields" => array('CIBlockPropertySKU','AddFilterFields'),
-			//"GetOffersFieldHtml" => array('CIBlockPropertySKU','GetOffersFieldHtml'),
 		);
 	}
 

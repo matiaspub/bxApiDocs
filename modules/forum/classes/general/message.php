@@ -61,9 +61,9 @@ class CAllForumMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -132,9 +132,9 @@ class CAllForumMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -213,9 +213,9 @@ class CAllForumMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -371,6 +371,8 @@ class CAllForumMessage
 			$e = new CAdminException(array_reverse($aMsg));
 			$GLOBALS["APPLICATION"]->ThrowException($e);
 			return false;
+		} else if(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("FORUM_MESSAGE", $ID, $arFields)) {
+			return false;
 		}
 
 		if (is_set($arFields, "AUTHOR_ID") || $ACTION=="ADD") {$arFields["AUTHOR_ID"] = intVal($arFields["AUTHOR_ID"]) <= 0 ? false : $arFields["AUTHOR_ID"];}
@@ -404,7 +406,7 @@ class CAllForumMessage
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">списке
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
 	 * полей сообщения</a>.
 	 *
 	 *
@@ -425,14 +427,14 @@ class CAllForumMessage
 	 * @return int <p>Возвращает код измененного сообщения. В случае ошибки
 	 * изменения возвращает False.</p><h4>Примечания</h4><p>Перед изменением
 	 * сообщения следует проверить возможность изменения методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p><p>Для
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p><p>Для
 	 * добавления и изменения сообщения и темы рекомендуется
 	 * пользоваться высокоуровневой функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
 	 * </li></ul>
 	 *
 	 *
@@ -559,6 +561,8 @@ class CAllForumMessage
 /***************** Attach/******************************************/
 /***************** Quota *******************************************/
 		$_SESSION["SESS_RECOUNT_DB"] = "Y";
+
+		$GLOBALS["USER_FIELD_MANAGER"]->Update("FORUM_MESSAGE", $ID, $arFields);
 /***************** Event onAfterMessageUpdate **********************/
 		$events = GetModuleEvents("forum", "onAfterMessageUpdate");
 		while ($arEvent = $events->Fetch())
@@ -724,7 +728,7 @@ class CAllForumMessage
 	 * <h4>See Also</h4> 
 	 * <ul><li>Перед удалением сообщения следует проверить возможность
 	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
 	 * </li></ul>
 	 *
 	 *
@@ -777,6 +781,8 @@ class CAllForumMessage
 		endif;
 		$DB->Commit();
 
+		$GLOBALS["USER_FIELD_MANAGER"]->Delete("FORUM_MESSAGE", $ID);
+
 		if ($AUTHOR_ID > 0):
 			CForumUser::SetStat($AUTHOR_ID);
 		endif;
@@ -823,7 +829,7 @@ class CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -903,7 +909,7 @@ class CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1061,7 +1067,7 @@ class CAllForumMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1226,6 +1232,11 @@ class CAllForumMessage
 							"forum/read.php?FID=#FID#&TID=#TID#&MID=#MID##message#MID#";
 				endif;
 			endforeach;
+			foreach(GetModuleEvents("forum", "onBeforeMailMessageSend", true) as $arEvent)
+			{
+				if (ExecuteModuleEventEx($arEvent, array(&$mailTemplate, &$arForumSites, &$arFields, $arForum, $arTopic, $arMessage)) === false)
+					return false;
+			}
 		}
 
 		/*
@@ -1630,7 +1641,7 @@ class CALLForumFiles
 		return $res;
 	}
 
-	public static function CheckFields(&$arFields, &$arParams, $ACTION = "ADD")
+	public static function CheckFields(&$arFields, &$arParams, $ACTION = "ADD", $extParams = array())
 	{
 		$aMsg = array();
 		$arFiles = (!is_array($arFields) ? array($arFields) : $arFields);
@@ -1653,7 +1664,7 @@ class CALLForumFiles
 				"text" => GetMessage("F_ERR_EMPTY_FORUM_ID"));
 		else:
 			// Y - Image files		F - Files of specified type		A - All files
-			$arForum = CForumNew::GetByID($arParams["FORUM_ID"]);
+			$arForum = (!!$extParams["FORUM"] ? $extParams["FORUM"] : CForumNew::GetByID($arParams["FORUM_ID"]));
 			if (empty($arForum))
 				$aMsg[] = array(
 					"id" => 'bad_forum',
@@ -1665,7 +1676,7 @@ class CALLForumFiles
 		endif;
 		if (empty($aMsg)):
 			$arFilesExists = array();
-			$iFileSize = intVal(COption::GetOptionString("forum", "file_max_size", 50000));
+			$iFileSize = intVal(COption::GetOptionString("forum", "file_max_size", 5242880));
 			foreach ($arFiles as $key => $val):
 				$res = "";
 				if (strLen($val["name"]) <= 0 && intVal($val["FILE_ID"]) <= 0):

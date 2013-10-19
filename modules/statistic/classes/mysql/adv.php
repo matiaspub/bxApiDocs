@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/adv.php");
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламными кампаниями</a>.
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.
  *
  *
  *
@@ -89,54 +89,54 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламных кампаний</a> (РК) с рассчитанными статистическими показателями и со всеми данными по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_traffic">трафику</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК) с рассчитанными статистическими показателями и со всеми данными по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "SESSIONS" Поле для сортировки. Возможные значения: <ul> <li> <b>ID</b> - ID РК; </li> <li>
 	 * <b>PRIORITY</b> - приоритет; </li> <li> <b>REFERER1</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_id">идентификатор</a> referer1 РК; </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a> referer1 РК; </li>
 	 * <li> <b>REFERER2</b> - идентификатор referer2 РК; </li> <li> <b>C_TIME_FIRST</b> - время
-	 * начала РК (первый <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямой
+	 * начала РК (первый <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой
 	 * заход</a>); </li> <li> <b>C_TIME_LAST</b> - последний прямой заход или <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврат</a> по РК; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по РК; </li> <li>
 	 * <b>ADV_TIME</b> - длительность РК (разница <b>C_TIME_LAST</b> - <b>C_TIME_FIRST</b>); </li> <li>
 	 * <b>ATTENT</b> - коэфициент <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_attent">внимательности</a> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a> на прямом
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_attent">внимательности</a> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a> на прямом
 	 * заходе по РК; </li> <li> <b>ATTENT_BACK</b> - коэфициент <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_attent">внимательности</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_attent">внимательности</a>
 	 * посетителей на возврате по РК; </li> <li> <b>NEW_VISITORS</b> - процент
 	 * посетителей впервые пришедших на сайт по данной РК от общего
 	 * количества посетителей пришедших по данной РК; </li> <li>
 	 * <b>RETURNED_VISITORS</b> - процент посетителей возвратившихся на сайт после
 	 * прямого захода по данной РК; </li> <li> <b>VISITORS_PER_DAY</b> - среднее
 	 * количество посетителей за день; </li> <li> <b>COST</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_cost">затраты</a> на РК; </li> <li>
-	 * <b>REVENUE</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_revenue">доходы</a> с РК;
-	 * </li> <li> <b>BENEFIT</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_benefit">прибыль</a>
-	 * РК; </li> <li> <b>ROI</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_roi">рентабельность</a> РК; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_cost">затраты</a> на РК; </li> <li>
+	 * <b>REVENUE</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_revenue">доходы</a> с РК;
+	 * </li> <li> <b>BENEFIT</b> - <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_benefit">прибыль</a> РК; </li> <li> <b>ROI</b> -
+	 * <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_roi">рентабельность</a> РК; </li> <li>
 	 * <b>SESSION_COST</b> - средняя стоимость <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессии</a> (затраты/кол-во
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a> (затраты/кол-во
 	 * сессий на прямом заходе); </li> <li> <b>VISITOR_COST</b> - средняя стоимость
 	 * посетителя (затраты/кол-во посетителей на прямых заходах); </li> <li>
 	 * <b>GUESTS</b> - суммарное кол-во посетителей на прямых заходах; </li> <li>
 	 * <b>GUESTS_BACK</b> - суммарное кол-во посетителей на возвратах; </li> <li>
 	 * <b>NEW_GUESTS</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#new_guest">новых посетителей</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> по
 	 * данной РК; </li> <li> <b>FAVORITES</b> - суммарное кол-во посетителей,
 	 * добавивших сайт в "<a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#favorites">Избранное</a>" на прямом
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>" на прямом
 	 * заходе по РК; </li> <li> <b>FAVORITES_BACK</b> - суммарное кол-во посетителей,
 	 * добавивших сайт в "Избранное" на возврате по РК; </li> <li> <b>C_HOSTS</b> -
-	 * суммарное кол-во <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#host">хостов</a> на
+	 * суммарное кол-во <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a> на
 	 * прямом заходе по РК; </li> <li> <b>HOSTS_BACK</b> - суммарное кол-во хостов на
 	 * возврате по РК; </li> <li> <b>SESSIONS</b> - суммарное кол-во сессий на прямом
 	 * заходе по РК; </li> <li> <b>SESSIONS_BACK</b> - суммарное кол-во сессий на
 	 * возврате по РК; </li> <li> <b>HITS</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a> на прямом заходе по РК;
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> на прямом заходе по РК;
 	 * </li> <li> <b>HITS_BACK</b> - суммарное кол-во хитов на возврате по РК; </li> <li>
 	 * <b>GUESTS_TODAY</b> - кол-во посетителей на прямом заходе за сегодня; </li> <li>
 	 * <b>GUESTS_BACK_TODAY</b> - кол-во посетителей на возврате за сегодня; </li> <li>
@@ -204,9 +204,9 @@ class CAdv extends CAllAdv
 	 * @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	 * допустимы следующие ключи: <ul> <li> <b>GROUP</b> - список возможных
 	 * значений: <ul> <li> <b>referer1</b> - список РК будет сгруппирован по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_id">идентификатору</a> referer1 РК; </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer1 РК; </li>
 	 * <li> <b>referer2</b> - список РК будет сгруппирован по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_id">идентификатору</a> referer2 РК. </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer2 РК. </li>
 	 * </ul> </li> <li> <b>ID</b>* - ID РК; </li> <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то
 	 * при фильтрации по <b>ID</b> будет искаться вхождение; </li> <li>
 	 * <b>DATE1_PERIOD</b> - начальное значение <i>периода</i> за который необходимо
@@ -282,7 +282,7 @@ class CAdv extends CAllAdv
 	 * финансовые показатели РК; </li> <li> <b>DESCRIPTION</b>* - описание РК; </li> <li>
 	 * <b>DESCRIPTION_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
 	 * <b>DESCRIPTION</b> будет искаться точное совпадение. </li> </ul> * - допускается
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -389,10 +389,10 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/getsimplelist.php">CAdv::GetSimpleList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getsimplelist.php">CAdv::GetSimpleList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -885,7 +885,7 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	 * <p>Возвращает настройки <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a>.</p>
+	 * <p>Возвращает настройки <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p>
 	 *
 	 *
 	 *
@@ -913,7 +913,7 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -944,7 +944,7 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типов событий</a>, инициализированных <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителями</a>, зашедшими по определённой <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a> (РК).</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a>, инициализированных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителями</a>, зашедшими по определённой <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> (РК).</p>
 	 *
 	 *
 	 *
@@ -954,18 +954,18 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типа события</a> </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a> </li> <li>
 	 * <b>s_event1</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор</a> event1 типа
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор</a> event1 типа
 	 * события </li> <li> <b>s_event2</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор</a> event2 типа
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор</a> event2 типа
 	 * события </li> <li> <b>s_sort</b> - индекс сортировки типа события </li> <li>
 	 * <b>s_name</b> - наименование типа события </li> <li> <b>s_counter</b> - количество
 	 * событий инициализированных посетителями на <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямом заходе</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямом заходе</a> по
 	 * рекламной кампании <i>adv_id</i> </li> <li> <b>s_counter_back</b> - количество событий
 	 * инициализированных посетителями на <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврате</a> по рекламной
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврате</a> по рекламной
 	 * кампании <i>adv_id</i> </li> <li> <b>s_def</b> - сортировка по умолчанию (для
 	 * вывода в соответствующей таблице) </li> </ul>
 	 *
@@ -1011,7 +1011,7 @@ class CAdv extends CAllAdv
 	 * указать конечное значение интервала количества денег
 	 * инициализированных посетителями на прямом заходе по рекламной
 	 * кампании <i>adv_id</i> </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -1057,8 +1057,8 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
-	 * кампания"</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
+	 * кампания"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
 	 * "Событие"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1384,7 +1384,7 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	 * <p>Возвращает данные по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_traffic">трафику</a> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a> в разрезе по датам.</p>
+	 * <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> в разрезе по датам.</p>
 	 *
 	 *
 	 *
@@ -1456,7 +1456,7 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1588,13 +1588,13 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	 * <p>Возвращает упрощённый список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламных кампаний</a> (РК).</p>
+	 * <p>Возвращает упрощённый список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК).</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_referer1" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID РК; </li> <li>
-	 * <b>s_referer1</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_id">идентификатор</a>
+	 * <b>s_referer1</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a>
 	 * referer1 РК; </li> <li> <b>s_referer2</b> - идентификатор referer2 РК; </li> <li> <b>s_description</b>
 	 * - описание РК. </li> </ul>
 	 *
@@ -1616,7 +1616,7 @@ class CAdv extends CAllAdv
 	 * совпадение; </li> <li> <b>DESCRIPTION</b>* - описание РК; </li> <li> <b>DESCRIPTION_EXACT_MATCH</b>
 	 * - если значение равно "Y", то при фильтрации по <b>DESCRIPTION</b> будет
 	 * искаться точное совпадение. </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -1655,10 +1655,10 @@ class CAdv extends CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/getlist.php">CAdv::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getlist.php">CAdv::GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *

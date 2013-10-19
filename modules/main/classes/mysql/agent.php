@@ -22,7 +22,7 @@ class CAgent extends CAllAgent
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
-	 * </li></ul>
+	 * </li></ul><br><br>
 	 *
 	 *
 	 * @static

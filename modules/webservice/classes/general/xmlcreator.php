@@ -2,7 +2,7 @@
 
 
 /**
- * Класс представляет собой тег XML-документа, состоящий из атрибутов, дочерних элементов, текстового содержимого и CDATA контента.
+ * <br><br>
  *
  *
  *
@@ -123,7 +123,7 @@ class CXMLCreator {
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <buttononclick><code>
+	 * <buttononclick>
 	 * CXMLCreator::createTagAttributed( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"");
 	 * 
 	 * // Или
@@ -132,7 +132,7 @@ class CXMLCreator {
 	 * 	"1:ArrayOfStringEl" =&gt; "Строка1", 
 	 * 	"2:ArrayOfStringEl" =&gt; "Строка2"
 	 * 	)
-	 * );</code></buttononclick>
+	 * );</buttononclick>
 	 * </pre>
 	 *
 	 *

@@ -1,4 +1,10 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
 
 IncludeModuleLangFile(__FILE__);
 
@@ -9,7 +15,7 @@ class CHotKeysCode
 
 	public function GetByID($ID)
 	{
-		return $this->GetList(array(),array("ID"=>$ID));
+		return $this->GetList(array(), array("ID" => $ID));
 	}
 
 	public function GetCodeByClassName($className)
@@ -22,8 +28,8 @@ class CHotKeysCode
 			return false;
 
 		foreach ($this->arList as $arCode)
-			if($arCode["CLASS_NAME"]==$className)
-					$arRet[]=$arCode;
+			if($arCode["CLASS_NAME"] == $className)
+				$arRet[] = $arCode;
 
 		return $arRet;
 	}
@@ -31,14 +37,14 @@ class CHotKeysCode
 	protected function CleanUrl($url)
 	{
 		//removes host & proto from url
-		if($hostPos=strpos($url, $_SERVER["HTTP_HOST"]))
-			$cleanUrl=substr($url,$hostPos+strlen($_SERVER["HTTP_HOST"]));
+		if(($hostPos = strpos($url, $_SERVER["HTTP_HOST"])))
+			$cleanUrl = substr($url, $hostPos+strlen($_SERVER["HTTP_HOST"]));
 		else
 			$cleanUrl = $url;
 
 		//removes all after "?"
-		if($qMarkPos = strpos($cleanUrl,"?"))
-			$cleanUrl=substr($cleanUrl,0,$qMarkPos);
+		if(($qMarkPos = strpos($cleanUrl, "?")))
+			$cleanUrl = substr($cleanUrl, 0, $qMarkPos);
 
 		return $cleanUrl;
 	}
@@ -56,8 +62,8 @@ class CHotKeysCode
 		{
 			$codeUrl = $this->CleanUrl($arCode["URL"]);
 
-			if(($codeUrl==substr($this->CleanUrl($url),0,strlen($codeUrl)) && $codeUrl) || (!$arCode["CLASS_NAME"] && (!$arCode["URL"] || $arCode["URL"]=="*")))
-				$arRet[]=$arCode;
+			if(($codeUrl == substr($this->CleanUrl($url), 0, strlen($codeUrl)) && $codeUrl) || (!$arCode["CLASS_NAME"] && (!$arCode["URL"] || $arCode["URL"] == "*")))
+				$arRet[] = $arCode;
 		}
 
 		return $arRet;
@@ -73,15 +79,17 @@ class CHotKeysCode
 				return false;
 
 			foreach ($this->arList as $arCode)
-				if($arCode["TITLE_OBJ"]==$strTitleObj)
+				if($arCode["TITLE_OBJ"] == $strTitleObj)
 					return $arCode["ID"];
 		}
 
 		return false;
 	}
 
-	protected function CheckFields($arFields,$ID=false)
+	protected function CheckFields($arFields, $ID = false)
 	{
+		global $APPLICATION;
+
 		$aMsg = array();
 
 		if(isset($arFields["CODE"]))
@@ -89,7 +97,7 @@ class CHotKeysCode
 			if(!$arFields["CODE"])
 				$aMsg[] = array("id"=>"CODE", "text"=>GetMessage("HK_CF_CODE"));
 
-			if(preg_match("#<\s*/*\s*script(.*?)*>#i",$arFields["CODE"]))
+			if(preg_match("#<\\s*/*\\s*script(.*?)*>#i", $arFields["CODE"]))
 				$aMsg[] = array("id"=>"CODE", "text"=>GetMessage("HK_CF_SCRIPT"));
 		}
 
@@ -121,7 +129,7 @@ class CHotKeysCode
 
 		if(!empty($arCond))
 		{
-			$res = $this->GetList(array(),$arCond);
+			$res = $this->GetList(array(), $arCond);
 			$code = $res->Fetch();
 
 			if($code)
@@ -133,14 +141,16 @@ class CHotKeysCode
 
 				}
 				else
+				{
 					$aMsg[] = array("id"=>"CLASS_NAME", "text"=>GetMessage("HK_CF_HK_CLASS_NAME"));
+				}
 			}
 		}
 
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -155,22 +165,24 @@ class CHotKeysCode
 		if(!is_array($this->arList))
 		{
 			if($CACHE_MANAGER->Read($this->hkCacheTtl, "b_hot_keys_code".LANGUAGE_ID))
+			{
 				$this->arList = $CACHE_MANAGER->Get("b_hot_keys_code".LANGUAGE_ID);
+			}
 			else
 			{
 				$res = $this->GetList();
-				while($arTemp=$res->Fetch())
+				while($arTemp = $res->Fetch())
 				{
 					if(!$arTemp["IS_CUSTOM"])
 					{
-						if(isset($arTemp["NAME"]) && $arTemp["NAME"]!="-=AUTONAME=-")
-							$arTemp["NAME"]=GetMessage($arTemp["NAME"]);
+						if(isset($arTemp["NAME"]) && $arTemp["NAME"] != "-=AUTONAME=-")
+							$arTemp["NAME"] = GetMessage($arTemp["NAME"]);
 
 						if(isset($arTemp["COMMENTS"]))
-							$arTemp["COMMENTS"]=GetMessage($arTemp["COMMENTS"]);
+							$arTemp["COMMENTS"] = GetMessage($arTemp["COMMENTS"]);
 					}
 
-					$this->arList[$arTemp["ID"]]=$arTemp;
+					$this->arList[$arTemp["ID"]] = $arTemp;
 				}
 				$CACHE_MANAGER->Set("b_hot_keys_code".LANGUAGE_ID, $this->arList);
 			}
@@ -199,9 +211,9 @@ class CHotKeysCode
 		$this->CleanCache();
 
 		$strSql = "SELECT ID FROM b_hot_keys WHERE CODE_ID=".intval($ID);
-		$res=$DB->Query($strSql,false, $this->ErrOrig()." Line: ".__LINE__);
+		$res = $DB->Query($strSql, false, $this->ErrOrig()." Line: ".__LINE__);
 
-		while($arHK=$res->Fetch())
+		while($arHK = $res->Fetch())
 			CHotKeys::GetInstance()->Delete($arHK["ID"]);
 
 		$sql = "DELETE FROM b_hot_keys_code WHERE ID=".intval($ID);
@@ -209,9 +221,9 @@ class CHotKeysCode
 		return $DB->Query($sql, false, $this->ErrOrig()." Line: ".__LINE__);
 	}
 
-	public function Update($ID,$arFields)
+	public function Update($ID, $arFields)
 	{
-		if(!$this->CheckFields($arFields,$ID))
+		if(!$this->CheckFields($arFields, $ID))
 			return false;
 
 		global $DB;
@@ -220,7 +232,7 @@ class CHotKeysCode
 
 		$strUpdate = $DB->PrepareUpdate("b_hot_keys_code", $arFields);
 
-		if($strUpdate!="")
+		if($strUpdate != "")
 		{
 			$strSql = "UPDATE b_hot_keys_code SET ".$strUpdate." WHERE ID=".intval($ID); //." AND IS_CUSTOM <> 0"
 			if(!$DB->Query($strSql))
@@ -238,35 +250,34 @@ class CHotKeysCode
 
 		$this->CleanCache();
 
-		return $DB->Add("b_hot_keys_code",$arFields);
+		return $DB->Add("b_hot_keys_code", $arFields);
 	}
 
-	public function GetList($aSort=array(), $arFilter=Array(), $showEmptyName=true)
+	public function GetList($aSort = array(), $arFilter = array(), $showEmptyName = true)
 	{
 		global $DB;
-		$arSqlSearch = Array();
-		$strSqlSearch = "";
+		$arSqlSearch = array();
 		if (is_array($arFilter))
 		{
 			foreach ($arFilter as $key => $val)
 			{
-				if (strlen($val)<=0 || $val=="NOT_REF")
+				if (strlen($val) <= 0 || $val == "NOT_REF")
 					continue;
 				$key = strtoupper($key);
 				switch($key)
 				{
-				case "ID":
-					$arSqlSearch[] = "C.ID=".intval($val);
-					break;
-				case "CLASS_NAME":
-				case "CODE":
-				case "NAME":
-				case "COMMENTS":
-				case "TITLE_OBJ":
-				case "URL":
-				case "IS_CUSTOM":
-					$arSqlSearch[] = GetFilterQuery("C.".$key, $val);
-					break;
+					case "ID":
+						$arSqlSearch[] = "C.ID=".intval($val);
+						break;
+					case "CLASS_NAME":
+					case "CODE":
+					case "NAME":
+					case "COMMENTS":
+					case "TITLE_OBJ":
+					case "URL":
+					case "IS_CUSTOM":
+						$arSqlSearch[] = GetFilterQuery("C.".$key, $val);
+						break;
 				}
 			}
 		}
@@ -275,7 +286,7 @@ class CHotKeysCode
 			$arSqlSearch[] = "C.NAME IS NOT NULL AND C.NAME<>'-=AUTONAME=-'";
 
 		$sOrder = "";
-		foreach($aSort as $key=>$val)
+		foreach($aSort as $key => $val)
 		{
 			$ord = (strtoupper($val) <> "ASC"? "DESC":"ASC");
 			switch (strtoupper($key))
@@ -290,10 +301,10 @@ class CHotKeysCode
 				case "IS_CUSTOM": $sOrder .= ", C.IS_CUSTOM ".$ord; break;
 			}
 		}
-		if (strlen($sOrder)<=0)
+		if (strlen($sOrder) <= 0)
 			$sOrder = "NAME ASC";
 
-		$strSqlOrder = " ORDER BY ".TrimEx($sOrder,",");
+		$strSqlOrder = " ORDER BY ".TrimEx($sOrder, ",");
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
 		$strSql = "
 			SELECT
@@ -311,6 +322,7 @@ class CHotKeysCode
 
 class CHotKeys
 {
+	/** @var CHotKeysCode */
 	protected static $codes;
 	/** @var CHotKeys */
 	protected static $instance;
@@ -384,10 +396,11 @@ class CHotKeys
 
 	private function __construct() { }
 	private function __clone() { }
-	private function __wakeup() { }
 
 	public static function GetInstance()
 	{
+		global $USER;
+
 		if (!isset(self::$instance))
 		{
 			$c = __CLASS__;
@@ -395,8 +408,7 @@ class CHotKeys
 			self::$codes = new CHotKeysCode;
 			self::$optUse = COption::GetOptionString('main', "use_hot_keys", "Y") == "Y";
 			self::$ExpImpFileName = "hk_export_".$_SERVER['HTTP_HOST'].".srl";
-			self::$cacheId = "b_hot_keys".$GLOBALS["USER"]->GetID().LANGUAGE_ID;
-
+			self::$cacheId = "b_hot_keys".$USER->GetID().LANGUAGE_ID;
 		}
 
 		return self::$instance;
@@ -409,12 +421,12 @@ class CHotKeys
 
 	protected function LoadToCache()
 	{
-		global $USER,$_SESSION,$CACHE_MANAGER;
+		global $USER, $CACHE_MANAGER;
 
 		if(is_array($this->arList) || !self::$optUse)
 			return false;
 
-		if(isset($_SESSION["hasHotKeys"]) && $_SESSION["hasHotKeys"]==false)
+		if(isset($_SESSION["hasHotKeys"]) && $_SESSION["hasHotKeys"] == false)
 			return false;
 
 		$uid = $USER->GetID();
@@ -425,33 +437,33 @@ class CHotKeys
 		}
 		else
 		{
-			$res = $this->GetList(array(),array("USER_ID"=>$uid));
+			$res = $this->GetList(array(), array("USER_ID"=>$uid));
 
 			$this->CheckStickers();
 
-			while($arTemp=$res->Fetch())
-				$this->arList[$arTemp["ID"]]=$arTemp;
+			while($arTemp = $res->Fetch())
+				$this->arList[$arTemp["ID"]] = $arTemp;
 		}
 
 		if(is_array($this->arList))
 		{
 			$CACHE_MANAGER->Set(self::$cacheId, $this->arList);
-			$_SESSION["hasHotKeys"]=true;
+			$_SESSION["hasHotKeys"] = true;
 		}
 		else  //for the first user's login let's try to set default keys
 		{
 			if(!$this->IsDefaultOpt())
 			{
-				$_SESSION["hasHotKeys"]=false;
+				$_SESSION["hasHotKeys"] = false;
 				return false;
 			}
 
-			$setDef=$this->SetDefault($uid);
-			$setNoDef=$this->SetNotDefaultOpt();
+			$setDef = $this->SetDefault($uid);
+			$setNoDef = $this->SetNotDefaultOpt();
 
 			if(!$setDef || !$setNoDef)
 			{
-				$_SESSION["hasHotKeys"]=false;
+				$_SESSION["hasHotKeys"] = false;
 				return false;
 			}
 
@@ -481,7 +493,7 @@ class CHotKeys
 			return false;
 
 		foreach ($this->arList as $arHK)
-			if($arHK["CODE_ID"]==$codeID)
+			if($arHK["CODE_ID"] == $codeID)
 				return $arHK;
 
 		return false;
@@ -495,7 +507,7 @@ class CHotKeys
 			return false;
 
 		foreach ($this->arList as $arHK)
-			if($arHK["ID"]==$hkID)
+			if($arHK["ID"] == $hkID)
 				return $arHK["USER_ID"];
 
 		return false;
@@ -503,33 +515,37 @@ class CHotKeys
 
 	protected function GlueSelfToCode(&$arCode)
 	{
-		$found=false;
+		$found = false;
 
 		if(!is_array($arCode)) //|| !is_array($this->arList)
 			return false;
 
 		if (is_array($this->arList))
+		{
 			foreach ($this->arList as $arHK)
-				if($arCode["ID"]==$arHK["CODE_ID"])
+			{
+				if($arCode["ID"] == $arHK["CODE_ID"])
 				{
-					$arCode["KEYS_STRING"]=$arHK["KEYS_STRING"];
-					$arCode["CODE_ID"]=$arHK["CODE_ID"];
-					$arCode["HK_ID"]=$arHK["ID"];
+					$arCode["KEYS_STRING"] = $arHK["KEYS_STRING"];
+					$arCode["CODE_ID"] = $arHK["CODE_ID"];
+					$arCode["HK_ID"] = $arHK["ID"];
 					$found = true;
 					break;
 				}
+			}
+		}
 
 		if(!$found)
 		{
-			$arCode["KEYS_STRING"]="";
-			$arCode["CODE_ID"]=$arCode["ID"];
-			$arCode["HK_ID"]=0;
+			$arCode["KEYS_STRING"] = "";
+			$arCode["CODE_ID"] = $arCode["ID"];
+			$arCode["HK_ID"] = 0;
 		}
 
 		return $found;
 	}
 
-	public function GetCodeByClassName($className, $name="",$code="")
+	public function GetCodeByClassName($className, $name = "", $code = "")
 	{
 		if(!self::$optUse)
 			return false;
@@ -572,7 +588,7 @@ class CHotKeys
 		return $arCodes;
 	}
 
-	public function GetTitle($strTitleObj, $forHint=false)
+	public function GetTitle($strTitleObj, $forHint = false)
 	{
 		if(!self::$optUse)
 			return false;
@@ -580,16 +596,16 @@ class CHotKeys
 		$this->LoadToCache();
 		$codeID = self::$codes->GetIDByTitleObj($strTitleObj);
 		$arHK = $this->GetByCodeID($codeID);
-		$space=($forHint ? "&nbsp;" : " ");
+		$space = ($forHint ? "&nbsp;" : " ");
 
 		if(is_array($arHK))
-			return " (".$space.htmlspecialcharsbx($this->ShowHKAsChar($arHK["KEYS_STRING"]),ENT_QUOTES).$space.") ";
+			return " (".$space.htmlspecialcharsbx($this->ShowHKAsChar($arHK["KEYS_STRING"]), ENT_QUOTES).$space.") ";
 
 		return "";
 	}
 
 	//if obj has unique id = b_hot-keys_code.TITLE_OBJ
-	public function SetTitle($className, $forHint=false)
+	public function SetTitle($className, $forHint = false)
 	{
 		$this->LoadToCache();
 		$arCodes = self::$codes->GetCodeByClassName($className);
@@ -597,7 +613,7 @@ class CHotKeys
 		if(!is_array($arCodes))
 			return false;
 
-		$retHtml="";
+		$retHtml = "";
 
 		foreach ($arCodes as $arCode)
 		{
@@ -605,7 +621,7 @@ class CHotKeys
 				continue;
 
 			$arHK = $this->GetByCodeID($arCode["ID"]);
-			$space=($forHint ? "&nbsp;" : " ");
+			$space = ($forHint ? "&nbsp;" : " ");
 
 			if(!is_array($arHK))
 				continue;
@@ -616,37 +632,39 @@ class CHotKeys
 		return $retHtml;
 	}
 
-	static public function PrintJSExecs($execs, $controlName="", $scriptTags=true, $checkHK=false)
+	static public function PrintJSExecs($execs, $controlName = "", $scriptTags = true, $checkHK = false)
 	{
 		$retStr = "";
 
 		if(!is_array($execs))
 			return false;
 
-		$printName= ($controlName) ? $controlName."." : "";
+		$printName = ($controlName? $controlName."." : "");
 
 		foreach ($execs as $arExec)
 		{
 			if($arExec["CODE"])
-				$code = $printName.addslashes($arExec["CODE"]);
+				$code = $printName.CUtil::JSEscape($arExec["CODE"]);
 			else
-				$code ="";
+				$code = "";
 
-			$retStr.=' BXHotKeys.Add("'.htmlspecialcharsbx($arExec["KEYS_STRING"]).'","'.$code.'",'.intval($arExec["CODE_ID"]).", '".strip_tags(addslashes($arExec["NAME"]),"<b>")."', ".intval($arExec["HK_ID"])."); ";
+			$retStr .= ' BXHotKeys.Add("'.htmlspecialcharsbx($arExec["KEYS_STRING"]).'", "'.$code.'", '.intval($arExec["CODE_ID"]).", '".strip_tags(addslashes($arExec["NAME"]),"<b>")."', ".intval($arExec["HK_ID"])."); ";
 		}
 
-		if($checkHK==true)
+		if($checkHK == true)
 			$retStr = ' if(window.BXHotKeys!==undefined) { '.$retStr.' } ';
 
-		if($scriptTags==true)
+		if($scriptTags == true)
 			$retStr = '<script type="text/javascript">'.$retStr.'</script>';
 
 		return $retStr;
 	}
 
 	//On Error Throws exception+message and return false
-	protected function CheckFields($arFields,$ID=false)
+	protected function CheckFields($arFields, $ID = false)
 	{
+		global $APPLICATION;
+
 		$aMsg = array();
 
 		if(isset($arFields["CODE_ID"]))
@@ -659,12 +677,12 @@ class CHotKeys
 
 
 		//USER_ID+CODE_ID must be unique
-		$res = $this->GetList(array(),array("CODE_ID"=>$arFields["CODE_ID"],"USER_ID"=>$arFields["USER_ID"]));
+		$res = $this->GetList(array(), array("CODE_ID"=>$arFields["CODE_ID"], "USER_ID"=>$arFields["USER_ID"]));
 		$hotKeys = $res->Fetch();
 		if($ID)
 		{
 			if($hotKeys)
-				if($hotKeys["CODE_ID"] == $arFields["CODE_ID"] && $hotKeys["USER_ID"] == $arFields["USER_ID"] && $ID!=$hotKeys["ID"])
+				if($hotKeys["CODE_ID"] == $arFields["CODE_ID"] && $hotKeys["USER_ID"] == $arFields["USER_ID"] && $ID != $hotKeys["ID"])
 					$aMsg[] = array("id"=>"CODE_ID", "text"=>GetMessage("HK_CF_CODEUSER_UNIQ"));
 
 		}
@@ -684,41 +702,40 @@ class CHotKeys
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
 		return true;
 	}
 
-	public function GetList($aSort=array(), $arFilter=Array())
+	public function GetList($aSort = array(), $arFilter = array())
 	{
 		global $DB;
-		$arSqlSearch = Array();
-		$strSqlSearch = "";
+		$arSqlSearch = array();
 		if (is_array($arFilter))
 		{
 			foreach ($arFilter as $key => $val)
 			{
-				if (strlen($val)<=0 || $val=="NOT_REF")
+				if (strlen($val) <=0 || $val == "NOT_REF")
 					continue;
 				$key = strtoupper($key);
 				switch($key)
 				{
-				case "ID":
-				case "CODE_ID":
-				case "USER_ID":
-					$arSqlSearch[] = $key."=".intval($val);
-					break;
-				case "KEYS_STRING":
-					$arSqlSearch[] = GetFilterQuery("KEYS_STRING", $val);
-					break;
+					case "ID":
+					case "CODE_ID":
+					case "USER_ID":
+						$arSqlSearch[] = $key."=".intval($val);
+						break;
+					case "KEYS_STRING":
+						$arSqlSearch[] = GetFilterQuery("KEYS_STRING", $val);
+						break;
 				}
 			}
 		}
 
 		$sOrder = "";
-		foreach($aSort as $key=>$val)
+		foreach($aSort as $key => $val)
 		{
 			$ord = (strtoupper($val) <> "ASC"? "DESC":"ASC");
 			switch (strtoupper($key))
@@ -730,10 +747,10 @@ class CHotKeys
 			}
 		}
 
-		if (strlen($sOrder)>0)
-			$strSqlOrder = " ORDER BY ".TrimEx($sOrder,",");
+		if (strlen($sOrder) > 0)
+			$strSqlOrder = " ORDER BY ".TrimEx($sOrder, ",");
 		else
-			$strSqlOrder="";
+			$strSqlOrder = "";
 
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
 		$strSql = "
@@ -759,17 +776,17 @@ class CHotKeys
 		$this->CleanCache();
 
 		$arPrepFields = array(
-			"KEYS_STRING"=>$arFields["KEYS_STRING"],
-			"CODE_ID"=>intval($arFields["CODE_ID"]),
-			"USER_ID"=>intval($arFields["USER_ID"]),
+			"KEYS_STRING" => $arFields["KEYS_STRING"],
+			"CODE_ID" => intval($arFields["CODE_ID"]),
+			"USER_ID" => intval($arFields["USER_ID"]),
 		);
 
-		return $DB->Add("b_hot_keys",$arPrepFields);
+		return $DB->Add("b_hot_keys", $arPrepFields);
 	}
 
-	public function Update($ID,$arFields)
+	public function Update($ID, $arFields)
 	{
-		if(!$this->CheckFields($arFields,$ID))
+		if(!$this->CheckFields($arFields, $ID))
 			return false;
 
 		global $DB;
@@ -779,7 +796,7 @@ class CHotKeys
 
 		$strUpdate = $DB->PrepareUpdate("b_hot_keys", $arFields);
 
-		if($strUpdate!="")
+		if($strUpdate != "")
 		{
 			$strSql = "UPDATE b_hot_keys SET ".$strUpdate." WHERE ID=".intval($ID);
 			if(!$DB->Query($strSql))
@@ -806,28 +823,28 @@ class CHotKeys
 	{
 		global $DB;
 
-		$uid= intval($userID);
+		$uid = intval($userID);
 
 		unset($_SESSION["hasHotKeys"]);
 
 		$sql = "DELETE FROM b_hot_keys WHERE USER_ID=".$uid;
 		$delRes = $DB->Query($sql, false, $this->ErrOrig()." Line: ".__LINE__);
 
-		$listRes=$this->GetList(array(),array("USER_ID"=>"0"));
+		$listRes = $this->GetList(array(), array("USER_ID"=>"0"));
 
-		$insErr=false;
-		while($arHK=$listRes->Fetch())
+		$insErr = false;
+		while($arHK = $listRes->Fetch())
 		{
 			$arPrepFields = array(
-				"KEYS_STRING"=>$arHK["KEYS_STRING"],
-				"CODE_ID"=>$arHK["CODE_ID"],
-				"USER_ID"=>$uid
+				"KEYS_STRING" => $arHK["KEYS_STRING"],
+				"CODE_ID" => $arHK["CODE_ID"],
+				"USER_ID" => $uid
 			);
 
 			$insRes = $DB->Add("b_hot_keys",$arPrepFields);
 
 			if(!$insRes)
-				$insErr=true;
+				$insErr = true;
 		}
 
 		return ($delRes && !$insErr);
@@ -838,36 +855,38 @@ class CHotKeys
 		if(!$this->CheckKeysString($hotKeysString))
 			return GetMessage("HK_WRONG_KS");
 
-		$lastPlusPos=strrpos($hotKeysString,"+");
+		$lastPlusPos = strrpos($hotKeysString, "+");
 
 		if($lastPlusPos)
 		{
 			$charCode = substr($hotKeysString, $lastPlusPos+1, strlen($hotKeysString));
 			$preChar = substr($hotKeysString, 0, $lastPlusPos+1);
-			if($charCode==16 || $charCode==17 || $charCode==18)
-				return substr($preChar,0,strlen($preChar)-1);
+			if($charCode == 16 || $charCode == 17 || $charCode == 18)
+				return substr($preChar, 0, strlen($preChar)-1);
 		}
 		else
 		{
-			$charCode=$hotKeysString;
-			$preChar="";
+			$charCode = $hotKeysString;
+			$preChar = "";
 		}
 
 		if(intval($charCode)<256)
 		{
-			if(!($codeSymb=$this->arServSymb[intval($charCode)]))
-				$codeSymb=Chr($charCode);
+			if(!($codeSymb = $this->arServSymb[intval($charCode)]))
+				$codeSymb = chr($charCode);
 		}
 		else
+		{
 			$codeSymb = html_entity_decode("&#".$charCode.";", ENT_NOQUOTES,LANG_CHARSET);
+		}
 
 		return $preChar.$codeSymb;
 	}
 
 	protected function CheckKeysString($keysString)
 	{
-		$keyCode=str_replace(array("ctrl","alt","shift","+"), "", strtolower($keysString));
-		return !(strcmp(intval($keyCode),$keyCode));
+		$keyCode = str_replace(array("ctrl", "alt", "shift", "+"), "", strtolower($keysString));
+		return !(strcmp(intval($keyCode), $keyCode));
 	}
 
 	static public function PrintPhpToJSVars()
@@ -908,19 +927,19 @@ class CHotKeys
 	}
 
 	// Top panel buttons
-	public function PrintTPButton(&$arPanelButton,$parent="")
+	public function PrintTPButton(&$arPanelButton, $parent = "")
 	{
 		if(!self::$optUse)
 			return false;
 
-		$retJS="";
-		$hkCode="";
+		$retJS = "";
+		$hkCode = "";
 
 		if(isset($arPanelButton["LINK"]))
-			$hkCode="location.href='".$arPanelButton["LINK"]."'";
+			$hkCode = "location.href='".$arPanelButton["LINK"]."'";
 
 		if(isset($arPanelButton["ACTION"]))
-			$hkCode=$arPanelButton["ACTION"];
+			$hkCode = $arPanelButton["ACTION"];
 
 		if(isset($arPanelButton["ALT"]))
 			$arPanelButton["ALT"] = $arPanelButton["ALT"].(isset($arPanelButton["HK_ID"])? $this->GetTitle($arPanelButton["HK_ID"]): "");
@@ -930,22 +949,22 @@ class CHotKeys
 
 		if(isset($arPanelButton["HK_ID"]))
 		{
-			$name = str_replace(array("#BR#","&nbsp;"),array(" ",""), $arPanelButton["TEXT"]);
+			$name = str_replace(array("#BR#", "&nbsp;"), array(" ", ""), $arPanelButton["TEXT"]);
 
-			if($parent!="")
-				$name=$parent.$name;
+			if($parent != "")
+				$name = $parent.$name;
 			else
 				if($arPanelButton["MENU"])
-					$name="<b>".$name."</b>";
+					$name = "<b>".$name."</b>";
 
-			$Execs=$this->GetCodeByClassName($arPanelButton["HK_ID"], $name, $hkCode);
-			$retJS.=$this->PrintJSExecs($Execs);
+			$Execs = $this->GetCodeByClassName($arPanelButton["HK_ID"], $name, $hkCode);
+			$retJS .= $this->PrintJSExecs($Execs);
 		}
 
 		if (isset($arPanelButton["MENU"]) && is_array($arPanelButton["MENU"]))
 		{
 			foreach ($arPanelButton["MENU"] as &$menu)
-				$retJS.=$this->PrintTPButton($menu,$parent."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+				$retJS .= $this->PrintTPButton($menu, $parent."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		}
 
 		return $retJS;
@@ -970,11 +989,11 @@ class CHotKeys
 	{
 		global $DB;
 
-		if(COption::GetOptionString("fileman", "stickers_use_hotkeys","Y") != "Y")
+		if(COption::GetOptionString("fileman", "stickers_use_hotkeys", "Y") != "Y")
 			return false;
 
 		$strSql = "SELECT ID FROM b_hot_keys WHERE USER_ID=0 AND ( CODE_ID=87 OR CODE_ID=88 OR CODE_ID=89)";
-		$res=$DB->Query($strSql,false, $this->ErrOrig()." Line: ".__LINE__);
+		$res = $DB->Query($strSql, false, $this->ErrOrig()." Line: ".__LINE__);
 
 		if(!$res->Fetch())
 		{
@@ -992,13 +1011,13 @@ class CHotKeys
 		if(!$GLOBALS["APPLICATION"]->PanelShowed)
 			return "";
 
-		$Execs=$this->GetCodeByClassName("Global");
-		$out=$this->PrintJSExecs($Execs);
+		$Execs = $this->GetCodeByClassName("Global");
+		$out = $this->PrintJSExecs($Execs);
 
-		$Execs=$this->GetCodeByUrl($_SERVER["REQUEST_URI"]);
-		$out.=$this->PrintJSExecs($Execs);
+		$Execs = $this->GetCodeByUrl($_SERVER["REQUEST_URI"]);
+		$out .= $this->PrintJSExecs($Execs);
 
-		$out.=$this->PrintPhpToJSVars();
+		$out .= $this->PrintPhpToJSVars();
 
 		return $out;
 	}
@@ -1011,7 +1030,7 @@ class CHotKeys
 	 * @param string $keysString - default combination of keys ("Ctrl+Shift+76")
 	 * @return int Count of users to wich adds hot-keys
 	 * */
-	public function AddDefaultKeyToAll($codeID,$keysString)
+	public function AddDefaultKeyToAll($codeID, $keysString)
 	{
 		global $DB;
 
@@ -1028,7 +1047,7 @@ class CHotKeys
 
 		//user can alredy using this hot-keys combination
 		while($hotKey = $res->Fetch())
-			if($hotKey["KEYS_STRING"]==$keysString)
+			if($hotKey["KEYS_STRING"] == $keysString)
 				$exceptedUsers[] = $hotKey["USER_ID"];
 
 		//we could alredy attempted to add this keys
@@ -1038,22 +1057,21 @@ class CHotKeys
 
 		//all users wich using hot-keys
 		$strSql = "SELECT DISTINCT USER_ID FROM b_hot_keys";
-		$res=$DB->Query($strSql,false, $this->ErrOrig()." Line: ".__LINE__);
+		$res = $DB->Query($strSql, false, $this->ErrOrig()." Line: ".__LINE__);
 
 		$added = 0;
 
 		while($hkUsers = $res->Fetch())
 		{
 			if(!empty($exceptedUsers))
-				if(in_array($hkUsers['USER_ID'],$exceptedUsers))
+				if(in_array($hkUsers['USER_ID'], $exceptedUsers))
 					continue;
 
 			$this->Add (array("KEYS_STRING"=>$keysString, "CODE_ID"=>$codeID, "USER_ID"=>$hkUsers['USER_ID']));
 			$added++;
-
 		}
 
-	return $added;
+		return $added;
 	}
 
 	/**
@@ -1068,15 +1086,12 @@ class CHotKeys
 			return false;
 
 		$arForExport = array();
-		$arTmpCode = array();
 		$tmpDir = CTempFile::GetDirectoryName();
 		CheckDirPath($tmpDir);
 		$tmpExportFile = $tmpDir.self::$ExpImpFileName;
 
-
 		foreach ($this->arList as $arHK)
 		{
-			$arTmpLink = array();
 			$res = self::$codes->GetByID($arHK['CODE_ID']);
 			$arTmpCode = $res->Fetch();
 
@@ -1088,19 +1103,19 @@ class CHotKeys
 				'CLASS_NAME' => $arTmpCode['CLASS_NAME'],
 				'NAME' => $arTmpCode['NAME'],
 				'IS_CUSTOM'	=> $arTmpCode['IS_CUSTOM']
-				);
+			);
 
 			if($arTmpCode['IS_CUSTOM'])
 			{
-				$arTmpLink['CODE']= $arTmpCode['CODE'];
-				$arTmpLink['COMMENTS']= $arTmpCode['COMMENTS'];
-				$arTmpLink['URL']= $arTmpCode['URL'];
+				$arTmpLink['CODE'] = $arTmpCode['CODE'];
+				$arTmpLink['COMMENTS'] = $arTmpCode['COMMENTS'];
+				$arTmpLink['URL'] = $arTmpCode['URL'];
 			}
 
-			$arForExport[]=$arTmpLink;
+			$arForExport[] = $arTmpLink;
 		}
 
-		$result = file_put_contents($tmpExportFile,serialize($arForExport));
+		$result = file_put_contents($tmpExportFile, serialize($arForExport));
 
 		if($result === false)
 			return false;
@@ -1109,17 +1124,18 @@ class CHotKeys
 	}
 	/**
 	 * Imports hot keys from file and binds them to user
-	 * @param string $filename - absolute path to file with serialized data
+	 * @param string $fileName - absolute path to file with serialized data
 	 * @param int $userID - user's id wich recieves our hot-keys from file
 	 * @return int count added hot keys
 	 * */
-	public function Import($fileName,$userID)
+	public function Import($fileName, $userID)
 	{
 		$fileContent = file_get_contents($fileName);
 
 		if(!$fileContent)
 			return false;
 
+		$arInput = null;
 		if(CheckSerializedData($fileContent))
 			$arInput = unserialize($fileContent);
 
@@ -1139,32 +1155,36 @@ class CHotKeys
 				if(!isset($arHotKey['CODE']))
 					continue;
 
-				$resCodes = self::$codes->GetList(array(),array(
-															'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : '',
-															'NAME' => $arHotKey['NAME'],
-															'CODE' => $arHotKey['CODE'],
-															));
+				$resCodes = self::$codes->GetList(array(), array(
+					'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : '',
+					'NAME' => $arHotKey['NAME'],
+					'CODE' => $arHotKey['CODE'],
+				));
 				$arCode = $resCodes->Fetch();
 				//if same code alredy exist
 				if(isset($arCode['ID']))
+				{
 					$codeID = $arCode['ID'];
+				}
 				else
+				{
 					$codeID = self::$codes->Add( array(
-												'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : "",
-												'CODE' => $arHotKey['CODE'],
-												'NAME' => $arHotKey['NAME'],
-												'COMMENTS' => isset($arHotKey['COMMENTS']) ? $arHotKey['COMMENTS'] : "",
-												'TITLE_OBJ' => isset($arHotKey['TITLE_OBJ']) ? $arHotKey['TITLE_OBJ'] : "",
-												'URL' => isset($arHotKey['URL']) ? $arHotKey['URL'] : "",
-												'IS_CUSTOM' => $arHotKey['IS_CUSTOM']
-												));
+						'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : "",
+						'CODE' => $arHotKey['CODE'],
+						'NAME' => $arHotKey['NAME'],
+						'COMMENTS' => isset($arHotKey['COMMENTS']) ? $arHotKey['COMMENTS'] : "",
+						'TITLE_OBJ' => isset($arHotKey['TITLE_OBJ']) ? $arHotKey['TITLE_OBJ'] : "",
+						'URL' => isset($arHotKey['URL']) ? $arHotKey['URL'] : "",
+						'IS_CUSTOM' => $arHotKey['IS_CUSTOM']
+					));
+				}
 			}
 			else //if system code
 			{
-				$resCodes = self::$codes->GetList(array(),array(
-															'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : '',
-															'NAME' => $arHotKey['NAME']
-															));
+				$resCodes = self::$codes->GetList(array(), array(
+					'CLASS_NAME' => isset($arHotKey['CLASS_NAME']) ? $arHotKey['CLASS_NAME'] : '',
+					'NAME' => $arHotKey['NAME']
+				));
 				$arCode = $resCodes->Fetch();
 
 				if(isset($arCode['ID']))
@@ -1174,10 +1194,9 @@ class CHotKeys
 			if(!$codeID)
 				continue;
 
-
-			$resHK = $this->GetList(array(),array(
-				"CODE_ID"=>$codeID,
-				"USER_ID"=>intval($userID)
+			$resHK = $this->GetList(array(), array(
+				"CODE_ID" => $codeID,
+				"USER_ID" => intval($userID)
 			));
 			$arHK = $resHK->Fetch();
 
@@ -1186,17 +1205,19 @@ class CHotKeys
 			{
 				$hkID = $arHK['ID'];
 				$this->Update( $hkID, array(
-					"KEYS_STRING"=>$arHotKey["KEYS_STRING"],
-					"CODE_ID"=>$codeID,
-					"USER_ID"=>intval($userID)
+					"KEYS_STRING" => $arHotKey["KEYS_STRING"],
+					"CODE_ID" => $codeID,
+					"USER_ID" => intval($userID)
 				));
 			}
 			else
+			{
 				$hkID = $this->Add( array(
-					"KEYS_STRING"=>$arHotKey["KEYS_STRING"],
-					"CODE_ID"=>$codeID,
-					"USER_ID"=>intval($userID)
+					"KEYS_STRING" => $arHotKey["KEYS_STRING"],
+					"CODE_ID" => $codeID,
+					"USER_ID" => intval($userID)
 				));
+			}
 
 			if($hkID)
 				$added++;
@@ -1205,4 +1226,3 @@ class CHotKeys
 		return $added;
 	}
 }
-?>

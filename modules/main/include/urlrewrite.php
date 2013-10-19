@@ -76,27 +76,37 @@ if(file_exists($_SERVER['DOCUMENT_ROOT']."/urlrewrite.php"))
 
 if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' || isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
 {
-	if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404')
+	if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' && !isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
 	{
 		$url = $requestUri;
 	}
 	else
 	{
+		$foundQMark = strpos($_SERVER["REQUEST_URI"], "?");
+		$requestUriWithoutParams = ($foundQMark !== false ? substr($_SERVER["REQUEST_URI"], 0, $foundQMark) : $_SERVER["REQUEST_URI"]);
+
 		$url = $requestUri = $_SERVER["REQUEST_URI"] = $REQUEST_URI = ((is_array($_GET["SEF_APPLICATION_CUR_PAGE_URL"])) ? '' : $_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
+		unset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
 	}
 
 	if(($pos=strpos($url, "?"))!==false)
 	{
 		$params = substr($url, $pos+1);
 		parse_str($params, $vars);
+		unset($vars["SEF_APPLICATION_CUR_PAGE_URL"]);
 
 		$_GET += $vars;
 		$_REQUEST += $vars;
-		$GLOBALS += $vars;
+		//$GLOBALS += $vars;
 		$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
 	}
 
-	if (isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]) && isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404')
+	if (isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"])
+		&& (
+			isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404'
+			|| ($requestUriWithoutParams != "/bitrix/urlrewrite.php")
+		)
+	)
 	{
 		$url = $requestUri = $_SERVER["REQUEST_URI"] = $REQUEST_URI = "";
 		$_GET = array();
@@ -127,10 +137,11 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 			{
 				$params = substr($url, $pos+1);
 				parse_str($params, $vars);
+				unset($vars["SEF_APPLICATION_CUR_PAGE_URL"]);
 
 				$_GET += $vars;
 				$_REQUEST += $vars;
-				$GLOBALS += $vars;
+				//$GLOBALS += $vars;
 				$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
 				$url = substr($url, 0, $pos);
 			}

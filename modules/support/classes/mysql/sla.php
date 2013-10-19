@@ -7,7 +7,7 @@ class CTicketSLA extends CAllTicketSLA
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CTicketSLA<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CTicketSLA<br>File: ".__FILE__;
 	}
 
 	// get SLA list
@@ -26,7 +26,8 @@ class CTicketSLA extends CAllTicketSLA
 			{
 
 				$filterKeys = array_keys($arFilter);
-				for ($i=0; $i<count($filterKeys); $i++)
+				$filterKeysCount = count($filterKeys);
+				for ($i=0; $i<$filterKeysCount; $i++)
 				{
 
 					$key = $filterKeys[$i];
@@ -51,6 +52,7 @@ class CTicketSLA extends CAllTicketSLA
 							break;
 						case "NAME":
 						case "DESCRIPTION":
+						case "DEADLINE_SOURCE":
 							$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $matchValueSet) ? "N" : "Y";
 							$arSqlSearch[] = GetFilterQuery("S.".$key, $val, $match);
 							break;

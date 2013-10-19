@@ -20,7 +20,7 @@ class CAllTicketDictionary
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CAllTicketDictionary<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CAllTicketDictionary<br>File: ".__FILE__;
 	}
 
 	public static function GetDefault($type, $siteID=SITE_ID)
@@ -30,6 +30,7 @@ class CAllTicketDictionary
 			$siteID = "";
 		}
 		$arFilter = array("DEFAULT" => "Y", "TYPE" => $type, "SITE" => $siteID);
+		$v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList(($v1="s_dropdown"), $v2, $arFilter, $v3);
 		$ar = $rs->Fetch();
 		return $ar["ID"];
@@ -54,6 +55,7 @@ class CAllTicketDictionary
 			$siteID = "";
 		}
 		$arFilter = array("TYPE" => $type, "SITE" => $siteID);
+		$v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList(($v1="s_dropdown"), $v2, $arFilter, $v3);
 		
 		$oldFunctionality = COption::GetOptionString( "support", "SUPPORT_OLD_FUNCTIONALITY", "Y" );
@@ -81,6 +83,7 @@ class CAllTicketDictionary
 	{
 		//M, C, K, S, SR, D, F
 		global $DB;
+		$err_mess = (CAllTicketDictionary::err_mess())."<br>Function: GetDropDownArray<br>Line: ";
 
 		if ($siteID == false || $siteID == "all")
 			$siteID = "";
@@ -88,6 +91,7 @@ class CAllTicketDictionary
 		$arFilter = Array("SITE" => $siteID);
 
 		$arReturn = Array();
+		$v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList(($v1="s_dropdown"), $v2, $arFilter, $v3);
 		while ($ar = $rs->Fetch())
 		{
@@ -157,6 +161,32 @@ class CAllTicketDictionary
 		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
 		while ($ar = $rs->Fetch()) $arrRes[] = $ar["SITE_ID"];
 		return $arrRes;
+	}
+
+	public static function GetSiteArrayForAllDictionaries()
+	{
+		static $GetSiteArrayForAllDictCache;
+		if(is_array($GetSiteArrayForAllDictCache))
+		{
+			return $GetSiteArrayForAllDictCache;
+		}
+
+		$err_mess = (CAllTicketDictionary::err_mess())."<br>Function: GetSiteArrayForAllDictionaries<br>Line: ";
+		global $DB;
+		$GetSiteArrayForAllDictCache = array();
+		$strSql = "
+			SELECT
+				DS.SITE_ID,
+				DS.DICTIONARY_ID
+			FROM
+				b_ticket_dictionary_2_site DS
+			";
+		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
+		while ($ar = $rs->Fetch())
+		{
+			$GetSiteArrayForAllDictCache[$ar["DICTIONARY_ID"]][] = $ar["SITE_ID"];
+		}
+		return $GetSiteArrayForAllDictCache;
 	}
 
 	public static function GetTypeList()
@@ -233,7 +263,11 @@ class CAllTicketDictionary
 		$err_mess = (CAllTicketDictionary::err_mess())."<br>Function: GetByID<br>Line: ";
 		global $DB;
 		$id = intval($id);
-		if ($id<=0) return;
+		if ($id<=0)
+		{
+			return;
+		}
+		$by = $order = $is_filtered = null;
 		$res = CTicketDictionary::GetList($by, $order, array("ID" => $id), $is_filtered);
 		return $res;
 	}
@@ -242,6 +276,7 @@ class CAllTicketDictionary
 	{
 		$err_mess = (CAllTicketDictionary::err_mess())."<br>Function: GetBySID<br>Line: ";
 		global $DB;
+		$v1 = $v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList($v1, $v2, array("SITE_ID"=>$siteID, "TYPE"=>$type, "SID"=>$sid), $v3);
 		return $rs;
 	}
@@ -308,6 +343,7 @@ class CAllTicketDictionary
 				$arFilter['ID'] = '~'.intval($id);
 			}
 
+			$v1 = $v2 = $v3 = null;
 			$z = CTicketDictionary::GetList($v1, $v2, $arFilter, $v3);
 			if ($zr = $z->Fetch())
 			{
@@ -399,13 +435,14 @@ class CAllTicketDictionary
 				'TYPE'	=> $arFields['C_TYPE'],
 				'SITE'	=> $arFields['arrSITE']
 				);
+			$v1 = $v2 = $v3 = null;
 			$z = CTicketDictionary::GetList($v1, $v2, $arFilter, $v3);
 			while ($zr = $z->Fetch())
 			{
 				$DB->Update('b_ticket_dictionary', array('SET_AS_DEFAULT' => "'N'"), 'WHERE ID=' . $zr['ID'], '', false, false, false);
 			}
 		}
-		else
+		elseif (array_key_exists('SET_AS_DEFAULT', $arFields))
 		{
 			$arFields['SET_AS_DEFAULT'] = 'N';
 		}

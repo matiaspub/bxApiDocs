@@ -101,7 +101,7 @@ class CAllSaleOrderUserPropsValue
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserpropsvalue/csaleorderuserpropsvalue__deleteall.96a04722.php
@@ -114,6 +114,27 @@ class CAllSaleOrderUserPropsValue
 		return $DB->Query("DELETE FROM b_sale_user_props_value WHERE USER_PROPS_ID = ".$ID."", true);
 	}
 	
+	
+	/**
+	 * <p>Функция обновляет свойство профиля покупателя в соответствии с массивом параметров arFields.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param $I $D  Код значения свойства профиля покупателя.
+	 *
+	 *
+	 *
+	 * @param $arField $s  Массив значений свойств.
+	 *
+	 *
+	 *
+	 * @return array 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserpropsvalue/update.php
+	 * @author Bitrix
+	 */
 	public static function Update($ID, $arFields)
 	{
 		global $DB;

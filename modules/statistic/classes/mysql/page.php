@@ -39,23 +39,23 @@ class CPage
 	 * @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	 * допустимы следующие ключи: <ul> <li> <b>DATE1</b> - начальное значение
 	 * интервала даты; </li> <li> <b>DATE2</b> - конечное значение интервала даты;
-	 * </li> <li> <b>ADV</b>* - ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной
+	 * </li> <li> <b>ADV</b>* - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной
 	 * кампании</a> (РК), данное поле позволяет отфильтровать только те
 	 * страницы (каталоги) которые были открыты только посетителями по
 	 * данной РК и соответственно получить данные по посещаемости
 	 * страницы (каталога) <i>url</i> только этих посетителей; </li> <li>
 	 * <b>ADV_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ADV</b>
 	 * будет искаться вхождение; </li> <li> <b>ADV_DATA_TYPE</b> - флаг "<a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврат</a> или <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямой заход</a> по рекламной
-	 * кампании" (используется только если указано <i>filter</i>["<b>ADV</b>"]),
-	 * возможные значения: <ul> <li> <b>B</b> - показывать данные по посетителям
-	 * только на возврате по РК; </li> <li> <b>P</b> - показывать данные по
-	 * посетителям только на прямом заходе по РК. </li> </ul> <br> Если не
-	 * указать ни одно из вышеперечисленных значений, то данные будут
-	 * показываться в сумме как по прямому заходу так и по возврату. <br><br>
-	 * </li> </ul> * - допускается <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная
-	 * логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> или <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой заход</a> по
+	 * рекламной кампании" (используется только если указано
+	 * <i>filter</i>["<b>ADV</b>"]), возможные значения: <ul> <li> <b>B</b> - показывать
+	 * данные по посетителям только на возврате по РК; </li> <li> <b>P</b> -
+	 * показывать данные по посетителям только на прямом заходе по РК.
+	 * </li> </ul> <br> Если не указать ни одно из вышеперечисленных значений,
+	 * то данные будут показываться в сумме как по прямому заходу так и
+	 * по возврату. <br><br> </li> </ul> * - допускается <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -95,9 +95,9 @@ class CPage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#enter">Термин "Точка входа"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#exit">Термин "Точка выхода"</a>
-	 * </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#enter">Термин "Точка входа"</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#exit">Термин "Точка
+	 * выхода"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -225,9 +225,9 @@ class CPage
 	 *
 	 * @param string $counter_type = "" Тип счетчика. Возможные значения: <ul> <li> <b>ENTER_COUNTER</b> - кол-во раз
 	 * когда данная страница (каталог) была <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#enter">точкой входа</a>; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#enter">точкой входа</a>; </li> <li>
 	 * <b>EXIT_COUNTER</b> - кол-во раз когда данная страница (каталог) была <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#exit">точкой выхода</a>. </li> </ul> По
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#exit">точкой выхода</a>. </li> </ul> По
 	 * умолчанию в счетчике хранится общее число хитов по странице
 	 * (каталогу) (включая и точки входа и точки выхода).
 	 *
@@ -254,11 +254,11 @@ class CPage
 	 * <b>URL</b>* - Полный путь к странице (каталогу) для которой необходимо
 	 * вывести данные; </li> <li> <b>URL_EXACT_MATCH</b> - если значение равно "Y", то при
 	 * фильтрации по <b>URL</b> будет искаться точное совпадение; </li> <li>
-	 * <b>URL_404</b> - была ли <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a>
+	 * <b>URL_404</b> - была ли <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a>
 	 * на странице, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> - не
 	 * было. </li> </ul> Для фильтрации каталогов данное поле не может
 	 * использоваться. </li> <li> <b>ADV</b>* - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a> (РК),
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> (РК),
 	 * данное поле позволяет отфильтровать только те страницы
 	 * (каталоги) которые были открыты только посетителями по данной РК
 	 * и соответственно получить данные по посещаемости страницы
@@ -266,13 +266,13 @@ class CPage
 	 * значение равно "N", то при фильтрации по <b>ADV</b> будет искаться
 	 * вхождение; </li> <li> <b>ADV_DATA_TYPE</b> - флаг типа данных для рекламной
 	 * кампании, возможные значения: <ul> <li> <b>P</b> - только по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямым заходам</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямым заходам</a> по
 	 * рекламной кампании; </li> <li> <b>B</b> - только по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возвратам</a> по рекламной
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возвратам</a> по рекламной
 	 * кампании; </li> <li> <b>S</b> - сумма по прямым заходам и возвратам. </li> </ul>
 	 * </li> <li> <b>SITE_ID</b>* - ID сайта; </li> <li> <b>SITE_ID_EXACT_MATCH</b> - если значение равно
 	 * "N", то при фильтрации по <b>SITE_ID</b> будет искаться вхождение. </li> </ul> *
-	 * - допускается <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная
+	 * - допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	 * логика</a>
 	 *
 	 *
@@ -314,9 +314,9 @@ class CPage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#enter">Термин "Точка входа"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#exit">Термин "Точка выхода"</a>
-	 * </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#enter">Термин "Точка входа"</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#exit">Термин "Точка
+	 * выхода"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

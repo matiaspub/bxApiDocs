@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/searcher.php");
 
 /**
- * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковыми системами</a>.
+ * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>.
  *
  *
  *
@@ -40,7 +40,7 @@ class CSearcher extends CAllSearcher
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковых систем</a> и количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц) каждой из них за все время ведения статистики, за последние 3 дня, либо за указанный интервал времени.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковых систем</a> и количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц) каждой из них за все время ведения статистики, за последние 3 дня, либо за указанный интервал времени.</p>
 	 *
 	 *
 	 *
@@ -53,7 +53,7 @@ class CSearcher extends CAllSearcher
 	 * <b>s_period_hits</b> - количество хитов за установленный период времени
 	 * (<i>filter</i>["<b>DATE1</b>"], <i>filter</i>["<b>DATE2</b>"]); </li> <li> <b>s_name</b> - название
 	 * поисковой системы; </li> <li> <b>s_user_agent</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_useragent">UserAgent поисковой
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_useragent">UserAgent поисковой
 	 * системы</a>. </li> </ul>
 	 *
 	 *
@@ -85,7 +85,7 @@ class CSearcher extends CAllSearcher
 	 * точное совпадение; </li> <li> <b>USER_AGENT</b>* - UserAgent поисковой системы; </li>
 	 * <li> <b>USER_AGENT_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
 	 * <b>USER_AGENT</b> будет искаться точное совпадение. </li> </ul> * - допускается
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -135,8 +135,8 @@ class CSearcher extends CAllSearcher
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/csearcher/getdropdownlist.php">CSearcher::GetDropdownList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">Термин "Поисковая
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getdropdownlist.php">CSearcher::GetDropdownList</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин "Поисковая
 	 * система"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -306,7 +306,7 @@ class CSearcher extends CAllSearcher
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц), для указанной <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковой системы</a> в разрезе по дням.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц), для указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системы</a> в разрезе по дням.</p>
 	 *
 	 *
 	 *
@@ -379,7 +379,7 @@ class CSearcher extends CAllSearcher
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">Термин "Хит
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">Термин "Хит
 	 * поисковой системы"</a> </li></ul><a name="examples"></a>
 	 *
 	 *

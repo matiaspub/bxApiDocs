@@ -156,8 +156,22 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 		{
 			$arAcc['SERVER_NAME'] = $arSiteServers[$arAcc['LID']];
 		}
+		$arAcc['CATALOG_QUANTITY'] = '';
+		$arAcc['CATALOG_QUANTITY_TRACE'] = 'N';
+		$rsProducts = CCatalogProduct::GetList(
+			array(),
+			array('ID' => $arAcc['ID']),
+			false,
+			false,
+			array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
+		);
+		if ($arProduct = $rsProducts->Fetch())
+		{
+			$arAcc['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
+			$arAcc['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
+		}
 
-		$str_QUANTITY = DoubleVal($arAcc["CATALOG_QUANTITY"]);
+		$str_QUANTITY = doubleval($arAcc["CATALOG_QUANTITY"]);
 		$str_QUANTITY_TRACE = $arAcc["CATALOG_QUANTITY_TRACE"];
 		if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
 			$str_AVAILABLE = ' available="false"';
@@ -196,9 +210,11 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 
 		$bNoActiveGroup = True;
 		$strTmpOff_tmp = "";
-		$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], true);
+		$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 		while ($ar_res1 = $db_res1->Fetch())
 		{
+			if (0 < intval($ar_res1['ADDITIONAL_PROPERTY_ID']))
+				continue;
 			$strTmpOff_tmp.= "<categoryId>".$ar_res1["ID"]."</categoryId>\n";
 			if ($bNoActiveGroup && in_array(intval($ar_res1["ID"]), $arAvailGroups))
 			{

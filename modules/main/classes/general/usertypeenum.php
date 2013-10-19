@@ -1,4 +1,10 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
 IncludeModuleLangFile(__FILE__);
 
 class CUserTypeEnum
@@ -25,6 +31,7 @@ class CUserTypeEnum
 			case "mssql":
 				return "int";
 		}
+		return "int";
 	}
 
 	public static function PrepareSettings($arUserField)
@@ -181,6 +188,7 @@ class CUserTypeEnum
 		if($arUserField["SETTINGS"]["DISPLAY"]=="CHECKBOX")
 		{
 			$result .= '<input type="hidden" value="" name="'.$arHtmlControl["NAME"].'">';
+			$bWasSelect = false;
 			while($arEnum = $rsEnum->GetNext())
 			{
 				$bSelected = (
@@ -223,8 +231,6 @@ class CUserTypeEnum
 		if(!$rsEnum)
 			return '';
 
-		$result = '';
-
 		if($arUserField["SETTINGS"]["LIST_HEIGHT"] < 5)
 			$size = ' size="5"';
 		else
@@ -265,7 +271,6 @@ class CUserTypeEnum
 
 	public static function GetAdminListEditHTML($arUserField, $arHtmlControl)
 	{
-		$result = '';
 		$rsEnum = call_user_func_array(
 			array($arUserField["USER_TYPE"]["CLASS_NAME"], "getlist"),
 			array(
@@ -297,7 +302,7 @@ class CUserTypeEnum
 	{
 		if(!is_array($arHtmlControl["VALUE"]))
 			$arHtmlControl["VALUE"] = array();
-		$result = '';
+
 		$rsEnum = call_user_func_array(
 			array($arUserField["USER_TYPE"]["CLASS_NAME"], "getlist"),
 			array(
@@ -358,4 +363,3 @@ class CUserTypeEnum
 		return $res;
 	}
 }
-?>

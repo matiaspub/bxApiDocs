@@ -1485,10 +1485,10 @@ function ChangeOrLeaveFile<?= $id?>(bChange)
 
 				// 1. Convert name
 				$name = preg_replace("/[^a-zA-Z0-9_:\.]/is", "_", $value["FILE"]["name"]);
-				$baseNamePart = substr($name, 0, strpos($name, '.'));
+				$baseNamePart = substr($name, 0, strrpos($name, '.'));
 				$ext = GetFileExtension($name);
 
-				if(strlen($ext) > 0 && !HasScriptExtension($name) && !substr($name, 0, 1) != ".")
+				if(strlen($ext) > 0 && !HasScriptExtension($name) && substr($name, 0, 1) != ".")
 				{
 					$ind = 0;
 					// 2. Check if file already exists

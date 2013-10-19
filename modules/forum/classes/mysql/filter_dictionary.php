@@ -46,12 +46,12 @@ class CFilterDictionary extends CAllFilterDictionary
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li>поля
-	 * таблицы <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li>поля
+	 * таблицы <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li>
 	 * </ul>
 	 *
 	 *
@@ -193,13 +193,13 @@ class CFilterLetter extends CAllFilterLetter
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	 * <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
-	 * </li> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
+	 * </li> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
 	 * транслита"</a> </li> </ul>
 	 *
 	 *
@@ -348,15 +348,16 @@ class CFilterUnquotableWords extends CAllFilterUnquotableWords
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	 * <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
-	 * </li> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterletter">"Словарь
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
+	 * </li> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
 	 * букв"</a> </li> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	 * </ul>
 	 *
 	 *
 	 * @static

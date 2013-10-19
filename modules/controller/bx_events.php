@@ -8,7 +8,7 @@ class _CEventsController {
 	/**
 	 * после отключения управляемого сайта.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CAllControllerMember::CloseMember
 	 */
 	public static function OnAfterCloseMember(){}
@@ -16,7 +16,7 @@ class _CEventsController {
 	/**
 	 * перед обновлением счётчиков сайта. Позволяет модифицировать код обновляющего счётчика
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CAllControllerMember::UpdateCounters
 	 */
 	public static function OnBeforeUpdateCounters(){}
@@ -24,7 +24,7 @@ class _CEventsController {
 	/**
 	 * перед добавлением клиента.
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CControllerMember::CheckFields
 	 */
 	public static function OnBeforeControllerMemberAdd(){}
@@ -32,7 +32,7 @@ class _CEventsController {
 	/**
 	 * перед обновлением клиента
 	 * 
-	 * <i>Вызывается в методе:</i>
+	 * <i>Вызывается в методе:</i><br>
 	 * CControllerMember::CheckFields
 	 */
 	public static function OnBeforeControllerMemberUpdate(){}

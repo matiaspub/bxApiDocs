@@ -3,6 +3,19 @@ IncludeModuleLangFile(__FILE__);
 
 $GLOBALS["SALE_ORDER"] = Array();
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/index.php
+ * @author Bitrix
+ */
 class CAllSaleOrder
 {
 	static function DoCalculateOrder($siteId, $userId, $arShoppingCart, $personTypeId, $arOrderPropsValues,
@@ -46,7 +59,11 @@ class CAllSaleOrder
 				$arShoppingCartItem['DISCOUNT_PRICE'] = $arShoppingCartItem['DEFAULT_PRICE'] - $arShoppingCartItem['PRICE'];
 				if (0 > $arShoppingCartItem['DISCOUNT_PRICE'])
 					$arShoppingCartItem['DISCOUNT_PRICE'] = 0;
-				$arShoppingCartItem['DISCOUNT_PRICE_PERCENT'] = $arShoppingCartItem['DISCOUNT_PRICE']*100/$arShoppingCartItem['DEFAULT_PRICE'];
+				if (doubleval($arShoppingCartItem['DEFAULT_PRICE']) > 0)
+					$arShoppingCartItem['DISCOUNT_PRICE_PERCENT'] = $arShoppingCartItem['DISCOUNT_PRICE']*100/$arShoppingCartItem['DEFAULT_PRICE'];
+				else
+					$arShoppingCartItem['DISCOUNT_PRICE_PERCENT'] = 0;
+
 			}
 
 			$arOrder["ORDER_PRICE"] += $arShoppingCartItem["PRICE"] * $arShoppingCartItem["QUANTITY"];
@@ -132,7 +149,7 @@ class CAllSaleOrder
 
 	static function DoSaveOrder(&$arOrder, $arAdditionalFields, $orderId, &$arErrors, $arCoupons = array(), $arStoreBarcodeOrderFormData = array(), $bSaveBarcodes = false)
 	{
-		global $APPLICATION;
+		global $APPLICATION, $DB;
 
 		$orderId = intval($orderId);
 
@@ -147,6 +164,7 @@ class CAllSaleOrder
 			"DELIVERY_ID" => (strlen($arOrder["DELIVERY_ID"]) > 0 ? $arOrder["DELIVERY_ID"] : false),
 			"DISCOUNT_VALUE" => $arOrder["DISCOUNT_PRICE"],
 			"TAX_VALUE" => $arOrder["TAX_VALUE"],
+			"TRACKING_NUMBER" => $arOrder["TRACKING_NUMBER"]
 		);
 
 		if ($orderId <= 0)
@@ -589,7 +607,7 @@ class CAllSaleOrder
 	//*************** ADD, UPDATE, DELETE *********************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $USER_FIELD_MANAGER;
+		global $USER_FIELD_MANAGER, $DB;
 
 		if (is_set($arFields, "SITE_ID") && strlen($arFields["SITE_ID"]) > 0)
 			$arFields["LID"] = $arFields["SITE_ID"];
@@ -747,6 +765,27 @@ class CAllSaleOrder
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["STATUS_ID"], GetMessage("SKGO_WRONG_STATUS")), "ERROR_NO_STATUS_ID");
 				return false;
+			}
+		}
+
+		if (is_set($arFields, "ACCOUNT_NUMBER") && $ACTION=="UPDATE")
+		{
+			if (strlen($arFields["ACCOUNT_NUMBER"]) <= 0)
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGO_EMPTY_ACCOUNT_NUMBER"), "EMPTY_ACCOUNT_NUMBER");
+				return false;
+			}
+			else
+			{
+				$dbres = $DB->Query("SELECT ID, ACCOUNT_NUMBER FROM b_sale_order WHERE ACCOUNT_NUMBER = '".$DB->ForSql($arFields["ACCOUNT_NUMBER"])."'", true);
+				if ($arRes = $dbres->GetNext())
+				{
+					if (is_array($arRes) && $arRes["ID"] != $ID)
+					{
+						$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGO_EXISTING_ACCOUNT_NUMBER"), "EXISTING_ACCOUNT_NUMBER");
+						return false;
+					}
+				}
 			}
 		}
 
@@ -1723,7 +1762,7 @@ class CAllSaleOrder
 			}
 
 			$arFields = Array(
-				"ORDER_ID" => $ID,
+				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
 				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
 				"EMAIL" => $userEMail,
 				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
@@ -1757,7 +1796,7 @@ class CAllSaleOrder
 		}
 
 		//reservation
-		if (COption::GetOptionString("sale", "product_reserve_condition", "O") == "P")
+		if (COption::GetOptionString("sale", "product_reserve_condition", "O") == "P" && $arOrder["RESERVED"] != $val)
 		{
 			if (!CSaleOrder::ReserveOrder($ID, $val))
 				return false;
@@ -1917,7 +1956,7 @@ class CAllSaleOrder
 
 			$eventName = "SALE_ORDER_DELIVERY";
 			$arFields = Array(
-				"ORDER_ID" => $ID,
+				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
 				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
 				"EMAIL" => $userEMail,
 				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
@@ -2250,7 +2289,7 @@ class CAllSaleOrder
 
 			$event = new CEvent;
 			$arFields = Array(
-				"ORDER_ID" => $ID,
+				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
 				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
 				"EMAIL" => $userEmail,
 				"ORDER_CANCEL_DESCRIPTION" => $description,
@@ -2353,7 +2392,7 @@ class CAllSaleOrder
 		$arStatus = CSaleStatus::GetByID($arOrder["STATUS_ID"], $arSite["LANGUAGE_ID"]);
 
 		$arFields = Array(
-			"ORDER_ID" => $ID,
+			"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
 			"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
 			"ORDER_STATUS" => $arStatus["NAME"],
 			"EMAIL" => $userEmail,
@@ -2395,7 +2434,7 @@ class CAllSaleOrder
 
 	
 	/**
-	 * <p>Функция устанавливает новое значение <i> Val</i> комментария (поле <b>COMMENTS</b>) к заказу с кодом <i> ID</i> </p>
+	 * <p>Функция устанавливает новое значение <i> Val</i> комментария (поле <b>COMMENTS</b>) к заказу с кодом <i> ID</i>.</p>
 	 *
 	 *
 	 *
@@ -2549,7 +2588,7 @@ class CAllSaleOrder
 						">=DATE_INSERT" => ConvertTimeStamp($minDay),
 					);
 
-				$dbOrder = CSaleOrder::GetList(Array("ID" => "DESC"), $arFilter, false, false, Array("ID", "DATE_INSERT", "PAYED", "USER_ID", "LID", "PRICE", "CURRENCY"));
+				$dbOrder = CSaleOrder::GetList(Array("ID" => "DESC"), $arFilter, false, false, Array("ID", "DATE_INSERT", "PAYED", "USER_ID", "LID", "PRICE", "CURRENCY", "ACCOUNT_NUMBER"));
 				while($arOrder = $dbOrder -> GetNext())
 				{
 					$date_insert = ConvertDateTime($arOrder["DATE_INSERT"], CSite::GetDateFormat("SHORT"));
@@ -2587,7 +2626,7 @@ class CAllSaleOrder
 						}
 
 						$arFields = Array(
-							"ORDER_ID" => $arOrder["ID"],
+							"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
 							"ORDER_DATE" => $date_insert,
 							"ORDER_USER" => $payerName,
 							"PRICE" => SaleFormatCurrency($arOrder["PRICE"], $arOrder["CURRENCY"]),
@@ -2670,6 +2709,7 @@ class CAllSaleOrder
 
 
 	/**
+	* @deprecated Use CSaleOrderChange::GetList instead
 	* The function selects order history
 	*
 	* @param array $arOrder - array to sort
@@ -2817,7 +2857,7 @@ class CAllSaleOrder
 
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) <= 0 )
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_order_history B ";
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_order_history V ";
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
 			if (strlen($arSqls["GROUPBY"]) > 0)
@@ -2890,7 +2930,7 @@ class CAllSaleOrder
 	/**
 	* Sets order account number
 	* Use OnBeforeOrderAccountNumberSet event to generate custom account number.
-	* Account number value must be unique! By default order ID is used
+	* Account number value must be unique! By default order ID is used if generated value is incorrect
 	*
 	* @param int $ID - order ID
 	* @return bool - true if account number is set successfully
@@ -2901,27 +2941,184 @@ class CAllSaleOrder
 		if ($ID <= 0)
 			return false;
 
-		$value = $ID;
+		$type = COption::GetOptionString("sale", "account_number_template", "");
+		$param = COption::GetOptionString("sale", "account_number_data", "");
 
-		$bCustomTemplateSet = false;
+		$bCustomAlgorithm = false;
 		foreach(GetModuleEvents("sale", "OnBeforeOrderAccountNumberSet", true) as $arEvent)
 		{
-			$tmpRes = ExecuteModuleEventEx($arEvent, Array($ID));
+			$tmpRes = ExecuteModuleEventEx($arEvent, Array($ID, $type));
 			if ($tmpRes !== false)
 			{
-				$bCustomTemplateSet = true;
+				$bCustomAlgorithm = true;
 				$value = $tmpRes;
 			}
 		}
 
-		if (!$bCustomTemplateSet)
+		if ($bCustomAlgorithm)
 		{
-			//todo - get selected template from settings and make value out of it
+			$res = CSaleOrder::Update($ID, array("ACCOUNT_NUMBER" => $value));
+		}
+		else
+		{
+			$res = false;
+			if ($type != "") // if special template is selected
+			{
+				for ($i = 0; $i < 10; $i++)
+				{
+					$value = CSaleOrder::GetNextAccountNumber($ID, $type, $param);
+
+					if ($value)
+					{
+						$res = CSaleOrder::Update($ID, array("ACCOUNT_NUMBER" => $value));
+
+						if ($res)
+							break;
+					}
+				}
+			}
 		}
 
-		$res = CSaleOrder::Update($ID, array("ACCOUNT_NUMBER" => $value));
+		if ($type == "" || !$res) // if no special template is used or error occured
+		{
+			$res = CSaleOrder::Update($ID, array("ACCOUNT_NUMBER" => $ID));
+		}
 
 		return $res;
+	}
+
+	/**
+	* Generates next account number according to the scheme selected in the module options
+	*
+	* @param int $orderID - order ID
+	* @param string $templateType - account number template type code
+	* @param string $param - account number template param
+	* @return mixed - generated number or false
+	*/
+	public static function GetNextAccountNumber($orderID, $templateType, $param)
+	{
+		global $DB, $USER;
+		$value = false;
+
+		switch ($templateType)
+		{
+			case 'NUMBER':
+
+				$param = intval($param);
+				$maxLastID = 0;
+
+				switch(strtolower($DB->type))
+				{
+					case "mysql":
+						$strSql = "SELECT ID, ACCOUNT_NUMBER FROM b_sale_order WHERE ACCOUNT_NUMBER IS NOT NULL ORDER BY ID DESC LIMIT 1";
+						break;
+					case "oracle":
+						$strSql = "SELECT ID, ACCOUNT_NUMBER FROM b_sale_order WHERE ACCOUNT_NUMBER IS NOT NULL AND ROWNUM <= 1 ORDER BY ID DESC";
+						break;
+					case "mssql":
+						$strSql = "SELECT TOP 1 ID, ACCOUNT_NUMBER FROM b_sale_order WHERE ACCOUNT_NUMBER IS NOT NULL ORDER BY ID DESC";
+						break;
+				}
+
+				$dbres = $DB->Query($strSql, true);
+				if ($arRes = $dbres->GetNext())
+				{
+					if (strlen($arRes["ACCOUNT_NUMBER"]) === strlen(intval($arRes["ACCOUNT_NUMBER"])))
+						$maxLastID = intval($arRes["ACCOUNT_NUMBER"]);
+				}
+
+				$value = ($maxLastID >= $param) ? $maxLastID + 1 : $param;
+				break;
+
+			case 'PREFIX':
+
+				$value = $param.$orderID;
+				break;
+
+			case 'RANDOM':
+
+				$rand = randString(intval($param), array("ABCDEFGHIJKLNMOPQRSTUVWXYZ", "0123456789"));
+				$dbres = $DB->Query("SELECT ID, ACCOUNT_NUMBER FROM b_sale_order WHERE ACCOUNT_NUMBER = '".$rand."'", true);
+				$value = ($arRes = $dbres->GetNext()) ? false : $rand;
+				break;
+
+			case 'USER':
+
+				$userID = $USER->GetID();
+
+				switch (strtolower($DB->type))
+				{
+					case "mysql":
+						$strSql = "SELECT MAX(CAST(SUBSTRING(ACCOUNT_NUMBER, LENGTH('".$userID."_') + 1) as UNSIGNED)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$userID."\_%'";
+						break;
+					case "oracle":
+						$strSql = "SELECT MAX(CAST(SUBSTR(ACCOUNT_NUMBER, LENGTH('".$userID."_') + 1) as NUMBER)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$userID."_%'";
+						break;
+					case "mssql":
+						$strSql = "SELECT MAX(CAST(SUBSTRING(ACCOUNT_NUMBER, LEN('".$userID."_') + 1, LEN(ACCOUNT_NUMBER)) as INT)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$userID."_%'";
+						break;
+				}
+
+				$dbres = $DB->Query($strSql, true);
+				if ($arRes = $dbres->GetNext())
+				{
+					$numID = (intval($arRes["NUM_ID"]) > 0) ? $arRes["NUM_ID"] + 1 : 1;
+					$value = $userID."_".$numID;
+				}
+				else
+					$value = $userID."_1";
+
+				break;
+
+			case 'DATE':
+
+				switch ($param)
+				{
+					// date in the site format but without delimeters
+					case 'day':
+						$date = date($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
+						$date = preg_replace("/[^0-9]/", "", $date);
+						break;
+					case 'month':
+						$date = date($DB->DateFormatToPHP(str_replace("DD", "", CSite::GetDateFormat("SHORT"))), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
+						$date = preg_replace("/[^0-9]/", "", $date);
+						break;
+					case 'year':
+						$date = date('Y');
+						break;
+				}
+
+				switch (strtolower($DB->type))
+				{
+					case "mysql":
+						$strSql = "SELECT MAX(CAST(SUBSTRING(ACCOUNT_NUMBER, LENGTH('".$date." / ') + 1) as UNSIGNED)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$date." / %'";
+						break;
+					case "oracle":
+						$strSql = "SELECT MAX(CAST(SUBSTR(ACCOUNT_NUMBER, LENGTH('".$date." / ') + 1) as NUMBER)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$date." / %'";
+						break;
+					case "mssql":
+						$strSql = "SELECT MAX(CAST(SUBSTRING(ACCOUNT_NUMBER, LEN('".$date." / ') + 1, LEN(ACCOUNT_NUMBER)) as INT)) as NUM_ID FROM b_sale_order WHERE ACCOUNT_NUMBER LIKE '".$date." / %'";
+						break;
+				}
+
+				$dbres = $DB->Query($strSql, true);
+				if ($arRes = $dbres->GetNext())
+				{
+					$numID = (intval($arRes["NUM_ID"]) > 0) ? $arRes["NUM_ID"] + 1 : 1;
+					$value = $date." / ".$numID;
+				}
+				else
+					$value = $date." / 1";
+
+				break;
+
+			default: // if unknown template
+
+				$value = false;
+				break;
+		}
+
+		return $value;
 	}
 }
 ?>

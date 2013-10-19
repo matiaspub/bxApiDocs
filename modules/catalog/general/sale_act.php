@@ -100,11 +100,6 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
-//		$arControls = array(CSaleActionCtrlBasketGroup::GetControlID(), CSaleActionCtrlSubGroup::GetControlID());
-		$arControls = array(
-			'ActSaleBsktGrp',
-			'ActSaleSubGrp',
-		);
 		return $arControls;
 	}
 
@@ -125,6 +120,7 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_iblock_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -147,6 +143,7 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -185,34 +182,6 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 				),
 				'PHP_VALUE' => '',
 			),
-/*			'CondIBPreviewText' => array(
-				'ID' => 'CondIBPreviewText',
-				'FIELD' => 'PREVIEW_TEXT',
-				'FIELD_TYPE' => 'text',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_PREFIX'),
-				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
-				'JS_VALUE' => array(
-					'type' => 'input',
-				),
-				'PHP_VALUE' => '',
-			),
-			'CondIBDetailText' => array(
-				'ID' => 'CondIBDetailText',
-				'FIELD' => 'DETAIL_TEXT',
-				'FIELD_TYPE' => 'text',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_PREFIX'),
-				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
-				'JS_VALUE' => array(
-					'type' => 'input',
-				),
-				'PHP_VALUE' => '',
-			), */
 			'CondIBTags' => array(
 				'ID' => 'CondIBTags',
 				'FIELD' => 'TAGS',
@@ -363,11 +332,6 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
-//		$arControls = array(CSaleActionCtrlBasketGroup::GetControlID(), CSaleActionCtrlSubGroup::GetControlID());
-		$arControls = array(
-			'ActSaleBsktGrp',
-			'ActSaleSubGrp',
-		);
 		return $arControls;
 	}
 
@@ -472,7 +436,8 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);
@@ -486,7 +451,8 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);

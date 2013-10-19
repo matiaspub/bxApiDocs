@@ -122,7 +122,7 @@ class CSalePaySystemAction extends CAllSalePaySystemAction
 	 * <td>Название типа плательщика.</td> </tr> <tr> <td>PT_SORT</td> <td>Индекс
 	 * сортировки типа плательщика.</td> </tr> </table><p>Если в качестве
 	 * параметра arGroupBy передается пустой массив, то функция вернет число
-	 * записей, удовлетворяющих фильтру.</p>
+	 * записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__getlist.324e3583.php
@@ -284,7 +284,7 @@ class CSalePaySystemAction extends CAllSalePaySystemAction
 	 *
 	 *
 	 * @return int <p>Возвращается код обновленной записи или <i>false</i> - в случае
-	 * ошибки.  </p>
+	 * ошибки.  </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__add.d76269ee.php
@@ -342,7 +342,7 @@ class CSalePaySystemAction extends CAllSalePaySystemAction
 	 *
 	 *
 	 * @return int <p>Возвращается код обновленной записи или <i>false</i> - в случае
-	 * ошибки.  </p>
+	 * ошибки.  </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__update.f76269ee.php

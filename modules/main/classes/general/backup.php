@@ -898,6 +898,7 @@ class CTar
 	var $BufferSize;
 	var $Buffer;
 	var $dataSizeCache = array();
+	var $EncryptKey;
 
 	##############
 	# READ
@@ -1451,6 +1452,7 @@ class CTar
 		}
 		else
 			fclose($this->res);
+		clearstatcache();
 	}
 
 	public function getNextName($file = '')

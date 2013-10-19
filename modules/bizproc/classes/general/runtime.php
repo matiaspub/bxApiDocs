@@ -54,6 +54,7 @@ class CBPRuntime
 		);
 		$this->arLoadedActivities = array();
 		$this->arActivityFolders = array(
+			$_SERVER["DOCUMENT_ROOT"]."/local/activities",
 			$_SERVER["DOCUMENT_ROOT"].BX_ROOT."/activities/custom",
 			$_SERVER["DOCUMENT_ROOT"].BX_ROOT."/activities/bitrix",
 			$_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/bizproc/activities",
@@ -141,7 +142,7 @@ class CBPRuntime
 	*/
 	
 	/**
-	 * <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p> <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
+	 * <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p> <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
 	 *
 	 *
 	 *
@@ -175,7 +176,7 @@ class CBPRuntime
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -228,6 +229,36 @@ class CBPRuntime
 	* @param mixed $instanceId - ID of the workflow instance
 	* @return CBPWorkflow
 	*/
+	
+	/**
+	 * <p>Метод возвращает экземпляр бизнес-процесса по его идентификатору.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $workflowId  Идентификатор бизнес-процесса
+	 *
+	 *
+	 *
+	 * @return CBPWorkflow <p>Возвращается экземпляр класса <a
+	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>,
+	 * представляющий собой экземпляр
+	 * существующего бизнес-процесса.</p><h4>Исключения</h4><table width="100%"
+	 * class="tnormal"><tbody> <tr> <th width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowId</i></td>
+	 * <td>Не указан код бизнес-процесса</td> </tr> <tr> <td><i>Empty root activity</i></td> <td>Не
+	 * удалось восстановить экземпляр бизнес-процесса</td> </tr> </tbody></table><a
+	 * name="examples"></a>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?<br><br>// Получим код документа, над которым запущен бизнес-процесс с указаным идентификатором<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>  $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>  $d = $workflow-&gt;GetDocumentId();<br>}<br>catch(Exception $e)<br>{<br>  //<br>}<br>?&gt;<br>
+	 * </pre>
+	 *
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/GetWorkflow.php
+	 * @author Bitrix
+	 */
 	public function GetWorkflow($workflowId)
 	{
 		if (strlen($workflowId) <= 0)

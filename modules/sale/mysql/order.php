@@ -1,6 +1,19 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order.php");
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/index.php
+ * @author Bitrix
+ */
 class CSaleOrder extends CAllSaleOrder
 {
 	
@@ -149,6 +162,7 @@ class CSaleOrder extends CAllSaleOrder
 		$ID = IntVal($DB->LastID());
 
 		CSaleOrder::SetAccountNumber($ID);
+		CSaleOrderChange::AddRecord($ID, "ORDER_ADDED");
 
 		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
@@ -207,7 +221,7 @@ class CSaleOrder extends CAllSaleOrder
 	 * <b>SUM_PAID </b> - сумма, которая уже была оплачена покупателем по
 	 * данному счету (например, с внутреннего счета);</li> <li> <b>PAY_VOUCHER_NUM </b> -
 	 * номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
-	 * поручения.</li> </ul>
+	 * поручения.</li> <li> <b>DATE_INSERT</b> - дата создания заказа.</li> </ul>
 	 *
 	 *
 	 *
@@ -258,7 +272,7 @@ class CSaleOrder extends CAllSaleOrder
 			}
 		}
 
-		if (!CSaleOrder::CheckFields("UPDATE", $arFields))
+		if (!CSaleOrder::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 
 		foreach(GetModuleEvents("sale", "OnBeforeOrderUpdate", true) as $arEvent)
@@ -282,14 +296,16 @@ class CSaleOrder extends CAllSaleOrder
 		if($bDateUpdate)
 			$strSql .=	",	DATE_UPDATE = ".$DB->GetNowFunction()." ";
 		$strSql .=	"WHERE ID = ".$ID." ";
-		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$res = $DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		if (!$res)
+			return false;
 
 		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
 		if ($res)
-		{
-			CSaleOrder::AddOrderHistory($arOrderOldFields, $arFields);
-		}
+			CSaleOrderChange::AddRecordsByFields($ID, $arOrderOldFields, $arFields);
 
 		unset($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID]);
 
@@ -666,7 +682,9 @@ class CSaleOrder extends CAllSaleOrder
 				"RESPONSIBLE_PERSONAL_PHOTO",
 				"RESPONSIBLE_GROUP_ID",
 				"DATE_PAY_BEFORE",
-				"ACCOUNT_NUMBER"
+				"DATE_BILL",
+				"ACCOUNT_NUMBER",
+				"TRACKING_NUMBER"
 			);
 		}
 		elseif (in_array("*", $arSelectFields))
@@ -742,7 +760,9 @@ class CSaleOrder extends CAllSaleOrder
 				"RESPONSIBLE_PERSONAL_PHOTO",
 				"RESPONSIBLE_GROUP_ID",
 				"DATE_PAY_BEFORE",
+				"DATE_BILL",
 				"ACCOUNT_NUMBER",
+				"TRACKING_NUMBER"
 			);
 		}
 
@@ -818,7 +838,9 @@ class CSaleOrder extends CAllSaleOrder
 			"ORDER_TOPIC" => array("FIELD" => "O.ORDER_TOPIC", "TYPE" => "string"),
 			"RESPONSIBLE_ID" => array("FIELD" => "O.RESPONSIBLE_ID", "TYPE" => "int"),
 			"DATE_PAY_BEFORE" => array("FIELD" => "O.DATE_PAY_BEFORE", "TYPE" => "datetime"),
+			"DATE_BILL" => array("FIELD" => "O.DATE_BILL", "TYPE" => "datetime"),
 			"ACCOUNT_NUMBER" => array("FIELD" => "O.ACCOUNT_NUMBER", "TYPE" => "string"),
+			"TRACKING_NUMBER" => array("FIELD" => "O.TRACKING_NUMBER", "TYPE" => "string"),
 
 			"NAME_SEARCH" => array("FIELD" => "U.NAME, U.LAST_NAME, U.SECOND_NAME, U.EMAIL, U.LOGIN, U.ID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_LOGIN" => array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),

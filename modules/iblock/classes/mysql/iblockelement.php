@@ -260,12 +260,12 @@ class CIBlockElement extends CAllIBlockElement
 	 * - код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
 	 * активности элемента; </li> <li> <i>show_counter </i>- количество показов
 	 * элемента (учитывается функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
 	 * <b>show_counter_start</b> - время первого показа элемента (учитывается
 	 * функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
 	 * <b>shows</b> - усредненное количество показов (количество показов /
 	 * продолжительность показа); </li> <li> <b>rand</b> - случайный порядок;</li> <li>
 	 * <span style="font-weight: bold;">xml_id</span> или <span style="font-weight: bold;">external_id</span> -
@@ -279,7 +279,9 @@ class CIBlockElement extends CAllIBlockElement
 	 * сортировки варианта значения свойства. Только для свойств типа
 	 * "Список" ; </li> <li> <b>catalog_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю CATALOG_FIELD
 	 * (может быть PRICE - цена или CURRENCY - валюта) из цены с типом <i>PRICE_TYPE</i>
-	 * (например, catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <span style="font-weight:
+	 * (например, catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <b>CATALOG_QUANTITY</b> - общее
+	 * количество товара;</li> <li> <b>CATALOG_WEIGHT</b> - вес товара;</li> <li>
+	 * <b>CATALOG_AVAILABLE</b> - признак наличия товара (Y|N);</li> <li> <span style="font-weight:
 	 * bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - по значению поля элемента
 	 * указанного в качестве привязки. PROPERTY_CODE - мнемонический или
 	 * символьный код свойства типа привязка к элементам. FIELD может
@@ -307,40 +309,40 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 * @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]).
 	 * "фильтруемое поле" может принимать значения: <ul> <li> <b>ID</b> - по
-	 * числовому коду (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li>
+	 * числовому коду (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li>
 	 * <li> <b>ACTIVE</b> - фильтр по активности (Y|N); передача пустого значения
 	 * (<i>"ACTIVE"=&gt;""</i>) выводит все элементы без учета их состояния (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>NAME</b> - по
-	 * названию (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>NAME</b> - по
+	 * названию (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li>
 	 * <b>CODE</b> - по мнемоническому идентификатору (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>TAGS</b> - по
-	 * тегам (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>TAGS</b> - по
+	 * тегам (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li>
 	 * <b>XML_ID</b> или<b> EXTERNAL_ID</b> - по внешнему коду (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>PREVIEW_TEXT</b> - по
-	 * анонсу (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>PREVIEW_TEXT</b> - по
+	 * анонсу (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li>
 	 * <b>PREVIEW_TEXT_TYPE</b> - по типу анонса (html|text, <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string_equal.php">Строка</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li>
 	 * <b>PREVIEW_PICTURE</b> - коду картинки для анонса (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>DETAIL_TEXT</b> - по
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>DETAIL_TEXT</b> - по
 	 * детальному описанию (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>DETAIL_TEXT_TYPE</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>DETAIL_TEXT_TYPE</b> -
 	 * по типу детальному описания (html|text, <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string_equal.php">Строка</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li>
 	 * <b>DETAIL_PICTURE</b> - по коду детальной картинки (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>CHECK_PERMISSIONS</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>CHECK_PERMISSIONS</b> -
 	 * если установлен в "Y", то в выборке будет осуществляться проверка
 	 * прав доступа к информационным блокам. По умолчанию права доступа
 	 * не проверяются. </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доступа,
 	 * будет обработан только если <b>CHECK_PERMISSIONS</b> установлен в "Y". По
 	 * умолчанию "R". Список прав доступа см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/setpermission.php">SetPermission</a>(). </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php">SetPermission</a>(). </li> <li>
 	 * <b>SEARCHABLE_CONTENT</b> - по содержимому для поиска. Включает в себя
 	 * название, описание для анонса и детальное описание (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>SORT</b> - по
-	 * сортировке (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>SORT</b> - по
+	 * сортировке (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li>
 	 * <b>TIMESTAMP_X</b> - по времени изменения (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/date.php">Дата</a>);</li> <li> <b>DATE_MODIFY_FROM</b> - по
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>);</li> <li> <b>DATE_MODIFY_FROM</b> - по
 	 * времени изменения. Будут выбраны элементы измененные после
 	 * времени указанного в фильтре. Время указывается в формате сайта.
 	 * Возможно использовать операцию отрицания "!DATE_MODIFY_FROM"; </li> <li>
@@ -349,61 +351,70 @@ class CIBlockElement extends CAllIBlockElement
 	 * в формате сайта. Возможно использовать операцию отрицания
 	 * "!DATE_MODIFY_TO";</li> <li> <b>MODIFIED_USER_ID </b>или<b> MODIFIED_BY</b> - по коду пользователя,
 	 * изменившего элемент (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>DATE_CREATE</b> - по
-	 * времени создания (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/date.php">Дата</a>); </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>DATE_CREATE</b> - по
+	 * времени создания (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>); </li>
 	 * <li> <b>CREATED_USER_ID </b>или<b> CREATED_BY</b> - по коду пользователя, добавившего
-	 * элемент (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li>
+	 * элемент (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li>
 	 * <b>DATE_ACTIVE_FROM</b> - по дате начала активности (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/date.php">Дата</a>) Формат даты должен
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>) Формат даты должен
 	 * соответствовать <a
-	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=28&amp;LESSON_ID=1499">формату даты</a>,
+	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=1992">формату даты</a>,
 	 * установленному на сайте.; </li> <li> <b>DATE_ACTIVE_TO</b> - по дате окончания
-	 * активности (<a href="http://dev.1c-bitrix.ruapi_help/iblock/filters/date.php">Дата</a>)Формат
+	 * активности (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>)Формат
 	 * даты должен соответствовать <a
-	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=28&amp;LESSON_ID=1499">формату даты</a>,
+	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=1992">формату даты</a>,
 	 * установленному на сайте.; </li> <li> <b>ACTIVE_DATE</b> - непустое значение
 	 * задействует фильтр по датам активности. Будут выбраны активные
 	 * по датам элементы.Если значение не установлено (<i>""</i>), фильтрация
 	 * по датам активности не производится; </li> <li> <b>ACTIVE_FROM</b> -
 	 * устаревший;</li> <li> <b>ACTIVE_TO</b> - устаревший;</li> <li> <b>IBLOCK_ID</b> - по коду
 	 * информационного блока (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>IBLOCK_CODE</b> - по
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>IBLOCK_CODE</b> - по
 	 * мнемоническому коду информационного блока (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_SITE_ID</b>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_SITE_ID</b>
 	 * или <span style="font-weight: bold;">IBLOCK_LID</span> или <span style="font-weight: bold;">SITE_ID</span> или
 	 * <span style="font-weight: bold;">LID</span> - по сайту (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>IBLOCK_TYPE</b>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>IBLOCK_TYPE</b>
 	 * - по типу информационного блока (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_ACTIVE</b> - по
-	 * активности информационного блока (Y|N, <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>SECTION_ID</b> -
-	 * по родительской группе. Если значение фильтра false, "" или 0, то будут
-	 * выбраны элементы не привязанные ни к каким разделам. Иначе будут
-	 * выбраны элементы привязанные к заданному разделу. Значением
-	 * фильтра может быть и массив. В этом случае будут выбраны элементы
-	 * привязанные хотя бы к одному из разделов указанных в фильтре.
-	 * Возможно указание отрицания "!". В этом случае условие будет
-	 * инвертировано;</li> <li> <span style="font-weight: bold;">SECTION_CODE</span> - по
-	 * мнемоническому коду родительской группы. Аналогично SECTION_ID; <br> </li>
-	 * <li> <b>INCLUDE_SUBSECTIONS</b> - если задан фильтр по родительским группам
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_ACTIVE</b> -
+	 * по активности информационного блока (Y|N, <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>SECTION_ID</b>
+	 * - по родительской группе. Если значение фильтра false, "" или 0, то
+	 * будут выбраны элементы не привязанные ни к каким разделам. Иначе
+	 * будут выбраны элементы привязанные к заданному разделу.
+	 * Значением фильтра может быть и массив. В этом случае будут
+	 * выбраны элементы привязанные хотя бы к одному из разделов
+	 * указанных в фильтре. Возможно указание отрицания "!". В этом случае
+	 * условие будет инвертировано;</li> <li> <b>SECTION_CODE</b> - по мнемоническому
+	 * коду родительской группы. Аналогично SECTION_ID; <br> </li> <li>
+	 * <b>INCLUDE_SUBSECTIONS</b> - если задан фильтр по родительским группам
 	 * <b>SECTION_ID</b>, то будут также выбраны элементы находящиеся в
-	 * подгруппах этих групп;</li> <li> <span style="font-weight: bold;">SUBSECTION</span>  - по
+	 * подгруппах этих групп (имеет смысле только в том случае, если
+	 * <b>SECTION_ID &gt; 0</b>);</li> <li> <span style="font-weight: bold;">SUBSECTION</span>  - по
 	 * принадлежности к подразделам раздела. Значением фильтра может
 	 * быть массив из двух элементов задающих левую и правую границу
 	 * дерева разделов. Операция отрицания поддерживается. <br> </li> <li> <span
-	 * style="font-weight: bold;">SECTION_ACTIVE</span> - если установлен в значение "Y", то
-	 * проверяется активность групп к которым привязан элемент. Если
-	 * естановлен "N", то будут выбраны элементы неактивных групп. <br> </li>
+	 * style="font-weight: bold;">SECTION_ACTIVE</span> - если ключ есть в фильтре, то
+	 * проверяется активность групп к которым привязан элемент. <br> </li>
 	 * <li> <span style="font-weight: bold;">SECTION_GLOBAL_ACTIVE</span> - аналогично предыдущему, но
-	 * учитывается также активность родительских групп.</li> <li>
-	 * <b>SHOW_COUNTER</b> - по количеству показов (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>SHOW_COUNTER_START</b> -
-	 * по времени первого показа (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/date.php">Дата</a>); </li> <li> <b>WF_COMMENTS</b> - по
+	 * учитывается также активность родительских групп.</li> <li> <span
+	 * style="font-weight: bold;">SECTION_SCOPE</span> - задает уточнение для фильтров SECTION_ACTIVE
+	 * и SECTION_GLOBAL_ACTIVE. Если значение "IBLOCK", то учитываются только привязки
+	 * к разделам инфоблока. Если значение "PROPERTY", то учитываются только
+	 * привязки к разделам свойств. "PROPERTY_<id>" - привязки к разделам
+	 * конкретного свойства.</id> </li> <li> <b>CATALOG_AVAILABLE</b> - по доступности
+	 * товара на складе (Y|N, флаг является вычисляемым значением); </li> <li>
+	 * <b>CATALOG_CATALOG_GROUP_ID_N</b> - по типу цен; </li> <li> <b>CATALOG_SHOP_QUANTITY_N</b> -
+	 * фильтрация по диапазону количества в цене; </li> <li> <b>CATALOG_QUANTITY</b> - по
+	 * общему количеству товара; </li> <li> <b>CATALOG_WEIGHT</b> - по весу товара; </li>
+	 * <li> <b>SHOW_COUNTER</b> - по количеству показов (<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>SHOW_COUNTER_START</b>
+	 * - по времени первого показа (<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>); </li> <li> <b>WF_COMMENTS</b> - по
 	 * комментарию документооборота (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>WF_STATUS_ID</b> или
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>WF_STATUS_ID</b> или
 	 * <span style="font-weight: bold;">WF_STATUS</span> - по коду статуса документооборота (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>SHOW_HISTORY</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>SHOW_HISTORY</b> -
 	 * если установлен в значение "Y", то вместе с элементами будут
 	 * выводится и их архив (история), по умолчанию выводятся только
 	 * опубликованные элементы; </li> <li> <b>SHOW_NEW</b> - если <b>SHOW_HISTORY</b> не
@@ -411,17 +422,17 @@ class CIBlockElement extends CAllIBlockElement
 	 * неопубликованные элементы вместе с опубликованными; </li> <li>
 	 * <b>WF_PARENT_ELEMENT_ID</b> - по коду элемента-родителя в документообороте для
 	 * выборки истории изменений (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>); </li> <li> <b>WF_NEW</b> - флаг
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>WF_NEW</b> - флаг
 	 * что элемент ещё ни разу не был опубликован (Y|N); </li> <li> <b>WF_LOCK_STATUS</b> -
 	 * статус заблокированности элемента в документооборте (red|green|yellow);
 	 * </li> <li> <b>PROPERTY_&lt;PROPERTY_CODE</b><b>&gt;</b> - фильтр по значениям свойств, где
 	 * PROPERTY_CODE - код свойства или мнемонический код. Для свойств типа
 	 * "Список", "Число", "Привязка к элементам" и "Привязка к разделам"  - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/number.php">Число</a>. Для прочих - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>; </li> <li> <b style="font-weight:
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>. Для прочих - <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>; </li> <li> <b style="font-weight:
 	 * bold;">PROPERTY_&lt;</b><b>PROPERTY_CODE<span style="font-weight: bold;">&gt;_VALUE</span></b> - фильтр по
 	 * значениям списка для свойств типа "список" (<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/filters/string.php">Маска</a>), поиск будет
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>), поиск будет
 	 * осуществляться по строковому значению списка, а не по
 	 * идентификатору; </li> <li> <b>CATALOG_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю
 	 * <i>CATALOG_FIELD</i> из цены типа <i>PRICE_TYPE</i> (ID типа цены), где <i>CATALOG_FIELD</i>
@@ -520,16 +531,16 @@ class CIBlockElement extends CAllIBlockElement
 	 * если не была задана группировка. <p><b>Примечание 3</b>: если
 	 * необходимо выбрать данные о рейтингах для выбранных элементов,
 	 * то для этого в массиве необходимо указать следующие <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/ratings/rating_vote.php">поля</a>: RATING_TOTAL_VALUE,
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/ratings/rating_vote.php">поля</a>: RATING_TOTAL_VALUE,
 	 * RATING_TOTAL_VOTES, RATING_TOTAL_POSITIVE_VOTES, RATING_TOTAL_NEGATIVE_VOTES, RATING_USER_VOTE_VALUE.</p>
 	 *
 	 *
 	 *
-	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
+	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
 	 *
 	 *
 	 * @static
@@ -1052,7 +1063,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Метод изменяет параметры элемента с кодом <i>ID</i>. Перед изменением элемента вызываются обработчики события  <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/OnStartIBlockElementUpdate.php">OnStartIBlockElementUpdate</a> из которых можно изменить значения полей или отменить изменение элемента вернув сообщение об ошибке. После изменения элемента вызывается само событие <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a>. </p> <p>Если изменяется свойство типа <b>файл</b>, то необходимо сформировать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">массив</a>. </p>
+	 * <p>Метод изменяет параметры элемента с кодом <i>ID</i>. Перед изменением элемента вызываются обработчики события  <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/OnStartIBlockElementUpdate.php">OnStartIBlockElementUpdate</a> из которых можно изменить значения полей или отменить изменение элемента вернув сообщение об ошибке. После изменения элемента вызывается само событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a>. </p> <p>Если изменяется свойство типа <b>файл</b>, то необходимо сформировать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">массив</a>. </p>
 	 *
 	 *
 	 *
@@ -1062,7 +1073,7 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 *
 	 * @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">полей элемента</a> инфоблоков
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей элемента</a> инфоблоков
 	 * и дополнительно может содержать поле "PROPERTY_VALUES" - массив со всеми
 	 * значениями свойств элемента в виде массива Array("код
 	 * свойства"=&gt;"значение свойства"). Где <br> "код свойства" - числовой
@@ -1074,10 +1085,10 @@ class CIBlockElement extends CAllIBlockElement
 	 * элемента будут удалены. <br> Это справедливо для всех типов свойств
 	 * кроме типа <b>файл</b>. Файлы надо удалять через массив с параметром
 	 * "del"=&gt;"Y". <br> Дополнительно для сохранения значения свойств см: <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode().</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode().</a>
 	 * <br><br><b>Примечание:</b> Нельзя изменить изначения полей ID и IBLOCK_ID. <br>
 	 *
 	 *
@@ -1100,7 +1111,7 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 *
 	 * @param bool $bResizePictures = false Использовать настройки инфоблока для обработки изображений. По
-	 * умоляанию настройки не применяются. Если этот параметр имеет
+	 * умолчанию настройки не применяются. Если этот параметр имеет
 	 * значение true, то к полям PREVIEW_PICTURE и DETAIL_PICTURE будут применены правила
 	 * генерации и масштабирования в соответствии с настройками
 	 * информационного блока.
@@ -1112,17 +1123,17 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * &lt;?<br>$el = new CIBlockElement;<br><br>$PROP = array();<br>$PROP[12] = "Белый";  // свойству с кодом 12 присваиваем значение "Белый"<br>$PROP[3] = 38;        // свойству с кодом 3 присваиваем значение 38<br><br>$arLoadProductArray = Array(<br>  "MODIFIED_BY"    =&gt; $USER-&gt;GetID(), // элемент изменен текущим пользователем<br>  "IBLOCK_SECTION" =&gt; false,          // элемент лежит в корне раздела<br>  "PROPERTY_VALUES"=&gt; $PROP,<br>  "NAME"           =&gt; "Элемент",<br>  "ACTIVE"         =&gt; "Y",            // активен<br>  "PREVIEW_TEXT"   =&gt; "текст для списка элементов",<br>  "DETAIL_TEXT"    =&gt; "текст для детального просмотра",<br>  "DETAIL_PICTURE" =&gt; CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/image.gif")<br>  );<br><br>$PRODUCT_ID = 2;  // изменяем элемент с кодом (ID) 2<br>$res = $el-&gt;Update($PRODUCT_ID, $arLoadProductArray);<br>?&gt;Менять параметр IBLOCK ID нельзя.
+	 * &lt;?<br>$el = new CIBlockElement;<br><br>$PROP = array();<br>$PROP[12] = "Белый";  // свойству с кодом 12 присваиваем значение "Белый"<br>$PROP[3] = 38;        // свойству с кодом 3 присваиваем значение 38<br><br>$arLoadProductArray = Array(<br>  "MODIFIED_BY"    =&gt; $USER-&gt;GetID(), // элемент изменен текущим пользователем<br>  "IBLOCK_SECTION" =&gt; false,          // элемент лежит в корне раздела<br>  "PROPERTY_VALUES"=&gt; $PROP,<br>  "NAME"           =&gt; "Элемент",<br>  "ACTIVE"         =&gt; "Y",            // активен<br>  "PREVIEW_TEXT"   =&gt; "текст для списка элементов",<br>  "DETAIL_TEXT"    =&gt; "текст для детального просмотра",<br>  "DETAIL_PICTURE" =&gt; CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/image.gif")<br>  );<br><br>$PRODUCT_ID = 2;  // изменяем элемент с кодом (ID) 2<br>$res = $el-&gt;Update($PRODUCT_ID, $arLoadProductArray);<br>?&gt;Менять параметр IBLOCK_ID нельзя.
 	 * </pre>
 	 *
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a></li>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockelementupdate.php">OnBeforeIBlockElementUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementupdate.php">OnBeforeIBlockElementUpdate</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1258,7 +1269,7 @@ class CIBlockElement extends CAllIBlockElement
 			if($ar_wf_element["IN_SECTIONS"] == "Y")
 			{
 				$ar_wf_element["IBLOCK_SECTION"] = array();
-				$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true);
+				$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true, array('ID', 'IBLOCK_ELEMENT_ID'));
 				while($arSection = $rsSections->Fetch())
 					$ar_wf_element["IBLOCK_SECTION"][] = $arSection["ID"];
 			}
@@ -1985,9 +1996,9 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">CIBlockElement::SetPropertyValueCode</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">CIBlockElement::SetPropertyValueCode</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

@@ -9,6 +9,11 @@ abstract class CSecurityFilterBaseAuditor
 	protected $name = "";
 
 
+	public function __construct($pChar = "")
+	{
+		$this->setSplittingChar($pChar);
+	}
+
 	/**
 	 * @param string $pString
 	 * @return bool

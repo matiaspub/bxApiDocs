@@ -16,6 +16,13 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllExtra
 {
+	protected static $arExtraCache = array();
+
+	public static function ClearCache()
+	{
+		self::$arExtraCache = array();
+	}
+
 	
 	/**
 	 * <p>Функция возвращает параметры наценки по ее коду ID </p>
@@ -30,7 +37,7 @@ class CAllExtra
 	 * @return array <p>Возвращается ассоциативный массив с ключами </p><table class="tnormal"
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	 * наценки.</td> </tr> <tr> <td>NAME</td> <td>Название наценки.</td> </tr> <tr> <td>PERCENTAGE</td>
-	 * <td>Процент наценки.</td> </tr> </table>
+	 * <td>Процент наценки.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__getbyid.949068d9.php
@@ -39,13 +46,24 @@ class CAllExtra
 	public static function GetByID($ID)
 	{
 		global $DB;
-		$strSql =
-			"SELECT ID, NAME, PERCENTAGE ".
-			"FROM b_catalog_extra ".
-			"WHERE ID = ".intval($ID)." ";
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		if ($res = $db_res->Fetch())
-			return $res;
+
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
+
+		if (array_key_exists($ID, self::$arExtraCache))
+		{
+			return self::$arExtraCache[$ID];
+		}
+		else
+		{
+			$strSql = "SELECT ID, NAME, PERCENTAGE FROM b_catalog_extra WHERE ID = ".$ID;
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($res = $db_res->Fetch())
+			{
+				return $res;
+			}
+		}
 		return false;
 	}
 
@@ -100,33 +118,40 @@ class CAllExtra
 	 */
 	public static function SelectBox($sFieldName, $sValue, $sDefaultValue = "", $JavaChangeFunc = "", $sAdditionalParams = "")
 	{
-		if (!isset($GLOBALS["MAIN_EXTRA_LIST_CACHE"]) || !is_array($GLOBALS["MAIN_EXTRA_LIST_CACHE"]) || count($GLOBALS["MAIN_EXTRA_LIST_CACHE"])<1)
+		if (empty(self::$arExtraCache))
 		{
-			unset($GLOBALS["MAIN_EXTRA_LIST_CACHE"]);
-
-			$l = CExtra::GetList(array("NAME" => "ASC"));
-			while ($l_res = $l->Fetch())
+			$rsExtras = CExtra::GetList(
+				array("NAME" => "ASC")
+			);
+			while ($arExtra = $rsExtras->Fetch())
 			{
-				$GLOBALS["MAIN_EXTRA_LIST_CACHE"][] = $l_res;
+				$arExtra['ID'] = intval($arExtra['ID']);
+				self::$arExtraCache[$arExtra['ID']] = $arExtra;
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $MAIN_EXTRA_LIST_CACHE;
+					$MAIN_EXTRA_LIST_CACHE = self::$arExtraCache;
+				}
 			}
 		}
 		$s = '<select name="'.$sFieldName.'"';
 		if (!empty($JavaChangeFunc))
-			$s .= ' OnChange="'.$JavaChangeFunc.'"';
+			$s .= ' onchange="'.$JavaChangeFunc.'"';
 		if (!empty($sAdditionalParams))
 			$s .= ' '.$sAdditionalParams.' ';
-		$s .= '>'."\n";
-		$found = false;
-
-		$intCount = count($GLOBALS["MAIN_EXTRA_LIST_CACHE"]);
-		for ($i=0; $i < $intCount; $i++)
-		{
-			$found = (intval($GLOBALS["MAIN_EXTRA_LIST_CACHE"][$i]["ID"]) == intval($sValue));
-			$s1 .= '<option value="'.$GLOBALS["MAIN_EXTRA_LIST_CACHE"][$i]["ID"].'"'.($found ? ' selected':'').'>'.htmlspecialcharsbx($GLOBALS["MAIN_EXTRA_LIST_CACHE"][$i]["NAME"]).' ('.htmlspecialcharsbx($GLOBALS["MAIN_EXTRA_LIST_CACHE"][$i]["PERCENTAGE"]).'%)</option>'."\n";
-		}
+		$s .= '>';
+		$sValue = intval($sValue);
+		$boolFound = array_key_exists($sValue, self::$arExtraCache);
 		if (!empty($sDefaultValue))
-			$s .= "<option value='' ".($found ? "" : "selected").">".htmlspecialcharsbx($sDefaultValue)."</option>";
-		return $s.$s1.'</select>';
+			$s .= '<option value="0"'.($boolFound ? '' : ' selected').'>'.htmlspecialcharsex($sDefaultValue).'</option>';
+
+		foreach (self::$arExtraCache as &$arExtra)
+		{
+			$s .= '<option value="'.$arExtra['ID'].'"'.($arExtra['ID'] == $sValue ? ' selected' : '').'>'.htmlspecialcharsex($arExtra['NAME']).' ('.htmlspecialcharsex($arExtra['PERCENTAGE']).'%)</option>';
+		}
+		if (isset($arExtra))
+			unset($arExtra);
+		return $s.'</select>';
 	}
 
 	
@@ -149,7 +174,7 @@ class CAllExtra
 	 *
 	 *
 	 * @return bool <p>Возвращает значение <i>true</i> в случае успешного сохранения
-	 * наценки и <i>false</i> - в противном случае </p>
+	 * наценки и <i>false</i> - в противном случае </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php
@@ -160,19 +185,23 @@ class CAllExtra
 		global $DB;
 
 		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 		if (!CExtra::CheckFields('UPDATE', $arFields, $ID))
 			return false;
 
 		$strUpdate = $DB->PrepareUpdate("b_catalog_extra", $arFields);
-		$strSql = "UPDATE b_catalog_extra SET ".$strUpdate." WHERE ID = '".intval($ID)."'";
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		if (!empty($arFields["RECALCULATE"]) && $arFields["RECALCULATE"]=="Y")
+		if (!empty($strUpdate))
 		{
-			CPrice::ReCalculate("EXTRA", $ID, $arFields["PERCENTAGE"]);
-		}
+			$strSql = "UPDATE b_catalog_extra SET ".$strUpdate." WHERE ID = ".$ID;
+			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		unset($GLOBALS["MAIN_EXTRA_LIST_CACHE"]);
+			if (array_key_exists('RECALCULATE', $arFields) && 'Y' == $arFields['RECALCULATE'])
+			{
+				CPrice::ReCalculate('EXTRA', $ID, $arFields['PERCENTAGE']);
+			}
+			CExtra::ClearCache();
+		}
 		return true;
 	}
 
@@ -188,7 +217,7 @@ class CAllExtra
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае </p>
+	 * противном случае </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__delete.ca4c66fe.php
@@ -198,11 +227,55 @@ class CAllExtra
 	{
 		global $DB;
 		$ID = intval($ID);
-		$DB->Query("UPDATE b_catalog_price SET EXTRA_ID = NULL WHERE EXTRA_ID = ".$ID." ");
-		unset($GLOBALS["MAIN_EXTRA_LIST_CACHE"]);
-		return $DB->Query("DELETE FROM b_catalog_extra WHERE ID = ".$ID." ", true);
+		if (0 >= $ID)
+			return false;
+		$DB->Query("UPDATE b_catalog_price SET EXTRA_ID = NULL WHERE EXTRA_ID = ".$ID);
+		CExtra::ClearCache();
+		return $DB->Query("DELETE FROM b_catalog_extra WHERE ID = ".$ID, true);
 	}
 
+	
+	/**
+	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $strAction  Указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a>;</li> <li>
+	 * <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</li>
+	 * </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров наценки. Допустимые ключи: <ul> <li>
+	 * <b>NAME</b> - название наценки;</li> <li> <b>PERCENTAGE</b> - процент наценки (может
+	 * быть как положительным, так и отрицательным).</li> </ul>
+	 *
+	 *
+	 *
+	 * @param int $ID  Код наценки.
+	 *
+	 *
+	 *
+	 * @return bool <p> В случае корректности переданных параметров возвращает true,
+	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	 * можно получить текст ошибок.</p>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a></li>
+	 * </ul><br><br>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/checkfields.php
+	 * @author Bitrix
+	 */
 	public static function CheckFields($strAction, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
@@ -210,112 +283,74 @@ class CAllExtra
 		$arMsg = array();
 		$boolResult = true;
 
-		if ($strAction != 'ADD' && $strAction != 'UPDATE')
-			$boolResult = false;
+		$strAction = strtoupper($strAction);
 
 		$ID = intval($ID);
-		if ($strAction == 'UPDATE' && $ID <= 0)
+		if ('UPDATE' == $strAction && 0 >= $ID)
 		{
-			$arMsg[] = $arMsg[] = array('id' => 'ID', 'text' => GetMessage('CAT_EXTRA_ERR_UPDATE_NOT_ID'));
+			$arMsg[] = array('id' => 'ID', 'text' => GetMessage('CAT_EXTRA_ERR_UPDATE_NOT_ID'));
 			$boolResult = false;
 		}
-
-		if ($boolResult)
+		if (array_key_exists('ID', $arFields))
 		{
-			if (isset($arFields['ID']))
-			{
-				if ($strAction == 'UPDATE')
-				{
-					unset($arFields['ID']);
-				}
-				else
-				{
-					$arFields['ID'] = intval($arFields['ID']);
-					if ($arFields['ID'] <= 0)
-					{
-						unset($arFields['ID']);
-					}
-					else
-					{
-						$mxRes = CExtra::GetByID($arFields['ID']);
-						if ($mxRes)
-						{
-							$arMsg[] = $arMsg[] = array('id' => 'ID', 'text' => GetMessage('CAT_EXTRA_ERR_ADD_EXISTS_ID'));
-							$boolResult = false;
-						}
-					}
-				}
-			}
+			unset($arFields['ID']);
 		}
 
-		if ($boolResult)
+		if ('ADD' == $strAction)
 		{
-			$arFields["NAME"] = trim($arFields["NAME"]);
-			if (empty($arFields["NAME"]))
+			if (!array_key_exists('NAME', $arFields))
 			{
 				$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('CAT_EXTRA_ERROR_NONAME'));
 				$boolResult = false;
 			}
-			if (empty($arFields["PERCENTAGE"]))
-				$arFields["PERCENTAGE"] = 0;
-			$arFields["PERCENTAGE"] = DoubleVal($arFields["PERCENTAGE"]);
+			if (!array_key_exists('PERCENTAGE', $arFields))
+			{
+				$arMsg[] = array('id' => 'PERCENTAGE', 'text' => GetMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
+				$boolResult = false;
+			}
+		}
+
+		if ($boolResult)
+		{
+			if (array_key_exists('NAME', $arFields))
+			{
+				$arFields["NAME"] = trim($arFields["NAME"]);
+				if ('' == $arFields["NAME"])
+				{
+					$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('CAT_EXTRA_ERROR_NONAME'));
+					$boolResult = false;
+				}
+			}
+			if (array_key_exists('PERCENTAGE', $arFields))
+			{
+				$arFields["PERCENTAGE"] = trim($arFields["PERCENTAGE"]);
+				if ('' == $arFields["PERCENTAGE"])
+				{
+					$arMsg[] = array('id' => 'PERCENTAGE', 'text' => GetMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
+					$boolResult = false;
+				}
+				else
+				{
+					$arFields["PERCENTAGE"] = doubleval($arFields["PERCENTAGE"]);
+				}
+			}
 		}
 
 		if (!$boolResult)
 		{
-			if (!empty($arMsg))
-			{
-				$obError = new CAdminException($arMsg);
-				$APPLICATION->ThrowException($obError);
-			}
+			$obError = new CAdminException($arMsg);
+			$APPLICATION->ResetException();
+			$APPLICATION->ThrowException($obError);
 		}
 		return $boolResult;
 	}
 
+/*
+* @deprecated deprecated since catalog 12.5.6
+*/
 	public static function PrepareInsert(&$arFields, &$intID)
 	{
-		global $APPLICATION;
-		global $DB;
-
-		$arMsg = array();
-		$boolResult = true;
-
-		$intID = '';
-		$arFieldsList = $DB->GetTableFieldsList("b_catalog_extra");
-		foreach ($arFields as $key => $value)
-		{
-			if (in_array($key,$arFieldsList))
-			{
-				if ($key == 'ID')
-				{
-					$intID = $value;
-					unset($arFields[$key]);
-				}
-				else
-				{
-					$arFields[$key] = "'".$DB->ForSql($value)."'";
-				}
-			}
-			else
-			{
-				unset($arFields[$key]);
-			}
-		}
-		if (empty($arFields))
-		{
-			$arMsg[] = array('id' => 'ID', 'text' => GetMessage('CAT_EXTRA_ERR_ADD_FIELDS_EMPTY'));
-			$boolResult = false;
-		}
-
-		if (!$boolResult)
-		{
-			if (!empty($arMsg))
-			{
-				$obError = new CAdminException($arMsg);
-				$APPLICATION->ThrowException($obError);
-			}
-		}
-		return $boolResult;
+		return false;
 	}
 }
 ?>

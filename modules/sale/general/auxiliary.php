@@ -187,7 +187,7 @@ class CAllSaleAuxiliary
 	 *
 	 *
 	 * @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	 * случае.</p>
+	 * случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.delete.php
@@ -216,7 +216,7 @@ class CAllSaleAuxiliary
 	 *
 	 *
 	 * @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	 * случае.</p>
+	 * случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.deletebyuserid.php

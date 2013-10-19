@@ -94,7 +94,7 @@ class CAllSalePaySystemAction
 			$arFields["HAVE_RESULT_RECEIVE"] = "N";
 		if (is_set($arFields, "ENCODING") && strlen($arFields["ENCODING"]) <= 0)
 			$arFields["ENCODING"] = false;
-			
+
 		if (is_set($arFields, "PAY_SYSTEM_ID"))
 		{
 			if (!($arPaySystem = CSalePaySystem::GetByID($arFields["PAY_SYSTEM_ID"])))
@@ -207,7 +207,7 @@ class CAllSalePaySystemAction
 			{
 				$res = $GLOBALS["SALE_INPUT_PARAMS"][$type][$value];
 			}
-			elseif (isset($GLOBALS["SALE_INPUT_PARAMS"]) && ($type == "SELECT" || $type == "RADIO"))
+			elseif (isset($GLOBALS["SALE_INPUT_PARAMS"]) && ($type == "SELECT" || $type == "RADIO" || $type == "FILE"))
 			{
 				$res = $GLOBALS["SALE_CORRESPONDENCE"][$key]["VALUE"];
 			}
@@ -259,6 +259,11 @@ class CAllSalePaySystemAction
 			$GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_INSERT_DATE"] = $arDateInsert[0];
 		else
 			$GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_INSERT_DATE"] = $GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_INSERT"];
+
+		if(strlen(trim($GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_BILL"])) > 0)
+			$GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_BILL_DATE"] = ConvertTimeStamp(MakeTimeStamp($GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_BILL"]), 'SHORT');
+		else
+			$GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["DATE_BILL_DATE"] = "";
 
 		$userID = IntVal($GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["USER_ID"]);
 		if ($userID > 0)

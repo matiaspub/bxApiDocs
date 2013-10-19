@@ -9,9 +9,38 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 	protected $filesCount = 0;
 	protected $filesPath = array();
 
-	static public function __construct()
+	protected $maximumExecutionTime = 0.0;
+	protected $savedMaxExecutionTime = 0.0;
+
+	public function __construct()
 	{
 		IncludeModuleLangFile(__FILE__);
+		$this->savedMaxExecutionTime = ini_get("max_execution_time");
+		if($this->savedMaxExecutionTime <= 0)
+			$phpMaxExecutionTime = 30;
+		else
+			$phpMaxExecutionTime = $this->savedMaxExecutionTime - 2;
+		$this->maximumExecutionTime = time() + $phpMaxExecutionTime;
+		set_time_limit(0);
+	}
+
+	public function __destruct()
+	{
+		set_time_limit($this->savedMaxExecutionTime);
+	}
+
+	/**
+	 * Check test requirements (e.g. max_execution_time)
+	 *
+	 * @param array $pParams
+	 * @throws CSecurityRequirementsException
+	 * @return bool
+	 */
+	public function checkRequirements($pParams = array())
+	{
+		if($this->maximumExecutionTime - time() <= 5)
+			throw new CSecurityRequirementsException(GetMessage('SECURITY_SITE_CHECKER_FILE_PERM_SMALL_MAX_EXEC'));
+		return true;
 	}
 
 	/**
@@ -25,17 +54,25 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 		if(!self::isRunOnWin())
 		{
 			$folder = self::getParam("folder", $_SERVER["DOCUMENT_ROOT"]);
-			$this->checkWorldWritableDirRecursive($folder);
+			try
+			{
+				$this->checkWorldWritableDirRecursive($folder);
+			}
+			catch(Exception $e)
+			{
+				return array(
+					"name" => $this->getName(),
+					"status" => true,
+					"fatal_error_text" => GetMessage($e->getMessage())
+				);
+			}
 		}
 
 		if($this->filesCount <= self::MAX_OUTPUT_FILES)
-		{
 			$recommendationFilesCount = $this->filesCount;
-		}
 		else
-		{
 			$recommendationFilesCount = self::MAX_OUTPUT_FILES;
-		}
+
 		$recommendation = GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_RECOMMENDATION");
 		$recommendation .= "<br>";
 		$recommendation .= GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_ADDITIONAL",array("#COUNT#" => $recommendationFilesCount));
@@ -78,6 +115,7 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 
 	/**
 	 * @param string $pDir
+	 * @throws Exception
 	 * @return bool
 	 */
 	protected function checkWorldWritableDirRecursive($pDir)
@@ -92,6 +130,9 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 
 				if($this->filesCount > self::MAX_OUTPUT_FILES)
 					return $result;
+
+				if(time() >= $this->maximumExecutionTime)
+					throw new Exception('SECURITY_SITE_CHECKER_FILE_PERM_TIMEOUT');
 
 				$curFile = $pDir."/".$item;
 				$isInteresting = self::isInterestingFile($curFile) || self::isInterestingDir($curFile);

@@ -167,7 +167,7 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция возвращает параметры службы доставки с кодом ID </p>
+	 * <p>Функция возвращает параметры службы доставки с кодом ID.</p>
 	 *
 	 *
 	 *
@@ -253,7 +253,7 @@ class CAllSaleDelivery
 	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>DELIVERY_ID</td> <td>Код службы
 	 * доставки.</td> </tr> <tr> <td>LOCATION_ID</td> <td>Код местоположения или группы
 	 * местоположений.</td> </tr> <tr> <td>LOCATION_TYPE</td> <td>Тип (L - местоположение, G -
-	 * группа местоположений) </td> </tr> </table>
+	 * группа местоположений) </td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__getlocationlist.e2a07bf9.php
@@ -497,7 +497,7 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция удаляет доставку с кодом ID </p>
+	 * <p>Функция удаляет доставку с кодом ID.</p>
 	 *
 	 *
 	 *

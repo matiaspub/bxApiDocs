@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * 
+ * <b>CWikiDiff</b> - Класс сравнения вики-страниц.
  *
  *
  *

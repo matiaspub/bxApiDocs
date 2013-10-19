@@ -7,7 +7,7 @@ class CAllRatings
 	// get specified rating record
 	
 	/**
-	 * <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -34,9 +34,9 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
 	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -95,8 +95,8 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
 	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -158,7 +158,7 @@ class CAllRatings
 	// get rating record list
 	
 	/**
-	 * <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -206,10 +206,10 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
 	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li> </ul><a
-	 * name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -413,7 +413,7 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
 	 * таблицы "Рейтинг"</a></li> <li>Метод <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/update.php">CRating::Update</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php">CRating::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -510,7 +510,7 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
 	 * таблицы "Рейтинг"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/add.php">CRating::Add</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/add.php">CRating::Add</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -921,7 +921,7 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_votting">Структура
 	 * таблицы "Результаты рейтингового голосования"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getratingresult.php">CRatings::GetRatingResult</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingresult.php">CRatings::GetRatingResult</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1065,7 +1065,7 @@ class CAllRatings
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_results">Структура
 	 * таблицы "Результаты рейтинга"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cratings/getratingvoteresult.php">CRatings::GetRatingVoteResult</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingvoteresult.php">CRatings::GetRatingVoteResult</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1266,9 +1266,10 @@ class CAllRatings
 		$rowAffected = $DB->Update("b_rating_voting", $arFields, "WHERE ENTITY_TYPE_ID='".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."' AND ENTITY_ID='".intval($arParam['ENTITY_ID'])."'" , $err_mess.__LINE__);
 		if ($rowAffected > 0)
 		{
-			$rsRV = $DB->Query("SELECT ID FROM b_rating_voting WHERE ENTITY_TYPE_ID='".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."' AND ENTITY_ID='".intval($arParam['ENTITY_ID'])."'", false, $err_mess.__LINE__);
+			$rsRV = $DB->Query("SELECT ID, TOTAL_POSITIVE_VOTES FROM b_rating_voting WHERE ENTITY_TYPE_ID='".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."' AND ENTITY_ID='".intval($arParam['ENTITY_ID'])."'", false, $err_mess.__LINE__);
 			$arRV = $rsRV->Fetch();
 			$arParam['RATING_VOTING_ID'] = $arRV['ID'];
+			$arParam['TOTAL_POSITIVE_VOTES'] = $arRV['TOTAL_POSITIVE_VOTES'];
 		}
 		else
 		{
@@ -1285,6 +1286,7 @@ class CAllRatings
 				"TOTAL_NEGATIVE_VOTES"	=> ($votePlus ? 0 : 1)
 			);
 			$arParam['RATING_VOTING_ID'] = $DB->Insert("b_rating_voting", $arFields, $err_mess.__LINE__);
+			$arParam['TOTAL_POSITIVE_VOTES'] = ($votePlus ? 1 : 0);
 		}
 
 		$arFields = array(
@@ -1302,6 +1304,22 @@ class CAllRatings
 
 		foreach(GetModuleEvents("main", "OnAddRatingVote", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(intval($ID), $arParam));
+
+		if (CModule::IncludeModule('pull'))
+		{
+			CPullStack::AddShared(Array(
+				'module_id' => 'main',
+				'command' => 'rating_vote',
+				'params' => Array(
+					"TYPE" => "ADD",
+					"USER_ID" => intval($arParam['USER_ID']),
+					"ENTITY_TYPE_ID" => $arParam["ENTITY_TYPE_ID"],
+					"ENTITY_ID" => intval($arParam['ENTITY_ID']),
+					"TOTAL_POSITIVE_VOTES" => $arParam['TOTAL_POSITIVE_VOTES'],
+					"RESULT" => $votePlus? 'PLUS': 'MINUS',
+				)
+			));
+		}
 
 		if (CACHED_b_rating_vote!==false)
 		{
@@ -1325,7 +1343,8 @@ class CAllRatings
 			SELECT
 				RVG.ID,
 				RV.ID AS VOTE_ID,
-				RV.VALUE AS VOTE_VALUE
+				RV.VALUE AS VOTE_VALUE,
+				RVG.TOTAL_POSITIVE_VOTES
 			FROM
 				b_rating_voting RVG,
 				b_rating_vote RV
@@ -1350,6 +1369,22 @@ class CAllRatings
 
 			foreach(GetModuleEvents("main", "OnCancelRatingVote", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array(intval($arVote['VOTE_ID']), $arParam));
+
+			if (CModule::IncludeModule('pull'))
+			{
+				CPullStack::AddShared(Array(
+					'module_id' => 'main',
+					'command' => 'rating_vote',
+					'params' => Array(
+						"TYPE" => "CANCEL",
+						"USER_ID" => intval($arParam['USER_ID']),
+						"ENTITY_TYPE_ID" => $arParam["ENTITY_TYPE_ID"],
+						"ENTITY_ID" => intval($arParam['ENTITY_ID']),
+						"TOTAL_POSITIVE_VOTES" => intval($arVote['TOTAL_POSITIVE_VOTES']+($votePlus? -1: 1)),
+						"RESULT" => $votePlus? 'PLUS': 'MINUS',
+					)
+				));
+			}
 
 			if (CACHED_b_rating_vote!==false)
 			{

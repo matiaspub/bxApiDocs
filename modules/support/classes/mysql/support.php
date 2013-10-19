@@ -26,7 +26,7 @@ class CTicket extends CAllTicket
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CTicket<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CTicket<br>File: ".__FILE__;
 	}
 
 	public static function AutoClose()
@@ -43,6 +43,8 @@ class CTicket extends CAllTicket
 			and (T.DATE_CLOSE is null or length(T.DATE_CLOSE)<=0)
 			and	(UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(T.TIMESTAMP_X))/86400 > T.AUTO_CLOSE_DAYS
 			";*/
+
+		$nowTime = $DB->CharToDateFunction(GetTime(time() + CTimeZone::GetOffset(),"FULL"));
 		$strSql = "
 			SELECT
 				T.ID
@@ -51,8 +53,9 @@ class CTicket extends CAllTicket
 			WHERE
 				T.AUTO_CLOSE_DAYS > 0
 			and (T.DATE_CLOSE is null or length(T.DATE_CLOSE)<=0)
-			and	(UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(T.LAST_MESSAGE_DATE))/86400 > T.AUTO_CLOSE_DAYS
-			";
+			and	(UNIX_TIMESTAMP($nowTime)-UNIX_TIMESTAMP(T.LAST_MESSAGE_DATE))/86400 > T.AUTO_CLOSE_DAYS
+			and T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y'
+			";//now()
 
 		$rsTickets = $DB->Query($strSql, false, $err_mess.__LINE__);
 		while ($arTicket = $rsTickets->Fetch())
@@ -63,7 +66,7 @@ class CTicket extends CAllTicket
 				"MODIFIED_USER_ID"		=> "null",
 				"MODIFIED_GUEST_ID"		=> "null",
 				"MODIFIED_MODULE_NAME"	=> "'auto closing'",
-				"AUTO_CLOSE_DAYS"		=> "null",
+				//"AUTO_CLOSE_DAYS"		=> "null",
 				"AUTO_CLOSED"			=> "'Y'"
 				);
 			$DB->Update("b_ticket",$arFields,"WHERE ID='".$arTicket["ID"]."'",$err_mess.__LINE__);
@@ -178,12 +181,17 @@ class CTicket extends CAllTicket
 				}
 			}
 
-			$DB->Query("DELETE FROM b_ticket_search WHERE MESSAGE_ID = '$ID'", false, $err_mess.__LINE__);
 			$z = $DB->Query("DELETE FROM b_ticket_message WHERE ID='$ID'", false, $err_mess.__LINE__);
 			if (intval($z->AffectedRowsCount())>0)
 			{
-				CTicket::UpdateLastParams($ticketID);
-				CTicket::UpdateLastParams2($ticketID, CTicket::DELETE);
+				//CTicket::UpdateLastParams($ticketID);
+				//CTicket::UpdateLastParams2($ticketID, CTicket::DELETE);
+				CTicket::UpdateLastParamsN($ticketID, array("EVENT"=>array(CTicket::DELETE)), true, true);
+
+				if (CSupportSearch::isIndexExists())
+				{
+					CSupportSearch::reindexTicket($ticketID);
+				}
 			}
 		}
 	}
@@ -326,18 +334,13 @@ class CTicket extends CAllTicket
 						CTicket::UnMarkMessageAsSpam($MESSAGE_ID,$checkRights);
 
 					//if ($notChangeStatus != "Y")
-					CTicket::UpdateLastParams($ticketID);
+					//CTicket::UpdateLastParams($ticketID);
 					//if ($notChangeStatus!="Y" && $hidden!="Y" && $log!="Y")
 					//{
 						//CTicketReminder::Update($ticketID);
 					//}
-					if ( $log!="Y" )
-					{
-						$strSql = "SELECT SITE_ID, TITLE FROM b_ticket T WHERE ID='$ticketID'";
-						$rsTicket = $DB->Query($strSql, false, $err_mess.__LINE__);
-						$arTicket = $rsTicket->Fetch();
-						CSupportSearch::writeWordsInTable( $MESSAGE_ID, $arTicket["SITE_ID"], $arTicket["TITLE"] . " " . $arFields["MESSAGE"] );
-					}
+
+					CSupportSearch::reindexTicket($ticketID);
 				}
 			}
 		}
@@ -517,7 +520,7 @@ class CTicket extends CAllTicket
 			$arFieldsI["DATE_CREATE"] = $DB->CharToDateFunction( GetTime( time() ,"FULL" ) );
 			CTimeZone::Enable();
 
-			if ($hidden!="Y" && $log!="Y" && $changeLastMessageDate == false)
+			/*if ($hidden!="Y" && $log!="Y" && $changeLastMessageDate == false)
 			{
 				if ($MessageBySupportTeam == "'Y'" || ($maxNumber <= 0 && array_key_exists('SOURCE_SID', $arFields) && $arFields['SOURCE_SID'] === 'email'))
 				{
@@ -527,7 +530,7 @@ class CTicket extends CAllTicket
 				{
 					$arFieldsI["NOT_CHANGE_STATUS"] = "'Y'";
 				}
-			}
+			}*/
 
 			if (intval($currentResponsibleUserID)>0) $arFieldsI["CURRENT_RESPONSIBLE_USER_ID"] = $currentResponsibleUserID;
 
@@ -592,20 +595,22 @@ class CTicket extends CAllTicket
 					}
 				}
 
+				/*
 				// если это не было скрытым сообщением или сообщение лога, то
 				if ($notChangeStatus!="Y" && $hidden!="Y" && $log!="Y")
 				{
 					// обновим ряд параметров обращения
 					if (!isset($arFields["AUTO_CLOSE_DAYS"])) $RESET_AUTO_CLOSE = "Y";
+					
 					CTicket::UpdateLastParams($ticketID, $RESET_AUTO_CLOSE, $changeLastMessageDate, true);
 
 					// при необходимости создадим или удалим агенты-напоминальщики
 					//CTicketReminder::Update($ticketID);
-				}
+				}*/
 
-				if ( $log!="Y" )
+				if ( $log!="Y" && CSupportSearch::isIndexExists())
 				{
-					CSupportSearch::writeWordsInTable( $mid, $siteID, $tTitle . " " . $arFields["MESSAGE"] );
+					CSupportSearch::reindexTicket($ticketID);
 				}
 
 				//если была установлена галочка "не изменять статус обращени" - пересчитаем количество собщений
@@ -670,7 +675,7 @@ class CTicket extends CAllTicket
 	 *
 	 *
 	 *
-	 * @param varchar &$by  Идентификатор позволяющий задать имя поля для сортировки.
+	 * @param varchar &$by  Идентификатор, позволяющий задать имя поля для сортировки.
 	 * Допустимы следующие значения: <ul> <li>s_id - по ID </li> <li>s_lid - по сайту,
 	 * для которого было создано обращение </li> <li>s_lamp - по индикатору </li>
 	 * <li>s_date_create - по дате создания </li> <li>s_timestamp - по дате изменения </li>
@@ -845,11 +850,24 @@ class CTicket extends CAllTicket
 		$err_mess = (CTicket::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $USER, $USER_FIELD_MANAGER;
 
+		/** @var string $d_join Dictionary join */
+		$d_join = "";
+
 		$bAdmin = 'N';
 		$bSupportTeam = 'N';
 		$bSupportClient = 'N';
 		$bDemo = 'N';
+
+		/** @var string $messJoin Messages join */
 		$messJoin = "";
+
+		/** @var string $searchJoin Search table join */
+		$searchJoin = '';
+
+		$need_group = false;
+
+		$arSqlHaving = array();
+
 		if ($checkRights=='Y')
 		{
 			$bAdmin = (CTicket::IsAdmin()) ? 'Y' : 'N';
@@ -883,7 +901,7 @@ class CTicket extends CAllTicket
 		{
 			$lamp = "
 				if(ifnull(T.DATE_CLOSE,'x')<>'x', 'grey',
-					if(ifnull(T.LAST_MESSAGE_USER_ID,0)='$uid', 'green', 'red'))
+					if(T.LAST_MESSAGE_BY_SUPPORT_TEAM='Y', 'red', 'green'))
 				";
 		}
 		$bJoinSupportTeamTbl = $bJoinClientTbl = false;
@@ -894,7 +912,8 @@ class CTicket extends CAllTicket
 		if (is_array($arFilter))
 		{
 			$filterKeys = array_keys($arFilter);
-			for ($i=0; $i<count($filterKeys); $i++)
+			$filterKeysCount = count($filterKeys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filterKeys[$i];
 				$val = $arFilter[$filterKeys[$i]];
@@ -924,7 +943,11 @@ class CTicket extends CAllTicket
 						{
 							if (count($val)>0)
 							{
-								foreach ($val as $value) $str .= ", '".$DB->ForSQL($value)."'";
+								$str = "";
+								foreach ($val as $value)
+								{
+									$str .= ", '".$DB->ForSQL($value)."'";
+								}
 								$str = TrimEx($str, ",");
 								$arSqlSearch[] = " ".$lamp." in (".$str.")";
 							}
@@ -998,15 +1021,17 @@ class CTicket extends CAllTicket
 						$arSqlSearch[] = "T.OVERDUE_MESSAGES<='".intval($val)."'";
 						break;
 					case "AUTO_CLOSE_DAYS_LEFT1":
-						$arSqlSearch[] = "TO_DAYS(ADDDATE(T.TIMESTAMP_X, INTERVAL T.AUTO_CLOSE_DAYS DAY))-TO_DAYS(now())>='".intval($val)."'";
+						$arSqlSearch[] = "CASE WHEN (UNIX_TIMESTAMP(T.DATE_CLOSE) IS NULL OR UNIX_TIMESTAMP(T.DATE_CLOSE) = 0) AND T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y' THEN
+							TO_DAYS(ADDDATE(T.LAST_MESSAGE_DATE, INTERVAL T.AUTO_CLOSE_DAYS DAY)) - TO_DAYS(now()) ELSE -1 END >='".intval($val)."'";
 						break;
 					case "AUTO_CLOSE_DAYS_LEFT2":
-						$arSqlSearch[] = "TO_DAYS(ADDDATE(T.TIMESTAMP_X, INTERVAL T.AUTO_CLOSE_DAYS DAY))-TO_DAYS(now())<='".intval($val)."'";
+						$arSqlSearch[] = "CASE WHEN (UNIX_TIMESTAMP(T.DATE_CLOSE) IS NULL OR UNIX_TIMESTAMP(T.DATE_CLOSE) = 0) AND T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y' THEN
+							TO_DAYS(ADDDATE(T.LAST_MESSAGE_DATE, INTERVAL T.AUTO_CLOSE_DAYS DAY))-TO_DAYS(now()) ELSE 999 END <='".intval($val)."'";
 						break;
 					case "OWNER":
 						$getUserName = "Y";
 						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $matchValueSet) ? "N" : "Y";
-						$arSqlSearch[] = GetFilterQuery("T.OWNER_USER_ID, UO.LOGIN, UO.LAST_NAME, UO.NAME, T.OWNER_SID", $val, $match, array("@", "."));
+						$arSqlSearch[] = GetFilterQuery("UO.ID, UO.LOGIN, UO.LAST_NAME, UO.NAME, T.OWNER_SID", $val, $match, array("@", ".")); //T.OWNER_USER_ID,
 						break;
 					case "OWNER_USER_ID":
 					case "OWNER_SID":
@@ -1040,6 +1065,8 @@ class CTicket extends CAllTicket
 					case "CATEGORY_SID":
 						$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $matchValueSet) ? "Y" : "N";
 						$arSqlSearch[] = GetFilterQuery("DC.SID", $val, $match);
+						$d_join = "
+			LEFT JOIN b_ticket_dictionary DC ON (DC.ID = T.CATEGORY_ID and DC.C_TYPE = 'C')";
 						break;
 					case "CRITICALITY_ID":
 					case "CRITICALITY":
@@ -1098,20 +1125,38 @@ class CTicket extends CAllTicket
 					case "MESSAGE":
 						global $strError;
 						if( strlen( $val ) <= 0 ) break;
-						if ($bSupportTeam=="Y" || $bAdmin=="Y" || $bDemo=="Y")
+
+						if(CSupportSearch::CheckModule() && CSupportSearch::isIndexExists())
 						{
-							$messJoin = "INNER JOIN b_ticket_message M ON (M.TICKET_ID=T.ID)";
+							// new indexed search
+							$searchSqlParams = CSupportSearch::getSql($val);
+							$searchOn = $searchSqlParams['WHERE'];
+							$searchHaving = $searchSqlParams['HAVING'];
+
+							if ($searchOn)
+							{
+								$searchJoin = 'INNER JOIN b_ticket_search TS ON TS.TICKET_ID = T.ID AND '.$searchOn;
+
+								if (!empty($searchHaving))
+								{
+									// 2 or more search words
+									$arSqlHaving[] = $searchHaving;
+									$need_group = true;
+								}
+							}
+
 						}
 						else
 						{
-							$messJoin = "INNER JOIN b_ticket_message M ON (M.TICKET_ID=T.ID and M.IS_HIDDEN='N' and M.IS_LOG='N')";
-						}
-						if( CSupportSearch::checkModule() )
-						{
-							$arSqlSearch[] = CSupportSearch::GetFilterQuery( $val, "M.ID", "T.TITLE", "M.MESSAGE", $strError );
-						}
-						else
-						{
+							if ($bSupportTeam=="Y" || $bAdmin=="Y" || $bDemo=="Y")
+							{
+								$messJoin = "INNER JOIN b_ticket_message M ON (M.TICKET_ID=T.ID)";
+							}
+							else
+							{
+								$messJoin = "INNER JOIN b_ticket_message M ON (M.TICKET_ID=T.ID and M.IS_HIDDEN='N' and M.IS_LOG='N')";
+							}
+
 							$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $matchValueSet) ? "N" : "Y";
 							$f = new CFilterQuery("OR", "yes", $match, array(), "N", "Y", "N");
 							$query = $f->GetQueryString( "T.TITLE,M.MESSAGE_SEARCH", $val );
@@ -1128,6 +1173,9 @@ class CTicket extends CAllTicket
 					case "LAST_MESSAGE_SID":
 						$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $matchValueSet) ? "Y" : "N";
 						$arSqlSearch[] = GetFilterQuery("T.".$key, $val, $match);
+						break;
+					case "LAST_MESSAGE_BY_SUPPORT_TEAM":
+						$arSqlSearch[] = "T.LAST_MESSAGE_BY_SUPPORT_TEAM= '".($val == 'Y' ? 'Y' : 'N')."'";
 						break;
 					case "SUPPORT_COMMENTS":
 						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $matchValueSet) ? "N" : "Y";
@@ -1216,7 +1264,7 @@ class CTicket extends CAllTicket
 		{
 			$strSqlOrder = "ORDER BY T.DATE_CREATE";
 		}
-		elseif ($by == "s_timestamp")
+		elseif ($by == "s_timestamp" || $by == "s_timestamp_x")
 		{
 			$strSqlOrder = "ORDER BY T.TIMESTAMP_X";
 		}
@@ -1385,7 +1433,9 @@ class CTicket extends CAllTicket
 				".$DB->DateToCharFunction("T.TIMESTAMP_X","SHORT",$siteID,true)."	TIMESTAMP_X_SHORT,
 				".$DB->DateToCharFunction("T.DATE_CLOSE","SHORT",$siteID,true)."	DATE_CLOSE_SHORT,
 				".$DB->DateToCharFunction("T.SUPPORT_DEADLINE","FULL",$siteID,true)."	SUPPORT_DEADLINE,
-				".$DB->DateToCharFunction("ADDDATE(T.TIMESTAMP_X, INTERVAL T.AUTO_CLOSE_DAYS DAY)","FULL",$siteID,true)."	AUTO_CLOSE_DATE
+				CASE WHEN (UNIX_TIMESTAMP(T.DATE_CLOSE) IS NULL OR UNIX_TIMESTAMP(T.DATE_CLOSE) = 0) AND T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y' THEN "
+					.$DB->DateToCharFunction("ADDDATE(T.LAST_MESSAGE_DATE, INTERVAL T.AUTO_CLOSE_DAYS DAY)","FULL",$siteID,true)
+				." ELSE NULL END AUTO_CLOSE_DATE
 			";
 		}
 		else
@@ -1399,81 +1449,144 @@ class CTicket extends CAllTicket
 				".$DB->DateToCharFunction("T.TIMESTAMP_X","SHORT")."	TIMESTAMP_X_SHORT,
 				".$DB->DateToCharFunction("T.DATE_CLOSE","SHORT")."		DATE_CLOSE_SHORT,
 				".$DB->DateToCharFunction("T.SUPPORT_DEADLINE","FULL")."	SUPPORT_DEADLINE,
-				".$DB->DateToCharFunction("ADDDATE(T.TIMESTAMP_X, INTERVAL T.AUTO_CLOSE_DAYS DAY)","FULL")."	AUTO_CLOSE_DATE
+				CASE WHEN (UNIX_TIMESTAMP(T.DATE_CLOSE) IS NULL OR UNIX_TIMESTAMP(T.DATE_CLOSE) = 0) AND T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y' THEN "
+					.$DB->DateToCharFunction("ADDDATE(T.LAST_MESSAGE_DATE, INTERVAL T.AUTO_CLOSE_DAYS DAY)","FULL")
+				." ELSE NULL END AUTO_CLOSE_DATE
 			";
 		}
 
 		$ugroupJoin = '';
-		$strSqlSearchUser = '';
 
-		if ($bJoinSupportTeamTbl || (!($bAdmin == 'Y' || $bDemo == 'Y') && $bSupportTeam == 'Y'))
+		if ($bJoinSupportTeamTbl)
 		{
 			$ugroupJoin .= "
-				LEFT JOIN b_ticket_user_ugroup UGS ON (UGS.USER_ID = T.RESPONSIBLE_USER_ID) ";
-		}
-		if ($bJoinClientTbl || (!($bAdmin == 'Y' || $bDemo == 'Y') && $bSupportClient == 'Y'))
-		{
-			$ugroupJoin .= "
-				LEFT JOIN b_ticket_user_ugroup UGC ON (UGC.USER_ID = T.OWNER_USER_ID) ";
+			LEFT JOIN b_ticket_user_ugroup UGS ON (UGS.USER_ID = T.RESPONSIBLE_USER_ID) ";
+			$need_group = true;
 		}
 
+		if ($bJoinClientTbl)
+		{
+			$ugroupJoin .= "
+			LEFT JOIN b_ticket_user_ugroup UGC ON (UGC.USER_ID = T.OWNER_USER_ID) ";
+			$need_group = true;
+		}
+
+		// add permissions check
 		if (!($bAdmin == 'Y' || $bDemo == 'Y'))
 		{
-			$strSqlSearchUser = "(T.OWNER_USER_ID='$uid' OR T.RESPONSIBLE_USER_ID='$uid'";
+			// a list of users who own or are responsible for tickets, which we can show to our current user
+			$ticketUsers = array($uid);
+
+			// check if user has groups
+			$result = $DB->Query('SELECT GROUP_ID FROM b_ticket_user_ugroup WHERE USER_ID = '.$uid.' AND CAN_VIEW_GROUP_MESSAGES = \'Y\'');
+			if ($result)
+			{
+				// collect members of these groups
+				$uGroups = array();
+
+				while ($row = $result->Fetch())
+				{
+					$uGroups[] = $row['GROUP_ID'];
+				}
+
+				if (!empty($uGroups))
+				{
+					$result = $DB->Query('SELECT USER_ID FROM b_ticket_user_ugroup WHERE GROUP_ID IN ('.join(',', $uGroups).')');
+					if ($result)
+					{
+						while ($row = $result->Fetch())
+						{
+							$ticketUsers[] = $row['USER_ID'];
+						}
+					}
+				}
+			}
+
+			// build sql
+			$strSqlSearchUser = "";
 
 			if($bSupportTeam == 'Y')
 			{
-				$strSqlSearchUser .= " OR (UGS2.USER_ID IS NOT NULL AND UGS2.USER_ID='$uid' AND UUS.IS_TEAM_GROUP IS NOT NULL AND UUS.IS_TEAM_GROUP='Y')";
-				$ugroupJoin .= "
-					LEFT JOIN b_ticket_user_ugroup UGS2 ON (UGS2.GROUP_ID = UGS.GROUP_ID AND UGS2.CAN_VIEW_GROUP_MESSAGES = 'Y')
-					LEFT JOIN b_ticket_ugroups UUS ON (UUS.ID = UGS.GROUP_ID) ";
+				$strSqlSearchUser = 'T.RESPONSIBLE_USER_ID IN ('.join(',', $ticketUsers).')';
 			}
 			elseif ($bSupportClient == 'Y')
 			{
-				$strSqlSearchUser .= " OR (UGC2.USER_ID IS NOT NULL AND UGC2.USER_ID='$uid' AND UUC.IS_TEAM_GROUP IS NOT NULL AND UUC.IS_TEAM_GROUP<>'Y')";
-				$ugroupJoin .= "
-					LEFT JOIN b_ticket_user_ugroup UGC2 ON (UGC2.GROUP_ID = UGC.GROUP_ID AND UGC2.CAN_VIEW_GROUP_MESSAGES = 'Y')
-					LEFT JOIN b_ticket_ugroups UUC ON (UUC.ID = UGC.GROUP_ID) ";
+				$strSqlSearchUser = 'T.OWNER_USER_ID IN ('.join(',', $ticketUsers).')';
 			}
 
-			$strSqlSearchUser .= ')';
 			$arSqlSearch[] = $strSqlSearchUser;
 		}
 
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
 		$onlineInterval = intval(COption::GetOptionString("support", "ONLINE_INTERVAL"));
 
-		$strSql = "
+		$strSqlSelect = "
 			SELECT
 				T.*,
 				T.SITE_ID,
 				T.SITE_ID																			LID,
 				$dates_select,
 				UNIX_TIMESTAMP(T.DATE_CLOSE)-UNIX_TIMESTAMP(T.DATE_CREATE)							TICKET_TIME,
-				TO_DAYS(ADDDATE(T.TIMESTAMP_X, INTERVAL T.AUTO_CLOSE_DAYS DAY))-TO_DAYS(now())		AUTO_CLOSE_DAYS_LEFT,
-				count(distinct TN.USER_ID)															USERS_ONLINE,
+				CASE WHEN (UNIX_TIMESTAMP(T.DATE_CLOSE) IS NULL OR UNIX_TIMESTAMP(T.DATE_CLOSE) = 0) AND T.LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y' THEN
+					TO_DAYS(
+						ADDDATE(
+							T.LAST_MESSAGE_DATE, INTERVAL T.AUTO_CLOSE_DAYS DAY
+						)
+					) - TO_DAYS(now())
+				ELSE -1 END AUTO_CLOSE_DAYS_LEFT,
+				(SELECT COUNT(DISTINCT USER_ID) FROM b_ticket_online WHERE TICKET_ID = T.ID AND TIMESTAMP_X >= DATE_ADD(now(), INTERVAL - ".$onlineInterval." SECOND)) USERS_ONLINE,
 				if(T.COUPON IS NOT NULL, 1, 0)														IS_SUPER_TICKET,
 				$lamp																				LAMP
 				$d_select
 				$u_select
-				" . $obUserFieldsSql->GetSelect() . "
+				" . $obUserFieldsSql->GetSelect();
+
+		$strSqlFrom = "
 			FROM
 				b_ticket T
-			LEFT JOIN b_ticket_online TN ON (TN.TICKET_ID = T.ID and TN.TIMESTAMP_X >= DATE_ADD(now(), INTERVAL - $onlineInterval SECOND))
 			$u_join
 			$d_join
 			$messJoin
+			$searchJoin
 			$ugroupJoin
-				" . $obUserFieldsSql->GetJoin("T.ID") . "
+				" . $obUserFieldsSql->GetJoin("T.ID");
+
+		$strSqlWhere = "
 			WHERE
 			$strSqlSearch
-			GROUP BY
-				T.ID
-			$strSqlOrder
-			";
+		";
 
-		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
-		$res->SetUserFields( $USER_FIELD_MANAGER->GetUserFields("SUPPORT") );
+		$strSqlGroup = $need_group ? ' GROUP BY T.ID  ' : '';
+		$strSqlHaving = $arSqlHaving ? ' HAVING ' . join(' AND ', $arSqlHaving) . ' ' : '';
+
+		$strSql = $strSqlSelect . $strSqlFrom . $strSqlWhere . $strSqlGroup . $strSqlHaving . $strSqlOrder;
+
+		if (is_array($arParams) && isset($arParams["NAV_PARAMS"]) && is_array($arParams["NAV_PARAMS"]))
+		{
+			$nTopCount = isset($arParams['NAV_PARAMS']['nTopCount']) ? intval($arParams['NAV_PARAMS']['nTopCount']) : 0;
+
+			if($nTopCount > 0)
+			{
+				$strSql = $DB->TopSql($strSql, $nTopCount);
+				$res = $DB->Query($strSql, false, $err_mess.__LINE__);
+				$res->SetUserFields( $USER_FIELD_MANAGER->GetUserFields("SUPPORT") );
+			}
+			else
+			{
+				$cntSql = "SELECT COUNT(T.ID) as C " . $strSqlFrom . $strSqlWhere . $strSqlGroup . $strSqlHaving;
+				$res_cnt = $DB->Query($cntSql);
+				$res_cnt = $res_cnt->Fetch();
+				$res = new CDBResult();
+				$res->SetUserFields( $USER_FIELD_MANAGER->GetUserFields("SUPPORT") );
+				$res->NavQuery($strSql, $res_cnt["C"], $arParams["NAV_PARAMS"]);
+			}
+		}
+		else
+		{
+			$res = $DB->Query($strSql, false, $err_mess.__LINE__);
+			$res->SetUserFields( $USER_FIELD_MANAGER->GetUserFields("SUPPORT") );
+		}
+
 		$isFiltered = (IsFiltered($strSqlSearch));
 		return $res;
 	}
@@ -1647,7 +1760,8 @@ class CTicket extends CAllTicket
 		if (is_array($arFilter))
 		{
 			$filterKeys = array_keys($arFilter);
-			for ($i=0; $i<count($filterKeys); $i++)
+			$filterKeysCount = count($filterKeys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filterKeys[$i];
 				$val = $arFilter[$filterKeys[$i]];
@@ -1764,7 +1878,8 @@ class CTicket extends CAllTicket
 		if (is_array($arFilter))
 		{
 			$filterKeys = array_keys($arFilter);
-			for ($i=0; $i<count($filterKeys); $i++)
+			$filterKeysCount = count($filterKeys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filterKeys[$i];
 				$val = $arFilter[$filterKeys[$i]];
@@ -1872,7 +1987,8 @@ class CTicket extends CAllTicket
 		if (is_array($arFilter))
 		{
 			$filterKeys = array_keys($arFilter);
-			for ($i=0; $i<count($filterKeys); $i++)
+			$filterKeysCount = count($filterKeys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filterKeys[$i];
 				$val = $arFilter[$filterKeys[$i]];

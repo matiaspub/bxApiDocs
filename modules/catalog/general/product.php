@@ -16,6 +16,13 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllCatalogProduct
 {
+	protected static $arProductCache = array();
+
+	public static function ClearCache()
+	{
+		self::$arProductCache = array();
+	}
+
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
@@ -112,9 +119,122 @@ class CAllCatalogProduct
 		return $boolResult;
 	}
 
+	public static function ParseQueryBuildField($field)
+	{
+		$field = strtoupper($field);
+		if (0 != strncmp($field, 'CATALOG_', 8))
+			return false;
+
+		$iNum = 0;
+		$field = substr($field, 8);
+		$p = strrpos($field, "_");
+		if (false !== $p && 0 < $p)
+		{
+			$iNum = intval(substr($field, $p+1));
+			if (0 < $iNum)
+				$field = substr($field, 0, $p);
+		}
+		return array(
+			"FIELD" => $field,
+			"NUM" => $iNum
+		);
+	}
+
 	
 	/**
-	 * <p>Функция по коду товара ID возвращает все параметры этого товара, включая относящиеся к товару как к элементу информационного блока. </p>
+	 * <p>Функция по коду товара ID возвращает массив параметров товара (которые относятся к товару как к таковому)</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  Код товара.
+	 *
+	 *
+	 *
+	 * @return array <p>Ассоциативный массив параметров товара с ключами</p><table class="tnormal"
+	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	 * товара.</td> </tr> <tr> <td>QUANTITY</td> <td>Количество на складе.</td> </tr> <tr>
+	 * <td>QUANTITY_TRACE</td> <td>Флаг (Y/N/D - значение берется из настроек модуля)
+	 * "уменьшать количество при оформлении заказа"</td> </tr> <tr> <td>WEIGHT</td>
+	 * <td>Вес единицы товара.</td> </tr> <tr> <td>PRICE_TYPE</td> <td>Тип цены (S -
+	 * одноразовый платеж, R - регулярные платежи, T - пробная подписка).</td>
+	 * </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип периода подписки ("H" - час, "D" - сутки, "W" -
+	 * неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год).</td> </tr> <tr>
+	 * <td>RECUR_SCHEME_LENGTH</td> <td>Длина периода подписки.</td> </tr> <tr> <td>VAT_ID</td>
+	 * <td>Идентификатор ставки НДС, привязанной к товару.</td> </tr> <tr>
+	 * <td>VAT_INCLUDED</td> <td>Включен ли НДС в цену или нет.</td> </tr> <tr> <td>TRIAL_PRICE_ID</td>
+	 * <td>Код товара, для которого данный товар является пробным.</td> </tr>
+	 * <tr> <td>WITHOUT_ORDER</td> <td>Флаг "Продление подписки без оформления
+	 * заказа".</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего изменения
+	 * записи.</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Флаг (Y/N/D - значение берется из
+	 * настроек модуля) "разрешить покупку при отсутствии товара".</td> </tr>
+	 * <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Флаг (Y/N/D - значение берется из настроек
+	 * модуля) "разрешить отрицательное количество товара".</td> </tr> <tr>
+	 * <td>PURCHASING_PRICE</td> <td>Величина закупочной цены.</td> </tr> <tr>
+	 * <td>PURCHASING_CURRENCY</td> <td>Валюта закупочной цены.</td> </tr> </table><a name="examples"></a>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * $ID = 5;
+	 * $ar_res = CCatalogProduct::GetByID($ID);
+	 * echo "&lt;br&gt;Товар с кодом ".$ID." имеет следующие параметры:&lt;pre&gt;";
+	 * print_r($ar_res);
+	 * echo "&lt;/pre&gt;";
+	 * ?&gt;
+	 * </pre>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getbyid.cc16046d.php
+	 * @author Bitrix
+	 */
+	public static function GetByID($ID)
+	{
+		global $DB;
+
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
+
+		if (array_key_exists($ID, self::$arProductCache))
+		{
+			return self::$arProductCache[$ID];
+		}
+		else
+		{
+			$rsProducts = CCatalogProduct::GetList(
+				array(),
+				array('ID' => $ID),
+				false,
+				false,
+				array(
+					'ID', 'QUANTITY', 'QUANTITY_RESERVED', 'QUANTITY_TRACE', 'QUANTITY_TRACE_ORIG', 'WEIGHT',
+					'VAT_ID', 'VAT_INCLUDED', 'CAN_BUY_ZERO', 'CAN_BUY_ZERO_ORIG', 'NEGATIVE_AMOUNT_TRACE', 'NEGATIVE_AMOUNT_TRACE_ORIG',
+					'PRICE_TYPE', 'RECUR_SCHEME_TYPE', 'RECUR_SCHEME_LENGTH', 'TRIAL_PRICE_ID', 'WITHOUT_ORDER', 'SELECT_BEST_PRICE',
+					'TMP_ID', 'PURCHASING_PRICE', 'PURCHASING_CURRENCY', 'BARCODE_MULTI', 'TIMESTAMP_X'
+				)
+			);
+			if ($arProduct = $rsProducts->Fetch())
+			{
+				$arProduct['ID'] = intval($arProduct['ID']);
+				self::$arProductCache[$ID] = $arProduct;
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $CATALOG_PRODUCT_CACHE;
+					$CATALOG_PRODUCT_CACHE = self::$arProductCache;
+				}
+				return $arProduct;
+			}
+		}
+
+		return false;
+	}
+
+	
+	/**
+	 * <p>Функция по коду товара ID возвращает все параметры этого товара, включая относящиеся к товару как к элементу информационного блока. </p> <p><b>Важно!</b> Метод нежелателен к использованию в связи с избыточностью данных и низкой производительностью.</p>
 	 *
 	 *
 	 *
@@ -138,6 +258,8 @@ class CAllCatalogProduct
 	 * print_r($ar_res);
 	 * echo "&lt;/pre&gt;";
 	 * ?&gt;
+	 * 
+	<b>Примечание:</b> до версии модуля <b>12.5.6</b> на агенте этот метод выдает ошибку, т.к. использует объект $USER, который еще не определен (см. <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" target="_blank">учебный курс</a>).
 	 * </pre>
 	 *
 	 *
@@ -368,7 +490,9 @@ class CAllCatalogProduct
 	 *
 	 *
 	 *
-	 * @return int <p>Количество товара, доступное для покупки.</p><a name="examples"></a>
+	 * @return int <p>Метод возвращает <i>false</i> или ближайшее к заданному количество
+	 * товара, которое можно положить в корзину. Метод имеет смысл при
+	 * работе с диапазонами цен.</p><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -523,8 +647,12 @@ class CAllCatalogProduct
 	 * @return array <p>Массив вида:</p><pre class="syntax">array( "PRICE" =&gt;
 	 * массив_параметров_минимальной_цены, "DISCOUNT_PRICE" =&gt;
 	 * минимальная_цена_в_базовой_валюте, "DISCOUNT" =&gt;
-	 * массив_параметров_максимальной_доступной_скидки )</pre><a
-	 * name="examples"></a>
+	 * массив_параметров_максимальной_доступной_скидки )</pre><p><b>Обратите
+	 * внимание, что</b> <i>DISCOUNT_PRICE</i> это минимальная цена в <b>базовой
+	 * валюте</b>. Чтобы перевести эту цену в валюту товара,
+	 * необходимо:</p><pre class="syntax">array( $baseCurrency = CCurrency::GetBaseCurrency();
+	 * $arPrice["DISCOUNT_PRICE"] = CCurrencyRates::ConvertCurrency($arPrice['DISCOUNT_PRICE'], $baseCurrency,
+	 * $arPrice["PRICE"]["CURRENCY"]); )</pre><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -610,19 +738,12 @@ class CAllCatalogProduct
 			return false;
 		}
 
-		$rsElements = CIBlockElement::GetList(
-			array(),
-			array('ID' => $intProductID, 'CHECK_PERMISSIONS' => 'N'),
-			false,
-			false,
-			array('ID', 'IBLOCK_ID')
-		);
-		if (!($arElement = $rsElements->Fetch()))
+		$intIBlockID = intval(CIBlockElement::GetIBlockByID($intProductID));
+		if (0 >= $intIBlockID)
 		{
 			$APPLICATION->ThrowException(str_replace("#ID#", $intProductID, GetMessage('BT_MOD_CATALOG_PROD_ERR_ELEMENT_ID_NOT_FOUND')), "NO_ELEMENT");
 			return false;
 		}
-		$intIBlockID = intval($arElement["IBLOCK_ID"]);
 
 		if (!isset($arPrices) || !is_array($arPrices))
 			$arPrices = array();
@@ -831,7 +952,7 @@ class CAllCatalogProduct
 
 	
 	/**
-	 * <p>Метод приминяет к цене price в валюте currency наибольшую скидку из массива arDiscounts.</p>
+	 * <p>Метод применяет к цене <i>price</i> в валюте <i>currency</i> цепочку скидок из массива <i>arDiscounts</i>.</p> <p><b>Примечание:</b> до версии модуля <b>12.0</b> метод применял к цене <i>price</i> в валюте <i>currency</i> наибольшую скидку из массива <i>arDiscounts</i>.</p>
 	 *
 	 *
 	 *
@@ -854,8 +975,10 @@ class CAllCatalogProduct
 	 *
 	 *
 	 *
-	 * @return array <p>Метод возвращает наименьшую цену, которую можно получить с
-	 * помощью наибольшей скидки.</p><a name="examples"></a>
+	 * @return array <p>Метод возвращает цену, получившуюся после применения цепочки
+	 * скидок.</p><p><b>Примечание:</b> до версии модуля <b>12.0.0</b> метод
+	 * возвращал наименьшую цену, которую можно было получить с помощью
+	 * наибольшей скидки.</p><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -1007,7 +1130,7 @@ class CAllCatalogProduct
 		global $stackCacheManager;
 
 		$ID = intval($ID);
-		if ($ID <= 0)
+		if (0 >= $ID)
 			return false;
 
 		$cacheTime = CATALOG_CACHE_DEFAULT_TIME;
@@ -1016,9 +1139,11 @@ class CAllCatalogProduct
 
 		$arProductSections = array();
 
-		$dbElementSections = CIBlockElement::GetElementGroups($ID);
+		$dbElementSections = CIBlockElement::GetElementGroups($ID, false, array("ID", "ADDITIONAL_PROPERTY_ID"));
 		while ($arElementSections = $dbElementSections->Fetch())
 		{
+			if (0 < intval($arElementSections['ADDITIONAL_PROPERTY_ID']))
+				continue;
 			$arSectionsTmp = array();
 
 			$strCacheKey = "p".$arElementSections["ID"];
@@ -1031,7 +1156,17 @@ class CAllCatalogProduct
 			}
 			else
 			{
-				$dbSection = CIBlockSection::GetByID($arElementSections["ID"]);
+				$dbSection = CIBlockSection::GetList(
+					array(),
+					array('ID' => $arElementSections["ID"]),
+					false,
+					$arSelect = array(
+						'ID',
+						'IBLOCK_ID',
+						'LEFT_MARGIN',
+						'RIGHT_MARGIN',
+					)
+				);
 				if ($arSection = $dbSection->Fetch())
 				{
 					$dbSectionTree = CIBlockSection::GetList(

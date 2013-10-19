@@ -77,9 +77,11 @@ class COpenIDClient
 			$protocol = (CMain::IsHTTPS() ? "https" : "http");
 			$port = ($_SERVER['SERVER_PORT'] > 0 && $_SERVER['SERVER_PORT'] <> 80 && $_SERVER['SERVER_PORT'] <> 443? ':'.$_SERVER['SERVER_PORT']:'');
 			$server_name = $protocol.'://'.$_SERVER['SERVER_NAME'].$port;
-	
+
 			if ($return_to === false)
 				$return_to = $server_name.$GLOBALS['APPLICATION']->GetCurPageParam('', array('SEF_APPLICATION_CUR_PAGE_URL'), false);
+
+			$return_to = preg_replace("|amp%3B|", '', $return_to);
 
 			if (strlen($arOpenidServerTags['delegate']) > 0)
 				$identity = $arOpenidServerTags['delegate'];
@@ -237,9 +239,8 @@ class COpenIDClient
 					if($def_group != '')
 						$arFields['GROUP_ID'] = explode(',', $def_group);
 
-					$rsEvents = GetModuleEvents('main', 'OnBeforeOpenIDUserAdd');
-					while ($arEvent = $rsEvents->Fetch())
-						$arFields = ExecuteModuleEventEx($arEvent, array($arFields));
+					foreach(GetModuleEvents("main", "OnBeforeOpenIDUserAdd", true) as $arEvent)
+						ExecuteModuleEventEx($arEvent, array($arFields));
 
 					$arFieldsUser = $arFields;
 					$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
@@ -263,9 +264,8 @@ class COpenIDClient
 
 					$redirect_url = $APPLICATION->GetCurPageParam('', $arKillParams, false);
 
-					$rsEvents = GetModuleEvents('main', 'OnBeforeOpenIDAuthFinalRedirect');
-					while ($arEvent = $rsEvents->Fetch())
-						$redirect_url = ExecuteModuleEventEx($arEvent, array($redirect_url, $USER_ID, $arFields));
+					foreach(GetModuleEvents("main", "OnBeforeOpenIDAuthFinalRedirect", true) as $arEvent)
+						ExecuteModuleEventEx($arEvent, array($redirect_url, $USER_ID, $arFields));
 
 					if ($redirect_url)
 						LocalRedirect($redirect_url, true);

@@ -10,16 +10,15 @@ class CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param user_i $d  Идентификатор пользователя
+	 * @param user_i $d  11.5.2
 	 *
 	 *
 	 *
-	 * @param cod $e  Код счётчика
+	 * @param cod $e  11.5.2
 	 *
 	 *
 	 *
-	 * @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	 * подставляется текущий сайт.
+	 * @param site_i $d = SITE_ID 11.5.2
 	 *
 	 *
 	 *
@@ -59,12 +58,11 @@ class CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param $user_i $d  Идентификатор пользователя, обязательный параметр.
+	 * @param $user_i $d  11.5.2
 	 *
 	 *
 	 *
-	 * @param $site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	 * принимает значение текущего сайта.
+	 * @param $site_i $d = SITE_ID 11.5.2
 	 *
 	 *
 	 *
@@ -93,7 +91,6 @@ class CAllUserCounter
 
 		if(!isset(self::$counters[$user_id][$site_id]))
 		{
-
 			if (
 				CACHED_b_user_counter !== false
 				&& $CACHE_MANAGER->Read(CACHED_b_user_counter, "user_counter".$user_id, "user_counter")
@@ -140,6 +137,81 @@ class CAllUserCounter
 		return self::$counters[$user_id][$site_id];
 	}
 
+	
+	/**
+	 * <p>Функция позволяет получить все значения для всех доступных сайтов.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param $user_i $d  12.5.8
+	 *
+	 *
+	 *
+	 * @return mixed <p>Возвращает все значения для всех доступных сайтов.</p>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getallvalues.php
+	 * @author Bitrix
+	 */
+	public static function GetAllValues($user_id)
+	{
+		global $DB, $CACHE_MANAGER;
+
+		$arCounters = Array();
+		$user_id = intval($user_id);
+		if ($user_id <= 0)
+			return $arCounters;
+
+		$arSites = Array();
+		$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+		while ($row = $res->Fetch())
+			$arSites[] = $row['ID'];
+
+		if (CACHED_b_user_counter !== false && $CACHE_MANAGER->Read(CACHED_b_user_counter, "user_counter".$user_id, "user_counter"))
+		{
+			$arAll = $CACHE_MANAGER->Get("user_counter".$user_id);
+		}
+		else
+		{
+			$strSQL = "
+				SELECT CODE, SITE_ID, CNT
+				FROM b_user_counter
+				WHERE USER_ID = ".$user_id;
+
+			$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$arAll = array();
+			while ($arRes = $dbRes->Fetch())
+				$arAll[] = $arRes;
+
+			if (CACHED_b_user_counter !== false)
+				$CACHE_MANAGER->Set("user_counter".$user_id, $arAll);
+		}
+
+		foreach($arAll as $arItem)
+		{
+			if ($arItem['SITE_ID'] == '**')
+			{
+				foreach ($arSites as $siteId)
+				{
+					if (isset($arCounters[$siteId][$arItem['CODE']]))
+						$arCounters[$siteId][$arItem['CODE']] += intval($arItem['CNT']);
+					else
+						$arCounters[$siteId][$arItem['CODE']] = intval($arItem['CNT']);
+				}
+			}
+			else
+			{
+				if (isset($arCounters[$arItem['SITE_ID']][$arItem['CODE']]))
+					$arCounters[$arItem['SITE_ID']][$arItem['CODE']] += intval($arItem['CNT']);
+				else
+					$arCounters[$arItem['SITE_ID']][$arItem['CODE']] = intval($arItem['CNT']);
+			}
+		}
+
+		return $arCounters;
+	}
+
 	public static function GetLastDate($user_id, $code, $site_id = SITE_ID)
 	{
 		global $DB;
@@ -171,7 +243,7 @@ class CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param user_i $d  Идентификатор пользователя
+	 * @param user_i $d  11.5.2
 	 *
 	 *
 	 *
@@ -189,7 +261,7 @@ class CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearall.php
 	 * @author Bitrix
 	 */
-	public static function ClearAll($user_id, $site_id = SITE_ID)
+	public static function ClearAll($user_id, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -198,10 +270,11 @@ class CAllUserCounter
 			return false;
 
 		$strSQL = "
-			DELETE FROM b_user_counter
+			UPDATE b_user_counter SET
+			CNT = 0
 			WHERE USER_ID = ".$user_id."
 			AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
-		$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if ($site_id == '**')
 		{
@@ -216,6 +289,9 @@ class CAllUserCounter
 
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
 
+		if ($sendPull)
+			self::SendPullEvent($user_id);
+
 		return true;
 	}
 
@@ -226,15 +302,15 @@ class CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param ta $g  Тег, по которому будут удалены счётчики.
+	 * @param ta $g  11.5.6
 	 *
 	 *
 	 *
-	 * @param cod $e  Код удаляемого счётчика.
+	 * @param cod $e  11.5.6
 	 *
 	 *
 	 *
-	 * @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	 * @param site_i $d = SITE_ID 11.5.6
 	 *
 	 *
 	 *
@@ -252,7 +328,7 @@ class CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearbytag.php
 	 * @author Bitrix
 	 */
-	public static function ClearByTag($tag, $code, $site_id = SITE_ID)
+	public static function ClearByTag($tag, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -260,15 +336,127 @@ class CAllUserCounter
 			return false;
 
 		$strSQL = "
-			DELETE FROM b_user_counter
+			UPDATE b_user_counter SET
+			CNT = 0
 			WHERE TAG = '".$DB->ForSQL($tag)."' AND CODE = '".$DB->ForSQL($code)."'
 			AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
-		$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		self::$counters = false;
 		$CACHE_MANAGER->CleanDir("user_counter");
 
+		if ($sendPull && self::CheckLiveMode())
+		{
+			global $DB;
+
+			$arSites = Array();
+			$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+			while ($row = $res->Fetch())
+				$arSites[] = $row['ID'];
+
+			$strSQL = "
+				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				FROM b_user_counter uc
+				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+				WHERE TAG = '".$DB->ForSQL($tag)."' AND CODE = '".$DB->ForSQL($code)."'
+				AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
+
+			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+			$pullMessage = Array();
+			while ($row = $res->Fetch())
+			{
+				if ($row['SITE_ID'] == '**')
+				{
+					foreach ($arSites as $siteId)
+					{
+						if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+						else
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+					}
+				}
+				else
+				{
+					if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
+					else
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
+				}
+			}
+
+			foreach ($pullMessage as $channelId => $arMessage)
+			{
+				CPullStack::AddByChannel($channelId, Array(
+					'module_id' => 'main',
+					'command'   => 'user_counter',
+					'params'    => $arMessage,
+				));
+			}
+		}
+
 		return true;
+	}
+
+	protected static function CheckLiveMode()
+	{
+		return CModule::IncludeModule('pull') && CPullOptions::GetNginxStatus();
+	}
+
+	protected static function SendPullEvent($user_id, $code = "")
+	{
+		$user_id = intval($user_id);
+		if ($user_id <= 0)
+			return false;
+
+		if (self::CheckLiveMode())
+		{
+			global $DB;
+
+			$arSites = Array();
+			$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+			while ($row = $res->Fetch())
+				$arSites[] = $row['ID'];
+
+			$strSQL = "
+				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				FROM b_user_counter uc
+				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+				WHERE uc.USER_ID = ".intval($user_id).(strlen($code) > 0? " AND uc.CODE = '".$DB->ForSQL($code)."'": "")."
+			";
+			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+			$pullMessage = Array();
+			while ($row = $res->Fetch())
+			{
+				if ($row['SITE_ID'] == '**')
+				{
+					foreach ($arSites as $siteId)
+					{
+						if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+						else
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+					}
+				}
+				else
+				{
+					if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
+					else
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
+				}
+			}
+
+			foreach ($pullMessage as $channelId => $arMessage)
+			{
+				CPullStack::AddByChannel($channelId, Array(
+					'module_id' => 'main',
+					'command'   => 'user_counter',
+					'params'    => $arMessage,
+				));
+			}
+		}
 	}
 
 	// legacy function

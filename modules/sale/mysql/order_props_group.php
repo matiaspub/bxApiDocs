@@ -258,7 +258,7 @@ class CSaleOrderPropsGroup extends CAllSaleOrderPropsGroup
 	 *
 	 *
 	 * @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__add.017e008c.php

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителям</a> сайта.
+ * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителям</a> сайта.
  *
  *
  *
@@ -16,30 +16,30 @@ class CAllGuest
 {
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_last_date" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID
 	 * посетителя; </li> <li> <b>s_events</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> сгенерированных
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> сгенерированных
 	 * посетителем; </li> <li> <b>s_sessions</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a> посетителя; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> посетителя; </li> <li>
 	 * <b>s_hits</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a> посетителя; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> посетителя; </li> <li>
 	 * <b>s_first_site_id</b> - ID сайта на который впервые пришел посетитель; </li> <li>
 	 * <b>s_first_date</b> - время первого захода на сайт; </li> <li> <b>s_first_url_from</b> -
 	 * страница с которой впервые пришел посетитель; </li> <li> <b>s_first_url_to</b> -
 	 * страница куда впервые пришел посетитель; </li> <li> <b>s_first_adv_id</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a> первого
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> первого
 	 * захода; </li> <li> <b>s_last_site_id</b> - ID сайта последнего захода посетителя;
 	 * </li> <li> <b>s_last_date</b> - время последнего захода поестителя; </li> <li>
 	 * <b>s_last_user_id</b> - ID пользователя; </li> <li> <b>s_last_url_last</b> - последняя
 	 * страница на которую заходил посетитель; </li> <li> <b>s_last_user_agent</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#user_agent">UserAgent</a> посетителя на
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent</a> посетителя на
 	 * последнем заходе; </li> <li> <b>s_last_ip</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#ip">IP адрес</a> посетителя на
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#ip">IP адрес</a> посетителя на
 	 * последнем заходе; </li> <li> <b>s_last_adv_id</b> - ID рекламной кампании на
 	 * последнем заходе; </li> <li> <b>s_last_country_id</b> - ID страны посетителя на
 	 * последнем заходе. </li> </ul>
@@ -77,7 +77,7 @@ class CAllGuest
 	 * просмотренная посетителем; </li> <li> <b>URL_EXACT_MATCH</b> - если значение
 	 * равно "Y", то при фильтрации по <b>URL</b> будет искаться точное
 	 * совпадение; </li> <li> <b>URL_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на первой странице
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на первой странице
 	 * или на последней странице посещенной посетителем, возможные
 	 * значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> - не было. </li> </ul> </li> <li>
 	 * <b>USER_AGENT</b>* - UserAgent посетителя на последнем заходе; </li> <li>
@@ -89,10 +89,10 @@ class CAllGuest
 	 * приходил никогда ни по одной рекламной кампании (не равной NA/NA).
 	 * </li> </ul> </li> <li> <b>ADV_ID</b> - ID рекламной кампании первого либо
 	 * последнего захода посетителя (при этом это мог быть как <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямой заход</a> так и <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврат</a> по рекламной
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой заход</a> так и <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по рекламной
 	 * кампании); </li> <li> <b>REFERER1</b>* - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_id">идентификатор</a> referer1
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a> referer1
 	 * рекламной кампании первого либо последнего захода посетителя;
 	 * </li> <li> <b>REFERER1_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
 	 * <b>REFERER1</b> будет искаться точное совпадение; </li> <li> <b>REFERER2</b>* -
@@ -100,7 +100,7 @@ class CAllGuest
 	 * захода посетителя; </li> <li> <b>REFERER2_EXACT_MATCH</b> - если значение равно "Y",
 	 * то при фильтрации по <b>REFERER2</b> будет искаться точное совпадение;
 	 * </li> <li> <b>REFERER3</b>* - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_referer3">дополнительный
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_referer3">дополнительный
 	 * параметр</a> referer3 рекламной кампании первого либо последнего
 	 * захода посетителя; </li> <li> <b>REFERER3_EXACT_MATCH</b> - если значение равно "Y",
 	 * то при фильтрации по <b>REFERER3</b> будет искаться точное совпадение;
@@ -114,10 +114,10 @@ class CAllGuest
 	 * сгенерированных посетителем; </li> <li> <b>HITS2</b> - конечное значение
 	 * для интервала кол-ва хитов сгенерированных посетителем; </li> <li>
 	 * <b>FAVORITES</b> - флаг "добавлял ли посетитель сайт в "<a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#favorites">Избранное</a>"", возможные
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>"", возможные
 	 * значения: <ul> <li> <b>Y</b> - добавлял; </li> <li> <b>N</b> - не добавлял. </li> </ul> </li>
 	 * <li> <b>IP</b> - IP адрес посетителя сайта в последнем заходе; </li> <li>
-	 * <b>LANG</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#browser_lang">языки
+	 * <b>LANG</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#browser_lang">языки
 	 * установленные в настройках браузера</a> посетителя в последнем
 	 * заходе; </li> <li> <b>COUNTRY_ID</b>* - ID страны (двухсимвольный идентификатор)
 	 * посетителя в последнем заходе; </li> <li> <b>COUNTRY_ID_EXACT_MATCH</b> - если
@@ -125,14 +125,15 @@ class CAllGuest
 	 * точное совпадение; </li> <li> <b>COUNTRY</b>* - название страны; </li> <li>
 	 * <b>COUNTRY_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
 	 * <b>COUNTRY</b> будет искаться точное совпадение; </li> <li> <b>USER</b>* - ID, логин,
-	 * имя, фамилия <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#user">пользователя</a>,
+	 * имя, фамилия <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user">пользователя</a>,
 	 * под которыми посетитель последний раз был авторизован; </li> <li>
 	 * <b>USER_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по <b>USER</b>
 	 * будет искаться точное совпадение; </li> <li> <b>USER_ID</b>* - ID пользователя,
 	 * под которым посетитель последний раз был авторизован; </li> <li>
 	 * <b>USER_ID_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
 	 * <b>USER_ID</b> будет искаться точное совпадение. </li> </ul> <br> * -
-	 * допускается <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
+	 * логика</a>
 	 *
 	 *
 	 *
@@ -171,7 +172,7 @@ class CAllGuest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">Термин "Посетитель"</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">Термин "Посетитель"</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -513,7 +514,7 @@ class CAllGuest
 
 	
 	/**
-	 * <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителю</a>.</p>
+	 * <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителю</a>.</p>
 	 *
 	 *
 	 *
@@ -541,7 +542,7 @@ class CAllGuest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">Термин "Посетитель"</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">Термин "Посетитель"</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *

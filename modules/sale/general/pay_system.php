@@ -208,7 +208,7 @@ class CAllSalePaySystem
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystem/csalepaysystem__update.cba446b8.php

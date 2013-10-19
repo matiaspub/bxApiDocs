@@ -217,9 +217,11 @@ if (strlen($strExportErrorMessage)<=0)
 
 				$bNoActiveGroup = true;
 				$strTmpOff_tmp = "";
-				$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], true);
+				$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 				while ($ar_res1 = $db_res1->Fetch())
 				{
+					if (0 < intval($ar_res1['ADDITIONAL_PROPERTY_ID']))
+						continue;
 					if (in_array(intval($ar_res1["ID"]), $arAvailGroups))
 					{
 						$strTmpOff_tmp.= "<categoryId>".$ar_res1["ID"]."</categoryId>\n";

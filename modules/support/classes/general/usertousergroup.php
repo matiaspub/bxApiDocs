@@ -98,7 +98,12 @@ class CSupportUser2UserGroup
 		$where = $obQueryWhere->GetQuery($arFilter);
 
 		$strQuery = 'SELECT ' .
-			'UG.*, G.NAME GROUP_NAME, G.IS_TEAM_GROUP, '.
+			'UG.GROUP_ID,
+			UG.USER_ID,
+			UG.CAN_VIEW_GROUP_MESSAGES,
+			UG.CAN_MAIL_GROUP_MESSAGES,
+			UG.CAN_MAIL_UPDATE_GROUP_MESSAGES as UG_CMUGM, '.
+			'G.NAME GROUP_NAME, G.IS_TEAM_GROUP, '.
 			'U.LOGIN, U.NAME FIRST_NAME, U.LAST_NAME ' .
 			'FROM b_ticket_user_ugroup UG ' .
 			'INNER JOIN b_ticket_ugroups G ON (UG.GROUP_ID=G.ID) ' .
@@ -113,7 +118,10 @@ class CSupportUser2UserGroup
 			$strQuery .= ' ORDER BY ' . $strOrder;
 		}
 
-		return $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$res = $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$res->arReplacedAliases = array('UG_CMUGM' => 'CAN_MAIL_UPDATE_GROUP_MESSAGES');
+
+		return $res;
 	}
 
 	public static function Add($arFields)

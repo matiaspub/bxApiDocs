@@ -891,8 +891,7 @@ class CAllVote
 							}
 						endif;
 						/***************** Event onAfterVoting *****************************/
-						$events = GetModuleEvents("vote", "onAfterVoting");
-						while ($arEvent = $events->Fetch())
+						foreach (GetModuleEvents("vote", "onAfterVoting", true) as $arEvent)
 							ExecuteModuleEventEx($arEvent, array($VOTE_ID, $EVENT_ID));
 						/***************** /Event ******************************************/
 					}

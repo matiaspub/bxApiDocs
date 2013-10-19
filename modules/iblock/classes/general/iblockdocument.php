@@ -662,7 +662,7 @@ class CIBlockDocument
 						$r = intval($r);
 						$dbImg = CFile::GetByID($r);
 						if ($arImg = $dbImg->Fetch())
-							$result[] = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($arImg["FILE_NAME"])."&i=".$r."]".htmlspecialcharsbx($arImg["ORIGINAL_NAME"])."[/url]";
+							$result[] = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($arImg["FILE_NAME"])."&i=".$r."&h=".md5($arImg["SUBDIR"])."]".htmlspecialcharsbx($arImg["ORIGINAL_NAME"])."[/url]";
 					}
 				}
 				else
@@ -670,7 +670,7 @@ class CIBlockDocument
 					$fieldValue = intval($fieldValue);
 					$dbImg = CFile::GetByID($fieldValue);
 					if ($arImg = $dbImg->Fetch())
-						$result = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($arImg["FILE_NAME"])."&i=".$fieldValue."]".htmlspecialcharsbx($arImg["ORIGINAL_NAME"])."[/url]";
+						$result = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($arImg["FILE_NAME"])."&i=".$fieldValue."&h=".md5($arImg["SUBDIR"])."]".htmlspecialcharsbx($arImg["ORIGINAL_NAME"])."[/url]";
 				}
 				break;
 
@@ -906,7 +906,7 @@ class CIBlockDocument
 						if ($ar)
 						{
 							$arResult["PROPERTY_".$propertyKey][intval($v)] = $ar["SRC"];
-							$arResult["PROPERTY_".$propertyKey."_printable"][intval($v)] = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($ar["FILE_NAME"])."&i=".$v."]".htmlspecialcharsbx($ar["ORIGINAL_NAME"])."[/url]";
+							$arResult["PROPERTY_".$propertyKey."_printable"][intval($v)] = "[url=/bitrix/tools/bizproc_show_file.php?f=".htmlspecialcharsbx($ar["FILE_NAME"])."&i=".$v."&h=".md5($ar["SUBDIR"])."]".htmlspecialcharsbx($ar["ORIGINAL_NAME"])."[/url]";
 						}
 					}
 				}
@@ -914,6 +914,13 @@ class CIBlockDocument
 				{
 					$arResult["PROPERTY_".$propertyKey] = $propertyValue["VALUE"];
 				}
+			}
+
+			$documentFields = static::GetDocumentFields(static::GetDocumentType($documentId));
+			foreach ($documentFields as $fieldKey => $field)
+			{
+				if (!array_key_exists($fieldKey, $arResult))
+					$arResult[$fieldKey] = null;
 			}
 		}
 
@@ -2034,7 +2041,7 @@ class CIBlockDocument
 				$ar_element["IBLOCK_SECTION"] = array();
 				if($ar_element["IN_SECTIONS"] == "Y")
 				{
-					$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true);
+					$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true, array('ID', 'IBLOCK_ELEMENT_ID'));
 					while($arSection = $rsSections->Fetch())
 						$ar_element["IBLOCK_SECTION"][] = $arSection["ID"];
 				}
@@ -2157,7 +2164,7 @@ class CIBlockDocument
 				$ar_element["IBLOCK_SECTION"] = array();
 				if($ar_element["IN_SECTIONS"] == "Y")
 				{
-					$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true);
+					$rsSections = CIBlockElement::GetElementGroups($ar_element["ID"], true, array('ID', 'IBLOCK_ELEMENT_ID'));
 					while($arSection = $rsSections->Fetch())
 						$ar_element["IBLOCK_SECTION"][] = $arSection["ID"];
 				}

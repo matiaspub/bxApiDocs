@@ -29,9 +29,9 @@ class CSubscription extends CSubscriptionGeneral
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ruapi_help/subscribe/classes/csubscription/csubscriptionfields.php">поля объекта
+	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscription/csubscriptionfields.php">поля объекта
 	 * "Подписка"</a>.</p><a name="examples"></a>
 	 *
 	 *

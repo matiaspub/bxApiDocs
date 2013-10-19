@@ -44,7 +44,7 @@ class CIMHistory
 				M.ID,
 				M.CHAT_ID,
 				M.MESSAGE,
-				".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 				M.AUTHOR_ID,
 				R1.USER_ID R1_USER_ID,
 				R2.USER_ID R2_USER_ID
@@ -56,7 +56,7 @@ class CIMHistory
 			AND R2.USER_ID = ".$toUserId."
 			AND R1.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."'
 			AND M.MESSAGE like '%".$DB->ForSql($searchText)."%'
-			ORDER BY M.ID DESC
+			ORDER BY DATE_CREATE DESC, ID DESC
 		";
 		if (!$bTimeZone)
 			CTimeZone::Enable();
@@ -67,7 +67,7 @@ class CIMHistory
 		$arUsers = Array();
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		while ($arRes = $dbRes->Fetch())
 		{
 			if ($fromUserId == $arRes['AUTHOR_ID'])
@@ -87,7 +87,7 @@ class CIMHistory
 				'id' => $arRes['ID'],
 				'senderId' => $arRes['FROM_USER_ID'],
 				'recipientId' => $arRes['TO_USER_ID'],
-				'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+				'date' => $arRes['DATE_CREATE'],
 				'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 			);
 
@@ -139,7 +139,7 @@ class CIMHistory
 					M.ID,
 					M.CHAT_ID,
 					M.MESSAGE,
-					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.AUTHOR_ID,
 					R1.USER_ID R1_USER_ID,
 					R2.USER_ID R2_USER_ID
@@ -150,7 +150,7 @@ class CIMHistory
 					R1.USER_ID = ".$fromUserId."
 				AND R2.USER_ID = ".$toUserId."
 				AND R1.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."'
-				ORDER BY M.DATE_CREATE DESC, ID DESC
+				ORDER BY M.DATE_CREATE DESC, M.ID DESC
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -159,7 +159,7 @@ class CIMHistory
 
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			while ($arRes = $dbRes->Fetch())
 			{
 				if ($fromUserId == $arRes['AUTHOR_ID'])
@@ -178,7 +178,7 @@ class CIMHistory
 					'id' => $arRes['ID'],
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
-					'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+					'date' => $arRes['DATE_CREATE'],
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 				$arUsers[$convId][] = $arRes['ID'];
@@ -217,7 +217,7 @@ class CIMHistory
 				R1.USER_ID = ".$this->user_id."
 			AND R2.USER_ID = ".$userId."
 			AND R1.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."'
-			GROUP BY M.CHAT_ID
+			GROUP BY M.CHAT_ID, R1.ID, R1.START_ID, R2.ID, R2.START_ID
 		";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
@@ -231,7 +231,7 @@ class CIMHistory
 				$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 			$obCache = new CPHPCache();
-			$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($this->user_id));
+			$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($this->user_id));
 		}
 
 		return true;
@@ -253,7 +253,7 @@ class CIMHistory
 				R1.USER_ID = ".$this->user_id."
 			AND R1.MESSAGE_TYPE = '".IM_MESSAGE_GROUP."'
 			AND R1.CHAT_ID = ".$chatId."
-			GROUP BY M.CHAT_ID
+			GROUP BY M.CHAT_ID, R1.ID
 		";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
@@ -262,7 +262,7 @@ class CIMHistory
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$obCache = new CPHPCache();
-			$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($this->user_id));
+			$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($this->user_id));
 		}
 
 		return true;
@@ -288,7 +288,7 @@ class CIMHistory
 				M.ID,
 				M.CHAT_ID,
 				M.MESSAGE,
-				".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 				M.AUTHOR_ID
 			FROM b_im_relation R1
 			INNER JOIN b_im_message M ON M.ID >= R1.START_ID AND M.CHAT_ID = R1.CHAT_ID
@@ -297,7 +297,7 @@ class CIMHistory
 			AND R1.CHAT_ID = ".$chatId."
 			AND R1.MESSAGE_TYPE = '".IM_MESSAGE_GROUP."'
 			AND M.MESSAGE like '%".$DB->ForSql($searchText)."%'
-			ORDER BY M.ID DESC
+			ORDER BY M.DATE_CREATE DESC, M.ID DESC
 		";
 		if (!$bTimeZone)
 			CTimeZone::Enable();
@@ -308,14 +308,14 @@ class CIMHistory
 		$usersMessage = Array();
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		while ($arRes = $dbRes->Fetch())
 		{
 			$arMessages[$arRes['ID']] = Array(
 				'id' => $arRes['ID'],
 				'senderId' => $arRes['AUTHOR_ID'],
 				'recipientId' => $arRes['CHAT_ID'],
-				'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+				'date' => $arRes['DATE_CREATE'],
 				'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 			);
 
@@ -355,12 +355,12 @@ class CIMHistory
 					M.ID,
 					M.CHAT_ID,
 					M.MESSAGE,
-					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.AUTHOR_ID
 				FROM b_im_message M
 				INNER JOIN b_im_relation R1 ON M.ID >= R1.START_ID AND M.CHAT_ID = R1.CHAT_ID
 				WHERE R1.CHAT_ID = ".$chatId." AND R1.USER_ID = ".$this->user_id."
-				ORDER BY M.DATE_CREATE DESC, ID DESC
+				ORDER BY M.DATE_CREATE DESC, M.ID DESC
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -369,14 +369,14 @@ class CIMHistory
 
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			while ($arRes = $dbRes->Fetch())
 			{
 				$arMessages[$arRes['ID']] = Array(
 					'id' => $arRes['ID'],
 					'senderId' => $arRes['AUTHOR_ID'],
 					'recipientId' => $arRes['CHAT_ID'],
-					'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+					'date' => $arRes['DATE_CREATE'],
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 

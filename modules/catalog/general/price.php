@@ -1,9 +1,6 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-/***********************************************************************/
-/***********  CPrice  **************************************************/
-/***********************************************************************/
 
 /**
  * 
@@ -21,19 +18,20 @@ class CAllPrice
 {
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		if ((is_set($arFields, "PRODUCT_ID") || $ACTION=="ADD") && IntVal($arFields["PRODUCT_ID"]) <= 0)
+		global $APPLICATION;
+		if ((is_set($arFields, "PRODUCT_ID") || $ACTION=="ADD") && intval($arFields["PRODUCT_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("KGP_EMPTY_PRODUCT"), "EMPTY_PRODUCT_ID");
+			$APPLICATION->ThrowException(GetMessage("KGP_EMPTY_PRODUCT"), "EMPTY_PRODUCT_ID");
 			return false;
 		}
-		if ((is_set($arFields, "CATALOG_GROUP_ID") || $ACTION=="ADD") && IntVal($arFields["CATALOG_GROUP_ID"]) <= 0)
+		if ((is_set($arFields, "CATALOG_GROUP_ID") || $ACTION=="ADD") && intval($arFields["CATALOG_GROUP_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("KGP_EMPTY_CATALOG_GROUP"), "EMPTY_CATALOG_GROUP_ID");
+			$APPLICATION->ThrowException(GetMessage("KGP_EMPTY_CATALOG_GROUP"), "EMPTY_CATALOG_GROUP_ID");
 			return false;
 		}
 		if ((is_set($arFields, "CURRENCY") || $ACTION=="ADD") && strlen($arFields["CURRENCY"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("KGP_EMPTY_CURRENCY"), "EMPTY_CURRENCY");
+			$APPLICATION->ThrowException(GetMessage("KGP_EMPTY_CURRENCY"), "EMPTY_CURRENCY");
 			return false;
 		}
 
@@ -43,12 +41,12 @@ class CAllPrice
 			$arFields["PRICE"] = DoubleVal($arFields["PRICE"]);
 		}
 
-		if ((is_set($arFields, "QUANTITY_FROM") || $ACTION=="ADD") && IntVal($arFields["QUANTITY_FROM"]) <= 0)
-			$arFields["QUANTITY_FROM"] = False;
-		if ((is_set($arFields, "QUANTITY_TO") || $ACTION=="ADD") && IntVal($arFields["QUANTITY_TO"]) <= 0)
-			$arFields["QUANTITY_TO"] = False;
+		if ((is_set($arFields, "QUANTITY_FROM") || $ACTION=="ADD") && intval($arFields["QUANTITY_FROM"]) <= 0)
+			$arFields["QUANTITY_FROM"] = false;
+		if ((is_set($arFields, "QUANTITY_TO") || $ACTION=="ADD") && intval($arFields["QUANTITY_TO"]) <= 0)
+			$arFields["QUANTITY_TO"] = false;
 
-		return True;
+		return true;
 	}
 
 	
@@ -94,7 +92,7 @@ class CAllPrice
 	 * цены и <i>false</i> - в противном случае. Для получения детальной
 	 * информации об ошибке следует вызвать
 	 * <b>$APPLICATION-&gt;GetException()</b>.</p><h4>События</h4><p>Метод работает с событиями
-	 * <a href="http://dev.1c-bitrix.ruapi_help/catalog/events/onbeforepriceupdate.php">OnBeforePriceUpdate</a> и
+	 * <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">OnBeforePriceUpdate</a> и
 	 * OnPriceUpdate.</p><h4>Примечания</h4><p>Если параметр $boolRecalc = true, все равно
 	 * необходимо указывать цену и валюту (в том случае, когда тип цены -
 	 * не базовый). Если существует базовая цена, значения цены и валюты
@@ -142,10 +140,10 @@ class CAllPrice
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/catalog/fields.php">Структура таблицы</a></li>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
 	 * <li>CPrice::CheckFields</li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/add.php">CPrice::Add</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onbeforepriceupdate.php">Событие
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">Событие
 	 * OnBeforePriceUpdate</a></li> <li>Событие OnPriceUpdate</li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -157,9 +155,9 @@ class CAllPrice
 	{
 		global $DB;
 
-		$ID = IntVal($ID);
+		$ID = intval($ID);
 		if ($ID <= 0)
-			return False;
+			return false;
 
 		if (!CPrice::CheckFields("UPDATE", $arFields, $ID))
 			return false;
@@ -167,28 +165,33 @@ class CAllPrice
 		$boolBase = false;
 		$arFields['RECALC'] = ($boolRecalc === true ? true : false);
 
-		$db_events = GetModuleEvents("catalog", "OnBeforePriceUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnBeforePriceUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
+		}
 
-		if (!empty($arFields['RECALC']) && $arFields['RECALC'] === true)
+		if (array_key_exists('RECALC', $arFields) && $arFields['RECALC'] === true)
 		{
-			CPrice::ReCountFromBase($arFields,$boolBase);
+			CPrice::ReCountFromBase($arFields, $boolBase);
 		}
 
 		$strUpdate = $DB->PrepareUpdate("b_catalog_price", $arFields);
-		$strSql = "UPDATE b_catalog_price SET ".$strUpdate." WHERE ID = ".$ID." ";
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if (!empty($strUpdate))
+		{
+			$strSql = "UPDATE b_catalog_price SET ".$strUpdate." WHERE ID = ".$ID;
+			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
 
-		if ($boolBase == true)
+		if ($boolBase)
 		{
 			CPrice::ReCountForBase($arFields);
 		}
 
-		$events = GetModuleEvents("catalog", "OnPriceUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnPriceUpdate", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+		}
 
 		return $ID;
 	}
@@ -217,10 +220,10 @@ class CAllPrice
 	 *
 	 * <h4>See Also</h4> 
 	 * <p><b>Методы</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
 	 * </ul><p><b>События</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onbeforepricedelete.php">OnProductPriceDelete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onpricedelete.php">OnPriceDelete</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepricedelete.php">OnProductPriceDelete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpricedelete.php">OnPriceDelete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -231,20 +234,22 @@ class CAllPrice
 	public static function Delete($ID)
 	{
 		global $DB;
-		$ID = IntVal($ID);
+		$ID = intval($ID);
 		if ($ID <= 0)
 			return false;
 
-		$db_events = GetModuleEvents("catalog", "OnBeforePriceDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnBeforePriceDelete", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
+		}
 
-		$mxRes = $DB->Query("DELETE FROM b_catalog_price WHERE ID = ".$ID." ", true);
+		$mxRes = $DB->Query("DELETE FROM b_catalog_price WHERE ID = ".$ID, true);
 
-		$events = GetModuleEvents("catalog", "OnPriceDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnPriceDelete", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ID));
+		}
 
 		return $mxRes;
 	}
@@ -308,11 +313,11 @@ class CAllPrice
 	{
 		global $DB;
 
-		$productID = IntVal($productID);
+		$productID = intval($productID);
 		if ($quantityFrom !== false)
-			$quantityFrom = IntVal($quantityFrom);
+			$quantityFrom = intval($quantityFrom);
 		if ($quantityTo !== false)
-			$quantityTo = IntVal($quantityTo);
+			$quantityTo = intval($quantityTo);
 
 		$arFilter = array(
 				"BASE" => "Y",
@@ -368,7 +373,7 @@ class CAllPrice
 	 *
 	 *
 	 * @return bool <p>Возвращает значение <i>true</i> в случае успешного сохранения цены и
-	 * <i>false</i> - в противном случае. </p>
+	 * <i>false</i> - в противном случае. </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__setbaseprice.a8de1fcf.php
@@ -383,14 +388,13 @@ class CAllPrice
 		$arFields = array();
 		$arFields["PRICE"] = DoubleVal($Price);
 		$arFields["CURRENCY"] = $Currency;
-		$arFields["QUANTITY_FROM"] = IntVal($quantityFrom);
-		$arFields["QUANTITY_TO"] = IntVal($quantityTo);
-		$arFields["EXTRA_ID"] = False;
+		$arFields["QUANTITY_FROM"] = intval($quantityFrom);
+		$arFields["QUANTITY_TO"] = intval($quantityTo);
+		$arFields["EXTRA_ID"] = false;
 
 		$ID = false;
 		if ($arBasePrice = CPrice::GetBasePrice($ProductID, $quantityFrom, $quantityTo))
 		{
-			//CPrice::Update($arBasePrice["ID"], $arFields);
 			$ID = CPrice::Update($arBasePrice["ID"], $arFields);
 		}
 		else
@@ -399,7 +403,6 @@ class CAllPrice
 			$arFields["CATALOG_GROUP_ID"] = $arBaseGroup["ID"];
 			$arFields["PRODUCT_ID"] = $ProductID;
 
-			//CPrice::Add($arFields);
 			$ID = CPrice::Add($arFields);
 		}
 		if (!$ID)
@@ -414,36 +417,49 @@ class CAllPrice
 
 	public static function ReCalculate($TYPE, $ID, $VAL)
 	{
-		$ID = IntVal($ID);
-		if ($TYPE=="EXTRA")
+		$ID = intval($ID);
+		if (0 < $ID)
 		{
-			$db_res = CPrice::GetList(
-					array("EXTRA_ID" => "ASC"),
-					array("EXTRA_ID" => $ID)
-				);
-			while ($res = $db_res->Fetch())
+			if ('EXTRA' == $TYPE)
 			{
-				unset($arFields);
-				$arFields = array();
-				if ($arBasePrice = CPrice::GetBasePrice($res["PRODUCT_ID"], $res["QUANTITY_FROM"], $res["QUANTITY_TO"]))
+				$db_res = CPrice::GetList(
+					array(),
+					array('EXTRA_ID' => $ID),
+					false,
+					false,
+					array('ID', 'PRODUCT_ID', 'EXTRA_ID', 'QUANTITY_FROM', 'QUANTITY_TO')
+				);
+				while ($res = $db_res->Fetch())
 				{
-					$arFields["PRICE"] = RoundEx($arBasePrice["PRICE"] * (1 + 1 * $VAL / 100), 2);
-					$arFields["CURRENCY"] = $arBasePrice["CURRENCY"];
-					CPrice::Update($res["ID"], $arFields);
+					$arFields = array();
+					if ($arBasePrice = CPrice::GetBasePrice($res["PRODUCT_ID"], $res["QUANTITY_FROM"], $res["QUANTITY_TO"]))
+					{
+						$arFields["PRICE"] = RoundEx($arBasePrice["PRICE"] * (1 + 1 * $VAL / 100), 2);
+						$arFields["CURRENCY"] = $arBasePrice["CURRENCY"];
+						CPrice::Update($res["ID"], $arFields);
+					}
 				}
 			}
-		}
-		else
-		{
-			$db_res = CPrice::GetList(array("PRODUCT_ID" => "ASC"), array("PRODUCT_ID" => $ID));
-			while ($res = $db_res->Fetch())
+			else
 			{
-				if (IntVal($res["EXTRA_ID"])>0)
+				$db_res = CPrice::GetList(
+					array(),
+					array("PRODUCT_ID" => $ID),
+					false,
+					false,
+					array('ID', 'PRODUCT_ID', 'EXTRA_ID')
+				);
+				while ($res = $db_res->Fetch())
 				{
-					$res1 = CExtra::GetByID($res["EXTRA_ID"]);
-					unset($arFields);
-					$arFields["PRICE"] = $VAL * (1 + 1 * $res1["PERCENTAGE"] / 100);
-					CPrice::Update($res["ID"], $arFields);
+					$res["EXTRA_ID"] = intval($res["EXTRA_ID"]);
+					if (0 < $res["EXTRA_ID"])
+					{
+						$res1 = CExtra::GetByID($res["EXTRA_ID"]);
+						$arFields = array(
+							"PRICE" => $VAL * (1 + 1 * $res1["PERCENTAGE"] / 100),
+						);
+						CPrice::Update($res["ID"], $arFields);
+					}
 				}
 			}
 		}
@@ -452,23 +468,20 @@ class CAllPrice
 	public static function OnCurrencyDelete($Currency)
 	{
 		global $DB;
-		if (strlen($Currency)<=0) return false;
+		if ('' == $Currency)
+			return false;
 
-		$strSql =
-			"DELETE FROM b_catalog_price ".
-			"WHERE CURRENCY = '".$DB->ForSql($Currency)."' ";
-
+		$strSql = "DELETE FROM b_catalog_price WHERE CURRENCY = '".$DB->ForSql($Currency)."'";
 		return $DB->Query($strSql, true);
 	}
 
 	public static function OnIBlockElementDelete($ProductID)
 	{
 		global $DB;
-		$ProductID = IntVal($ProductID);
-		$strSql =
-			"DELETE ".
-			"FROM b_catalog_price ".
-			"WHERE PRODUCT_ID = ".$ProductID." ";
+		$ProductID = intval($ProductID);
+		if (0 >= $ProductID)
+			return false;
+		$strSql = "DELETE FROM b_catalog_price WHERE PRODUCT_ID = ".$ProductID;
 		return $DB->Query($strSql, true);
 	}
 
@@ -503,10 +516,10 @@ class CAllPrice
 	 *
 	 * <h4>See Also</h4> 
 	 * <p><b>Методы</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
 	 * </ul><p><b>События</b></p><ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -518,31 +531,33 @@ class CAllPrice
 	{
 		global $DB;
 
-		$ProductID = IntVal($ProductID);
+		$ProductID = intval($ProductID);
 		if ($ProductID <= 0)
 			return false;
-		$db_events = GetModuleEvents("catalog", "OnBeforeProductPriceDelete");
-		while ($arEvent = $db_events->Fetch())
-			if (ExecuteModuleEventEx($arEvent, array($ProductID,&$arExceptionIDs))===false)
+		foreach (GetModuleEvents("catalog", "OnBeforeProductPriceDelete", true) as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array($ProductID, &$arExceptionIDs))===false)
 				return false;
+		}
 
-		for ($i = 0, $intCount = count($arExceptionIDs); $i < $intCount; $i++)
-			$arExceptionIDs[$i] = intval($arExceptionIDs[$i]);
-		$arExceptionIDs[] = 0;
+		if (!empty($arExceptionIDs))
+			CatalogClearArray($arExceptionIDs, false);
 
-		$strExceptionIDs = implode(',',$arExceptionIDs);
-
-		$strSql =
-			"DELETE ".
-			"FROM b_catalog_price ".
-			"WHERE PRODUCT_ID = ".$ProductID." ".
-			"	AND ID NOT IN (".$strExceptionIDs.") ";
+		if (!empty($arExceptionIDs))
+		{
+			$strSql = "DELETE FROM b_catalog_price WHERE PRODUCT_ID = ".$ProductID." AND ID NOT IN (".implode(',',$arExceptionIDs).")";
+		}
+		else
+		{
+			$strSql = "DELETE FROM b_catalog_price WHERE PRODUCT_ID = ".$ProductID;
+		}
 
 		$mxRes = $DB->Query($strSql, true);
 
-		$events = GetModuleEvents("catalog", "OnProductPriceDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnProductPriceDelete", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ProductID,$arExceptionIDs));
+		}
 
 		return $mxRes;
 	}

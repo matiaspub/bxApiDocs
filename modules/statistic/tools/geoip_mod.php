@@ -74,7 +74,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		return $ar;
 	}
 
-	public function GetDescription()
+	public static function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_geoip_mod",
@@ -86,7 +86,7 @@ class CCityLookup_geoip_mod extends CCityLookup
 		);
 	}
 
-	public function IsInstalled()
+	public static function IsInstalled()
 	{
 		return $this->is_installed;
 	}

@@ -25,13 +25,13 @@ class CCountry
 	 * двухсимвольный идентификатор страны; </li> <li> <b>s_short_name</b> -
 	 * трехсимвольный идентификатор страны; </li> <li> <b>s_name</b> -
 	 * наименование страны; </li> <li> <b>s_sessions</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a> по данной стране;
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> по данной стране;
 	 * </li> <li> <b>s_new_guests</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#new_guest">новых посетителей</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> по
 	 * данной стране; </li> <li> <b>s_hits</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a> по данной стране; </li> <li>
-	 * <b>s_events</b> - суммарное кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> по данной стране.
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> по данной стране; </li>
+	 * <li> <b>s_events</b> - суммарное кол-во <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> по данной стране.
 	 * </li> </ul>
 	 *
 	 *
@@ -60,7 +60,7 @@ class CCountry
 	 * хитов"; </li> <li> <b>EVENTS1</b> - начальное значение интервала для поля
 	 * "кол-во событий"; </li> <li> <b>EVENTS2</b> - конечное значение интервала для
 	 * поля "кол-во событий". <br><br> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a> </li> </ul>
 	 *
 	 *
 	 *
@@ -109,8 +109,8 @@ class CCountry
 	 * <ul> <li>Пользовательскую документацию, <a
 	 * href="http://www.1c-bitrix.ru/user_help/statistic/settings.php">настройки модуля
 	 * "Статистика"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectbox.php">SelectBox</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectbox.php">SelectBox</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -243,13 +243,13 @@ class CCountry
 	 * цвет линии графика и сектора круговой диаграммы для каждой
 	 * страны. Структура данного массива: <pre>Array<br>(<br> [<i>ID страны</i>] =&gt;
 	 * Array<br> (<br> [NAME] =&gt; название страны<br> [SESSIONS] =&gt; кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a> за <i>интервал
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> за <i>интервал
 	 * времени</i><br> [NEW_GUESTS] =&gt; кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#new_guest">новых посетителей</a> за
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> за
 	 * <i>интервал времени</i><br> [HITS] =&gt; кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a> за <i>интервал
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> за <i>интервал
 	 * времени</i><br> [C_EVENTS] =&gt; кол-во <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> за <i>интервал
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> за <i>интервал
 	 * времени</i><br> [TOTAL_SESSIONS] =&gt; суммарное кол-во сессий<br> [TOTAL_NEW_GUESTS] =&gt;
 	 * суммарное кол-во новых посетителей<br> [TOTAL_HITS] =&gt; суммарное кол-во
 	 * хитов<br> [TOTAL_C_EVENTS] =&gt; суммарное кол-во событий<br> [COLOR] =&gt; цвет

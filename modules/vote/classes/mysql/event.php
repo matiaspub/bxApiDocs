@@ -89,12 +89,8 @@ class CVoteEvent extends CAllVoteEvent
 					}
 					break;
 				case "BGETVOTERS":
-					if ($val == "Y" || $val > 0)
-					{
-						$arSqlGroup[] = $arSqlSelect[] = "VU.AUTH_USER_ID";
-						$arSqlSearch[] = "VU.AUTH_USER_ID > 0";
-						$arFilter["bGetVoters"] = intval($val == "Y" ? $GLOBALS["USER"]->GetID() : $val);
-					}
+					$arSqlSearch[] = "VU.AUTH_USER_ID > 0";
+					$arFilter["bGetVoters"] = intval($val === "Y" ? $GLOBALS["USER"]->GetID() : $val);
 					break;
 				case "BGETEVENTRESULTS":
 					$arFilter["bGetEventResults"] = intval($arFilter["bGetEventResults"]);
@@ -129,25 +125,24 @@ class CVoteEvent extends CAllVoteEvent
 				" INNER JOIN b_vote_event_answer VEA ON (VEA.EVENT_QUESTION_ID = VEQ.ID) ".
 				" LEFT JOIN b_vote_user VU ON (VU.ID = VE.VOTE_USER_ID)".
 				" WHERE 1=1 ".$strSqlSearch.
-				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID".$strSqlGroup.") VEG";
+				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID".$strSqlGroup.") VEG";
 			$db_res = $GLOBALS["DB"]->Query($strSql);
 			if ($db_res && ($res = $db_res->Fetch()))
 			{
-				$strSql = "SELECT VEQ.QUESTION_ID, VEA.ANSWER_ID, COUNT(VEA.ID) as COUNTER, ".
-					" MIN(TIMESTAMPDIFF(SECOND, VE.DATE_VOTE, NOW())) AS LAST_VOTE, ".
+				$strSql = "SELECT VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID, COUNT(DISTINCT VEA.ID) as COUNTER, \n\t".
+					"MIN(TIMESTAMPDIFF(SECOND, VE.DATE_VOTE, NOW())) AS LAST_VOTE, \n\t".
 					($arFilter["bGetVoters"] > 0 ?
-						" SUM(case when RV0.ID is not null then 1 else 0 end) RANK, " : " 0 as RANK, ").
-					" MAX(RV.VALUE) RV_VALUE, MAX(RV.ID) RV_ID".$strSqlSelect.
-				" FROM b_vote_event VE ".
-					" INNER JOIN b_vote_event_question VEQ ON (VEQ.EVENT_ID = VE.ID) ".
-					" INNER JOIN b_vote_event_answer VEA ON (VEA.EVENT_QUESTION_ID = VEQ.ID) ".
-					" LEFT JOIN b_vote_user VU ON (VU.ID = VE.VOTE_USER_ID)".
-					" LEFT JOIN b_rating_vote RV ON (RV.USER_ID = VU.AUTH_USER_ID)".
+						"SUM(case when RV0.ID is not null then 1 else 0 end) RANK" : "0 as RANK").$strSqlSelect."\n".
+				"FROM b_vote_event VE \n\t".
+					"INNER JOIN b_vote_event_question VEQ ON (VEQ.EVENT_ID = VE.ID) \n\t".
+					"INNER JOIN b_vote_event_answer VEA ON (VEA.EVENT_QUESTION_ID = VEQ.ID) \n\t".
+					"LEFT JOIN b_vote_user VU ON (VU.ID = VE.VOTE_USER_ID)\n\t".
+					"LEFT JOIN b_rating_user RV ON (RV.ENTITY_ID = VU.AUTH_USER_ID)\n".
 					($arFilter["bGetVoters"] > 0 ?
-						" LEFT JOIN b_rating_vote RV0 ON (RV0.USER_ID = ".intval($arFilter["bGetVoters"])." AND RV0.OWNER_ID = RV.USER_ID) " : "").
-				" WHERE 1=1 ".$strSqlSearch.
-				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID".$strSqlGroup.
-				" ORDER BY RANK DESC, RV_VALUE DESC, RV_ID DESC";
+						"\tLEFT JOIN b_rating_vote RV0 ON (RV0.USER_ID = ".$arFilter["bGetVoters"]." AND RV0.OWNER_ID = VU.AUTH_USER_ID) \n" : "").
+				" WHERE 1=1 ".$strSqlSearch."\n".
+				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID".$strSqlGroup."\n".
+				" ORDER BY ".(IsModuleInstalled("intranet") ? "RV.VOTE_WEIGHT DESC, RANK DESC" : "RANK DESC, RV.VOTE_WEIGHT DESC");
 				$db_res = new CDBResult();
 				$db_res->NavQuery($strSql, $res["CNT"], $arParams);
 			}

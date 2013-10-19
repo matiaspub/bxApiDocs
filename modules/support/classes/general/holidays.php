@@ -26,7 +26,7 @@ class CSupportHolidays
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/" . $module_id . "/install/version.php");
-		return "<br>Module: " . $module_id . " (" . $arModuleVersion["VERSION"] . ")<br>Class: CSupportHolidays<br>File: " . __FILE__;
+		return "<br>Module: " . $module_id . " <br>Class: CSupportHolidays<br>File: " . __FILE__;
 	}
 	
 	public static function Set($arFields, $arFieldsSLA) //$arFields, $arFieldsSLA = array(0 => array("HOLIDAYS_ID" => 1, "SLA_ID" => 1), 1 => array("HOLIDAYS_ID" => 2, "SLA_ID" => 2) ...)
@@ -67,23 +67,36 @@ class CSupportHolidays
 		$table_s2h = self::table_s2h; 
 		
 		$isNew = ($f->ID <= 0);
-		
+
+		$objError = new CAdminException(array());
 		if(strlen($f->NAME) <= 0)
 		{
-				$APPLICATION->ThrowException(GetMessage('SUP_ERROR_EMPTY_NAME'));
-				return false;
+			$objError->AddMessage(array("text" => GetMessage('SUP_ERROR_EMPTY_NAME')));
 		}
 		if(strlen($f->OPEN_TIME) <= 0)
 		{
-				$APPLICATION->ThrowException(GetMessage('SUP_ERROR_EMPTY_OPEN_TIME'));
-				return false;
+			$objError->AddMessage(array("text" => GetMessage('SUP_ERROR_EMPTY_OPEN_TIME')));
 		}
 		$zd = mktime(0, 0, 0, 1, 1, 2010);
-		if($f->OPEN_TIME == "CUSTOM" && ($f->DATE_FROM < $zd || $f->DATE_TILL < $zd))
+		if($f->DATE_FROM < $zd || $f->DATE_FROM === null || $f->DATE_TILL < $zd || $f->DATE_TILL === null || $f->DATE_FROM > $f->DATE_TILL)
 		{
-				$APPLICATION->ThrowException(GetMessage('SUP_ERROR_EMPTY_DATE'));
-				return false;
-		}	
+			if($f->DATE_FROM < $zd || $f->DATE_FROM === null)
+			{
+				$f->DATE_FROM = time() + CTimeZone::GetOffset();
+			}
+
+			if($f->DATE_TILL < $zd || $f->DATE_TILL === null)
+			{
+				$f->DATE_TILL = time() + CTimeZone::GetOffset();
+			}
+			$objError->AddMessage(array("text" => GetMessage('SUP_ERROR_EMPTY_DATE')));
+		}
+
+		if(count($objError->GetMessages())>0)
+		{
+			$APPLICATION->ThrowException($objError);
+			return false;
+		}
 		
 		$arFields_i = $f->ToArray(CSupportTableFields::ALL, array(CSupportTableFields::NOT_NULL), true);
 		$res = 0;
@@ -180,10 +193,21 @@ class CSupportHolidays
 			if(is_array($arDiff) && count($arDiff) > 0) foreach($arDiff as $value) unset($arSort[$value]);
 		}
 		if(count($arSort) <= 0) $arSort = array("ID" => "ASC");
+		$fs = "";
 		foreach($arSort as $by => $order) 
 		{
 			if(strtoupper($order) != "DESC") $order="ASC";
-			$arSqlOrder[] = $by . " " . $order;
+			if($by === "DATE_TILL" || $by === "DATE_FROM")
+			{
+				$fs .= ",
+				" . $by . " " . $by . "_SORT";
+				$arSqlOrder[] = $by . "_SORT " . $order;
+			}
+			else
+			{
+				$arSqlOrder[] = $by . " " . $order;
+			}
+			
 		}
 		if(is_array($arSqlOrder) && count($arSqlOrder) > 0) $strSqlOrder = " ORDER BY " . implode(",", $arSqlOrder);
 
@@ -194,7 +218,7 @@ class CSupportHolidays
 				H.DESCRIPTION,
 				H.OPEN_TIME,
 				" . $DB->DateToCharFunction("H.DATE_FROM", "FULL") . " DATE_FROM,
-				" . $DB->DateToCharFunction("H.DATE_TILL", "FULL") . " DATE_TILL
+				" . $DB->DateToCharFunction("H.DATE_TILL", "FULL") . " DATE_TILL" . $fs . "
 			FROM
 				$table H
 			WHERE
@@ -283,7 +307,9 @@ class CSupportHolidays
 		$isAdmin = null;
 		$isAccess = null;
 		$userID = null;
+
 		CTicket::GetRoles($isDemo, $isSupportClient, $isSupportTeam, $isAdmin, $isAccess, $userID, $checkRights);
+
 		if(!$isAdmin)
 		{
 			$arMsg = Array();
@@ -292,12 +318,24 @@ class CSupportHolidays
 			$APPLICATION->ThrowException($e);
 			return false;
 		}
-		
+
+		// get affected sla
+		$affected_sla = array();
+
+		$res = $DB->Query("SELECT SLA_ID FROM b_ticket_sla_2_holidays WHERE HOLIDAYS_ID = $id");
+		while ($row = $res->Fetch())
+		{
+			$affected_sla[] = $row['SLA_ID'];
+		}
+
+		// delete
 		$DB->Query("DELETE FROM $table WHERE ID = $id", false, $err_mess . __LINE__);
 		$DB->Query("DELETE FROM $table_s2h WHERE HOLIDAYS_ID = $id", false, $err_mess . __LINE__);
-		CSupportTimetableCache::toCache();
+
+		// recalculate only affected sla
+		CSupportTimetableCache::toCache(array("SLA_ID" => $affected_sla));
+
 		return true;
-				
 	}
 	
 }

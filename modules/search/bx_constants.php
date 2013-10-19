@@ -16,7 +16,7 @@ define('CACHED_b_search_tags_len', 2);
 /**
  * START_EXEC_TIME
  */
-define('START_EXEC_TIME', getmicrotime());
+define('START_EXEC_TIME', getmicrotime);
 
 /**
  * BX_SEARCH_VERSION

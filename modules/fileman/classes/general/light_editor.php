@@ -2,7 +2,6 @@
 IncludeModuleLangFile(__FILE__);
 class CLightHTMLEditor // LHE
 {
-	var $ownerType;
 	public function Init(&$arParams)
 	{
 		global $USER, $APPLICATION;
@@ -226,6 +225,7 @@ class CLightHTMLEditor // LHE
 				if(JCLightHTMLEditor.items['<?= $this->Id?>'] == undefined)
 				{
 					top.<?=$this->jsObjName?> = window.<?=$this->jsObjName?> = new window.JCLightHTMLEditor(<?=CUtil::PhpToJSObject($this->JSConfig)?>);
+					BX.onCustomEvent(window, 'LHE_ConstructorInited', [window.<?=$this->jsObjName?>]);
 				}
 			}
 

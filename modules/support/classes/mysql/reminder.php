@@ -7,7 +7,7 @@ class CTicketReminder extends CAllTicketReminder
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CTicketReminder<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CTicketReminder<br>File: ".__FILE__;
 	}
 }
 ?>

@@ -64,7 +64,7 @@ final class Configuration
 		$data = var_export($this->data, true);
 
 		if (!is_writable($path))
-			@chmod($path, 0600);
+			@chmod($path, 0644);
 		file_put_contents($path, "<"."?php\n\$data=".$data.";\n");
 	}
 

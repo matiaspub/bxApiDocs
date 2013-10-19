@@ -1,9 +1,6 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/product_group.php");
 
-/***********************************************************************/
-/***********  CCatalogProductGroups  ***********************************/
-/***********************************************************************/
 
 /**
  * 
@@ -40,7 +37,7 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 	 *
 	 *
 	 * @return bool <p>Метод возвращает код вставленной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.add.php
@@ -55,9 +52,7 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 
 		$arInsert = $DB->PrepareInsert("b_catalog_product2group", $arFields);
 
-		$strSql =
-			"INSERT INTO b_catalog_product2group(".$arInsert[0].") ".
-			"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_catalog_product2group(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$ID = intval($DB->LastID());
@@ -97,33 +92,31 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
 	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
 	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
-	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
-	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле
-	 * заказов.<br><br> Пример фильтра: <pre class="syntax">array("PRODUCT_ID" =&gt; 150)</pre> Этот
-	 * фильтр означает "выбрать все записи, в которых значение в поле
-	 * PRODUCT_ID (код товара) равно 150".<br><br> Значение по умолчанию - пустой
-	 * массив array() - означает, что результат отфильтрован не будет.
+	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
+	 * значение поля меньше или равно передаваемой в фильтр
+	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
+	 * фильтр величины;</b></li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле заказов.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("PRODUCT_ID" =&gt; 150)</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле PRODUCT_ID (код товара) равно 150".<br><br>
+	 * Значение по умолчанию - пустой массив array() - означает, что
+	 * результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
-	 * "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле записи. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
+	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	 * "название_поля<i>N</i>" может стоять любое поле записи.<br><br> Если
+	 * массив пустой, то функция вернет число записей, удовлетворяющих
+	 * фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	 * результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -155,7 +148,7 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 	 * полугодие, "Y" - год);</li> <li> <b>GROUP_ACTIVE</b> - флаг активности группы
 	 * пользователей;</li> <li> <b>GROUP_NAME</b> - название группы пользователей.</li>
 	 * </ul><p>Если в качестве параметра arGroupBy передается пустой массив, то
-	 * функция вернет число записей, удовлетворяющих фильтру.</p>
+	 * функция вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.getlist.php
@@ -166,58 +159,55 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 		global $DB;
 
 		$arFields = array(
-				"ID" => array("FIELD" => "CPG.ID", "TYPE" => "int"),
-				"PRODUCT_ID" => array("FIELD" => "CPG.PRODUCT_ID", "TYPE" => "int"),
-				"GROUP_ID" => array("FIELD" => "CPG.GROUP_ID", "TYPE" => "int"),
-				"ACCESS_LENGTH" => array("FIELD" => "CPG.ACCESS_LENGTH", "TYPE" => "int"),
-				"ACCESS_LENGTH_TYPE" => array("FIELD" => "CPG.ACCESS_LENGTH_TYPE", "TYPE" => "char"),
-				"GROUP_ACTIVE" => array("FIELD" => "G.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_group G ON (CPG.GROUP_ID = G.ID)"),
-				"GROUP_NAME" => array("FIELD" => "G.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_group G ON (CPG.GROUP_ID = G.ID)")
-			);
+			"ID" => array("FIELD" => "CPG.ID", "TYPE" => "int"),
+			"PRODUCT_ID" => array("FIELD" => "CPG.PRODUCT_ID", "TYPE" => "int"),
+			"GROUP_ID" => array("FIELD" => "CPG.GROUP_ID", "TYPE" => "int"),
+			"ACCESS_LENGTH" => array("FIELD" => "CPG.ACCESS_LENGTH", "TYPE" => "int"),
+			"ACCESS_LENGTH_TYPE" => array("FIELD" => "CPG.ACCESS_LENGTH_TYPE", "TYPE" => "char"),
+			"GROUP_ACTIVE" => array("FIELD" => "G.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_group G ON (CPG.GROUP_ID = G.ID)"),
+			"GROUP_NAME" => array("FIELD" => "G.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_group G ON (CPG.GROUP_ID = G.ID)")
+		);
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_catalog_product2group CPG ".
-				"	".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product2group CPG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
-				return False;
+				return false;
 		}
 
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-			"FROM b_catalog_product2group CPG ".
-			"	".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_product2group CPG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-				"FROM b_catalog_product2group CPG ".
-				"	".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_product2group CPG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -237,9 +227,10 @@ class CCatalogProductGroups extends CAllCatalogProductGroups
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 

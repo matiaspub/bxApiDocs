@@ -198,7 +198,6 @@ class CPullPush
 		return $res;
 	}
 
-
 	public static function Add($arFields = Array())
 	{
 		global $DB;
@@ -207,8 +206,8 @@ class CPullPush
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_pull_push", $arFields);
-			$strSql ="INSERT INTO b_pull_push(".$arInsert[0].", DATE_CREATE, DATE_AUTH) ".
-					"VALUES(".$arInsert[1].", ".$DB->CurrentTimeFunction().", ".$DB->CurrentTimeFunction().")";
+		$strSql ="INSERT INTO b_pull_push(".$arInsert[0].", DATE_CREATE, DATE_AUTH) ".
+				"VALUES(".$arInsert[1].", ".$DB->CurrentTimeFunction().", ".$DB->CurrentTimeFunction().")";
 		// echo $strSql ;
 		$ID = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		return $ID;
@@ -250,10 +249,8 @@ class CPullPush
 				$arFields["DEVICE_NAME"] = $arFields["DEVICE_ID"];
 		}
 
-
 		return true;
 	}
-
 
 	public static function Delete($ID = false)
 	{
@@ -261,6 +258,7 @@ class CPullPush
 		$ID = intval($ID);
 		if ($ID<=0)
 			return false;
+
 		$strSql = "DELETE from b_pull_push WHERE ID=".$ID;
 		$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
@@ -296,7 +294,6 @@ class CPushManager
 		}
 	}
 
-
 	static public function AddQueue($arParams)
 	{
 		global $DB;
@@ -312,24 +309,35 @@ class CPushManager
 			if (strlen($arFields['MESSAGE'])>110)
 				$arFields['MESSAGE'] = substr($arFields['MESSAGE'], 0, 105).' ...';
 		}
-		else
-			return false;
 
 		$arFields['TAG'] = '';
 		if (isset($arParams['TAG']) && strlen(trim($arParams['TAG'])) > 0 && strlen(trim($arParams['TAG'])) <= 255)
 			$arFields['TAG'] = trim($arParams['TAG']);
 
+		$arFields['SUB_TAG'] = '';
+		if (isset($arParams['SUB_TAG']) && strlen(trim($arParams['SUB_TAG'])) > 0 && strlen(trim($arParams['SUB_TAG'])) <= 255)
+			$arFields['SUB_TAG'] = trim($arParams['SUB_TAG']);
+
+		$arFields['BADGE'] = -1;
+		if (isset($arParams['BADGE']) && $arParams['BADGE'] != '' && intval($arParams['BADGE']) >= 0)
+			$arFields['BADGE'] = intval($arParams['BADGE']);
+
 		$arFields['PARAMS'] = '';
 		if (isset($arParams['PARAMS']) && strlen(trim($arParams['PARAMS'])) > 0)
 			$arFields['PARAMS'] = $arParams['PARAMS'];
 
-		if ((IsModuleInstalled('im') || IsModuleInstalled('socialnetwork')) && !CUser::IsOnLine($arFields['USER_ID'], 120))
+		if (isset($arParams['SEND_IMMEDIATELY']) && $arParams['SEND_IMMEDIATELY'] == 'Y' || !CUser::IsOnLine($arFields['USER_ID'], 180))
 		{
 			$arAdd = Array(
 				'USER_ID' => $arFields['USER_ID'],
-				'MESSAGE' => $arFields['MESSAGE'],
-				'PARAMS' => $arFields['PARAMS'],
 			);
+			if (strlen($arFields['MESSAGE']) > 0)
+				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
+			if (strlen($arFields['PARAMS']) > 0)
+				$arAdd['PARAMS'] = $arFields['PARAMS'];
+			if ($arFields['BADGE'] >= 0)
+				$arAdd['BADGE'] = $arFields['BADGE'];
+
 			$CPushManager = new CPushManager();
 			$CPushManager->SendMessage(Array($arAdd), defined('PULL_PUSH_SANDBOX')? true: false);
 		}
@@ -337,11 +345,17 @@ class CPushManager
 		{
 			$arAdd = Array(
 				'USER_ID' => $arFields['USER_ID'],
-				'MESSAGE' => $arFields['MESSAGE'],
 				'TAG' => $arFields['TAG'],
-				'PARAMS' => $arFields['PARAMS'],
+				'SUB_TAG' => $arFields['SUB_TAG'],
 				'~DATE_CREATE' => $DB->CurrentTimeFunction()
 			);
+			if (strlen($arFields['MESSAGE']) > 0)
+				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
+			if (strlen($arFields['PARAMS']) > 0)
+				$arAdd['PARAMS'] = $arFields['PARAMS'];
+			if ($arFields['BADGE'] >= 0)
+				$arAdd['BADGE'] = $arFields['BADGE'];
+
 			$DB->Add("b_pull_push_queue", $arAdd, Array("PARAMS"));
 
 			CAgent::AddAgent("CPushManager::SendAgent();", "pull", "N", 30, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+30, "FULL"));
@@ -350,13 +364,25 @@ class CPushManager
 		return true;
 	}
 
-	public static function DeleteFromQueue($userId, $tag)
+	public static function DeleteFromQueueByTag($userId, $tag)
 	{
 		global $DB;
 		if (strlen($tag) <= 0 || intval($userId) <= 0)
 			return false;
 
 		$strSql = "DELETE FROM b_pull_push_queue WHERE USER_ID = ".intval($userId)." AND TAG = '".$DB->ForSQL($tag)."'";
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		return true;
+	}
+
+	public static function DeleteFromQueueBySubTag($userId, $tag)
+	{
+		global $DB;
+		if (strlen($tag) <= 0 || intval($userId) <= 0)
+			return false;
+
+		$strSql = "DELETE FROM b_pull_push_queue WHERE USER_ID = ".intval($userId)." AND SUB_TAG = '".$DB->ForSQL($tag)."'";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
@@ -383,10 +409,13 @@ class CPushManager
 		else if ($dbType == "oracle")
 			$sqlDate = " WHERE DATE_CREATE < SYSDATE-(1/24/60/60*15) ";
 
-		$strSql = $DB->TopSql("SELECT ID, USER_ID, MESSAGE, PARAMS FROM b_pull_push_queue".$sqlDate, 280);
+		$strSql = $DB->TopSql("SELECT ID, USER_ID, MESSAGE, PARAMS, BADGE FROM b_pull_push_queue".$sqlDate, 280);
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
 		{
+			if ($arRes['BADGE'] == '')
+				unset($arRes['BADGE']);
+
 			$arPush[$count][] = $arRes;
 			if ($pushLimit <= count($arPush[$count]))
 				$count++;
@@ -394,16 +423,16 @@ class CPushManager
 			$maxId = $maxId < $arRes['ID']? $arRes['ID']: $maxId;
 		}
 
+		$CPushManager = new CPushManager();
 		foreach ($arPush as $arStack)
 		{
-			$CPushManager = new CPushManager();
 			$CPushManager->SendMessage($arStack, defined('PULL_PUSH_SANDBOX')? true: false);
 		}
 
 		if ($maxId > 0)
 		{
 			$strSql = "DELETE FROM b_pull_push_queue WHERE ID <= ".$maxId;
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		$strSql = "SELECT COUNT(ID) CNT FROM b_pull_push_queue";
@@ -437,7 +466,7 @@ class CPushManager
 			$arUsers[] = $message["USER_ID"];
 			if(!array_key_exists("USER_".$message["USER_ID"], $arTmpMessages))
 				$arTmpMessages["USER_".$message["USER_ID"]] = Array();
-			$arTmpMessages["USER_".$message["USER_ID"]][] = $message;
+			$arTmpMessages["USER_".$message["USER_ID"]][] = htmlspecialcharsback($message);
 		}
 
 		$arUsers = array_unique($arUsers);
@@ -483,11 +512,17 @@ class CPushManager
 		{
 			$request = new CHTTP();
 			$arPostData = Array(
-					"Action"=>"SendMessage",
-					"MessageBody" =>$batch
-				);
-			$response = $request->Post(self::$remoteProviderUrl."?key=".md5($key), $arPostData);
-			return $response;
+				"Action"=>"SendMessage",
+				"MessageBody" =>$batch
+			);
+
+			$postdata = CHTTP::PrepareData($arPostData);
+			$arUrl = $request->ParseURL(self::$remoteProviderUrl."?key=".md5($key), false);
+
+			$request->Query('POST', $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $postdata, $arUrl['proto'], 'N', true);
+
+			return true;
+
 		}
 
 		return false;

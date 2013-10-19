@@ -81,8 +81,8 @@ class CAllIBlockRSS
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS::</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS::</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -216,27 +216,27 @@ class CAllIBlockRSS
 
 	
 	/**
-	 * <p>Функция преобразует результат функции <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление.</p>
+	 * <p>Функция преобразует результат функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $arRes  Массив описания xml. Результат работы функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx.</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx.</a>
 	 *
 	 *
 	 *
 	 * @param array $bOutChannel = false Параметр должен быть синхронизирован с одноименным функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a>.
 	 *
 	 *
 	 *
 	 * @return array <p>Массив следующего вида:</p><ul> <li>title - заголовок rss ленты;</li> <li>link -
 	 * ссылка;</li> <li>description - описание;</li> <li>lastBuildDate - время в rss формате (см.
-	 * <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> <li>ttl -
+	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> <li>ttl -
 	 * время действия в минутах;</li> <li>image - описание картинки:</li> <ul> <li>title -
 	 * заголовок;</li> <li>url;</li> <li>link - ссылка;</li> <li>width - ширина;</li> <li>height -
 	 * высота;</li> </ul> <li>item - массив элементами которого являются
@@ -245,8 +245,8 @@ class CAllIBlockRSS
 	 * обязательно):</li> <ul> <li>url;</li> <li>length;</li> <li>type;</li> <li>width - не
 	 * обязательно;</li> <li>height - не обязательно;</li> </ul> <li>category - категория;
 	 * <br> </li> <li>pubDate - время в rss формате (см. <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> </ul> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> </ul> </ul>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -257,10 +257,10 @@ class CAllIBlockRSS
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -430,10 +430,10 @@ class CAllIBlockRSS
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> http://www.w3.org/Protocols/rfc822/ </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

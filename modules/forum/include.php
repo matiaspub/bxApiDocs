@@ -121,7 +121,8 @@ CModule::AddAutoloadClasses(
 		"ForumEventManager" => "classes/general/event_manager.php",
 		"CForumCacheManager" => "classes/general/functions.php",
 		"CForumAutosave" => "classes/general/functions.php",
-		"CForumDBTools" => "tools/dbtools.php"
+		"CForumDBTools" => "tools/dbtools.php",
+		"CForumNotifySchema" => "classes/general/forum_notify_schema.php",
 	));
 
 $forumCache = new CForumCacheManager();
@@ -336,16 +337,16 @@ function ForumSubscribeNewMessages($FID, $TID, &$strErrorMessage, &$strOKMessage
 
 function ForumGetRealIP()
 {
-	$ip = False;
+	$ip = false;
 	if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
 	{
 		$ips = explode(", ", $_SERVER['HTTP_X_FORWARDED_FOR']);
-		for ($i = 0; $i < count($ips); $i++)
+		foreach ($ips as $ipst)
 		{
 			// Skip RFC 1918 IP's 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16
-			if (!preg_match("/^(10|172\.16|192\.168)\./", $ips[$i]) && preg_match("/^[^.]+\.[^.]+\.[^.]+\.[^.]+/", $ips[$i]))
+			if (!preg_match("/^(10|172\.16|192\.168)\./", $ipst) && preg_match("/^[^.]+\.[^.]+\.[^.]+\.[^.]+/", $ipst))
 			{
-				$ip = $ips[$i];
+				$ip = $ipst;
 				break;
 			}
 		}
@@ -643,7 +644,6 @@ function ForumAddMessage(
 			$aMsg[] = array("id" => "EDITOR_NAME", "text" => GetMessage("ADDMESS_INPUT_EDITOR").".");
 	}
 //*************************/Input params ***************************************************************************
-
 //************************* Actions ********************************************************************************
 //************************* Add/edit topic *************************************************************************
 	if (empty($aMsg))
@@ -755,7 +755,7 @@ function ForumAddMessage(
 			if ($db_res && $res = $db_res->Fetch())
 				$res["PARAM2"] = $res["PARAM2"];
 		}*/
-
+		$GLOBALS["USER_FIELD_MANAGER"]->EditFormAddFields("FORUM_MESSAGE", $arFields);
 		if ($MESSAGE_TYPE=="NEW" || $MESSAGE_TYPE=="REPLY")
 		{
 			$arFields["AUTHOR_NAME"] = $arFieldsG["AUTHOR_NAME"];
@@ -882,21 +882,26 @@ function ForumAddMessage(
 
 	if (empty($aMsg))
 	{
+		$arNote = array();
 		if ($MESSAGE_TYPE=="NEW" || $MESSAGE_TYPE=="REPLY")
 		{
 			CForumMessage::SendMailMessage($MID, array(), false, "NEW_FORUM_MESSAGE");
-			$strOKMessage1 = GetMessage("ADDMESS_SUCCESS_ADD").". \n";
+			$arNote = array("id" => $MESSAGE_TYPE, "text" => GetMessage("ADDMESS_SUCCESS_ADD").". \n");
 		}
 		else
 		{
 			CForumMessage::SendMailMessage($MID, array(), false, "EDIT_FORUM_MESSAGE");
-			$strOKMessage1 = GetMessage("ADDMESS_SUCCESS_EDIT").". \n";
+			$arNote = array("id" => "EDIT", "text" => GetMessage("ADDMESS_SUCCESS_EDIT").". \n");
 		}
 
-		if ($arFieldsG["APPROVED"]!="Y")
-			$strOKMessage1 .= GetMessage("ADDMESS_AFTER_MODERATE").". \n";
-
-		$strOKMessage .= $strOKMessage1;
+		if ($arFieldsG["APPROVED"]!="Y") {
+			$arNote["id"] .= "_NOT_APPROVED";
+			$arNote["text"] .= GetMessage("ADDMESS_AFTER_MODERATE").". \n";
+		}
+		if (is_array($strOKMessage))
+			$strOKMessage[] = $arNote;
+		else
+			$strOKMessage .= $arNote["text"];
 
 		return $MID;
 	}
@@ -973,8 +978,7 @@ function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage
 					else
 					{
 						/***************** Events onMessageModerate ************************/
-						$events = GetModuleEvents("forum", "onMessageModerate");
-						while ($arEvent = $events->Fetch())
+						foreach (GetModuleEvents("forum", "onMessageModerate", true) as $arEvent)
 							ExecuteModuleEventEx($arEvent, array($ID, $TYPE, $arMessage));
 						/***************** /Events *****************************************/
 						$TID = $arMessage["TOPIC_ID"];
@@ -1566,7 +1570,7 @@ function ForumMoveMessage($FID, $TID, $Message, $NewTID = 0, $arFields, &$strErr
 					// check attach
 					if (false && intVal($res["ATTACH_IMG"]) > 0)
 					{
-						$iFileSize = COption::GetOptionString("forum", "file_max_size", 50000);
+						$iFileSize = COption::GetOptionString("forum", "file_max_size", 5242880);
 						$attach_img = CFile::GetByID(intVal($res["ATTACH_IMG"]));
 						$attach = "";
 						if ($attach_img && is_set($attach_img, "ORIGINAL_NAME"))
@@ -2094,7 +2098,7 @@ function ForumGetUserForumStatus($userID = false, $perm = false, $arAdditionalPa
 		$res = $arStatuses["user"];
 		if ($arStatuses[$perm])
 			$res = $arStatuses[$perm];
-		elseif (COption::GetOptionString("forum", "SHOW_VOTES", "Y") == "Y")
+		else
 		{
 			$arRank = (is_set($arAdditionalParams, "Rank") ?
 				$arAdditionalParams["Rank"] : CForumUser::GetUserRank($userID, LANGUAGE_ID));
@@ -2633,29 +2637,29 @@ function InitSortingEx($Path=false, $sByVar="by", $sOrderVar="order")
 {
 	static $ii = -1;
 	$ii++;
-	global $APPLICATION, $$sByVar, $$sOrderVar;
+	global $APPLICATION, ${$sByVar}, ${$sOrderVar};
 	$sByVarE = $sByVar . $ii;
 	$sOrderVarE = $sOrderVar . $ii;
-	global $$sByVarE, $$sOrderVarE;
+	global ${$sByVarE}, ${$sOrderVarE};
 
 	if($Path===false)
 		$Path = $APPLICATION->GetCurPage();
 
 	$md5Path = md5($Path);
-	if (strlen($$sByVarE)>0)
-		$_SESSION["SESS_SORT_BY_EX"][$md5Path][$sByVarE] = $$sByVarE;
+	if (!empty(${$sByVarE}))
+		$_SESSION["SESS_SORT_BY_EX"][$md5Path][$sByVarE] = ${$sByVarE};
 	else
-		$$sByVarE = $_SESSION["SESS_SORT_BY_EX"][$md5Path][$sByVarE];
+		${$sByVarE} = $_SESSION["SESS_SORT_BY_EX"][$md5Path][$sByVarE];
 
-	if(strlen($$sOrderVarE)>0)
-		$_SESSION["SESS_SORT_ORDER_EX"][$md5Path][$sOrderVarE] = $$sOrderVarE;
+	if(!empty(${$sOrderVarE}))
+		$_SESSION["SESS_SORT_ORDER_EX"][$md5Path][$sOrderVarE] = ${$sOrderVarE};
 	else
-		$$sOrderVarE = $_SESSION["SESS_SORT_ORDER_EX"][$md5Path][$sOrderVarE];
+		${$sOrderVarE} = $_SESSION["SESS_SORT_ORDER_EX"][$md5Path][$sOrderVarE];
 
-	strtolower($$sByVarE);
-	strtolower($$sOrderVarE);
-	$$sByVar = $$sByVarE;
-	$$sOrderVar = $$sOrderVarE;
+	strtolower(${$sByVarE});
+	strtolower(${$sOrderVarE});
+	${$sByVar} = ${$sByVarE};
+	${$sOrderVar} = ${$sOrderVarE};
 	return $ii;
 }
 
@@ -2772,7 +2776,7 @@ function CustomizeLHEForForum()
 							h = parseInt(h) || 300,
 							src = BX.util.trim(src);
 
-						return '<img id="' + pLEditor.SetBxTag(false, {tag: "forumvideo", params: {value : src}}) + '" src="/bitrix/images/1.gif" class="bxed-video" width=' + w + ' height=' + h + ' title="' + LHE_MESS.Video + ": " + src + '" />';
+						return '<img id="' + pLEditor.SetBxTag(false, {tag: "forumvideo", params: {value : src}}) + '" src="/bitrix/images/1.gif" class="bxed-video" width=' + w + ' height=' + h + ' title="' + BX.message.Video + ": " + src + '" />';
 					});
 					return sContent;
 				},
@@ -2798,7 +2802,7 @@ function CustomizeLHEForForum()
 			'<td></td>' +
 			'<td style="padding: 0!important; font-size: 11px!important;"><?= GetMessageJS('FR_VIDEO_PATH_EXAMPLE')?></td>' +
 		'</tr><tr>' +
-			'<td class="lhe-dialog-label lhe-label-imp"><label for="' + pObj.pLEditor.id + 'lhed_forum_video_width">' + LHE_MESS.ImageSizing + ':</label></td>' +
+			'<td class="lhe-dialog-label lhe-label-imp"><label for="' + pObj.pLEditor.id + 'lhed_forum_video_width">' + BX.message.ImageSizing + ':</label></td>' +
 			'<td class="lhe-dialog-param">' +
 				'<input id="' + pObj.pLEditor.id + 'lhed_forum_video_width" value="" size="4"/>' +
 				' x ' +
@@ -2838,12 +2842,19 @@ function CustomizeLHEForForum()
 				{
 					pLEditor.InsertHTML('<img id="' + pLEditor.SetBxTag(false, {tag: "forumvideo", params: {value : src}}) +
 							'" src="/bitrix/images/1.gif" class="bxed-video" width=' + w + ' height=' + h +
-							' title="' + LHE_MESS.Video + ": " + src + '" />');
+							' title="' + BX.message.Video + ": " + src + '" />');
 				}
 			}
 		};
 	};
 	</script>
 <?
+}
+function ForumGetEntity($entityId, $value = true) {
+	static $arForumGetEntity = array();
+	if (array_key_exists($entityId, $arForumGetEntity))
+		return $arForumGetEntity[$entityId];
+	$arForumGetEntity[$entityId] = $value;
+	return false;
 }
 ?>

@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формами</a>.
+ * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>.
  *
  *
  *
@@ -28,7 +28,7 @@ class CForm extends CAllForm
 	// список веб-форм
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форм</a> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форм</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -72,7 +72,7 @@ class CForm extends CAllForm
 	 *
 	 *
 	 *
-	 * @param int $min_permission = 10 Минимальный уровень <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#form">прав на
+	 * @param int $min_permission = 10 Минимальный уровень <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">прав на
 	 * веб-форму</a>.<br><br>Параметр необязательный. По умолчанию - 10 (право
 	 * на заполнение веб-формы и создание нового результата)
 	 *
@@ -109,10 +109,10 @@ class CForm extends CAllForm
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getbysid.php">CForm::GetBySID</a> <br> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbysid.php">CForm::GetBySID</a> <br> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -266,7 +266,7 @@ class CForm extends CAllForm
 
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -291,9 +291,9 @@ class CForm extends CAllForm
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getbysid.php">CForm::GetBySID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbysid.php">CForm::GetBySID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

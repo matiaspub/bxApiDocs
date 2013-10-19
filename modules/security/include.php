@@ -24,6 +24,7 @@ CModule::AddAutoloadClasses(
 		"CSecurityFilterMask" => "classes/general/filter_mask.php",
 		"CSecurityXSSDetect" => "classes/general/post_filter.php",
 		"CSecurityXSSDetectVariables" => "classes/general/post_filter_variables.php",
+		"CSecuritySessionVirtual" => "classes/general/session_virtual.php",
 		"CSecuritySessionDB" => "classes/general/session_db.php",
 		"CSecuritySessionMC" => "classes/general/session_mc.php",
 		"CSecuritySession" => "classes/general/session.php",
@@ -33,6 +34,7 @@ CModule::AddAutoloadClasses(
 		"CSecurityFrame" => "classes/general/frame.php",
 		"CSecurityFrameMask" => "classes/general/frame.php",
 		"CSecurityEvent" => "classes/general/event.php",
+		"CSecurityEventMessageFormatter" => "classes/general/event_message.php",
 		"CSecuritySystemInformation" => "classes/general/system_information.php",
 		"CSecurityTemporaryStorage" => "classes/general/temporary_storage.php",
 		"CSecuritySiteChecker" => "classes/general/site_checker.php",
@@ -45,7 +47,8 @@ CModule::AddAutoloadClasses(
 		"CSecurityFilePermissionsTest" => "classes/general/tests/file_permissions.php",
 		"CSecurityPhpConfigurationTest" => "classes/general/tests/php_configuration.php",
 		"CSecuritySiteConfigurationTest" => "classes/general/tests/site_configuration.php",
-		"CSecurityTaintCheckingTest" => "classes/general/tests/taint_checking.php"
+		"CSecurityTaintCheckingTest" => "classes/general/tests/taint_checking.php",
+		"CSecurityRequirementsException" => "classes/general/requirements_exception.php"
 	)
 );
 

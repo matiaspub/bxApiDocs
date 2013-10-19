@@ -135,7 +135,7 @@ class CAllSaleUserCards
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.delete.php
@@ -168,7 +168,7 @@ class CAllSaleUserCards
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i>, если пароль установлен, и <i>false</i> в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.checkpassword.php
@@ -206,7 +206,7 @@ class CAllSaleUserCards
 	 *
 	 *
 	 *
-	 * @return string <p>Метод возвращает результат шифрования (расшифровывания).</p>
+	 * @return string <p>Метод возвращает результат шифрования (расшифровывания).</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php

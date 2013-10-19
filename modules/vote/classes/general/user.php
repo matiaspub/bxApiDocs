@@ -14,6 +14,11 @@ class CAllVoteUser
 		return "<br>Module: ".$module_id."<br>Class: CAllVoteUser<br>File: ".__FILE__;
 	}
 
+	public static function OnUserLogin()
+	{
+		$_SESSION["VOTE"] = array("VOTES" => array());
+	}
+
 	public static function Delete($USER_ID)
 	{
 		$err_mess = (CAllVoteUser::err_mess())."<br>Function: Delete<br>Line: ";

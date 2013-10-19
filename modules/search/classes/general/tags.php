@@ -3,7 +3,7 @@ class CSearchTags
 {
 	
 	/**
-	 * <p>Получение списка тегов элементов поискового индекса.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ruapi_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
+	 * <p>Получение списка тегов элементов поискового индекса.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
 	 *
 	 *
 	 *
@@ -46,7 +46,7 @@ class CSearchTags
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны поля
 	 * перечисленные в параметре arSelect.</p>
 	 *
@@ -59,7 +59,7 @@ class CSearchTags
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/constants.php">Константы модуля
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">Константы модуля
 	 * поиска</a></li> </ul><a name="examples"></a>
 	 *
 	 *

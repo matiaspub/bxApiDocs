@@ -113,7 +113,7 @@ function stemming_split($sText, $sLang="ru")
 
 
 /**
- * <p>Функция производит морфологический анализ текста и возвращает массив неизменных основ слов.</p> <p>Сначала ищется и подключается анализатор для заданного языка (параметр sLang):</p> <ul> <li>Выполняется попытка подключения файла $_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/".$sLang."/search/stemming.php" и если в нем определена функция "stemming_"$sLang, то на этом поиск завершается.</li> <li>Иначе выполняется попытка подключить анализатор из набора поставляемых с модулем поиска.</li> <li>Если и эта попытка провалилась, то будет использован анализатор по умолчанию <a href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_default.php">Stemming_default</a>.</li> </ul> <p>Также ожидается, что в одном из файлов определена функция поиска стоп слов - "stemming_stop_".$sLang. Если это не так, то для определения списка стоп слов будет использована функция по умолчанию <a href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_stop_default.php">Stemming_stop_default</a>.</p> <p>Далее текст приводится к верхнему регистру и разбивается на отдельные слова. Разбивка происходит путем удаления всех символов не входящих в алфавит языка. Алфавит задается следующим образом:</p> <ul> <li>В расчет принимаются все символы возвращаемые функцией <a href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_letter_default.php">Stemming_letter_default</a>;</li> <li>К ним добавляются символы возвращаемые функцией "stemming_letter_".$sLang (если таковая определена);</li> <li>А также символы входящие в соответствующую настройку модуля поиска.</li> </ul> <p>Для каждого слова с помощью найденной ранее функции определяется неизменная основа. После этого, если слово не является стоп словом оно заносится в массив который будет возвращен в качестве результата.</p>
+ * <p>Функция производит морфологический анализ текста и возвращает массив неизменных основ слов.</p> <p>Сначала ищется и подключается анализатор для заданного языка (параметр sLang):</p> <ul> <li>Выполняется попытка подключения файла $_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/".$sLang."/search/stemming.php" и если в нем определена функция "stemming_"$sLang, то на этом поиск завершается.</li> <li>Иначе выполняется попытка подключить анализатор из набора поставляемых с модулем поиска.</li> <li>Если и эта попытка провалилась, то будет использован анализатор по умолчанию <a href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_default.php">Stemming_default</a>.</li> </ul> <p>Также ожидается, что в одном из файлов определена функция поиска стоп слов - "stemming_stop_".$sLang. Если это не так, то для определения списка стоп слов будет использована функция по умолчанию <a href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_stop_default.php">Stemming_stop_default</a>.</p> <p>Далее текст приводится к верхнему регистру и разбивается на отдельные слова. Разбивка происходит путем удаления всех символов не входящих в алфавит языка. Алфавит задается следующим образом:</p> <ul> <li>В расчет принимаются все символы возвращаемые функцией <a href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_letter_default.php">Stemming_letter_default</a>;</li> <li>К ним добавляются символы возвращаемые функцией "stemming_letter_".$sLang (если таковая определена);</li> <li>А также символы входящие в соответствующую настройку модуля поиска.</li> </ul> <p>Для каждого слова с помощью найденной ранее функции определяется неизменная основа. После этого, если слово не является стоп словом оно заносится в массив который будет возвращен в качестве результата.</p>
  *
  *
  *
@@ -151,10 +151,10 @@ function stemming_split($sText, $sLang="ru")
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_default.php">Stemming_default</a></li>
- * <li><a href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_stop_default.php">Stemming_stop_default</a></li>
+ * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_default.php">Stemming_default</a></li>
+ * <li><a href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_stop_default.php">Stemming_stop_default</a></li>
  * <li><a
- * href="http://dev.1c-bitrix.ruapi_help/search/functions/stemming_letter_default.php">Stemming_letter_default</a></li>
+ * href="http://dev.1c-bitrix.ru/api_help/search/functions/stemming_letter_default.php">Stemming_letter_default</a></li>
  * </ul><a name="examples"></a>
  *
  *

@@ -11,11 +11,57 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 		"dbPassword" => array(
 			"method" => "checkDbPassword"
 		),
+		"scriptExtension" => array(
+			"method" => "checkScriptExtension"
+		),
+//		"otp" => array(
+//			"method" => "checkOtp"
+//		),
 	);
+
+	protected static $actualScriptExtensions = "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp";
 
 	static public function __construct()
 	{
 		IncludeModuleLangFile(__FILE__);
+	}
+
+	/**
+	 * Check if saved script file extension is up to date
+	 */
+	protected function checkScriptExtension()
+	{
+		$missingExtensions = array_diff(
+			explode(",", self::$actualScriptExtensions),
+			getScriptFileExt()
+		);
+		if(!empty($missingExtensions))
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_SCRIPT_EXTENSIONS", CSecurityCriticalLevel::HIGHT);
+		}
+	}
+
+	protected function checkOtp()
+	{
+		if(IsModuleInstalled('intranet')) //OTP not used in Bitrix Intranet Portal
+			return;
+
+		if(CSecurityUser::isActive())
+		{
+			$dbUser = CUser::GetList($by = 'ID', $order = 'ASC', array("GROUPS_ID" => 1, "ACTIVE" => "Y"), array("FIELDS" => "ID"));
+			while($user = $dbUser->fetch())
+			{
+				$userInfo = CSecurityUser::getSecurityUserInfo($user["ID"]);
+				if(!$userInfo)
+				{
+					$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
+				}
+			}
+		}
+		else
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
+		}
 	}
 
 	protected function checkSecurityLevel()
@@ -26,12 +72,12 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_WAF_OFF", CSecurityCriticalLevel::HIGHT);
 		}
-		if (self::AdminPolicyLevel() != "high")
+		if(self::AdminPolicyLevel() != "high")
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL", CSecurityCriticalLevel::HIGHT);
 		}
 		$validErrorReporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE;
-		if (COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting && COption::GetOptionInt("main","error_reporting","") != 0)
+		if(COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting && COption::GetOptionInt("main","error_reporting","") != 0)
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ERROR_REPORTING", CSecurityCriticalLevel::MIDDLE);
 		}
@@ -47,7 +93,7 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 		/** @global CDataBase $DB */
 		global $DB;
 		$password = $DB->DBPassword;
-		$sign = ",.#!*%$:-";
+		$sign = ",.#!*%$:-^@";
 		$dit = "1234567890";
 		if(trim($password) == "")
 		{

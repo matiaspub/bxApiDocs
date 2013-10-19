@@ -129,7 +129,7 @@ class CIBlockPropertyElementAutoComplete
 		return array(' ', '#', '*','_');
 	}
 
-	protected function GetValueForAutoComplete($arProperty,$arValue,$arBanSym,$arRepSym)
+	static public function GetValueForAutoComplete($arProperty,$arValue,$arBanSym="",$arRepSym="")
 	{
 		$strResult = '';
 		$mxResult = self::GetPropertyValue($arProperty,$arValue);
@@ -140,7 +140,7 @@ class CIBlockPropertyElementAutoComplete
 		return $strResult;
 	}
 
-	protected function GetValueForAutoCompleteMulti($arProperty,$arValues,$arBanSym,$arRepSym)
+	static public function GetValueForAutoCompleteMulti($arProperty,$arValues,$arBanSym="",$arRepSym="")
 	{
 		$arResult = false;
 
@@ -211,11 +211,12 @@ class CIBlockPropertyElementAutoComplete
 		{
 			ob_start();
 			?><?
+			$strRandControlID = $strHTMLControlName["VALUE"].'_'.mt_rand(0, 10000);
 			$control_id = $APPLICATION->IncludeComponent(
 				"bitrix:main.lookup.input",
 				"iblockedit",
 				array(
-					"CONTROL_ID" => preg_replace("/[^a-zA-Z0-9_]/i", "x", $strHTMLControlName["VALUE"]),
+					"CONTROL_ID" => preg_replace("/[^a-zA-Z0-9_]/i", "x", $strRandControlID),
 					"INPUT_NAME" => $strHTMLControlName["VALUE"],
 					"INPUT_NAME_STRING" => "inp_".$strHTMLControlName["VALUE"],
 					"INPUT_VALUE_STRING" => htmlspecialcharsback(self::GetValueForAutoComplete($arProperty,$arValue,$arSymbols['BAN_SYM'],$arSymbols['REP_SYM'])),
@@ -225,6 +226,7 @@ class CIBlockPropertyElementAutoComplete
 					"IBLOCK_ID" => $arProperty["LINK_IBLOCK_ID"],
 					'BAN_SYM' => $arSymbols['BAN_SYM_STRING'],
 					'REP_SYM' => $arSymbols['REP_SYM_STRING'],
+					'FILTER' => 'Y',
 				), null, array("HIDE_ICONS" => "Y")
 			);
 			?><?
@@ -343,11 +345,12 @@ class CIBlockPropertyElementAutoComplete
 
 			ob_start();
 			?><?
+			$strRandControlID = $strHTMLControlName["VALUE"].'_'.mt_rand(0, 10000);
 			$control_id = $APPLICATION->IncludeComponent(
 				"bitrix:main.lookup.input",
 				"iblockedit",
 				array(
-					"CONTROL_ID" => preg_replace("/[^a-zA-Z0-9_]/i", "x", $strHTMLControlName["VALUE"]),
+					"CONTROL_ID" => preg_replace("/[^a-zA-Z0-9_]/i", "x", $strRandControlID),
 					"INPUT_NAME" => $strHTMLControlName['VALUE'].'[]',
 					"INPUT_NAME_STRING" => "inp_".$strHTMLControlName['VALUE'],
 					"INPUT_VALUE_STRING" => $strResultValue,
@@ -359,6 +362,7 @@ class CIBlockPropertyElementAutoComplete
 					"IBLOCK_ID" => $arProperty["LINK_IBLOCK_ID"],
 					'BAN_SYM' => $arSymbols['BAN_SYM_STRING'],
 					'REP_SYM' => $arSymbols['REP_SYM_STRING'],
+					'FILTER' => 'Y',
 				), null, array("HIDE_ICONS" => "Y")
 			);
 			?><?

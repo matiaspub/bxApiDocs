@@ -87,7 +87,7 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">всех полей</a> попытки.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -132,9 +132,9 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -183,7 +183,7 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">всех полей</a> попытки.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -226,9 +226,9 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">Поля попытки</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php
@@ -392,12 +392,12 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">Поля попытки</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li>
 	 *
 	 *
 	 * @static
@@ -661,8 +661,8 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/update.php">Update</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -797,47 +797,24 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 *
-	 * @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	 * сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	 * сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	 * попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li> <b>STUDENT_ID</b> -
-	 * идентификатор студента ; </li> <li> <b>DATE_START</b> - дата начала попытки; </li>
-	 * <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>STATUS</b> - статус
-	 * попытки; </li> <li> <b>SCORE</b> - количество баллов; </li> <li> <b>MAX_SCORE</b> -
-	 * максимальное количество баллов; </li> <li> <b>COMPLETED</b> - тест пройден; </li>
-	 * <li> <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>USER_NAME</b> - имя студента ;
-	 * </li> <li> <b>TEST_NAME</b> - название теста. </li> </ul>Направление сортировки
-	 * может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
-	 * <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
-	 * фильтруется по убыванию идентификатора попытки.
+	 * @param array $arrayarOrder = Array("ID"=>"DESC") 
 	 *
 	 *
 	 *
-	 * @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	 * Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	 * идентификатор попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li>
-	 * <b>STUDENT_ID</b> - идентификатор студента; </li> <li> <b>SCORE</b> - количество
-	 * баллов; </li> <li> <b>MAX_SCORE</b> - максимальное количество баллов; </li> <li>
-	 * <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>STATUS</b> - статус попытки (B -
-	 * тестирование началось, D - тест прерван, F - тест закончен.); </li> <li>
-	 * <b>COMPLETED</b> - тест пройден (Y|N); </li> <li> <b>DATE_START</b> - дата начала попытки;
-	 * </li> <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>USER</b> -
-	 * пользователь (возможны сложные условия по полям пользователя ID,
-	 * LOGIN, NAME, LAST_NAME); </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
-	 * умолчанию "R". Список прав доступа см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li> <li>
-	 * <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
-	 * значение "N" - права доступа не проверяются. </li> </ul>Перед названием
-	 * фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
-	 * </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
-	 * </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" -
-	 * одиночное значение или массив.<br><br>Необязательный. По умолчанию
-	 * записи не фильтруются.
+	 * @param array $arrayarFilter = Array() 
+	 *
+	 *
+	 *
+	 * @param array $arrayarSelect = Array() 9.5.2
+	 *
+	 *
+	 *
+	 * @param array $arrayarNavParams = Array() 12.5.1
 	 *
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -883,10 +860,10 @@ abstract class CAllTestAttempt
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

@@ -44,6 +44,7 @@ class CSearchItem extends CDBResult
 				case "ID":
 				case "MODULE_ID":
 				case "ITEM_ID":
+				case "BODY":
 				case "PARAM1":
 				case "PARAM2":
 				case "CUSTOM_RANK":
@@ -185,8 +186,7 @@ class CSearchItem extends CDBResult
 
 			if(substr($r["URL"], 0, 1)=="=")
 			{
-				$events = GetModuleEvents("search", "OnSearchGetURL");
-				while ($arEvent = $events->Fetch())
+				foreach(GetModuleEvents("search", "OnSearchGetURL", true) as $arEvent)
 					$r["URL"] = ExecuteModuleEventEx($arEvent, array($r));
 			}
 

@@ -115,7 +115,7 @@ class CAllSaleUserAccount
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.delete.php

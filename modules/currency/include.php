@@ -35,6 +35,18 @@ CModule::AddAutoloadClasses(
  * &lt;?
  * echo CurrencyFormat(11800.95, "USD");
  * ?&gt;
+ * &lt;?
+ * // Задать свой формат вывода цены можно следующим образом
+ * 
+ * AddEventHandler("currency", "CurrencyFormat", "myFormat";);
+ * 
+ * function myFormat($fSum, $strCurrency)
+ * {
+ *    return number_format ( $fSum, 2, '.', ' ' ).' <b style="color:red;">Р</b>ублей.';
+ * }
+ * 
+ * echo CurrencyFormat(1234.5678, 'RUB');
+ * ?&gt;
  * </pre>
  *
  *

@@ -132,29 +132,35 @@ class CSaleBasket extends CAllSaleBasket
 	 * <td>LID</td> <td>Сайт, на котором сделана покупка.</td> </tr> <tr> <td>DELAY</td>
 	 * <td>Флаг "товар отложен" (Y/N)</td> </tr> <tr> <td>CAN_BUY</td> <td>Флаг "товар можно
 	 * купить" (Y/N)</td> </tr> <tr> <td>NAME</td> <td>Название товара.</td> </tr> <tr>
-	 * <td>CALLBACK_FUNC</td> <td>Название функции обратного вызова для поддержки
-	 * актуальности корзины.</td> </tr> <tr> <td>MODULE</td> <td>Модуль, добавляющий
-	 * товар в корзину.</td> </tr> <tr> <td>NOTES</td> <td>Особые заметки, например, тип
-	 * цены.</td> </tr> <tr> <td>ORDER_CALLBACK_FUNC</td> <td>Название функции обратного
-	 * вызова для оформления заказа.</td> </tr> <tr> <td>ORDER_ALLOW_DELIVERY</td>
-	 * <td>Доставка заказа корзины разрешена. (Для корзин, уже привязанных
-	 * к заказу.)</td> </tr> <tr> <td>ORDER_PAYED</td> <td>Заказ корзины оплачен. (Для
-	 * корзин, уже привязанных к заказу.)</td> </tr> <tr> <td>ORDER_PRICE</td>
-	 * <td>Стоимость заказа корзины. (Для корзин, уже привязанных к
-	 * заказу.)</td> </tr> <tr> <td>DETAIL_PAGE_URL</td> <td>Ссылка на страницу детального
-	 * просмотра товара.</td> </tr> <tr> <td>FUSER_ID</td> <td>Внутренний код владельца
-	 * корзины (не совпадает с кодом пользователя) </td> </tr> <tr> <td>ORDER_ID</td>
-	 * <td>Код заказа, в который вошла эта запись (товар). Для товаров,
-	 * которые помещены в корзину, но ещё не заказаны, это поле равно NULL.
-	 * </td> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления товара в корзину.</td> </tr> <tr>
-	 * <td>DATE_UPDATE</td> <td>Дата последнего изменения записи.</td> </tr> <tr>
-	 * <td>CANCEL_CALLBACK_FUNC</td> <td>Название функции обратного вызова для отмены
-	 * заказа. </td> </tr> <tr> <td>PAY_CALLBACK_FUNC</td> <td>Название функции обратного
+	 * <td>CALLBACK_FUNC<font color="#FF0000">*</font> </td> <td>Название функции обратного
+	 * вызова для поддержки актуальности корзины.</td> </tr> <tr> <td>MODULE</td>
+	 * <td>Модуль, добавляющий товар в корзину.</td> </tr> <tr> <td>NOTES</td> <td>Особые
+	 * заметки, например, тип цены.</td> </tr> <tr> <td>ORDER_CALLBACK_FUNC<font color="#FF0000">*</font>
+	 * </td> <td>Название функции обратного вызова для оформления заказа.</td>
+	 * </tr> <tr> <td>ORDER_ALLOW_DELIVERY</td> <td>Доставка заказа корзины разрешена. (Для
+	 * корзин, уже привязанных к заказу.)</td> </tr> <tr> <td>ORDER_PAYED</td> <td>Заказ
+	 * корзины оплачен. (Для корзин, уже привязанных к заказу.)</td> </tr> <tr>
+	 * <td>ORDER_PRICE</td> <td>Стоимость заказа корзины. (Для корзин, уже
+	 * привязанных к заказу.)</td> </tr> <tr> <td>DETAIL_PAGE_URL</td> <td>Ссылка на страницу
+	 * детального просмотра товара.</td> </tr> <tr> <td>FUSER_ID</td> <td>Внутренний код
+	 * владельца корзины (не совпадает с кодом пользователя) </td> </tr> <tr>
+	 * <td>ORDER_ID</td> <td>Код заказа, в который вошла эта запись (товар). Для
+	 * товаров, которые помещены в корзину, но ещё не заказаны, это поле
+	 * равно NULL. </td> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления товара в
+	 * корзину.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
+	 * записи.</td> </tr> <tr> <td>CANCEL_CALLBACK_FUNC<font color="#FF0000">*</font> </td> <td>Название
+	 * функции обратного вызова для отмены заказа. </td> </tr> <tr>
+	 * <td>PAY_CALLBACK_FUNC<font color="#FF0000">*</font> </td> <td>Название функции обратного
 	 * вызова, которая вызывается при установке флага заказа "Доставка
-	 * разрешена". </td> </tr> <tr> <td>DISCOUNT_PRICE</td> <td>Скидка на товар. Значение
-	 * устанавливается только после оформления заказа. </td> </tr>
-	 * </table><p>Если в качестве параметра arGroupBy передается пустой массив,
-	 * то функция вернет число записей, удовлетворяющих фильтру.</p><a
+	 * разрешена". </td> </tr> <tr> <td>PRODUCT_PROVIDER_CLASS<font color="#0000FF">**</font> </td> <td>Имя
+	 * класса, реализующего интерфейс <b> IBXSaleProductProvider</b>. Торговый
+	 * каталог записывает в это поле имя класса <b>CCatalogProductProvider</b>.</td> </tr>
+	 * <tr> <td>DISCOUNT_PRICE</td> <td>Скидка на товар. Значение устанавливается
+	 * только после оформления заказа. </td> </tr> </table><p>Если в качестве
+	 * параметра arGroupBy передается пустой массив, то функция вернет число
+	 * записей, удовлетворяющих фильтру.</p><p><b><font color="#FF0000">*</font></b> - ключи
+	 * считаются устаревшими, начиная с версии 12.5.<br><b><font
+	 * color="#0000FF">**</font></b> - ключ доступен, начиная с версии 12.5.</p><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -196,6 +202,63 @@ class CSaleBasket extends CAllSaleBasket
 	 *     $arBasketItems[] = $arItems;
 	 * }
 	 * 
+	 * // Печатаем массив, содержащий актуальную на текущий момент корзину
+	 * echo "&lt;pre&gt;";
+	 * print_r($arBasketItems);
+	 * echo "&lt;/pre&gt;";
+	 * ?&gt;&lt;?
+	 * $arID = array();
+	 * $arBasketItems = array();
+	 * 
+	 * $dbBasketItems = CSaleBasket::GetList(
+	 *      array(
+	 * "NAME" =&gt; "ASC",
+	 * "ID" =&gt; "ASC"
+	 * ),
+	 * array(
+	 * "FUSER_ID" =&gt; CSaleBasket::GetBasketUserID(),
+	 * "LID" =&gt; SITE_ID,
+	 * "ORDER_ID" =&gt; "NULL"
+	 * ),
+	 * false,
+	 * false,
+	 * array("ID", "CALLBACK_FUNC", "MODULE", "PRODUCT_ID", "QUANTITY", "PRODUCT_PROVIDER_CLASS")
+	 * );
+	 * while ($arItems = $dbBasketItems-&gt;Fetch())
+	 * {
+	 * if ('' != $arItems['PRODUCT_PROVIDER_CLASS'] || '' != $arItems["CALLBACK_FUNC"])
+	 * {
+	 * CSaleBasket::UpdatePrice($arItems["ID"],
+	 * $arItems["CALLBACK_FUNC"],
+	 * $arItems["MODULE"],
+	 * $arItems["PRODUCT_ID"],
+	 * $arItems["QUANTITY"],
+	 * "N",
+	 * $arItems["PRODUCT_PROVIDER_CLASS"]
+	 * );
+	 * $arID[] = $arItems["ID"];
+	 * }
+	 * }
+	 * 
+	 * $dbBasketItems = CSaleBasket::GetList(
+	 * array(
+	 * "NAME" =&gt; "ASC",
+	 * "ID" =&gt; "ASC"
+	 * ),
+	 * array(
+	 * "ID" =&gt; $arID,
+	 *         "ORDER_ID" =&gt; "NULL"
+	 * ),
+	 *         false,
+	 *         false,
+	 *         array("ID", "CALLBACK_FUNC", "MODULE",
+	 * "PRODUCT_ID", "QUANTITY", "DELAY",
+	 * "CAN_BUY", "PRICE", "WEIGHT", "PRODUCT_PROVIDER_CLASS", "NAME")
+	 * );
+	 * while ($arItems = $dbBasketItems-&gt;Fetch())
+	 * {
+	 *     $arBasketItems[] = $arItems;
+	 * }
 	 * // Печатаем массив, содержащий актуальную на текущий момент корзину
 	 * echo "&lt;pre&gt;";
 	 * print_r($arBasketItems);
@@ -307,8 +370,13 @@ class CSaleBasket extends CAllSaleBasket
 				"DISCOUNT_COUPON",
 				"VAT_RATE",
 				"ORDER_ALLOW_DELIVERY",
+				"ORDER_DATE_ALLOW_DELIVERY",
+				"ORDER_STATUS",
+				"ORDER_CANCELED",
 				"ORDER_PAYED",
 				"ORDER_PRICE",
+				"ORDER_DATE",
+				"ORDER_DATE_PAYED",
 				"USER_ID",
 				"SUBSCRIBE",
 				"BARCODE_MULTI",
@@ -359,8 +427,14 @@ class CSaleBasket extends CAllSaleBasket
 				"CUSTOM_PRICE" => array("FIELD" => "B.CUSTOM_PRICE", "TYPE" => "char"),
 
 				"ORDER_ALLOW_DELIVERY" => array("FIELD" => "O.ALLOW_DELIVERY", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_DATE_ALLOW_DELIVERY" => array("FIELD" => "O.DATE_ALLOW_DELIVERY", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_STATUS" => array("FIELD" => "O.STATUS_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_CANCELED" => array("FIELD" => "O.CANCELED", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_DATE" => array("FIELD" => "O.DATE_INSERT", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
 				"ORDER_PAYED" => array("FIELD" => "O.PAYED", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
-				"ORDER_PRICE" => array("FIELD" => "O.PRICE", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_DATE_PAYED" => array("FIELD" => "O.DATE_PAYED", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+				"ORDER_PRICE" => array("FIELD" => "O.PRICE", "TYPE" => "double", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+
 				"USER_ID" => array("FIELD" => "F.USER_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_fuser F ON (F.ID = B.FUSER_ID)"),
 
 				"ALL_PRICE" => array("FIELD" => "(B.PRICE+B.DISCOUNT_PRICE)", "TYPE" => "double"),
@@ -693,15 +767,16 @@ class CSaleBasket extends CAllSaleBasket
 	 * отложен" (Y/N);</li> <li> <b>CAN_BUY</b> - флаг "товар можно купить" (Y/N) - может
 	 * устанавливаться автоматически про наличии функции обратного
 	 * вызова для поддержки актуальности корзины;</li> <li> <b>NAME</b> - название
-	 * товара (обязательное поле);</li> <li> <b>CALLBACK_FUNC</b> - название функции
-	 * обратного вызова для поддержки актуальности корзины (описание
-	 * ниже);</li> <li> <b>MODULE</b> - модуль, добавляющий товар в корзину;</li> <li>
-	 * <b>NOTES</b> - особые заметки, например, тип цены;</li> <li> <b>ORDER_CALLBACK_FUNC</b> -
-	 * название функции обратного вызова для оформления заказа
-	 * (описание ниже);</li> <li> <b>DETAIL_PAGE_URL</b> - ссылка на страницу детального
-	 * просмотра товара;</li> <li> <b>CANCEL_CALLBACK_FUNC</b> - название функции
-	 * обратного вызова для отмены заказа (описание ниже);</li> <li>
-	 * <b>PAY_CALLBACK_FUNC</b> - название функции обратного вызова, которая
+	 * товара (обязательное поле);</li> <li> <b>CALLBACK_FUNC<font color="#FF0000">*</font></b> -
+	 * название функции обратного вызова для поддержки актуальности
+	 * корзины (описание ниже);</li> <li> <b>MODULE</b> - модуль, добавляющий товар в
+	 * корзину;</li> <li> <b>NOTES</b> - особые заметки, например, тип цены;</li> <li>
+	 * <b>ORDER_CALLBACK_FUNC<font color="#FF0000">*</font></b> - название функции обратного
+	 * вызова для оформления заказа (описание ниже);</li> <li> <b>DETAIL_PAGE_URL</b> -
+	 * ссылка на страницу детального просмотра товара;</li> <li>
+	 * <b>CANCEL_CALLBACK_FUNC<font color="#FF0000">*</font></b> - название функции обратного
+	 * вызова для отмены заказа (описание ниже);</li> <li> <b>PAY_CALLBACK_FUNC<font
+	 * color="#FF0000">*</font></b> - название функции обратного вызова, которая
 	 * вызывается при установке флага "Доставка разрешена" заказа;</li> <li>
 	 * <b>FUSER_ID</b> - идентификатор пользователя интернет-магазина,
 	 * необязательный параметр, по умолчанию CSaleBasket::GetBasketUserID() (текущий
@@ -709,7 +784,12 @@ class CSaleBasket extends CAllSaleBasket
 	 * сохраняется в корзине. Каждый элемент этого массива является
 	 * массивом следующего формата: <pre class="syntax"><code>array("NAME" =&gt; "Название
 	 * свойства", "CODE" =&gt; "Код свойства", "VALUE" =&gt; "Значение свойства", "SORT"
-	 * =&gt; "Индекс сортировки")</code></pre> </li> </ul>
+	 * =&gt; "Индекс сортировки")</code></pre> </li> <li> <b>PRODUCT_PROVIDER_CLASS<font
+	 * color="#0000FF">**</font></b> - содержит имя класса, реализующего интерфейс <b>
+	 * IBXSaleProductProvider</b>. Торговый каталог записывает в это поле имя класса
+	 * <b>CCatalogProductProvider</b>. Если поле пусто, то возникает попытка
+	 * использовать старые поля:<b>CALLBACK_FUNC</b>, <b>ORDER_CALLBACK_FUNC</b>,
+	 * <b>CANCEL_CALLBACK_FUNC</b> и <b>PAY_CALLBACK_FUNC</b>.</li> </ul>
 	 *
 	 *
 	 *
@@ -720,68 +800,8 @@ class CSaleBasket extends CAllSaleBasket
 	 * <h4>Example</h4> 
 	 * <pre>
 	 * &lt;?<br>if (CModule::IncludeModule("sale"))<br>{<br>  $arFields = array(<br>    "PRODUCT_ID" =&gt; 51,<br>    "PRODUCT_PRICE_ID" =&gt; 0,<br>    "PRICE" =&gt; 138.54,<br>    "CURRENCY" =&gt; "RUB",<br>    "WEIGHT" =&gt; 530,<br>    "QUANTITY" =&gt; 1,<br>    "LID" =&gt; LANG,<br>    "DELAY" =&gt; "N",<br>    "CAN_BUY" =&gt; "Y",<br>    "NAME" =&gt; "Чемодан кожаный",<br>    "CALLBACK_FUNC" =&gt; "MyBasketCallback",<br>    "MODULE" =&gt; "my_module",<br>    "NOTES" =&gt; "",<br>    "ORDER_CALLBACK_FUNC" =&gt; "MyBasketOrderCallback",<br>    "DETAIL_PAGE_URL" =&gt; "/".LANG."/detail.php?ID=51"<br>  );<br><br>  $arProps = array();<br><br>  $arProps[] = array(<br>    "NAME" =&gt; "Цвет",<br>    "CODE" =&gt; "color",<br>    "VALUE" =&gt; "черный"<br>  );<br><br>  $arProps[] = array(<br>    "NAME" =&gt; "Размер",<br>    "VALUE" =&gt; "1.5 x 2.5"<br>  );<br><br>  $arFields["PROPS"] = $arProps;<br><br>  CSaleBasket::Add($arFields);<br>}<br>?&gt;<br>
-	Функция обратного вызова для поддержки актуальности корзиныФункция обратного вызова вызывается (если установлена) при каждом чтении корзины для обновления параметров содержащихся в корзине товаров. Например, если после добавления товара в корзину изменилась его цена или товар сняли с продажи, то использование функции обратного вызова позволяет соответственно обновить данные в корзине. В поле <b>CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова уже написаны (например, для модуля <b>catalog</b> функция обратного вызова называется <code>CatalogBasketCallback($PRODUCT_ID, $QUANTITY = 0, $renewal = "N")</code>)
-	<b>array CALLBACK_FUNC(</b>
-	 *  <b>int</b> <i>PRODUCT_ID</i> [, <br><b>int</b> <i>QUANTITY</i>,<br> char <i>renewal</i>]<br><b>);</b>
-	Функция обратного вызова должна возвращать массив той же структуры, что и входной массив функции <b> CSaleBasket::Add(array arFields)</b>. Если функция возвращает пустой массив, то это означает, что данный товар не доступен для покупки. Параметры функции обратного вызова<tbody>
-	<tr>
-	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-	<tr>
-	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-	<tr>
-	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
-	<tr>
-	<td><b>renewal</b></td>	<td>Равен "<i>Y</i>", если функция вызывается для продления подписки, и 		"<i>N</i>" в остальных случаях.</td> </tr>
-	</tbody>&lt;?<br>function MyBasketCallback($PRODUCT_ID, $QUANTITY = 0)<br>{<br>  $arResult = array();<br><br>  $iProductQuantity = GetProductQuantity($PRODUCT_ID);<br>  if ($iProductQuantity&lt;=0)<br>    return $arResult;    // товар кончился, возвращаем пустой массив<br><br>  $arResult = array(<br>    "PRODUCT_PRICE_ID" =&gt; 0,<br>    "PRICE" =&gt; 125.2,<br>    "CURRENCY" =&gt; "RUB",<br>    "WEIGHT" =&gt; 530,<br>    "NAME" =&gt; "Чемодан кожаный",<br>    "CAN_BUY" =&gt; "Y"<br>  );<br><br>  if (IntVal($QUANTITY)&gt;0 &amp;&amp; ($iProductQuantity-$QUANTITY)&lt;0)<br>    $arResult["QUANTITY"] = $iProductQuantity;    // товара осталось <br>                     // меньше, чем в корзине, поэтому уменьшаем <br>                     // количество товара в корзине<br><br>  return $arResult;<br>}<br>?&gt;Функция обратного вызова для оформления заказаФункция обратного вызова для оформления заказа вызывается (если установлена) в момент оформления заказа на данный товар. Например, если отслеживается количество оставшихся в магазине единиц товара, то использование функции обратного вызова заказа позволяет соответственно уменьшить количество оставшихся в магазине единиц товара. В поле <i>ORDER_CALLBACK_FUNC</i> записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется <code> CatalogBasketOrderCallback($PRODUCT_ID, $QUANTITY)</code>)
-	<b>void ORDER_CALLBACK_FUNC(</b>
-	 *  <b>int</b> <i>PRODUCT_ID</i>, <br><b>int</b> <i>QUANTITY</i>
-	 * <b>);</b>
-	Функция вызывается на каждый товар в заказе. В случае если функция возвращяет не пустой массив считается, что товар можно купить он попадает в заказ, если возвращяет пустой массив, товар в заказ не попадает. Если функция ничего не возвращяет или возвращяет не массив, товар также попадает в заказ.Параметры функции обратного вызова заказа<tbody>
-	<tr>
-	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-	<tr>
-	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-	<tr>
-	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине.</td> </tr>
-	</tbody>&lt;?<br>function MyBasketOrderCallback($PRODUCT_ID, $QUANTITY)<br>{<br>   UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}<br>?&gt;Функция обратного вызова для отмены заказаФункция обратного вызова для отмены заказа вызывается при отмене или удалении заказа. Она служит как правило для возвращения в продажу зарезервированого для заказа количества товара. В поле CANCEL_CALLBACK_FUNC записывается только имя функции обратного вызова заказа. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля catalog функция обратного вызова заказа называется CatalogBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel))
-	<b>void CANCEL_CALLBACK_FUNC(
-	 *    </b><b>int</b> <i>PRODUCT_ID</i>, <br><b>int</b> <i>QUANTITY</i>,<br><b>bool</b> <i>bCancel</i>
-	 * <b>);</b>
-	Функция не возвращает значений.Параметры функции обратного вызова заказа.PRODUCT_IDtruefalse<tbody>
-	<tr>
-	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-	<tr>
-	<td><b>PRODUCT_ID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-	<tr>
-	<td><b>QUANTITY</b></td>	<td>Количество товаров в корзине. </td> </tr>
-	<tr>
-	<td><b>bCancel</b></td>	<td>
-	<i>true</i>, если отменяется заказ, и <i>false</i>, если отменяется.</td> </tr>
-	</tbody>function MyBasketCancelCallback($PRODUCT_ID, $QUANTITY, $bCancel)<br>{<br>    $PRODUCT_ID = IntVal($PRODUCT_ID);<br>    $QUANTITY = IntVal($QUANTITY);<br>    $bCancel = ($bCancel ? True : False);<br><br>    if ($bCancel)<br>        UpdateProductQuantity($PRODUCT_ID, -$QUANTITY);<br>    else<br>        UpdateProductQuantity($PRODUCT_ID, $QUANTITY);<br>}Функция обратного вызова при разрешении доставкиФункция обратного вызова при разрешении доставки вызывается при разрешении доставки заказа. Она может служить для привязки пользователя к каким-либо группам пользователей, для начисления на счет пользователя каких-либо сумм и для других действий, которые должны произойти в момент выполнения заказа. В поле <b> PAY_CALLBACK_FUNC</b> записывается только имя функции обратного вызова. Для некоторых модулей функции обратного вызова заказа уже написаны (например, для модуля <b> catalog</b> функция обратного вызова заказа называется <code> CatalogPayOrderCallback($productID, $userID, $bPaid, $orderID)</code>)
-	<b>array PAY_CALLBACK_FUNC(
-	 *    </b> <b>int</b> <i>productID</i>, <br><b>int</b> <i>userID</i>,<br><b>bool</b> <i>bPaid</i>,<br><b>int</b> <i>orderID</i>
-	 * <b>);</b>
-	Функция может вернуть одно из следующих значений:
-	<li>массив для вставки в продление заказа;</li>
-	 *  	 
-	 *   <li>
-	<i>true</i>, если функция отработала успешно, но вставлять в продление ничего не надо;</li>
-	 *  	 
-	 *   <li>
-	<i>false</i>, если функция во время работы функции произошли ошибки.</li>
-	 *  Параметры функции обратного вызова при разрешении доставки<tbody>
-	<tr>
-	<th align="center"><b>Название</b></th> 	<th align="center"><b>Описание</b></th> </tr>
-	<tr>
-	<td><b>productID</b></td>	<td>Код товара, находящегося в корзине.</td> </tr>
-	<tr>
-	<td><b>userID</b></td>	<td>Код пользователя, осуществившего заказ.</td> </tr>
-	<tr>
-	<td><b>bPaid</b></td>	<td>
-	<i>true</i>, если доставка заказа разрешена, и <i>false</i>, если запрещена.</td> </tr>
-	<tr>
-	<td><b>orderID</b></td>	<td>Код заказа.</td> </tr>
-	</tbody>function MyBasketPayOrderCallback($productID, $userID, $bPaid, $orderID)<br>{<br>    global $DB;<br><br>    $productID = IntVal($productID);<br>    $userID = IntVal($userID);<br>    $bPaid = ($bPaid ? True : False);<br>    $orderID = IntVal($orderID);<br><br>    if ($userID &lt;= 0)<br>        return False;<br><br>    if ($orderID &lt;= 0)<br>        return False;<br><br>    if (!array_key_exists($productID, $GLOBALS["arMP3Sums"]))<br>        return False;<br><br>    if (!($arOrder = CSaleOrder::GetByID($orderID)))<br>        return False;<br><br>    $currentPrice = 10;<br>    $currentCurrency = "USD";<br><br>    if (!CSaleUserAccount::UpdateAccount($userID, <br>                                         ($bPaid ? $currentPrice : -$currentPrice), <br>                                         $currentCurrency, "MANUAL", $orderID))<br>        return False;<br><br>    return True;<br>}
+	Смотрите также:
+	<li><a href="/api_help/catalog/interface.php">Взаимодействие торгового каталога и магазина</a></li>
 	 * </pre>
 	 *
 	 *
@@ -806,67 +826,93 @@ class CSaleBasket extends CAllSaleBasket
 
 		$bFound = false;
 		$bEqAr = false;
+
+		$boolProps = (array_key_exists('PROPS', $arFields) && !empty($arFields["PROPS"]) && is_array($arFields["PROPS"]));
+
 		$db_res = CSaleBasket::GetList(
-				array("LID" => "ASC"),
-				array(
-						"FUSER_ID" => $arFields["FUSER_ID"],
-						"PRODUCT_ID" => $arFields["PRODUCT_ID"],
-						"LID" => $arFields["LID"],
-						"ORDER_ID" => "NULL"
-					),
-				false,
-				false,
-				array("ID", "QUANTITY")
-			);
+			array(),
+			array(
+				"FUSER_ID" => $arFields["FUSER_ID"],
+				"PRODUCT_ID" => $arFields["PRODUCT_ID"],
+				"LID" => $arFields["LID"],
+				"ORDER_ID" => "NULL"
+			),
+			false,
+			false,
+			array("ID", "QUANTITY")
+		);
 		while($res = $db_res->Fetch())
 		{
 			if(!$bEqAr)
 			{
-				$arPropsCur = Array();
-				$arPropsOld = Array();
+				$arPropsCur = array();
+				$arPropsOld = array();
 
-				//$dbProp = CSaleBasket::GetPropsList(Array("ID" => "DESC"), Array("BASKET_ID" => $ID));
-				if(is_array($arFields["PROPS"]))
+				if ($boolProps)
 				{
-					foreach($arFields["PROPS"] as $arProp)
+					foreach($arFields["PROPS"] as &$arProp)
 					{
-						if(strlen($arProp["VALUE"]) > 0)
+						if (array_key_exists('VALUE', $arProp)&& '' != $arProp["VALUE"])
 						{
-							if(strlen($arProp["CODE"]) > 0)
+							$propID = '';
+							if (array_key_exists('CODE', $arProp) && '' != $arProp["CODE"])
+							{
 								$propID = $arProp["CODE"];
-							else
+							}
+							elseif (array_key_exists('NAME', $arProp) && '' != $arProp["NAME"])
+							{
 								$propID = $arProp["NAME"];
+							}
+							if ('' == $propID)
+								continue;
 							$arPropsCur[$propID] = $arProp["VALUE"];
 						}
 					}
+					if (isset($arProp))
+						unset($arProp);
 				}
 
-				$dbProp = CSaleBasket::GetPropsList(Array("ID" => "DESC"), Array("BASKET_ID" => $res["ID"]));
-				while($arProp = $dbProp->Fetch())
+				$dbProp = CSaleBasket::GetPropsList(
+					array(),
+					array("BASKET_ID" => $res["ID"]),
+					false,
+					false,
+					array('NAME', 'VALUE', 'CODE')
+				);
+				while ($arProp = $dbProp->Fetch())
 				{
-					if(strlen($arProp["VALUE"]) > 0)
+					if ('' != $arProp["VALUE"])
 					{
-						if(strlen($arProp["CODE"]) > 0)
+						$propID = '';
+						if ('' != $arProp["CODE"])
+						{
 							$propID = $arProp["CODE"];
-						else
+						}
+						elseif ('' != $arProp["NAME"])
+						{
 							$propID = $arProp["NAME"];
+						}
+						if ('' == $propID)
+							continue;
 						$arPropsOld[$propID] = $arProp["VALUE"];
 					}
 				}
 
 				$bEqAr = false;
-				if(count($arPropsCur) == count($arPropsOld))
+				if (count($arPropsCur) == count($arPropsOld))
 				{
 					$bEqAr = true;
 					foreach($arPropsCur as $key => $val)
 					{
-						if($bEqAr && (strlen($arPropsOld[$key]) <= 0 || $arPropsOld[$key] != $val))
+						if (!array_key_exists($key, $arPropsOld) || $arPropsOld[$key] != $val)
+						{
 							$bEqAr = false;
+							break;
+						}
 					}
 				}
 
-
-				if($bEqAr)
+				if ($bEqAr)
 				{
 					$ID = $res["ID"];
 					$arFields["QUANTITY"] += $res["QUANTITY"];
@@ -881,28 +927,49 @@ class CSaleBasket extends CAllSaleBasket
 		{
 			$arInsert = $DB->PrepareInsert("b_sale_basket", $arFields);
 
-			$strSql =
-				"INSERT INTO b_sale_basket(".$arInsert[0].", DATE_INSERT, DATE_UPDATE) ".
-				"VALUES(".$arInsert[1].", ".$DB->GetNowFunction().", ".$DB->GetNowFunction().")";
+			$strSql = "INSERT INTO b_sale_basket(".$arInsert[0].", DATE_INSERT, DATE_UPDATE) VALUES(".$arInsert[1].", ".$DB->GetNowFunction().", ".$DB->GetNowFunction().")";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			$ID = IntVal($DB->LastID());
-			$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID]++;
+			$ID = intval($DB->LastID());
 
-			if (is_array($arFields["PROPS"]) && count($arFields["PROPS"])>0)
+			$boolOrder = false;
+			if (array_key_exists('ORDER_ID', $arFields))
 			{
-				foreach ($arFields["PROPS"] as $prop)
+				$boolOrder = (0 < intval($arFields['ORDER_ID']));
+			}
+
+			if (!$boolOrder)
+			{
+				$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID]++;
+			}
+
+			if ($boolProps)
+			{
+				foreach ($arFields["PROPS"] as &$prop)
 				{
-					if(strlen($prop["NAME"]) > 0)
+					if ('' != $prop["NAME"])
 					{
 						$arInsert = $DB->PrepareInsert("b_sale_basket_props", $prop);
 
-						$strSql =
-							"INSERT INTO b_sale_basket_props(BASKET_ID, ".$arInsert[0].") ".
-							"VALUES(".$ID.", ".$arInsert[1].")";
+						$strSql = "INSERT INTO b_sale_basket_props(BASKET_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
 						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					}
 				}
+				if (isset($prop))
+					unset($prop);
+			}
+
+			if ($boolOrder)
+			{
+				CSaleOrderChange::AddRecord(
+					$arFields["ORDER_ID"],
+					"BASKET_ADDED",
+					array(
+						"PRODUCT_ID" => $arFields["PRODUCT_ID"],
+						"NAME" => $arFields["NAME"],
+						"QUANTITY" => $arFields["QUANTITY"]
+					)
+				);
 			}
 		}
 
@@ -943,26 +1010,57 @@ class CSaleBasket extends CAllSaleBasket
 	{
 		global $DB;
 
-		$ID = IntVal($ID);
-		if ($ID <= 0)
-			return False;
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
+
+		$rsBaskets = CSaleBasket::GetList(
+			array(),
+			array('ID' => $ID),
+			false,
+			false,
+			array(
+				'ID',
+				'ORDER_ID',
+				'PRODUCT_ID',
+				'NAME',
+				'SUBSCRIBE',
+				'FUSER_ID'
+			)
+		);
+		if (!($arBasket = $rsBaskets->Fetch()))
+			return false;
 
 		foreach(GetModuleEvents("sale", "OnBeforeBasketDelete", true) as $arEvent)
-			if (ExecuteModuleEventEx($arEvent, Array($ID))===false)
+			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
 
-		$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$ID." ", true);
-		if(IntVal($_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID]) > 0 )
+		if (0 < intval($arBasket["ORDER_ID"]))
+			CSaleOrderChange::AddRecord($arBasket["ORDER_ID"], "BASKET_REMOVED", array("PRODUCT_ID" => $arBasket["PRODUCT_ID"], "NAME" => $arBasket["NAME"]));
+
+		$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$ID, true);
+		if(intval($_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID]) > 0 )
 			$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID]--;
 
-		$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$ID." ", true);
+		$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$ID, true);
 
-		$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$ID." ", true);
+		$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$ID, true);
+
+		if ('Y' == $arBasket['SUBSCRIBE'] && array_key_exists('NOTIFY_PRODUCT', $_SESSION))
+		{
+			$intUserID = CSaleUser::GetUserID($arBasket['FUSER_ID']);
+			if ($intUserID && array_key_exists($intUserID, $_SESSION['NOTIFY_PRODUCT']))
+			{
+				if (array_key_exists($arBasket['PRODUCT_ID'], $_SESSION['NOTIFY_PRODUCT'][$intUserID]))
+				{
+					unset($_SESSION['NOTIFY_PRODUCT'][$intUserID][$arBasket['PRODUCT_ID']]);
+				}
+			}
+		}
 
 		foreach(GetModuleEvents("sale", "OnBasketDelete", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, Array($ID));
+			ExecuteModuleEventEx($arEvent, array($ID));
 
-		//return $DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$ID." ", true);
 		return true;
 	}
 
@@ -1008,20 +1106,34 @@ class CSaleBasket extends CAllSaleBasket
 		global $DB, $APPLICATION;
 
 		$bIncOrdered = ($bIncOrdered ? True : False);
-		$FUSER_ID = IntVal($FUSER_ID);
+		$FUSER_ID = intval($FUSER_ID);
 		if ($FUSER_ID <= 0)
 			return false;
 
-		$arFilter = Array("FUSER_ID" => $FUSER_ID);
+		$arFilter = array("FUSER_ID" => $FUSER_ID);
 		if (!$bIncOrdered)
 			$arFilter["ORDER_ID"] = "NULL";
 
-		$dbBasket = CSaleBasket::GetList(array("NAME" => "ASC"), $arFilter);
+		$dbBasket = CSaleBasket::GetList(
+			array(),
+			$arFilter,
+			false,
+			false,
+			array(
+				'ID',
+				'ORDER_ID',
+				'PRODUCT_ID',
+				'NAME',
+			)
+		);
 		while ($arBasket = $dbBasket->Fetch())
 		{
-			$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$arBasket["ID"]." ", true);
-			$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$arBasket["ID"]." ", true);
-			$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$arBasket["ID"]." ", true);
+			if (0 < intval($arBasket["ORDER_ID"]))
+				CSaleOrderChange::AddRecord($arBasket["ORDER_ID"], "BASKET_REMOVED", array("PRODUCT_ID" => $arBasket["PRODUCT_ID"], "NAME" => $arBasket["NAME"]));
+
+			$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$arBasket["ID"], true);
+			$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$arBasket["ID"], true);
+			$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$arBasket["ID"], true);
 		}
 
 		$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID] = 0;
@@ -1176,6 +1288,7 @@ class CSaleBasket extends CAllSaleBasket
 	}
 }
 
+
 class CSaleUser extends CAllSaleUser
 {
 	public static function Add()
@@ -1235,7 +1348,6 @@ class CSaleUser extends CAllSaleUser
 
 		return $ID;
 	}
-
 
 	public static function DeleteOld($nDays)
 	{
@@ -1378,6 +1490,21 @@ class CSaleUser extends CAllSaleUser
 		}
 
 		return $dbRes;
+	}
+
+	public static function GetUserID ($intFUserID)
+	{
+		global $DB;
+		$intFUserID = intval($intFUserID);
+		if (0 >= $intFUserID)
+			return false;
+		$strSql = "SELECT USER_ID FROM b_sale_fuser WHERE ID = ".$intFUserID;
+		$rsUsers = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($arUser = $rsUsers->Fetch())
+		{
+			return intval($arUser['USER_ID']);
+		}
+		return false;
 	}
 }
 ?>

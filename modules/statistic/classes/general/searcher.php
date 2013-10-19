@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковыми системами</a>.
+ * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>.
  *
  *
  *
@@ -104,7 +104,7 @@ class CAllSearcher
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_domain">доменов поисковых систем</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">доменов поисковых систем</a>.</p>
 	 *
 	 *
 	 *
@@ -133,7 +133,7 @@ class CAllSearcher
 	 * которых хранится поисковая фраза; </li> <li> <b>VARIABLE_EXACT_MATCH</b> - если
 	 * значение равно "Y", то при фильтрации по <b>VARIABLE</b> будет искаться
 	 * точное совпадение. </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -172,8 +172,8 @@ class CAllSearcher
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/csearcher/getbyid.php">CSearcher::GetByID</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_domain">Термин "Домен
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getbyid.php">CSearcher::GetByID</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">Термин "Домен
 	 * поисковой системы"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -253,7 +253,7 @@ class CAllSearcher
 
 	
 	/**
-	 * <p>Возвращает данные по указанной <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковой системе</a>.</p>
+	 * <p>Возвращает данные по указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a>.</p>
 	 *
 	 *
 	 *
@@ -282,8 +282,8 @@ class CAllSearcher
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/csearcher/getdomainlist.php">CSearcher::GetDomainList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">Термин "Поисковая
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getdomainlist.php">CSearcher::GetDomainList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин "Поисковая
 	 * система"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

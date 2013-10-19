@@ -30,6 +30,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 			"method" => "checkUploadNegotiationEnabled"
 		),
 	);
+	//TODO: check custom php/py/perl/etc handlers in .htaccess files
 
 	static public function __construct()
 	{
@@ -78,7 +79,7 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 		}
 
 
-		if(self::isScriptExecutable("test.py", "print 'Content-type:text/html\r\n\r\n{$uniqueString}'", $uniqueString))
+		if(self::isScriptExecutable("test.py", "print 'Content-type:text/html\\r\\n\\r\\n{$uniqueString}'", $uniqueString))
 		{
 			$isPythonCgiExecutable = true;
 			$this->addUnformattedDetailError($baseMessageKey."_PY", CSecurityCriticalLevel::LOW);

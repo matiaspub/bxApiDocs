@@ -7,7 +7,7 @@ class CIMContactList extends CAllIMContactList
 	{
 		$entityId = intval($entityId);
 		$messageId = intval($messageId);
-		if ($entityId <= 0 || $messageId <= 0)
+		if ($entityId <= 0)
 			return false;
 
 		$userId = intval($userId);
@@ -26,7 +26,7 @@ class CIMContactList extends CAllIMContactList
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		$obCache = new CPHPCache();
-		$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($userId));
+		$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($userId));
 
 		if ($isChat)
 			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_GROUP);
@@ -34,6 +34,33 @@ class CIMContactList extends CAllIMContactList
 			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_MESSAGE);
 
 		return true;
+	}
+
+	public static function GetOnline($ID = array())
+	{
+		global $DB;
+
+		if (!is_array($ID))
+			return false;
+
+		$arUsers = array();
+		$strSQL = "
+			SELECT U.ID, S.STATUS
+			FROM b_user U LEFT JOIN b_im_status S ON U.ID = S.USER_ID
+			WHERE U.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL 180 SECOND)
+		";
+		$dbUsers = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		while ($arUser = $dbUsers->Fetch())
+		{
+			if (!empty($ID) && !in_array($arUser["ID"], $ID))
+				continue;
+
+			$arUsers[$arUser["ID"]] = Array(
+				'id' => $arUser["ID"],
+				'status' => isset($arUser["STATUS"])? $arUser["STATUS"]: 'online',
+			);
+		}
+		return $arUsers;
 	}
 }
 ?>

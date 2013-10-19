@@ -93,11 +93,18 @@ class CGooglePush
 			$messCount = count($messages);
 			while($mess<$messCount)
 			{
-				$message = new CGoogleMessage($token);
+				if (strlen(trim($messages[$mess]["MESSAGE"])) <= 0)
+				{
+					$mess++;
+					continue;
+				}
+
 				if ("UTF-8"!=toupper(SITE_CHARSET))
 					$messages[$mess] = $APPLICATION->ConvertCharsetArray($messages[$mess], SITE_CHARSET, "utf-8");
 
 				$text = $messages[$mess]["MESSAGE"];
+
+				$message = new CGoogleMessage($token);
 				$message->setText($text);
 				if($messages[$mess]["TITLE"])
 					$message->setTitle($messages[$mess]["TITLE"]);

@@ -52,7 +52,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Открывает транзакцию. Для закрытия используйте <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/commit.php">Commit</a> или <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/rollback.php">Rollback</a>.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
+	 * <p>Открывает транзакцию. Для закрытия используйте <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">Commit</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">Rollback</a>.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
 	 *
 	 *
 	 *
@@ -114,9 +114,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php
@@ -190,9 +190,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
 	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -268,8 +268,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
+	 * <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -329,7 +330,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -397,82 +398,6 @@ class CDatabase extends CAllDatabase
 	}
 
 	//This function executes query against database
-	
-	/**
-	 * <p>Функция выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь функцией <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь функцией <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $sql  SQL запрос.
-	 *
-	 *
-	 *
-	 * @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
-	 * возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
-	 * ошибки функция прекращает выполнение всей
-	 * страницы.<br>Необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
-	 * данная функция CDatabase::Query. Если в SQL запросе будет ошибка и если в
-	 * файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
-	 * то на экране будет выведена данная информация и сам SQL запрос.
-	 *
-	 *
-	 *
-	 * @return CDBResult
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function GetByID($ID, $GET_BY_SID="N")
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: GetByID&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$where = ($GET_BY_SID=="N") ? " F.ID = '".intval($ID)."' " : " F.VARNAME='".$DB-&gt;ForSql($ID,50)."' ";
-	 * 	$strSql = "
-	 * 		SELECT
-	 * 			F.*,
-	 * 			F.FIRST_SITE_ID,
-	 * 			F.FIRST_SITE_ID									LID,
-	 * 			F.VARNAME,
-	 * 			F.VARNAME										SID,
-	 * 			".$DB-&gt;DateToCharFunction("F.TIMESTAMP_X")."	TIMESTAMP_X,
-	 * 			count(distinct D1.ID)							C_FIELDS,
-	 * 			count(distinct D2.ID)							QUESTIONS,
-	 * 			count(distinct S.ID)							STATUSES
-	 * 		FROM b_form F
-	 * 		LEFT JOIN b_form_status S ON (S.FORM_ID = F.ID)
-	 * 		LEFT JOIN b_form_field D1 ON (D1.FORM_ID = F.ID and D1.ADDITIONAL='Y')
-	 * 		LEFT JOIN b_form_field D2 ON (D2.FORM_ID = F.ID and D2.ADDITIONAL&lt;&gt;'Y')
-	 * 		WHERE 
-	 * 			$where
-	 * 		GROUP BY 
-	 * 			F.ID
-	 * 		";
-	 * 	$res = <b>$DB-&gt;Query</b>($strSql, false, $err_mess.__LINE__);
-	 * 	return $res;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
-	 * @author Bitrix
-	 */
 	public function Query($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
 	{
 		global $DB;
@@ -634,9 +559,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/currentdatefunction.php">CDatabase::CurrentDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currentdatefunction.php">CDatabase::CurrentDateFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -681,9 +606,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/currenttimefunction.php">CDatabase::CurrentTimeFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currenttimefunction.php">CDatabase::CurrentTimeFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -792,9 +717,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
@@ -875,9 +800,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -900,6 +825,55 @@ class CDatabase extends CAllDatabase
 		}
 
 		return $sFieldExpr;
+	}
+
+	
+	/**
+	 * <p>Позволяет выбирать дату в формате UNIX_TIMESTAMP без обращения к <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> (с версии main 12.5.12).</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param TABLE_FIEL $D  Поле в БД которое требуется перевести из формата DATE TIME в формат
+	 * TIMESTAMP.
+	 *
+	 *
+	 *
+	 * @return mixed <p>Возвращает валидный <b>timestamp</b>.</p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * $strSql = "
+	 *     SELECT 
+	 * ID, 
+	 * ".$DB-&gt; DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE
+	 * FROM 
+	 * my_table
+	 * ";
+	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	 * ?&gt;
+	 * </pre>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetimetotimestampfunction.php
+	 * @author Bitrix
+	 */
+	public static function DatetimeToTimestampFunction($fieldName)
+	{
+		$timeZone = "";
+		if (CTimeZone::Enabled())
+		{
+			static $diff = false;
+			if($diff === false)
+				$diff = CTimeZone::GetOffset();
+
+			if($diff <> 0)
+				$timeZone = $diff > 0? "+".$diff: $diff;
+		}
+		return "UNIX_TIMESTAMP(".$fieldName.")".$timeZone;
 	}
 
 	public static function DatetimeToDateFunction($strValue)
@@ -951,9 +925,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
 	 * датой и временем</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -978,7 +952,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция возвращает ID последней вставленной записи.</p> <p> </p> <p class="note">Только для MySQL версии!</p>
+	 * <p>Функция возвращает ID последней вставленной записи.</p> <p> </p>
 	 *
 	 *
 	 *
@@ -1004,7 +978,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li></ul><a
+	 * <ul><li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a></li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1038,7 +1012,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/connect.php">CDatabase::Connect</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDatabase::Connect</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1065,7 +1039,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p> Функция подготавливает глобальные переменные, соответствующие именам полей таблицы <i>table</i> для записи в БД.</p> <p>Создает глобальные переменные ${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} и устанавливает их значениями глобальных переменных, соответствующих именам полей из таблицы <i>table</i>, предварительно преобразовав их в зависимости от типа поля. <br><br>Например, для поля типа <b>int</b> будет выполнено: </p> <pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = intval(${<i>имя_поля</i>});</pre> Для поля типа <b>varchar</b>:<br><br><pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = CDatabase::ForSql(${<i>имя_поля</i>}, <i>размер_поля</i>);</pre> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при [link=89638#make]создании основных файлов компонентов[/link].</p>
+	 * <p> Функция подготавливает глобальные переменные, соответствующие именам полей таблицы <i>table</i> для записи в БД.</p> <p>Создает глобальные переменные ${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} и устанавливает их значениями глобальных переменных, соответствующих именам полей из таблицы <i>table</i>, предварительно преобразовав их в зависимости от типа поля. <br><br>Например, для поля типа <b>int</b> будет выполнено: </p> <pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = intval(${<i>имя_поля</i>});</pre> Для поля типа <b>varchar</b>:<br><br><pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = CDatabase::ForSql(${<i>имя_поля</i>}, <i>размер_поля</i>);</pre> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
 	 *
 	 *
 	 *
@@ -1138,7 +1112,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/inittablevarsforedit.php">CDatabase::InitTableVarsForEdit</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php">CDatabase::InitTableVarsForEdit</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1219,7 +1193,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1338,7 +1312,7 @@ class CDatabase extends CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1410,7 +1384,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция вставляет запись в таблицу <i>table</i> с значениями полей <i>fields</i>. Необходимые условия использования данной функции: </p> <ul> <li>Необходимо наличие поля "ID" в таблице, представляющее из себя Primary Key для данной таблицы. </li> <li>Для MySQL поле "ID" должно быть auto increment (если при вызове функции явно не задается параметр exist_id). </li> <li>Для Oracle обязательно наличие sequence (последовательности) с именем вида "SQ_.<i>table</i>". </li> </ul> Возвращает ID вставленной записи или false в случае ошибки. <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
+	 * <p>Функция вставляет запись в таблицу <i>table</i> с значениями полей <i>fields</i>. Необходимые условия использования данной функции: </p> <ul> <li>Необходимо наличие поля "ID" в таблице, представляющее из себя Primary Key для данной таблицы. </li> <li>Для MySQL поле "ID" должно быть auto increment (если при вызове функции явно не задается параметр exist_id). </li> <li>Для Oracle обязательно наличие sequence (последовательности) с именем вида "SQ_.<i>table</i>". </li> </ul> Возвращает ID вставленной записи или false в случае ошибки. <p><b>Примечание</b>. Если необходимо вставить запись с определенным ID и при этом указать его в параметре fields, то функция возвращает 0, при этом запись вставляется. Если необходимо, чтобы функция вернула ID, который вы указывали, то его необходимо указывать в параметре exist_id.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
 	 *
 	 *
 	 *
@@ -1504,11 +1478,11 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1556,7 +1530,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция изменяет записи в таблицы <i>table</i> значениями полей <i>fields</i>. Возвращает количество измененных записей.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
+	 * <p>Функция изменяет записи в таблицы <i>table</i> значениями полей <i>fields</i>. Возвращает количество измененных записей.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
 	 *
 	 *
 	 *
@@ -1648,11 +1622,11 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1768,9 +1742,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1816,7 +1790,7 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Создает глобальные переменные с именами ${<i>prefix_to</i>.имя_поля} и присваивает им значения переменных с именами ${<i>prefix_from</i>.имя_поля.<i>postfix_from</i>} переводя при этом в HTML-безопасный вид. Под "имя_поля" подразумеваются имена полей таблицы <i>table</i>.</p> <p> </p> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при [link=89638#make]создании основных файлов компонентов[/link].</p>
+	 * <p>Создает глобальные переменные с именами ${<i>prefix_to</i>.имя_поля} и присваивает им значения переменных с именами ${<i>prefix_from</i>.имя_поля.<i>postfix_from</i>} переводя при этом в HTML-безопасный вид. Под "имя_поля" подразумеваются имена полей таблицы <i>table</i>.</p> <p> </p> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
 	 *
 	 *
 	 *
@@ -1826,22 +1800,22 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * @param string $prefix_from = "str_" Префикс для переменных ИЗ которых будет производиться
-	 * преобразование. <br>Необязательный. По умолчанию "str_".
+	 * преобразование. <br> Необязательный. По умолчанию "str_".
 	 *
 	 *
 	 *
 	 * @param string $prefix_to = "str_" Префикс для переменных В которые будет производиться
-	 * преобразование. <br>Необязательный. По умолчанию "str_".
+	 * преобразование. <br> Необязательный. По умолчанию "str_".
 	 *
 	 *
 	 *
 	 * @param string $postfix_from = "" Суффикс (постфикс) для переменных ИЗ которых будет производиться
-	 * преобразование. <br>Необязательный. По умолчанию "".
+	 * преобразование. <br> Необязательный. По умолчанию "".
 	 *
 	 *
 	 *
 	 * @param bool $init_anyway = false Значение "true" - инициализировать переменные всегда, т.е. не
-	 * зависимо были ли они изначально. <br>Необязательный. По умолчанию -
+	 * зависимо были ли они изначально. <br> Необязательный. По умолчанию -
 	 * "false".
 	 *
 	 *
@@ -1878,9 +1852,9 @@ class CDatabase extends CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/preparefields.php">CDatabase::PrepareFields</a>
-	 * </li></ul><a name="examples"></a>
+	 * <ul> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php">CDatabase::PrepareFields</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php
@@ -2156,9 +2130,9 @@ class CDBResult extends CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -2236,7 +2210,7 @@ class CDBResult extends CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
 	 *
 	 *
 	 *
@@ -2263,7 +2237,7 @@ class CDBResult extends CAllDBResult
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2283,7 +2257,7 @@ class CDBResult extends CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество записей, измененных SQL-командами "INSERT", "UPDATE" или "DELETE".</p>
+	 * <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
 	 *
 	 *
 	 *
@@ -2327,7 +2301,7 @@ class CDBResult extends CAllDBResult
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2386,7 +2360,7 @@ class CDBResult extends CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2432,7 +2406,7 @@ class CDBResult extends CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *

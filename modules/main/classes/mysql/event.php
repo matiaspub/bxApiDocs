@@ -116,7 +116,7 @@ class CEventMessage extends CAllEventMessage
 {
 	
 	/**
-	 * <p>Возвращает список почтовых шаблонов в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список почтовых шаблонов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -188,10 +188,10 @@ class CEventMessage extends CAllEventMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/index.php">Поля шаблона
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
 	 * почтового сообщения</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/getbyid.php">CEventMessage::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getbyid.php">CEventMessage::GetByID</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

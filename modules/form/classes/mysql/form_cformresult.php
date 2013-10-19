@@ -6,7 +6,7 @@
 
 
 /**
- * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатами</a>.
+ * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.
  *
  *
  *
@@ -29,7 +29,7 @@ class CFormResult extends CAllFormResult
 	// список результатов
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
 	 *
 	 *
 	 *
@@ -88,35 +88,35 @@ class CFormResult extends CAllFormResult
 	 * искаться точное совпадение); </li> <li> <b>SESSION_ID_EXACT_MATCH</b> - если
 	 * значение равно "N", то при фильтрации по <b>SESSION_ID</b> будет искаться
 	 * вхождение; </li> <li> <b>FIELDS</b> - массив, содержащий параметры фильтра
-	 * для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a>
-	 * по значениям <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a> и <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы. Каждый
+	 * для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>
+	 * по значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Каждый
 	 * элемент данного массива представляет из себя массив, описывающий
 	 * параметры фильтра по <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросу</a> или <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полю</a> веб-формы; ключами
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросу</a> или <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полю</a> веб-формы; ключами
 	 * подобного массива могут быть: <ul> <li> <b>SID</b> - символьный
-	 * идентификатор <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> или
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы; </li> <li>
-	 * <b>PARAMETER_NAME</b> - тип данных по которым фильтруем, допустимы
-	 * следующие значения: <ul> <li> <b>USER</b> - фильтруем по ответам введенных
-	 * авторами с клавиатуры; </li> <li> <b>ANSWER_TEXT</b> - фильтруем по параметру
-	 * <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> - фильтруем по параметру
-	 * <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> - значение, по которому
-	 * фильтруем (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
-	 * логика</a>); </li> <li> <b>FILTER_TYPE</b> - тип фильтра, определяет, как
-	 * интерпретировать данные по которым фильтруем: <ul> <li> <b>integer</b> -
-	 * означает, что данные, по которым будет осуществляться фильтрация,
-	 * считать числами (используется только с
-	 * <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>text</b> - означает, что данные,
-	 * по которым будет осуществляться фильтрация, должны
-	 * обрабатываться как текстовые поля (используется только с
-	 * <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>date</b> - означает, что данные
-	 * по которым будет осуществляться фильтрация, должны
-	 * обрабатываться как даты (используется только с <b>PARAMETER_NAME</b>=USER);
-	 * </li> <li> <b>answer_id</b> - означает, что фильтрация будет производиться
-	 * только по прямому совпадению с ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (при этом PARAMETER_NAME не
+	 * идентификатор <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; синоним -
+	 * <b>CODE</b>;</li> <li> <b>PARAMETER_NAME</b> - тип данных по которым фильтруем,
+	 * допустимы следующие значения: <ul> <li> <b>USER</b> - фильтруем по ответам
+	 * введенных авторами с клавиатуры; </li> <li> <b>ANSWER_TEXT</b> - фильтруем по
+	 * параметру <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> - фильтруем по
+	 * параметру <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> - значение, по
+	 * которому фильтруем (допускается <a
+	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>); </li> <li>
+	 * <b>FILTER_TYPE</b> - тип фильтра, определяет, как интерпретировать данные
+	 * по которым фильтруем: <ul> <li> <b>integer</b> - означает, что данные, по
+	 * которым будет осуществляться фильтрация, считать числами
+	 * (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>text</b>
+	 * - означает, что данные, по которым будет осуществляться
+	 * фильтрация, должны обрабатываться как текстовые поля
+	 * (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>date</b>
+	 * - означает, что данные по которым будет осуществляться
+	 * фильтрация, должны обрабатываться как даты (используется только
+	 * с <b>PARAMETER_NAME</b>=USER); </li> <li> <b>answer_id</b> - означает, что фильтрация будет
+	 * производиться только по прямому совпадению с ID <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (при этом PARAMETER_NAME не
 	 * имеет значения). </li> </ul> </li> <li> <b>PART</b> - если тип фильтра
 	 * <b>FILTER_TYPE</b>=[integer|date], то данное поле <b>должно</b>содержать одно из
 	 * трех значений: <ul> <li> <b>0</b> - прямое совпадение со значением; </li> <li>
@@ -137,9 +137,9 @@ class CFormResult extends CAllFormResult
 	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
 	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
 	 * проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для того
-	 * чтобы <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результат</a> попал в
+	 * чтобы <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a> попал в
 	 * результирующий список, необходимо обладать следующими <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму
 	 * <i>form_id</i>: <br><br><b>[20] Работа со всеми результатами в соответствии с
 	 * их статусами</b> <br><br> или <br><br><b>[15] Работа со своим результатом в
 	 * соответствии с его статусом</b> - в этом случае результирующий
@@ -238,10 +238,10 @@ class CFormResult extends CAllFormResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -603,12 +603,12 @@ class CFormResult extends CAllFormResult
 
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данной функцией: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
+	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данной функцией: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>.
+	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
 	 *
 	 *
 	 *
@@ -627,12 +627,13 @@ class CFormResult extends CAllFormResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>;
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getlist.php">CFormResult::GetList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>;
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>;
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getlist.php">CFormResult::GetList</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>; </li>
+	 * <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -671,17 +672,17 @@ class CFormResult extends CAllFormResult
 	// права на результат
 	
 	/**
-	 * <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
+	 * <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>.
+	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
 	 *
 	 *
 	 *
 	 * @param int &$current_status_id  Ссылка на переменную, в которую будет сохранен ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статуса</a>, указанного
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>, указанного
 	 * результата <i>result_id</i>.
 	 *
 	 *
@@ -713,13 +714,13 @@ class CFormResult extends CAllFormResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#result">Права на результат</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getpermission.php">CForm::GetPermission</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

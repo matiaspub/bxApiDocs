@@ -134,13 +134,19 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			$arResultExt = array();
 			while($ar = $rs->Fetch())
 			{
+				$canSort = true;
 				if(preg_match("/^(varchar|char)\\((\\d+)\\)/", $ar["Type"], $match))
 				{
 					$ar["DATA_TYPE"] = "string";
 					$ar["DATA_LENGTH"] = $match[2];
 				}
-				elseif(preg_match("/^(varchar|char|text|longtext|mediumtext)/", $ar["Type"]))
+				elseif(preg_match("/^(varchar|char)/", $ar["Type"]))
 				{
+					$ar["DATA_TYPE"] = "string";
+				}
+				elseif(preg_match("/^(text|longtext|mediumtext)/", $ar["Type"]))
+				{
+					$canSort = false;
 					$ar["DATA_TYPE"] = "string";
 				}
 				elseif(preg_match("/^(datetime|timestamp)/", $ar["Type"]))
@@ -151,7 +157,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 				{
 					$ar["DATA_TYPE"] = "date";
 				}
-				elseif(preg_match("/^(int|smallint)/", $ar["Type"]))
+				elseif(preg_match("/^(int|smallint|bigint)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "int";
 				}
@@ -161,6 +167,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 				}
 				else
 				{
+					$canSort = false;
 					$ar["DATA_TYPE"] = "unknown";
 				}
 				$arResult[$ar["Field"]] = $ar["DATA_TYPE"];
@@ -169,6 +176,7 @@ class CPerfomanceTable extends CAllPerfomanceTable
 					"length" => $ar["DATA_LENGTH"],
 					"nullable" => $ar["Null"] !== "NO",
 					"default" => $ar["Default"],
+					"sortable" => $canSort,
 					//"info" => $ar,
 				);
 			}
@@ -254,6 +262,12 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			$strSql = $strSql." LIMIT ".IntVal($arNavParams["nTopCount"]);
 			return $DB->Query($strSql);
 		}
+	}
+
+
+	public static function escapeColumn($column)
+	{
+		return "`".$column."`";
 	}
 }
 ?>

@@ -160,7 +160,7 @@ if (empty($arRunErrors))
 
 	// We can't link more than 30 tables.
 	$tableLinksCount = 10;
-	for ($i = 0; $i < count($field_code); $i++)
+	for ($i = 0, $intCount = count($field_code); $i < $intCount; $i++)
 	{
 		if (substr($field_code[$i], 0, strlen("CR_PRICE_"))=="CR_PRICE_" && isset($field_needed[$i]) && $field_needed[$i]=="Y")
 		{
@@ -425,9 +425,11 @@ if (empty($arRunErrors))
 			if ($bNeedGroups)
 			{
 				$indreseg = 0;
-				$reseg = CIBlockElement::GetElementGroups($res1["ID"], true);
+				$reseg = CIBlockElement::GetElementGroups($res1["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 				while ($reseg1 = $reseg->Fetch())
 				{
+					if (0 < intval($reseg1['ADDITIONAL_PROPERTY_ID']))
+						continue;
 					$sections_path = GetIBlockSectionPath($IBLOCK_ID, $reseg1["ID"]);
 					while ($arSection = $sections_path->Fetch())
 					{
@@ -440,28 +442,18 @@ if (empty($arRunErrors))
 					}
 					$indreseg++;
 				}
-				if (count($arResSections)<=0)
+				if (empty($arResSections))
 					$arResSections[0] = array();
 			}
 			else
 			{
 				$arResSections[0] = array();
-				/*$sections_path = GetIBlockSectionPath($IBLOCK_ID, $res1["IBLOCK_SECTION_ID"]);
-				while ($arSection = $sections_path->GetNext())
-				{
-					$arResSectionTmp = array();
-					foreach ($arAvailGroupFields_names as $key => $value)
-					{
-						$arResSectionTmp[$key] = $arSection[$value["field"]];
-					}
-					$arResSections[0][] = $arResSectionTmp;
-				}*/
 			}
 
-			for ($inds = 0; $inds < count($arResSections); $inds++)
+			for ($inds = 0, $intSectCount = count($arResSections); $inds < $intSectCount; $inds++)
 			{
 				$arResFields = array();
-				for ($i = 0; $i < count($arNeedFields); $i++)
+				for ($i = 0, $intNFCount = count($arNeedFields); $i < $intNFCount; $i++)
 				{
 					$bFieldOut = False;
 					if (is_set($arAvailProdFields_names, $arNeedFields[$i]))

@@ -142,8 +142,8 @@ class CGridOptions
 			//filtered outside, we don't control the filter field value
 			if($field["filtered"] == true)
 			{
-				if(isset($field["value"]))
-					$aRes[$field["id"]] = $field["value"];
+				if(isset($field["filter_value"]))
+					$aRes[$field["id"]] = $field["filter_value"];
 				else
 					$aRes[$field["id"]] = true;
 				continue;

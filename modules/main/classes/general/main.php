@@ -93,7 +93,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает путь к текущей странице относительно корня без параметров.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	 * <p>Возвращает путь к текущей странице относительно корня без параметров.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
 	 *
 	 *
 	 *
@@ -122,12 +122,12 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -185,10 +185,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -205,7 +205,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает путь к текущей странице относительно корня вместе с параметрами.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	 * <p>Возвращает путь к текущей странице относительно корня вместе с параметрами.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
 	 *
 	 *
 	 *
@@ -229,12 +229,12 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -254,7 +254,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает путь к текущей странице относительно корня c добавленными новыми и(или) удаленными текущими параметрами.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	 * <p>Возвращает путь к текущей странице относительно корня c добавленными новыми и(или) удаленными текущими параметрами.</p> <p class="note">Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
 	 *
 	 *
 	 *
@@ -312,12 +312,12 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/other/deleteparam.php">DeleteParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/deleteparam.php">DeleteParam</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -364,12 +364,12 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -556,7 +556,7 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89637]Компоненты[/link] </li> <li> <a
 	 * href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права доступа</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/other/showmessage.php">ShowMessage</a> </li> </ul><a
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -734,7 +734,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает HTML-код для отображения меню заданного типа. В отличии от функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> шаблон меню будет подключаться на каждый пункт меню.</p>
+	 * <p>Возвращает HTML-код для отображения меню заданного типа. В отличии от функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> шаблон меню будет подключаться на каждый пункт меню.</p>
 	 *
 	 *
 	 *
@@ -894,10 +894,10 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04708" >Меню</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -912,7 +912,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает HTML-код для отображения меню заданного типа. В отличие от функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> шаблон меню будет подключаться только один раз.</p> <p class="note">В шаблоне меню, используемом данной функцией, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
+	 * <p>Возвращает HTML-код для отображения меню заданного типа. В отличие от функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> шаблон меню будет подключаться только один раз.</p> <p class="note">В шаблоне меню, используемом данной функцией, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
 	 *
 	 *
 	 *
@@ -1136,10 +1136,10 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04708" >Меню</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> </ul><a
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1154,7 +1154,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/index.php">CMenu</a>, инициализированный функцией <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/init.php">CMenu::Init</a>. Если произошла ошибка, то текст ошибки будет содержаться в свойстве LAST_ERROR данного объекта.</p>
+	 * <p>Возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">CMenu</a>, инициализированный функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a>. Если произошла ошибка, то текст ошибки будет содержаться в свойстве LAST_ERROR данного объекта.</p>
 	 *
 	 *
 	 *
@@ -1208,10 +1208,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1281,7 +1281,7 @@ abstract class CAllMain
 	 * случае в параметре передается идентификатор свойства страницы,
 	 * значение которого будет выведено в качестве заголовка (если это
 	 * значение задано, например, с помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>).<br>Необязательный.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>).<br>Необязательный.
 	 * По умолчанию "false".
 	 *
 	 *
@@ -1295,8 +1295,8 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php
@@ -1315,7 +1315,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Устанавливает заголовок страницы. Если заголовок страницы у вас выводится с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a>, то устанавливать его вы можете уже после того как у вас будет выведена пролог сайта.</p>
+	 * <p>Устанавливает заголовок страницы. Если заголовок страницы у вас выводится с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a>, то устанавливать его вы можете уже после того как у вас будет выведен пролог сайта.</p>
 	 *
 	 *
 	 *
@@ -1337,8 +1337,8 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1385,7 +1385,7 @@ abstract class CAllMain
 	 * @param string $property_name = "title" Идентификатор свойства страницы, значение которого будет
 	 * выведено в качестве заголовка (если это значение задано например,
 	 * с помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>).<br>Необязательный.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>).<br>Необязательный.
 	 * По умолчанию "title".
 	 *
 	 *
@@ -1419,8 +1419,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	 * >Отложенные функции</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1461,14 +1461,15 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
-	 * </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php
@@ -1512,13 +1513,14 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1573,13 +1575,14 @@ abstract class CAllMain
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	 * >Отложенные функции</a> </li> <li>[link=89635]Свойства страниц и
 	 * мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1593,7 +1596,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает [link=89635]свойство[/link] текущей страницы или раздела. Если на самой странице свойство не задано, то будет возвращено значение свойства вышестоящего раздела (рекурсивно до корня сайта).</p>
+	 * <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущей страницы или раздела. Если на самой странице свойство не задано, то будет возвращено значение свойства вышестоящего раздела (рекурсивно до корня сайта).</p>
 	 *
 	 *
 	 *
@@ -1623,13 +1626,14 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties"
 	 * >Свойства страниц и мета-теги</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1672,13 +1676,14 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-тэги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1730,13 +1735,14 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1845,13 +1851,14 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-тэги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1908,13 +1915,14 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-тэги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getproperty.php">CMain::GetProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpageproperty.php">CMain::GetDirProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpagepropertylist.php">CMain::GetPagePropertyList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1980,10 +1988,10 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89635]Свойства страниц и мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li> </ul><a
-	 * name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php
@@ -2030,7 +2038,7 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <p><a href="http://dev.1c-bitrix.ruapi_help/advertising/classes/index.php">Классы модуля
+	 * <p><a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/index.php">Классы модуля
 	 * Реклама</a></p><a name="examples"></a>
 	 *
 	 *
@@ -2050,7 +2058,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Отображает [link=89635]свойство страницы[/link] в виде мета-тега. Функция допускает использование специальных символов (html entities) в значениях свойств.</p> <p>Если на самой странице свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если значение свойства не определено, то метод отобразит пустую строку.</p> <p>Данная функция использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать значения мета-тегов через свойства страницы или раздела (с помощью функций <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>, <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>) уже после того как был выведен пролог сайта.</p>
+	 * <p>Отображает [link=89635]свойство страницы[/link] в виде мета-тега. Функция допускает использование специальных символов (html entities) в значениях свойств.</p> <p>Если на самой странице свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если значение свойства не определено, то метод отобразит пустую строку.</p> <p>Данная функция использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать значения мета-тегов через свойства страницы или раздела (с помощью функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>) уже после того как был выведен пролог сайта.</p>
 	 *
 	 *
 	 *
@@ -2099,10 +2107,10 @@ abstract class CAllMain
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	 * >Отложенные функции</a> </li> <li>[link=89635]Свойства страниц и
 	 * мета-теги[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmeta.php">CMain::GetMeta</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li> </ul><a
-	 * name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php">CMain::GetMeta</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php
@@ -2137,9 +2145,9 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2206,16 +2214,21 @@ abstract class CAllMain
 		return array_unique($this->sPath2css);
 	}
 
+	public function GetAdditionalCSSArray()
+	{
+		return array_unique($this->arHeadAdditionalCss);
+	}
+
 	
 	/**
-	 * <p>Возвращает CSS страницы. CSS страницы может быть задан с помощью функций <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> и <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>. Помимо заданных CSS стилей, всегда возвращается CSS текущего шаблона сайта, задаваемого в файле <b>/bitrix/templates/</b><i>ID шаблона</i><b>/styles.css</b>.</p>
+	 * <p>Возвращает CSS страницы. CSS страницы может быть задан с помощью функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>. Помимо заданных CSS стилей, всегда возвращается CSS текущего шаблона сайта, задаваемого в файле <b>/bitrix/templates/</b><i>ID шаблона</i><b>/styles.css</b>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param bool $external = true Если значение - "true", то выводится HTML представляющий из себя ссылку
 	 * на внешний CSS, например: <br><pre>&lt;LINK
-	 * href="http://dev.1c-bitrix.rubitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
+	 * href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
 	 * значение "false", то выводится HTML представляющий из себя внутренний
 	 * CSS, например: <pre>&lt;style type="text/css"&gt; body { margin: 0px; padding:0px; background-color: #FFFFFF}
 	 * ... &lt;/style&gt;</pre> Исключение составляет CSS стили лежащие в каталоге
@@ -2235,9 +2248,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
+	 * </ul>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php
@@ -2247,18 +2261,14 @@ abstract class CAllMain
 	{
 		$res = '';
 		$site_template = '';
-		$arCSS = $this->GetCSSArray();
 		$arTemplateCss = array();
+		$arCSS = $this->GetCSSArray();
+		$arAdditionalCSS = $this->GetAdditionalCSSArray();
 		$optimizeCSS = self::IsCSSOptimized();
 
 		if($cMaxStylesCnt === true)
 		{
 			$cMaxStylesCnt = COption::GetOptionInt('main', 'max_css_files', 15);
-		}
-
-		if($optimizeCSS)
-		{
-			$cMaxStylesCnt -= 3;
 		}
 
 		global $USER;
@@ -2285,14 +2295,16 @@ abstract class CAllMain
 				$arTemplateCss[] = $path."/template_styles.css";
 			}
 		}
-		if($optimizeCSS == 'Y')
+
+		if($optimizeCSS)
 		{
+			$cMaxStylesCnt -= 3;
 			$cssFile = array();
 			$cssSrcFile = array();
 			$cssBxFile = array();
 			$cssSrcBxFile = array();
 			$cssTemplateFile = array();
-			$cssSrcTmplateFile = array();
+			$cssSrcTemplateFile = array();
 
 			foreach ($arTemplateCss as $key => $css)
 			{
@@ -2302,31 +2314,35 @@ abstract class CAllMain
 		}
 		else
 		{
-			$arCSS = array_merge($arCSS,$arTemplateCss, array_unique($this->arHeadAdditionalCss));
+			$arCSS = array_merge($arCSS, $arTemplateCss, $arAdditionalCSS);
 		}
 
-		$isIE = IsIE();
 		$cnt = 0;
-		$optimCnt = 0;
-		$res_content = '';
 		$ruleCount = 0;
+		$res_content = '';
+		$isIE = IsIE();
+		$optimizeCnt = count($arTemplateCss) + count($arAdditionalCSS);
+
 		foreach($arCSS as $cssKey => $css_path)
 		{
 			$bExternalLink = (strncmp($css_path, 'http://', 7) == 0 || strncmp($css_path, 'https://', 8) == 0);
 
 			if(!$bExternalLink)
 			{
-				if(($p = strpos($css_path, "?"))>0)
+				if(($p = strpos($css_path, "?")) > 0)
+				{
 					$css_file = substr($css_path, 0, $p);
+				}
 				else
+				{
 					$css_file = $css_path;
-
+				}
 				$filename = $_SERVER["DOCUMENT_ROOT"].$css_file;
 			}
 
 			$bLink = ($bExternalLink || substr($css_file, -4, 4) != '.css');
 			$addCSS = ((strncmp($css_path, '/bitrix/themes/', 15) != 0) && (strncmp($css_path, '/bitrix/modules/', 16) != 0));
-			$optimize = ($optimizeCSS == 'Y' && $addCSS);
+			$optimize = ($optimizeCSS && $addCSS);
 
 			if(!$isIE || $cnt < $cMaxStylesCnt || $optimize || $bLink)
 			{
@@ -2356,7 +2372,7 @@ abstract class CAllMain
 							else
 							{
 								// Template css
-								$cssSrcTmplateFile[] = $css_path;
+								$cssSrcTemplateFile[] = $css_path;
 								$cssTemplateFile[] = $css_file;
 							}
 						}
@@ -2366,7 +2382,7 @@ abstract class CAllMain
 							$cssSrcBxFile[] = $css_path;
 							$cssBxFile[] = $css_file;
 						}
-						$optimCnt++;
+						$optimizeCnt++;
 					}
 					else
 					{
@@ -2396,24 +2412,27 @@ abstract class CAllMain
 			}
 		}
 
-		if($optimizeCSS == 'Y' && $optimCnt > 0)
+		if($optimizeCSS && $optimizeCnt > 0)
 		{
 			$res .= $this->__OptimizeCssJs($cssFile, $cssSrcFile, $site_template, false, 'page', 'css', $bXhtmlStyle);
 			$res .= $this->__OptimizeCssJs($cssBxFile, $cssSrcBxFile, $site_template, true, 'kernel', 'css', $bXhtmlStyle);
 
+			$arTemplateCss = array_merge($arTemplateCss, $arAdditionalCSS);
 
-			$arTemplateCss = array_merge($arTemplateCss, array_unique($this->arHeadAdditionalCss));
-			foreach ($arTemplateCss as $key => $css)
+			foreach ($arTemplateCss as $css)
 			{
 				$cssTemplateFile[] = $css;
-				$cssSrcTmplateFile[] = CUtil::GetAdditionalFileURL($css);
+				$cssSrcTemplateFile[] = CUtil::GetAdditionalFileURL($css);
 			}
-			$res .= $this->__OptimizeCssJs($cssTemplateFile, $cssSrcTmplateFile, $site_template, false, 'template', 'css', $bXhtmlStyle);
-			unset($cssFile, $cssSrcFile, $arTemplateCss, $cssTemplateFile, $cssSrcTmplateFile);
+
+			$res .= $this->__OptimizeCssJs($cssTemplateFile, $cssSrcTemplateFile, $site_template, false, 'template', 'css', $bXhtmlStyle);
+			unset($cssFile, $cssSrcFile, $arTemplateCss, $cssTemplateFile, $cssSrcTemplateFile);
 		}
 
 		if($res_content!='')
+		{
 			$res .= '<style type="text/css">'."\n".$res_content."\n</style>\n";
+		}
 
 		return $res;
 	}
@@ -2455,10 +2474,27 @@ abstract class CAllMain
 
 		foreach($arSrcFile as $key => $filePath)
 		{
-			if(strpos($filePath, '?') === false)
+			if(strncmp($filePath, 'http://', 7) == 0 || strncmp($filePath, 'https://', 8) == 0)
+			{
+				if($type = 'js')
+				{
+					$res .= '<script type="text/javascript" src="'.$filePath.'"></script>'."\n";
+				}
+				else
+				{
+					$res .= '<link href="'.$filePath.'" type="text/css" rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
+				}
+				unset($arFile[$key], $arSrcFile[$key]);
+			}
+			elseif(strpos($filePath, '?') === false)
 			{
 				$arSrcFile[$key] = CUtil::GetAdditionalFileURL($filePath);
 			}
+		}
+
+		if(count($arFile) < 1 || count($arSrcFile) < 1)
+		{
+			return $res;
 		}
 
 		if(!$unique)
@@ -2552,7 +2588,7 @@ abstract class CAllMain
 
 				if($noCheckOnly)
 				{
-					$contents .= "\n\n".file_get_contents($_SERVER["DOCUMENT_ROOT"].$optimFName);
+					$contents .= file_get_contents($_SERVER["DOCUMENT_ROOT"].$optimFName);
 
 					if($type == 'css')
 					{
@@ -2578,13 +2614,14 @@ abstract class CAllMain
 				}
 			}
 
+			$needWrite = false;
 			if($noCheckOnly)
 			{
 				foreach($arFile as $key => $filename)
 				{
 					$filename = $_SERVER['DOCUMENT_ROOT'].$filename;
 					$tmp_content = file_get_contents($filename);
-					if($tmp_content !== '')
+					if($tmp_content && $tmp_content !== '')
 					{
 						if($type == 'css')
 						{
@@ -2605,20 +2642,28 @@ abstract class CAllMain
 								$arFilesInfo['CUR_IE_CNT']++;
 								$arIEContent[$arFilesInfo['CUR_IE_CNT']] .= $tmp_content;
 							}
-
 							$contents .= "\n\n".$tmp_content;
 						}
 						else
 						{
 							$contents .= "\n; /* Start:".$arFile[$key]."*/\n".$tmp_content."\n/* End */\n;";
 						}
-					}
 
-					if($unique)
-						$arFilesInfo['FILES'][$filename] = self::__GetCssJsTime($arSrcFile[$key]);
+						if($unique)
+						{
+							$arFilesInfo['FILES'][$filename] = self::__GetCssJsTime($arSrcFile[$key]);
+						}
+
+						$needWrite = true;
+					}
 				}
 
-				if(($writeResult = self::__WriteCssJsCache($optimFName, $contents)) && $unique)
+				if(!$needWrite)
+				{
+					$writeResult = true;
+				}
+
+				if($needWrite && ($writeResult = self::__WriteCssJsCache($optimFName, $contents)) && $unique)
 				{
 					$cacheInfo = '<? $arFilesInfo = array( \'FILES\' => array(';
 
@@ -2858,7 +2903,7 @@ abstract class CAllMain
 	 *
 	 * @param bool $external = true Если значение - "true", то выводится HTML представляющий из себя ссылку
 	 * на внешний CSS, например: <br><pre>&lt;LINK
-	 * href="http://dev.1c-bitrix.rubitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
+	 * href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
 	 * значение "false", то выводится HTML представляющий из себя внутренний
 	 * CSS, например: <pre>&lt;style type="text/css"&gt; body { margin: 0px; padding:0px; background-color: #FFFFFF}
 	 * ... &lt;/style&gt;</pre> Исключение составляет CSS стили лежащие в каталоге
@@ -2898,9 +2943,9 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	 * >Отложенные функции</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -3117,6 +3162,24 @@ abstract class CAllMain
 		return defined('SITE_TEMPLATE_ID') && COption::GetOptionString('main', 'optimize_js_files', 'N') == 'Y' && !$this->bInAjax;
 	}
 
+	public static function isKernelJS($src)
+	{
+		$arNotKernel = array(
+			'/bitrix/js/fileman/sticker.js', '/bitrix/js/main/core/core_admin.js', '/bitrix/js/main/admin_tools.js',
+			'/bitrix/js/main/admin_search.js', '/bitrix/js/main/hot_keys.js','/bitrix/js/main/public_tools.js',
+			'/bitrix/js/main/file_upload_agent.js', '/bitrix/js/main/core/core_tags.js', '/bitrix/js/meeting/meeting.js',
+			'/bitrix/js/intranet/outlook.js', '/bitrix/js/intranet/structure.js', '/bitrix/js/forum/popup_image.js',
+			'/bitrix/js/report/construct.js', '/bitrix/js/iblock/iblock_edit.js', '/bitrix/js/socialnetwork/log-destination.js',
+			'/bitrix/js/webdav/file_dialog.js','/bitrix/js/crm/common.js','/bitrix/js/crm/crm.js',
+			'/bitrix/js/crm/activity.js','/bitrix/js/crm/interface_grid.js', '/bitrix/js/crm/communication_search.js','/bitrix/js/crm/webdav_uploader.js',
+			'/bitrix/js/crm/progress_control.js','/bitrix/js/crm/interface_form.js','/bitrix/js/crm/instant_editor.js',
+			'/bitrix/js/crm/outlook.js','/bitrix/js/tasks/task-popups.js','/bitrix/js/tasks/task-reminders.js'
+		);
+
+		$res = in_array($src, $arNotKernel);
+		return !$res;
+	}
+
 	public function GetHeadScripts($type = 0)
 	{
 		$res = "";
@@ -3177,8 +3240,15 @@ abstract class CAllMain
 					}
 					else
 					{
-						$arBxFile[] = $arScripts[$jsKey];
-						$arSrcBxFile[] = $src;
+						if($this->isKernelJS($arScripts[$jsKey]))
+						{
+							$arBxFile[] = $arScripts[$jsKey];
+							$arSrcBxFile[] = $src;
+						}
+						else
+						{
+							$this->AddAdditionalJS('<script type="text/javascript" src="'.$src.'"></script>');
+						}
 					}
 				}
 				else
@@ -3326,7 +3396,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает "true", если кнопка "Показать включаемые области" на <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">панели управления</a> нажата, в противном случае - "false".</p>
+	 * <p>Возвращает "true", если кнопка "Показать включаемые области" на <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a> нажата, в противном случае - "false".</p>
 	 *
 	 *
 	 *
@@ -3414,7 +3484,7 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -3444,6 +3514,20 @@ abstract class CAllMain
 		$this->SetShowIncludeAreas($mode != 'view');
 	}
 
+	
+	/**
+	 * <p>Функция возвращает текущий режим отображения административной панели.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @return string <p>Одно из следующих зачений:</p><ul> <li>view - просмотр (по умолчанию) <br>
+	 * </li> <li>edit - редактирование <br> </li> <li>configure - редактирование <br> </li>
+	 * </ul><br>
+	 *
+	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php
+	 * @author Bitrix
+	 */
 	public function GetPublicShowMode()
 	{
 		return $this->GetShowIncludeAreas() ? 'configure' : 'view';
@@ -3574,7 +3658,7 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getshowincludeareas.php">CMain::GetShowIncludeAreas</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getshowincludeareas.php">CMain::GetShowIncludeAreas</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -3621,7 +3705,7 @@ abstract class CAllMain
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89637]Компоненты[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -3677,9 +3761,9 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -3852,30 +3936,6 @@ abstract class CAllMain
 		return $result;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php
-	 * @author Bitrix
-	 */
 	public function AddViewContent($view, $content, $pos = 500)
 	{
 		if(!is_array($this->__view[$view]))
@@ -3886,7 +3946,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку в одну строку и передать в <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов.</p>
+	 * <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку в одну строку и передать в <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов.</p>
 	 *
 	 *
 	 *
@@ -4106,9 +4166,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li>[link=89637]Компоненты[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
+	 * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04565"
+	 * >Компоненты</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -4401,8 +4462,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927"
 	 * >Навигационная цепочка</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4451,8 +4512,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927"
 	 * >Навигационная цепочка</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> </ul>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php
@@ -4662,8 +4723,8 @@ abstract class CAllMain
 	 * >Навигационная цепочка</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные
 	 * функции</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4735,12 +4796,12 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/events/onchangepermissions.php">Событие
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onchangepermissions.php">Событие
 	 * "OnChangePermissions"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -4834,6 +4895,7 @@ abstract class CAllMain
 
 		$this->SaveFileContent($DOC_ROOT.$path_dir."/.access.php", $str);
 		$CACHE_MANAGER->CleanDir("menu");
+		CBitrixComponent::clearComponentCache("bitrix:menu");
 		unset($this->FILE_PERMISSION_CACHE[$site."|".$path_dir."/.access.php"]);
 
 		if($bDiff)
@@ -4884,11 +4946,11 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -4949,6 +5011,7 @@ abstract class CAllMain
 
 		$this->SaveFileContent($DOC_ROOT.$path_dir."/.access.php", $str);
 		$CACHE_MANAGER->CleanDir("menu");
+		CBitrixComponent::clearComponentCache("bitrix:menu");
 		unset($this->FILE_PERMISSION_CACHE[$site."|".$path_dir."/.access.php"]);
 
 		foreach(GetModuleEvents("main", "OnChangePermissions", true) as $arEvent)
@@ -5011,11 +5074,11 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfileaccesspermission.php">CMain::GetFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -5090,11 +5153,11 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -5489,10 +5552,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getfilecontent.php">CMain::GetFileContent</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/events/onbeforechangefile.php">Событие
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfilecontent.php">CMain::GetFileContent</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforechangefile.php">Событие
 	 * "OnChangeFile"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -5606,7 +5669,7 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -5954,8 +6017,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getuserright.php">CMain::GetUserRight</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getuserright.php">CMain::GetUserRight</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -6096,8 +6159,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права
 	 * доступа</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getuserroles.php">CMain::GetUserRoles</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getuserroles.php">CMain::GetUserRoles</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -6394,8 +6457,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285"
 	 * >Технология переноса посетителей</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -6494,8 +6557,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285"
 	 * >Технология переноса посетителей</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -6684,8 +6747,8 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285"
 	 * >Технология переноса посетителей</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> </ul>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php
@@ -6696,78 +6759,6 @@ abstract class CAllMain
 		$this->AddBufferContent(array(&$this, "GetSpreadCookieHTML"));
 	}
 
-	
-	/**
-	 * <p>Добавляет в <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">панель управления</a> кнопку.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $button  Массив описывающий добавляемую кнопку. Ключи массива:<br><ul> <li>
-	 * <b>HREF</b> - ссылка на кнопке </li> <li> <b>SRC</b> - путь от корня сайта к
-	 * картинке которая будет выведена на кнопке </li> <li> <b>ALT</b> - текст
-	 * всплывающей подсказки на кнопке </li> <li> <b>MAIN_SORT</b> - индекс
-	 * сортировки для группы кнопок, для стандартных групп иконок
-	 * данный параметр имеет следующие значения: <ul> <li>100 - группа иконок
-	 * модуля управления статикой </li> <li>200 - группа иконок модуля
-	 * документооборота </li> <li>300 - группа иконок модуля информационных
-	 * блоков </li> </ul> </li> <li> <b>SORT</b> - индекс сортировки внутри группы
-	 * кнопок </li> <li> <b>TYPE</b> - (BIG/SMALL) размер иконки. (По умолчанию "SMALL".) </li>
-	 * <li> <b>HINT</b> - Массив с ключами: <ul> <li> <b>TITLE</b> - Заголовок всплывающей
-	 * подсказки;</li> <li> <b>TEXT</b> - Текст всплывающей подсказки.</li> </ul> </li> <li>
-	 * <b>ICON</b> - CSS иконки. </li> <li> <b>TEXT</b> - Текст кнопки. </li> </ul> Если у
-	 * пользователя не хватает прав на ту или иную операцию и вы хотите в
-	 * любом случае вывести кнопку, то необходимо <b>HREF</b> оставлять
-	 * пустым, при этом кнопка будет выведена черно-белой и без ссылки.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим уровень доступа к модулю "Веб-формы"
-	 * $FORM_RIGHT = $APPLICATION-&gt;GetUserRight("form");
-	 * // если доступ есть то
-	 * if($FORM_RIGHT&gt;"D"):
-	 *     // добавим в панель кнопку ведущую на список веб-форм
-	 *     <b>$APPLICATION-&gt;AddPanelButton</b>(array(
-	 *         "HREF"      =&gt; "/bitrix/admin/form_list.php", 
-	 *         "SRC"       =&gt; "/bitrix/images/fileman/panel/web_form.gif", 
-	 *         "ALT"       =&gt; "Редактировать веб-форму", 
-	 *         "MAIN_SORT" =&gt; 400, 
-	 *         "SORT"      =&gt; 100
-	 *     ));
-	 * endif;
-	 * ?&gt;Подменю кнопки (на примере кнопки стикеров):MENU =&gt; Array(
-	 *  [0] =&gt; Array(
-	 *   [TEXT] =&gt; &lt;div style="float: left; margin: 0 50px 0 0;"&gt;Наклеить стикер&lt;/div&gt;
-	 *   [TITLE] =&gt; Наклеить новый стикер на страницу
-	 *   [ICON] =&gt;
-	 *   [ACTION] =&gt; if (wind ow .oBXSticker){window .oBXSticker.AddSticker();}
-	 *   [DEFAULT] =&gt; 1
-	 *   [HK_ID] =&gt; FMST_PANEL_STICKER_ADD
-	 *  )
-	 *  [1] =&gt; Array(
-	 *   [SEPARATOR] =&gt; 1
-	 *  )
-	 * )
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">Панель управления</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php
-	 * @author Bitrix
-	 */
 	public function AddPanelButton($arButton, $bReplace=false)
 	{
 		if(is_array($arButton) && count($arButton)>0)
@@ -6846,8 +6837,8 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -6864,7 +6855,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Отображает <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">панель управления</a> в публичной части сайта. <br>Данная функция использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять кнопку в панель управления уже после того как будет выведен пролог сайта.<br><br> Если у пользователя не хватает прав ни на одну операцию задаваемую кнопками <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">панели управления</a>, то панель выведена не будет. Если вам необходимо вывести панель в обязательном порядке, необходимо задать в теле страницы: </p> <pre>$APPLICATION-&gt;ShowPanel = true;</pre>
+	 * <p>Отображает <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панель управления</a> в публичной части сайта. <br>Данная функция использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять кнопку в панель управления уже после того как будет выведен пролог сайта.<br><br> Если у пользователя не хватает прав ни на одну операцию задаваемую кнопками <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a>, то панель выведена не будет. Если вам необходимо вывести панель в обязательном порядке, необходимо задать в теле страницы: </p> <pre>$APPLICATION-&gt;ShowPanel = true;</pre>
 	 *
 	 *
 	 *
@@ -6892,11 +6883,11 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/panel.php">Панель управления</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">Панель управления</a> </li>
 	 * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные
 	 * функции</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -6932,7 +6923,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Возвращает массив описывающий сайт, определяемый по указанному пути и домену. Описание ключей данного массива вы можете найти на странице <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a>. Алгоритм работы функции следующий: </p> <ol> <li>Ищем сайты для которых удовлетворяют <i>path</i> и <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>path</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Возвращаем сайт с установленным флагом "Сайт по умолчанию" </li> </ol>
+	 * <p>Возвращает массив описывающий сайт, определяемый по указанному пути и домену. Описание ключей данного массива вы можете найти на странице <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a>. Алгоритм работы функции следующий: </p> <ol> <li>Ищем сайты для которых удовлетворяют <i>path</i> и <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>path</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Возвращаем сайт с установленным флагом "Сайт по умолчанию" </li> </ol>
 	 *
 	 *
 	 *
@@ -6969,7 +6960,7 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li>
 	 * <li>[link=89624]Сайты[/link] </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -7026,12 +7017,12 @@ abstract class CAllMain
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	 * >Отложенные функции</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -7157,10 +7148,10 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/capplicationexception/index.php">Класс
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
 	 * CApplicationException</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/throwexception.php">CMain::GetException</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::GetException</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -7176,13 +7167,13 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Метод фиксирует исключение <i>msg</i> c кодом <i>id</i>. Получить последнее исключение можно методом $APPLICATION-&gt;<a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getexception.php">GetException()</a></p>
+	 * <p>Метод фиксирует исключение <i>msg</i> c кодом <i>id</i>. Получить последнее исключение можно методом $APPLICATION-&gt;<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">GetException()</a></p>
 	 *
 	 *
 	 *
 	 *
 	 * @param mixed $msg  Текст ошибки или объект класса, наследованного от <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/index.php">CApplicationException</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php">CApplicationException</a>.
 	 *
 	 *
 	 *
@@ -7208,9 +7199,9 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/resetexception.php">CMain::ResetException</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getexception.php">CMain::GetException</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/resetexception.php">CMain::ResetException</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">CMain::GetException</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php
@@ -7227,7 +7218,7 @@ abstract class CAllMain
 
 	
 	/**
-	 * <p>Метод возвращает объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/capplicationexception/index.php">CApplicationException</a>, содержащий последнее исключение. </p>
+	 * <p>Метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">CApplicationException</a>, содержащий последнее исключение. </p>
 	 *
 	 *
 	 *
@@ -7245,9 +7236,9 @@ abstract class CAllMain
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/capplicationexception/index.php">Класс
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
 	 * CApplicationException</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -7813,10 +7804,10 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/index.php#date">Методы класса
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/index.php#date">Методы класса
 	 * CDataBase для работы с датой и временем</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с датой и
-	 * временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с датой
+	 * и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -8089,7 +8080,7 @@ class CAllSite
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]).
 	 *
 	 *
@@ -8126,9 +8117,9 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -8200,7 +8191,7 @@ class CAllSite
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]).
 	 *
 	 *
@@ -8236,9 +8227,9 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/add.php">CSite::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/add.php">CSite::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -8299,7 +8290,7 @@ class CAllSite
 
 	
 	/**
-	 * <p>Функция удаляет сайт. Если удаление успешно, то возвращает объект <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, иначе "false".</p>
+	 * <p>Функция удаляет сайт. Если удаление успешно, то возвращает объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, иначе "false".</p>
 	 *
 	 *
 	 *
@@ -8322,10 +8313,10 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/add.php">CSite::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onbeforesitedelete.php">Событие "OnBeforeSiteDelete"</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/events/onsitedelete.php">Событие "OnSiteDelete"</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/add.php">CSite::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforesitedelete.php">Событие "OnBeforeSiteDelete"</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onsitedelete.php">Событие "OnSiteDelete"</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -8462,7 +8453,7 @@ class CAllSite
 
 	
 	/**
-	 * <p>Возвращает список сайтов в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список сайтов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -8509,9 +8500,9 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getbyid.php">CSite::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getbyid.php">CSite::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -8633,7 +8624,7 @@ class CAllSite
 
 	
 	/**
-	 * <p>Возвращает информацию по сайту в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает информацию по сайту в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -8657,9 +8648,9 @@ class CAllSite
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getlist.php">CSite::GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getlist.php">CSite::GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -9008,7 +8999,7 @@ class CAllLanguage
 
 	
 	/**
-	 * <p>Возвращает список языков в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список языков в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -9048,9 +9039,9 @@ class CAllLanguage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/getbyid.php">CLanguage::GetByID</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/getbyid.php">CLanguage::GetByID</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -9127,7 +9118,7 @@ class CAllLanguage
 
 	
 	/**
-	 * <p>Возвращает язык по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает язык по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -9151,10 +9142,10 @@ class CAllLanguage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/getlist.php">CLanguage::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/selectbox.php">CLanguage::SelectBox</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/getlist.php">CLanguage::GetList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/selectbox.php">CLanguage::SelectBox</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -9242,7 +9233,7 @@ class CAllLanguage
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]).
 	 *
 	 *
@@ -9272,9 +9263,9 @@ class CAllLanguage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/update.php">CLanguage::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/update.php">CLanguage::Update</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -9324,7 +9315,7 @@ class CAllLanguage
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]).
 	 *
 	 *
@@ -9353,9 +9344,9 @@ class CAllLanguage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/add.php">CLanguage::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/add.php">CLanguage::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -9394,7 +9385,7 @@ class CAllLanguage
 
 	
 	/**
-	 * <p>Функция удаляет язык. Возвращается объект <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Функция удаляет язык. Возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -9417,11 +9408,11 @@ class CAllLanguage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/add.php">CLanguage::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/clanguage/update.php">CLanguage::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onbeforelanguagedelete.php">Событие
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/add.php">CLanguage::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/update.php">CLanguage::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforelanguagedelete.php">Событие
 	 * "OnBeforeLanguageDelete"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onlanguagedelete.php">Событие "OnLanguageDelete"</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onlanguagedelete.php">Событие "OnLanguageDelete"</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -10163,8 +10154,8 @@ class CApplicationException
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/capplicationexception/index.php">CApplicationException</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">CApplicationException</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *

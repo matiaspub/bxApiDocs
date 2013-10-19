@@ -52,7 +52,7 @@ define('SITE_TEMPLATE_ID', $siteTemplateId);
 /**
  * Содержит время начала работы страницы в формате возвращаемом функцией <a href="/api_help/main/functions/date/getmicrotime.php">getmicrotime</a>.
  */
-define('START_EXEC_TIME', microtime(true));
+define('START_EXEC_TIME', microtime);
 
 /**
  * Если подключена служебная часть пролога, то данная константа будет инициализирована значением "true". Как правило эту константу используют во включаемых файлах в целях безопасности, когда необходимо убедиться, что пролог подключен и все необходимые права проверены.
@@ -62,12 +62,12 @@ define('B_PROLOG_INCLUDED', true);
 /**
  * Текущая версия главного модуля.
  */
-define('SM_VERSION', "12.5.7");
+define('SM_VERSION', "12.5.13");
 
 /**
  * Дата выпуска текущей версии главного модуля.
  */
-define('SM_VERSION_DATE', "2013-05-16 16:00:00");
+define('SM_VERSION_DATE', "2013-08-23 15:00:00");
 
 /**
  * Если необходимо подключать пролог административной части, то значение данной константы - "true".
@@ -209,7 +209,7 @@ define('BX_CRONTAB', true);
  *        Пример: 
  *         <pre>define("BX_FILE_PERMISSIONS", 0755);</pre>
  */
-define('BX_FILE_PERMISSIONS', 0600);
+define('BX_FILE_PERMISSIONS', 0644);
 
 /**
  * Unix-права для вновь создаваемых каталогов. 	 
@@ -217,7 +217,7 @@ define('BX_FILE_PERMISSIONS', 0600);
  *        Пример: 
  *         <pre>define("BX_DIR_PERMISSIONS", 0755);</pre>
  */
-define('BX_DIR_PERMISSIONS', 0700);
+define('BX_DIR_PERMISSIONS', 0755);
 
 /**
  * Инициализация данной константы значением "true" позволит отключить все модули системы за исключением главного и модуля "<a href="../../../../../fileman/help/ru/index.php.html">Управление структурой</a>". 	 
@@ -267,6 +267,16 @@ define('BX_DISABLE_INDEX_PAGE', null);
  * Может принимать значение true/false. Если инициализировать данную константу каким либо значением,то она отключает/включает сбор бектрейсов при включенной отладке.
  */
 define('BX_NO_SQL_BACKTRACE', null);
+
+/**
+ * Константа для регулирования тегированного кеша пользователей.
+ */
+define('TAGGED_user_card_size', null);
+
+/**
+ * Константа запрещающая сброс кеша акселератора.
+ */
+define('BX_NO_ACCELERATOR_RESET', true);
 
 /**
  * BX_ROOT
@@ -501,27 +511,27 @@ define('BX_WIZARD_CANCEL_ID', "__install_cancel");
 /**
  * ZIP_START_TIME
  */
-define('ZIP_START_TIME', microtime(true));
+define('ZIP_START_TIME', microtime);
 
 /**
  * START_EXEC_EPILOG_AFTER_1
  */
-define('START_EXEC_EPILOG_AFTER_1', microtime());
+define('START_EXEC_EPILOG_AFTER_1', microtime);
 
 /**
  * START_EXEC_EVENTS_1
  */
-define('START_EXEC_EVENTS_1', microtime());
+define('START_EXEC_EVENTS_1', microtime);
 
 /**
  * START_EXEC_EVENTS_2
  */
-define('START_EXEC_EVENTS_2', microtime());
+define('START_EXEC_EVENTS_2', microtime);
 
 /**
  * START_EXEC_EPILOG_BEFORE_1
  */
-define('START_EXEC_EPILOG_BEFORE_1', microtime());
+define('START_EXEC_EPILOG_BEFORE_1', microtime);
 
 /**
  * ADMIN_AJAX_MODE
@@ -536,12 +546,12 @@ define('BITRIX_STATIC_PAGES', true);
 /**
  * START_EXEC_PROLOG_AFTER_1
  */
-define('START_EXEC_PROLOG_AFTER_1', microtime());
+define('START_EXEC_PROLOG_AFTER_1', microtime);
 
 /**
  * START_EXEC_PROLOG_AFTER_2
  */
-define('START_EXEC_PROLOG_AFTER_2', microtime());
+define('START_EXEC_PROLOG_AFTER_2', microtime);
 
 /**
  * ADMIN_SECTION_LOAD_AUTH
@@ -551,7 +561,7 @@ define('ADMIN_SECTION_LOAD_AUTH', 1);
 /**
  * START_EXEC_PROLOG_BEFORE_1
  */
-define('START_EXEC_PROLOG_BEFORE_1', microtime());
+define('START_EXEC_PROLOG_BEFORE_1', microtime);
 
 /**
  * BX_PUBLIC_MODE
@@ -566,7 +576,7 @@ define('BX_URLREWRITE', true);
 /**
  * POST_FORM_ACTION_URI
  */
-define('POST_FORM_ACTION_URI', htmlspecialcharsbx($_SERVER["REQUEST_URI"]));
+define('POST_FORM_ACTION_URI', htmlspecialcharsbx);
 
 /**
  * BX_CHECK_SHORT_URI
@@ -601,7 +611,7 @@ define('BX_SEARCH_ADMIN', true);
 /**
  * ADMIN_THEME_ID
  */
-define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme());
+define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme);
 
 /**
  * BX_COMP_MANAGED_CACHE
@@ -611,7 +621,7 @@ define('BX_COMP_MANAGED_CACHE', true);
 /**
  * BX_CRONTAB_SUPPORT
  */
-define('BX_CRONTAB_SUPPORT', defined("BX_CRONTAB"));
+define('BX_CRONTAB_SUPPORT', defined);
 
 /**
  * BX_STARTED
@@ -621,12 +631,12 @@ define('BX_STARTED', true);
 /**
  * START_EXEC_AGENTS_1
  */
-define('START_EXEC_AGENTS_1', microtime());
+define('START_EXEC_AGENTS_1', microtime);
 
 /**
  * START_EXEC_AGENTS_2
  */
-define('START_EXEC_AGENTS_2', microtime());
+define('START_EXEC_AGENTS_2', microtime);
 
 /**
  * LANG
@@ -646,7 +656,7 @@ define('LANG_ADMIN_LID', $arLang["LANGUAGE_ID"]);
 /**
  * LICENSE_KEY
  */
-define('LICENSE_KEY', $dispatcher->getLicenseKey());
+define('LICENSE_KEY', $dispatcher->getLicenseKey);
 
 /**
  * BX_UTF_PCRE_MODIFIER
@@ -734,19 +744,9 @@ define('ADMIN_MODULE_NAME', 'main');
 define('ADMIN_MODULE_ICON', '<a href="'.BX_ROOT.'/admin/index.php?lang='.LANG.'"><img src="'.BX_ROOT.'/images/main/user.gif" width="48" height="48" border="0" alt="'.GetMessage('MAIN_MODULE_TITLE').'" title="'.GetMessage('MAIN_MODULE_TITLE').'"></a>');
 
 /**
- * BX_SKIP_SESSION_TERMINATE_TIME
- */
-define('BX_SKIP_SESSION_TERMINATE_TIME', true);
-
-/**
- * NOT_CHECK_FILE_PERMISSIONS
- */
-define('NOT_CHECK_FILE_PERMISSIONS', true);
-
-/**
  * START_TIME
  */
-define('START_TIME', time());
+define('START_TIME', time);
 
 /**
  * LOCK_FILE
@@ -756,7 +756,7 @@ define('LOCK_FILE', $_SERVER['DOCUMENT_ROOT'].'/bitrix/backup/auto_lock');
 /**
  * DOCUMENT_ROOT
  */
-define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
+define('DOCUMENT_ROOT', rtrim);
 
 /**
  * DOCUMENT_ROOT_SITE
@@ -767,11 +767,6 @@ define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
  * BX_PUBLIC_TOOLS
  */
 define('BX_PUBLIC_TOOLS', true);
-
-/**
- * BX_NO_ACCELERATOR_RESET
- */
-define('BX_NO_ACCELERATOR_RESET', true);
 
 
 ?>

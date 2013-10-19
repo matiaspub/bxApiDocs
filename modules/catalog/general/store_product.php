@@ -35,23 +35,33 @@ class CCatalogStoreProductAll
 
 	public static function Update($id, $arFields)
 	{
-		$id=intval($id);
-		if($id<0 || !self::CheckFields('UPDATE',$arFields))
+		$id = intval($id);
+
+		foreach(GetModuleEvents("catalog", "OnBeforeStoreProductUpdate", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+				return false;
+
+		if($id < 0 || !self::CheckFields('UPDATE', $arFields))
 			return false;
 		global $DB;
+
 		$strUpdate = $DB->PrepareUpdate("b_catalog_store_product", $arFields);
 		$strSql = "UPDATE b_catalog_store_product SET ".$strUpdate." WHERE ID = ".$id;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		foreach(GetModuleEvents("catalog", "OnStoreProductUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($id, $arFields));
+
 		return true;
 	}
 
-	public static function OnIBlockElementDelete($ProductID)
+	public static function OnIBlockElementDelete($productId)
 	{
 		global $DB;
-		$ProductID = IntVal($ProductID);
-		if ($ProductID > 0)
+		$productId = IntVal($productId);
+		if($productId > 0)
 		{
-			return $DB->Query("DELETE FROM b_catalog_store_product WHERE PRODUCT_ID = ".$ProductID." ", true);
+			return $DB->Query("DELETE FROM b_catalog_store_product WHERE PRODUCT_ID = ".$productId." ", true);
 		}
 	}
 
@@ -59,9 +69,17 @@ class CCatalogStoreProductAll
 	{
 		global $DB;
 		$id = intval($id);
-		if ($id > 0)
+		if($id > 0)
 		{
+			foreach(GetModuleEvents("catalog", "OnBeforeStoreProductDelete", true) as $arEvent)
+				if(ExecuteModuleEventEx($arEvent, array($id)) === false)
+					return false;
+
 			$DB->Query("DELETE FROM b_catalog_store_product WHERE ID = ".$id." ", true);
+
+			foreach(GetModuleEvents("catalog", "OnStoreProductDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id));
+
 			return true;
 		}
 		return false;

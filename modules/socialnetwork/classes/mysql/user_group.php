@@ -42,6 +42,24 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	 * @return int <p>Код связи в случае успешного выполнения и false - в противном
 	 * случае.</p>
 	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * CSocNetUserToGroup::Add(
+	 *       array(
+	 *       "USER_ID" =&gt; $GLOBALS["USER"]-&gt;GetID(), 
+	 *       "GROUP_ID" =&gt; 1,
+	 *       "ROLE" =&gt; SONET_ROLES_USER,
+	 *       "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	 *       "=DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	 *       "INITIATED_BY_TYPE" =&gt; SONET_INITIATED_BY_USER,
+	 *       "INITIATED_BY_USER_ID" =&gt; CUser::GetID(),
+	 *       "MESSAGE" =&gt; false,
+	 *       )
+	 * );
+	 * </pre>
+	 *
+	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Add.php
 	 * @author Bitrix
@@ -322,7 +340,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

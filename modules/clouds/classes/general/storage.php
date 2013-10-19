@@ -485,7 +485,7 @@ class CCloudStorage
 		$fileToStore = CFile::MakeFileArray($to_path);
 		$baseURL = preg_replace("/^https?:/i", "", $obBucket->GetFileSRC("/"));
 		$pathToStore = substr($task["TO_PATH"], strlen($baseURL)-1);
-		if (!$obBucket->SaveFile($pathToStore, $fileToStore))
+		if (!$obBucket->SaveFile(urldecode($pathToStore), $fileToStore))
 		{
 			$DB->Query("
 				UPDATE b_clouds_file_resize
@@ -1106,7 +1106,7 @@ class CCloudStorage
 							&& preg_match("#^(/".$obBucket->PREFIX."|)(/resize_cache/.*\$)#", $request_uri, $match)
 						)
 						{
-							$to_file = $obBucket->GetFileSRC($match[2]);
+							$to_file = $obBucket->GetFileSRC(urldecode($match[2]));
 							if (CCloudStorage::ResizeImageFileCheck($obBucket, $to_file))
 							{
 								LocalRedirect($to_file, true);

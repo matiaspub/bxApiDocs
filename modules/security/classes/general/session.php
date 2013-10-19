@@ -1,15 +1,34 @@
 <?
 class CSecuritySession
 {
+	const GC_AGENT_NAME = "CSecuritySession::CleanUpAgent();";
 	protected static $oldSessionId = null;
 
 	public static function Init()
 	{
-		if(
-			CSecuritySessionMC::isStorageEnabled()
-			&& CSecuritySessionMC::Init()
-		)
+		if(CSecuritySessionVirtual::isStorageEnabled())
 		{
+			if(!CSecuritySessionVirtual::init())
+				self::triggerFatalError("Failed to initialize Virtual session handler");
+
+			//may return false with session.auto_start is set to On
+			if(session_set_save_handler(
+				array("CSecuritySessionVirtual", "open"),
+				array("CSecuritySessionVirtual", "close"),
+				array("CSecuritySessionVirtual", "read"),
+				array("CSecuritySessionVirtual", "write"),
+				array("CSecuritySessionVirtual", "destroy"),
+				array("CSecuritySessionVirtual", "gc")
+			))
+			{
+				register_shutdown_function("session_write_close");
+			};
+		}
+		elseif(CSecuritySessionMC::isStorageEnabled())
+		{
+			if(!CSecuritySessionMC::Init())
+				self::triggerFatalError("Failed to initialize Memcache session handler");
+
 			//may return false with session.auto_start is set to On
 			if(session_set_save_handler(
 				array("CSecuritySessionMC", "open"),
@@ -23,8 +42,11 @@ class CSecuritySession
 				register_shutdown_function("session_write_close");
 			}
 		}
-		elseif(CSecuritySessionDB::Init())
+		else
 		{
+			if(!CSecuritySessionDB::Init())
+				self::triggerFatalError("Failed to initialize DB session handler");
+
 			//may return false with session.auto_start is set to On
 			if(session_set_save_handler(
 				array("CSecuritySessionDB", "open"),
@@ -40,6 +62,19 @@ class CSecuritySession
 		}
 	}
 
+	/**
+	 * @param string $pMessage
+	 */
+	public static function triggerFatalError($pMessage = "")
+	{
+		CHTTP::SetStatus("500 Internal Server Error");
+		trigger_error($pMessage, E_USER_ERROR);
+		die();
+	}
+
+	/**
+	 * @return string
+	 */
 	public static function CleanUpAgent()
 	{
 		global $DB;
@@ -57,7 +92,7 @@ class CSecuritySession
 				$DB->Query($strSql, false, "Module: security; Class: CSecuritySession; Function: CleanUpAgent; File: ".__FILE__."; Line: ".__LINE__);
 		}
 
-		return "CSecuritySession::CleanUpAgent();";
+		return self::GC_AGENT_NAME;
 	}
 
 	public static function UpdateSessID()
@@ -71,18 +106,48 @@ class CSecuritySession
 			self::$oldSessionId = $oldSessionId;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public static function isOldSessionIdExist()
 	{
-		return self::$oldSessionId && self::CheckSessionId(self::$oldSessionId);
+		return self::$oldSessionId && self::checkSessionId(self::$oldSessionId);
 	}
 
+	/**
+	 * @return string
+	 */
 	public static function getOldSessionId()
 	{
 		return self::$oldSessionId;
 	}
 
-	public static function CheckSessionId($id)
+	/**
+	 * @param string $id
+	 * @return int
+	 */
+	public static function checkSessionId($id)
 	{
 		return preg_match("/^[\da-z]{1,32}$/i", $id);
+	}
+
+	public static function activate()
+	{
+		COption::SetOptionString("security", "session", "Y");
+		CSecuritySession::Init();
+		CAgent::RemoveAgent(self::GC_AGENT_NAME, "security");
+		CAgent::Add(array(
+			"NAME" => self::GC_AGENT_NAME,
+			"MODULE_ID" => "security",
+			"ACTIVE" => "Y",
+			"AGENT_INTERVAL" => 1800,
+			"IS_PERIOD" => "N",
+		));
+	}
+
+	public static function deactivate()
+	{
+		COption::SetOptionString("security", "session", "N");
+		CAgent::RemoveAgent(self::GC_AGENT_NAME, "security");
 	}
 }

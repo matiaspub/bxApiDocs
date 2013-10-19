@@ -112,9 +112,9 @@ class CAllForumUser
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -153,9 +153,9 @@ class CAllForumUser
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -194,9 +194,9 @@ class CAllForumUser
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -329,7 +329,7 @@ class CAllForumUser
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">списке полей
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">списке полей
 	 * профайла пользователя</a>. Обязательные поля должны быть
 	 * заполнены.
 	 *
@@ -345,10 +345,10 @@ class CAllForumUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
 	 * <li>Перед добавлением профайла следует проверить возможность
 	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -365,8 +365,7 @@ class CAllForumUser
 		if (!CForumUser::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeUserAdd ***************************/
-		$events = GetModuleEvents("forum", "onBeforeUserAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onBeforeUserAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 /***************** /Event ******************************************/
 		if (empty($arFields))
@@ -400,8 +399,7 @@ class CAllForumUser
 
 		$ID = $DB->Add("b_forum_user", $arFields, $arBinds);
 /***************** Event onAfterUserAdd ****************************/
-		$events = GetModuleEvents("forum", "onAfterUserAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onAfterUserAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -420,7 +418,7 @@ class CAllForumUser
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">списке полей
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">списке полей
 	 * профайла</a>.
 	 *
 	 *
@@ -435,10 +433,10 @@ class CAllForumUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
 	 * <li>Перед изменением профайла следует проверить возможность
 	 * изменения методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -482,8 +480,7 @@ class CAllForumUser
 
 /***************** Event onBeforeUserUpdate ************************/
 		$profileID = null;
-		$events = GetModuleEvents("forum", "onBeforeUserUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onBeforeUserUpdate", true) as $arEvent)
 		{
 			if ($UpdateByUserId)
 			{
@@ -526,8 +523,7 @@ class CAllForumUser
 			$arBinds["INTERESTS"] = $arFields["INTERESTS"];
 		$DB->QueryBind($strSql, $arBinds);
 /***************** Event onAfterUserUpdate *************************/
-		$events = GetModuleEvents("forum", "onAfterUserUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("forum", "onAfterUserUpdate", true) as $arEvent)
 		{
 			if ($UpdateByUserId)
 			{
@@ -565,7 +561,7 @@ class CAllForumUser
 	 * <h4>See Also</h4> 
 	 * <ul><li>Перед удалением профайла следует проверить возможность
 	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
 	 * </li></ul>
 	 *
 	 *
@@ -581,8 +577,7 @@ class CAllForumUser
 			return false;
 		endif;
 /***************** Event onBeforeUserDelete ************************/
-		$events = GetModuleEvents("forum", "onBeforeUserDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("forum", "onBeforeUserDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$ID));
 /***************** /Event ******************************************/
 		$strSql = "SELECT F.ID FROM b_forum_user FU, b_file F WHERE FU.ID = ".$ID." AND FU.AVATAR = F.ID ";
@@ -593,8 +588,7 @@ class CAllForumUser
 		$arForumUser = CForumUser::GetByID($ID);
 		$res = $DB->Query("DELETE FROM b_forum_user WHERE ID = ".$ID, True);
 /***************** Event onAfterUserDelete *************************/
-		$events = GetModuleEvents("forum", "onAfterUserDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("forum", "onAfterUserDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 /***************** /Event ******************************************/
 		unset($GLOBALS["FORUM_CACHE"]["USER"][$ID]);
@@ -654,7 +648,7 @@ class CAllForumUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -750,7 +744,7 @@ class CAllForumUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -811,7 +805,7 @@ class CAllForumUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -1046,8 +1040,8 @@ class CAllForumUser
 					break;
 			}
 		}
-		for ($i=0; $i<count($arSqlSearch); $i++)
-			$strSqlSearch .= " AND (".$arSqlSearch[$i].") ";
+		if (!empty($arSqlSearch))
+			$strSqlSearch = " AND (".implode(") AND (", $arSqlSearch).")";
 		foreach ($arOrder as $by=>$order)
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
@@ -1573,7 +1567,7 @@ class CAllForumSubscribe
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -1624,7 +1618,7 @@ class CAllForumSubscribe
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -1677,7 +1671,7 @@ class CAllForumSubscribe
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsubscribe">списке
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">списке
 	 * полей подписки</a>. Обязательные поля должны быть заполнены.
 	 *
 	 *
@@ -1693,10 +1687,10 @@ class CAllForumSubscribe
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsubscribe">Поля подписки</a> </li>
-	 * <li>Перед добавлением подписки следует проверить возможность
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a>
+	 * </li> <li>Перед добавлением подписки следует проверить возможность
 	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1760,7 +1754,7 @@ class CAllForumSubscribe
 	 * <h4>See Also</h4> 
 	 * <ul><li>Перед удалением подписки следует проверить возможность
 	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
 	 * </li></ul>
 	 *
 	 *
@@ -1835,23 +1829,24 @@ class CAllForumSubscribe
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsubscribe">Поля подписки</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a> </li> </ul>
 	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/getlist.php
 	 * @author Bitrix
 	 */
-	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array())
+	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array(), $arAddParams = array())
 	{
 		global $DB;
 		$arSqlSearch = Array();
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
+		$arAddParams = (is_array($arAddParams) ? $arAddParams : array());
 
 		foreach ($arFilter as $key => $val)
 		{
@@ -1893,10 +1888,17 @@ class CAllForumSubscribe
 			}
 		}
 
-		$strSqlSearch = "";
-		for ($i=0; $i<count($arSqlSearch); $i++)
+		$strSqlSearch = (empty($arSqlSearch) ? "" : " AND (".implode(") AND (", $arSqlSearch).") ");
+
+		$iCnt = 0;
+		if (is_set($arAddParams, "bDescPageNumbering") || is_set($arAddParams, "nCount"))
 		{
-			$strSqlSearch .= " AND (".$arSqlSearch[$i].") ";
+			$strSql = "SELECT COUNT(FP.ID) AS CNT FROM b_forum_subscribe FP WHERE 1 = 1 ".$strSqlSearch;
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($ar_res = $db_res->Fetch())
+				$iCnt = intVal($ar_res["CNT"]);
+			if (is_set($arAddParams, "nCount"))
+				return $iCnt;
 		}
 
 		$strSql =
@@ -1925,18 +1927,19 @@ class CAllForumSubscribe
 			}
 		}
 
-		$strSqlOrder = "";
-		DelDuplicateSort($arSqlOrder); for ($i=0; $i<count($arSqlOrder); $i++)
-		{
-			if ($i==0)
-				$strSqlOrder = " ORDER BY ";
-			else
-				$strSqlOrder .= ", ";
+		DelDuplicateSort($arSqlOrder);
+		$strSqlOrder = (empty($arSqlOrder) ? "" : " ORDER BY ".implode(", ", $arSqlOrder));
 
-			$strSqlOrder .= $arSqlOrder[$i];
+		$strSql .= $strSqlOrder.($arAddParams["nTopCount"] > 0 ? "\nLIMIT 0,".intval($arAddParams["nTopCount"]) : "");
+
+		if ($arAddParams["nTopCount"] <= 0 && is_set($arAddParams, "bDescPageNumbering"))
+		{
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
+		} else {
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		$strSql .= $strSqlOrder;
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
 		return $db_res;
 	}
 
@@ -1989,7 +1992,7 @@ class CAllForumSubscribe
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
 	 *
 	 *
 	 * @static
@@ -2216,22 +2219,21 @@ class CAllForumRank
 	{
 		if (is_set($arFields, "LANG") || $ACTION=="ADD")
 		{
-			for ($i = 0; $i<count($arFields["LANG"]); $i++)
+			foreach ($arFields["LANG"] as $val)
 			{
-				if (!is_set($arFields["LANG"][$i], "LID") || strLen($arFields["LANG"][$i]["LID"])<=0) return false;
-				if (!is_set($arFields["LANG"][$i], "NAME") || strLen($arFields["LANG"][$i]["NAME"])<=0) return false;
+				if (!is_set($val, "LID") || empty($val["LID"])) return false;
+				if (!is_set($val, "NAME") || empty($val["NAME"])) return false;
 			}
 
 			$db_lang = CLang::GetList(($b="sort"), ($o="asc"));
 			while ($arLang = $db_lang->Fetch())
 			{
-				$bFound = False;
-				for ($i = 0; $i<count($arFields["LANG"]); $i++)
-				{
-					if ($arFields["LANG"][$i]["LID"]==$arLang["LID"])
-						$bFound = True;
-				}
-				if (!$bFound) return false;
+				$bFound = false;
+				foreach ($arFields["LANG"] as $val):
+					$bFound = ($bFound ? $bFound : ($val["LID"] == $arLang["LID"]));
+				endforeach;
+				if (!$bFound)
+					return false;
 			}
 		}
 
@@ -2282,9 +2284,8 @@ class CAllForumRank
 		$DB->Query("DELETE FROM b_forum_rank_lang WHERE RANK_ID = ".$ID, True);
 		$DB->Query("DELETE FROM b_forum_rank WHERE ID = ".$ID, True);
 
-		for ($i = 0; $i < count($arUsers); $i++)
-		{
-			CForumUser::SetStat(intVal($arUsers[$i]));
+		foreach ($arUsers as $userId) {
+			CForumUser::SetStat($userId);
 		}
 
 		return true;

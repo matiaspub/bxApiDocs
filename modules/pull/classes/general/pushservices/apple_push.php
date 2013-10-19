@@ -164,10 +164,10 @@ class CAppleMessage
 		if (isset($this->_sText)) {
 			$aPayload[self::APPLE_RESERVED_NAMESPACE]['alert'] = (string)$this->_sText;
 		}
-		if (isset($this->_nBadge) && $this->_nBadge > 0) {
+		if (isset($this->_nBadge) && $this->_nBadge >= 0) {
 			$aPayload[self::APPLE_RESERVED_NAMESPACE]['badge'] = (int)$this->_nBadge;
 		}
-		if (isset($this->_sSound)) {
+		if (isset($this->_sSound) && strlen($this->_sSound) > 0) {
 			$aPayload[self::APPLE_RESERVED_NAMESPACE]['sound'] = (string)$this->_sSound;
 		}
 
@@ -225,6 +225,10 @@ class CAppleMessage
 						else
 							$arData[$key] = "false";
 					}
+					elseif(is_integer($value))
+					{
+						$arData[$key] = $value;
+					}
 					else
 					{
 						if(preg_match("#['\"\\n\\r<\\\\]#", $value))
@@ -258,6 +262,10 @@ class CAppleMessage
 				if(is_array($value))
 				{
 					$res .= self::_MakeJson($value, $bWS, $bSkipTilda);
+				}
+				elseif(is_integer($value))
+				{
+					$res .= $value;
 				}
 				elseif(is_bool($value))
 				{
@@ -381,7 +389,11 @@ class CApplePush
 				else
 					$text = $messages[$mess]["MESSAGE"];
 				$message->setText($text);
-				$message->setSound();
+				if (strlen($text) > 0)
+					$message->setSound();
+				else
+					$message->setSound('');
+
 				if($messages[$mess]["PARAMS"])
 				{
 					$params = $messages[$mess]["PARAMS"];

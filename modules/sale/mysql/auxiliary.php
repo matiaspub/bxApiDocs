@@ -33,7 +33,7 @@ class CSaleAuxiliary extends CAllSaleAuxiliary
 	 * <b>USER_ID</b> - код пользователя;</li> <li> <b>ITEM</b> - ресурс, доступ к которому
 	 * разрешен;</li> <li> <b>ITEM_MD5</b> - идентификатор ресурса (строка,
 	 * однозначно идентифицирующая ресурс);</li> <li> <b>TIMESTAMP_X</b> - дата
-	 * изменения;</li> <li> <b>DATE_INSERT</b> - дата вставки записи.</li> </ul>
+	 * изменения;</li> <li> <b>DATE_INSERT</b> - дата вставки записи.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.getbyid.php
@@ -82,7 +82,7 @@ class CSaleAuxiliary extends CAllSaleAuxiliary
 	 * <b>USER_ID</b> - код пользователя</li> <li> <b>ITEM</b> - ресурс, доступ к которому
 	 * разрешен</li> <li> <b>ITEM_MD5</b> - идентификатор ресурса (строка,
 	 * однозначно идентифицирующая ресурс)</li> <li> <b>TIMESTAMP_X</b> - дата
-	 * изменения</li> <li> <b>DATE_INSERT</b> - дата вставки записи</li> </ul>
+	 * изменения</li> <li> <b>DATE_INSERT</b> - дата вставки записи</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.getbyparams.php
@@ -208,7 +208,7 @@ class CSaleAuxiliary extends CAllSaleAuxiliary
 	 * идентифицирующая ресурс); </li> <li> <b>TIMESTAMP_X</b> - дата изменения; </li> <li>
 	 * <b>DATE_INSERT</b> - дата вставки записи.</li> </ul><p>Если в качестве параметра
 	 * arGroupBy передается пустой массив, то функция вернет число записей,
-	 * удовлетворяющих фильтру.</p>
+	 * удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.getlist.php
@@ -404,7 +404,7 @@ class CSaleAuxiliary extends CAllSaleAuxiliary
 	 *
 	 *
 	 * @return int <p>Метод возвращает код вставленной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.add.php
@@ -469,7 +469,7 @@ class CSaleAuxiliary extends CAllSaleAuxiliary
 	 *
 	 *
 	 * @return int <p>Метод возвращает код измененной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.update.php

@@ -86,7 +86,7 @@ class CCityLookup_geoip_pure extends CCityLookup
 	}
 
 
-	public function GetDescription()
+	public static function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_geoip_pure",
@@ -97,7 +97,7 @@ class CCityLookup_geoip_pure extends CCityLookup
 		);
 	}
 
-	public function IsInstalled()
+	public static function IsInstalled()
 	{
 		return $this->is_installed;
 	}

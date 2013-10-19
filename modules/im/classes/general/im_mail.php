@@ -13,6 +13,7 @@ class CIMMail
 		$arGroupNotify = array();
 		$arGroupNotifyUser = array();
 		$arUnsendNotify = CIMNotify::GetUnsendNotify();
+		
 		foreach($arUnsendNotify as $id => $arNotify)
 		{
 			if (!isset($arMark[$arNotify["CHAT_ID"]]) || $arMark[$arNotify["CHAT_ID"]] < $arNotify["ID"])
@@ -25,17 +26,16 @@ class CIMMail
 			}
 
 			if (isset($arNotify["NOTIFY_MODULE"]) && isset($arNotify["NOTIFY_EVENT"])
-			&& !CIMNotifySchema::CheckEnableFeature($arNotify["NOTIFY_MODULE"], $arNotify["NOTIFY_EVENT"], IM_FEATURE_MAIL))
+			&& !CIMSettings::GetNotifyAccess($arNotify["TO_USER_ID"], $arNotify["NOTIFY_MODULE"], $arNotify["NOTIFY_EVENT"], CIMSettings::CLIENT_MAIL))
 			{
 				unset($arUnsendNotify[$id]);
 				continue;
 			}
 
-			$siteID = $arNotify["TO_USER_LID"];
-			if ($siteID == false || StrLen($siteID) <= 0)
+			if (!$arNotify["TO_USER_LID"] || StrLen($arNotify["TO_USER_LID"]) <= 0)
 			{
-				$siteID = $defSiteID;
-				if ($siteID == false || StrLen($siteID) <= 0)
+				$arNotify["TO_USER_LID"] = $defSiteID;
+				if (!$arNotify["TO_USER_LID"] || StrLen($arNotify["TO_USER_LID"]) <= 0)
 				{
 					unset($arUnsendNotify[$id]);
 					continue;
@@ -60,6 +60,7 @@ class CIMMail
 					"LOGIN"		=> $arNotify["FROM_USER_LOGIN"]), true));
 
 			$arNotify['NOTIFY_TAG_MD5'] = md5($arNotify['NOTIFY_TAG']);
+			$arUnsendNotify[$id] = $arNotify;
 			if ($arNotify["EMAIL_TEMPLATE"] == "IM_NEW_NOTIFY" && $arNotify['NOTIFY_TAG'] != '')
 			{
 				if (isset($arGroupNotify[$arNotify['NOTIFY_TAG_MD5']]))
@@ -73,7 +74,6 @@ class CIMMail
 					$arGroupNotify[$arNotify['NOTIFY_TAG_MD5']] = true;
 				}
 			}
-			$arUnsendNotify[$id] = $arNotify;
 		}
 		foreach ($arMark as $chatId => $lastSendId)
 			CIMNotify::SetLastSendId($chatId, $lastSendId);
@@ -115,8 +115,9 @@ class CIMMail
 				$arFields['FROM_USERS'] = implode(', ', $arGroupNotifyUser[$arNotify['NOTIFY_TAG_MD5']]);
 				unset($arFields['FROM_USER']);
 			}
+
 			$event = new CEvent;
-			$event->Send($arNotify["EMAIL_TEMPLATE"], $siteID, $arFields, "N");
+			$event->Send($arNotify["EMAIL_TEMPLATE"], $arNotify["TO_USER_LID"], $arFields, "N");
 		}
 
 		return "CIMMail::MailNotifyAgent();";
@@ -138,6 +139,18 @@ class CIMMail
 		{
 			if (!isset($arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]]) || $arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]] < $arMessage["ID"])
 				$arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]] = $arMessage["ID"];
+
+			if ($arMessage['TO_USER_ACTIVE'] != 'Y')
+			{
+				unset($arUnsendMessage[$id]);
+				continue;
+			}
+
+			if (!CIMSettings::GetNotifyAccess($arMessage["TO_USER_ID"], 'im', 'message', CIMSettings::CLIENT_MAIL))
+			{
+				unset($arUnsendMessage[$id]);
+				continue;
+			}
 
 			if (strlen($arMessage["MESSAGE_OUT"]) <= 0)
 				$arMessage["MESSAGE_OUT"] = $arMessage["MESSAGE"];
@@ -245,7 +258,6 @@ class CIMMail
 			$event = new CEvent;
 			$event->Send($mailTemplate, $arToInfo['TO_USER_LID'], $arFields, "N");
 		}
-
 
 		return "CIMMail::MailMessageAgent();";
 	}

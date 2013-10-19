@@ -55,9 +55,9 @@ IncludeModuleLangFile(__FILE__);
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/isdate.php">CDataBase::IsDate</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/comparedates.php">CDataBase::CompareDates</a> </li>
- * </ul><a name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/isdate.php">CDataBase::IsDate</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/comparedates.php">CDataBase::CompareDates</a>
+ * </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -146,7 +146,7 @@ function CheckFilterDates($date1, $date2, &$date1_wrong, &$date2_wrong, &$date2_
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/delfilterex.php">DelFilterEx</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/delfilterex.php">DelFilterEx</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -278,7 +278,7 @@ function InitFilterEx($arName, $varName, $action="set", $session=true, $FilterLo
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/initfilterex.php">InitFilterEx</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/initfilterex.php">InitFilterEx</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -389,7 +389,7 @@ function DelFilter($arName)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/getfilterparams.php">GetFilterParams</a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/getfilterparams.php">GetFilterParams</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -504,7 +504,7 @@ function GetFilterHiddens($var = "filter_", $button = array("filter" => "Y", "se
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/getfilterhiddens.php">GetFilterHiddens</a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/getfilterhiddens.php">GetFilterHiddens</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -1003,7 +1003,7 @@ return $s;
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/sortingex.php">SortingEx</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/sortingex.php">SortingEx</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -1090,7 +1090,7 @@ function InitSorting($Path=false, $sByVar="by", $sOrderVar="order")
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/initsorting.php">InitSorting</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/initsorting.php">InitSorting</a> </li></ul><a
  * name="examples"></a>
  *
  *

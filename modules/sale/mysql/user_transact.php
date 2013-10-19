@@ -35,7 +35,7 @@ class CSaleUserTransact extends CAllSaleUserTransact
 	 * - код заказа, если транзакция относится к заказу;</li> <li> <b>EMPLOYEE_ID</b> -
 	 * код пользователя, осуществившего транзакцию;</li> <li> <b>TIMESTAMP_X</b> -
 	 * дата последнего изменения записи;</li> <li> <b>TRANSACT_DATE</b> - дата
-	 * транзакции.</li> </ul>
+	 * транзакции.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.getbyid.php
@@ -158,7 +158,7 @@ class CSaleUserTransact extends CAllSaleUserTransact
 	 * пользователя;</li> <li> <b>USER_NAME</b> - имя пользователя;</li> <li> <b>USER_LAST_NAME</b>
 	 * - фамилия пользователя;</li> <li> <b>USER_EMAIL</b> - E-Mail пользователя.</li>
 	 * </ul><p>Если в качестве параметра arGroupBy передается пустой массив, то
-	 * функция вернет число записей, удовлетворяющих фильтру.</p>
+	 * функция вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.getlist.php
@@ -285,13 +285,13 @@ class CSaleUserTransact extends CAllSaleUserTransact
 	 * валюта суммы;</li> <li> <b>DEBIT</b> - "Y", если занесение денег на счет, и "N",
 	 * если списание денег со счета;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li>
 	 * <b>ORDER_ID</b> - код заказа, если транзакция относится к заказу;</li> <li>
-	 * <b>EMPLOYEE_ID</b> - код пользователя, осуществивщего транзакцию;</li> <li>
+	 * <b>EMPLOYEE_ID</b> - код пользователя, осуществившего транзакцию;</li> <li>
 	 * <b>TRANSACT_DATE</b> - дата транзакции.</li> </ul>
 	 *
 	 *
 	 *
 	 * @return int <p>Метод возвращает код вставленной транзакции или <i>false</i> в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.add.php
@@ -356,7 +356,7 @@ class CSaleUserTransact extends CAllSaleUserTransact
 	 *
 	 *
 	 * @return int <p>Метод возвращает код измененной транзакции или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.update.php

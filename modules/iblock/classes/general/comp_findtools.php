@@ -55,8 +55,9 @@ class CIBlockFindTools
 
 		$requestURL = $APPLICATION->GetCurPage(true);
 
+		$cacheId = $requestURL.implode("|", array_keys($pageCandidates));
 		$cache = new CPHPCache;
-		if ($cache->startDataCache(3600, $requestURL, "iblock_find"))
+		if ($cache->startDataCache(3600, $cacheId, "iblock_find"))
 		{
 			if (defined("BX_COMP_MANAGED_CACHE"))
 			{

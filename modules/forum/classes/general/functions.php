@@ -14,6 +14,19 @@ function Error($error)
 	echo "Error: ".$msg;
 }
 
+
+/**
+ * <b>forumTextParser</b> - класс, предназначенный для форматирования сообщений форума. Этот класс - потомок класса TextParser, с расширениями для парсинга файлов и спойлеров. Осуществляет замену спецсимволов и заказных тегов на реальные HTML- теги, обработку ссылок, отображение смайлов.
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/forum/developer/forumtextparser/index.php
+ * @author Bitrix
+ */
 class forumTextParser extends CTextParser
 {
 	var $image_params = array();
@@ -30,6 +43,9 @@ class forumTextParser extends CTextParser
 		$this->serverName = (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0 ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", ""));
 		$this->serverName = (strlen($this->serverName) > 0 ? $this->serverName : $_SERVER["SERVER_NAME"]);
 		$pathToSmiles = (!empty($pathToSmiles) ? $pathToSmiles : "/bitrix/images/forum/smile/");
+		$this->arUserfields = array();
+		$this->ajaxPage = $GLOBALS["APPLICATION"]->GetCurPageParam("", array("bxajaxid", "logout"));
+		$this->pathToUser = "";
 
 		if ($mode == 'full')
 		{
@@ -67,6 +83,8 @@ class forumTextParser extends CTextParser
 
 			AddEventHandler("main", "TextParserBeforeTags", Array(&$this, "ParserSpoiler"));
 			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserFile"));
+			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserUserfields"));
+			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserUser"));
 		}
 	}
 
@@ -91,14 +109,16 @@ class forumTextParser extends CTextParser
 			"ALLOW_QUOTE" => array('Quote'),
 			'ALLOW_ANCHOR' => array('CreateLink'),
 			"ALLOW_VIDEO" => array('InputVideo'),
-			"ALLOW_UPLOAD" => array('UploadFile')
+			"ALLOW_UPLOAD" => array('UploadFile'),
+			"ALLOW_MENTION" => array('MentionUser')
 		);
-		if (isset($arParams['forum']))
+		if (isset($arParams['forum']) && is_array($arParams['forum']))
 		{
-			foreach ($arEditorFeatures as $featureName => $toolbarIcons)
+			$res = array_intersect_key($arParams['forum'], $arEditorFeatures);
+			foreach ($res as $featureName => $val)
 			{
-				if (isset($arParams['forum'][$featureName]) && ($arParams['forum'][$featureName] != 'N'))
-					$result = array_merge($result, $toolbarIcons);
+				if ($val != 'N')
+					$result = array_merge($result, $arEditorFeatures[$featureName]);
 			}
 		}
 		return $result;
@@ -107,21 +127,21 @@ class forumTextParser extends CTextParser
 	static function GetEditorToolbar($arParams)
 	{
 		static $arEditorFeatures = array(
-					"ALLOW_BIU" => array('Bold', 'Italic', 'Underline', 'Strike', 'Spoiler'),
-					"ALLOW_FONT" => array('ForeColor','FontList', 'FontSizeList'),
-					"ALLOW_QUOTE" => array('Quote'),
-					"ALLOW_CODE" => array('Code'),
-					'ALLOW_ANCHOR' => array('CreateLink', 'DeleteLink'),
-					"ALLOW_IMG" => array('Image'),
-					"ALLOW_VIDEO" => array('InputVideo'),
-					"ALLOW_TABLE" => array('Table'),
-					"ALLOW_ALIGN" => array('Justify'),
-					"ALLOW_LIST" => array('InsertOrderedList', 'InsertUnorderedList'),
-					"ALLOW_SMILES" => array('SmileList'),
-					//"ALLOW_UPLOAD" => array('UploadFile'),
-					//"ALLOW_NL2BR" => array(''),
-				);
-
+			"ALLOW_BIU" => array('Bold', 'Italic', 'Underline', 'Strike', 'Spoiler'),
+			"ALLOW_FONT" => array('ForeColor','FontList', 'FontSizeList'),
+			"ALLOW_QUOTE" => array('Quote'),
+			"ALLOW_CODE" => array('Code'),
+			'ALLOW_ANCHOR' => array('CreateLink', 'DeleteLink'),
+			"ALLOW_IMG" => array('Image'),
+			"ALLOW_VIDEO" => array('InputVideo'),
+			"ALLOW_TABLE" => array('Table'),
+			"ALLOW_ALIGN" => array('Justify'),
+			"ALLOW_LIST" => array('InsertOrderedList', 'InsertUnorderedList'),
+			"ALLOW_SMILES" => array('SmileList'),
+			//"ALLOW_UPLOAD" => array('UploadFile'),
+			//"ALLOW_NL2BR" => array(''),
+			"ALLOW_MENTION" => array("MentionUser")
+		);
 		$result = array();
 
 		if (isset($arParams['mode']) && ($arParams['mode'] == 'full'))
@@ -216,6 +236,71 @@ class forumTextParser extends CTextParser
 			$text = preg_replace("/(\[file([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\])/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_attachment('\\3', '\\4', \$type, '\\1')", $text);
 	}
 
+	public static function ParserUserfields(&$text, &$obj, $type="html")
+	{
+		if (is_object($obj) && get_class($obj) == "forumTextParser" && !empty($obj->arUserfields))
+		{
+			foreach($obj->arUserfields as $userField)
+			{
+				if (empty($userField["TAG"]))
+				{
+					switch($userField["USER_TYPE_ID"])
+					{
+						case "webdav_element" :
+							$userField["TAG"] = "DOCUMENT ID";
+							break;
+						case "vote" :
+							$userField["TAG"] = "VOTE ID";
+							break;
+					}
+				}
+
+				if (!empty($userField["TAG"]) && method_exists($userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"))
+				{
+					$obj->userField = $userField;
+					$obj->type = $type;
+					$text = preg_replace_callback(
+						"/\[".$userField["TAG"]."\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+						array( &$obj, 'convert_userfields'),
+						$text
+					);
+				}
+			}
+		}
+		return $text;
+	}
+
+	public static function ParserUser(&$text, &$obj)
+	{
+		if($obj->allow["USER"] != "N" && is_callable(array($obj, 'convert_user')))
+			$text = preg_replace("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_user('\\1', '\\2')", $text);
+	}
+
+	public function convert_user($userId = 0, $name = "")
+	{
+		$userId = intval($userId);
+		if($userId > 0)
+		{
+			$anchor_id = RandString(8);
+			return
+				'<a class="blog-p-user-name" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.
+				(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
+		}
+		return;
+	}
+
+	public function convert_userfields($matches)
+	{
+		if (is_array($this->userField["VALUE"]) && !empty($this->userField["VALUE"])) {
+			$id = intval($matches[1]);
+			if ($id > 0 && in_array($id, $this->userField["VALUE"]))
+			{
+				return call_user_func_array(array($this->userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"), array($this->userField, $id, $matches[2]));
+			}
+		}
+		return $matches[0];
+	}
+
 	public static function convert_spoiler_tag($text, $title="")
 	{
 		if (empty($text))
@@ -264,16 +349,15 @@ class forumTextParser extends CTextParser
 	{
 		static $bShowedScript = false;
 		$url = trim($url);
-		if (strlen($url)<=0) return;
-		$type = (strToLower($this->type) == "rss" ? "rss" : "html");
-		$extension = preg_replace("/^.*\.(\S+)$/".BX_UTF_PCRE_MODIFIER, "\\1", $url);
-		$extension = strtolower($extension);
-		$extension = preg_quote($extension, "/");
+		if (empty($url)) return;
+		$type = (strtolower($this->type) == "rss" ? "rss" : "html");
+		$extension = "";
+		$urlforcheck = (strpos($url, "?") !== false ? substr($url, 0, strpos($url, "?")) : $url);
+		if (preg_match("/^.*\.(\S+)$/".BX_UTF_PCRE_MODIFIER, $urlforcheck, $matches)) {
+			$extension = preg_quote(strtolower($matches[1]), "/");
+		}
 
-		$bErrorIMG = False;
-
-		if (preg_match("/[?&;]/".BX_UTF_PCRE_MODIFIER, $url))
-			$bErrorIMG = True;
+		$bErrorIMG = (!$extension);
 		if (!$bErrorIMG && !preg_match("/$extension(\||\$)/".BX_UTF_PCRE_MODIFIER, $this->AllowImgExt))
 			$bErrorIMG = True;
 		if (!$bErrorIMG && !preg_match("/^(http|https|ftp|\/)/i".BX_UTF_PCRE_MODIFIER, $url))

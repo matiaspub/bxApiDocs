@@ -21,7 +21,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	 * <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
+	 * <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
 	 *
 	 *
 	 *
@@ -269,8 +269,8 @@ class CSocNetMessages extends CAllSocNetMessages
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetMessages/GetByID.php">CSocNetMessages::GetById</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetByID.php">CSocNetMessages::GetById</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -517,7 +517,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -654,7 +654,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

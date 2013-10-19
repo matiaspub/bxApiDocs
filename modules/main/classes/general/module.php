@@ -23,10 +23,13 @@ class CModule
 	var $MODULE_NAME;
 	var $MODULE_DESCRIPTION;
 	var $MODULE_VERSION;
+	var $MODULE_VERSION_DATE;
 	var $MODULE_ID;
 	var $MODULE_SORT = 10000;
 	var $SHOW_SUPER_ADMIN_GROUP_RIGHTS;
 	var $MODULE_GROUP_RIGHTS;
+	var $PARTNER_NAME;
+	var $PARTNER_URI;
 
 	public static function AddAutoloadClasses($module, $arParams = array())
 	{
@@ -38,7 +41,7 @@ class CModule
 		if (defined("NO_BITRIX_AUTOLOAD") && NO_BITRIX_AUTOLOAD)
 		{
 			foreach ($arParams as $value)
-				include_once($_SERVER["DOCUMENT_ROOT"].($module <> ''? BX_ROOT."/modules/".$module."/" : "").$value);
+				include_once($_SERVER["DOCUMENT_ROOT"].($module <> ''? getLocalPath("modules/".$module)."/" : "").$value);
 		}
 		else
 		{
@@ -81,7 +84,7 @@ class CModule
 		if (isset(self::$classes[$className]))
 		{
 			if (self::$classes[$className]['module'] != '')
-				$dir = BX_ROOT.'/modules/'.self::$classes[$className]['module'].'/';
+				$dir = getLocalPath('modules/'.self::$classes[$className]['module']).'/';
 			else
 				$dir = '';
 
@@ -189,7 +192,7 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/registermodule.php">RegisterModule</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -350,7 +353,7 @@ class CModule
 
 	
 	/**
-	 * <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае.</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
+	 * <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае.</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
 	 *
 	 *
 	 *
@@ -379,10 +382,11 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификаторы
-	 * модулей</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы модулей</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php
@@ -426,7 +430,7 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -464,8 +468,8 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/add.php">CModule::Add</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php">CModule::Add</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -502,8 +506,8 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/remove.php">CModule::Remove</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php">CModule::Remove</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -525,7 +529,7 @@ class CModule
 
 	
 	/**
-	 * <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -548,7 +552,7 @@ class CModule
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/getdropdownlist.php">CModule::GetDropDownList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getdropdownlist.php">CModule::GetDropDownList</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -597,9 +601,9 @@ class CModule
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификаторы
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы
 	 * модулей</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -630,13 +634,14 @@ class CModule
 			return false;
 		}
 
-		if(!file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$module_name."/include.php"))
+		$include = getLocalPath("modules/".$module_name."/include.php");
+		if($include === false)
 		{
 			self::$includedModules[$module_name] = false;
 			return false;
 		}
 
-		$res = include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$module_name."/include.php");
+		$res = include_once($_SERVER["DOCUMENT_ROOT"].$include);
 		if($res === false)
 		{
 			self::$includedModules[$module_name] = false;
@@ -695,6 +700,10 @@ class CModule
 		return $res;
 	}
 
+	/**
+	 * @param string $moduleId
+	 * @return CModule|bool
+	 */
 	public static function CreateModuleObject($moduleId)
 	{
 		$moduleId = trim($moduleId);
@@ -702,11 +711,11 @@ class CModule
 		if ($moduleId == '')
 			return false;
 
-		$path = $_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$moduleId."/install/index.php";
-		if (!file_exists($path))
+		$path = getLocalPath("modules/".$moduleId."/install/index.php");
+		if ($path === false)
 			return false;
 
-		include_once($path);
+		include_once($_SERVER["DOCUMENT_ROOT"].$path);
 
 		$className = str_replace(".", "_", $moduleId);
 		if (!class_exists($className))
@@ -746,7 +755,7 @@ else
  *
  *
  *
- * @param string $m  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+ * @param string $m  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
  *
  *
  *
@@ -768,8 +777,8 @@ else
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
- * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/doinstall.php">CModule::DoInstall</a> </li>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
+ * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/doinstall.php">CModule::DoInstall</a> </li>
  * </ul><a name="examples"></a>
  *
  *
@@ -794,7 +803,7 @@ function RegisterModule($id)
  *
  *
  *
- * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+ * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
  *
  *
  *
@@ -812,8 +821,8 @@ function RegisterModule($id)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/douninstall.php">CModule::DoUninstall</a> </li>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/douninstall.php">CModule::DoUninstall</a> </li>
  * </ul><a name="examples"></a>
  *
  *
@@ -843,7 +852,7 @@ function UnRegisterModule($id)
  *
  *
  *
- * @param string $from_module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>
+ * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * который будет инициировать событие.
  *
  *
@@ -894,7 +903,7 @@ function UnRegisterModule($id)
  *
  * <h4>See Also</h4> 
  * <ul> <li>[link=89622]Связи и взаимодействие модулей[/link] </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -1116,7 +1125,7 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/module/getmoduleevents.php">GetModuleEvents</a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php">GetModuleEvents</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -1132,7 +1141,7 @@ function ExecuteModuleEvent($arEvent, $param1=NULL, $param2=NULL, $param3=NULL, 
 	{
 		if(!CModule::IncludeModule($arEvent["TO_MODULE_ID"]))
 			return null;
-		$r = include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$arEvent["TO_MODULE_ID"]."/include.php");
+		$r = include_once($_SERVER["DOCUMENT_ROOT"].getLocalPath("modules/".$arEvent["TO_MODULE_ID"]."/include.php"));
 	}
 	elseif($arEvent["TO_PATH"] <> '' && file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT.$arEvent["TO_PATH"]))
 	{
@@ -1189,7 +1198,7 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
 	)
 	{
 		if(CModule::IncludeModule($arEvent["TO_MODULE_ID"]))
-			$r = include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$arEvent["TO_MODULE_ID"]."/include.php");
+			$r = include_once($_SERVER["DOCUMENT_ROOT"].getLocalPath("modules/".$arEvent["TO_MODULE_ID"]."/include.php"));
 		else
 			return null;
 	}
@@ -1243,7 +1252,7 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  *
  *
- * @param string $from_module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>
+ * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * который инициирует событие.
  *
  *
@@ -1252,7 +1261,7 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  *
  *
- * @param string $to_module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>
+ * @param string $to_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * содержащий функцию-обработчик события.
  *
  *
@@ -1282,7 +1291,7 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  * <h4>See Also</h4> 
  * <ul> <li>[link=89622]Связи и взаимодействие модулей[/link] </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -1323,7 +1332,7 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  *
  *
  *
- * @param string $from_module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>,
+ * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который будет инициировать событие.
  *
  *
@@ -1332,7 +1341,7 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  *
  *
  *
- * @param string $to_module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>,
+ * @param string $to_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * содержащий функцию-обработчик события.
  *
  *
@@ -1367,8 +1376,9 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li>[link=89622]Связи и взаимодействие модулей[/link] </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/module/unregistermoduledependences.php">UnRegisterModuleDependences</a>
+ * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2825" >Связи и
+ * взаимодействие модулей</a></li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermoduledependences.php">UnRegisterModuleDependences</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -1420,12 +1430,12 @@ function RegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID, 
 
 
 /**
- * <p>Проверяет установлен ли модуль. Возвращает "true", если модуль установлен. Иначе - "false".</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
+ * <p>Проверяет установлен ли модуль. Возвращает "true", если модуль установлен. Иначе - "false".</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
  *
  *
  *
  *
- * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+ * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
  *
  *
  *
@@ -1446,9 +1456,10 @@ function RegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID, 
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
- * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>
- * </li> </ul><a name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
+ * </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a> </li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1464,7 +1475,7 @@ function IsModuleInstalled($module_id)
 
 
 /**
- * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">идентификатор модуля</a>, которому принадлежит файл.</p>
+ * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">идентификатор модуля</a>, которому принадлежит файл.</p>
  *
  *
  *

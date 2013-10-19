@@ -1,38 +1,116 @@
 <?
 class CAllPullWatch
 {
+	const bucket_size = 100;
+
+	private static $arUpdate = Array();
+	private static $arInsert = Array();
+
 	public static function Add($userId, $tag)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (intval($userId) <= 0 && strlen($tag) <= 0)
 			return false;
 
-		$arChannel = CPullChannel::Get($userId);
+		$arResult = $CACHE_MANAGER->Read(3600, $cache_id="b_pw_".$userId, "b_pull_watch");
+		if ($arResult)
+			$arResult = $CACHE_MANAGER->Get($cache_id);
 
-		$strSql = "SELECT ID FROM b_pull_watch WHERE USER_ID = ".intval($userId)." AND TAG = '".$DB->ForSQL($tag)."'";
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		if ($arRes = $dbRes->Fetch())
+		if(!$arResult)
 		{
-			$DB->Query("UPDATE b_pull_watch SET DATE_CREATE = ".$DB->CurrentTimeFunction().", CHANNEL_ID = '".$DB->ForSQL($arChannel['CHANNEL_ID'])."' WHERE ID = ".$arRes['ID']);
-			$ID = $arRes['ID'];
+			CTimeZone::Disable();
+			$strSql = "
+					SELECT ID, USER_ID, CHANNEL_ID, TAG, ".$DB->DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE FROM b_pull_watch
+					WHERE USER_ID = ".intval($userId)."
+			";
+			CTimeZone::Enable();
+			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			while ($arRes = $dbRes->Fetch())
+				$arResult[$arRes["TAG"]] = $arRes;
+
+			$CACHE_MANAGER->Set($cache_id, $arResult);
 		}
-		else
+
+		if ($arResult && $arResult[$tag])
 		{
-			$arParams = Array(
-				'USER_ID' => intval($userId),
-				'CHANNEL_ID' => $arChannel['CHANNEL_ID'],
-				'TAG' => trim($tag),
-				'~DATE_CREATE' => $DB->CurrentTimeFunction(),
-			);
-			$ID = IntVal($DB->Add("b_pull_watch", $arParams, Array()));
+			if ($arResult[$tag]['DATE_CREATE']+1800 > time())
+			{
+				self::$arUpdate[intval($arResult[$tag]['ID'])] = intval($arResult[$tag]['ID']);
+				return true;
+			}
+			else
+			{
+				self::Delete($userId, $tag);
+				return self::Add($userId, $tag);
+			}
 		}
-		return $ID;
+		$CACHE_MANAGER->Clean("b_pw_".$userId, "b_pull_watch");
+
+		self::$arInsert[trim($tag)] = trim($tag);
+
+		return true;
+	}
+
+	public static function DeferredSql($userId = false)
+	{
+		global $DB, $USER;
+		if (empty(self::$arUpdate) && empty(self::$arInsert))
+			return false;
+
+		if ($userId <= 0)
+			$userId = $USER->GetId();
+
+		if ($userId <= 0)
+			return false;
+		
+		$arChannel = CPullChannel::Get($userId);
+		if (!empty(self::$arUpdate))
+		{
+			$DB->Query("
+				UPDATE b_pull_watch
+				SET DATE_CREATE = ".$DB->CurrentTimeFunction().", CHANNEL_ID = '".$DB->ForSQL($arChannel['CHANNEL_ID'])."'
+				WHERE ID IN (".(implode(',', self::$arUpdate)).")
+			");
+		}
+
+		if (!empty(self::$arInsert))
+		{
+			$strSqlPrefix = "INSERT INTO b_pull_watch (USER_ID, CHANNEL_ID, TAG, DATE_CREATE) VALUES ";
+			$maxValuesLen = 2048;
+			$strSqlValues = "";
+
+			foreach(self::$arInsert as $tag)
+			{
+				$strSqlValues .= ",\n(".intval($userId).", '".$DB->ForSql($arChannel['CHANNEL_ID'])."', '".$DB->ForSql($tag)."', ".$DB->CurrentTimeFunction().")";
+				if(strlen($strSqlValues) > $maxValuesLen)
+				{
+					$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
+					$strSqlValues = "";
+				}
+			}
+			if(strlen($strSqlValues) > 0)
+			{
+				$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
+			}
+		}
+	}
+
+	public static function Delete($userId, $tag = null)
+	{
+		global $DB, $CACHE_MANAGER;
+
+		$strSql = "DELETE FROM b_pull_watch WHERE USER_ID = ".intval($userId).(!is_null($tag)? " AND TAG = '".$DB->ForSQL($tag)."'": "");
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$CACHE_MANAGER->Clean("b_pw_".$userId, "b_pull_watch");
+
+		return true;
 	}
 
 	public static function Extend($userId, $tag)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (intval($userId) <= 0 && strlen($tag) <= 0)
 			return false;
@@ -44,6 +122,7 @@ class CAllPullWatch
 			$ID = $arRes['ID'];
 			$arChannel = CPullChannel::Get($userId);
 			$DB->Query("UPDATE b_pull_watch SET DATE_CREATE = ".$DB->CurrentTimeFunction().", CHANNEL_ID = '".$DB->ForSQL($arChannel['CHANNEL_ID'])."' WHERE ID = ".$ID);
+			$CACHE_MANAGER->Clean("b_pw_".$userId, "b_pull_watch");
 		}
 		return false;
 	}

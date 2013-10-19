@@ -178,7 +178,7 @@ class CBitrixCloudBackup
 	 *
 	 * @return CBitrixCloudBackup
 	 */
-	static public function clearOptions()
+	public function clearOptions()
 	{
 		CBitrixCloudOption::getOption("backup_files")->delete();
 		CBitrixCloudOption::getOption("backup_quota")->delete();

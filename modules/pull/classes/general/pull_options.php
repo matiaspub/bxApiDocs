@@ -9,12 +9,12 @@ class CPullOptions
 		if(defined("ADMIN_SECTION") && ADMIN_SECTION == true)
 			$bAdminSection = true;
 
+		$arResult = Array();
 		$res = $CACHE_MANAGER->Read(2592000, "pull_cnr");
 		if ($res)
-		{
 			$arResult = $CACHE_MANAGER->Get("pull_cnr");
-		}
-		else
+
+		if(!$res)
 		{
 			$arResult = Array(
 				'ADMIN_SECTION' => false,
@@ -59,12 +59,14 @@ class CPullOptions
 
 		if (self::ModuleEnable())
 		{
+			CAgent::AddAgent("CPullChannel::CheckOnlineChannel();", "pull", "N", 100, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+100, "FULL"));
 			CAgent::AddAgent("CPullChannel::CheckExpireAgent();", "pull", "N", 43200, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset() + 43200, "FULL"));
 			CAgent::AddAgent("CPullStack::CheckExpireAgent();", "pull", "N", 86400, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset() + 86400, "FULL"));
 			CAgent::AddAgent("CPullWatch::CheckExpireAgent();", "pull", "N", 600, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset() + 600, "FULL"));
 		}
 		else
 		{
+			CAgent::RemoveAgent("CPullChannel::CheckOnlineChannel();", "pull");
 			CAgent::RemoveAgent("CPullChannel::CheckExpireAgent();", "pull");
 			CAgent::RemoveAgent("CPullStack::CheckExpireAgent();", "pull");
 			CAgent::RemoveAgent("CPullWatch::CheckExpireAgent();", "pull");
@@ -96,9 +98,15 @@ class CPullOptions
 		COption::SetOptionString("pull", "nginx", $flag=='Y'?'Y':'N');
 
 		if ($flag=='Y')
+		{
+			CAgent::AddAgent("CPullChannel::CheckOnlineChannel();", "pull", "N", 100, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+100, "FULL"));
 			CAgent::RemoveAgent("CPullStack::CheckExpireAgent();", "pull");
+		}
 		else
+		{
+			CAgent::RemoveAgent("CPullChannel::CheckOnlineChannel();", "pull");
 			CAgent::AddAgent("CPullStack::CheckExpireAgent();", "pull", "N");
+		}
 
 		return true;
 	}
@@ -117,7 +125,10 @@ class CPullOptions
 	public static function SetPublishUrl($path = "")
 	{
 		if (strlen($path)<=0)
-			$path = 'http://127.0.0.1:8895/bitrix/pub/';
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $pull_default_option["path_to_publish"];
+		}
 
 		COption::SetOptionString("pull", "path_to_publish", $path);
 		return true;
@@ -126,9 +137,60 @@ class CPullOptions
 	public static function SetListenUrl($path = "")
 	{
 		if (strlen($path)<=0)
-			$path = (CMain::IsHTTPS() ? "https" : "http")."://#DOMAIN#".(CMain::IsHTTPS() ? ":8894" : ":8893").(BX_UTF ? '/bitrix/sub/' : '/bitrix/subwin/');
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $pull_default_option["path_to_listener"];
+		}
 
 		COption::SetOptionString("pull", "path_to_listener", $path);
+		return true;
+	}
+
+	public static function SetListenSecureUrl($path = "")
+	{
+		if (strlen($path)<=0)
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $pull_default_option["path_to_listener_secure"];
+		}
+
+		COption::SetOptionString("pull", "path_to_listener_secure", $path);
+		return true;
+	}
+
+	public static function SetWebSocketStatus($flag = "N")
+	{
+		COption::SetOptionString("pull", "websocket", $flag=='Y'?'Y':'N');
+
+		if ($flag=='Y')
+			CAgent::RemoveAgent("CPullStack::CheckExpireAgent();", "pull");
+		else
+			CAgent::AddAgent("CPullStack::CheckExpireAgent();", "pull", "N");
+
+		return true;
+	}
+
+	public static function SetWebSocketUrl($path = "")
+	{
+		if (strlen($path)<=0)
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $pull_default_option["path_to_websocket"];
+		}
+
+		COption::SetOptionString("pull", "path_to_websocket", $path);
+		return true;
+	}
+
+	public static function SetWebSocketSecureUrl($path = "")
+	{
+		if (strlen($path)<=0)
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $pull_default_option["path_to_websocket_secure"];
+		}
+
+		COption::SetOptionString("pull", "path_to_websocket_secure", $path);
 		return true;
 	}
 
@@ -146,13 +208,57 @@ class CPullOptions
 
 	public static function GetPublishUrl($channelId = "")
 	{
-		$url = COption::GetOptionString("pull", "path_to_publish", "").(strlen($channelId)>0?'?CHANNEL_ID='.$channelId:'');
+		$url = COption::GetOptionString("pull", "path_to_publish").(strlen($channelId)>0?'?CHANNEL_ID='.$channelId:'');
 		return $url;
 	}
 
 	public static function GetListenUrl($channelId = "")
 	{
-		$url = COption::GetOptionString("pull", "path_to_listener", "").(strlen($channelId)>0?'?CHANNEL_ID='.$channelId:'');
+		if (!is_array($channelId) && strlen($channelId) > 0)
+			$channelId = Array($channelId);
+		else if (!is_array($channelId))
+			$channelId = Array();
+
+		$url = COption::GetOptionString("pull", "path_to_listener").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		return $url;
+	}
+
+	public static function GetListenSecureUrl($channelId = "")
+	{
+		if (!is_array($channelId) && strlen($channelId) > 0)
+			$channelId = Array($channelId);
+		else if (!is_array($channelId))
+			$channelId = Array();
+
+		$url = COption::GetOptionString("pull", "path_to_listener_secure").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		return $url;
+	}
+
+	public static function GetWebSocketStatus()
+	{
+		$result = COption::GetOptionString("pull", "websocket", "N");
+		return $result == 'N'? false: true;
+	}
+
+	public static function GetWebSocketUrl($channelId = "")
+	{
+		if (!is_array($channelId) && strlen($channelId) > 0)
+			$channelId = Array($channelId);
+		else if (!is_array($channelId))
+			$channelId = Array();
+
+		$url = COption::GetOptionString("pull", "path_to_websocket").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		return $url;
+	}
+
+	public static function GetWebSocketSecureUrl($channelId = "")
+	{
+		if (!is_array($channelId) && strlen($channelId) > 0)
+			$channelId = Array($channelId);
+		else if (!is_array($channelId))
+			$channelId = Array();
+
+		$url = COption::GetOptionString("pull", "path_to_websocket_secure").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
 		return $url;
 	}
 

@@ -39,7 +39,7 @@ class CSaleDiscount extends CAllSaleDiscount
 	 *
 	 *
 	 * @return int <p>Возвращается код добавленной скидки или <i>false</i> в случае ошибки.
-	 * </p>
+	 * </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__add.php
@@ -93,14 +93,12 @@ class CSaleDiscount extends CAllSaleDiscount
 			$arInsert[1] .= ', '.implode(', ',array_values($arFields1));
 		}
 
-		$strSql =
-			"INSERT INTO b_sale_discount(".$arInsert[0].") ".
-			"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_sale_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$ID = intval($DB->LastID());
 
-		if ($ID)
+		if (0 < $ID)
 		{
 			if (!empty($arFields['USER_GROUPS']))
 			{
@@ -118,9 +116,7 @@ class CSaleDiscount extends CAllSaleDiscount
 				{
 					foreach ($arFields['USER_GROUPS'] as &$value)
 					{
-						$strSql =
-							"INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) ".
-							"VALUES(".$ID.", ".$value.")";
+						$strSql = "INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) VALUES(".$ID.", ".$value.")";
 						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					}
 					if (isset($value))
@@ -160,7 +156,7 @@ class CSaleDiscount extends CAllSaleDiscount
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной скидки или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__update.700e1b34.php
@@ -245,9 +241,7 @@ class CSaleDiscount extends CAllSaleDiscount
 			{
 				foreach ($arFields['USER_GROUPS'] as &$value)
 				{
-					$strSql =
-						"INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) ".
-						"VALUES(".$ID.", ".$value.")";
+					$strSql = "INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) VALUES(".$ID.", ".$value.")";
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				}
 				if (isset($value))
@@ -270,7 +264,7 @@ class CSaleDiscount extends CAllSaleDiscount
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__delete.7216613a.php
@@ -398,7 +392,7 @@ class CSaleDiscount extends CAllSaleDiscount
 	 *               "LID" =&gt; SITE_ID, 
 	 *               "ACTIVE" =&gt; "Y", 
 	 *               "&gt;=PRICE_TO" =&gt; $ORDER_PRICE, 
-	 *               " $ORDER_PRICE
+	 *               "&lt;=PRICE_FROM" =&gt; $ORDER_PRICE
 	 *             ),
 	 *         false,
 	 *         false,
@@ -432,7 +426,7 @@ class CSaleDiscount extends CAllSaleDiscount
 		{
 			$arOrder = strval($arOrder);
 			$arFilter = strval($arFilter);
-			if (strlen($arOrder) > 0 && strlen($arFilter) > 0)
+			if ('' != $arOrder && '' != $arFilter)
 				$arOrder = array($arOrder => $arFilter);
 			else
 				$arOrder = array();
@@ -488,36 +482,42 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", '', $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
-				return False;
+				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_discount D ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_discount D ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -537,9 +537,10 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -560,45 +561,42 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_sale_discount_group DG ".
-				"	".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount_group DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
-				return False;
+				return false;
 		}
 
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-			"FROM b_sale_discount_group DG ".
-			"	".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount_group DG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-				"FROM b_sale_discount_group DG ".
-				"	".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_discount_group DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -618,9 +616,10 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 

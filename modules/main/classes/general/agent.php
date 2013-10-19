@@ -146,9 +146,9 @@ class CAllAgent
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
-	 * </li> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li>
+	 * </li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
 	 * <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2823" >Структура
 	 * файлов</a></li> </ul><a name="examples"></a>
 	 *
@@ -265,8 +265,8 @@ class CAllAgent
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -318,8 +318,8 @@ class CAllAgent
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -366,8 +366,8 @@ class CAllAgent
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

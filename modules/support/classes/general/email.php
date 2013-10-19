@@ -30,7 +30,8 @@ class CSupportEMail
 	public static function EMailMessageCheck($arFields, $ACTION_VARS)
 	{
 		$arActionVars = explode("&", $ACTION_VARS);
-		for($i=0; $i<count($arActionVars); $i++)
+		$countAr = count($arActionVars);
+		for($i=0; $i<$countAr; $i++)
 		{
 			$v = $arActionVars[$i];
 			if($pos = strpos($v, "="))
@@ -42,7 +43,8 @@ class CSupportEMail
 	public static function EMailMessageAdd($arMessageFields, $ACTION_VARS)
 	{
 		$arActionVars = explode("&", $ACTION_VARS);
-		for($i=0; $i<count($arActionVars); $i++)
+		$countAr = count($arActionVars);
+		for($i=0; $i<$countAr; $i++)
 		{
 			$v = $arActionVars[$i];
 			if($pos = strpos($v, "="))
@@ -74,7 +76,8 @@ class CSupportEMail
 
 		$TID = 0;
 		$arSubjects = explode("\n", trim($W_SUPPORT_SUBJECT));
-		for($i=0; $i<count($arSubjects); $i++)
+		$countAr = count($arSubjects);
+		for($i=0; $i<$countAr; $i++)
 		{
 			$arSubjects[$i] = Trim($arSubjects[$i]);
 			if(strlen($arSubjects[$i])>0)
@@ -177,7 +180,16 @@ class CSupportEMail
 		if (count($arFILES) > 0)
 			$arFieldsTicket["FILES"] = $arFILES;
 
-		
+		$arFieldsTicket["CURRENT_USER_ID"] = null;
+		if(intval($AUTHOR_USER_ID) > 0)
+		{
+			$resU = CUser::GetByID(intval($AUTHOR_USER_ID));
+			if($arU = $resU->Fetch())
+			{
+				$arFieldsTicket["CURRENT_USER_ID"] = $arU["ID"];
+			}
+		}
+
 		if($TID>0) // extend exist message
 		{
 			$arFieldsTicket["MESSAGE_AUTHOR_USER_ID"] = $AUTHOR_USER_ID;

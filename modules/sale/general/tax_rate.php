@@ -131,7 +131,7 @@ class CAllSaleTaxRate
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной ставки налога или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__update.bd202837.php
@@ -171,7 +171,7 @@ class CAllSaleTaxRate
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__delete.c72c6dd5.php

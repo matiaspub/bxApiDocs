@@ -85,18 +85,18 @@ class CSecurityFilter
 		self::cleanGlobals();
 		$originalPostVars = $_POST;
 
-		$_GET = $this->safeizeArray($_GET, "\$_GET");
-		$_POST = $this->safeizeArray($_POST, "\$_POST", "/^File\d+_\d+$/");
-		$_COOKIE = $this->safeizeArray($_COOKIE, "\$_COOKIE");
-		$_SERVER = $this->safeizeServerArray($_SERVER);
+		$_GET = $this->filterArray($_GET, "\$_GET");
+		$_POST = $this->filterArray($_POST, "\$_POST", "/^File\d+_\d+$/");
+		$_COOKIE = $this->filterArray($_COOKIE, "\$_COOKIE");
+		$_SERVER = $this->filterServerArray($_SERVER);
+
+		self::reconstructRequest();
+		self::restoreGlobals();
 
 		$HTTP_GET_VARS = $_GET;
 		$HTTP_POST_VARS = $_POST;
 		$HTTP_COOKIE_VARS = $_COOKIE;
 		$HTTP_REQUEST_VARS = $_REQUEST;
-
-		self::reconstructRequest();
-		self::restoreGlobals();
 
 		$this->doPostProccessActions($originalPostVars);
 	}
@@ -283,7 +283,7 @@ class CSecurityFilter
 		unset($this->auditors["SQL"]);
 		unset($this->auditors["PHP"]);
 
-		return $this->safeizeVar($pValue, 'fakeVar');
+		return $this->filterVar($pValue, 'fakeVar');
 	}
 
 	/**
@@ -426,7 +426,7 @@ class CSecurityFilter
 	 * @param $pName
 	 * @return string
 	 */
-	protected function safeizeVar($pValue, $pName)
+	protected function filterVar($pValue, $pName)
 	{
 		if(preg_match("/^[A-Za-z0-9_.,-]*$/", $pValue))
 			return $pValue;
@@ -475,7 +475,7 @@ class CSecurityFilter
 	 * @param $pArray
 	 * @return array
 	 */
-	protected function safeizeServerArray($pArray)
+	protected function filterServerArray(array $pArray)
 	{
 		if(!is_array($pArray))
 			return $pArray;
@@ -486,14 +486,14 @@ class CSecurityFilter
 		{
 			if(strpos($key, "HTTP_")===0)
 			{
-				$array[$key] = $this->safeizeVar($array[$key], '$_SERVER["'.$key.'"]');
+				$array[$key] = $this->filterVar($array[$key], '$_SERVER["'.$key.'"]');
 			}
 
 		}
-		$array["QUERY_STRING"] = $this->safeizeVar($array["QUERY_STRING"], '$_SERVER["QUERY_STRING"]');
-		$array["REQUEST_URI"] = $this->safeizeVar($array["REQUEST_URI"], '$_SERVER["REQUEST_URI"]');
-		$array["SCRIPT_URL"] = $this->safeizeVar($array["SCRIPT_URL"], '$_SERVER["SCRIPT_URL"]');
-		$array["SCRIPT_URI"] = $this->safeizeVar($array["SCRIPT_URI"], '$_SERVER["SCRIPT_URI"]');
+		$array["QUERY_STRING"] = $this->filterVar($array["QUERY_STRING"], '$_SERVER["QUERY_STRING"]');
+		$array["REQUEST_URI"] = $this->filterVar($array["REQUEST_URI"], '$_SERVER["REQUEST_URI"]');
+		$array["SCRIPT_URL"] = $this->filterVar($array["SCRIPT_URL"], '$_SERVER["SCRIPT_URL"]');
+		$array["SCRIPT_URI"] = $this->filterVar($array["SCRIPT_URI"], '$_SERVER["SCRIPT_URI"]');
 		return $array;
 	}
 
@@ -504,7 +504,7 @@ class CSecurityFilter
 	 * @param string $pSkipKeyPreg
 	 * @return array
 	 */
-	protected function safeizeArray($pArray, $pName, $pSkipKeyPreg = '')
+	protected function filterArray(array $pArray, $pName, $pSkipKeyPreg = '')
 	{
 		if(!is_array($pArray))
 			return $pArray;
@@ -516,7 +516,7 @@ class CSecurityFilter
 			if($pSkipKeyPreg && preg_match($pSkipKeyPreg, $key))
 				continue;
 
-			$filteredKey =  $this->safeizeVar($key, $pName."['".$key."']");
+			$filteredKey =  $this->filterVar($key, $pName."['".$key."']");
 			if($filteredKey != $key)
 			{
 				unset($array[$key]);
@@ -525,11 +525,11 @@ class CSecurityFilter
 
 			if(is_array($value))
 			{
-				$array[$key] = $this->safeizeArray($value, $pName."['".$key."']", $pSkipKeyPreg);
+				$array[$key] = $this->filterArray($value, $pName."['".$key."']", $pSkipKeyPreg);
 			}
 			else
 			{
-				$array[$key] = $this->safeizeVar($value, $pName."['".$key."']");
+				$array[$key] = $this->filterVar($value, $pName."['".$key."']");
 			}
 		}
 		return $array;
@@ -600,7 +600,7 @@ class CSecurityFilter
 	 */
 	protected static function logVariable($pValue, $pName, $pAuditorName)
 	{
-		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_".$pAuditorName, $pName, "==".base64_encode($pValue));
+		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_".$pAuditorName, $pName, $pValue);
 	}
 
 
@@ -856,7 +856,7 @@ class CSecurityFilter
 	 * @param string $pPrefix
 	 * @return string
 	 */
-	protected static function formatHiddenFields($pArray, $pPrefix = "")
+	protected static function formatHiddenFields(array $pArray, $pPrefix = "")
 	{
 		$result = "";
 		foreach($pArray as $key => $value)

@@ -20,16 +20,18 @@ $SUPPORT_CACHE_USER_ROLES  = Array();
 class CAllTicket
 {
 
-	const ADD = 1;
-	const DELETE = 2;
-	const CURRENT_DATE = 3;
-	const IGNORE = 4;
-	
+	const ADD = "ADD";
+	const UPDATE = "UPDATE";
+	const DELETE = "DELETE";
+	const IGNORE = "IGNORE";
+	const REOPEN = "REOPEN";
+	const NEW_SLA = "NEW_SLA";
+		
 	public static function err_mess()
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CAllTicket<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CAllTicket<br>File: ".__FILE__;
 	}
 
 	/***************************************************************
@@ -295,12 +297,15 @@ class CAllTicket
 		if(count($sg) > 0)
 		{
 			$cU = CUser::GetList($v1="id", $v2="asc", array("ACTIVE" => "Y", "GROUPS_ID" => $sg));
-			while($arU = $cU->Fetch()) $arUser[] = intval($arU["ID"]);
+			while($arU = $cU->Fetch())
+			{
+				$arUser[] = intval($arU["ID"]);
+			}
 		}
-		if(count($arUser) <= 0)
-		{
+		//if(count($arUser) <= 0)
+		//{
 			$arUser[] = 1;
-		}
+		//}
 		return array_unique($arUser);
 	}
 
@@ -353,7 +358,7 @@ class CAllTicket
 			{
 				if ($id<=0 || ($id>0 && is_set($arFields, $key)))
 				{
-					if (!is_array($arFields[$key]) && (strlen($arFields[$key])<=0 || $arFields[$key]=="NOT_REF"))
+					if (!is_array($arFields[$key]) && (strlen($arFields[$key])<=0 || $arFields[$key]==="NOT_REF"))
 					{
 						$arMsg[] = array("id"=>$key, "text"=> GetMessage("SUP_ERROR_REQUIRED_".$key));
 						//$str.= GetMessage("SUP_ERROR_REQUIRED_".$key)."<br>";
@@ -510,6 +515,7 @@ class CAllTicket
 			"RESPONSE_TIME_UNIT",
 			"NOTICE_TIME_UNIT",
 			"OPEN_TIME",
+			"DEADLINE_SOURCE"
 			);
 		foreach($arrSTRING as $key)
 			if (is_set($arFields, $key))
@@ -619,6 +625,7 @@ class CAllTicket
 	public static function SplitTicket($arParam)
 	{
 		global $DB;
+		$err_mess = (CAllTicket::err_mess())."<br>Function: SplitTicket<br>Line: ";
 
 		$intLastTicketID 	 = IntVal($arParam['SOURCE_TICKET_ID']);
 		$stLastTicketTitle	 = htmlspecialcharsEx($arParam['SOURCE_TICKET_TITLE']);
@@ -821,6 +828,7 @@ class CAllTicket
 			$exactly = ($exactly=="Y" && $bAdmin=="Y") ? "Y" : "N";
 
 			$arFilter = array("TICKET_ID" => $ticketID, "TICKET_ID_EXACT_MATCH" => "Y", "IS_LOG" => "N");
+			$a = $b = $c = null;
 			if ($rsMessages = CTicket::GetMessageList($a, $b, $arFilter, $c, $checkRights))
 			{
 				// помечаем исходное сообщение
@@ -855,6 +863,7 @@ class CAllTicket
 		if ($bAdmin=="Y" || $bSupportTeam=="Y")
 		{
 			$arFilter = array("TICKET_ID" => $ticketID, "TICKET_ID_EXACT_MATCH" => "Y");
+			$a = $b = $c = null;
 			if ($rsMessages = CTicket::GetMessageList($a, $b, $arFilter, $c, $checkRights))
 			{
 				// снимаем отметку о спаме только у первого сообщения
@@ -873,7 +882,7 @@ class CAllTicket
 					Группа функций по управлению обращениями
 	*****************************************************************/
 
-	public static function UpdateLastParams($ticketID, $resetAutoClose=false, $changeLastMessageDate = true, $setReopenDefault = true)
+	/*function UpdateLastParams($ticketID, $resetAutoClose=false, $changeLastMessageDate = true, $setReopenDefault = true)
 	{	
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UpdateLastParams<br>Line: ";
 		global $DB, $USER;
@@ -881,7 +890,7 @@ class CAllTicket
 		if ($ticketID<=0) return;
 
 		$arFields = array();
-		if ($resetAutoClose=="Y") $arFields["AUTO_CLOSE_DAYS"] = "null";
+		//if ($resetAutoClose=="Y") $arFields["AUTO_CLOSE_DAYS"] = "null";
 
 		
 		// определим последнего автора
@@ -896,10 +905,10 @@ class CAllTicket
 				b_ticket_message
 			WHERE
 				TICKET_ID=$ticketID
-			and (NOT_CHANGE_STATUS='N')
-			and (IS_HIDDEN='N' or IS_HIDDEN is null or ".$DB->Length("IS_HIDDEN")."<=0)
-			and (IS_LOG='N' or IS_LOG is null or ".$DB->Length("IS_LOG")."<=0)
-			and (IS_OVERDUE='N' or IS_OVERDUE is null or ".$DB->Length("IS_OVERDUE")."<=0)
+			AND(NOT(NOT_CHANGE_STATUS='Y'))
+			AND(NOT(IS_HIDDEN='Y'))
+			AND(NOT(IS_LOG='Y'))
+			AND(NOT(IS_OVERDUE='Y'))
 			ORDER BY
 				C_NUMBER desc
 			";
@@ -945,7 +954,7 @@ class CAllTicket
 		MESSAGES
 		REOPEN
 		PROBLEM_TIME
-		*/
+		*//*
 				
 		$DB->Update("b_ticket",$arFields,"WHERE ID='".$ticketID."'",$err_mess.__LINE__);		
 	}
@@ -976,27 +985,37 @@ class CAllTicket
 				INNER JOIN b_ticket_message TM
 					ON T.ID = TM.TICKET_ID
 						AND T.ID = $ticketID
-						AND (TM.IS_LOG='N' OR TM.IS_LOG IS NULL OR " . $DB->Length("TM.IS_LOG") . " <= 0)
 						AND TM.OWNER_USER_ID IN($strUsers)
+						AND (NOT(TM.IS_LOG='Y'))
+						AND (NOT(TM.IS_HIDDEN='Y'))
+						AND (NOT(TM.NOT_CHANGE_STATUS='Y'))
 				
 			GROUP BY
 				T.ID";
 				
 		$rs = $DB->Query($strSql, false, $err_mess . __LINE__);
-		if($arrRs = $rs->Fetch()) if(intval($arrRs["M_ID"]) > 0) $M_ID = intval($arrRs["M_ID"]);
+		if($arrRs = $rs->Fetch())
+		{
+			if(intval($arrRs["M_ID"]) > 0)
+			{
+				$M_ID = intval($arrRs["M_ID"]);
+			}
+		}
 		
 		// Get first user request after last support response
 		$strSql = "
 			SELECT
 				T.SLA_ID,
 				T.DATE_CLOSE,
+				" . $DB->DateToCharFunction("T.DEADLINE_SOURCE_DATE", "FULL") . " DEADLINE_SOURCE_DATE,
+				" . $DB->DateToCharFunction("T.D_1_USER_M_AFTER_SUP_M", "FULL") . " DATE_OLD,
+				T.IS_OVERDUE,
 				SLA.RESPONSE_TIME_UNIT,
 				SLA.RESPONSE_TIME,
 				SLA.NOTICE_TIME_UNIT,
 				SLA.NOTICE_TIME,
 				PZ2.M_ID,
-				PZ2.D_1_USER_M_AFTER_SUP_M,
-				" . $DB->DateToCharFunction("T.D_1_USER_M_AFTER_SUP_M", "FULL") . " DATE_OLD
+				PZ2.D_1_USER_M_AFTER_SUP_M
 			FROM
 				b_ticket T
 				INNER JOIN b_ticket_sla SLA
@@ -1016,8 +1035,10 @@ class CAllTicket
 							INNER JOIN b_ticket_message TM
 								ON T.ID = TM.TICKET_ID
 								AND T.ID = $ticketID
-								AND (NOT(TM.IS_LOG='Y'))
 								AND TM.ID > $M_ID
+								AND (NOT(TM.IS_LOG='Y'))
+								AND (NOT(TM.NOT_CHANGE_STATUS='Y'))
+								AND (NOT(TM.IS_HIDDEN='Y'))
 							
 						GROUP BY
 							T.ID) PZ
@@ -1031,24 +1052,224 @@ class CAllTicket
 		{
 			return;
 		}
-		
+
+		$isOverdue = false;
 		if(intval($arrRs["M_ID"]) > 0)
 		{
 			$arFields["D_1_USER_M_AFTER_SUP_M"] = $DB->CharToDateFunction($arrRs["D_1_USER_M_AFTER_SUP_M"]);
 			$arFields["ID_1_USER_M_AFTER_SUP_M"] = intval($arrRs["M_ID"]);
 			$arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] = "'N'";
+
+			if($arrRs["IS_OVERDUE"] == "Y" && !(isset($dateType["EVENT"]) && in_array(CTicket::REOPEN, $dateType["EVENT"])))
+			{
+				unset($arFields["SUPPORT_DEADLINE_NOTIFY"]);
+				unset($arFields["SUPPORT_DEADLINE"]);
+				unset($arFields["IS_OVERDUE"]);
+				unset($arFields["IS_NOTIFIED"]);
+				$isOverdue = true;
+			}
 		}
 				
-		if( intval($arrRs["DATE_CLOSE"]) <= 0 && $arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] == "'N'")
+		if( !$isOverdue && intval($arrRs["DATE_CLOSE"]) <= 0 && $arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] == "'N'")
 		{
 			$arrRs["ID"] =  $ticketID;
 			CTicketReminder::RecalculateSupportDeadlineForOneTicket($arrRs, $arFields, $dateType);
 		}
 		else
 		{
+			if(isset($dateType["EVENT"]) && is_array($dateType["EVENT"]) && in_array(CTicket::REOPEN, $dateType["EVENT"]))
+			{
+				$arFields["DEADLINE_SOURCE_DATE"] = $DB->CharToDateFunction(GetTime(time() + CTimeZone::GetOffset(),"FULL"));
+			}
 			$DB->Update("b_ticket", $arFields, "WHERE ID='" . $ticketID . "'", $err_mess . __LINE__);
 		}
 				
+	}*/
+
+	public static function UpdateLastParamsN($ticketID, $dateType, $recalculateSupportDeadline = true, $setReopenDefault = true)
+	{	
+		$err_mess = (CAllTicket::err_mess())."<br>Function: UpdateLastParamsN<br>Line: ";
+		global $DB, $USER;
+		$ticketID = intval($ticketID);
+		if ($ticketID<=0) return;
+		
+		$arSupportTeam = CTicket::GetSupportTeamAndAdminUsers();
+		
+		$arFields = array(
+			"LAST_MESSAGE_DATE" => "null",
+			"LAST_MESSAGE_USER_ID" => "null",
+			"LAST_MESSAGE_GUEST_ID" => "null",
+			"LAST_MESSAGE_SID" => "null",
+			"D_1_USER_M_AFTER_SUP_M" => "null",
+			"ID_1_USER_M_AFTER_SUP_M" => "null",
+			"LAST_MESSAGE_BY_SUPPORT_TEAM" => "'Y'",
+		);
+		if ($setReopenDefault)
+		{
+			$arFields["REOPEN"] = "'N'";
+		}
+
+		$DB->StartUsingMasterOnly();
+		
+		$strSql = "
+			SELECT
+				T.ID,
+				T.SLA_ID,
+				T.DATE_CLOSE,
+				" . $DB->DateToCharFunction("T.DEADLINE_SOURCE_DATE", "FULL") . " DEADLINE_SOURCE_DATE,
+				" . $DB->DateToCharFunction("T.D_1_USER_M_AFTER_SUP_M", "FULL") . " DATE_OLD,
+				T.IS_OVERDUE,
+				SLA.RESPONSE_TIME_UNIT,
+				SLA.RESPONSE_TIME,
+				SLA.NOTICE_TIME_UNIT,
+				SLA.NOTICE_TIME
+			FROM
+				b_ticket T
+				INNER JOIN b_ticket_sla SLA
+					ON T.SLA_ID = SLA.ID
+						AND T.ID = $ticketID
+			";
+		$rs = $DB->Query($strSql, false, $err_mess . __LINE__);
+		$arTicket = $rs->Fetch();
+		if(!$arTicket)
+		{
+			$DB->StopUsingMasterOnly();
+			return;
+		}
+
+		$arMessagesAll = array();
+		$arLastMess = null;
+		$arFirstUserMessAfterSupportMess = null;
+		$allTime = 0;
+		$messages = 0;
+		$messAfterSupportMess = true;
+
+		$strSql = "
+			SELECT
+				ID,
+				".$DB->DateToCharFunction("DATE_CREATE","FULL")." DATE_CREATE,
+				OWNER_USER_ID,
+				OWNER_GUEST_ID,
+				OWNER_SID,
+				TASK_TIME,
+				IS_OVERDUE,
+				IS_HIDDEN,
+				NOT_CHANGE_STATUS
+			FROM
+				b_ticket_message
+			WHERE
+				TICKET_ID=$ticketID
+			AND(NOT(IS_LOG='Y'))
+			ORDER BY
+				C_NUMBER
+			";
+			//NOT_CHANGE_STATUS
+			//IS_HIDDEN
+			//IS_OVERDUE
+			
+		$rs = $DB->Query($strSql,false,$err_mess.__LINE__);
+		$DB->StopUsingMasterOnly();
+		
+		while($arM = $rs->Fetch())
+		{
+			$arMessagesAll[] = $arM;
+			if($arM["IS_OVERDUE"] !== 'Y')
+			{
+				if($arM["IS_HIDDEN"] !== 'Y')
+				{
+					if($arM["NOT_CHANGE_STATUS"] !== 'Y')
+					{
+						$arLastMess = $arM;
+					}
+					$messages++;
+				}
+				$allTime += intval($arM["TASK_TIME"]);
+			}
+			if($arM["IS_HIDDEN"] !== 'Y' && $arM["NOT_CHANGE_STATUS"] !== 'Y')
+			{
+				if(in_array(intval($arM["OWNER_USER_ID"]), $arSupportTeam))
+				{
+					$arFirstUserMessAfterSupportMess = null;
+					$messAfterSupportMess = true;
+				}
+				elseif($messAfterSupportMess)
+				{
+					$arFirstUserMessAfterSupportMess = $arM;
+					$messAfterSupportMess = false;
+				}
+			}
+		}
+
+		if($arLastMess !== null)
+		{
+			$arFields["LAST_MESSAGE_USER_ID"] = $arLastMess["OWNER_USER_ID"];
+			//if ($changeLastMessageDate)
+			//{
+				$arFields["LAST_MESSAGE_DATE"] = $DB->CharToDateFunction($arLastMess["DATE_CREATE"]);
+			//}
+			$arFields["LAST_MESSAGE_GUEST_ID"] = intval($arLastMess["OWNER_GUEST_ID"]);
+			$arFields["LAST_MESSAGE_SID"] = "'" . $DB->ForSql($arLastMess["OWNER_SID"], 255) . "'";
+		}
+		$arFields["MESSAGES"] = $messages;
+		$arFields["PROBLEM_TIME"] = $allTime;
+		
+		if($arFirstUserMessAfterSupportMess !== null)
+		{
+			$arFields["D_1_USER_M_AFTER_SUP_M"] = $DB->CharToDateFunction($arFirstUserMessAfterSupportMess["DATE_CREATE"]);
+			$arFields["ID_1_USER_M_AFTER_SUP_M"] = intval($arFirstUserMessAfterSupportMess["ID"]);
+			$arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] = "'N'";
+		}
+		
+		if(is_array($dateType["EVENT"]) && in_array(CTicket::REOPEN, $dateType["EVENT"]))
+		{
+			$arFields["DEADLINE_SOURCE_DATE"] = $DB->CharToDateFunction(GetTime(time() + CTimeZone::GetOffset(),"FULL"));
+		}
+		elseif($arTicket["IS_OVERDUE"] == "Y")
+		{
+			$recalculateSupportDeadline = false;
+		}
+		
+		$recalculateSupportDeadline = $recalculateSupportDeadline && (intval($arTicket["DATE_CLOSE"]) <= 0) && ($arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] == "'N'");
+		
+		if(!$recalculateSupportDeadline)
+		{
+			if ($arFields["LAST_MESSAGE_BY_SUPPORT_TEAM"] == "'Y'")
+			{
+				$arFields["SUPPORT_DEADLINE_NOTIFY"] = "null";
+				$arFields["SUPPORT_DEADLINE"] = "null";
+				$arFields["IS_OVERDUE"] = "'N'";
+				$arFields["IS_NOTIFIED"] = "'N'";
+			}
+		}
+		
+		$DB->Update("b_ticket", $arFields, "WHERE ID='" . $ticketID . "'", $err_mess . __LINE__);
+		
+		if($recalculateSupportDeadline)
+		{
+			$arTicket["M_ID"] = $arFirstUserMessAfterSupportMess["ID"];
+			$arTicket["D_1_USER_M_AFTER_SUP_M"] = $arFirstUserMessAfterSupportMess["DATE_CREATE"];
+			CTicketReminder::RecalculateSupportDeadlineForOneTicket($arTicket, $arFields, $dateType);
+		}
+		
+		/*
+		LAST_MESSAGE_DATE
+		LAST_MESSAGE_USER_ID
+		LAST_MESSAGE_GUEST_ID
+		LAST_MESSAGE_SID
+		MESSAGES
+		REOPEN
+		PROBLEM_TIME
+		D_1_USER_M_AFTER_SUP_M
+		ID_1_USER_M_AFTER_SUP_M
+		LAST_MESSAGE_BY_SUPPORT_TEAM
+		
+		DEADLINE_SOURCE_DATE
+		SUPPORT_DEADLINE_NOTIFY
+		SUPPORT_DEADLINE
+		IS_OVERDUE
+		IS_NOTIFIED
+		*/
+	
 	}
 
 	public static function UpdateMessages($ticketID)
@@ -1089,7 +1310,8 @@ class CAllTicket
 		if (is_array($arFilter))
 		{
 			$filter_keys = array_keys($arFilter);
-			for ($i=0; $i<count($filter_keys); $i++)
+			$filterKeysCount = count($filter_keys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filter_keys[$i];
 				$val = $arFilter[$filter_keys[$i]];
@@ -1224,6 +1446,7 @@ class CAllTicket
 	 */
 	public static function GetMessageByID($id, $checkRights="Y", $get_user_name="Y")
 	{
+		$by = $order = $is_filtered = null;
 		return CTicket::GetMessageList($by, $order, array("ID" => $id, "ID_EXACT_MATCH" => "Y"), $is_filtered, $checkRights, $get_user_name);
 	}
 
@@ -1343,7 +1566,24 @@ class CAllTicket
 	 */
 	public static function GetByID($id, $lang=LANG, $checkRights="Y", $get_user_name="Y", $get_extra_names="Y", $arParams = Array())
 	{
+		$by = $order = $is_filtered = null;
 		return CTicket::GetList($by, $order, array("ID" => $id, "ID_EXACT_MATCH" => "Y"), $is_filtered, $checkRights, $get_user_name, $get_extra_names, $lang, $arParams);
+	}
+
+	public static function getMaxId()
+	{
+		global $DB;
+
+		$id = null;
+
+		$result = $DB->Query("SELECT MAX(ID) as MAX_ID FROM b_ticket");
+		if ($result)
+		{
+			$row = $result->Fetch();
+			$id = $row['MAX_ID'];
+		}
+
+		return $id;
 	}
 
 	
@@ -1404,10 +1644,14 @@ class CAllTicket
 
 			//CTicketReminder::Delete($ticketID);
 			$DB->Query("DELETE FROM b_ticket_message_2_file WHERE TICKET_ID='$ticketID'", false, $err_mess.__LINE__);
-			$DB->Query("DELETE FROM b_ticket_search WHERE MESSAGE_ID IN(SELECT ID FROM b_ticket_message WHERE TICKET_ID = '$ticketID')", false, $err_mess.__LINE__);
 			$DB->Query("DELETE FROM b_ticket_message WHERE TICKET_ID='$ticketID'", false, $err_mess.__LINE__);
 			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SUPPORT", $ticketID);
 			$DB->Query("DELETE FROM b_ticket WHERE ID='$ticketID'", false, $err_mess.__LINE__);
+
+			if (CSupportSearch::isIndexExists())
+			{
+				CSupportSearch::reindexTicket($ticketID);
+			}
 		}
 	}
 
@@ -1439,6 +1683,7 @@ class CAllTicket
 	{
 		//global $DB;
 		//$DB->DebugToFile = true;
+		$messageID = null;
 		$x = CTicket::Set($arFields, $messageID, $ticketID, $checkRights, $sendEmailToAuthor, $sendEmailToTechsupport);
 		//$DB->DebugToFile = false;
 		return $x;
@@ -1471,10 +1716,16 @@ class CAllTicket
 						foreach($arr[1] as $email)
 						{
 							$email = trim($email);
-							if(strlen($email) > 0 && !in_array($email, $res) && check_email($email)) $res[] = $email;
+							if(strlen($email) > 0 && !in_array($email, $res) && check_email($email))
+							{
+								$res[] = $email;
+							}
 						}
 					}
-					elseif(!in_array($email, $res) && check_email($email)) $res[] = $email;
+					elseif(!in_array($email, $res) && check_email($email))
+					{
+						$res[] = $email;
+					}
 				}
 			}
 		}
@@ -1487,6 +1738,7 @@ class CAllTicket
 		$n = CSupportTableFields::VT_NUMBER;
 		$s = CSupportTableFields::VT_STRING;
 		$yn = CSupportTableFields::VT_Y_N;
+		$ynn = CSupportTableFields::VT_Y_N_NULL;
 		$d = CSupportTableFields::VT_DATE;
 		$dt = CSupportTableFields::VT_DATE_TIME;
 		$tables = array(
@@ -1513,7 +1765,7 @@ class CAllTicket
 				"DIFFICULTY_ID" =>					array("TYPE" => $n,	"DEF_VAL" => null	),
 				"TITLE" =>							array("TYPE" => $s,	"DEF_VAL" => "", 	"MAX_STR_LEN" => 255),
 				"MESSAGES" =>						array("TYPE" => $n,	"DEF_VAL" => 0		),
-				"IS_SPAM" =>						array("TYPE" => $yn,	"DEF_VAL" => null	),
+				"IS_SPAM" =>						array("TYPE" => $ynn,	"DEF_VAL" => null	),
 				"OWNER_USER_ID" =>					array("TYPE" => $n,	"DEF_VAL" => null	),
 				"OWNER_GUEST_ID" =>					array("TYPE" => $n,	"DEF_VAL" => null	),
 				"OWNER_SID" =>						array("TYPE" => $s,	"DEF_VAL" => null, 	"MAX_STR_LEN" => 255),
@@ -1534,12 +1786,13 @@ class CAllTicket
 				"HOLD_ON" =>						array("TYPE" => $yn,	"DEF_VAL" => "N"	),
 				"REOPEN" =>							array("TYPE" => $yn,	"DEF_VAL" => "N"	),
 				"COUPON" =>							array("TYPE" => $s,	"DEF_VAL" => null, 	"MAX_STR_LEN" => 255),
+				"DEADLINE_SOURCE_DATE" =>			array("TYPE" => $dt,	"DEF_VAL" => null	),
 			),
 			
 			"EventFields" => array(
 				"ID" =>								array("TYPE" => $n,	"DEF_VAL" => null	),
-				"LANGUAGE" =>						array("TYPE" => $n,	"DEF_VAL" => null	),
-				"LANGUAGE_ID" =>					array("TYPE" => $n,	"DEF_VAL" => null	),
+				"LANGUAGE" =>						array("TYPE" => $s,	"DEF_VAL" => null	),
+				"LANGUAGE_ID" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"WHAT_CHANGE" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"DATE_CREATE" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"TIMESTAMP" =>						array("TYPE" => $s,	"DEF_VAL" => null	),
@@ -1557,7 +1810,7 @@ class CAllTicket
 				"ADMIN_EDIT_URL" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"PUBLIC_EDIT_URL" =>				array("TYPE" => $s,	"DEF_VAL" => null	),
 				"OWNER_EMAIL" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
-				"OWNER_USER_ID" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
+				"OWNER_USER_ID" =>					array("TYPE" => $n,	"DEF_VAL" => null	),
 				"OWNER_USER_NAME" =>				array("TYPE" => $s,	"DEF_VAL" => null	),
 				"OWNER_USER_LOGIN" =>				array("TYPE" => $s,	"DEF_VAL" => null	),
 				"OWNER_USER_EMAIL" =>				array("TYPE" => $s,	"DEF_VAL" => null	),
@@ -1693,6 +1946,10 @@ class CAllTicket
 					$v->change .= GetMessage("SUP_SLA_CHANGED") . "\n";
 					$change_log .= "<li>" . htmlspecialcharsEx(GetMessage("SUP_SLA_CHANGED_LOG", array("#VALUE#" => $nf->SLA_NAME)));
 					break;
+				case "TITLE":
+					$v->change .= GetMessage("SUP_TITLE_CHANGED") . "\n";
+					$change_log .= "<li>" . htmlspecialcharsEx(GetMessage("SUP_TITLE_CHANGED_LOG", array("#VALUE#" => $nf->TITLE)));
+					break;
 				case "MESSAGE":
 					$v->change .= GetMessage("SUP_NEW_MESSAGE") . "\n";
 					break;
@@ -1733,7 +1990,7 @@ class CAllTicket
 		$mf->ADMIN_EDIT_URL = "/bitrix/admin/ticket_edit.php";
 		$mf->LANGUAGE = $v->arrSite["LANGUAGE_ID"];
 		$mf->LANGUAGE_ID = $v->arrSite["LANGUAGE_ID"];
-		
+
 		$arrSet = array(
 			"ID"						=> "ID",
 			"DATE_CREATE"				=> "DATE_CREATE",
@@ -1746,15 +2003,17 @@ class CAllTicket
 			"STATUS"					=> "STATUS_NAME",
 			"SLA"						=> "SLA_NAME",
 			"OWNER_USER_ID"				=> "OWNER_USER_ID",
+			"OWNER_GUEST_ID"			=> "OWNER_GUEST_ID",
+			"OWNER_SID"					=> "OWNER_SID",
 			"OWNER_USER_NAME"			=> "OWNER_NAME",
 			"OWNER_USER_LOGIN"			=> "OWNER_LOGIN",
 			"OWNER_USER_EMAIL"			=> "OWNER_EMAIL",
-			"OWNER_SID"					=> "OWNER_SID",
 			"RESPONSIBLE_USER_ID"		=> "RESPONSIBLE_USER_ID",
 			"RESPONSIBLE_USER_NAME"		=> "RESPONSIBLE_NAME",
 			"RESPONSIBLE_USER_LOGIN"	=> "RESPONSIBLE_LOGIN",
 			"RESPONSIBLE_USER_EMAIL"	=> "RESPONSIBLE_EMAIL",
 			"CREATED_USER_ID"			=> "CREATED_USER_ID",
+			"CREATED_GUEST_ID"			=> "CREATED_GUEST_ID",
 			"CREATED_USER_LOGIN"		=> "CREATED_LOGIN",
 			"CREATED_USER_EMAIL"		=> "CREATED_EMAIL",
 			"CREATED_USER_NAME"			=> "CREATED_NAME"
@@ -1763,6 +2022,7 @@ class CAllTicket
 		if(!$v->isNew) // UPDATE
 		{
 			$arrSet["MODIFIED_USER_ID"]			= "MODIFIED_USER_ID";
+			$arrSet["MODIFIED_GUEST_ID"]		= "MODIFIED_GUEST_ID";
 			$arrSet["MODIFIED_USER_LOGIN"]		= "MODIFIED_LOGIN";
 			$arrSet["MODIFIED_USER_EMAIL"]		= "MODIFIED_EMAIL";
 			$arrSet["MODIFIED_USER_NAME"]		= "MODIFIED_NAME";
@@ -1772,53 +2032,93 @@ class CAllTicket
 						
 		
 		$mf->FromArray((array)$nf, $arrSet);
+
+		$arUserIDs = array($mf->OWNER_USER_ID, $mf->CREATED_USER_ID, $mf->MODIFIED_USER_ID, $mf->RESPONSIBLE_USER_ID);
+		$arGuestIDs = array($mf->OWNER_GUEST_ID, $mf->CREATED_GUEST_ID, $mf->MODIFIED_GUEST_ID);
+		$arStrUsers =CTicket::GetUsersPropertiesArray($arUserIDs, $arGuestIDs);
 		
 		$mf->FILES_LINKS = self::Set_getFilesLinks($v->arrFILES, $v->arrSite["LANGUAGE_ID"]);
 		$mf->IMAGE_LINK = $mf->FILES_LINKS;
 		
 		$mf->MESSAGE_BODY = PrepareTxtForEmail($arFields["MESSAGE"], $v->arrSite["LANGUAGE_ID"], false, false);
 		if(strlen($mf->MESSAGE_BODY) > 0) $mf->MESSAGE_BODY = (strlen($mf->FILES_LINKS) > 0 ? "\n" : "\n\n") . $mf->MESSAGE_BODY . "\n";
-					
+
 		// сформируем email автора
-		// Событие: "TICKET_NEW_FOR_AUTHOR"					- "EMAIL_TO" = "OWNER_EMAIL"
-		// Событие: "TICKET_CHANGE_BY_AUTHOR_FOR_AUTHOR"	- "EMAIL_TO" = "OWNER_EMAIL"
-		// Событие: "TICKET_CHANGE_BY_SUPPORT_FOR_AUTHOR"	- "EMAIL_TO" = "OWNER_EMAIL"
-		$arrOwnerEmails = self::EmailsFromStringToArray($mf->OWNER_SID,  array($nf->OWNER_EMAIL));
+		// Событие: "TICKET_CHANGE_BY_AUTHOR_FOR_AUTHOR"	- #DEFAULT_EMAIL_FROM# -> #OWNER_EMAIL# (Обращение изменено автором (для автора))
+		// Событие: "TICKET_CHANGE_BY_SUPPORT_FOR_AUTHOR"	- #DEFAULT_EMAIL_FROM# -> #OWNER_EMAIL# (Обращение изменено сотрудником техподдержки (для автора))
+		// Событие: "TICKET_NEW_FOR_AUTHOR"					- #DEFAULT_EMAIL_FROM# -> #OWNER_EMAIL# (Новое обращение (для автора))
+
+		$ownerEmail = "";
+		if($mf->OWNER_USER_ID > 0 && isset($arStrUsers["arUsers"][$mf->OWNER_USER_ID]))
+		{
+			$ownerEmail = $arStrUsers["arUsers"][$mf->OWNER_USER_ID]["EMAIL"];
+		}
+		elseif($mf->OWNER_GUEST_ID > 0 && isset($arStrUsers["arGuests"][$mf->OWNER_GUEST_ID]))
+		{
+			$ownerEmail = $arStrUsers["arGuests"][$mf->OWNER_GUEST_ID]["EMAIL"];
+		}
+		$arrOwnerEmails = self::EmailsFromStringToArray($mf->OWNER_SID,  array($ownerEmail));
 		if(intval($mf->OWNER_USER_ID) > 0)
 		{
 			$rs = CTicket::GetResponsibleList($mf->OWNER_USER_ID, $I_Email, $U_Email);
-			while($arr0 = $rs->Fetch()) if(strlen($arr0['EMAIL']) > 0) $arrOwnerEmails[] = $arr0['EMAIL'];
+			while($arr0 = $rs->Fetch())
+			{
+				if(strlen($arr0['EMAIL']) > 0)
+				{
+					$arrOwnerEmails[] = $arr0['EMAIL'];
+				}
+			}
 		}
+
 		$mf->OWNER_EMAIL = implode(", ", array_unique($arrOwnerEmails));
 		
 		// выбираем административные email'ы
 		$arrAdminEMails = CTicket::GetAdminEmails();
-		if(!is_array($arrAdminEMails)) $arrAdminEMails = array();
+		if(!is_array($arrAdminEMails))
+		{
+			$arrAdminEMails = array();
+		}
 		TrimArr($arrAdminEMails);
 	
 		// сформируем email техподдержки
-		// Событие: "TICKET_NEW_FOR_TECHSUPPORT"	- "EMAIL_TO" = "SUPPORT_EMAIL"
-		// Событие: "TICKET_CHANGE_FOR_TECHSUPPORT"	- "EMAIL_TO" = "SUPPORT_EMAIL"
+		// Событие: "TICKET_OVERDUE_REMINDER"				- #DEFAULT_EMAIL_FROM# -> #SUPPORT_EMAIL# (Напоминание о необходимости ответа (для техподдержки))
+		// Событие: "TICKET_CHANGE_FOR_TECHSUPPORT"			- #DEFAULT_EMAIL_FROM# -> #SUPPORT_EMAIL# (Изменения в обращении (для техподдержки))
+		// Событие: "TICKET_NEW_FOR_TECHSUPPORT"			- #DEFAULT_EMAIL_FROM# -> #SUPPORT_EMAIL# (Новое обращение (для техподдержки))
+
 		$arrSupportEmails = array();
-		if(strlen($nf->RESPONSIBLE_EMAIL) > 0) $arrSupportEmails[] = $nf->RESPONSIBLE_EMAIL;
-		if(count($arrSupportEmails) <= 0) $arrSupportEmails = $arrAdminEMails;
+		if($mf->RESPONSIBLE_USER_ID > 0 && isset($arStrUsers["arUsers"][$mf->RESPONSIBLE_USER_ID]))
+		{
+			$arrSupportEmails[] = $arStrUsers["arUsers"][$mf->RESPONSIBLE_USER_ID]["EMAIL"];
+
+			// из группы ответсвенного, выбираем всех пользователей кто имеет доступ к рассылке
+			$rs = CTicket::GetResponsibleList($mf->RESPONSIBLE_USER_ID, $I_Email, $U_Email, "Y");
+			while($arr0 = $rs->Fetch()) if(strlen($arr0['EMAIL']) > 0)
+			{
+				$arrSupportEmails[] = $arr0['EMAIL'];
+			}
+		}
+		if(count($arrSupportEmails) <= 0)
+		{
+			$arrSupportEmails = $arrAdminEMails;
+		}
 		if(count($arrSupportEmails) <= 0)
 		{
 			$se = COption::GetOptionString("main", "email_from", "");
 			if(strlen($se) > 0) $arrSupportEmails[] = $se;
 		}
-				
-		// из группы ответсвенного, выбираем всех пользователей кто имеет доступ к рассылке
-		if($mf->RESPONSIBLE_USER_ID)
-		{
-			$rs = CTicket::GetResponsibleList($mf->RESPONSIBLE_USER_ID, $I_Email, $U_Email, "Y");
-			while($arr0 = $rs->Fetch()) if(strlen($arr0['EMAIL']) > 0) $arrSupportEmails[] = $arr0['EMAIL'];
-		}
+
 		TrimArr($arrSupportEmails);
 		$mf->SUPPORT_EMAIL = count($arrSupportEmails) > 0 ? TrimEx(implode(",", array_unique($arrSupportEmails)), ",") : "";
-		
+
+
 		// удалим продублированные адреса из макроса #SUPPORT_ADMIN_EMAIL#
-		if(count($arrSupportEmails) > 0) foreach($arrSupportEmails as $e) unset($arrAdminEMails[$e]);
+		if(count($arrSupportEmails) > 0)
+		{
+			foreach($arrSupportEmails as $e)
+			{
+				unset($arrAdminEMails[$e]);
+			}
+		}
 		$mf->SUPPORT_ADMIN_EMAIL = count($arrAdminEMails) > 0 ? TrimEx(implode(",", $arrAdminEMails), ",") : "";
 	
 		if(array_key_exists('PUBLIC_EDIT_URL', $arFields) && strlen($arFields['PUBLIC_EDIT_URL']) > 0)
@@ -1840,22 +2140,85 @@ class CAllTicket
 		if(strlen($mf->SUPPORT_COMMENTS) > 0) $mf->SUPPORT_COMMENTS = "\n\n" . $mf->SUPPORT_COMMENTS . "\n";
 		
 		$mf->SOURCE = strlen($nf->SOURCE_NAME) <= 0 ? "" : "[" . $nf->SOURCE_NAME . "] ";
+
+		$oUID = intval($mf->OWNER_USER_ID);
+		$oGID = intval($mf->OWNER_GUEST_ID);
+		if($oGID > 0)
+		{
+			$mf->OWNER_TEXT = $arStrUsers["arGuests"][$oGID]["HTML_NAME_S"];
+			if($oUID > 0)
+			{
+				$mf->OWNER_TEXT .= self::addSupportText($oUID);
+			}
+		}
+		elseif($oUID > 0)
+		{
+			$mf->OWNER_TEXT = $arStrUsers["arUsers"][$oUID]["HTML_NAME_S"];
+			$mf->OWNER_TEXT .= self::addSupportText($oUID);
+		}
+		if(strlen(trim($mf->OWNER_SID)) > 0 && $mf->OWNER_SID != null)
+		{
+			$mf->OWNER_TEXT = " / " . $mf->OWNER_TEXT;
+		}
+
+
+		if($nf->CREATED_MODULE_NAME == "support" || strlen($nf->CREATED_MODULE_NAME) <= 0)
+		{
+			$cUID = intval($mf->CREATED_USER_ID);
+			$cGID = intval($mf->CREATED_GUEST_ID);
+			if($cGID > 0)
+			{
+				$mf->CREATED_TEXT = $arStrUsers["arGuests"][$cGID]["HTML_NAME_S"];
+			}
+			elseif($cUID > 0)
+			{
+				$mf->CREATED_TEXT = $arStrUsers["arUsers"][$cUID]["HTML_NAME_S"];
+			}
+		}
+		else
+		{
+			$mf->CREATED_MODULE_NAME = "[" . $nf->CREATED_MODULE_NAME . "]";
+		}
+
+		$rUID = intval($mf->RESPONSIBLE_USER_ID);
+		if($rUID > 0)
+		{
+			$mf->RESPONSIBLE_TEXT = $arStrUsers["arUsers"][$rUID]["HTML_NAME_S"];
+			$mf->RESPONSIBLE_TEXT .= self::addSupportText($rUID);
+		}
+
+
+		/*
 		if($mf->OWNER_USER_ID > 0 || strlen(trim($mf->OWNER_USER_LOGIN)) > 0)
 		{
 			$mf->OWNER_TEXT = "[" . $mf->OWNER_USER_ID . "] (" . $mf->OWNER_USER_LOGIN . ") " . $mf->OWNER_USER_NAME;
 			if(strlen(trim($mf->OWNER_SID)) > 0 && $mf->OWNER_SID != null) $mf->OWNER_TEXT = " / " . $mf->OWNER_TEXT;
 			$mf->OWNER_TEXT .= self::addSupportText($mf->OWNER_USER_ID);
 		}
-		
+
 		if($nf->CREATED_MODULE_NAME == "support")
 		{
 			$mf->CREATED_MODULE_NAME = "";
-			if($mf->CREATED_USER_ID > 0) $mf->CREATED_TEXT = "[" . $mf->CREATED_USER_ID . "] (" . $mf->CREATED_USER_LOGIN . ") " . $mf->CREATED_USER_NAME . self::addSupportText($mf->CREATED_USER_ID);
+			if($mf->CREATED_USER_ID > 0)
+			{
+				$mf->CREATED_TEXT = "[" . $mf->CREATED_USER_ID . "] (" . $mf->CREATED_USER_LOGIN . ") " . $mf->CREATED_USER_NAME . self::addSupportText($mf->CREATED_USER_ID);
+			}
 		}
-		else $mf->CREATED_MODULE_NAME = "[" . $nf->CREATED_MODULE_NAME . "]";
+		else
+		{
+			$mf->CREATED_MODULE_NAME = "[" . $nf->CREATED_MODULE_NAME . "]";
+		}
+
+		if($mf->RESPONSIBLE_USER_ID > 0)
+		{
+			$mf->RESPONSIBLE_TEXT = "[" . $mf->RESPONSIBLE_USER_ID . "] (" . $nf->RESPONSIBLE_LOGIN . ") " . $nf->RESPONSIBLE_NAME;
+			$mf->RESPONSIBLE_TEXT .= self::addSupportText($mf->RESPONSIBLE_USER_ID);
+		}
+		*/
 		
 		if(!$v->isNew) // UPDATE
 		{
+			/*
 			if($nf->MODIFIED_MODULE_NAME == "support" && strlen($nf->MODIFIED_MODULE_NAME) > 0)
 			{
 				$mf->MODIFIED_MODULE_NAME = "";
@@ -1866,7 +2229,30 @@ class CAllTicket
 				}
 			}
 			else $mf->MODIFIED_MODULE_NAME = "[" . $nf->MODIFIED_MODULE_NAME . "]";
-			
+			*/
+
+			if($nf->MODIFIED_MODULE_NAME == "support" || strlen($nf->MODIFIED_MODULE_NAME) <= 0)
+			{
+				$rUID = intval($mf->MODIFIED_USER_ID);
+				$rGID = intval($mf->MODIFIED_GUEST_ID);
+				if($rGID > 0)
+				{
+					$mf->MODIFIED_TEXT = $arStrUsers["arGuests"][$rGID]["HTML_NAME_S"];
+					if($rUID > 0)
+					{
+						$mf->MODIFIED_TEXT .= self::addSupportText($rUID);
+					}
+				}
+				elseif($rUID > 0)
+				{
+					$mf->MODIFIED_TEXT = $arStrUsers["arUsers"][$rUID]["HTML_NAME_S"];
+					$mf->MODIFIED_TEXT .= self::addSupportText($rUID);
+				}
+			}
+			else
+			{
+				$mf->MODIFIED_MODULE_NAME = "[" . $nf->MODIFIED_MODULE_NAME . "]";
+			}
 			
 			$mf->MESSAGE_SOURCE = "";
 			if($rsSource = CTicketDictionary::GetByID($arFields["MESSAGE_SOURCE_ID"]))
@@ -1900,12 +2286,6 @@ class CAllTicket
 			
 		
 		}
-	
-		if($mf->RESPONSIBLE_USER_ID > 0) 
-		{
-			$mf->RESPONSIBLE_TEXT = "[" . $mf->RESPONSIBLE_USER_ID . "] (" . $nf->RESPONSIBLE_LOGIN . ") " . $nf->RESPONSIBLE_NAME;
-			$mf->RESPONSIBLE_TEXT .= self::addSupportText($mf->RESPONSIBLE_USER_ID);
-		}
 		
 		$mf->SPAM_MARK = "";
 		if(strlen($nf->IS_SPAM) > 0)
@@ -1924,7 +2304,7 @@ class CAllTicket
 		
 		if ($v->isNew && $v->bActiveCoupon) $mf->COUPON = $v->V_COUPON;
 		
-		$arEventFields_author = $mf->ToArray(CSupportTableFields::ALL, array(CSupportTableFields::NOT_NULL));
+		$arEventFields_author = $mf->ToArray(CSupportTableFields::ALL); //, array(CSupportTableFields::NOT_NULL)
 		$arEventFields_support = $arEventFields_author;
 		
 		// отсылаем письмо автору
@@ -2018,7 +2398,14 @@ class CAllTicket
 		{
 			// ответственный из настроек SLA
 			$rsSLA = CTicketSLA::GetByID($f->SLA_ID);
-			if($arSLA = $rsSLA->Fetch()) if(intval($arSLA["RESPONSIBLE_USER_ID"]) > 0) $f->RESPONSIBLE_USER_ID = $arSLA["RESPONSIBLE_USER_ID"];
+
+			if($rsSLA !== false && $arSLA = $rsSLA->Fetch())
+			{
+				if(intval($arSLA["RESPONSIBLE_USER_ID"]) > 0)
+				{
+					$f->RESPONSIBLE_USER_ID = $arSLA["RESPONSIBLE_USER_ID"];
+				}
+			}
 		}
 		
 		// ответственный из настроек модуля
@@ -2035,6 +2422,11 @@ class CAllTicket
 	public static function Set_getCOUPONandSLA($v, $f, $arFields)
 	{
 		global $APPLICATION;
+		$slaID = 0;
+		if(isset($arFields['SLA_ID']) && (intval($arFields['SLA_ID']) > 0))
+		{
+			$slaID = $arFields['SLA_ID'];
+		}
 		// получение купона
 		if(array_key_exists('COUPON', $arFields) && strlen($arFields['COUPON']) > 0)
 		{
@@ -2043,7 +2435,14 @@ class CAllTicket
 			{
 				$v->V_COUPON = $arFields['COUPON'];
 				$rsCoupon = CSupportSuperCoupon::GetList(false, array('COUPON' => $arFields['COUPON']));
-				if($arCoupon = $rsCoupon->Fetch() && intval($arCoupon['SLA_ID']) > 0) $arFields['SLA_ID'] = intval($arCoupon['SLA_ID']);
+				//if($arCoupon = $rsCoupon->Fetch() && intval($arCoupon['SLA_ID']) > 0) $arFields['SLA_ID'] = intval($arCoupon['SLA_ID']);
+				if($arCoupon = $rsCoupon->Fetch())
+				{
+					if(intval($arCoupon['SLA_ID']) > 0)
+					{
+						$slaID= intval($arCoupon['SLA_ID']);
+					}
+				}
 			}
 			else
 			{
@@ -2052,9 +2451,16 @@ class CAllTicket
 			}
 		}
 		// получаем SLA
-		if($v->bSupportTeam || $v->bAdmin || $v->bDemo || $v->bActiveCoupon) $f->FromArray($arFields, "SLA_ID", array(CSupportTableFields::MORE0));
+		if($slaID > 0)
+		{
+			//$f->FromArray($arFields, "SLA_ID", array(CSupportTableFields::MORE0));
+			$f->SLA_ID = $slaID;
+		}
+		else
+		{
+			$f->SLA_ID = CTicketSLA::GetSLA($f->SITE_ID, $f->OWNER_USER_ID, $f->CATEGORY_ID, ($v->bActiveCoupon ? $v->V_COUPON : "") );
+		}
 		//elseif(intval($arFields["SLA_ID"]) <= 0) $f->SLA_ID = CTicketSLA::GetForUser($f->SITE_ID, $f->OWNER_USER_ID);
-		else $f->SLA_ID = CTicketSLA::GetSLA($f->SITE_ID, $f->OWNER_USER_ID, $f->CATEGORY_ID, ($v->bActiveCoupon ? $v->V_COUPON : "") );
 		
 		return true;			
 	}
@@ -2065,8 +2471,16 @@ class CAllTicket
 				
 		$f = self::GetCSupportTableFields("b_ticket");
 		$v = (object)array();
-		
-		if(!is_object($USER)) $USER = new CUser;
+
+		if(!is_object($USER))
+		{
+			$USER = new CUser;
+		}
+		$uid = $USER->GetID();
+		if(isset($arFields["CURRENT_USER_ID"]) && intval($arFields["CURRENT_USER_ID"]) > 0)
+		{
+			$uid = intval($arFields["CURRENT_USER_ID"]);
+		}
 		
 		$f->ID = intval($id);	
 		$v->isNew = ($f->ID <= 0);
@@ -2114,11 +2528,11 @@ class CAllTicket
 		$v->bAdmin = $v->bSupportTeam = $v->bSupportClient = $v->bDemo = $v->bOwner = false;
 		if($v->CHECK_RIGHTS == "Y")
 		{
-			$v->bAdmin = CTicket::IsAdmin();
-			$v->bSupportTeam = CTicket::IsSupportTeam();
-			$v->bSupportClient = CTicket::IsSupportClient();
-			$v->bDemo = CTicket::IsDemo();
-			$v->uid = intval($USER->GetID());
+			$v->uid = $uid;
+			$v->bAdmin = CTicket::IsAdmin($uid);
+			$v->bSupportTeam = CTicket::IsSupportTeam($uid);
+			$v->bSupportClient = CTicket::IsSupportClient($uid);
+			$v->bDemo = CTicket::IsDemo($uid);
 			if($v->isNew) $v->bOwner = true;
 			else $v->bOwner = CTicket::IsOwner($f->ID, $v->uid);
 		}
@@ -2128,6 +2542,7 @@ class CAllTicket
 			$v->uid = 0;
 		}
 		if(!$v->bAdmin && !$v->bSupportTeam && !$v->bSupportClient) return false;
+		if (!$v->bAdmin && !$v->bSupportTeam && ($v->bSupportClient && !$v->bOwner)) return false;
 		
 		// Это спам?
 		$f->FromArray($arFields, "IS_SPAM");
@@ -2241,6 +2656,7 @@ class CAllTicket
 		$v0 = self::Set_InitVar($arFields, $id, $checkRights, $sendEmailToAuthor, $sendEmailToTechsupport);
 		if(!is_array($v0)) return $v0;
 		$v = $v0["v"]; /* isNew, CHECK_RIGHTS, SEND_EMAIL_TO_AUTHOR, SEND_EMAIL_TO_TECHSUPPORT, bAdmin, bSupportTeam, bSupportClient, bDemo, bOwner, uid, bActiveCoupon, IsSpam */
+		/** @var CSupportTableFields $f */
 		$f = $v0["f"]; /* ID, SITE_ID, MODIFIED_GUEST_ID, OWNER_USER_ID, OWNER_SID, HOLD_ON, IS_SPAM */
 
 		// если модифицируем обращение то
@@ -2254,35 +2670,44 @@ class CAllTicket
 			// запоминаем предыдущие важные значения
 			$v->arrOldFields = array();
 			$arr = array(
-				"RESPONSIBLE_USER_ID",
-				"SLA_ID",
-				"CATEGORY_ID",
-				"CRITICALITY_ID",
-				"STATUS_ID",
-				"MARK_ID",
-				"DIFFICULTY_ID",
-				"DATE_CLOSE",
-				"HOLD_ON"
+				"TITLE" => "T.TITLE",
+				"RESPONSIBLE_USER_ID" => "T.RESPONSIBLE_USER_ID",
+				"SLA_ID" => "T.SLA_ID",
+				"CATEGORY_ID" => "T.CATEGORY_ID",
+				"CRITICALITY_ID" => "T.CRITICALITY_ID",
+				"STATUS_ID" => "T.STATUS_ID",
+				"MARK_ID" => "T.MARK_ID",
+				"DIFFICULTY_ID" => "T.DIFFICULTY_ID",
+				"DATE_CLOSE" => "T.DATE_CLOSE",
+				"HOLD_ON" => "T.HOLD_ON",
+				"RESPONSE_TIME" => "S.RESPONSE_TIME",
+				"RESPONSE_TIME_UNIT" => "S.RESPONSE_TIME_UNIT"
 				);
-			$str = "ID";
+			$str = "T.ID";
 			foreach ($arr as $s) $str .= "," . $s;
-			$strSql = "SELECT " . $str . ", SITE_ID FROM b_ticket WHERE ID='" . $f->ID . "'";
+			$strSql = "SELECT " . $str . ", SITE_ID FROM b_ticket T LEFT JOIN b_ticket_sla S ON T.SLA_ID = S.ID WHERE T.ID='" . $f->ID . "'";
 			$z = $DB->Query($strSql, false, $err_mess . __LINE__);
 			if($zr=$z->Fetch())
 			{
 				$f->SITE_ID = $zr["SITE_ID"];
 				if(intval($v->uid) == $zr["RESPONSIBLE_USER_ID"]) $v->bSupportTeam = "Y";
-				foreach ($arr as $key) $v->arrOldFields[$key] = $zr[$key];
+				foreach ($arr as $key=>$s) $v->arrOldFields[$key] = $zr[$key];
 			}
 						
 			$f->FromArray(
 				$arFields,
-				"SITE_ID,MODIFIED_MODULE_NAME,SUPPORT_COMMENTS,SLA_ID,SOURCE_ID",
+				"SITE_ID,MODIFIED_MODULE_NAME,SLA_ID,SOURCE_ID",
 				array(CSupportTableFields::MORE0,CSupportTableFields::NOT_EMTY_STR)
 			);
+
+			if (!$f->MODIFIED_MODULE_NAME)
+			{
+				$f->MODIFIED_MODULE_NAME = '';
+			}
+
 			$f->FromArray(
 				$arFields,
-				"CATEGORY_ID,RESPONSIBLE_USER_ID,STATUS_ID,DIFFICULTY_ID,CRITICALITY_ID"
+				"TITLE,CATEGORY_ID,RESPONSIBLE_USER_ID,STATUS_ID,DIFFICULTY_ID,CRITICALITY_ID,SUPPORT_COMMENTS"
 			);
 			$f->set("MODIFIED_USER_ID", $v->uid, array(CSupportTableFields::MORE0));
 			$f->setCurrentTime("TIMESTAMP_X");
@@ -2310,13 +2735,19 @@ class CAllTicket
 			}
 			// }
 			
-			if(isset($arFields["AUTO_CLOSE_DAYS"]) &&
-				intval($arFields["AUTO_CLOSE_DAYS"]) > 0 &&
-				strlen($arFields["MESSAGE"]) > 0 &&
-				$arFields["HIDDEN"] != "Y" &&
-				$arFields["NOT_CHANGE_STATUS"] != "Y"
-			) $f->AUTO_CLOSE_DAYS = $arFields["AUTO_CLOSE_DAYS"];
-			
+			if(isset($arFields["AUTO_CLOSE_DAYS"]) && intval($arFields["AUTO_CLOSE_DAYS"]) >= 0)
+			{
+				if (intval($arFields["AUTO_CLOSE_DAYS"]) == 0)
+				{
+					// get from module settings
+					$f->AUTO_CLOSE_DAYS = COption::GetOptionString('support', "DEFAULT_AUTO_CLOSE_DAYS");
+				}
+				else
+				{
+					$f->AUTO_CLOSE_DAYS = $arFields["AUTO_CLOSE_DAYS"];
+				}
+			}
+
 			if(is_array($v->arrOldFields) && is_array($arFields) && $arFields["CLOSE"] == "N" && strlen($v->arrOldFields["DATE_CLOSE"] ) > 0)
 			{
 				$f->DATE_CLOSE = null;
@@ -2329,6 +2760,10 @@ class CAllTicket
 			if($v->bSupportTeam || $v->bAdmin)
 			{
 				$arFields_i = $f->ToArray(CSupportTableFields::ALL, array(CSupportTableFields::ONLY_CHANGED), true);
+				if($v->CHECK_RIGHTS == "N" && isset($arFields["MARK_ID"]) && intval($arFields["MARK_ID"]) > 0)
+				{
+					$arFields_i["MARK_ID"] = intval($arFields["MARK_ID"]);
+				}
 				if(count($arFields_i) > 0)
 				{
 					$v->SupportTeamUpdateRes = $DB->Update("b_ticket", $arFields_i, "WHERE ID='" . $f->ID . "'", $err_mess . __LINE__); //$rows1
@@ -2364,6 +2799,14 @@ class CAllTicket
 				"MESSAGE_SOURCE_ID"				=> intval($arFields["SOURCE_ID"])
 			);*/
 			
+			$v->arFields_log = array(
+				"LOG"							=> "Y",
+				"MESSAGE_CREATED_USER_ID"		=> $f->MODIFIED_USER_ID,
+				"MESSAGE_CREATED_MODULE_NAME"	=> $f->MODIFIED_MODULE_NAME,
+				"MESSAGE_CREATED_GUEST_ID"		=> $f->MODIFIED_GUEST_ID,
+				"MESSAGE_SOURCE_ID"				=> $f->SOURCE_ID
+			);
+			
 			// если необходимо соблюдать права то
 			if($v->CHECK_RIGHTS == "Y")
 			{
@@ -2392,15 +2835,25 @@ class CAllTicket
 				// добавляем сообщение
 				$arFields["MESSAGE_CREATED_MODULE_NAME"] = $arFields["MODIFIED_MODULE_NAME"];
 				if(is_set($arFields, "IMAGE")) $arFields["FILES"][] = $arFields["IMAGE"];
+				$arFiles = null;
 				$MID = CTicket::AddMessage($f->ID, $arFields, $arFiles, $v->CHECK_RIGHTS);
+				$v->arrFILES = $arFiles;
 				$MID = intval($MID);
 				
-				$dateType = CTicket::ADD;
-				if($v->newSLA || $f->REOPEN == "Y") 
+				$dateType = array();
+				$dateType["EVENT"] = array(CTicket::UPDATE);
+				if($v->newSLA) 
 				{
-					$dateType = CTicket::CURRENT_DATE;
+					$dateType["EVENT"][] = CTicket::NEW_SLA;
+					$dateType["OLD_SLA_RESPONSE_TIME"] = $v->arrOldFields["RESPONSE_TIME"];
+					$dateType["OLD_SLA_RESPONSE_TIME_UNIT"] = $v->arrOldFields["RESPONSE_TIME_UNIT"];
 				}
-				CTicket::UpdateLastParams2($f->ID, $dateType);
+				if($f->REOPEN == "Y") 
+				{
+					$dateType["EVENT"][] = CTicket::REOPEN;
+				}
+				//CTicket::UpdateLastParams2($f->ID, $dateType);
+				CTicket::UpdateLastParamsN($f->ID, $dateType, true, true);
 
 				/*// если обращение закрывали то
 				if($v->closeDate)
@@ -2454,9 +2907,16 @@ class CAllTicket
 							
 					foreach($v->arrOldFields as $key => $value)
 					{
-						if(isset($arFields[$key]) && intval($value) != intval($arFields[$key]))
+						if(isset($arFields[$key]))
 						{
-							$v->arChange[$key] = "Y";
+							if ($key === 'TITLE' && $value !== $arFields[$key])
+							{
+								$v->arChange[$key] = "Y";
+							}
+							elseif (intval($value) != intval($arFields[$key]))
+							{
+								$v->arChange[$key] = "Y";
+							}
 						}
 					}
 					
@@ -2482,6 +2942,12 @@ class CAllTicket
 		}
 		else
 		{
+			// restrict to set SLA_ID directly, allow through events or automatically
+			if (isset($arFields['SLA_ID']) && !($v->bSupportTeam || $v->bAdmin || $v->bDemo || $v->bActiveCoupon))
+			{
+				unset($arFields['SLA_ID']);
+			}
+
 			$arFields = CTicket::ExecuteEvents('OnBeforeTicketAdd', $arFields, false);
 			if(!$arFields) return false;
 			
@@ -2493,14 +2959,19 @@ class CAllTicket
 				$f->OWNER_GUEST_ID = intval($_SESSION["SESS_GUEST_ID"]) > 0 ? intval($_SESSION["SESS_GUEST_ID"]) : null;
 			}
 						
-			$f->FromArray($arFields, "CREATED_MODULE_NAME,CATEGORY_ID,STATUS_ID,DIFFICULTY_ID,CRITICALITY_ID,SOURCE_ID,TITLE", array(CSupportTableFields::MORE0,CSupportTableFields::NOT_EMTY_STR));
-			$f->set("CREATED_USER_ID", $v->uid, array(CSupportTableFields::MORE0));
-			$f->setCurrentTime("LAST_MESSAGE_DATE,DAY_CREATE,TIMESTAMP_X");
-			
+			$f->FromArray($arFields, "CREATED_USER_ID,CREATED_MODULE_NAME,CATEGORY_ID,STATUS_ID,DIFFICULTY_ID,CRITICALITY_ID,SOURCE_ID,TITLE", array(CSupportTableFields::MORE0,CSupportTableFields::NOT_EMTY_STR));
+
+			if (!$f->CREATED_USER_ID)
+			{
+				$f->set("CREATED_USER_ID", $v->uid, array(CSupportTableFields::MORE0));
+			}
+
+			$f->setCurrentTime("LAST_MESSAGE_DATE,DAY_CREATE,TIMESTAMP_X,DEADLINE_SOURCE_DATE");
+
 			$f->DATE_CREATE = time() + CTimeZone::GetOffset();
 			
 			// если обращение создается сотрудником техподдержки, администратором или демо пользователем
-			if($v->bSupportTeam || $v->bAdmin || $bv->Demo)
+			if($v->bSupportTeam || $v->bAdmin || $v->Demo)
 			{
 				$f->FromArray($arFields, "SUPPORT_COMMENTS", array(CSupportTableFields::NOT_EMTY_STR));
 			}
@@ -2540,7 +3011,7 @@ class CAllTicket
 			$arFields["HIDDEN"] = "N";
 			$arFields["LOG"] = "N";
 			$arFields["IS_LOG"] = "N";
-					
+
 			if (is_set($arFields, "IMAGE")) $arFields["FILES"][] = $arFields["IMAGE"];
 			$arFiles = null;
 			$MID = CTicket::AddMessage($f->ID, $arFields, $arFiles, $v->CHECK_RIGHTS);
@@ -2549,7 +3020,8 @@ class CAllTicket
 			
 			if(intval($MID) > 0)
 			{
-				CTicket::UpdateLastParams2($f->ID, CTicket::ADD);
+				//CTicket::UpdateLastParams2($f->ID, array("EVENT"=>array(CTicket::ADD)));
+				CTicket::UpdateLastParamsN($f->ID, array("EVENT"=>array(CTicket::ADD)), true, true);
 				
 				// если указана отметка о спаме то установим отметку о спаме
 				if (strlen($f->IS_SPAM) > 0) CTicket::MarkAsSpam($f->ID, $f->IS_SPAM, $v->CHECK_RIGHTS);
@@ -2559,18 +3031,18 @@ class CAllTicket
 				********************************************/
 
 				CTimeZone::Disable();
-				$z = CTicket::GetByID($f->ID, $f->SITE_ID, "N");
+				$z = CTicket::GetByID($f->ID, $f->SITE_ID, "N", "N");
 				CTimeZone::Enable();
 				
 				if($zr = $z->Fetch())
 				{
 					$nf = (object)$zr;
-					
+
 					$rsSite = CSite::GetByID($nf->SITE_ID);
 					$v->arrSite = $rsSite->Fetch();
-															
+
 					self::Set_sendMails($nf, $v, $arFields);
-					
+
 					// создаем событие в модуле статистики
 					if(CModule::IncludeModule("statistic"))
 					{
@@ -2605,6 +3077,7 @@ class CAllTicket
 		global $DB;
 		if ($site_id=="all") $site_id = "";
 		$arFilter = array("TYPE" => "F", "SITE" => $site_id);
+		$v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList(($v1="s_dropdown"), $v2, $arFilter, $v3);
 		return $rs;
 	}
@@ -2615,6 +3088,7 @@ class CAllTicket
 		global $DB;
 		if ($site_id=="all") $site_id = "";
 		$arFilter = array("TYPE" => $type, "SITE" => $site_id);
+		$v2 = $v3 = null;
 		$rs = CTicketDictionary::GetList(($v1="s_dropdown"), $v2, $arFilter, $v3);
 		return $rs;
 	}
@@ -2623,6 +3097,7 @@ class CAllTicket
 	{
 		$arFilter["TICKET_ID"] = $ticketID;
 		$arFilter["TICKET_ID_EXACT_MATCH"] = "Y";
+		$by = $order = $is_filtered = null;
 		return CTicket::GetMessageList($by, $order, $arFilter, $is_filtered, $checkRights, "Y");
 	}
 
@@ -2667,7 +3142,7 @@ class CAllTicket
 			SELECT
 				U.ID as ID,
 				U.LOGIN as LOGIN,
-				" . CTicket::isnull("U.LAST_NAME", "''") . " + ' ' + " . CTicket::isnull("U.NAME", "''") . " + ' (' + U.LOGIN + ')' as NAME,
+				". $DB->Concat(CTicket::isnull("U.LAST_NAME", "''"), CTicket::isnull("U.NAME", "''"), 'U.LOGIN')." as NAME,
 				U.EMAIL as EMAIL
 			FROM
 				(
@@ -2692,7 +3167,90 @@ class CAllTicket
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 		return $res;
 	}
-	
+
+	static function GetUsersPropertiesArray($arUserIDs = array(), $arGuestIDs = array())
+	{
+		$arGuestUserIDs = array();
+		$arResUsers = array();
+		$arResGuests = array();
+		$siteNameFormat = CSite::GetNameFormat();
+		$isActive = CModule::IncludeModule("statistic");
+		$arUserIDs = array_map(intval, $arUserIDs);
+
+
+		if(count($arGuestIDs) > 0)
+		{
+			$arGuestIDsU = array_unique($arGuestIDs);
+			$arGuestIDsU = array_map(intval, $arGuestIDsU);
+			$arGuestIDs = array();
+			if($isActive)
+			{
+				$strGuests = implode("|", $arGuestIDsU);
+				$f = "ID";
+				$o = "asc";
+				$isf = null;
+				$rs = CGuest::GetList($f, $o, array( "ID" => $strGuests), $isf);
+				while($ar = $rs->Fetch())
+				{
+					$arGuestUserIDs[] = intval($ar["LAST_USER_ID"]);
+					$arGuestIDs[intval($ar["ID"])] = intval($ar["LAST_USER_ID"]);
+				}
+			}
+			else
+			{
+				foreach($arGuestIDs as $k => $v)
+				{
+					$arGuestIDs[$v] = 0;
+				}
+			}
+		}
+
+		if(count($arUserIDs) > 0)
+		{
+			$arRespUserIDs = array_unique(array_merge($arUserIDs, $arGuestUserIDs));
+			$strUsers = implode("|", $arRespUserIDs);
+			$f = "ID";
+			$o = "asc";
+			$rs = CUser::GetList($f, $o, array( "ID" => $strUsers), array("FIELDS"=>array("NAME", "SECOND_NAME","LAST_NAME","LOGIN","ID","EMAIL")));
+			while($ar = $rs->Fetch())
+			{
+				$arResUsers[intval($ar["ID"])] = $ar;
+			}
+		}
+
+		foreach($arUserIDs as $k => $v)
+		{
+			if(!isset($arResUsers[$v]))
+			{
+				$arResUsers[$v] = array("NAME" => GetMessage("SUP_UNKNOWN_USER"), "SECOND_NAME" => "","LAST_NAME" => "","LOGIN" => GetMessage("SUP_UNKNOWN_USER"),"ID" => $v, "EMAIL" => "");
+			}
+			$name = CUser::FormatName($siteNameFormat, $arResUsers[$v], true, true);
+			$arResUsers[$v]["HTML_NAME"] = "[<a title=\"" . GetMessage("SUP_USER_PROFILE") . "\" href=\"/bitrix/admin/user_edit.php?lang=" . LANGUAGE_ID . "&ID=" . $v . "\">" . $v."</a>] " . $name;
+				//" (".$str_OWNER_LOGIN.") ".$str_OWNER_NAME;
+			$arResUsers[$v]["HTML_NAME_S"] = "[" . $v . "] " . $name;
+		}
+
+		foreach($arGuestIDs as $k => $v)
+		{
+			if(isset($arResUsers[$v]))
+			{
+				$arResGuests[$k] = $arResUsers[$v];
+				$arResGuests[$k]["UNKNOWN"] = false;
+			}
+			else
+			{
+				$arResGuests[$k] = array("NAME" => GetMessage("SUP_UNKNOWN_GUEST"), "SECOND_NAME" => "","LAST_NAME" => "","LOGIN" => GetMessage("SUP_UNKNOWN_GUEST"),"ID" => $v,"UNKNOWN" => true, "EMAIL" => "");
+			}
+			$name = CUser::FormatName($siteNameFormat, $arResGuests[$k], true, true);
+			$arResGuests[$k]["HTML_NAME"] = "[<a title=\"" . GetMessage("SUP_USER_PROFILE") . "\" href=\"/bitrix/admin/user_edit.php?lang=" . LANGUAGE_ID . "&ID=" . $v . "\">" . $v."</a>] " . $name .
+				" [<a title='" . GetMessage("SUP_GUEST_ID") . "'  href='/bitrix/admin/guest_list.php?lang=" . LANG . "&find_id=" . $k . "&find_id_exact_match=Y&set_filter=Y'>" . $k . "</a>]";
+			$arResUsers[$v]["HTML_NAME_S"] = "[" . $v . "] " . $name . " [" . $k . "]";
+		}
+
+		return array("arUsers" => $arResUsers, "arGuests" => $arResGuests);
+	}
+
+
 	
 	
 }

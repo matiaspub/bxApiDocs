@@ -250,7 +250,7 @@ WHERE HID IN (".$strKeys.")";
 	 *
 	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий записи со
 	 * структурой, аналогичной <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandlers::GetList()</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandlers::GetList()</a>
 	 * с единственным изменением:</p><table class="tnormal" width="100%"> <tr> <th
 	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>INSTALLED</td> <td>Флаг,
 	 * показывающий, есть ли в БД конфигурация для данного обработчика
@@ -397,7 +397,7 @@ WHERE HID IN (".$strKeys.")";
 	 * "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre> </td>
 	 * </tr> <tr> <td>CONFIG</td> <td>Массив настроек обработчика доставки со
 	 * значениями. Подробнее см. <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/delivery.php">Руководство по созданию
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/delivery.php">Руководство по созданию
 	 * автоматизированных обработчиков доставки</a>.</td> </tr> <tr>
 	 * <td>PROFILE_USE_DEFAULT</td> <td>Значение флага "используются параметры
 	 * профилей по умолчанию" (Y|N).</td> </tr> </table><a name="examples"></a>
@@ -639,11 +639,11 @@ WHERE
 	 *
 	 *
 	 * @param array $arHandler  Описательный массив обработчика, возвращаемый методами <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php">CSaleDeliveryHandler::GetBySID()</a>,
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php">CSaleDeliveryHandler::GetBySID()</a>,
 	 * <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>,
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>,
 	 * <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php">CSaleDeliveryHandler::GetAdminList()</a>,
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php">CSaleDeliveryHandler::GetAdminList()</a>,
 	 *
 	 *
 	 *
@@ -659,7 +659,7 @@ WHERE
 	 * "<i>название_профиля</i>", "DESCRIPTION" =&gt; "<i>описание_профиля</i>",
 	 * "RESTRICTIONS_WEIGHT" =&gt; Array ( //< ограничения обработчика по весу >// ),
 	 * "RESTRICTIONS_SUM" =&gt; Array ( //< ограничения обработчика по стоимости >// ),
-	 * "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre>
+	 * "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_gethandlercompability.php
@@ -762,7 +762,7 @@ WHERE
 	 *
 	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий запись со
 	 * структурой, аналогичной <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>.</p><a
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>.</p><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -953,7 +953,7 @@ WHERE
 
 			if ($bInstalled)
 			{
-				if ($rsHandlerDataFull->SelectedRowsCount() > 1 && $SITE_ID == false)
+				if ($rsHandlerDataFull->SelectedRowsCount() > 1 && $SITE_ID === false)
 				{
 					$DB->Query("DELETE FROM b_sale_delivery_handler WHERE HID='".$DB->ForSql($SID)."' AND LID<>'".$DB->ForSql($arHandlerDataFull['LID'])."'");
 					$SITE_ID = $arHandlerDataFull['LID'];
@@ -1028,7 +1028,7 @@ WHERE
 
 	
 	/**
-	 * <p>Вызов полного цикла расчёта. В случае, если обработчик службы доставки осуществляет расчёт за один шаг, метод аналогичен <a href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php">CSaleDeliveryHandler::Calculate()</a>. В противном случае метод автоматически выполнит переход на следующий шаг расчёта.</p>
+	 * <p>Вызов полного цикла расчёта. В случае, если обработчик службы доставки осуществляет расчёт за один шаг, метод аналогичен <a href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php">CSaleDeliveryHandler::Calculate()</a>. В противном случае метод автоматически выполнит переход на следующий шаг расчёта.</p>
 	 *
 	 *
 	 *
@@ -1198,7 +1198,7 @@ WHERE
 	 * сопровождающий переход на следующий шаг (<code>RESULT =
 	 * {'ERROR'|'NEXT_STEP'}</code>).</td> </tr> <tr> <td><b>TEMP</b></td> <td>Строка, содержащая
 	 * промежуточные данные, которые нужно передать следующему шагу
-	 * (<code>RESULT = 'NEXT_STEP'</code>).</td> </tr> </table>
+	 * (<code>RESULT = 'NEXT_STEP'</code>).</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php

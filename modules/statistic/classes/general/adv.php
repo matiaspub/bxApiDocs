@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламными кампаниями</a>.
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.
  *
  *
  *
@@ -268,7 +268,7 @@ class CAllAdv
 
 	
 	/**
-	 * <p>Удаляет <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламную кампанию</a>.</p>
+	 * <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламную кампанию</a>.</p>
 	 *
 	 *
 	 *
@@ -292,9 +292,9 @@ class CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/reset.php">CAdv::Reset</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/reset.php">CAdv::Reset</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -321,7 +321,7 @@ class CAllAdv
 
 	
 	/**
-	 * <p>Обнуляет статистические данные <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной кампании</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	 * <p>Обнуляет статистические данные <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	 *
 	 *
 	 *
@@ -345,9 +345,9 @@ class CAllAdv
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">Термин "Рекламная
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
 	 * кампания"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cadv/delete.php">CAdv::Delete</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/delete.php">CAdv::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

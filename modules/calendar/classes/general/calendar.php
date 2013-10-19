@@ -546,14 +546,12 @@ class CCalendar
 		}
 	}
 
-	private static function GetPermissions($Params = array())
+	public static function GetPermissions($Params = array())
 	{
 		global $USER;
 		$type = isset($Params['type']) ? $Params['type'] : self::$type;
-		$bOwner = isset($Params['bOwner']) ? $Params['bOwner'] : self::$bOwner;
 		$ownerId = isset($Params['ownerId']) ? $Params['ownerId'] : self::$ownerId;
 		$userId = isset($Params['userId']) ? $Params['userId'] : self::$userId;
-		$bCheckSocNet = $Params['bCheckSocNet'] !== false;
 
 		$bView = true;
 		$bEdit = true;
@@ -729,8 +727,6 @@ class CCalendar
 
 					$arFields = array(
 						"ID" => $id,
-						//"DT_FROM" => $_POST['from'],
-						//"DT_TO" => $_POST['to'],
 						"DT_FROM_TS" => $_POST['from_ts'],
 						"DT_TO_TS" => $_POST['to_ts'],
 						'NAME' => trim($_POST['name']),
@@ -1060,7 +1056,7 @@ class CCalendar
 					CCalendar::OutputJSRes($reqId, array(
 						'data' => CCalendar::CheckUsersAccessibility(array(
 								'users' => $_REQUEST['attendees'],
-								'from' => self::Date($_POST['from']), //!
+								'from' => self::Date($_POST['from']),
 								'to' => self::Date($_POST['to']),
 								'eventId' => intVal($_POST['event_id'])
 							)
@@ -1124,6 +1120,8 @@ class CCalendar
 						if (self::$allowVideoMeeting && $loc_new['mrid'] == self::$settings['vr_iblock_id'])
 						{
 							$Params['VMiblockId'] = self::$settings['vr_iblock_id'];
+							if ($loc_old['mrevid'] > 0)
+								$Params['ID'] = $loc_old['mrevid'];
 							$check = CCalendar::CheckVideoRoom($Params);
 						}
 						elseif(self::$allowReserveMeeting)
@@ -1193,16 +1191,9 @@ class CCalendar
 
 	public static function GetEventList($Params = array(), &$arAttendees)
 	{
-		// $cache = new CPHPCache;
-		// $cacheId = array();
-		// $cachePath = CCalendar::CachePath().'events';
-		// if ($cache->InitCache(CCalendar::CacheTime(), $cacheId, CCalendar::CachePath().'events'))
-		// {
-		// $res = $cache->GetVars();
-		// $bRes = $res['id'] == $iblockId;
-		// }
-
 		$type = isset($Params['type']) ? $Params['type'] : self::$type;
+		$ownerId = isset($Params['ownerId']) ? $Params['ownerId'] : self::$ownerId;
+		$userId = isset($Params['userId']) ? $Params['userId'] : self::$userId;
 
 		if ($type != 'user' && !isset($Params['section']) || count($Params['section']) <= 0)
 			return array();
@@ -1221,8 +1212,8 @@ class CCalendar
 		if (isset($Params['section']))
 			$arFilter["SECTION"] = $Params['section'];
 
-		if (self::$type == 'user')
-			$fetchMeetings = in_array(self::GetMeetingSection(self::$ownerId), $Params['section']);
+		if ($type == 'user')
+			$fetchMeetings = in_array(self::GetMeetingSection($ownerId), $Params['section']);
 		else
 			$fetchMeetings = in_array(self::GetCurUserMeetingSection(), $Params['section']);
 
@@ -1232,7 +1223,7 @@ class CCalendar
 				'arSort' => Array('ACTIVE_FROM' => 'ASC'),
 				'parseRecursion' => true,
 				'fetchAttendees' => true,
-				'userId' => self::$userId,
+				'userId' => $userId,
 				'fetchMeetings' => $fetchMeetings
 			)
 		);
@@ -1248,7 +1239,7 @@ class CCalendar
 		{
 			foreach($Params['additonalMeetingsId'] as $spUser)
 			{
-				if ($spUser['ID'] == self::$ownerId)
+				if ($spUser['ID'] == $ownerId)
 					continue;
 				unset($arFilter["SECTION"]);
 				$arFilter["IS_MEETING"] = 1;
@@ -1260,7 +1251,7 @@ class CCalendar
 						'arSort' => Array('ACTIVE_FROM' => 'ASC'),
 						'parseRecursion' => true,
 						'fetchAttendees' => true,
-						'userId' => self::$userId,
+						'userId' => $userId,
 						'fetchMeetings' => true
 					)
 				);
@@ -1269,29 +1260,29 @@ class CCalendar
 				{
 					foreach($res_i as $i => $event)
 					{
-						if ($event['IS_MEETING'] && $event['SECT_ID'] != intVal($spUser['SECTION_ID']) && !$resEventInd[$event['ID']])
+						if (($event['IS_MEETING'] || $event['~IS_MEETING']) && $event['SECT_ID'] != intVal($spUser['SECTION_ID']) && !$resEventInd[$event['ID']])
 						{
 							$event['SECT_ID'] = intVal($spUser['SECTION_ID']);
-
-							$checkPermissionsForEvent = self::$userId != $event['CREATED_BY']; // It's creator
+							$checkPermissionsForEvent = $userId != $event['CREATED_BY']; // It's creator
 							// It's event in user's calendar
-							if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && self::$userId == $event['OWNER_ID'])
+							if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && $userId == $event['OWNER_ID'])
 								$checkPermissionsForEvent = false;
-							if ($checkPermissionsForEvent && $event['IS_MEETING'] && $event['USER_MEETING'] && $event['USER_MEETING']['ATTENDEE_ID'] == self::$userId)
+							if ($checkPermissionsForEvent && $event['IS_MEETING'] && $event['USER_MEETING'] && $event['USER_MEETING']['ATTENDEE_ID'] == $userId)
 								$checkPermissionsForEvent = false;
 							if ($checkPermissionsForEvent && $event['IS_MEETING'] && is_array($event['~ATTENDEES']))
 							{
 								foreach($event['~ATTENDEES'] as $att)
 								{
-									if ($att['USER_ID'] == self::$userId)
+									if ($att['USER_ID'] == $userId)
 									{
 										$checkPermissionsForEvent = false;
 										break;
 									}
 								}
 							}
-							$event = CCalendarEvent::ApplyAccessRestrictions($event, self::$userId);
-							$resAdd[] = $res_i[$i];
+
+							$event = CCalendarEvent::ApplyAccessRestrictions($event, $userId);
+							$resAdd[] = $event;
 						}
 					}
 				}
@@ -1734,13 +1725,50 @@ class CCalendar
 				)
 			);
 
+			$bPersonal = $bPersonal && self::IsPersonal($oCurEvent['CAL_TYPE'], $oCurEvent['OWNER_ID'], $userId);
+
 			if ($oCurEvent)
 				$oCurEvent = $oCurEvent[0];
 
+			$arFields['CAL_TYPE'] = $oCurEvent['CAL_TYPE'];
+			$arFields['OWNER_ID'] = $oCurEvent['OWNER_ID'];
+			$arFields['CREATED_BY'] = $oCurEvent['CREATED_BY'];
+			$arFields['ACTIVE'] = $oCurEvent['ACTIVE'];
+
+			if (!isset($arFields['DT_FROM_TS']) && !isset($arFields['DT_FROM']))
+				$arFields['DT_FROM_TS'] = $oCurEvent['DT_FROM_TS'];
+			if (!isset($arFields['DT_TO_TS']) && !isset($arFields['DT_TO']))
+				$arFields['DT_TO_TS'] = $oCurEvent['DT_TO_TS'];
+			if (!isset($arFields['DT_LENGTH']))
+				$arFields['DT_LENGTH'] = $oCurEvent['DT_LENGTH'];
+			if (!isset($arFields['SKIP_TIME']))
+				$arFields['SKIP_TIME'] = $oCurEvent['DT_SKIP_TIME'] == "Y";
+			if (!isset($arFields['NAME']))
+				$arFields['NAME'] = $oCurEvent['NAME'];
+			if (!isset($arFields['DESCRIPTION']))
+				$arFields['DESCRIPTION'] = $oCurEvent['DESCRIPTION'];
 			if (!isset($arFields['COLOR']) && $oCurEvent['COLOR'])
 				$arFields['COLOR'] = $oCurEvent['COLOR'];
 			if (!isset($arFields['TEXT_COLOR']) && $oCurEvent['TEXT_COLOR'])
 				$arFields['TEXT_COLOR'] = $oCurEvent['TEXT_COLOR'];
+			if (!isset($arFields['SECTIONS']))
+				$arFields['SECTIONS'] = array($oCurEvent['SECT_ID']);
+			if (!isset($arFields['IS_MEETING']))
+				$arFields['IS_MEETING'] = $oCurEvent['IS_MEETING'];
+			if (!isset($arFields['ACTIVE']))
+				$arFields['ACTIVE'] = $oCurEvent['ACTIVE'];
+			if (!isset($arFields['PRIVATE_EVENT']))
+				$arFields['PRIVATE_EVENT'] = $oCurEvent['PRIVATE_EVENT'];
+			if (!isset($arFields['ACCESSIBILITY']))
+				$arFields['ACCESSIBILITY'] = $oCurEvent['ACCESSIBILITY'];
+			if (!isset($arFields['IMPORTANCE']))
+				$arFields['IMPORTANCE'] = $oCurEvent['IMPORTANCE'];
+
+			if ($arFields['IS_MEETING'])
+			{
+				if (!isset($arFields['MEETING_HOST']))
+					$arFields['MEETING_HOST'] = $oCurEvent['MEETING_HOST'];
+			}
 
 			if (!$bPersonal && !CCalendarSect::CanDo('calendar_edit', $oCurEvent['SECT_ID'], self::$userId))
 			{
@@ -1788,6 +1816,9 @@ class CCalendar
 					return $newId;
 				}
 			}
+
+			if ($oCurEvent)
+				$Params['currentEvent'] = $oCurEvent;
 		}
 		elseif ($sectionId > 0 && !$bPersonal && !CCalendarSect::CanDo('calendar_add', $sectionId, self::$userId))
 		{
@@ -1885,6 +1916,9 @@ class CCalendar
 		{
 			if (!isset(self::$type))
 				self::$type = $Event['CAL_TYPE'];
+
+			if (!isset(self::$ownerId))
+				self::$ownerId = $Event['OWNER_ID'];
 
 			if (!self::IsPersonal() && !CCalendarSect::CanDo('calendar_edit', $Event['SECT_ID'], self::$userId))
 				return GetMessage('EC_ACCESS_DENIED');
@@ -3317,13 +3351,17 @@ class CCalendar
 
 	public static function CheckVideoRoom($Params)
 	{
-		return CVideo::CheckRooms(Array(
-			"regularity" => $Params["regularity"],
-			"dateFrom" => $Params["dateFrom"],
-			"dateTo" => $Params["dateTo"],
-			"iblockId" => $Params["VMiblockId"],
-			"ID" => $Params["ID"],
-		));
+		if (CModule::IncludeModule("video"))
+		{
+			return CVideo::CheckRooms(Array(
+				"regularity" => $Params["regularity"],
+				"dateFrom" => $Params["dateFrom"],
+				"dateTo" => $Params["dateTo"],
+				"iblockId" => $Params["VMiblockId"],
+				"ID" => $Params["ID"],
+			));
+		}
+		return false;
 	}
 
 	public static function GetTextLocation($loc = '')
@@ -3546,7 +3584,6 @@ class CCalendar
 		$arEvents = CCalendarEvent::GetList(
 			array(
 				'arFilter' => $arFilter,
-				'setDefaultLimit' => true,
 				'getUserfields' => false,
 				'parseRecursion' => false,
 				'fetchAttendees' => false,
@@ -4131,7 +4168,7 @@ class CCalendar
 		return CDavGroupdavClientCalendar::DoCheckCalDAVServer($arServer["scheme"], $arServer["host"], $arServer["port"], $username, $password, $arServer["path"]);
 	}
 
-	public static function Color($color = '', $bSetDefault = true)
+	public static function Color($color = '', $defaultColor = true)
 	{
 		if ($color != '')
 		{
@@ -4143,8 +4180,18 @@ class CCalendar
 		}
 		$color = '#'.$color;
 
-		if ($color == '#') // Default color
-			$color = $bSetDefault ? '#CEE669' : '';
+		// Default color
+		$DEFAULT_COLOR = '#CEE669';
+		if ($color == '#')
+		{
+			if ($defaultColor === true)
+				$color = $DEFAULT_COLOR;
+			elseif($defaultColor)
+				$color = $defaultColor;
+			else
+				$color = '';
+		}
+
 		return $color;
 	}
 
@@ -4528,6 +4575,7 @@ class CCalendar
 		global $APPLICATION;
 
 		$ownerId = isset($Params['ownerId']) ? $Params['ownerId'] : self::$ownerId;
+		$bSync = false;
 		$l = count($arConnections);
 		for ($i = 0; $i < $l; $i++)
 		{
@@ -4550,6 +4598,7 @@ class CCalendar
 					"SERVER_USERNAME" => $con['user_name'],
 					"SERVER_PASSWORD" => $con['pass']
 				));
+				$bSync = true;
 			}
 			elseif ($con['del'] != 'Y') // Edit connection
 			{
@@ -4561,6 +4610,7 @@ class CCalendar
 				if ($con['pass'] !== 'bxec_not_modify_pass')
 					$arFields["SERVER_PASSWORD"] = $con['pass'];
 				CDavConnection::Update($conId, $arFields);
+				$bSync = true;
 			}
 			else
 			{
@@ -4581,7 +4631,26 @@ class CCalendar
 		if($err = $APPLICATION->GetException())
 			return $err->GetString();
 
-		CDavGroupdavClientCalendar::DataSync("user", self::$ownerId);
+		if ($bSync)
+			CDavGroupdavClientCalendar::DataSync("user", self::$ownerId);
+
+		$res = CDavConnection::GetList(
+			array("ID" => "DESC"),
+			array(
+				"ENTITY_TYPE" => "user",
+				"ENTITY_ID" => self::$ownerId,
+				"ACCOUNT_TYPE" => 'caldav'
+			),
+			false,
+			false
+		);
+
+		while($arCon = $res->Fetch())
+		{
+			if (strpos($arCon['LAST_RESULT'], "[200]") === false)
+				return GetMessage('EC_CALDAV_CONNECTION_ERROR', array('#CONNECTION_NAME#' => $arCon['NAME'], '#ERROR_STR#' => $arCon['LAST_RESULT']));
+		}
+
 		return true;
 	}
 

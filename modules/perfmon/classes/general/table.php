@@ -23,9 +23,9 @@ class CAllPerfomanceTable
 			{
 				$arSelect[] = $strColumn;
 				if($arFields[$strColumn]=="datetime")
-					$arQueryOrder[$strColumn] = "TMP_".$strColumn." ".$strDirection;
+					$arQueryOrder[$strColumn] = $this->escapeColumn("TMP_".$strColumn)." ".$strDirection;
 				else
-					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+					$arQueryOrder[$strColumn] = $this->escapeColumn($strColumn)." ".$strDirection;
 			}
 		}
 
@@ -93,6 +93,11 @@ class CAllPerfomanceTable
 			//echo "<pre>",htmlspecialcharsbx($strSql),"</pre><hr>";
 			return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
+	}
+
+	public static function escapeColumn($column)
+	{
+		return $column;
 	}
 }
 ?>

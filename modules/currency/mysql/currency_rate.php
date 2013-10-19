@@ -51,6 +51,18 @@ class CCurrencyRates extends CAllCurrencyRates
 	 * $newval = CCurrencyRates::ConvertCurrency($val, "USD", "EUR");
 	 * echo $val." USD = ".$newval." EUR";
 	 * ?&gt;
+	 * &lt;?
+	 * // способ конвертации валюты для списка
+	 * if (CModule::IncludeModule('currency')) {
+	 *    $factor = CCurrencyRates::GetConvertFactor('UEE', 'RUB');
+	 * } else {
+	 *    $factor = 1;
+	 * }
+	 * 
+	 * foreach ($arResult['ITEMS'] as $i =&gt; &amp;$arItem) {
+	 *    $arItem['PROPERTY_PRICE_VALUE'] = number_format($arItem['PROPERTY_PRICE_VALUE'] * $factor, 0, '.', ' ');
+	 * }
+	 * ?&amp;gt
 	 * </pre>
 	 *
 	 *

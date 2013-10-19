@@ -124,7 +124,7 @@ class CAllTest
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">всех полей</a> теста.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -170,9 +170,9 @@ class CAllTest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">Поля теста</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -214,7 +214,7 @@ class CAllTest
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">всех полей</a> теста.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -259,9 +259,9 @@ class CAllTest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">Поля теста</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/add.php">Add</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php
@@ -451,12 +451,12 @@ class CAllTest
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">Поля теста</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li>
 	 *
 	 *
 	 * @static
@@ -479,7 +479,7 @@ class CAllTest
 	 *
 	 * @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	 * Описание фильтра см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/getlist.php">CTest::GetList</a>.<br> По
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">CTest::GetList</a>.<br> По
 	 * умолчанию тесты не фильтруются.
 	 *
 	 *
@@ -517,8 +517,9 @@ class CAllTest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * @static

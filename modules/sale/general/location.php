@@ -14,6 +14,7 @@
  */
 class CAllSaleLocation
 {
+
 	
 	/**
 	 * <p>Функция возвращает языконезависимые параметры страны с кодом ID </p>
@@ -29,7 +30,7 @@ class CAllSaleLocation
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	 * страны.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название страны.</td>
 	 * </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название страны.</td>
-	 * </tr> </table>
+	 * </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrybyid.bc803b85.php
@@ -70,9 +71,10 @@ class CAllSaleLocation
 	 *
 	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * записи.</td> </tr> <tr> <td>CITY_ID</td> <td>Код страны.</td> </tr> <tr> <td>LID</td> <td>Язык.</td>
-	 * </tr> <tr> <td>NAME</td> <td>Языкозависимое название страны.</td> </tr> <tr>
-	 * <td>SHORT_NAME</td> <td>Языкозависимое короткое название страны.</td> </tr> </table>
+	 * записи.</td> </tr> <tr> <td>COUNTRY_ID</td> <td>Код страны.</td> </tr> <tr> <td>LID</td>
+	 * <td>Язык.</td> </tr> <tr> <td>NAME</td> <td>Языкозависимое название страны.</td> </tr>
+	 * <tr> <td>SHORT_NAME</td> <td>Языкозависимое короткое название страны.</td> </tr>
+	 * </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrylangbyid.aef8761b.php
@@ -114,7 +116,7 @@ class CAllSaleLocation
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	 * города.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название города.</td>
 	 * </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название города.</td>
-	 * </tr> </table><p>  </p>
+	 * </tr> <tr> <td>REGION_ID</td> <td>Код региона.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitybyid.fb724f2b.php
@@ -157,7 +159,8 @@ class CAllSaleLocation
 	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	 * записи.</td> </tr> <tr> <td>CITY_ID</td> <td>Код города.</td> </tr> <tr> <td>LID</td> <td>Язык.</td>
 	 * </tr> <tr> <td>NAME</td> <td>Языкозависимое название города.</td> </tr> <tr>
-	 * <td>SHORT_NAME</td> <td>Языкозависимое короткое название города.</td> </tr> </table>
+	 * <td>SHORT_NAME</td> <td>Языкозависимое короткое название города.</td> </tr>
+	 * </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitylangbyid.f2bc091a.php
@@ -278,7 +281,7 @@ class CAllSaleLocation
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной страны или <i>false</i> у случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecountry.d8fa5b90.php
@@ -293,8 +296,7 @@ class CAllSaleLocation
 		if ($ID <= 0 || !CSaleLocation::CountryCheckFields("UPDATE", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCountryUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeCountryUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
 
@@ -320,8 +322,7 @@ class CAllSaleLocation
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		$events = GetModuleEvents("sale", "OnCountryUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnCountryUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
@@ -359,18 +360,15 @@ class CAllSaleLocation
 		global $DB;
 		$ID = IntVal($ID);
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCountryDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeCountryDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
 
 		$DB->Query("DELETE FROM b_sale_location_country_lang WHERE COUNTRY_ID = ".$ID."", true);
 		$bDelete = $DB->Query("DELETE FROM b_sale_location_country WHERE ID = ".$ID."", true);
 
-		$events = GetModuleEvents("sale", "OnCountryDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnCountryDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
-
 
 		return $bDelete;
 	}
@@ -425,7 +423,7 @@ class CAllSaleLocation
 	 *
 	 *
 	 * @return int <p>Возвращается код измененного города или <i>false</i> у случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecity.3fe4165d.php
@@ -440,8 +438,7 @@ class CAllSaleLocation
 		if ($ID <= 0 || !CSaleLocation::CityCheckFields("UPDATE", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCityUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeCityUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
 
@@ -467,8 +464,7 @@ class CAllSaleLocation
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		$events = GetModuleEvents("sale", "OnCityUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnCityUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
@@ -490,8 +486,7 @@ class CAllSaleLocation
 		if ($ID <= 0 || !CSaleLocation::RegionCheckFields("UPDATE", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeRegionUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeRegionUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
 
@@ -505,7 +500,8 @@ class CAllSaleLocation
 			if ($arCntLang = CSaleLocation::GetRegionLangByID($ID, $arLang["LID"]))
 			{
 				$strUpdate = $DB->PrepareUpdate("b_sale_location_region_lang", $arFields[$arLang["LID"]]);
-				print_r($arFields);die();
+				//print_r($arFields);die();
+
 				$strSql = "UPDATE b_sale_location_region_lang SET ".$strUpdate." WHERE ID = ".$arCntLang["ID"]."";
 			}
 			else
@@ -518,8 +514,7 @@ class CAllSaleLocation
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		$events = GetModuleEvents("sale", "OnRegionUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnRegionUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
@@ -536,8 +531,7 @@ class CAllSaleLocation
 		global $DB;
 		$ID = IntVal($ID);
 
-		$db_events = GetModuleEvents("sale", "OnBeforeRegionDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeRegionDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
 
@@ -545,8 +539,7 @@ class CAllSaleLocation
 		$DB->Query("DELETE FROM b_sale_location_region_lang WHERE REGION_ID = ".$ID."", true);
 		$bDelete = $DB->Query("DELETE FROM b_sale_location_region WHERE ID = ".$ID."", true);
 
-		$events = GetModuleEvents("sale", "OnRegionDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnRegionDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 
 		return $bDelete;
@@ -584,16 +577,14 @@ class CAllSaleLocation
 		global $DB;
 		$ID = IntVal($ID);
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCityDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeCityDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
 
 		$DB->Query("DELETE FROM b_sale_location_city_lang WHERE CITY_ID = ".$ID."", true);
 		$bDelete = $DB->Query("DELETE FROM b_sale_location_city WHERE ID = ".$ID."", true);
 
-		$events = GetModuleEvents("sale", "OnCityDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnCityDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 
 		return $bDelete;
@@ -624,13 +615,14 @@ class CAllSaleLocation
 	 *
 	 * @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
 	 * <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны;</li> <li>
-	 * <b>CITY_ID</b> - код города (если такой город уже есть, иначе код должен
-	 * быть нулем, и должен быть заполнен ключ CITY).</li> </ul>
+	 * <b>REGION_ID</b> - код региона;</li> <li> <b>CITY_ID</b> - код города (если такой город
+	 * уже есть, иначе код должен быть нулем, и должен быть заполнен ключ
+	 * CITY).</li> </ul>
 	 *
 	 *
 	 *
-	 * @return int <p>Возвращается код измененного местоположения или <i>false</i> у
-	 * случае ошибки.</p>
+	 * @return int <p>Возвращается код измененного местоположения или <i>false</i> в
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatelocation.3c5a6205.php
@@ -645,8 +637,7 @@ class CAllSaleLocation
 		if ($ID <= 0 || !CSaleLocation::LocationCheckFields("UPDATE", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeLocationUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeLocationUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
 
@@ -654,8 +645,7 @@ class CAllSaleLocation
 		$strSql = "UPDATE b_sale_location SET ".$strUpdate." WHERE ID = ".$ID."";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$events = GetModuleEvents("sale", "OnLocationUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnLocationUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
@@ -698,7 +688,8 @@ class CAllSaleLocation
 	 * это местоположение без города (только страна) (если значением с
 	 * этим ключом является N, то необходимо заполнить ключ CITY);</li> <li>
 	 * <b>CITY</b> - массив с параметрами города (если установлен флаг WITHOUT_CITY
-	 * в значение Y, то этот ключ заполнять не нужно);</li> </ul> Массив с
+	 * в значение Y, то этот ключ заполнять не нужно);</li> <li> <b>REGION_NAME</b> -
+	 * название региона;</li> <li> <b>REGION_ID</b> - ID региона;</li> </ul> Массив с
 	 * параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> - название
 	 * страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> - сокращенное
 	 * название страны - абревиатура (не зависящее от языка);</li> <li>
@@ -962,7 +953,7 @@ class CAllSaleLocation
 		}
 		elseif ($arFields["REGION_ID"] == 0 && $arFields["REGION_ID"] != '')
 		{
-			$db_res = CSaleLocation::GetRegionList(array("ID" => "DESC"), array("NAME" => $arFields["REGION"][SITE_ID]["NAME"]));
+			$db_res = CSaleLocation::GetRegionList(array("ID" => "DESC"), array("NAME" => $arFields["REGION"][LANGUAGE_ID]["NAME"]));
 			$arRegion = $db_res->Fetch();
 
 			if (count($arRegion) > 1)
@@ -1028,8 +1019,7 @@ class CAllSaleLocation
 		if (!($arLocRes = CSaleLocation::GetByID($ID, LANGUAGE_ID)))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeLocationDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeLocationDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
 
@@ -1065,8 +1055,7 @@ class CAllSaleLocation
 		$DB->Query("DELETE FROM b_sale_location_zip WHERE LOCATION_ID = ".$ID."", true);
 		$bDelete = $DB->Query("DELETE FROM b_sale_location WHERE ID = ".$ID."", true);
 
-		$events = GetModuleEvents("sale", "OnLocationDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnLocationDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 
 		return $bDelete;
@@ -1082,7 +1071,7 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция удаляет все местоположения из базы.</p>
+	 * <p>Функция удаляет все местоположения из базы.</p> <br><br>
 	 *
 	 *
 	 *
@@ -1097,8 +1086,7 @@ class CAllSaleLocation
 	{
 		global $DB;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeLocationDeleteAll");
-		while ($arEvent = $db_events->Fetch())
+		foreach (GetModuleEvents("sale", "OnBeforeLocationDeleteAll", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent)===false)
 				return false;
 
@@ -1120,8 +1108,7 @@ class CAllSaleLocation
 
 		$DB->Query("DELETE FROM b_sale_location_zip");
 
-		$events = GetModuleEvents("sale", "OnLocationDeleteAll");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("sale", "OnLocationDeleteAll", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent);
 
 	}

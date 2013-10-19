@@ -48,7 +48,7 @@ class CAllIBlockElement
 	 *
 	 *
 	 * @param array $arFilter  Фильтр элементов тот же, что и в функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>.
 	 *
 	 *
 	 *
@@ -64,7 +64,7 @@ class CAllIBlockElement
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1232,6 +1232,17 @@ class CAllIBlockElement
 
 		if(strlen($sWhere))
 		{
+			$sectionScope = "";
+			if (isset($arFilter["SECTION_SCOPE"]))
+			{
+				if ($arFilter["SECTION_SCOPE"] == "IBLOCK")
+					$sectionScope = "AND BSE.ADDITIONAL_PROPERTY_ID IS NULL";
+				elseif ($arFilter["SECTION_SCOPE"] == "PROPERTY")
+					$sectionScope = "AND BSE.ADDITIONAL_PROPERTY_ID IS NOT NULL";
+				elseif (preg_match("/^PROPERTY_(\\d+)\$/", $arFilter["SECTION_SCOPE"], $match))
+					$sectionScope = "AND BSE.ADDITIONAL_PROPERTY_ID = ".$match[1];
+			}
+
 			//Try to convert correlated subquery to join subquery
 			if($level == 0 && $Logic == "AND" && !count($arSectionFilter["BE"]))
 			{
@@ -1246,7 +1257,7 @@ class CAllIBlockElement
 					" : "
 					INNER JOIN b_iblock_section BS ON BSE.IBLOCK_SECTION_ID = BS.ID
 					")."
-					WHERE (".$sWhere.")
+					WHERE (".$sWhere.")$sectionScope
 					) BES ON BES.IBLOCK_ELEMENT_ID = BE.ID\n";
 			}
 			else
@@ -1263,7 +1274,7 @@ class CAllIBlockElement
 					INNER JOIN b_iblock_section BS ON BSE.IBLOCK_SECTION_ID = BS.ID
 					")."
 					WHERE BSE.IBLOCK_ELEMENT_ID = BE.ID
-					AND (".$sWhere.")
+					AND (".$sWhere.")$sectionScope
 					))";
 			}
 		}
@@ -2896,6 +2907,7 @@ class CAllIBlockElement
 					|| $val == "CATALOG_PURCHASING_CURRENCY"
 					|| $val == "CATALOG_WEIGHT"
 					|| $val == "CATALOG_QUANTITY"
+					|| $val == "CATALOG_VAT_INCLUDED"
 				)
 				{
 					$arAddSelectFields[] = $val;
@@ -3004,23 +3016,23 @@ class CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Метод добавляет новый элемент информационного блока. Перед добавлением элемента вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a>, из которых можно изменить значения полей или отменить добавление элемента вернув сообщение об ошибке. После добавления элемента вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a>.
+	 * Метод добавляет новый элемент информационного блока. Перед добавлением элемента вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a>, из которых можно изменить значения полей или отменить добавление элемента вернув сообщение об ошибке. После добавления элемента вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a>.
 	 *
 	 *
 	 *
 	 *
 	 * @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">полей элемента</a> инфоблоков
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей элемента</a> инфоблоков
 	 * и дополнительно может содержать поле "PROPERTY_VALUES" - массив со всеми
 	 * значениями свойств элемента в виде массива Array("код
 	 * свойства"=&gt;"значение свойства"). Где "код свойства" - числовой или
 	 * мнемонический код свойства, "значение свойства" - одиночное
 	 * значение, либо массив значений если свойство множественное.
 	 * Дополнительно для сохранения значения свойств см: <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode()</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode()</a>
 	 *
 	 *
 	 *
@@ -3058,14 +3070,15 @@ class CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode()</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode()</a>
 	 * </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -3747,7 +3760,7 @@ class CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Функция удаляет элемент информационного блока. Также удаляются значения свойств типа "Привязка к элементу" указывающие на удаляемый. При установленном модуле поиска элемент удаляется из поискового индекса. Перед удалением вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblockelementdelete.php">OnBeforeIBlockElementDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockElementDelete. </p>
+	 * <p>Функция удаляет элемент информационного блока. Также удаляются значения свойств типа "Привязка к элементу" указывающие на удаляемый. При установленном модуле поиска элемент удаляется из поискового индекса. Перед удалением вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementdelete.php">OnBeforeIBlockElementDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockElementDelete. </p>
 	 *
 	 *
 	 *
@@ -3981,11 +3994,11 @@ class CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">полями элемента
-	 * информационного блока</a><h4>Примечание</h4><i>ID</i><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockElement</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>
+	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
+	 * информационного блока</a><i>false</i><h4>Примечание</h4><i>ID</i><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockElement</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -4000,12 +4013,12 @@ class CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">Поля элемента
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элемента
 	 * информационного блока </a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4018,7 +4031,38 @@ class CAllIBlockElement
 		return CIBlockElement::GetList(Array(), $arFilter=Array("ID"=>IntVal($ID), "SHOW_HISTORY"=>"Y"));
 	}
 
-
+	
+	/**
+	 * <p>Метод возвращает инфоблок по <i>ID</i> его элемента.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID элемента.
+	 *
+	 *
+	 *
+	 * @return mixed <p>Метод возвращает идентификатор инфоблока по <i>ID</i> его элемента
+	 * или <i>false</i>, если элемент не найден.</p><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getiblockbyid.php
+	 * @author Bitrix
+	 */
+	public static function GetIBlockByID($ID)
+	{
+		global $DB;
+		$ID = intval($ID);
+		if ($ID <= 0)
+			return false;
+		$strSql = "SELECT IBLOCK_ID FROM b_iblock_element WHERE ID=".$ID;
+		$rsItems = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		if ($arItem = $rsItems->Fetch())
+		{
+			return $arItem['IBLOCK_ID'];
+		}
+		return false;
+	}
 	///////////////////////////////////////////////////////////////////
 	// Checks fields before update or insert
 	///////////////////////////////////////////////////////////////////
@@ -4549,7 +4593,7 @@ class CAllIBlockElement
 	//////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Функция изменяет значение свойства элемента информационного блока. Выполняет один дополнительный запрос к БД для определения кода информационного блока элемента. Если код инфоблока известен, то лучше воспользоваться функцией <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a>, задав ей 4-й параметр.
+	 * Функция изменяет значение свойства элемента информационного блока. Выполняет один дополнительный запрос к БД для определения кода информационного блока элемента. Если код инфоблока известен, то лучше воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a>, задав ей 4-й параметр.
 	 *
 	 *
 	 *
@@ -4578,9 +4622,9 @@ class CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">CIBlockElement::SetPropertyValues</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">CIBlockElement::SetPropertyValues</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -4627,7 +4671,39 @@ class CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @param array $arSelect = array() Перечень возвращаемых полей. Допустимые поля: <p>Поля, относящиеся
+	 * к разделу:</p> <ul> <li>ID - ID раздела инфоблока;</li> <li>TIMESTAMP_X - дата
+	 * последнего изменения параметров раздела;</li> <li>MODIFIED_BY -
+	 * идентификатор пользователя, в последний раз изменившего
+	 * раздел;</li> <li>DATE_CREATE - дата создания раздела;</li> <li>CREATED_BY -
+	 * идентификатор пользователя, создавшего раздел;</li> <li>IBLOCK_ID - ID
+	 * информационного блока;</li> <li>IBLOCK_SECTION_ID - ID раздела-родителя;</li>
+	 * <li>ACTIVE - (Y|N) флаг активности раздела;</li> <li>GLOBAL_ACTIVE - (Y|N) флаг
+	 * активности раздела, учитывая активность вышележащих
+	 * (родительских) разделов;</li> <li>SORT - порядок сортировки;</li> <li>NAME -
+	 * название раздела;</li> <li>PICTURE - код картинки раздела;</li> <li>LEFT_MARGIN -
+	 * левая граница раздела;</li> <li>RIGHT_MARGIN - правая граница раздела;</li>
+	 * <li>DEPTH_LEVEL - уровень вложенности раздела;</li> <li>DESCRIPTION - описание
+	 * раздела;</li> <li>DESCRIPTION_TYPE - тип описания группы (text/html);</li>
+	 * <li>SEARCHABLE_CONTENT - содержимое для поиска при фильтрации групп;</li> <li>CODE
+	 * - мнемонический идентификатор;</li> <li>XML_ID - внешний код;</li> <li>EXTERNAL_ID -
+	 * внешний код;</li> <li>TMP_ID - временный строковый идентификатор,
+	 * используемый для служебных целей;</li> <li>DETAIL_PICTURE - код картинки
+	 * детального просмотра раздела;</li> <li>SOCNET_GROUP_ID - группа Социальной
+	 * сети.</li> </ul> <p>Поля, относящиеся к инфоблоку раздела:</p> <ul>
+	 * <li>LIST_PAGE_URL - шаблон URL-а к странице для публичного просмотра списка
+	 * элементов информационного блока;</li> <li>SECTION_PAGE_URL -шаблон URL-а к
+	 * странице для просмотра раздела;</li> <li>IBLOCK_TYPE_ID - код типа
+	 * инфоблоков;</li> <li>IBLOCK_CODE - мнемонический код инфоблока;</li>
+	 * <li>IBLOCK_EXTERNAL_ID - внешний код инфоблока.</li> </ul> <p>Поля, относящиеся к
+	 * элементу, для которого возвращаются разделы:</p> <ul> <li>IBLOCK_ELEMENT_ID -
+	 * код элемента;</li> <li>ADDITIONAL_PROPERTY_ID - код свойства (не пусто, если
+	 * элемент привязан к разделу через свойство).</li> </ul> По умолчанию
+	 * возвращаются все поля. <br><br> Параметр доступен с версии 12.5.7.
+	 *
+	 *
+	 *
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -4638,11 +4714,11 @@ class CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fsection">Поля раздела </a> </li> <li> <span
-	 * class="syntax"><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setelementsection.php">SetElementSectio</a></span><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setelementsection.php">n()</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела </a> </li> <li> <span
+	 * class="syntax"><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setelementsection.php">SetElementSectio</a></span><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setelementsection.php">n()</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4650,9 +4726,45 @@ class CAllIBlockElement
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getelementgroups.php
 	 * @author Bitrix
 	 */
-	public static function GetElementGroups($ID, $bElementOnly = false)
+	public static function GetElementGroups($ID, $bElementOnly = false, $arSelect = array())
 	{
 		global $DB;
+
+		$arFields = array(
+			"ID" => "BS.ID",
+			"TIMESTAMP_X" => "BS.TIMESTAMP_X",
+			"MODIFIED_BY" => "BS.MODIFIED_BY",
+			"DATE_CREATE" => "BS.DATE_CREATE",
+			"CREATED_BY" => "BS.CREATED_BY",
+			"IBLOCK_ID" => "BS.IBLOCK_ID",
+			"IBLOCK_SECTION_ID" => "BS.IBLOCK_SECTION_ID",
+			"ACTIVE" => "BS.ACTIVE",
+			"GLOBAL_ACTIVE" => "BS.GLOBAL_ACTIVE",
+			"SORT" => "BS.SORT",
+			"NAME" => "BS.NAME",
+			"PICTURE" => "BS.PICTURE",
+			"LEFT_MARGIN" => "BS.LEFT_MARGIN",
+			"RIGHT_MARGIN" => "BS.RIGHT_MARGIN",
+			"DEPTH_LEVEL" => "BS.DEPTH_LEVEL",
+			"DESCRIPTION" => "BS.DESCRIPTION",
+			"DESCRIPTION_TYPE" => "BS.DESCRIPTION_TYPE",
+			"SEARCHABLE_CONTENT" => "BS.SEARCHABLE_CONTENT",
+			"CODE" => "BS.CODE",
+			"XML_ID" => "BS.XML_ID",
+			"EXTERNAL_ID" => "BS.XML_ID",
+			"TMP_ID" => "BS.TMP_ID",
+			"DETAIL_PICTURE" => "BS.DETAIL_PICTURE",
+			"SOCNET_GROUP_ID" => "BS.SOCNET_GROUP_ID",
+
+			"LIST_PAGE_URL" => "B.LIST_PAGE_URL",
+			"SECTION_PAGE_URL" => "B.SECTION_PAGE_URL",
+			"IBLOCK_TYPE_ID" => "B.IBLOCK_TYPE_ID",
+			"IBLOCK_CODE" => "B.CODE as IBLOCK_CODE",
+			"IBLOCK_EXTERNAL_ID" => "B.XML_ID",
+
+			"IBLOCK_ELEMENT_ID" => "SE.IBLOCK_ELEMENT_ID",
+			"ADDITIONAL_PROPERTY_ID" => "SE.ADDITIONAL_PROPERTY_ID",
+		);
 
 		if(is_array($ID))
 		{
@@ -4666,8 +4778,38 @@ class CAllIBlockElement
 			$sqlID = array(intval($ID));
 		}
 
-		$dbr = new CIBlockResult($DB->Query("
-			SELECT
+		$arSqlSelect = array();
+		foreach($arSelect as &$field)
+		{
+			$field = strtoupper($field);
+			if(array_key_exists($field, $arFields))
+				$arSqlSelect[$field] = $arFields[$field]." AS ".$field;
+		}
+		if (isset($field))
+			unset($field);
+
+		if (array_key_exists("DESCRIPTION", $arSqlSelect))
+			$arSqlSelect["DESCRIPTION_TYPE"] = $arFields["DESCRIPTION_TYPE"]." AS DESCRIPTION_TYPE";
+
+		if(array_key_exists("LIST_PAGE_URL", $arSqlSelect) || array_key_exists("SECTION_PAGE_URL", $arSqlSelect))
+		{
+			$arSqlSelect["ID"] = $arFields["ID"]." AS ID";
+			$arSqlSelect["CODE"] = $arFields["CODE"]." AS CODE";
+			$arSqlSelect["EXTERNAL_ID"] = $arFields["EXTERNAL_ID"]." AS EXTERNAL_ID";
+			$arSqlSelect["IBLOCK_TYPE_ID"] = $arFields["IBLOCK_TYPE_ID"]." AS IBLOCK_TYPE_ID";
+			$arSqlSelect["IBLOCK_ID"] = $arFields["IBLOCK_ID"]." AS IBLOCK_ID";
+			$arSqlSelect["IBLOCK_CODE"] = $arFields["IBLOCK_CODE"]." AS IBLOCK_CODE";
+			$arSqlSelect["IBLOCK_EXTERNAL_ID"] = $arFields["IBLOCK_EXTERNAL_ID"]." AS IBLOCK_EXTERNAL_ID";
+			$arSqlSelect["GLOBAL_ACTIVE"] = $arFields["GLOBAL_ACTIVE"]." AS GLOBAL_ACTIVE";
+		}
+
+		if (!empty($arSelect))
+		{
+			$strSelect = implode(", ", $arSqlSelect);
+		}
+		else
+		{
+			$strSelect = "
 				BS.*
 				,B.LIST_PAGE_URL
 				,B.SECTION_PAGE_URL
@@ -4676,6 +4818,12 @@ class CAllIBlockElement
 				,B.XML_ID as IBLOCK_EXTERNAL_ID
 				,BS.XML_ID as EXTERNAL_ID
 				,SE.IBLOCK_ELEMENT_ID
+			";
+		}
+
+		$dbr = new CIBlockResult($DB->Query("
+			SELECT
+				".$strSelect."
 			FROM
 				b_iblock_section_element SE
 				INNER JOIN b_iblock_section BS ON SE.IBLOCK_SECTION_ID = BS.ID
@@ -4752,8 +4900,8 @@ class CAllIBlockElement
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <span class="syntax"><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::</span><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getelementgroups.php">GetElementGroups</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::</span><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getelementgroups.php">GetElementGroups</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -5318,8 +5466,8 @@ class CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">поля свойств</a><br><br><br><br><br>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">поля свойств</a><br><br><br><br><br>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -5330,8 +5478,8 @@ class CAllIBlockElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">Поля свойств </a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойств </a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -5628,7 +5776,7 @@ class CAllIBlockElement
 
 	
 	/**
-	 * Функция сохраняет значения всех свойств элемента информационного блока. В отличие от <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a> может не содержать полный набор значений. Значения свойств, неуказанных в массиве PROPERTY_VALUES, будут сохранены. Эта функция более экономна в количестве запросов к БД. <br> Функция возвращает <b>Null</b>.
+	 * Функция сохраняет значения всех свойств элемента информационного блока. В отличие от <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a> может не содержать полный набор значений. Значения свойств, неуказанных в массиве PROPERTY_VALUES, будут сохранены. Эта функция более экономна в количестве запросов к БД. <br> Функция возвращает <b>Null</b>.
 	 *
 	 *
 	 *
@@ -5671,7 +5819,7 @@ class CAllIBlockElement
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/setpropertyvalues.php">CIBlockElement::SetPropertyValues</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">CIBlockElement::SetPropertyValues</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

@@ -4,12 +4,21 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/learning/classes/general
 // 2012-04-10 Checked/modified for compatibility with new data model
 
 /**
- * 
+ * <br><br>
  *
  *
  *
  *
  * @return mixed 
+ *
+ *
+ * <h4>Example</h4> 
+ * <pre>
+ * // пример пересчета журнала
+ * $gradebook = new CGradeBook; 
+ * $gradebook-&gt;RecountAttempts($STUDENT_ID,$TEST_ID);
+ * </pre>
+ *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php
@@ -48,7 +57,7 @@ class CGradeBook extends CAllGradeBook
 	 * сложные условия по полям пользователя ID, LOGIN, NAME, LAST_NAME);</li> <li>
 	 * <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По умолчанию "R". Список
 	 * прав доступа см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
 	 * <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
 	 * значение "N" - права доступа не проверяются.</li> </ul> Перед названием
 	 * фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не
@@ -60,7 +69,7 @@ class CGradeBook extends CAllGradeBook
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -107,10 +116,10 @@ class CGradeBook extends CAllGradeBook
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/getbyid.php">GetByID</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">Поля журнала</a></li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getbyid.php">GetByID</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

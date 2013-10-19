@@ -77,7 +77,7 @@ class CCityLookup_stat_table extends CCityLookup
 		return parent::GetFullInfo();
 	}
 
-	public function GetDescription()
+	public static function GetDescription()
 	{
 		return array(
 			"CLASS" => "CCityLookup_stat_table",

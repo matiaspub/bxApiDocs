@@ -728,10 +728,12 @@ class CCalendarEvent
 	{
 		if ($item['IS_MEETING'] && $item['MEETING'] != "" && !is_array($item['MEETING']))
 		{
-			$item['IS_MEETING'] = unserialize($item['MEETING']);
+			$item['MEETING'] = unserialize($item['MEETING']);
 			if (!is_array($item['MEETING']))
 				$item['MEETING'] = array();
 		}
+		if (!isset($item['~IS_MEETING']))
+			$item['~IS_MEETING'] = $item['IS_MEETING'];
 
 		$item['DT_FROM_TS'] = CCalendar::Timestamp($item['DT_FROM']);
 		$item['DT_TO_TS'] = CCalendar::Timestamp($item['DT_TO']);
@@ -1067,7 +1069,10 @@ class CCalendarEvent
 		if (!isset($arFields['LOCATION']['OLD']) && !$bNew)
 		{
 			// Select meeting info about event
-			$oldEvent = CCalendarEvent::GetById($arFields['ID']);
+			if (isset($Params['currentEvent']))
+				$oldEvent = $Params['currentEvent'];
+			else
+				$oldEvent = CCalendarEvent::GetById($arFields['ID']);
 			if ($oldEvent)
 				$arFields['LOCATION']['OLD'] = $oldEvent['LOCATION'];
 		}
@@ -1839,6 +1844,40 @@ class CCalendarEvent
 		CCalendar::ClearCache(array('attendees_list', 'event_list'));
 	}
 
+	public static function GetMeetingStatus($userId, $eventId)
+	{
+		global $DB;
+		$eventId = intVal($eventId);
+		$userId = intVal($userId);
+
+		// Select meeting info about event
+		CTimeZone::Disable();
+		$res = CCalendarEvent::GetList(
+			array(
+				'arFilter' => array(
+					"ID" => $eventId,
+					"DELETED" => "N"
+				),
+				'fetchMeetings' => true,
+				'parseRecursion' => false,
+				'setDefaultLimit' => false
+			)
+		);
+
+		$status = false;
+		$Event = $res[0];
+		if ($Event && $Event['IS_MEETING'])
+		{
+			// Try to find this user into attendees for this event
+			$strSql = "SELECT * FROM b_calendar_attendees WHERE USER_KEY=$userId AND EVENT_ID=$eventId";
+			$dbAtt = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if($att = $dbAtt->Fetch()) // We find the user
+				$status = $att["STATUS"];
+		}
+
+		return $status;
+	}
+
 	public static function SetMeetingParams($userId, $eventId, $arFields)
 	{
 		global $DB;
@@ -1861,7 +1900,7 @@ class CCalendarEvent
 		// Reminding options
 		$Event = CCalendarEvent::GetById($eventId);
 		if (!$Event)
-			return;
+			return false;
 
 		$path = CCalendar::GetPath($arFields['CAL_TYPE']);
 		$path = CHTTP::urlDeleteParams($path, array("action", "sessid", "bx_event_calendar_request", "EVENT_ID"));
@@ -1923,6 +1962,7 @@ class CCalendarEvent
 		}
 
 		CCalendar::ClearCache('attendees_list');
+		return true;
 	}
 
 	public static function GetAccessibilityForUsers($Params = array())
@@ -1971,10 +2011,14 @@ class CCalendarEvent
 		}
 		$strInvIds = join(',', $arInvIds);
 
+		$from_ts = false;
+		$to_ts = false;
 		$arSqlSearch = array();
 		if ($Params['from'])
 		{
 			$val = $Params['from'];
+			$from_ts = CCalendar::Timestamp($val);
+
 			if (strtoupper($DB->type) == "MYSQL")
 				$arSqlSearch[] = "CE.DT_TO>=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y"),"d.m.Y")."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
@@ -1985,6 +2029,10 @@ class CCalendarEvent
 		if ($Params['to'])
 		{
 			$val = $Params['to'];
+			$to_ts = CCalendar::Timestamp($val);
+			if (date('H:i', $to_ts) == '00:00')
+				$to_ts += CCalendar::DAY_LENGTH;
+
 			if (strtoupper($DB->type) == "MYSQL")
 				$arSqlSearch[] = "CE.DT_FROM<=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y")." 23:59:59","d.m.Y H:i:s")."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
@@ -2028,6 +2076,9 @@ class CCalendarEvent
 
 		foreach($arResult as $event)
 		{
+			if (($from_ts && $event['DT_TO_TS'] < $from_ts) || ($to_ts && $event['DT_FROM_TS'] > $to_ts))
+				continue;
+
 			if (!in_array($event["ACCESSIBILITY"], array('busy', 'quest', 'free', 'absent')))
 				$event["ACCESSIBILITY"] = 'busy';
 			if (!in_array($event['IMPORTANCE'], array('high', 'normal', 'low')))
@@ -2117,6 +2168,7 @@ class CCalendarEvent
 					$event['NAME'] = $event['NAME'].' ['.GetMessage('EC_ACCESSIBILITY_'.strtoupper($event['ACCESSIBILITY'])).']';
 				}
 			}
+			$event['~IS_MEETING'] = $event['IS_MEETING'];
 
 			// Clear information about
 			unset($event['DESCRIPTION'], $event['IS_MEETING'],$event['MEETING_HOST'],$event['MEETING'],$event['LOCATION'],$event['REMIND'],$event['USER_MEETING'],$event['~ATTENDEES']);

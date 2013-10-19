@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 6);
+// define("IM_REVISION", 15);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
@@ -28,6 +28,7 @@ global $DBType;
 CModule::AddAutoloadClasses(
 	"im",
 	array(
+		"CIMSettings" => "classes/general/im_settings.php",
 		"CIMMessenger" => "classes/general/im_messenger.php",
 		"CIMNotify" => "classes/general/im_notify.php",
 		"CIMContactList" => "classes/".$DBType."/im_contact_list.php",
@@ -39,6 +40,7 @@ CModule::AddAutoloadClasses(
 		"CIMConvert" => "classes/general/im_convert.php",
 		"CIMTableSchema" => "classes/general/im_table_schema.php",
 		"CIMNotifySchema" => "classes/general/im_notify_schema.php",
+		"CIMRestService" => "classes/general/im_rest.php",
 	)
 );
 

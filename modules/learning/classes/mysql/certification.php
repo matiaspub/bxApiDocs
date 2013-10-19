@@ -57,8 +57,8 @@ class CCertification extends CAllCertification
 	 * (возможны сложные условия по полям пользователя ID, LOGIN, NAME, LAST_NAME);
 	 * </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доступа. По умолчанию "R".
 	 * Список прав доступа см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li> <li>
-	 * <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li>
+	 * <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
 	 * значение "N" - права доступа не проверяются. </li> </ul> Перед названием
 	 * фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
 	 * </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
@@ -69,7 +69,7 @@ class CCertification extends CAllCertification
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -80,10 +80,10 @@ class CCertification extends CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/getbyid.php">GetByID</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php">Поля сертификата</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getbyid.php">GetByID</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

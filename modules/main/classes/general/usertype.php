@@ -129,23 +129,29 @@ class CAllUserTypeEntity extends CDBResult
 	 */
 	
 	/**
-	 * 
+	 * <p>Возвращает массив параметров пользовательского поля с кодом ID.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed <p></p>
+	 * @param int $ID  ID пользовательского поля
+	 *
+	 *
+	 *
+	 * @return mixed <p>Возвращает массив параметров пользовательского поля. Или false
+	 * если поле не найдено.</p><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <br><br>
+	 * &lt;?
+	 * $ar_res = CUserTypeEntity::GetByID( $id );
+	 * echo $ar_res["NAME"];                // вывод названия
+	 * echo "&lt;pre&gt;"; print_r($ar_res); echo "&lt;/pre&gt;";       // вывод всего массива   
+	 * ?&gt;Чтобы получить список возможных значений пользовательского свойства пользователя типа "список":$rsEnum = CUserFieldEnum::GetList(array(), array("ID" =&gt;$arUser["UF_LEGAL"]));
+	 * $arEnum = $rsEnum-&gt;GetNext();
+	 * echo $arEnum["VALUE"];$arUser["UF_LEGAL"] - в данном случае значение пользовательского типа "список".
 	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -212,8 +218,8 @@ class CAllUserTypeEntity extends CDBResult
 	 * </li> <li> <b>FIELD_NAME</b> - Название поля;</li> <li> <b>SORT</b> - Значение
 	 * сортировки;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>MULTIPLE</b> -
 	 * Множественность свойства;</li> <li><b>MANDATORY</b></li> <li><b>SHOW_FILTER</b></li>
-	 * <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> </ul>
-	 * Необязательное. По умолчанию записи не фильтруются.
+	 * <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> <li> <b>LANG</b> - ID
+	 * языка</li> </ul> Необязательное. По умолчанию записи не фильтруются.
 	 *
 	 *
 	 *
@@ -697,18 +703,8 @@ class CAllUserTypeEntity extends CDBResult
 			$USER_FIELD_MANAGER->CleanCache();
 
 		$strUpdate = $DB->PrepareUpdate("b_user_field", $arFields);
-		if($strUpdate!="")
-		{
-			if(CACHED_b_user_field!==false) $CACHE_MANAGER->CleanDir("b_user_field");
-			$strSql = "UPDATE b_user_field SET ".$strUpdate." WHERE ID = ".$ID;
-			if(array_key_exists("SETTINGS", $arFields))
-				$arBinds = array("SETTINGS" => $arFields["SETTINGS"]);
-			else
-				$arBinds = array();
-			$DB->QueryBind($strSql, $arBinds);
-		}
 
-		$arLabels = array("EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL", "ERROR_MESSAGE", "HELP_MESSAGE");
+		static $arLabels = array("EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL", "ERROR_MESSAGE", "HELP_MESSAGE");
 		$arLangs = array();
 		foreach($arLabels as $label)
 		{
@@ -721,13 +717,34 @@ class CAllUserTypeEntity extends CDBResult
 			}
 		}
 
-		if(count($arLangs)>0)
-			$DB->Query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$ID, false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-		foreach($arLangs as $lang=>$arLangFields)
+		if($strUpdate <> "" || !empty($arLangs))
 		{
-			$arLangFields["USER_FIELD_ID"] = $ID;
-			$arLangFields["LANGUAGE_ID"] = $lang;
-			$DB->Add("b_user_field_lang", $arLangFields);
+			if(CACHED_b_user_field !== false)
+			{
+				$CACHE_MANAGER->CleanDir("b_user_field");
+			}
+
+			if($strUpdate <> "")
+			{
+				$strSql = "UPDATE b_user_field SET ".$strUpdate." WHERE ID = ".$ID;
+				if(array_key_exists("SETTINGS", $arFields))
+					$arBinds = array("SETTINGS" => $arFields["SETTINGS"]);
+				else
+					$arBinds = array();
+				$DB->QueryBind($strSql, $arBinds);
+			}
+
+			if(!empty($arLangs))
+			{
+				$DB->Query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$ID, false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+
+				foreach($arLangs as $lang=>$arLangFields)
+				{
+					$arLangFields["USER_FIELD_ID"] = $ID;
+					$arLangFields["LANGUAGE_ID"] = $lang;
+					$DB->Add("b_user_field_lang", $arLangFields);
+				}
+			}
 		}
 
 		return true;
@@ -1065,15 +1082,17 @@ class CAllUserTypeManager
 			if($ar = $rs->Fetch())
 			{
 				foreach($ar as $key=>$value)
+				{
 					if(array_key_exists($key, $result))
 					{
 						if($result[$key]["MULTIPLE"]=="Y")
-							$result[$key]["VALUE"] = unserialize($value);
+							$result[$key]["VALUE"] = $this->OnAfterFetch($result[$key], unserialize($value));
 						else
-							$result[$key]["VALUE"] = $value;
+							$result[$key]["VALUE"] = $this->OnAfterFetch($result[$key], $value);
 
 						$result[$key]["ENTITY_VALUE_ID"] = $value_id;
 					}
+				}
 			}
 		}
 
@@ -1098,6 +1117,7 @@ class CAllUserTypeManager
 		$rs = CUserTypeEntity::GetList(array(), $arFilter);
 		if($arUserField = $rs->Fetch())
 		{
+			$arUserField["USER_TYPE"] = $this->GetUserType($arUserField["USER_TYPE_ID"]);
 			static $tables = array();
 			if($tables[$strTableName] || $DB->TableExists($strTableName))
 			{
@@ -1114,14 +1134,52 @@ class CAllUserTypeManager
 					if($ar = $rs->Fetch())
 					{
 						if($arUserField["MULTIPLE"]=="Y")
-							$result = unserialize($ar["VALUE"]);
+							$result = $this->OnAfterFetch($arUserField, unserialize($ar["VALUE"]));
 						else
-							$result = $ar["VALUE"];
+							$result = $this->OnAfterFetch($arUserField, $ar["VALUE"]);
 					}
 				}
 			}
 		}
 
+		return $result;
+	}
+
+	public static function OnAfterFetch($arUserField, $result)
+	{
+		if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onafterfetch")))
+		{
+			if ($arUserField["MULTIPLE"] == "Y")
+			{
+				if (is_array($result))
+				{
+					foreach($result as $key => $value)
+					{
+						$result[$key] = call_user_func_array(
+							array($arUserField["USER_TYPE"]["CLASS_NAME"], "onafterfetch"),
+							array(
+								$arUserField,
+								array(
+									"VALUE" => $value,
+								),
+							)
+						);
+					}
+				}
+			}
+			else
+			{
+				$result = call_user_func_array(
+					array($arUserField["USER_TYPE"]["CLASS_NAME"], "onafterfetch"),
+					array(
+						$arUserField,
+						array(
+							"VALUE" => $result,
+						),
+					)
+				);
+			}
+		}
 		return $result;
 	}
 
@@ -3148,7 +3206,7 @@ class CUserFieldEnum
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cuserfieldenum/index.php">Поля
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
 	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -3290,7 +3348,7 @@ class CUserFieldEnum
 
 	
 	/**
-	 * <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. </p>
+	 * <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. </p>
 	 *
 	 *
 	 *
@@ -3325,7 +3383,7 @@ class CUserFieldEnum
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cuserfieldenum/index.php">Поля
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
 	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -3474,7 +3532,7 @@ class CUserFieldEnum
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cuserfieldenum/index.php">Поля
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
 	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
 	 *
 	 *

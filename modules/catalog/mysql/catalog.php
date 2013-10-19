@@ -52,31 +52,28 @@ class CCatalog extends CAllCatalog
 	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&lt;=</b> -
 	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
 	 * <li> <b>&lt;</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле
-	 * каталога.<br><br> Пример фильтра: <pre class="syntax">array("SUBSCRIPTION" =&gt; "Y")</pre>
-	 * Этот фильтр означает "выбрать все записи, в которых значение в
-	 * поле SUBSCRIPTION (флаг "Продажа контента") равно Y".<br><br> Значение по
-	 * умолчанию - пустой массив array() - означает, что результат
-	 * отфильтрован не будет.
+	 * величины;</li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле каталога.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("SUBSCRIPTION" =&gt; "Y")</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле SUBSCRIPTION (флаг "Продажа контента")
+	 * равно Y".<br><br> Значение по умолчанию - пустой массив array() - означает,
+	 * что результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи каталога. Массив
-	 * имеет вид: <pre class="syntax">array("название_поля1", "группирующая_функция2"
-	 * =&gt; "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле каталога. В качестве группирующей функции
-	 * могут стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> -
-	 * вычисление среднего значения;</li> <li> <b>MIN</b> - вычисление
-	 * минимального значения;</li> <li> <b> MAX</b> - вычисление максимального
-	 * значения;</li> <li> <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой,
-	 * то функция вернет число записей, удовлетворяющих фильтру.<br><br>
-	 * Значение по умолчанию - <i>false</i> - означает, что результат
-	 * группироваться не будет.
+	 * имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
+	 * качестве "название_поля<i>N</i>" может стоять любое поле каталога. <br>
+	 * Если массив пустой, то функция вернет число записей,
+	 * удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
+	 * означает, что результат группироваться не будет.
 	 *
 	 *
 	 *
@@ -106,7 +103,7 @@ class CCatalog extends CAllCatalog
 	 * контента".</td> </tr> <tr> <td>NAME</td> <td>Название информационного блока.</td>
 	 * </tr> <tr> <td>YANDEX_EXPORT</td> <td>флаг "экспортировать в Яндекс.Товары"</td> </tr>
 	 * </table><p>Если в качестве параметра arGroupBy передается пустой массив,
-	 * то функция вернет число записей, удовлетворяющих фильтру.</p>
+	 * то функция вернет число записей, удовлетворяющих фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__getlist.d4805440.php
@@ -121,7 +118,7 @@ class CCatalog extends CAllCatalog
 		{
 			$arOrder = strval($arOrder);
 			$arFilter = strval($arFilter);
-			if (strlen($arOrder) > 0 && strlen($arFilter) > 0)
+			if ('' != $arOrder && '' != $arFilter)
 				$arOrder = array($arOrder => $arFilter);
 			else
 				$arOrder = array();
@@ -132,40 +129,33 @@ class CCatalog extends CAllCatalog
 			$arGroupBy = false;
 		}
 
-		// FIELDS -->
 		$arFields = array(
-				"ID" => array("FIELD" => "I.ID", "TYPE" => "int"),
-				"IBLOCK_ID" => array("FIELD" => "CI.IBLOCK_ID", "TYPE" => "int"),
-				"YANDEX_EXPORT" => array("FIELD" => "CI.YANDEX_EXPORT", "TYPE" => "char"),
-				"SUBSCRIPTION" => array("FIELD" => "CI.SUBSCRIPTION", "TYPE" => "char"),
-				"PRODUCT_IBLOCK_ID" => array("FIELD" => "CI.PRODUCT_IBLOCK_ID", "TYPE" => "int"),
-				"SKU_PROPERTY_ID" => array("FIELD" => "CI.SKU_PROPERTY_ID", "TYPE" => "int"),
-				"OFFERS_PROPERTY_ID" => array("FIELD" => "OFFERS.SKU_PROPERTY_ID", "TYPE" => "int"),
-				"OFFERS_IBLOCK_ID" => array("FIELD" => "OFFERS.IBLOCK_ID", "TYPE" => "int"),
-				"IBLOCK_TYPE_ID" => array("FIELD" => "I.IBLOCK_TYPE_ID", "TYPE" => "string"),
-				"IBLOCK_ACTIVE" => array("FIELD" => "I.ACTIVE", "TYPE" => "char"),
-				"LID" => array("FIELD" => "I.LID", "TYPE" => "string"),
-				"NAME" => array("FIELD" => "I.NAME", "TYPE" => "string")
-			);
-		// <-- FIELDS
+			"IBLOCK_ID" => array("FIELD" => "CI.IBLOCK_ID", "TYPE" => "int"),
+			"YANDEX_EXPORT" => array("FIELD" => "CI.YANDEX_EXPORT", "TYPE" => "char"),
+			"SUBSCRIPTION" => array("FIELD" => "CI.SUBSCRIPTION", "TYPE" => "char"),
+			"VAT_ID" => array("FIELD" => "CI.VAT_ID", "TYPE" => "int"),
+			"PRODUCT_IBLOCK_ID" => array("FIELD" => "CI.PRODUCT_IBLOCK_ID", "TYPE" => "int"),
+			"SKU_PROPERTY_ID" => array("FIELD" => "CI.SKU_PROPERTY_ID", "TYPE" => "int"),
+			"OFFERS_PROPERTY_ID" => array("FIELD" => "OFFERS.SKU_PROPERTY_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_catalog_iblock OFFERS ON (CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID)"),
+			"OFFERS_IBLOCK_ID" => array("FIELD" => "OFFERS.IBLOCK_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_catalog_iblock OFFERS ON (CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID)"),
+			"ID" => array("FIELD" => "I.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock I ON (CI.IBLOCK_ID = I.ID)"),
+			"IBLOCK_TYPE_ID" => array("FIELD" => "I.IBLOCK_TYPE_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock I ON (CI.IBLOCK_ID = I.ID)"),
+			"IBLOCK_ACTIVE" => array("FIELD" => "I.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_iblock I ON (CI.IBLOCK_ID = I.ID)"),
+			"LID" => array("FIELD" => "I.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock I ON (CI.IBLOCK_ID = I.ID)"),
+			"NAME" => array("FIELD" => "I.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock I ON (CI.IBLOCK_ID = I.ID)")
+		);
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_catalog_iblock CI
-				INNER JOIN b_iblock I ON CI.IBLOCK_ID = I.ID
-				LEFT JOIN b_catalog_iblock OFFERS ON CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID".
-				" ".$arSqls["FROM"]." ".
-				"WHERE 1=1 ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql .= "AND ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_iblock CI ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -174,37 +164,31 @@ class CCatalog extends CAllCatalog
 				return False;
 		}
 
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-			"FROM b_catalog_iblock CI
-			INNER JOIN b_iblock I ON CI.IBLOCK_ID = I.ID
-			LEFT JOIN b_catalog_iblock OFFERS ON CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID".
-			" ".$arSqls["FROM"]." ".
-			"WHERE 1=1 ";
-		if (strlen($arSqls["WHERE"]) > 0)
-			$strSql .= "AND ".$arSqls["WHERE"]." ";
-		if (strlen($arSqls["GROUPBY"]) > 0)
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-		if (strlen($arSqls["ORDERBY"]) > 0)
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_iblock CI ".$arSqls["FROM"];
+		if (!empty($arSqls["WHERE"]))
+			$strSql .= " WHERE ".$arSqls["WHERE"];
+		if (!empty($arSqls["GROUPBY"]))
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+		if (!empty($arSqls["ORDERBY"]))
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-				"FROM b_catalog_iblock CI
-				INNER JOIN b_iblock I ON CI.IBLOCK_ID = I.ID
-				LEFT JOIN b_catalog_iblock OFFERS ON CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID".
-				" ".$arSqls["FROM"]." ".
-				"WHERE 1=1 ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql_tmp .= "AND ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_iblock CI ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
-			if (strlen($arSqls["GROUPBY"]) <= 0)
+			if (empty($arSqls["GROUPBY"]))
 			{
 				if ($arRes = $dbRes->Fetch())
 					$cnt = $arRes["CNT"];
@@ -220,9 +204,10 @@ class CCatalog extends CAllCatalog
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 

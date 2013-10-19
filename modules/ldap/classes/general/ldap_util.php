@@ -399,9 +399,9 @@ class CLdapUtil
 			$backUrl=strlen($APPLICATION->GetCurPage())>1 ? "?back_url=".rawurlencode($APPLICATION->GetCurUri()) : "";
 
 			if ($_SERVER['SERVER_PORT'] == '80')
-				LocalRedirect('http://'.$_SERVER["SERVER_NAME"].':8890/'.$backUrl);
+				LocalRedirect('http://'.$_SERVER["SERVER_NAME"].':8890/'.$backUrl, true);
 			elseif (($_SERVER['SERVER_PORT'] == '443'))
-				LocalRedirect('https://'.$_SERVER["SERVER_NAME"].':8891/'.$backUrl);
+				LocalRedirect('https://'.$_SERVER["SERVER_NAME"].':8891/'.$backUrl, true);
 		}
 
 		return true;
@@ -505,6 +505,11 @@ class CLdapUtil
 				return $type;
 
 		return false;
+	}
+
+	public static function isLdapPaginationAviable()
+	{
+		return function_exists("ldap_control_paged_result");
 	}
 }
 

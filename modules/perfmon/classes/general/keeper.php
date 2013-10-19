@@ -122,7 +122,7 @@ class CAllPerfomanceKeeper
 			else
 			{
 				$query_count = intval($DB->cntQuery);
-				$query_time  = $DB->timeQuery;
+				$query_time  = $DB->timeQuery > 0? $DB->timeQuery: 0;
 			}
 			foreach($APPLICATION->arIncludeDebug as $i => $ar)
 			{
@@ -394,8 +394,7 @@ class CAllPerfomanceKeeper
 	public static function IsActive()
 	{
 		$bActive = false;
-		$rsEvents = GetModuleEvents("main", "OnPageStart");
-		while($arEvent = $rsEvents->Fetch())
+		foreach(GetModuleEvents("main", "OnPageStart", true) as $arEvent)
 		{
 			if($arEvent["TO_MODULE_ID"] == "perfmon")
 			{

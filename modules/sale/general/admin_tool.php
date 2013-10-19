@@ -827,7 +827,7 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 
 		foreach ($arData["ITEMS"] as $items)
 		{
-			if (strlen($items["CURRENCY"]) > 0 && $items["CURRENCY"] != $currency)
+			if (!empty($items["CURRENCY"]) && $items["CURRENCY"] != $currency)
 			{
 				if (floatval($items["PRICE"]) > 0)
 					$items["PRICE"] = CCurrencyRates::ConvertCurrency($items["PRICE"], $items["CURRENCY"], $currency);
@@ -835,8 +835,7 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 				if (floatval($items["DISCOUNT_PRICE"]) > 0)
 					$items["DISCOUNT_PRICE"] = CCurrencyRates::ConvertCurrency($items["DISCOUNT_PRICE"], $items["CURRENCY"], $currency);
 
-				if (floatval($items["PRICE"]) > 0 || floatval($items["DISCOUNT_PRICE"]) > 0)
-					$items["CURRENCY"] = $currency;
+				$items["CURRENCY"] = $currency;
 			}
 
 			if ($items["MODULE"] == "catalog")
@@ -866,6 +865,10 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 			while($arProduct = $dbProduct->Fetch())
 			{
 				$imgCode = 0;
+				$arImgProduct = false;
+				$arFile = false;
+				$imgUrl = '';
+				$imgProduct = '';
 				$arDataTab[$arProduct['ID']]['IBLOCK_ID'] = $arProduct['IBLOCK_ID'];
 				$arDataTab[$arProduct['ID']]['IBLOCK_SECTION_ID'] = $arProduct['IBLOCK_SECTION_ID'];
 				$arDataTab[$arProduct['ID']]['DETAIL_PICTURE'] = $arProduct['DETAIL_PICTURE'];
@@ -942,10 +945,10 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 				$arParams['skuProps'] = CUtil::PhpToJSObject($arSkuProperty);
 				$arParams["catalogXmlID"] = "";
 				$arParams["productXmlID"] = "";
-				$arParams["callback"] = "CatalogBasketCallback";
-				$arParams["orderCallback"] = "CatalogBasketOrderCallback";
-				$arParams["cancelCallback"] = "CatalogBasketCancelCallback";
-				$arParams["payCallback"] = "CatalogPayOrderCallback";
+				$arParams["callback"] = "";
+				$arParams["orderCallback"] = "";
+				$arParams["cancelCallback"] = "";
+				$arParams["payCallback"] = "";
 				$arParams["productProviderClass"] = "CCatalogProductProvider";
 
 				$result .= "<tr id='more_".$type."_".$items["ID"]."'>
@@ -956,7 +959,7 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 										".GetMessage('NEWO_SUBTAB_PRICE').": <b>".SaleFormatCurrency($items["PRICE"], $currency)."</b>
 									</div>";
 
-				$arResult = CSaleProduct::GetProductSku($USER_ID, $LID, $items["PRODUCT_ID"], $items["NAME"], $currency);
+				$arResult = CSaleProduct::GetProductSku($USER_ID, $LID, $items["PRODUCT_ID"], $items["NAME"], $currency, $arProduct);
 
 				if (count($arResult["SKU_ELEMENTS"]) > 0)
 				{
@@ -995,7 +998,7 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 					else
 					{
 						$cntProd = (floatval($items["QUANTITY"]) > 0) ? floatval($items["QUANTITY"]) : 1;
-						$url = "/bitrix/admin/sale_order_new.php?lang=".LANG."&user_id=".$USER_ID."&LID=".$LID."&product[".$items["PRODUCT_ID"]."]=".$cntProd;
+						$url = "/bitrix/admin/sale_order_new.php?lang=".LANGUAGE_ID."&user_id=".$USER_ID."&LID=".$LID."&product[".$items["PRODUCT_ID"]."]=".$cntProd;
 						$result .= "<a href=\"".$url."\" target=\"_blank\" class=\"get_new_order\"><span></span>".GetMessage('NEWO_SUBTAB_ADD_ORDER')."</a>";
 					}
 				}
@@ -1025,11 +1028,17 @@ function fGetFormatedProduct($USER_ID, $LID, $arData, $currency, $type = '')
 function fDeleteDoubleProduct($arShoppingCart = array(), $arDelete = array(), $showAll = 'N')
 {
 	global $COUNT_RECOM_BASKET_PROD;
-	$arResult = array();
+	$arResult = array(
+		"CNT" => 0,
+		"ITEMS" => array(),
+	);
+
 	$arShoppingCartTmp = array();
 	$arProductId = array();
+	if (empty($arDelete) ||!is_array($arDelete))
+		$arDelete = array();
 
-	if (count($arShoppingCart) > 0)
+	if (!empty($arShoppingCart) && is_array($arShoppingCart))
 	{
 		foreach($arShoppingCart as $key => $val)
 		{
@@ -1041,33 +1050,30 @@ function fDeleteDoubleProduct($arShoppingCart = array(), $arDelete = array(), $s
 		}
 	}
 
-	if (count($arShoppingCartTmp) > 0)
+	if (!empty($arShoppingCartTmp))
 	{
-		CModule::IncludeModule('catalog');
-		$i = 0;
-
-		$res = CIBlockElement::GetList(array(), array("ID" => $arProductId), false, false, array('ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'IBLOCK_TYPE_ID'));
-		while ($arSectionTmp = $res->Fetch())
-			$arSection[$arSectionTmp["ID"]] = $arSectionTmp;
-
-		foreach($arShoppingCartTmp as $key => $val)
+		if (CModule::IncludeModule('catalog'))
 		{
-			if (!isset($val["PRODUCT_ID"]))
-				$val["PRODUCT_ID"] = $val["ID"];
+			$i = 0;
 
-			if ((!isset($val["EDIT_PAGE_URL"]) || $val["EDIT_PAGE_URL"] == "") && $arSection[$val["PRODUCT_ID"]]["IBLOCK_ID"] > 0)
-				$val["EDIT_PAGE_URL"] = "/bitrix/admin/iblock_element_edit.php?ID=".$val["PRODUCT_ID"]."&type=".$arSection[$val["PRODUCT_ID"]]["IBLOCK_TYPE_ID"]."&lang=".LANG."&IBLOCK_ID=".$arSection[$val["PRODUCT_ID"]]["IBLOCK_ID"]."&find_section_section=".IntVal($arSection[$val["PRODUCT_ID"]]["IBLOCK_SECTION_ID"]);
+			$res = CIBlockElement::GetList(array(), array("ID" => $arProductId), false, false, array('ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'IBLOCK_TYPE_ID'));
+			while ($arSectionTmp = $res->Fetch())
+				$arSection[$arSectionTmp["ID"]] = $arSectionTmp;
 
-			$arResult["ITEMS"][] = $val;
-			$i++;
-			if ($i >= $COUNT_RECOM_BASKET_PROD && $showAll == "N")
-				break;
+			foreach($arShoppingCartTmp as $key => $val)
+			{
+				if (!isset($val["PRODUCT_ID"]))
+					$val["PRODUCT_ID"] = $val["ID"];
+
+				if ((!isset($val["EDIT_PAGE_URL"]) || $val["EDIT_PAGE_URL"] == "") && $arSection[$val["PRODUCT_ID"]]["IBLOCK_ID"] > 0)
+					$val["EDIT_PAGE_URL"] = "/bitrix/admin/iblock_element_edit.php?ID=".$val["PRODUCT_ID"]."&type=".$arSection[$val["PRODUCT_ID"]]["IBLOCK_TYPE_ID"]."&lang=".LANG."&IBLOCK_ID=".$arSection[$val["PRODUCT_ID"]]["IBLOCK_ID"]."&find_section_section=".IntVal($arSection[$val["PRODUCT_ID"]]["IBLOCK_SECTION_ID"]);
+
+				$arResult["ITEMS"][] = $val;
+				$i++;
+				if ($i >= $COUNT_RECOM_BASKET_PROD && $showAll == "N")
+					break;
+			}
 		}
-	}
-	else
-	{
-		$arResult["CNT"] = 0;
-		$arResult["ITEMS"] = array();
 	}
 
 	if ($showAll == "Y")

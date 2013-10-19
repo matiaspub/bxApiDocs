@@ -49,8 +49,8 @@ class CBPWorkflow
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
-	 * </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetRuntime.php
@@ -73,7 +73,7 @@ class CBPWorkflow
 	 * <b>CBPActivityExecutionStatus::Canceling</b> - бизнес-процесс отменен, </li> <li>
 	 * <b>CBPActivityExecutionStatus::Closed</b> - бизнес-процесс завершен, </li> <li>
 	 * <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li>
-	 * </ul>
+	 * </ul><br><br>
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionStatus.php
 	 * @author Bitrix
@@ -144,7 +144,7 @@ class CBPWorkflow
 	*/
 	
 	/**
-	 * <p>Конструктор создает новый экземпляр класса <a href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>.</p>
+	 * <p>Конструктор создает новый экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>.</p>
 	 *
 	 *
 	 *
@@ -161,8 +161,8 @@ class CBPWorkflow
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
-	 * </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/constructor.php

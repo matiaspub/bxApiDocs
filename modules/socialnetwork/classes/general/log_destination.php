@@ -460,7 +460,10 @@ class CSocNetLogDestination
 		$arExtranetTestUsers = array();
 
 		$search = trim($search);
-		if (strlen($search) <= 0)
+		if (
+			strlen($search) <= 0
+			|| !GetFilterQuery("TEST", $search)
+		)
 			return $arUsers;
 
 		$arFilter = array(

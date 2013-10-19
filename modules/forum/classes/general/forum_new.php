@@ -64,9 +64,9 @@ class CAllForumNew
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -120,9 +120,9 @@ class CAllForumNew
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -169,9 +169,9 @@ class CAllForumNew
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -351,7 +351,7 @@ class CAllForumNew
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">списке полей
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
 	 * форума</a>.
 	 *
 	 *
@@ -360,10 +360,10 @@ class CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
 	 * <li>Перед изменением форума следует проверить возможность
 	 * изменения методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
 	 * </ul>
 	 *
 	 *
@@ -484,7 +484,7 @@ class CAllForumNew
 	 * <h4>See Also</h4> 
 	 * <ul><li>Перед удалением форума следует проверить возможность
 	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
 	 * </li></ul>
 	 *
 	 *
@@ -1113,7 +1113,7 @@ class CAllForumNew
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -1141,8 +1141,8 @@ class CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1312,11 +1312,11 @@ class CAllForumNew
 	 *
 	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]).<br>
 	 * Подробное описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/getlist.php">CForumNew::GetList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlist.php">CForumNew::GetList</a>.
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -1356,8 +1356,8 @@ class CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1865,7 +1865,7 @@ class CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1948,7 +1948,7 @@ class CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2566,12 +2566,12 @@ class CAllForumGroup
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля элементов</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля элементов</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -2725,7 +2725,7 @@ class CAllForumGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -2766,7 +2766,7 @@ class CAllForumGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -2819,7 +2819,7 @@ class CAllForumGroup
 	 *
 	 *
 	 *
-	 * @param char(2) $LANG  Сайт.
+	 * @param char(2) $LANG  Язык
 	 *
 	 *
 	 *
@@ -2827,7 +2827,7 @@ class CAllForumGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -2969,7 +2969,7 @@ class CAllForumSmile
 				"width" => $arFile[0],
 				"height" => $arFile[1]);
 
-			$res = CFile::CheckImageFile($arFile, COption::GetOptionString("forum", "file_max_size", 50000));
+			$res = CFile::CheckImageFile($arFile, COption::GetOptionString("forum", "file_max_size", 5242880));
 			if (strLen($res) > 0)
 			{
 				$aMsg[] = array(
@@ -3039,9 +3039,10 @@ class CAllForumSmile
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">списке полей
-	 * смайла</a>. В специальное поле "LANG" заносится массив массивов полей
-	 * языковых параметров звания, которые имеют аналогичную структуру.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">списке
+	 * полей смайла</a>. В специальное поле "LANG" заносится массив массивов
+	 * полей языковых параметров звания, которые имеют аналогичную
+	 * структуру.
 	 *
 	 *
 	 *
@@ -3049,7 +3050,7 @@ class CAllForumSmile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -3149,12 +3150,12 @@ class CAllForumSmile
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">Поля смайла</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -3309,7 +3310,7 @@ class CAllForumSmile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
 	 *
 	 *
 	 * @static
@@ -3345,7 +3346,7 @@ class CAllForumSmile
 	 *
 	 *
 	 *
-	 * @param char(2) $LANG  Сайт.
+	 * @param char(2) $LANG  Язык сайта
 	 *
 	 *
 	 *
@@ -3353,7 +3354,8 @@ class CAllForumSmile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a>
+	 * </li></ul><br><br>
 	 *
 	 *
 	 * @static
@@ -3398,7 +3400,8 @@ class CAllForumSmile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmilelang">Поля смайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmilelang">Поля смайла</a>
+	 * </li></ul>
 	 *
 	 *
 	 * @static

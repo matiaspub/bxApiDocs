@@ -40,7 +40,7 @@ class blogTextParser extends CTextParser
 				}
 			}
 
-			function sortlen($a, $b) {
+			public function sortlen($a, $b) {
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
 

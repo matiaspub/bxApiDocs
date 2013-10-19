@@ -13,14 +13,14 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 			"PROPERTY_TYPE" => "E",
 			"USER_TYPE" => BT_UT_SKU_CODE,
 			"DESCRIPTION" => GetMessage('BT_UT_SKU_DESCR'),
-			"GetPropertyFieldHtml" => array("CIBlockPropertySKU", "GetPropertyFieldHtml"),
-			"GetPublicViewHTML" => array("CIBlockPropertySKU", "GetPublicViewHTML"),
-			"GetAdminListViewHTML" => array("CIBlockPropertySKU","GetAdminListViewHTML"),
-			"GetAdminFilterHTML" => array('CIBlockPropertySKU','GetAdminFilterHTML'),
-			"GetSettingsHTML" => array('CIBlockPropertySKU','GetSettingsHTML'),
-			"PrepareSettings" => array('CIBlockPropertySKU','PrepareSettings'),
-			"AddFilterFields" => array('CIBlockPropertySKU','AddFilterFields'),
-			//"GetOffersFieldHtml" => array('CIBlockPropertySKU','GetOffersFieldHtml'),
+			"GetPropertyFieldHtml" => array(__CLASS__, "GetPropertyFieldHtml"),
+			"GetPropertyFieldHtmlMulty" => array(__CLASS__, "GetPropertyFieldHtml"),
+			"GetPublicViewHTML" => array(__CLASS__, "GetPublicViewHTML"),
+			"GetAdminListViewHTML" => array(__CLASS__,"GetAdminListViewHTML"),
+			"GetAdminFilterHTML" => array(__CLASS__,'GetAdminFilterHTML'),
+			"GetSettingsHTML" => array(__CLASS__,'GetSettingsHTML'),
+			"PrepareSettings" => array(__CLASS__,'PrepareSettings'),
+			"AddFilterFields" => array(__CLASS__,'AddFilterFields')
 		);
 	}
 
@@ -55,18 +55,23 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		 */
 		$arResult = parent::PrepareSettings($arFields);
 		$arResult['SHOW_ADD'] = 'N';
+		$arFields['MULTIPLE'] = 'N';
+		$arFields['USER_TYPE_SETTINGS'] = $arResult;
 
-		return $arResult;
+		return $arFields;
 	}
 
 	static public function GetSettingsHTML($arFields,$strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
-			"HIDE" => array("ROW_COUNT", "COL_COUNT", "MULTIPLE_CNT"),
+			"HIDE" => array("ROW_COUNT", "COL_COUNT", "MULTIPLE_CNT", "MULTIPLE"),
+			"SET" => array("MULTIPLE" => "N"),
 			'USER_TYPE_SETTINGS_TITLE' => GetMessage('BT_UT_SKU_SETTING_TITLE'),
 		);
 
 		$arSettings = self::PrepareSettings($arFields);
+		if (array_key_exists('USER_TYPE_SETTINGS', $arSettings))
+			$arSettings = $arSettings['USER_TYPE_SETTINGS'];
 
 		$strResult = '<tr>
 		<td>'.GetMessage('BT_UT_SKU_SETTING_VIEW').'</td>

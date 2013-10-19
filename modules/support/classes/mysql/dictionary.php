@@ -20,7 +20,7 @@ class CTicketDictionary extends CAllTicketDictionary
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CTicketDictionary<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CTicketDictionary<br>File: ".__FILE__;
 	}
 
 	
@@ -125,7 +125,8 @@ class CTicketDictionary extends CAllTicketDictionary
 		if (is_array($arFilter))
 		{
 			$filterKeys = array_keys($arFilter);
-			for ($i=0; $i<count($filterKeys); $i++)
+			$filterKeysCount = count($filterKeys);
+			for ($i=0; $i<$filterKeysCount; $i++)
 			{
 				$key = $filterKeys[$i];
 				$val = $arFilter[$filterKeys[$i]];

@@ -165,7 +165,7 @@ class CAllSaleDiscount
 	 * задана в абсолютной сумме).</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N)
 	 * активности скидки.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки (если по
 	 * сумме заказа доступно несколько скидок, то берется первая по
-	 * сортировке).</td> </tr> </table>
+	 * сортировке).</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__getbyid.1af201c0.php
@@ -348,7 +348,7 @@ class CAllSaleDiscount
 		{
 			if (empty($arFields['ACTIONS']))
 			{
-				$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_EMPTY_ACTIONS"), "ACTIONS");
+				$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_EMPTY_ACTIONS_EXT"), "ACTIONS");
 				return false;
 			}
 			else
@@ -357,13 +357,13 @@ class CAllSaleDiscount
 				{
 					if (!CheckSerializedData($arFields['ACTIONS']))
 					{
-						$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS"), "ACTIONS");
+						$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS_EXT"), "ACTIONS");
 						return false;
 					}
 					$arFields['ACTIONS'] = unserialize($arFields['ACTIONS']);
 					if (!is_array($arFields['ACTIONS']) || empty($arFields['ACTIONS']))
 					{
-						$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS"), "ACTIONS");
+						$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS_EXT"), "ACTIONS");
 						return false;
 					}
 				}
@@ -386,7 +386,7 @@ class CAllSaleDiscount
 				);
 				if ('' == $strEval)
 				{
-					$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS"), "ACTIONS");
+					$APPLICATION->ThrowException(GetMessage("BT_MOD_SALE_DISC_ERR_BAD_ACTIONS_EXT"), "ACTIONS");
 					return false;
 				}
 				$arFields['APPLICATION'] = $strEval;

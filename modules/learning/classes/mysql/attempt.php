@@ -97,8 +97,8 @@ class CTestAttempt extends CAllTestAttempt
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestresult/index.php">CTestResult</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctestresult/add.php">Add</a> </li></ul><a name="examples"></a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/index.php">CTestResult</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php">Add</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

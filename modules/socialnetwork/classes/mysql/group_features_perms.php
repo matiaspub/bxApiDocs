@@ -21,7 +21,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	 * <p>Создает новое право.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
+	 * <p>Создает новое право.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
 	 *
 	 *
 	 *
@@ -36,9 +36,9 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
 	 * </ul>
 	 *
 	 *
@@ -158,8 +158,8 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/GetByID.php">CSocNetFeaturesPerms::GetById</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetByID.php">CSocNetFeaturesPerms::GetById</a>
 	 * </li> </ul>
 	 *
 	 *

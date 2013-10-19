@@ -306,7 +306,7 @@ class CAllSocNetLog
 			{
 				$res = CAgent::AddAgent($agent, "socialnetwork", "N", 0, $arLog["LOG_DATE"], "Y", $arLog["LOG_DATE"]);
 				if(!$res)
-					$APPLICATION->ResetException();
+					$GLOBALS["APPLICATION"]->ResetException();
 			}
 			elseif ($bAgent)
 			{
@@ -590,6 +590,17 @@ class CAllSocNetLog
 		CUserCounter::IncrementWithSelect(
 			CSocNetLogCounter::GetSubSelect($arLog["ID"], $arLog["ENTITY_TYPE"], $arLog["ENTITY_ID"], $arLog["EVENT_ID"], $arLog["USER_ID"], $arOfEntities, false, false, "Y", "L")
 		);
+
+		if ($arLog["EVENT_ID"] == "blog_post_important")
+		{
+			CUserCounter::IncrementWithSelect(
+				CSocNetLogCounter::GetSubSelect(
+					$arLog["ID"], $arLog["ENTITY_TYPE"], $arLog["ENTITY_ID"], $arLog["EVENT_ID"],
+					$arLog["USER_ID"], $arOfEntities, false, false, "Y", "L",
+					array("CODE" => "'BLOG_POST_IMPORTANT'")
+				)
+			);
+		}
 
 		return true;
 	}

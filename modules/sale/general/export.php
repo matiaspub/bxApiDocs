@@ -65,7 +65,7 @@ class CAllSaleExport
 
 		return False;
 	}
-	
+
 	public static function ExportOrders2Xml($arFilter = Array(), $nTopCount = 0, $currency = "", $crmMode = false)
 	{
 		global $DB;
@@ -79,6 +79,8 @@ class CAllSaleExport
 			"COMPANIES" => 0,
 		);
 
+		$accountNumberPrefix = COption::GetOptionString("sale", "1C_SALE_ACCOUNT_NUMBER_SHOP_PREFIX", "");
+
 		$arOrder = array("ID" => "DESC");
 		if ($crmMode)
 			$arOrder = array("DATE_UPDATE" => "ASC");
@@ -88,17 +90,24 @@ class CAllSaleExport
 				$arFilter,
 				false,
 				$count,
-				array("ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED", "EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID", "PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE", "SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION", "ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE", "COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID")
+				array(
+					"ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED",
+					"EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID",
+					"PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE",
+					"SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION",
+					"ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE",
+					"COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "ACCOUNT_NUMBER"
+				)
 			);
 
 		$dbPaySystem = CSalePaySystem::GetList(Array("ID" => "ASC"), Array("ACTIVE" => "Y"), false, false, Array("ID", "NAME", "ACTIVE"));
 		while($arPaySystem = $dbPaySystem -> Fetch())
 			$paySystems[$arPaySystem["ID"]] = $arPaySystem["NAME"];
-		
+
 		$dbDelivery = CSaleDelivery::GetList(Array("ID" => "ASC"), Array("ACTIVE" => "Y"), false, false, Array("ID", "NAME", "ACTIVE"));
 		while($arDelivery = $dbDelivery -> Fetch())
 			$delivery[$arDelivery["ID"]] = $arDelivery["NAME"];
-			
+
 		$rsDeliveryHandlers = CSaleDeliveryHandler::GetAdminList(array("SID" => "ASC"));
 		while ($arHandler = $rsDeliveryHandlers->Fetch())
 		{
@@ -116,8 +125,8 @@ class CAllSaleExport
 		{
 			$arAgent[$arExport["PERSON_TYPE_ID"]] = unserialize($arExport["VARS"]);
 		}
-		
-		$dateFormat = CSite::GetDateFormat("FULL"); 
+
+		$dateFormat = CSite::GetDateFormat("FULL");
 
 		if ($crmMode)
 		{
@@ -143,7 +152,7 @@ class CAllSaleExport
 
 			$agentParams = $arAgent[$arOrder["PERSON_TYPE_ID"]];
 			$arProp = Array();
-		
+
 			$arProp["ORDER"] = $arOrder;
 			if (IntVal($arOrder["USER_ID"]) > 0)
 			{
@@ -151,7 +160,7 @@ class CAllSaleExport
 				if ($arUser = $dbUser->Fetch())
 					$arProp["USER"] = $arUser;
 			}
-		
+
 			$dbOrderPropVals = CSaleOrderPropsValue::GetList(
 					array(),
 					array("ORDER_ID" => $arOrder["ID"]),
@@ -195,13 +204,13 @@ class CAllSaleExport
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] =  ($arVal["COUNTRY_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["CITY_NAME"])<=0) ? "" : " - ").$arVal["CITY_NAME"]);
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_CITY"] = $arVal["CITY_NAME"];
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_COUNTRY"] = $arVal["COUNTRY_NAME"];
-				}          
+				}
 				else
 				{
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] = $arOrderPropVals["VALUE"];
 				}
 			}
-			
+
 			foreach($agentParams as $k => $v)
 			{
 				if(strpos($k, "REKV_") !== false)
@@ -244,7 +253,7 @@ class CAllSaleExport
 			?>
 			<<?=GetMessage("SALE_EXPORT_DOCUMENT")?>>
 				<<?=GetMessage("SALE_EXPORT_ID")?>><?=$arOrder["ID"]?></<?=GetMessage("SALE_EXPORT_ID")?>>
-				<<?=GetMessage("SALE_EXPORT_NUMBER")?>><?=$arOrder["ID"]?></<?=GetMessage("SALE_EXPORT_NUMBER")?>>
+				<<?=GetMessage("SALE_EXPORT_NUMBER")?>><?=$accountNumberPrefix.$arOrder["ACCOUNT_NUMBER"]?></<?=GetMessage("SALE_EXPORT_NUMBER")?>>
 				<<?=GetMessage("SALE_EXPORT_DATE")?>><?=$DB->FormatDate($arOrder["DATE_INSERT_FORMAT"], $dateFormat, "YYYY-MM-DD");?></<?=GetMessage("SALE_EXPORT_DATE")?>>
 				<<?=GetMessage("SALE_EXPORT_HOZ_OPERATION")?>><?=GetMessage("SALE_EXPORT_ITEM_ORDER")?></<?=GetMessage("SALE_EXPORT_HOZ_OPERATION")?>>
 				<<?=GetMessage("SALE_EXPORT_ROLE")?>><?=GetMessage("SALE_EXPORT_SELLER")?></<?=GetMessage("SALE_EXPORT_ROLE")?>>
@@ -333,7 +342,7 @@ class CAllSaleExport
 										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["FLAT"])."</".GetMessage("SALE_EXPORT_VALUE").">
 									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
 						}
-						
+
 						if($agent["IS_FIZ"]=="Y")
 						{
 							$arResultStat["CONTACTS"]++;
@@ -517,7 +526,7 @@ class CAllSaleExport
 								<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($agent["F_ADDRESS_FULL"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
 								<?
 								if(strlen($agent["F_INDEX"])>0)
-								{	
+								{
 									?>
 									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
 										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_POST_CODE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
@@ -536,7 +545,7 @@ class CAllSaleExport
 								}
 								if(strlen($agent["F_REGION"])>0)
 								{
-									?>									
+									?>
 									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
 										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_REGION")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
 										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_REGION"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
@@ -611,7 +620,7 @@ class CAllSaleExport
 							<?
 						}
 						if(strlen($agent["PHONE"])>0 || strlen($agent["EMAIL"])>0)
-						{	
+						{
 							?>
 							<<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
 								<?
@@ -650,14 +659,14 @@ class CAllSaleExport
 								</<?=GetMessage("SALE_EXPORT_REPRESENTATIVE")?>>
 							</<?=GetMessage("SALE_EXPORT_REPRESENTATIVES")?>>
 							<?
-						}?>					
-						<<?=GetMessage("SALE_EXPORT_ROLE")?>><?=GetMessage("SALE_EXPORT_BUYER")?></<?=GetMessage("SALE_EXPORT_ROLE")?>>						
+						}?>
+						<<?=GetMessage("SALE_EXPORT_ROLE")?>><?=GetMessage("SALE_EXPORT_BUYER")?></<?=GetMessage("SALE_EXPORT_ROLE")?>>
 					</<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
 				</<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
-				
+
 				<<?=GetMessage("SALE_EXPORT_TIME")?>><?=$DB->FormatDate($arOrder["DATE_INSERT_FORMAT"], $dateFormat, "HH:MI:SS");?></<?=GetMessage("SALE_EXPORT_TIME")?>>
 				<<?=GetMessage("SALE_EXPORT_COMMENTS")?>><?=htmlspecialcharsbx($arOrder["COMMENTS"])?></<?=GetMessage("SALE_EXPORT_COMMENTS")?>>
-				<? 
+				<?
 				$dbOrderTax = CSaleOrderTax::GetList(
 					array(),
 					array("ORDER_ID" => $arOrder["ID"]),
@@ -698,7 +707,7 @@ class CAllSaleExport
 					<?
 				}
 				?>
-				<<?=GetMessage("SALE_EXPORT_ITEMS")?>>                              
+				<<?=GetMessage("SALE_EXPORT_ITEMS")?>>
 				<?
 				$dbBasket = CSaleBasket::GetList(
 						array("NAME" => "ASC"),
@@ -785,7 +794,7 @@ class CAllSaleExport
 					<?
 					$basketSum += $arBasket["PRICE"]*$arBasket["QUANTITY"];
 				}
-				
+
 				if(IntVal($arOrder["PRICE_DELIVERY"]) > 0)
 				{
 					?>
@@ -861,7 +870,7 @@ class CAllSaleExport
 							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($paySystems[$arOrder["PAY_SYSTEM_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
-					}	
+					}
 					if(strlen($arOrder["DATE_ALLOW_DELIVERY"])>0)
 					{
 						?>
@@ -901,7 +910,7 @@ class CAllSaleExport
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_ORDER_STATUS")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
 						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?$arStatus = CSaleStatus::GetLangByID($arOrder["STATUS_ID"]); echo htmlspecialcharsbx("[".$arOrder["STATUS_ID"]."] ".$arStatus["NAME"]);?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 					</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
-					
+
 					<?if(strlen($arOrder["DATE_CANCELED"])>0)
 					{
 						?>

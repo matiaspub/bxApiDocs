@@ -219,11 +219,19 @@ class CSocNetLogFollow
 							AND CODE = 'L".$log_id."' 
 							AND USER_ID IN (".implode(", ", $arUserID).")
 					";
-					if ($DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__))
-						return true;
-					else
-						return false;
+					$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 				}
+
+				$strSQL = "UPDATE b_sonet_log_follow 
+					SET b_sonet_log_follow.FOLLOW_DATE = NULL 
+					WHERE 
+						TYPE = 'Y' 
+						AND CODE = 'L".$log_id."' 
+				";
+				if ($DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__))
+					return true;
+				else
+					return false;
 			}
 			else
 			{
@@ -377,7 +385,7 @@ class CSocNetLogFollow
 			&& intval($arMessageFields["TO_USER_ID"]) > 0
 			&& intval($arMessageFields["LOG_ID"]) > 0
 		)
-			$res = CSocNetLogFollow::Set(intval($arMessageFields["TO_USER_ID"]), "L".intval($arMessageFields["LOG_ID"]), "Y", ConvertTimeStamp(time(), "FULL", SITE_ID));
+			$res = CSocNetLogFollow::Set(intval($arMessageFields["TO_USER_ID"]), "L".intval($arMessageFields["LOG_ID"]), "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
 
 		return $res;
 	}

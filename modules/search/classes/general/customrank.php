@@ -14,7 +14,7 @@ class CSearchCustomRank
 	 * @param array $arrayaSort = array() Массив, содержащий признак сортировки в виде наборов "название
 	 * поля"=&gt;"направление". <br><br> Название поля может принимать
 	 * значение названия любого из полей <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>. Не обязательный параметр. По умолчанию равен: <pre
 	 * class="syntax"> array( "SITE_ID"=&gt;"ASC", "MODULE_ID"=&gt;"ASC", "PARAM1"=&gt;"DESC", "PARAM2"=&gt;"DESC",
 	 * "ITEM_ID"=&gt;"DESC", ) </pre>
@@ -24,22 +24,22 @@ class CSearchCustomRank
 	 * @param array $arrayaFilter = array() Массив, содержащий фильтр в виде наборов "название
 	 * поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
 	 * значение названия любого из полей <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>. Фильтрация осуществляется по точному совпадению
 	 * значения фильтра и правила. Не обязательный параметр.
 	 *
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны поля <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">Поля объекта
-	 * правила сортировки</a></li> </ul>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">Поля объекта
+	 * правила сортировки</a></li> </ul><br><br>
 	 *
 	 *
 	 * @static
@@ -134,15 +134,15 @@ class CSearchCustomRank
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	 * результата методами класса CDBResult становятся доступны поля <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">Поля объекта
-	 * правила сортировки</a></li> </ul>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">Поля объекта
+	 * правила сортировки</a></li> </ul><br><br>
 	 *
 	 *
 	 * @static
@@ -165,7 +165,7 @@ class CSearchCustomRank
 
 	
 	/**
-	 * <p>Удаление правила сортировки по идентификатору.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a> и <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
+	 * <p>Удаление правила сортировки по идентификатору.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a> и <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
 	 *
 	 *
 	 *
@@ -175,16 +175,16 @@ class CSearchCustomRank
 	 *
 	 *
 	 * @return CDBResult <p>Если правило успешно удалено, то возвращается результат
-	 * запроса типа <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, в
+	 * запроса типа <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, в
 	 * противном случае функция вернет false.</p>
 	 *
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @static
@@ -217,13 +217,13 @@ class CSearchCustomRank
 
 	
 	/**
-	 * <p>Функция добавляет новое правило.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a> и <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
+	 * <p>Функция добавляет новое правило.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a> и <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $arFields  Массив со значениями полей <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>.
 	 *
 	 *
@@ -233,12 +233,12 @@ class CSearchCustomRank
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">Поля объекта
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">Поля объекта
 	 * правила сортировки</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php
@@ -256,7 +256,7 @@ class CSearchCustomRank
 
 	
 	/**
-	 * <p>Изменение правила сортировки.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdate</a> и <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
+	 * <p>Изменение правила сортировки.</p> <p>После удаления всех требуемых правил необходимо пересчитать поисковый индекс методами <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
 	 *
 	 *
 	 *
@@ -266,7 +266,7 @@ class CSearchCustomRank
 	 *
 	 *
 	 * @param array $arFields  Массив со значениями полей <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">объекта правила
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">объекта правила
 	 * сортировки</a>.
 	 *
 	 *
@@ -276,12 +276,12 @@ class CSearchCustomRank
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/fields.php">Поля объекта
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/fields.php">Поля объекта
 	 * правила сортировки</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdate</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php
@@ -310,7 +310,7 @@ class CSearchCustomRank
 
 	
 	/**
-	 * <p>Подготовка к применению изменений в правилах.</p> <p>Данная функция начинает процедуру применения правил сортировки к поисковому индексу. Применение правил требуется всякий раз когда происходят их изменения (<a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a>, <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> и <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a>). При индексации данных или после переиндексации данная процедура не требуется, т.к. правила сортировки учитываются в процессе построения поискового индекса.</p> <p>Фактически данный метод сбрасывает все весовые коэффициенты. А для собственно применения правил необходимо воспользоваться пошаговой <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
+	 * <p>Подготовка к применению изменений в правилах.</p> <p>Данная функция начинает процедуру применения правил сортировки к поисковому индексу. Применение правил требуется всякий раз когда происходят их изменения (<a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> и <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a>). При индексации данных или после переиндексации данная процедура не требуется, т.к. правила сортировки учитываются в процессе построения поискового индекса.</p> <p>Фактически данный метод сбрасывает все весовые коэффициенты. А для собственно применения правил необходимо воспользоваться пошаговой <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>.</p>
 	 *
 	 *
 	 *
@@ -321,13 +321,13 @@ class CSearchCustomRank
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php">CSearchCustomRank::NextUpdate</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> </li>
-	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a>
+	 * </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @static
@@ -356,7 +356,7 @@ class CSearchCustomRank
 
 	
 	/**
-	 * <p>Шаг применения изменений правил сортировки.</p> <p>Данная функция применяет следующее непримененное правило сортировки к поисковому индексу. Применение правил требуется всякий раз когда происходят их изменения (<a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a>, <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> и <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a>). При индексации данных или после переиндексации данная процедура не требуется, т.к. правила сортировки учитываются в процессе построения поискового индекса.</p> <p>Перед началом применения правил необходимо инициировать процесс вызвав <a href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a>.</p>
+	 * <p>Шаг применения изменений правил сортировки.</p> <p>Данная функция применяет следующее непримененное правило сортировки к поисковому индексу. Применение правил требуется всякий раз когда происходят их изменения (<a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> и <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a>). При индексации данных или после переиндексации данная процедура не требуется, т.к. правила сортировки учитываются в процессе построения поискового индекса.</p> <p>Перед началом применения правил необходимо инициировать процесс вызвав <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a>.</p>
 	 *
 	 *
 	 *
@@ -370,13 +370,13 @@ class CSearchCustomRank
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/startupdate.php">CSearchCustomRank::StartUpdates</a>
 	 * </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/add.php">CSearchCustomRank::Add</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/update.php">CSearchCustomRank::Update</a> </li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/delete.php">CSearchCustomRank::Delete</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchcustomrank/nextupdate.php

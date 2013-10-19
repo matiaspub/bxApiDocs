@@ -151,7 +151,7 @@ class CAllIBlockSection
 
 	
 	/**
-	 * <p>Функция возвращает список разделов, отсортированный в порядке "полного развернутого дерева". По сути является оберткой функции <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/getlist.php">GetList</a>() с предустановленным параметром сортировки:</p> <pre class="syntax" id="xmpF1F83FB0"> CIBlockSection::GetList(Array("left_margin"=&gt;"asc"), $arFilter);</pre>
+	 * <p>Функция возвращает список разделов, отсортированный в порядке "полного развернутого дерева". По сути является оберткой функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/getlist.php">GetList</a>() с предустановленным параметром сортировки:</p> <pre class="syntax" id="xmpF1F83FB0"> CIBlockSection::GetList(Array("left_margin"=&gt;"asc"), $arFilter);</pre>
 	 *
 	 *
 	 *
@@ -166,9 +166,9 @@ class CAllIBlockSection
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/gettreelist.php
 	 * @author Bitrix
 	 */
-	public static function GetTreeList($arFilter=Array())
+	public static function GetTreeList($arFilter = array(), $arSelect = array())
 	{
-		return CIBlockSection::GetList(Array("left_margin"=>"asc"), $arFilter);
+		return CIBlockSection::GetList(Array("left_margin"=>"asc"), $arFilter, false, $arSelect);
 	}
 
 	
@@ -190,8 +190,8 @@ class CAllIBlockSection
 	 *
 	 *
 	 *
-	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocksection">раздела информационного
+	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocksection">раздела информационного
 	 * блока.</a>
 	 *
 	 *
@@ -203,8 +203,8 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocksection">Поля раздела
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocksection">Поля раздела
 	 * информационного блока </a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -324,7 +324,7 @@ class CAllIBlockSection
 	 *
 	 *
 	 *
-	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
+	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -335,8 +335,8 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fsection">Поля раздела</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -354,13 +354,13 @@ class CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Метод добавляет новый раздел в информационный блок. Перед добавлением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectionadd.php">OnBeforeIBlockSectionAdd</a> из которых можно изменить значения полей или отменить добавление раздела вернув сообщение об ошибке. После добавления раздела вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblocksectionadd.php">OnAfterIBlockSectionAdd</a>.</p>
+	 * <p>Метод добавляет новый раздел в информационный блок. Перед добавлением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionadd.php">OnBeforeIBlockSectionAdd</a> из которых можно изменить значения полей или отменить добавление раздела вернув сообщение об ошибке. После добавления раздела вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionadd.php">OnAfterIBlockSectionAdd</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fsection">полей раздела</a> инфоблоков.
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей раздела</a> инфоблоков.
 	 *
 	 *
 	 *
@@ -371,8 +371,8 @@ class CAllIBlockSection
 	 * автоматизированное создание дерева разделов "с нуля"), в этом
 	 * случае для повышения производительности можно установить
 	 * параметр в <i>false</i>, а после всех изменений вызвать метод <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/resort.php">ReSort</a>()
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/resort.php">ReSort</a>()
 	 *
 	 *
 	 *
@@ -393,9 +393,10 @@ class CAllIBlockSection
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectionadd.php">OnBeforeIBlockSectionAdd</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblocksectionadd.php">OnAfterIBlockSectionAdd</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionadd.php">OnBeforeIBlockSectionAdd</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionadd.php">OnAfterIBlockSectionAdd</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -884,7 +885,7 @@ class CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Метод изменяет параметры раздела с кодом <i>ID</i>. Перед изменением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectionupdate.php">OnBeforeIBlockSectionUpdate</a> из которых можно изменить значения полей или отменить изменение параметров раздела вернув сообщение об ошибке. После изменения раздела вызывается событие <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblocksectionupdate.php">OnAfterIBlockSectionUpdate</a>.</p> <p><b>Примечание</b>: Изменить значения полей GLOBAL_ACTIVE, DEPTH_LEVEL, LEFT_MARGIN, RIGHT_MARGIN, IBLOCK_ID, DATE_CREATE и CREATED_BY нельзя. Значение первого определяется флагом активности раздела и его родителей. DEPTH_LEVEL, LEFT_MARGIN и RIGHT_MARGIN расчитываются автоматически в зависимости от положения раздела в дереве. <br></p>
+	 * <p>Метод изменяет параметры раздела с кодом <i>ID</i>. Перед изменением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionupdate.php">OnBeforeIBlockSectionUpdate</a> из которых можно изменить значения полей или отменить изменение параметров раздела вернув сообщение об ошибке. После изменения раздела вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionupdate.php">OnAfterIBlockSectionUpdate</a>.</p> <p><b>Примечание</b>: Изменить значения полей GLOBAL_ACTIVE, DEPTH_LEVEL, LEFT_MARGIN, RIGHT_MARGIN, IBLOCK_ID, DATE_CREATE и CREATED_BY нельзя. Значение первого определяется флагом активности раздела и его родителей. DEPTH_LEVEL, LEFT_MARGIN и RIGHT_MARGIN расчитываются автоматически в зависимости от положения раздела в дереве. <br></p>
 	 *
 	 *
 	 *
@@ -894,7 +895,7 @@ class CAllIBlockSection
 	 *
 	 *
 	 * @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fsection">полей раздела</a> инфоблоков.
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей раздела</a> инфоблоков.
 	 *
 	 *
 	 *
@@ -905,8 +906,8 @@ class CAllIBlockSection
 	 * к полной перестройке дерева разделов, в последнем случае для
 	 * повышения производительности можно установить параметр в
 	 * <i>false</i>, а после всех изменений вызвать метод <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/resort.php">ReSort</a>()
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/resort.php">ReSort</a>()
 	 *
 	 *
 	 *
@@ -926,11 +927,11 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a></li>
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectionupdate.php">OnBeforeIBlockSectionUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionupdate.php">OnBeforeIBlockSectionUpdate</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onafteriblocksectionupdate.php">OnAfterIBlockSectionUpdate</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionupdate.php">OnAfterIBlockSectionUpdate</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1574,7 +1575,7 @@ class CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Функция удаляет раздел с кодом <i>ID</i>, вместе со всеми подразделами и элементами, которые привязаны только к этому разделу. Также удаляются значения свойств типа "Привязка к разделу" указывающие на удаляемый. При установленном модуле поиска раздел удаляется из поискового индекса. Перед удалением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectiondelete.php">OnBeforeIBlockSectionDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockSectionDelete. <br></p>
+	 * <p>Функция удаляет раздел с кодом <i>ID</i>, вместе со всеми подразделами и элементами, которые привязаны только к этому разделу. Также удаляются значения свойств типа "Привязка к разделу" указывающие на удаляемый. При установленном модуле поиска раздел удаляется из поискового индекса. Перед удалением раздела вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectiondelete.php">OnBeforeIBlockSectionDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockSectionDelete. <br></p>
 	 *
 	 *
 	 *
@@ -1595,7 +1596,7 @@ class CAllIBlockSection
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/events/onbeforeiblocksectiondelete.php">OnBeforeIBlockSectionDelete</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectiondelete.php">OnBeforeIBlockSectionDelete</a></li>
 	 * <li>OnAfterIBlockSectionDelete <br> </li> </ul><br><a name="examples"></a>
 	 *
 	 *
@@ -2270,7 +2271,7 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2417,7 +2418,7 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>
 	 * <br> </li>
 	 *
 	 *
@@ -2686,8 +2687,8 @@ class CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblocksection/getlist.php">GetList()</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/index.php">CIBlockSection</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/getlist.php">GetList()</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *

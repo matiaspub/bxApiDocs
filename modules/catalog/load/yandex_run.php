@@ -709,9 +709,11 @@ if (empty($arRunErrors))
 			$boolCurrentSections = false;
 			$bNoActiveGroup = True;
 			$strTmpOff_tmp = "";
-			$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], true);
+			$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 			while ($ar_res1 = $db_res1->Fetch())
 			{
+				if (0 < intval($ar_res1['ADDITIONAL_PROPERTY_ID']))
+					continue;
 				$boolCurrentSections = true;
 				if (in_array(intval($ar_res1["ID"]), $arSectionIDs))
 				{
@@ -914,11 +916,14 @@ if (empty($arRunErrors))
 			$boolCurrentSections = false;
 			$boolNoActiveSections = true;
 			$strSections = '';
-			$rsSections = CIBlockElement::GetElementGroups($arItem["ID"]);
+			$rsSections = CIBlockElement::GetElementGroups($arItem["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 			while ($arSection = $rsSections->Fetch())
 			{
+				if (0 < intval($arSection['ADDITIONAL_PROPERTY_ID']))
+					continue;
+				$arSection["ID"] = intval($arSection["ID"]);
 				$boolCurrentSections = true;
-				if (in_array(intval($arSection["ID"]), $arSectionIDs))
+				if (in_array($arSection["ID"], $arSectionIDs))
 				{
 					$strSections .= "<categoryId>".$arSection["ID"]."</categoryId>\n";
 					$boolNoActiveSections = false;

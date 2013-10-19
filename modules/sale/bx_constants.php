@@ -55,6 +55,41 @@ define('DELIVERY_UPS_EXPORT_PHP_FILE', 'ups/export.php');
 define('SALE_DH_INITIALIZED', 1);
 
 /**
+ * DLSERVER
+ */
+define('DLSERVER', $arParams['DLSERVER']);
+
+/**
+ * DLPORT
+ */
+define('DLPORT', $arParams['DLPORT']);
+
+/**
+ * DLPATH
+ */
+define('DLPATH', $arParams['DLPATH']);
+
+/**
+ * DLMETHOD
+ */
+define('DLMETHOD', $arParams['DLMETHOD']);
+
+/**
+ * DLZIPFILE
+ */
+define('DLZIPFILE', $arParams["DLZIPFILE"]);
+
+/**
+ * ZIP_STEP_LENGTH
+ */
+define('ZIP_STEP_LENGTH', $step_length);
+
+/**
+ * LOC_STEP_LENGTH
+ */
+define('LOC_STEP_LENGTH', $step_length);
+
+/**
  * COLUMNS_COUNT_FOR_SIMPLE_TEMPLATE
  */
 define('COLUMNS_COUNT_FOR_SIMPLE_TEMPLATE', 3);
@@ -65,49 +100,49 @@ define('COLUMNS_COUNT_FOR_SIMPLE_TEMPLATE', 3);
 define('PATH_TO_MOBILE_REPORTS', '/bitrix/admin/mobile/sale_reports_view.php');
 
 /**
+ * FPDF_FONTPATH
+ */
+define('FPDF_FONTPATH', $_SERVER["DOCUMENT_ROOT"]."/bitrix/fonts/");
+
+/**
+ * tFPDF_VERSION
+ */
+define('tFPDF_VERSION', '1.24');
+
+/**
+ * _TTF_MAC_HEADER
+ */
+define('_TTF_MAC_HEADER', false);
+
+/**
+ * GF_WORDS
+ */
+define('GF_WORDS', null);
+
+/**
+ * GF_SCALE
+ */
+define('GF_SCALE', null);
+
+/**
+ * GF_MORE
+ */
+define('GF_MORE', null);
+
+/**
+ * GF_XYSCALE
+ */
+define('GF_XYSCALE', null);
+
+/**
+ * GF_TWOBYTWO
+ */
+define('GF_TWOBYTWO', null);
+
+/**
  * SALE_TIME_LOCK_USER
  */
 define('SALE_TIME_LOCK_USER', 600);
-
-/**
- * SALE_DEBUG
- */
-define('SALE_DEBUG', false);
-
-/**
- * SALE_PROC_REC_NUM
- */
-define('SALE_PROC_REC_NUM', 3);
-
-/**
- * SALE_PROC_REC_ATTEMPTS
- */
-define('SALE_PROC_REC_ATTEMPTS', 3);
-
-/**
- * SALE_PROC_REC_TIME
- */
-define('SALE_PROC_REC_TIME', 43200);
-
-/**
- * SALE_PROC_REC_FREQUENCY
- */
-define('SALE_PROC_REC_FREQUENCY', 7200);
-
-/**
- * SALE_REPORT_OWNER_ID
- */
-define('SALE_REPORT_OWNER_ID', 'sale');
-
-/**
- * SALE_VALUE_PRECISION
- */
-define('SALE_VALUE_PRECISION', 2);
-
-/**
- * BX_SALE_MENU_CATALOG_CLEAR
- */
-define('BX_SALE_MENU_CATALOG_CLEAR', 'Y');
 
 /**
  * NO_KEEP_STATISTIC

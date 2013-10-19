@@ -29,8 +29,8 @@ class CIBlockSection extends CAllIBlockSection
 	 * принимать значения: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код
 	 * родительской группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> -
 	 * мнемонический код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
-	 * <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина
-	 * вложенности;</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
+	 * <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина вложенности
+	 * (начинается с 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
 	 * времени создания группы;</li> <li> <b>created_by</b> - по идентификатору
 	 * создателя группы;</li> <li> <b>modified_by</b> - по идентификатору
 	 * пользователя изменившего группу;</li> <li> <b>element_cnt</b> - количество
@@ -48,15 +48,15 @@ class CIBlockSection extends CAllIBlockSection
 	 * (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по мнемоническому
 	 * коду (по шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему
 	 * коду (по шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя;</li>
-	 * <li> <b>DEPTH_LEVEL</b> - по уровню вложенности;</li> <li> <b>LEFT_BORDER</b>, <b>
-	 * RIGHT_BORDER </b>- по левой и правой границе (поля <b>LEFT_MARGIN</b> и <b>RIGHT_MARGIN</b>,
-	 * см. примечание);</li> <li> <span style="font-weight: bold; ">LEFT_MARGIN</span> - по положению в
-	 * дереве; <br> </li> <li> <span style="font-weight: bold; ">RIGHT_MARGIN</span> - по положению в
-	 * дереве;</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> - по коду
-	 * родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> - по
-	 * активности родительского информационного блока;</li> <li> <b>IBLOCK_NAME</b>
-	 * - по названию информационного блока (по шаблону [%_]);</li> <li>
-	 * <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
+	 * <li> <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li> <li>
+	 * <b>LEFT_BORDER</b>, <b> RIGHT_BORDER </b>- по левой и правой границе (поля <b>LEFT_MARGIN</b>
+	 * и <b>RIGHT_MARGIN</b>, см. примечание);</li> <li> <span style="font-weight: bold; ">LEFT_MARGIN</span> -
+	 * по положению в дереве; <br> </li> <li> <span style="font-weight: bold; ">RIGHT_MARGIN</span> - по
+	 * положению в дереве;</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
+	 * по коду родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> -
+	 * по активности родительского информационного блока;</li> <li>
+	 * <b>IBLOCK_NAME</b> - по названию информационного блока (по шаблону [%_]);</li>
+	 * <li> <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
 	 * <b>IBLOCK_CODE </b><i> - </i>по мнемоническому коду информационного блока (по
 	 * шаблону [%_]);</li> <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему коду
 	 * информационного блока (по шаблону [%_]);</li> <li> <span style="font-weight: bold;
@@ -105,18 +105,18 @@ class CIBlockSection extends CAllIBlockSection
 	 * <b>LEFT_MARGIN</b> - Левая граница группы. Вычисляется автоматически (не
 	 * устанавливается вручную). </li> <li> <b>RIGHT_MARGIN</b> - Правая граница
 	 * группы. Вычисляется автоматически (не устанавливается вручную).
-	 * </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности группы. Вычисляется
-	 * автоматически (не устанавливается вручную). </li> <li> <b>SEARCHABLE_CONTENT</b>
-	 * Содержимое для поиска при фильтрации групп. Вычисляется
-	 * автоматически. Складывается из полей <b>NAME</b> и <b>DESCRIPTION</b> (без html
-	 * тэгов, если <b>DESCRIPTION_TYPE</b> установлен в html).</li> <li> <b>SECTION_PAGE_URL</b> -
-	 * Шаблон URL-а к странице для детального просмотра раздела.
-	 * Определяется из параметров информационного блока. Изменяется
-	 * автоматически.</li> <li> <b>MODIFIED_BY</b> - Код пользователя, в последний раз
-	 * изменившего элемент.</li> <li> <b>DATE_CREATE</b> - Дата создания элемента.</li>
-	 * <li> <b>CREATED_BY</b> - Код пользователя, создавшего элемент.</li> <li>
-	 * <b>DETAIL_PICTURE</b> - Код картинки в таблице файлов для детального
-	 * просмотра.</li> </ul>
+	 * </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности группы. Начинается с 1.
+	 * Вычисляется автоматически (не устанавливается вручную) . </li> <li>
+	 * <b>SEARCHABLE_CONTENT</b> Содержимое для поиска при фильтрации групп.
+	 * Вычисляется автоматически. Складывается из полей <b>NAME</b> и
+	 * <b>DESCRIPTION</b> (без html тэгов, если <b>DESCRIPTION_TYPE</b> установлен в html).</li> <li>
+	 * <b>SECTION_PAGE_URL</b> - Шаблон URL-а к странице для детального просмотра
+	 * раздела. Определяется из параметров информационного блока.
+	 * Изменяется автоматически.</li> <li> <b>MODIFIED_BY</b> - Код пользователя, в
+	 * последний раз изменившего элемент.</li> <li> <b>DATE_CREATE</b> - Дата
+	 * создания элемента.</li> <li> <b>CREATED_BY</b> - Код пользователя, создавшего
+	 * элемент.</li> <li> <b>DETAIL_PICTURE</b> - Код картинки в таблице файлов для
+	 * детального просмотра.</li> </ul>
 	 *
 	 *
 	 *
@@ -129,7 +129,7 @@ class CIBlockSection extends CAllIBlockSection
 	 *
 	 *
 	 * @return CIBlockResult <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><h4>Примечание</h4><p>
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><h4>Примечание</h4><p>
 	 * Поле для сортировки <i>left_margin</i>, так называемая "сквозная"
 	 * сортировка, высчитывается на основании поля <i>sort</i>, уровня
 	 * вложенности и сортировкой верхнего уровня. Отличие полей <i>sort</i> и
@@ -147,8 +147,8 @@ class CIBlockSection extends CAllIBlockSection
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fiblocksection">Поля раздела
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
 	 * информационного блока </a> </li> </ul><a name="examples"></a>
 	 *
 	 *

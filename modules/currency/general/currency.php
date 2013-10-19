@@ -18,7 +18,7 @@ class CAllCurrency
 {
 	
 	/**
-	 * <p>Функция возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>. Функция является оболочкой функции <a href="http://dev.1c-bitrix.ruapi_help/currency/developer/ccurrency/ccurrency__getbyid.a0947d8b.php">CCurrency::GetByID</a>.</p>
+	 * <p>Функция возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>. Функция является оболочкой функции <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getbyid.a0947d8b.php">CCurrency::GetByID</a>.</p>
 	 *
 	 *
 	 *
@@ -36,7 +36,7 @@ class CAllCurrency
 	 * (одна из валют сайта должна иметь курс 1, она называется базовой,
 	 * остальные валюты имеют курс относительно базовой валюты)</td> </tr>
 	 * <tr> <td>SORT</td> <td>Порядок сортировки.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата
-	 * последнего изменения записи.</td> </tr> </table>
+	 * последнего изменения записи.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getcurrency.205e6985.php
@@ -50,7 +50,7 @@ class CAllCurrency
 
 	
 	/**
-	 * <p>Выполняет проверку полей валюты при добавлении или изменении.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	 * <p>Выполняет проверку полей валюты при добавлении или изменении.</p>
 	 *
 	 *
 	 *
@@ -226,7 +226,7 @@ class CAllCurrency
 
 	
 	/**
-	 * <p>Функция добавляет новую валюту, если ее еще не было. После добавления новой валюты необходимо установить ее языкозависимые параметры в помощью метода <a href="http://dev.1c-bitrix.ruapi_help/currency/developer/ccurrencylang/ccurrencylang__add.7ce2349e.php">CCurrencyLang::Add</a>.</p>
+	 * <p>Функция добавляет новую валюту, если ее еще не было. После добавления новой валюты необходимо установить ее языкозависимые параметры в помощью метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__add.7ce2349e.php">CCurrencyLang::Add</a>.</p>
 	 *
 	 *
 	 *
@@ -297,7 +297,7 @@ class CAllCurrency
 
 	
 	/**
-	 * <p>Функция изменяет параметры валюты <b>currency</b> на параметры, указанные в массиве <i>arFields</i>. Языкозависимые параметры (название, формат и прочее) обновляются отдельно, через класс <a href="http://dev.1c-bitrix.ruapi_help/currency/developer/ccurrencylang/ccurrencylang__update.8a1e7a7b.php">CCurrencyLang</a></p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b> в случае успешного обновления (только если произошел запрос к базе). Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
+	 * <p>Функция изменяет параметры валюты <b>currency</b> на параметры, указанные в массиве <i>arFields</i>. Языкозависимые параметры (название, формат и прочее) обновляются отдельно, через класс <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__update.8a1e7a7b.php">CCurrencyLang</a></p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b> в случае успешного обновления (только если произошел запрос к базе). Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	 *
 	 *
 	 *
@@ -320,7 +320,7 @@ class CAllCurrency
 	 *
 	 *
 	 * @return bool <p>Код валюты, параметры которой изменили, или <i>false</i> в случае
-	 * ошибки (текст получается через <code>$APPLICATION-&gt;GetException()</code>).</p>
+	 * ошибки (текст получается через <code>$APPLICATION-&gt;GetException()</code>).</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__update.16586d51.php
@@ -391,17 +391,21 @@ class CAllCurrency
 		global $stackCacheManager;
 		global $CACHE_MANAGER;
 
+		if (3 < strlen($currency))
+			return false;
 		$currency = substr($currency, 0, 3);
 
 		$bCanDelete = true;
-		$db_events = GetModuleEvents("currency", "OnBeforeCurrencyDelete");
-		while($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("currency", "OnBeforeCurrencyDelete", true) as $arEvent)
+		{
 			if(ExecuteModuleEventEx($arEvent, array($currency))===false)
 				return false;
+		}
 
-		$events = GetModuleEvents("currency", "OnCurrencyDelete");
-		while($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("currency", "OnCurrencyDelete", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($currency));
+		}
 
 		$stackCacheManager->Clear("currency_currency_lang");
 		$stackCacheManager->Clear("currency_rate");
@@ -424,7 +428,7 @@ class CAllCurrency
 
 	
 	/**
-	 * <p>Функция возвращает массив языконезависимых параметров валюты по ее коду currency.</p> <p>Смотрите так же функцию <a href="http://dev.1c-bitrix.ruapi_help/currency/developer/ccurrency/ccurrency__getcurrency.205e6985.php">CCurrency::GetCurrency</a></p>
+	 * <p>Функция возвращает массив языконезависимых параметров валюты по ее коду currency.</p> <p>Смотрите так же функцию <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getcurrency.205e6985.php">CCurrency::GetCurrency</a></p>
 	 *
 	 *
 	 *

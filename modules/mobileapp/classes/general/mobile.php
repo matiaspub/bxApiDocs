@@ -15,6 +15,8 @@ class CMobile
 	private $largeScreenSupport = true;
 	public static $platform = "ios";
 	public static $apiVersion = 1;
+	public static $pgVersion = "2.0.0";
+	private static $remoteScriptPath = "http://dev.1c-bitrix.ru/mobile_scripts/";
 
 	private function __construct()
 	{
@@ -24,6 +26,7 @@ class CMobile
 		$this->setDeviceheight($_COOKIE["MOBILE_RESOLUTION_HEIGHT"]);
 		$this->setScreenCategory($_COOKIE["MOBILE_SCREEN_CATEGORY"]);
 		$this->setPixelratio($_COOKIE["MOBILE_SCALE"]);
+		$this->setPgVersion($_COOKIE["PG_VERSION"]);
 
 		$this->setDevice($_COOKIE["MOBILE_DEVICE"]);
 
@@ -68,6 +71,17 @@ class CMobile
 
 	}
 
+	public static function getPgVersion()
+	{
+		return self::$pgVersion;
+	}
+
+	public static function setPgVersion($pgVersion)
+	{
+		if($pgVersion)
+			self::$pgVersion = $pgVersion;
+	}
+
 	private function __clone()
 	{
 		//you can't clone it
@@ -96,9 +110,12 @@ class CMobile
 	{
 		global $APPLICATION;
 
-
+		$pgJsFile = "/bitrix/js/mobileapp/" . self::$platform . "-cordova-" . self::$pgVersion . ".js";
+		if(!file_exists($_SERVER["DOCUMENT_ROOT"]. $pgJsFile))
+			$pgJsFile = self::$remoteScriptPath . self::$platform . "-cordova-" . self::$pgVersion . ".js";
 		$APPLICATION->AddHeadString("<script type=\"text/javascript\"> var appVersion = " . self::$apiVersion . ";var platform = \"" . self::$platform . "\";</script>", false, true);
-		$APPLICATION->AddHeadString("<script type=\"text/javascript\" src=\"" . CUtil::GetAdditionalFileURL("/bitrix/js/mobileapp/" . self::$platform . "-cordova-2.0.0.js") . "\"></script>", false, true);
+		$APPLICATION->AddHeadString("<script type=\"text/javascript\" src=\"" . CUtil::GetAdditionalFileURL($pgJsFile) . "\"></script>", false, true);
+
 		if ($APPLICATION->IsJSOptimized())
 		{
 			$APPLICATION->AddHeadScript("/bitrix/js/mobileapp/bitrix_mobile.js");
@@ -428,7 +445,7 @@ class CMobile
 	}
 
 	/**
-	 * Sets the value of deviceDpi.
+	 * Sets the value of screenCategory.
 	 *
 	 * @param mixed $screenCategory the screenCategory
 	 */

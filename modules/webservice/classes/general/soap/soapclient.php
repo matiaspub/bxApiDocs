@@ -43,6 +43,26 @@
  * 	echo "SOAPRequest: ".htmlspecialchars($client-&gt;getRawRequest());
  * 	echo "SOAPResponse: ".htmlspecialchars($client-&gt;getRawResponse());
  * }</buttononclick>
+ * CModule::IncludeModule('webservice');
+ * 
+ * $client = new CSOAPClient("192.168.1.1", '/path_to_webservice/');
+ * $request = new CSOAPRequest("myMethod", "http://some-namespace/");
+ * 
+ * $client-&gt;setLogin('my_login');
+ * $client-&gt;setPassword('my_password');
+ * 
+ * $request-&gt;addParameter("myMethodParam", "xxxxx");
+ * 
+ * $response = $client-&gt;send($request);
+ *  
+ * if ( $response-&gt;isFault() ) 
+ * { 
+ *    print( "SOAP fault: " . $response-&gt;faultCode(). " - " . $response-&gt;faultString() . "" ); 
+ * } 
+ * else 
+ * { 
+ *      echo "[OK]: ".print_r($response-&gt;Value, 1);    
+ * }
  * </pre>
  *
  *

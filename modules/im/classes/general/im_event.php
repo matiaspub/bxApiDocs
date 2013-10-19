@@ -12,14 +12,15 @@ class CIMEvent
 			return false;
 
 		$CSI = new CSearchItem;
-		$res = $CSI->GetList(Array(), Array('=ENTITY_TYPE_ID' => $arParams['ENTITY_TYPE_ID'], '=ENTITY_ID' => $arParams['ENTITY_ID']), Array('URL', 'TITLE', 'PARAM1'));
+		$res = $CSI->GetList(Array(), Array('=ENTITY_TYPE_ID' => $arParams['ENTITY_TYPE_ID'], '=ENTITY_ID' => $arParams['ENTITY_ID']), Array('URL', 'TITLE', 'BODY', 'PARAM1'));
 		if ($arItem = $res->GetNext(true, false))
 		{
 			$arParams["ENTITY_LINK"] = $arItem['URL'];
 			$arParams["ENTITY_PARAM"] = $arItem['PARAM1'];
 			$arParams["ENTITY_TITLE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['TITLE']))));
+			$arParams["ENTITY_MESSAGE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['BODY']))));
 
-			if (strlen($arParams["ENTITY_TITLE"]) > 0 && strlen($arParams["ENTITY_LINK"]) > 0)
+			if ((strlen($arParams["ENTITY_TITLE"]) > 0 || strlen($arParams["ENTITY_MESSAGE"]) > 0 ) && strlen($arParams["ENTITY_LINK"]) > 0)
 			{
 				if (CModule::IncludeModule("extranet"))
 				{
@@ -87,7 +88,6 @@ class CIMEvent
 					"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
 				);
 				CIMNotify::Add($arMessageFields);
-
 			}
 		}
 	}
@@ -99,20 +99,29 @@ class CIMEvent
 
 	private static function GetMessageRatingVote($arParams, $bForMail = false)
 	{
-		$message = '';
-
 		$like = $arParams['VALUE'] >= 0? '_LIKE': '_DISLIKE';
+
+		if ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST' || $arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
+		{
+			$dot = strlen($arParams["ENTITY_MESSAGE"])>=100? '...': '';
+			$arParams["ENTITY_MESSAGE"] = substr($arParams["ENTITY_MESSAGE"], 0, 99).$dot;
+		}
+		else
+		{
+			$dot = strlen($arParams["ENTITY_TITLE"])>=100? '...': '';
+			$arParams["ENTITY_TITLE"] = substr($arParams["ENTITY_TITLE"], 0, 99).$dot;
+		}
 
 		if ($bForMail)
 		{
 			if ($arParams['ENTITY_TYPE_ID'] == 'BLOG_POST')
 				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_BLOG_POST'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_TOPIC')
 				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_FORUM_TOPIC'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'library')
 				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_FILE'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'photos')
@@ -127,17 +136,14 @@ class CIMEvent
 		}
 		else
 		{
-			$dot = strlen($arParams["ENTITY_TITLE"])>=100? '...': '';
-			$arParams["ENTITY_TITLE"] = substr($arParams["ENTITY_TITLE"], 0, 99).$dot;
-
 			if ($arParams['ENTITY_TYPE_ID'] == 'BLOG_POST')
 				$message = str_replace('#LINK#', '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>', GetMessage('IM_EVENT_RATING_BLOG_POST'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_TOPIC')
 				$message = str_replace('#LINK#', '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>', GetMessage('IM_EVENT_RATING_FORUM_TOPIC'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'library')
 				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_FILE'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'photos')
@@ -153,6 +159,47 @@ class CIMEvent
 		}
 
 		return $message;
+	}
+
+	public static function OnUserDelete($ID)
+	{
+		$ID = intval($ID);
+		if ($ID <= 0)
+			return false;
+
+		global $DB;
+
+		$arChat = Array();
+		$strSQL = "SELECT R.CHAT_ID FROM b_im_chat C, b_im_relation R WHERE R.USER_ID = ".$ID." and R.MESSAGE_TYPE IN ('".IM_MESSAGE_PRIVATE."', '".IM_MESSAGE_SYSTEM."') and R.CHAT_ID = C.ID";
+		$dbRes = $DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while ($arRes = $dbRes->Fetch())
+			$arChat[$arRes['CHAT_ID']] = $arRes['CHAT_ID'];
+
+		if (count($arChat) > 0)
+		{
+			$strSQL = "DELETE FROM b_im_chat WHERE ID IN (".implode(',', $arChat).")";
+			$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+
+		$strSQL = "DELETE FROM b_im_message WHERE AUTHOR_ID = ".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$strSQL = "DELETE FROM b_im_relation WHERE AUTHOR_ID =".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$strSQL = "DELETE FROM b_im_recent WHERE USER_ID = ".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$strSQL = "DELETE FROM b_im_recent WHERE ITEM_TYPE = 'P' and ITEM_ID = ".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$strSQL = "DELETE FROM b_im_status WHERE USER_ID = ".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$obCache = new CPHPCache();
+		$obCache->CleanDir('/bx/imc/rec');
+
+		return true;
 	}
 
 	public static function OnAfterUserUpdate($arParams)

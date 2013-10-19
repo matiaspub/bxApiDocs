@@ -9,7 +9,7 @@ class CLDAP
 
 	protected static $PHOTO_ATTRIBS = array("thumbnailPhoto", "jpegPhoto");
 
-	public static function Connect($arFields = Array())
+	public function Connect($arFields = Array())
 	{
 		if(!is_object($this))
 		{
@@ -122,46 +122,64 @@ class CLDAP
 				$str = $GLOBALS["APPLICATION"]->ConvertCharset($str, SITE_CHARSET, "utf-8");
 			}
 
-			if($fields === false)
-				$sr = @ldap_search($this->conn, $BaseDN, $str);
-			else
-				$sr = @ldap_search($this->conn, $BaseDN, $str, $fields);
+			$defaultMaxPageSizeAD = 1000;
+			$pageSize = isset($this->arFields['MAX_PAGE_SIZE']) && intval($this->arFields['MAX_PAGE_SIZE'] > 0) ? intval($this->arFields['MAX_PAGE_SIZE']) : $defaultMaxPageSizeAD;
+			$cookie = '';
 
-			if($sr)
+			do
 			{
-				$entry = ldap_first_entry($this->conn, $sr);
+				if(CLdapUtil::isLdapPaginationAviable())
+					ldap_control_paged_result($this->conn, $pageSize, false, $cookie);
 
-				if($entry)
+				if($fields === false)
+					$sr = @ldap_search($this->conn, $BaseDN, $str);
+				else
+					$sr = @ldap_search($this->conn, $BaseDN, $str, $fields);
+
+				if($sr)
 				{
-					if(!is_array($info))
+					$entry = ldap_first_entry($this->conn, $sr);
+
+					if($entry)
 					{
-						$info = Array();
-						$i=0;
-					}
-
-					do
-					{
-						$attributes = ldap_get_attributes($this->conn, $entry);
-
-						for($j=0; $j<$attributes['count']; $j++)
+						if(!is_array($info))
 						{
-							$values = ldap_get_values_len($this->conn, $entry, $attributes[$j]);
-							$bPhotoAttr = in_array($attributes[$j], self::$PHOTO_ATTRIBS);
-							$info[$i][strtolower($attributes[$j])] = $bPhotoAttr ? $values : $this->WorkAttr($values);
+							$info = Array();
+							$i=0;
 						}
-						if(!is_set($info[$i], 'dn'))
-						{
-							if($this->arFields["CONVERT_UTF8"]=="Y")
-								$info[$i]['dn'] = $GLOBALS["APPLICATION"]->ConvertCharset(ldap_get_dn($this->conn, $entry), "utf-8", SITE_CHARSET);
-							else
-								$info[$i]['dn'] = ldap_get_dn($this->conn, $entry);
-						}
-						$i++;
 
+						do
+						{
+							$attributes = ldap_get_attributes($this->conn, $entry);
+
+							for($j=0; $j<$attributes['count']; $j++)
+							{
+								$values = ldap_get_values_len($this->conn, $entry, $attributes[$j]);
+								$bPhotoAttr = in_array($attributes[$j], self::$PHOTO_ATTRIBS);
+								$info[$i][strtolower($attributes[$j])] = $bPhotoAttr ? $values : $this->WorkAttr($values);
+							}
+							if(!is_set($info[$i], 'dn'))
+							{
+								if($this->arFields["CONVERT_UTF8"]=="Y")
+									$info[$i]['dn'] = $GLOBALS["APPLICATION"]->ConvertCharset(ldap_get_dn($this->conn, $entry), "utf-8", SITE_CHARSET);
+								else
+									$info[$i]['dn'] = ldap_get_dn($this->conn, $entry);
+							}
+							$i++;
+
+						}
+						while($entry = ldap_next_entry($this->conn, $entry));
 					}
-					while($entry = ldap_next_entry($this->conn, $entry));
 				}
-			}
+				elseif($sr === false)
+				{
+					$GLOBALS['APPLICATION']->ThrowException("LDAP_SEARCH_ERROR");
+				}
+
+				if(CLdapUtil::isLdapPaginationAviable())
+					ldap_control_paged_result_response($this->conn, $sr, $cookie);
+
+			} while($cookie !== null && $cookie != '');
 		}
 
 		return $info;
@@ -860,6 +878,7 @@ class CLDAP
 	// update user info, using previously loaded data from AD, make additional calls to AD if needed
 	public function SetUser($arLdapUser, $bAddNew = true)
 	{
+
 		global $USER, $DB;
 		if(!is_object($USER))
 		{

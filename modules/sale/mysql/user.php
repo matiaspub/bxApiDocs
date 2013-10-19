@@ -418,6 +418,23 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	 * @return int <p>Метод возвращает код добавленного счета или <i>false</i> в случае
 	 * ошибки.</p>
 	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * if($USER-&gt;IsAuthorized())
+	 * {
+	 * $user_id = $USER-&gt;GetID();
+	 * $arFields = Array("USER_ID" =&gt; $user_id, "CURRENCY" =&gt; "USD", "CURRENT_BUDGET" =&gt; 0);
+	 * $accountID = CSaleUserAccount::Add($arFields);
+	 * }
+	 * Создание счета для текущего пользователя
+	 * if(!CSaleUserAccount::GetByUserID($USER-&gt;GetID(), "RUB")){
+	 *    $arFields = Array("USER_ID" =&gt; $USER-&gt;GetID(), "CURRENCY" =&gt; "RUB", "CURRENT_BUDGET" =&gt; 0);
+	 *    CSaleUserAccount::Add($arFields);  
+	 * }
+	 * </pre>
+	 *
+	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.add.php
 	 * @author Bitrix
@@ -481,7 +498,7 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	 *
 	 *
 	 * @return int <p>Метод возвращает код измененного счета или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.update.php

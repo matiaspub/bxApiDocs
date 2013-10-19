@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#validator">валидаторами</a>.
+ * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидаторами</a>.
  *
  *
  *
@@ -34,12 +34,12 @@ class CAllFormValidator
 	 */
 	
 	/**
-	 * <p>Возвращает список заданных для поля валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список заданных для поля валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -51,7 +51,7 @@ class CAllFormValidator
 	 *
 	 * @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
 	 * списка. Может принимать значения: <ul> <li> <b>VALIDATOR_SID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
 	 * индекс сортировки. </li> </ul>
 	 *
 	 *
@@ -83,17 +83,17 @@ class CAllFormValidator
 	 */
 	
 	/**
-	 * <p>Возвращает список валидаторов, заданных для полей формы, в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список валидаторов, заданных для полей формы, в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $FORM_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>.
+	 * @param int $FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	 *
 	 *
 	 *
 	 * @param mixed $arFilter = array() Массив для фильтрации. В массиве допустимы следующие ключи: <ul> <li>
-	 * <b>FIELD_ID</b> - ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>;</li> <li>
+	 * <b>FIELD_ID</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>;</li> <li>
 	 * <b>ACTIVE</b> - флаг активности валидатора;</li> <li> <b>NAME</b> - идентификатор
 	 * валидатора;</li> </ul>
 	 *
@@ -101,7 +101,7 @@ class CAllFormValidator
 	 *
 	 * @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
 	 * списка. Может принимать значения: <ul> <li> <b>VALIDATOR_SID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
 	 * индекс сортировки. </li> </ul>
 	 *
 	 *
@@ -205,7 +205,7 @@ class CAllFormValidator
 	 */
 	
 	/**
-	 * <p>Возвращает список зарегистрированных валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список зарегистрированных валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -385,11 +385,11 @@ class CAllFormValidator
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>.
+	 * @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	 *
 	 *
 	 *
-	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -447,16 +447,16 @@ class CAllFormValidator
 	 */
 	
 	/**
-	 * <p>Прикрепляет группу валидаторов с заданными настройками к полю формы. Аналогична вызову <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformvalidator/set.php">CFormValidator::Set</a> для каждого валидатора группы.</p>
+	 * <p>Прикрепляет группу валидаторов с заданными настройками к полю формы. Аналогична вызову <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/set.php">CFormValidator::Set</a> для каждого валидатора группы.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>.
+	 * @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	 *
 	 *
 	 *
-	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -520,7 +520,7 @@ class CAllFormValidator
 
 	
 	/**
-	 * <p>Возвращает список настроек валидатора со значениями, преобразованный для занесения в базу. Аналогичен прямому вызову метода преобразования настроек (<code>CONVERT_TO_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformvalidator/getlist.php">CFormValidator::Set</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformvalidator/getlistform.php">CFormValidator::SetBatch</a> вызывается автоматически.</p>
+	 * <p>Возвращает список настроек валидатора со значениями, преобразованный для занесения в базу. Аналогичен прямому вызову метода преобразования настроек (<code>CONVERT_TO_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::Set</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::SetBatch</a> вызывается автоматически.</p>
 	 *
 	 *
 	 *
@@ -551,7 +551,7 @@ class CAllFormValidator
 	
 	
 	/**
-	 * <p>Возвращает список настроек валидатора со значениями после обратного преобразования строки, занесенной в базу. Аналогичен прямому вызову метода обратного преобразования (<code>CONVERT_FROM_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformvalidator/getlist.php">CFormValidator::GetList</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformvalidator/getlistform.php">CFormValidator::GetListForm</a> вызывается автоматически.</p>
+	 * <p>Возвращает список настроек валидатора со значениями после обратного преобразования строки, занесенной в базу. Аналогичен прямому вызову метода обратного преобразования (<code>CONVERT_FROM_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::GetList</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::GetListForm</a> вызывается автоматически.</p>
 	 *
 	 *
 	 *

@@ -1,6 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
 class CAllTicketReminder
 {
 		
@@ -8,9 +9,10 @@ class CAllTicketReminder
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CAllTicketReminder<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CAllTicketReminder<br>File: ".__FILE__;
 	}
 	
+
 	public static function ConvertResponseTimeUnit($rt, $rtu)
 	{
 		switch($rtu)
@@ -21,11 +23,131 @@ class CAllTicketReminder
 		}
 		return 0;
 	}
-	
+
+	public static function RecalculateLastMessageDeadline($RSD = true)
+	{
+		global $DB, $DBType;
+		$err_mess = (self::err_mess())."<br>Function: RecalculateLastMessage<br>Line: ";
+
+		$DB->StartUsingMasterOnly();
+
+		$strSql = "SELECT count(*) C FROM b_ticket";
+		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
+		$resC = $rs->Fetch();
+		if(!is_array($resC))
+		{
+			return true;
+		}
+
+		if(!isset($resC["C"]) || $resC["C"] == 0)
+		{
+			return true;
+		}
+
+		$strUsers = implode(",", CTicket::GetSupportTeamAndAdminUsers());
+		$strSql0 = "
+				b_ticket
+				INNER JOIN (
+					SELECT
+						T.ID TID,
+						M.DATE_CREATE DATE_CREATE,
+						M.ID ID,
+						" . CTicket::isnull("Q.LMBS", "'Y'") . " LMBS
+					FROM
+						b_ticket as T
+						LEFT JOIN (
+							SELECT
+								TM.TICKET_ID ID,
+								MIN(TM.ID) M_ID,
+								'N' LMBS
+							FROM
+								b_ticket_message TM
+								INNER JOIN (
+									SELECT
+										T.ID ID,
+										MAX(" . CTicket::isnull("TM.ID", "0") . ") M_ID
+									FROM
+										b_ticket T
+										LEFT JOIN b_ticket_message TM
+											ON T.ID = TM.TICKET_ID
+												AND (NOT(TM.IS_LOG='Y'))
+												AND (NOT(TM.IS_HIDDEN='Y'))
+												AND (NOT(TM.NOT_CHANGE_STATUS='Y'))
+												AND TM.OWNER_USER_ID IN ($strUsers)
+									WHERE
+										T.DATE_CLOSE IS NULL
+									GROUP BY
+										T.ID
+								) AS Q
+									ON TM.TICKET_ID = Q.ID
+										AND TM.ID > Q.M_ID
+										AND (NOT(TM.IS_LOG='Y'))
+										AND (NOT(TM.IS_HIDDEN='Y'))
+										AND (NOT(TM.NOT_CHANGE_STATUS='Y'))
+							GROUP BY
+								TM.TICKET_ID
+						) AS Q
+							ON T.ID = Q.ID
+						LEFT JOIN b_ticket_message AS M
+							ON Q.M_ID = M.ID
+					WHERE
+						T.DATE_CLOSE IS NULL
+				) AS M
+					ON b_ticket.ID = M.TID
+		";
+
+		$arS = array(
+			"MySQL" =>	"
+	UPDATE $strSql0
+	SET
+	b_ticket.D_1_USER_M_AFTER_SUP_M = M.DATE_CREATE,
+	b_ticket.ID_1_USER_M_AFTER_SUP_M = M.ID,
+	b_ticket.LAST_MESSAGE_BY_SUPPORT_TEAM = M.LMBS
+					",
+
+			"MSSQL" =>	"
+	UPDATE b_ticket
+	SET
+	b_ticket.D_1_USER_M_AFTER_SUP_M = M.DATE_CREATE,
+	b_ticket.ID_1_USER_M_AFTER_SUP_M = M.ID,
+	b_ticket.LAST_MESSAGE_BY_SUPPORT_TEAM = M.LMBS
+	FROM $strSql0
+					",
+
+
+
+
+			"Oracle" =>	"
+	UPDATE b_ticket T0
+	SET (D_1_USER_M_AFTER_SUP_M, ID_1_USER_M_AFTER_SUP_M, LAST_MESSAGE_BY_SUPPORT_TEAM) = (
+		SELECT
+			M.DATE_CREATE,
+			M.ID,
+			M.LMBS
+		FROM ".str_replace(" AS ", " ", $strSql0)."
+		WHERE b_ticket.ID = T0.ID
+	)
+					",
+		);
+
+		$res = $DB->Query($arS[$DBType], true);
+
+		$res = $DB->Query("UPDATE b_ticket SET SUPPORT_DEADLINE = null, SUPPORT_DEADLINE_NOTIFY = null WHERE LAST_MESSAGE_BY_SUPPORT_TEAM = 'Y'", true);
+
+		if($RSD)
+		{
+			self::RecalculateSupportDeadline();
+		}
+
+		$DB->StopUsingMasterOnly();
+
+	}
+
+
 	public static function RecalculateSupportDeadline($arFilter = array())
 	{
 		global $DB;
-		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: supportDeadline<br>Line: ";	
+		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: RecalculateSupportDeadline<br>Line: ";	
 		
 		$arSqlSearch = Array();
 		if(!is_array($arFilter)) $arFilter = array();
@@ -50,7 +172,9 @@ class CAllTicketReminder
 			SELECT
 				T.ID ID,
 				T.SLA_ID,
+				" . $DB->DateToCharFunction("T.DEADLINE_SOURCE_DATE", "FULL") . " DEADLINE_SOURCE_DATE,
 				" . $DB->DateToCharFunction("T.D_1_USER_M_AFTER_SUP_M", "FULL") . " D_1_USER_M_AFTER_SUP_M,
+				T.IS_OVERDUE,
 				SLA.RESPONSE_TIME_UNIT,
 				SLA.RESPONSE_TIME,
 				SLA.NOTICE_TIME_UNIT,
@@ -71,19 +195,20 @@ class CAllTicketReminder
 		}
 	}
 	
-	/*$arTicket = ID,SLA_ID,RESPONSE_TIME, D_1_USER_M_AFTER_SUP_M, RESPONSE_TIME_UNIT, NOTICE_TIME, NOTICE_TIME_UNIT
-	$dateType = CTicket::ADD, CTicket::DELETE, CTicket::CURRENT_DATE, CTicket::IGNORE*/
-	public static function RecalculateSupportDeadlineForOneTicket($arTicket, $arFields = array(), $dateType = CTicket::IGNORE)
+	/*$arTicket = ID,SLA_ID,RESPONSE_TIME, D_1_USER_M_AFTER_SUP_M, RESPONSE_TIME_UNIT, NOTICE_TIME, NOTICE_TIME_UNIT,DEADLINE_SOURCE_DATE
+	$dateType = CTicket::ADD, CTicket::UPDATE CTicket::DELETE, CTicket::IGNORE, CTicket::REOPEN, CTicket::NEW_SLA*/
+	public static function RecalculateSupportDeadlineForOneTicket($arTicket, $arFields = array(), $dateType = array("EVENT"=>array(CTicket::IGNORE)))
 	{
 		global $DB;
 		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: RecalculateSupportDeadlineForOneTicket<br>Line: ";	
 		$currDateTS = time() + CTimeZone::GetOffset();
+		$ts2010 = mktime(0, 0, 0, 1, 1, 2010);
 		$supportDeadlineNotify = 0;
 		$ticketID = intval($arTicket["ID"]);
 		$slaID = intval($arTicket["SLA_ID"]);
 		$periodMin = self::ConvertResponseTimeUnit($arTicket["RESPONSE_TIME"], $arTicket["RESPONSE_TIME_UNIT"]);
 		$periodNMin = 0;
-		if($ticketID <= 0 || $slaID <= 0 || $periodMin <= 0 ||  intval($arTicket["D_1_USER_M_AFTER_SUP_M"]) <= 0) 
+		if($ticketID <= 0 || $slaID <= 0 || $periodMin <= 0 || intval($arTicket["D_1_USER_M_AFTER_SUP_M"]) <= 0)
 		{
 			if($ticketID > 0 && count($arFields) > 0)
 			{
@@ -98,44 +223,112 @@ class CAllTicketReminder
 			$periodNMin = $periodMin - $periodNMinMinus;
 		}
 		
-		$newDateTS = MakeTimeStamp($arTicket["D_1_USER_M_AFTER_SUP_M"]);
-
-		if($dateType == CTicket::CURRENT_DATE)
+		$newDate1UserMessAfterSupMessTS = MakeTimeStamp($arTicket["D_1_USER_M_AFTER_SUP_M"]);
+		$deadlineSourceDate = MakeTimeStamp($arTicket["DEADLINE_SOURCE_DATE"]);
+		if($deadlineSourceDate <= $ts2010)
 		{
-			$arTicket["D_1_USER_M_AFTER_SUP_M"] = GetTime(($currDateTS - $periodNMin*60),"FULL");
-			$arFields["D_1_USER_M_AFTER_SUP_M"] = $DB->CharToDateFunction($arTicket["D_1_USER_M_AFTER_SUP_M"]);
-		}
-		elseif($dateType == CTicket::ADD)
-		{
-			$oldDateTS = MakeTimeStamp($arTicket["DATE_OLD"]);
-			if($oldDateTS > $newDateTS)
+			if($newDate1UserMessAfterSupMessTS <= $ts2010)
 			{
-				$arTicket["D_1_USER_M_AFTER_SUP_M"] = $arTicket["DATE_OLD"];
-				$arFields["D_1_USER_M_AFTER_SUP_M"] = $DB->CharToDateFunction($arTicket["D_1_USER_M_AFTER_SUP_M"]);
+				$deadlineSourceDate = $currDateTS;
+			}
+			else
+			{
+				$deadlineSourceDate = $newDate1UserMessAfterSupMessTS;
+			}
+			$arFields["DEADLINE_SOURCE_DATE"] = $DB->CharToDateFunction(GetTime($deadlineSourceDate,"FULL"));
+		}
+		$oldPeriodMin = null;
+		if(isset($dateType["EVENT"]) && in_array(CTicket::UPDATE, $dateType["EVENT"]))
+		{
+			if(isset($dateType["OLD_SLA_RESPONSE_TIME"]) && isset($dateType["OLD_SLA_RESPONSE_TIME_UNIT"]))
+			{
+				$oldPeriodMin = self::ConvertResponseTimeUnit($dateType["OLD_SLA_RESPONSE_TIME"], $dateType["OLD_SLA_RESPONSE_TIME_UNIT"]);
+			}
+
+			if(
+				in_array(CTicket::REOPEN, $dateType["EVENT"]) ||
+				(
+					in_array(CTicket::NEW_SLA, $dateType["EVENT"]) &&
+					($arTicket["IS_OVERDUE"] != "Y") &&
+					($oldPeriodMin != null) &&
+					($oldPeriodMin > $periodMin)
+				)
+			)
+			{
+				$deadlineSourceDate = $currDateTS;
+				$arFields["DEADLINE_SOURCE_DATE"] = $DB->CharToDateFunction(GetTime($deadlineSourceDate,"FULL"));
+			}
+			elseif(($arTicket["IS_OVERDUE"] != "Y") && ($newDate1UserMessAfterSupMessTS > $deadlineSourceDate))
+			{
+				$sla = CTicketSLA::getById($slaID)->Fetch();
+
+				if (empty($sla['DEADLINE_SOURCE']))
+				{
+					// default deadline calculation
+					// date of first client message after support message
+					$deadlineSourceDate = $newDate1UserMessAfterSupMessTS;
+					$arFields["DEADLINE_SOURCE_DATE"] = $arFields["D_1_USER_M_AFTER_SUP_M"];
+				}
 			}
 		}
-		
-		$supportDeadlineTS = CSupportTimetableCache::getEndDate($slaID, $periodMin, $arTicket["D_1_USER_M_AFTER_SUP_M"]);
+
+		$supportDeadlineTS = CSupportTimetableCache::getEndDate($slaID, $periodMin, GetTime($deadlineSourceDate,"FULL"));
 		$arFields["SUPPORT_DEADLINE"] = $DB->CharToDateFunction(GetTime($supportDeadlineTS, "FULL"));
 		$arFields["IS_OVERDUE"] = (($supportDeadlineTS <= $currDateTS) ? "'Y'" : "'N'");
+
+		// exec event and confirm if overdue
+		if ($arTicket['IS_OVERDUE'] == "N" && $arFields['IS_OVERDUE'] == "'Y'")
+		{
+			$rs = GetModuleEvents('support', 'OnBeforeTicketExpire');
+			while ($arr = $rs->Fetch())
+			{
+				$arFields = ExecuteModuleEventEx($arr, array($ticketID, $arFields));
+
+				if (!$arFields)
+				{
+					return false;
+				}
+			}
+		}
+
+
 		if($periodNMin > 0)
 		{
-			$supportDeadlineNotifyTS = CSupportTimetableCache::getEndDate($slaID, $periodNMin, $arTicket["D_1_USER_M_AFTER_SUP_M"]);
+			$supportDeadlineNotifyTS = CSupportTimetableCache::getEndDate($slaID, $periodNMin, GetTime($deadlineSourceDate,"FULL"));
 			$arFields["SUPPORT_DEADLINE_NOTIFY"] = $DB->CharToDateFunction(GetTime($supportDeadlineNotifyTS, "FULL"));
 			$arFields["IS_NOTIFIED"] = (($supportDeadlineNotifyTS <= $currDateTS) ? "'Y'" : "'N'");
+
+			// exec event and confirm if set notified
+			if ($arTicket['IS_NOTIFIED'] == "N" && $arFields['IS_NOTIFIED'] == "'Y'")
+			{
+				$rs = GetModuleEvents('support', 'OnBeforeTicketNotify');
+				while ($arr = $rs->Fetch())
+				{
+					$arFields = ExecuteModuleEventEx($arr, array($ticketID, $arFields));
+
+					if (!$arFields)
+					{
+						return false;
+					}
+				}
+			}
 		}
+
 		$DB->Update("b_ticket", $arFields, "WHERE ID='" . $ticketID . "'", $err_mess . __LINE__);
 	}
-	
+
+
 	public static function SupportDeadline($arrTicket)
 	{
+
 		global $MESS, $DB;
+
 		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: supportDeadline<br>Line: ";
-				
 		$rsSite = CSite::GetByID($arrTicket["SITE_ID"]);
 		$arSite = $rsSite->Fetch();
+
+		//$oldMess = $MESS;
 		
-		$oldMess = $MESS;
 		IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/messages.php", $arSite["LANGUAGE_ID"]);
 
 		// update message params
@@ -144,8 +337,20 @@ class CAllTicketReminder
 			"IS_OVERDUE"			=> "'Y'",
 			"OVERDUE_MESSAGES"		=> "OVERDUE_MESSAGES + 1",
 		);
+
+		// execute event
+		$rs = GetModuleEvents('support', 'OnBeforeTicketExpire');
+		while ($arr = $rs->Fetch())
+		{
+			$arFields = ExecuteModuleEventEx($arr, array($arrTicket["ID"], $arFields));
+
+			if (!$arFields)
+			{
+				return false;
+			}
+		}
+
 		$DB->Update("b_ticket", $arFields, "WHERE ID='" . $arrTicket["ID"] . "'", $err_mess . __LINE__);
-		
 
 		// add message log
 		$message = str_replace("#ID#", $arrTicket["TM_ID"], GetMessage("SUP_MESSAGE_OVERDUE_LOG"));
@@ -169,22 +374,32 @@ class CAllTicketReminder
 			"MESSAGE_SOURCE_ID"				=> "null",
 			"MESSAGE"						=> $message
 		);
-		$mid = CTicket::AddMessage($TICKET_ID, $arFields, $v, "N");
+		$v = null;
+		$mid = CTicket::AddMessage($arrTicket['ID'], $arFields, $v, "N");
 
-		$MESS = $oldMess;
+		//$MESS = $oldMess;
+
 	}
-	
+
+
 	public static function SupportDeadlineNotify($arrTicket0)
 	{
 		//SUPPORT_DEADLINE_NOTIFY
 		//SUPPORT_DEADLINE			= EXPIRATION_DATE
 		//SUPPORT_DEADLINE_STMP		= EXPIRATION_DATE_STMP
-				
+
+		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: SupportDeadlineNotify<br>Line: ";
 		$rs = CTicket::GetByID($arrTicket0["ID"], false, "N");
 		if(!($arTicket = $rs->Fetch())) return false;
 		
 		$rsMessage = CTicket::GetMessageByID(intval($arTicket["ID_1_USER_M_AFTER_SUP_M"]), "N", "N");
-		if(!($arMessage = $rsMessage->Fetch())) return false;
+		if(!($arMessage = $rsMessage->Fetch()))
+		{
+			return false;
+		}
+
+		$arMessage["EXPIRATION_DATE"] = $arrTicket0["SUPPORT_DEADLINE"];
+		$arMessage["EXPIRATION_DATE_STMP"] = MakeTimeStamp($arMessage["EXPIRATION_DATE"]);
 		
 		//$SUPPORT_DEADLINE_STMP = MakeTimeStamp($arrTicket0["SUPPORT_DEADLINE"]);
 			
@@ -192,7 +407,7 @@ class CAllTicketReminder
 		$arSite = $rsSite->Fetch();
 
 		global $MESS, $DB;;
-		$oldMess = $MESS;
+		//$oldMess = $MESS;
 		IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/support/classes/general/messages.php", $arSite["LANGUAGE_ID"]);
 
 		$sourceName = strlen($arTicket["SOURCE_NAME"]) <= 0 ? "" : "[" . $arTicket["SOURCE_NAME"] . "] ";
@@ -260,7 +475,7 @@ class CAllTicketReminder
 		$support_admin_email = implode(",", $arAdminEMails);
 
 		$createdModuleName = "";
-		if($arTicket["CREATED_MODULE_NAME"] == "support" && strlen($arTicket["CREATED_MODULE_NAME"]) > 0)
+		if($arTicket["CREATED_MODULE_NAME"] == "support" || !strlen($arTicket["CREATED_MODULE_NAME"]))
 		{
 			if(intval($arTicket["CREATED_USER_ID"]) > 0)
 			{
@@ -288,7 +503,7 @@ class CAllTicketReminder
 			$strRemainedTime .= ($remainedTime % 60) . " " . GetMessage("SUP_SEC");
 		}
 
-		$arFields = array(
+		$arFields_notify = array(
 			"ID"						=> $arTicket["ID"],
 			"LANGUAGE_ID"				=> $arSite["LANGUAGE_ID"],
 			"DATE_CREATE"				=> $arTicket["DATE_CREATE"],
@@ -329,17 +544,37 @@ class CAllTicketReminder
 
 			"MESSAGE_BODY"				=> $MESSAGE
 		);
-					
-		CEvent::Send("TICKET_OVERDUE_REMINDER", $arTicket["SITE_ID"], $arFields);
-		$MESS = $oldMess;
+
+		//$MESS = $oldMess;
 
 		$arFields = array("NOTIFY_AGENT_ID" => "null", "IS_NOTIFIED" => "'Y'");
+
+		// execute event
+		$rs = GetModuleEvents('support', 'OnBeforeTicketNotify');
+		while ($arr = $rs->Fetch())
+		{
+			$arFields = ExecuteModuleEventEx($arr, array($arTicket["ID"], $arFields));
+
+			if (!$arFields)
+			{
+				return false;
+			}
+		}
+
+		// check value again and send notification
+		if (isset($arFields['IS_NOTIFIED']) && $arFields['IS_NOTIFIED'] === "'Y'")
+		{
+			CEvent::Send("TICKET_OVERDUE_REMINDER", $arTicket["SITE_ID"], $arFields_notify);
+		}
+
+		// event for notification
+
 		$DB->Update("b_ticket", $arFields, "WHERE ID='" . $arTicket["ID"] . "'", $err_mess . __LINE__);
 
 		$arFields = array("NOTIFY_AGENT_DONE" => "'Y'");
 		$DB->Update("b_ticket_message", $arFields, "WHERE ID='" . $arMessage["ID"] . "'", $err_mess . __LINE__);
 	}
-	
+
 	public static function AgentFunction()
 	{
 		//IS_OVERDUE
@@ -348,10 +583,7 @@ class CAllTicketReminder
 		//SUPPORT_DEADLINE_NOTIFY
 		global $DB;
 		$err_mess = (CAllTicketReminder::err_mess())."<br>Function: AgentFunction<br>Line: ";
-		if(CSupportUpdate::CurrentVersionLowerThanUpdateVersion())
-		{
-			return "CTicketReminder::AgentFunction();";
-		}
+
 		CTimeZone::Disable();
 		$cyrrDateTime = $DB->CharToDateFunction(GetTime(time(), "FULL"));
 		CTimeZone::Enable();
@@ -384,9 +616,12 @@ class CAllTicketReminder
 			SELECT
 				T.*,
 				TM.ID TM_ID,
-				TM.C_NUMBER TM_C_NUMBER
+				TM.C_NUMBER TM_C_NUMBER,
+				S.NAME SLA_NAME
 			FROM
 				b_ticket T
+				LEFT JOIN b_ticket_sla S
+					ON T.SLA_ID = S.ID
 				LEFT JOIN b_ticket_message TM
 					ON T.ID_1_USER_M_AFTER_SUP_M	= TM.ID	
 			WHERE
@@ -403,7 +638,8 @@ class CAllTicketReminder
 		}
 		return "CTicketReminder::AgentFunction();";
 	}
-	
+
+
 	public static function StartAgent()
 	{
 		CAgent::RemoveModuleAgents("support");
@@ -411,7 +647,7 @@ class CAllTicketReminder
 		CAgent::AddAgent('CTicket::CleanUpOnline();', 'support', 'N');
 		CAgent::AddAgent('CTicket::AutoClose();', 'support', 'N');
 	}
-	
+
 }
 
 ?>

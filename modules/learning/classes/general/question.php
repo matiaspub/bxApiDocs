@@ -106,7 +106,7 @@ class CLQuestion
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">всех полей</a> вопроса.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">всех полей</a> вопроса.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -154,9 +154,9 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">Поля вопроса</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">Поля вопроса</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -203,7 +203,7 @@ class CLQuestion
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">всех полей</a> вопроса.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">всех полей</a> вопроса.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -246,9 +246,9 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">Поля вопроса</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/add.php">Add</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">Поля вопроса</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/update.php
@@ -348,8 +348,8 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/add.php">Add</a> </li></ul><a name="examples"></a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/add.php">Add</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -415,7 +415,7 @@ class CLQuestion
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -438,10 +438,10 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">Поля вопроса</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">Поля вопроса</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -584,7 +584,7 @@ class CLQuestion
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -664,10 +664,10 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/getbyid.php">GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#question">Поля вопроса</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/getbyid.php">GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">Поля вопроса</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -751,7 +751,7 @@ class CLQuestion
 	 *
 	 * @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	 * Описание фильтра см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/getlist.php">CLQuestion::GetList</a>.<br> По
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/getlist.php">CLQuestion::GetList</a>.<br> По
 	 * умолчанию вопросы не фильтруются.
 	 *
 	 *
@@ -789,8 +789,8 @@ class CLQuestion
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/clquestion/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

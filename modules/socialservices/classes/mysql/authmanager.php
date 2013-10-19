@@ -8,7 +8,7 @@ class CSocServAuthDB
 	static function Add($arFields)
 	{
 		global $DB;
-		if (!self::CheckFields('ADD',$arFields))
+		if(!self::CheckFields('ADD', $arFields))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_socialservices_user", $arFields);
@@ -16,7 +16,7 @@ class CSocServAuthDB
 			"INSERT INTO b_socialservices_user (".$arInsert[0].") ".
 				"VALUES(".$arInsert[1].")";
 
-		$res=$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$res = $DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if(!$res)
 		{
 			$_SESSION["LAST_ERROR"] = GetMessage("SC_ADD_ERROR");
@@ -27,9 +27,10 @@ class CSocServAuthDB
 		$obCache = new CPHPCache;
 		$cache_dir = '/bx/socserv_ar_user';
 		$obCache->Clean($cache_id, $cache_dir);
-		$events = GetModuleEvents("socialservices", "OnAfterSocServUserAdd");
-		while ($arEvent = $events->Fetch())
+
+		foreach(GetModuleEvents("socialservices", "OnAfterSocServUserAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
+
 		return $lastId;
 	}
 
@@ -38,7 +39,7 @@ class CSocServAuthDB
 		global $DB;
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "LOGIN", "NAME", "LAST_NAME", "EMAIL", "PERSONAL_PHOTO",
-				"EXTERNAL_AUTH_ID", "USER_ID", "XML_ID", "CAN_DELETE", "PERSONAL_WWW", "PERMISSIONS", "OATOKEN", "OASECRET", "REFRESH_TOKEN", "ACTIVE", "SEND_ACTIVITY");
+				"EXTERNAL_AUTH_ID", "USER_ID", "XML_ID", "CAN_DELETE", "PERSONAL_WWW", "PERMISSIONS", "OATOKEN", "OASECRET", "REFRESH_TOKEN", "ACTIVE", "SEND_ACTIVITY", "OATOKEN_EXPIRES");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "SU.ID", "TYPE" => "int"),
@@ -58,6 +59,7 @@ class CSocServAuthDB
 			"REFRESH_TOKEN" => array("FIELD" => "SU.REFRESH_TOKEN", "TYPE" => "string"),
 			"SEND_ACTIVITY" => array("FIELD" => "SU.SEND_ACTIVITY", "TYPE" => "char"),
 			"SITE_ID" => array("FIELD" => "SU.SITE_ID", "TYPE" => "string"),
+			"OATOKEN_EXPIRES" => array("FIELD" => "SU.OATOKEN_EXPIRES", "TYPE" => "int"),
 			"ACTIVE" => array("FIELD" => "BU.ACTIVE", "TYPE" => "char", "FROM" => "RIGHT JOIN b_user BU ON (SU.USER_ID = BU.ID)"),
 		);
 		$arSqls = CGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
@@ -163,9 +165,7 @@ class CSocServMessage extends CSocServAllMessage
 		$obCache = new CPHPCache;
 		$cache_dir = '/bx/socserv_mes_user';
 		$obCache->Clean($cache_id, $cache_dir);
-		/*$events = GetModuleEvents("socialservices", "OnAfterSocServUserAdd");
-		while ($arEvent = $events->Fetch())
-			ExecuteModuleEventEx($arEvent, array(&$arFields));*/
+
 		return $lastId;
 	}
 

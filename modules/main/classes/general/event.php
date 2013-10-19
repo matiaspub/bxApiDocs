@@ -15,7 +15,7 @@ class CAllEvent
 {
 	
 	/**
-	 * <p>Отправляет сообщение немедленно. В отличие от <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cevent/send.php">CEvent::Send</a> не возвращает идентификатор созданного сообщения.</p>
+	 * <p>Отправляет сообщение немедленно. В отличие от <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cevent/send.php">CEvent::Send</a> не возвращает идентификатор созданного сообщения. При отправке сообщения данным методом запись в таблицу <b>b_event</b> не производится.</p>
 	 *
 	 *
 	 *
@@ -171,7 +171,7 @@ class CAllEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/mailevents.php">Почтовая система</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -702,9 +702,9 @@ class CAllEventMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/index.php">Поля шаблона
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
 	 * почтового сообщения</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/update.php">CEventMessage::Update</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/update.php">CEventMessage::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -761,7 +761,7 @@ class CAllEventMessage
 
 	
 	/**
-	 * <p>Изменяет почтовый шаблон с кодом <i>id</i>. Возвращает "true", если изменение прошло успешно, при возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. </p>
+	 * <p>Изменяет почтовый шаблон с кодом <i>id</i>. Возвращает <i>true</i>, если изменение прошло успешно, при возникновении ошибки функция вернет <i>false</i>, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
 	 *
 	 *
 	 *
@@ -822,9 +822,9 @@ class CAllEventMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/index.php">Поля шаблона
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
 	 * почтового сообщения</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/add.php">CEventMessage::Add</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/add.php">CEventMessage::Add</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -889,7 +889,7 @@ class CAllEventMessage
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Возвращает почтовый шаблон по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает почтовый шаблон по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -913,10 +913,10 @@ class CAllEventMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/index.php">Поля шаблона
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
 	 * почтового сообщения</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventmessage/getlist.php">CEventMessage::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getlist.php">CEventMessage::GetList</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -943,7 +943,7 @@ class CAllEventMessage
 
 	
 	/**
-	 * <p>Удаляет почтовый шаблон. Если шаблон удален успешно, то возвращается объект <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, в противном случае - "false".</p>
+	 * <p>Удаляет почтовый шаблон. Если шаблон удален успешно, то возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, в противном случае - <i>false</i>.</p>
 	 *
 	 *
 	 *
@@ -975,10 +975,10 @@ class CAllEventMessage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/events/oneventmessagedelete.php">Событие
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/oneventmessagedelete.php">Событие
 	 * "OnEventMessageDelete"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/events/onbeforeeventmessagedelete.php">Событие
+	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeeventmessagedelete.php">Событие
 	 * "OnBeforeEventMessageDelete"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1108,13 +1108,13 @@ class CEventType
 
 	
 	/**
-	 * <p>Добавляет тип почтового события. Возвращает ID вставленного типа. При возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
+	 * <p>Добавляет тип почтового события. Возвращает ID вставленного типа. При возникновении ошибки функция вернет <i>false</i>, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/index.php">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]). В качестве "полей" допустимо
 	 * использовать: <ul> <li> <b>LID</b> - язык интерфейса</li> <li> <b>EVENT_NAME</b> -
 	 * идентификатор типа почтового события </li> <li> <b>NAME</b> - заголовок
@@ -1188,7 +1188,7 @@ class CEventType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/index.php">Поля типа
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">Поля типа
 	 * почтового события</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1243,7 +1243,7 @@ class CEventType
 
 	
 	/**
-	 * <p>Удаляет тип почтового события. Возвращается объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Удаляет тип почтового события. Возвращается объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -1260,13 +1260,21 @@ class CEventType
 	 * &lt;?
 	 * $et = new CEventType;
 	 * <b>$et-&gt;Delete</b>("ADV_BANNER_STATUS_CHANGE");
-	 * ?&gt;
+	 * ?&gt;Возможно использование массива:CEventType::Delete(
+	 *  array (
+	 *   "ID" =&gt; 1,
+	 *   "LID"=&gt; "ru",
+	 *   "EVENT_NAME" =&gt; "EVENT_NAME",
+	 *   "NAME" =&gt; "NAME",
+	 *   "SORT" =&gt; 100500
+	 * )
+	 * );
 	 * </pre>
 	 *
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1295,7 +1303,7 @@ class CEventType
 
 	
 	/**
-	 * <p>Возвращает список типов почтовых событий по фильтру <i>filter</i> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список типов почтовых событий по фильтру <i>filter</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -1328,10 +1336,10 @@ class CEventType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/index.php">Поля типа
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">Поля типа
 	 * события</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/getbyid.php">CEventType::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/getbyid.php">CEventType::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1471,7 +1479,7 @@ class CEventType
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Возвращает тип почтового события в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает тип почтового события в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -1498,10 +1506,10 @@ class CEventType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/index.php">Поля типа
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">Поля типа
 	 * события</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/ceventtype/getlist.php">CEventType::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/getlist.php">CEventType::GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

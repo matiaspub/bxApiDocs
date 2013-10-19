@@ -1,6 +1,10 @@
 <?
 global $DBType;
 
+// define("SOCSERV_AUTHORISATION_ERROR", 1);
+// define("SOCSERV_REGISTRATION_DENY", 2);
+// define("SOCSERV_DEFAULT_HTTP_TIMEOUT", 10);
+
 $arClasses = array(
 	"CSocServAuthManager" => "classes/general/authmanager.php",
 	"CSocServAuthDB" => "classes/".$DBType."/authmanager.php",
@@ -23,6 +27,8 @@ $arClasses = array(
 	"CSocServOdnoklassniki" => "classes/general/odnoklassniki.php",
 	"COpenIDClient" => "classes/general/openidclient.php",
 	"CSocServMessage" => "classes/".$DBType."/authmanager.php",
+	"CBitrixOAuthInterface" => "classes/general/bitrix24.php",
+	"CSocServBitrixOAuth" => "classes/general/bitrix24.php",
 	//"CSocServDropbox" => "classes/general/dropbox.php",
 );
 

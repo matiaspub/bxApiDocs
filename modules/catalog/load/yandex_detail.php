@@ -544,7 +544,7 @@ HTML form
 			<td colspan="2"><?=GetMessage('YANDEX_TYPE')?></td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center">
+			<td colspan="2" style="text-align: center;">
 				<select name="type" onchange="switchType(this[this.selectedIndex].value)">
 				<option value="none"<? echo ($type == '' || $type == 'none' ? ' selected' : ''); ?>><?=GetMessage('YANDEX_TYPE_SIMPLE');?></option>
 <?
@@ -561,7 +561,7 @@ HTML form
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center">
+			<td colspan="2" style="text-align: center;">
 		<?echo BeginNote(), GetMessage('YANDEX_TYPE_NOTE'), EndNote();?>
 			</td>
 		</tr>
@@ -600,7 +600,7 @@ endforeach;
 		foreach ($arTypesConfig as $key => $arConfig):
 ?>
 				<div id="config_<?=htmlspecialcharsbx($key)?>" style="padding: 10px; display: <? echo ($type == $key ? 'block' : 'none'); ?>;">
-					<table width="90%" class="inner" align="center">
+					<table width="90%" class="inner" style="text-align: center;">
 <?
 			foreach ($arConfig as $prop):
 ?>
@@ -625,7 +625,7 @@ endforeach;
 		<tr>
 			<td colspan="2">
 				<div id="config_param" style="padding: 10px auto; text-align: center;">
-				<table class="inner" id="yandex_params_tbl" align="center">
+				<table class="inner" id="yandex_params_tbl" style="text-align: center; margin: 0 auto;">
 					<thead>
 					<tr><td style="text-align: center;"> </td>
 					<td style="text-align: center;"><? echo GetMessage('YANDEX_PARAMS_TITLE'); ?></td>
@@ -882,7 +882,7 @@ function __addYP()
 		'CB' => GetMessage('YANDEX_CURRENCY_RATE_CB')
 	);
 ?>
-<table cellpadding="2" cellspacing="0" border="0" class="internal" align="center">
+<table cellpadding="2" cellspacing="0" border="0" class="internal" style="text-align: center;">
 <thead>
 	<tr class="heading">
 		<td colspan="2"><?=GetMessage('YANDEX_CURRENCY')?></td>

@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типами событий</a>.
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.
  *
  *
  *
@@ -18,7 +18,7 @@ class CAllStatEventType
 {
 	
 	/**
-	 * <p>Удаляет указанный <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">тип события</a>, вместе со всеми событиями данного типа.</p>
+	 * <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a>, вместе со всеми событиями данного типа.</p>
 	 *
 	 *
 	 *
@@ -43,7 +43,7 @@ class CAllStatEventType
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
 	 * события"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -154,7 +154,7 @@ class CAllStatEventType
 
 	
 	/**
-	 * <p>Находит <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификаторам</a>, либо создает новый тип события если такого ещё не существует.</p>
+	 * <p>Находит <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>, либо создает новый тип события если такого ещё не существует.</p>
 	 *
 	 *
 	 *
@@ -193,10 +193,10 @@ class CAllStatEventType
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип события"</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип события"</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

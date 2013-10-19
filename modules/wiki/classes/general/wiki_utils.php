@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * 
+ * <b>CWikiUtils</b> - Класс дополнительных функций.
  *
  *
  *
@@ -230,12 +230,12 @@ class CWikiUtils
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a> </li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	 * </li> </ul>
 	 *
 	 *
 	 * @static
@@ -258,12 +258,12 @@ class CWikiUtils
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a> </li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	 * </li> </ul>
 	 *
 	 *
 	 * @static
@@ -297,10 +297,11 @@ class CWikiUtils
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -328,12 +329,12 @@ class CWikiUtils
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
+	 * </li> </ul>
 	 *
 	 *
 	 * @static
@@ -395,7 +396,7 @@ class CWikiUtils
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li>
 	 * </ul>
 	 *
 	 *
@@ -443,7 +444,7 @@ class CWikiUtils
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiutils/CheckServicePage.php">CWikiUtils::CheckServicePage</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php">CWikiUtils::CheckServicePage</a>
 	 * </li> </ul>
 	 *
 	 *
@@ -602,6 +603,44 @@ class CWikiUtils
 		}
 
 		return $strRet;
+	}
+
+	static function isCategoryVirtual($name)
+	{
+
+		$result = false;
+		$sCatName = '';
+
+		if(CWikiUtils::IsCategoryPage($name, $sCatName))
+		{
+			if($sCatName == GetMessage("WIKI_CATEGORY_NOCAT")
+				||
+				$sCatName == GetMessage("WIKI_CATEGORY_ALL")
+			)
+			{
+				$result = true;
+			}
+
+			if(!$result)
+			{
+				$categories = new CWikiCategories;
+				$rsHandlers = GetModuleEvents("wiki", "OnCategoryListCreate");
+				while($arHandler = $rsHandlers->Fetch())
+					ExecuteModuleEventEx($arHandler, array(&$categories, ''));
+
+				$arCats = $categories->GetItems();
+
+				foreach ($arCats as $category)
+				{
+					if($category["NAME"] == $sCatName)
+					{
+							$result = true;
+							break;
+					}
+				}
+			}
+		}
+		return $result;
 	}
 }
 

@@ -68,7 +68,7 @@ class CAllSaleUserTransact
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.delete.php

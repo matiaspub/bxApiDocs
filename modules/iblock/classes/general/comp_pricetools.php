@@ -1,17 +1,4 @@
 <?
-
-/**
- * 
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpricetools/index.php
- * @author Bitrix
- */
 class CIBlockPriceTools
 {
 	
@@ -49,7 +36,7 @@ class CIBlockPriceTools
 			foreach($arPriceCode as $value)
 			{
 				$t_value = trim($value);
-				if(strlen($t_value) > 0)
+				if('' != $t_value)
 					$arCatalogGroupCodesFilter[$value] = true;
 			}
 			$arCatalogGroupsFilter = array();
@@ -89,7 +76,7 @@ class CIBlockPriceTools
 				{
 					$arPriceGroups["view"][]=htmlspecialcharsbx("PROPERTY_".$arProperty["CODE"]);
 					$arCatalogPrices[$arProperty["CODE"]] = array(
-						"ID"=>htmlspecialcharsbx($arProperty["ID"]),
+						"ID"=>$arProperty["ID"],
 						"TITLE"=>htmlspecialcharsbx($arProperty["NAME"]),
 						"SELECT" => "PROPERTY_".$arProperty["ID"],
 						"CAN_VIEW"=>true,
@@ -101,25 +88,228 @@ class CIBlockPriceTools
 		return $arCatalogPrices;
 	}
 
+	public static function GetAllowCatalogPrices($arPriceTypes)
+	{
+		$arResult = array();
+		if (!empty($arPriceTypes) && is_array($arPriceTypes))
+		{
+			foreach ($arPriceTypes as &$arOnePriceType)
+			{
+				if ($arOnePriceType['CAN_VIEW'] || $arOnePriceType['CAN_BUY'])
+					$arResult[] = intval($arOnePriceType['ID']);
+			}
+			if (isset($arOnePriceType))
+				unset($arOnePriceType);
+		}
+		return $arResult;
+	}
+
+	public static function SetCatalogDiscountCache($arCatalogGroups, $arUserGroups)
+	{
+		global $DB;
+		if (CModule::IncludeModule('catalog'))
+		{
+			if (!is_array($arCatalogGroups))
+				return false;
+			if (!is_array($arUserGroups))
+				return false;
+			CatalogClearArray($arCatalogGroups);
+			if (empty($arCatalogGroups))
+				return false;
+			CatalogClearArray($arUserGroups);
+			if (empty($arUserGroups))
+				return false;
+
+			$arRestFilter = array(
+				'PRICE_TYPES' => $arCatalogGroups,
+				'USER_GROUPS' => $arUserGroups,
+			);
+			$arRest = CCatalogDiscount::GetRestrictions($arRestFilter, false, false);
+			$arDiscountFilter = array();
+			$arDiscountResult = array();
+			if (empty($arRest) || (array_key_exists('DISCOUNTS', $arRest) && empty($arRest['DISCOUNTS'])))
+			{
+				foreach ($arCatalogGroups as &$intOneGroupID)
+				{
+					$strCacheKey = CCatalogDiscount::GetDiscountFilterCacheKey(array($intOneGroupID), $arUserGroups, false);
+					$arDiscountFilter[$strCacheKey] = array();
+				}
+				if (isset($intOneGroupID))
+					unset($intOneGroupID);
+			}
+			else
+			{
+				$arSelect = array(
+					"ID", "TYPE", "SITE_ID", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO",
+					"RENEWAL", "NAME", "SORT", "MAX_DISCOUNT", "VALUE_TYPE", "VALUE", "CURRENCY",
+					"PRIORITY", "LAST_DISCOUNT",
+					"COUPON", "COUPON_ONE_TIME", "COUPON_ACTIVE", 'UNPACK'
+				);
+				$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
+				$arFilter = array(
+					"ID" => $arRest['DISCOUNTS'],
+					"SITE_ID" => SITE_ID,
+					"TYPE" => DISCOUNT_TYPE_STANDART,
+					"ACTIVE" => "Y",
+					"RENEWAL" => 'N',
+					"+<=ACTIVE_FROM" => $strDate,
+					"+>=ACTIVE_TO" => $strDate,
+					'+COUPON' => array(),
+				);
+
+				$arResultDiscountList = array();
+
+				$rsPriceDiscounts = CCatalogDiscount::GetList(
+					array(),
+					$arFilter,
+					false,
+					false,
+					$arSelect
+				);
+
+				while ($arPriceDiscount = $rsPriceDiscounts->Fetch())
+				{
+					$arPriceDiscount['ID'] = intval($arPriceDiscount['ID']);
+					$arResultDiscountList[$arPriceDiscount['ID']] = $arPriceDiscount;
+				}
+
+				foreach ($arCatalogGroups as &$intOneGroupID)
+				{
+					$strCacheKey = CCatalogDiscount::GetDiscountFilterCacheKey(array($intOneGroupID), $arUserGroups, false);
+					$arDiscountDetailList = array();
+					$arDiscountList = array();
+					foreach ($arRest['RESTRICTIONS'] as $intDiscountID => $arDiscountRest)
+					{
+						if (empty($arDiscountRest['PRICE_TYPE']) || array_key_exists($intOneGroupID, $arDiscountRest['PRICE_TYPE']))
+						{
+							$arDiscountList[] = $intDiscountID;
+							if (array_key_exists($intDiscountID, $arResultDiscountList))
+								$arDiscountDetailList[] = $arResultDiscountList[$intDiscountID];
+						}
+					}
+					sort($arDiscountList);
+					$arDiscountFilter[$strCacheKey] = $arDiscountList;
+					$strResultCacheKey = CCatalogDiscount::GetDiscountResultCacheKey($arDiscountList, SITE_ID, 'N');
+					$arDiscountResult[$strResultCacheKey] = $arDiscountDetailList;
+				}
+				if (isset($intOneGroupID))
+					unset($intOneGroupID);
+			}
+			$boolFlag = CCatalogDiscount::SetAllDiscountFilterCache($arDiscountFilter, false);
+			$boolFlagExt = CCatalogDiscount::SetAllDiscountResultCache($arDiscountResult);
+			return $boolFlag && $boolFlagExt;
+		}
+		return true;
+	}
+
 	
 	/**
-	 * 
+	 * <p>Метод возвращает цену с учётом скидок (без купонов), в том числе и сконвертированную в нужную валюту.</p>
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed <p></p>
+	 * @param $IBLOCK_I $D  
+	 *
+	 *
+	 *
+	 * @param $arCatalogPrice $s  
+	 *
+	 *
+	 *
+	 * @param $arIte $m  
+	 *
+	 *
+	 *
+	 * @param $bVATInclud $e = true 
+	 *
+	 *
+	 *
+	 * @param $arCurrencyParam $s = array() В данном параметре необходимо передать код валюты, в которую
+	 * необходимо произвести конвертацию: <pre class="syntax"> $arCurrencyParams =
+	 * array('CURRENCY_ID' =&gt; 'USD'); // конвертировать в доллары </pre>
+	 *
+	 *
+	 *
+	 * @return function <p>Массив цен. Возвращает данные по ценам определённых типов,
+	 * определённых товаров, определённого инфоблока, с учётом/без
+	 * учёта НДС.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <br><br>
+	 * Ценовое предложение без конвертации:
+	 * array( 
+	 *    "VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "VALUE_VAT" =&gt; ,
+	 *    "PRINT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    "VATRATE_VALUE" =&gt; ,
+	 *    "PRINT_VATRATE_VALUE" =&gt; ,
+	 * 
+	 *    "DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'PRINT_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 * 
+	 *    "CURRENCY" =&gt; 'код валюты', 
+	 *    'ID' =&gt; 'ID ценового предложения', 
+	 *    'CAN_ACCESS' =&gt; 'возможность просмотра - Y/N', 
+	 *    'CAN_BUY' =&gt; 'возможность купить - Y/N', 
+	 *    'VALUE' =&gt; 'цена', 
+	 *    'PRINT_VALUE' =&gt; 'отформатированная цена для вывода', 
+	 *    'DISCOUNT_VALUE' =&gt; 'цена со скидкой',
+	 *    'PRINT_DISCOUNT_VALUE' =&gt; 'отформатированная цена со скидкой'
+	 * )
+	 * Сконвертированное ценовое предложение:
+	 * array(  
+	 *    'ORIG_VALUE_NOVAT' =&gt; ,
+	 *    "VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    'ORIG_VALUE_VAT' =&gt; ,
+	 *    "VALUE_VAT" =&gt; ,
+	 *    "PRINT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'ORIG_VATRATE_VALUE' =&gt; ,
+	 *    "VATRATE_VALUE" =&gt; ,
+	 *    "PRINT_VATRATE_VALUE" =&gt; ,
+	 * 
+	 *    'ORIG_DISCOUNT_VALUE_NOVAT' =&gt; ,
+	 *    "DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "ORIG_DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'ORIG_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'PRINT_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 * 
+	 *    'ORIG_CURRENCY' =&gt; 'код исходной валюты',
+	 *    "CURRENCY" =&gt; 'код валюты, в которую конвертим',
+	 *  
+	 *    'ID' =&gt; 'ID ценового предложения', 
+	 *    'CAN_ACCESS' =&gt; 'возможность просмотра - Y/N', 
+	 *    'CAN_BUY' =&gt; 'возможность покупки - Y/N', 
+	 *    'VALUE' =&gt; 'цена', 
+	 *    'PRINT_VALUE' =&gt; 'отформатированная цена для вывода', 
+	 *    'DISCOUNT_VALUE' =&gt; 'цена со скидкой',
+	 *    'PRINT_DISCOUNT_VALUE' =&gt; 'отформатированная цена со скидкой'
+	 * )
 	 * </pre>
 	 *
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
+	 * <ul> <li> <a href="../../../main/reference/cdbresult/index.php.html">CDBResult</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -140,17 +330,27 @@ class CIBlockPriceTools
 				$intUserID = $USER->GetID();
 			if (!array_key_exists($intUserID, $arCurUserGroups))
 			{
-				$arCurUserGroups[$intUserID] = (0 < $USER_ID ? CUser::GetUserGroup($USER_ID) : $USER->GetUserGroupArray());
+				$arUserGroups = (0 < $USER_ID ? CUser::GetUserGroup($USER_ID) : $USER->GetUserGroupArray());
+				CatalogClearArray($arUserGroups);
+				$arCurUserGroups[$intUserID] = $arUserGroups;
 			}
-			$arUserGroups = $arCurUserGroups[$intUserID];
+			else
+			{
+				$arUserGroups = $arCurUserGroups[$intUserID];
+			}
 
 			$boolConvert = false;
 			$strCurrencyID = '';
-			if (is_array($arCurrencyParams) && !empty($arCurrencyParams) && !empty($arCurrencyParams['CURRENCY_ID']))
+			if (!empty($arCurrencyParams) && is_array($arCurrencyParams))
 			{
-				$boolConvert = true;
-				$strCurrencyID = $arCurrencyParams['CURRENCY_ID'];
+				if (array_key_exists('CURRENCY_ID', $arCurrencyParams) && !empty($arCurrencyParams['CURRENCY_ID']))
+				{
+					$boolConvert = true;
+					$strCurrencyID = $arCurrencyParams['CURRENCY_ID'];
+				}
 			}
+
+			CCatalogDiscountSave::Disable();
 			foreach($arCatalogPrices as $key => $value)
 			{
 				if($value["CAN_VIEW"] && strlen($arItem["CATALOG_PRICE_".$value["ID"]]) > 0)
@@ -160,7 +360,6 @@ class CIBlockPriceTools
 					{
 						$arItem['CATALOG_PRICE_'.$value['ID']] *= (1 + $arItem['CATALOG_VAT'] * 0.01);
 					}
-					CCatalogDiscountSave::Disable();
 					// so discounts will include VAT
 					$arDiscounts = CCatalogDiscount::GetDiscount(
 						$arItem["ID"],
@@ -171,7 +370,6 @@ class CIBlockPriceTools
 						$LID,
 						array()
 					);
-					CCatalogDiscountSave::Enable();
 					$discountPrice = CCatalogProduct::CountPriceWithDiscount(
 						$arItem["CATALOG_PRICE_".$value["ID"]],
 						$arItem["CATALOG_CURRENCY_".$value["ID"]],
@@ -271,6 +469,7 @@ class CIBlockPriceTools
 					}
 				}
 			}
+			CCatalogDiscountSave::Enable();
 		}
 		else
 		{
@@ -598,7 +797,7 @@ class CIBlockPriceTools
 			if (CModule::IncludeModule("catalog"))
 			{
 				$arCatalog = CCatalogSKU::GetInfoByProductIBlock($IBLOCK_ID);
-				if (is_array($arCatalog))
+				if (!empty($arCatalog) && is_array($arCatalog))
 				{
 					$arResult = array(
 						'OFFERS_IBLOCK_ID' => $arCatalog['IBLOCK_ID'],
@@ -684,9 +883,151 @@ class CIBlockPriceTools
 		return $arResult;
 	}
 
-	public static function GetOffersArray($IBLOCK_ID, $arElementID, $arOrder, $arSelectFields, $arSelectProperties, $limit, $arPrices, $vat_include, $arCurrencyParams = array(), $USER_ID = 0, $LID = SITE_ID)
+	
+	/**
+	 * <p>Метод конвертирует цену в нужную валюту.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param $IBLOCK_I $D  
+	 *
+	 *
+	 *
+	 * @param $arElementI $D  
+	 *
+	 *
+	 *
+	 * @param $arOrde $r  
+	 *
+	 *
+	 *
+	 * @param $arSelectField $s  
+	 *
+	 *
+	 *
+	 * @param $arSelectPropertie $s  
+	 *
+	 *
+	 *
+	 * @param $limi $t  
+	 *
+	 *
+	 *
+	 * @param $arPrice $s  
+	 *
+	 *
+	 *
+	 * @param $vat_includ $e  
+	 *
+	 *
+	 *
+	 * @param $arCurrencyParam $s = array() В данном параметре необходимо передать код валюты, в которую
+	 * необходимо произвести конвертацию: <pre class="syntax"> $arCurrencyParams =
+	 * array('CURRENCY_ID' =&gt; 'USD'); // конвертировать в доллары </pre>
+	 *
+	 *
+	 *
+	 * @return function <p>Массив цен.</p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * Ценовое предложение без конвертации:
+	 * array( 
+	 *    "VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "VALUE_VAT" =&gt; ,
+	 *    "PRINT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    "VATRATE_VALUE" =&gt; ,
+	 *    "PRINT_VATRATE_VALUE" =&gt; ,
+	 * 
+	 *    "DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'PRINT_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 * 
+	 *    "CURRENCY" =&gt; 'код валюты', 
+	 *    'ID' =&gt; 'ID ценового предложения', 
+	 *    'CAN_ACCESS' =&gt; 'возможность просмотра - Y/N', 
+	 *    'CAN_BUY' =&gt; 'возможность купить - Y/N', 
+	 *    'VALUE' =&gt; 'цена', 
+	 *    'PRINT_VALUE' =&gt; 'отформатированная цена для вывода', 
+	 *    'DISCOUNT_VALUE' =&gt; 'цена со скидкой',
+	 *    'PRINT_DISCOUNT_VALUE' =&gt; 'отформатированная цена со скидкой'
+	 * )
+	 * Сконвертированное ценовое предложение:
+	 * array(  
+	 *    'ORIG_VALUE_NOVAT' =&gt; ,
+	 *    "VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    'ORIG_VALUE_VAT' =&gt; ,
+	 *    "VALUE_VAT" =&gt; ,
+	 *    "PRINT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'ORIG_VATRATE_VALUE' =&gt; ,
+	 *    "VATRATE_VALUE" =&gt; ,
+	 *    "PRINT_VATRATE_VALUE" =&gt; ,
+	 * 
+	 *    'ORIG_DISCOUNT_VALUE_NOVAT' =&gt; ,
+	 *    "DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_NOVAT" =&gt; ,
+	 * 
+	 *    "ORIG_DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "DISCOUNT_VALUE_VAT" =&gt; ,
+	 *    "PRINT_DISCOUNT_VALUE_VAT" =&gt; ,
+	 * 
+	 *    'ORIG_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 *    'PRINT_DISCOUNT_VATRATE_VALUE' =&gt; ,
+	 * 
+	 *    'ORIG_CURRENCY' =&gt; 'код исходной валюты',
+	 *    "CURRENCY" =&gt; 'код валюты, в которую конвертим',
+	 *  
+	 *    'ID' =&gt; 'ID ценового предложения', 
+	 *    'CAN_ACCESS' =&gt; 'возможность просмотра - Y/N', 
+	 *    'CAN_BUY' =&gt; 'возможность покупки - Y/N', 
+	 *    'VALUE' =&gt; 'цена', 
+	 *    'PRINT_VALUE' =&gt; 'отформатированная цена для вывода', 
+	 *    'DISCOUNT_VALUE' =&gt; 'цена со скидкой',
+	 *    'PRINT_DISCOUNT_VALUE' =&gt; 'отформатированная цена со скидкой'
+	 * )
+	 * </pre>
+	 *
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li> <a href="../../../main/reference/cdbresult/index.php.html">CDBResult</a> </li> </ul><a name="examples"></a>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpricetools/getoffersarray.php
+	 * @author Bitrix
+	 */
+	public static function GetOffersArray($arFilter, $arElementID, $arOrder, $arSelectFields, $arSelectProperties, $limit, $arPrices, $vat_include, $arCurrencyParams = array(), $USER_ID = 0, $LID = SITE_ID)
 	{
 		$arResult = array();
+
+		$boolHideNotAvailable = false;
+		$IBLOCK_ID = 0;
+		if (!empty($arFilter) && is_array($arFilter))
+		{
+			if (array_key_exists('IBLOCK_ID', $arFilter))
+				$IBLOCK_ID = $arFilter['IBLOCK_ID'];
+			if (array_key_exists('HIDE_NOT_AVAILABLE', $arFilter))
+				$boolHideNotAvailable = 'Y' === $arFilter['HIDE_NOT_AVAILABLE'];
+		}
+		else
+		{
+			$IBLOCK_ID = $arFilter;
+		}
 
 		$arOffersIBlock = CIBlockPriceTools::GetOffersIBlock($IBLOCK_ID);
 		if($arOffersIBlock)
@@ -704,6 +1045,8 @@ class CIBlockPriceTools
 				"ACTIVE" => "Y",
 				"ACTIVE_DATE" => "Y",
 			);
+			if ($boolHideNotAvailable)
+				$arFilter['CATALOG_AVAILABLE'] = 'Y';
 
 			$arSelect = array(
 				"ID" => 1,
@@ -753,7 +1096,6 @@ class CIBlockPriceTools
 							}
 						}
 					}
-
 					$arOffer["PRICES"] = CIBlockPriceTools::GetItemPrices($arOffersIBlock["OFFERS_IBLOCK_ID"], $arPrices, $arOffer, $vat_include, $arCurrencyParams, $USER_ID, $LID);
 					$arOffer["CAN_BUY"] = CIBlockPriceTools::CanBuy($arOffersIBlock["OFFERS_IBLOCK_ID"], $arPrices, $arOffer);
 				}

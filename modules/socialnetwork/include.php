@@ -153,6 +153,7 @@ $arClasses = array(
 	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
 	"CSocNetLogFollow" => "classes/general/log_follow.php",
 	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
+	"CSocNetLogRestService" => "classes/general/rest.php",	
 	"logTextParser" => "classes/general/log_tools.php",
 	"CSocNetPhotoCommentEvent" => "classes/general/log_tools.php",
 	"CSocNetLogComments" => "classes/".$DBType."/log_comments.php",
@@ -852,7 +853,7 @@ if (!CBXFeatures::IsFeatureEnabled("Friends"))
 	$arSocNetAllowedSubscribeEntityTypesDesc[SONET_SUBSCRIBE_ENTITY_USER]["HAS_MY"] = "N";
 }
 
-if (!defined("CACHED_b_sonet_group_subjects"))
+//if (!defined("CACHED_b_sonet_group_subjects"))
 	// define("CACHED_b_sonet_group_subjects", 3600);
 
 class CSocNetUpdater

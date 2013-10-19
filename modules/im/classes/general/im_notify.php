@@ -28,60 +28,97 @@ class CIMNotify
 		global $DB;
 
 		$iNumPage = 1;
-		if (isset($arParams['PAGE']) && intval($arParams['PAGE']) > 0)
+		if (isset($arParams['PAGE']) && intval($arParams['PAGE']) >= 0)
 			$iNumPage = intval($arParams['PAGE']);
 
 		$bTimeZone = isset($arParams['USE_TIME_ZONE']) && $arParams['USE_TIME_ZONE'] == 'N'? false: true;
 
-
 		$sqlStr = "
-			SELECT COUNT(M.ID) as CNT
+			SELECT COUNT(M.ID) as CNT, M.CHAT_ID
 			FROM b_im_relation R
-			INNER JOIN b_im_message M ON M.NOTIFY_READ = 'Y' AND M.CHAT_ID = R.CHAT_ID
+			INNER JOIN b_im_message M ON M.CHAT_ID = R.CHAT_ID
 			WHERE R.USER_ID = ".$this->user_id." AND R.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."'
+			GROUP BY M.CHAT_ID
 		";
 		$res_cnt = $DB->Query($sqlStr);
 		$res_cnt = $res_cnt->Fetch();
 		$cnt = $res_cnt["CNT"];
+		$chatId = $res_cnt["CHAT_ID"];
 
 		$arNotify = Array();
 		if ($cnt > 0)
 		{
 			if (!$bTimeZone)
 				CTimeZone::Disable();
+
 			$strSql ="
 				SELECT
 					M.ID,
 					M.CHAT_ID,
 					M.MESSAGE,
 					M.MESSAGE_OUT,
-					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.NOTIFY_TYPE,
 					M.NOTIFY_MODULE,
+					M.NOTIFY_EVENT,
 					M.NOTIFY_TITLE,
 					M.NOTIFY_BUTTONS,
 					M.NOTIFY_TAG,
 					M.NOTIFY_SUB_TAG,
 					M.NOTIFY_READ,
-					R.LAST_ID,
-					R.USER_ID TO_USER_ID,
+					$this->user_id TO_USER_ID,
 					M.AUTHOR_ID FROM_USER_ID
-				FROM b_im_relation R
-				INNER JOIN b_im_message M ON M.NOTIFY_READ = 'Y' AND M.CHAT_ID = R.CHAT_ID
-				WHERE R.USER_ID = ".$this->user_id." AND R.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."'
+				FROM b_im_message M
+				WHERE M.CHAT_ID = ".$chatId." #LIMIT#
 				ORDER BY M.DATE_CREATE DESC, ID DESC
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
-			$dbRes = new CDBResult();
-			$dbRes->NavQuery($strSql, $cnt, Array('iNumPage' => $iNumPage, 'nPageSize' => 20));
 
+			if ($iNumPage == 0)
+			{
+				$dbType = strtolower($DB->type);
+				if ($dbType== "mysql")
+					$sqlLimit = " AND M.DATE_CREATE > DATE_SUB(NOW(), INTERVAL 30 DAY)";
+				else if ($dbType == "mssql")
+					$sqlLimit = " AND M.DATE_CREATE > dateadd(day, -30, getdate())";
+				else if ($dbType == "oracle")
+					$sqlLimit = " AND M.DATE_CREATE > SYSDATE-30";
+
+				$strSql = $DB->TopSql($strSql, 20);
+				$dbRes = $DB->Query(str_replace("#LIMIT#", $sqlLimit, $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+				if (!$dbRes->SelectedRowsCount())
+					$dbRes = $DB->Query(str_replace("#LIMIT#", "", $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+			else
+			{
+				$dbRes = new CDBResult();
+				$dbRes->NavQuery(str_replace("#LIMIT#", "", $strSql), $cnt, Array('iNumPage' => $iNumPage, 'nPageSize' => 20));
+			}
+
+			$arGetUsers = Array();
 			while ($arRes = $dbRes->Fetch())
 			{
+				if ($arRes['NOTIFY_READ'] == 'N')
+					continue;
+
 				if ($this->bHideLink)
 					$arRes['HIDE_LINK'] = 'Y';
 
-				$arNotify[$arRes['ID']] = self::GetFormatNotify($arRes);
+				$arNotify[$arRes['ID']] = $arRes;
+				$arGetUsers[] = $arRes['FROM_USER_ID'];
+			}
+			if (empty($arNotify))
+				return $arNotify;
+
+			$arUsers = CIMContactList::GetUserData(Array('ID' => $arGetUsers, 'DEPARTMENT' => 'N', 'USE_CACHE' => 'Y', 'CACHE_TTL' => 86400));
+			$arGetUsers = $arUsers['users'];
+
+			foreach ($arNotify as $key => $value)
+			{
+				$value['FROM_USER_DATA'] = $arGetUsers;
+				$arNotify[$key] = self::GetFormatNotify($value);
 			}
 		}
 		return $arNotify;
@@ -100,11 +137,22 @@ class CIMNotify
 		$arNotify['notify'] = Array();
 		$arNotify['unreadNotify'] = Array();
 		$arNotify['loadNotify'] = false;
+		$arNotify['countNotify'] = 0;
 		$arNotify['maxNotify'] = 0;
 
 		$bLoadNotify = $bSpeedCheck? !CIMMessenger::SpeedFileExists($this->user_id, IM_SPEED_NOTIFY): true;
 		if ($bLoadNotify)
 		{
+			$strSql = "SELECT CHAT_ID, STATUS FROM b_im_relation WHERE USER_ID = ".$this->user_id." AND MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."'";
+			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($arRes = $dbRes->Fetch())
+			{
+				$chatId = intval($arRes['CHAT_ID']);
+				$chatStatus = $arRes['STATUS'];
+			}
+			else
+				return $arNotify;
+
 			if (!$bTimeZone)
 				CTimeZone::Disable();
 			$strSql ="
@@ -113,7 +161,7 @@ class CIMNotify
 					M.CHAT_ID,
 					M.MESSAGE,
 					M.MESSAGE_OUT,
-					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.NOTIFY_TYPE,
 					M.NOTIFY_MODULE,
 					M.NOTIFY_EVENT,
@@ -121,14 +169,10 @@ class CIMNotify
 					M.NOTIFY_BUTTONS,
 					M.NOTIFY_TAG,
 					M.NOTIFY_SUB_TAG,
-					R.LAST_ID,
-					R.STATUS,
-					R.USER_ID TO_USER_ID,
+					$this->user_id TO_USER_ID,
 					M.AUTHOR_ID FROM_USER_ID
-				FROM b_im_relation R
-				INNER JOIN b_im_message M ON M.NOTIFY_READ = 'N' AND M.CHAT_ID = R.CHAT_ID
-				WHERE R.USER_ID = ".$this->user_id." AND R.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."'
-				ORDER BY DATE_CREATE ".($order == "DESC"? "DESC": "ASC").", ID ".($order == "DESC"? "DESC": "ASC")."
+				FROM b_im_message M
+				WHERE M.CHAT_ID = ".$chatId." AND M.NOTIFY_READ = 'N'
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -136,20 +180,23 @@ class CIMNotify
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$arMark = Array();
+			$arGetUsers = Array();
 			while ($arRes = $dbRes->Fetch())
 			{
 				if ($this->bHideLink)
 					$arRes['HIDE_LINK'] = 'Y';
 
 				$arNotify['original_notify'][$arRes['ID']] = $arRes;
-				$arNotify['notify'][$arRes['ID']] = $bGetOnlyFlash? $arRes: self::GetFormatNotify($arRes);
+				$arNotify['notify'][$arRes['ID']] = $arRes;
 				$arNotify['unreadNotify'][$arRes['ID']] = $arRes['ID'];
 
-				if ($arRes['STATUS'] == IM_STATUS_UNREAD && (!isset($arMark[$arRes["CHAT_ID"]]) || $arMark[$arRes["CHAT_ID"]] < $arRes["ID"]))
+				if ($chatStatus == IM_STATUS_UNREAD && (!isset($arMark[$arRes["CHAT_ID"]]) || $arMark[$arRes["CHAT_ID"]] < $arRes["ID"]))
 					$arMark[$arRes["CHAT_ID"]] = $arRes["ID"];
 
 				if ($arNotify['maxNotify'] < $arRes['ID'])
 					$arNotify['maxNotify'] = $arRes['ID'];
+
+				$arGetUsers[] = $arRes['FROM_USER_ID'];
 			}
 			foreach ($arMark as $chatId => $lastSendId)
 				CIMNotify::SetLastSendId($chatId, $lastSendId);
@@ -157,11 +204,14 @@ class CIMNotify
 			$arNotify['countNotify'] = $this->GetNotifyCounter($arNotify);
 			CIMMessenger::SpeedFileCreate($this->user_id, $arNotify['countNotify'], IM_SPEED_NOTIFY);
 
+			$arUsers = CIMContactList::GetUserData(Array('ID' => $arGetUsers, 'DEPARTMENT' => 'N', 'USE_CACHE' => 'Y', 'CACHE_TTL' => 86400));
+			$arGetUsers = $arUsers['users'];
+
 			if ($bGetOnlyFlash)
 			{
 				foreach ($arNotify['notify'] as $key => $value)
 				{
-					if (isset($_SESSION['IM_FLASHED_NOTIFY']) && in_array($key, $_SESSION['IM_FLASHED_NOTIFY']))
+					if (isset($_SESSION['IM_FLASHED_NOTIFY'][$key]))
 					{
 						unset($arNotify['notify'][$key]);
 						unset($arNotify['original_notify'][$key]);
@@ -169,10 +219,20 @@ class CIMNotify
 					}
 					else
 					{
+						$value['FROM_USER_DATA'] = $arGetUsers;
 						$arNotify['notify'][$key] = self::GetFormatNotify($value);
 					}
 				}
 			}
+			else
+			{
+				foreach ($arNotify['notify'] as $key => $value)
+				{
+					$value['FROM_USER_DATA'] = $arGetUsers;
+					$arNotify['notify'][$key] = self::GetFormatNotify($value);
+				}
+			}
+
 			$arNotify['result'] = true;
 		}
 		else
@@ -195,7 +255,7 @@ class CIMNotify
 				M.CHAT_ID,
 				M.MESSAGE,
 				M.MESSAGE_OUT,
-				".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 				M.NOTIFY_TYPE,
 				M.NOTIFY_MODULE,
 				M.NOTIFY_EVENT,
@@ -219,11 +279,11 @@ class CIMNotify
 				U2.LAST_NAME FROM_USER_LAST_NAME,
 				U2.SECOND_NAME FROM_USER_SECOND_NAME
 			FROM b_im_relation R
-			INNER JOIN b_im_message M ON M.NOTIFY_READ = 'N' AND M.ID > R.LAST_SEND_ID AND M.CHAT_ID = R.CHAT_ID
+			INNER JOIN b_im_message M ON M.ID > R.LAST_SEND_ID AND M.CHAT_ID = R.CHAT_ID
 			LEFT JOIN b_user U1 ON U1.ID = R.USER_ID
 			LEFT JOIN b_user U2 ON U2.ID = M.AUTHOR_ID
 			WHERE R.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."' AND R.STATUS < ".IM_STATUS_NOTIFY."
-			ORDER BY DATE_CREATE ".($order == "DESC"? "DESC": "ASC").", ID ".($order == "DESC"? "DESC": "ASC")."
+			".($order == "DESC"? "ORDER BY DATE_CREATE DESC, ID DESC": "")."
 		";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -236,33 +296,31 @@ class CIMNotify
 
 	public static function GetFlashNotify($arUnreadNotify)
 	{
-		$arResult = Array();
-
-		if (!empty($arUnreadNotify))
+		$arFlashNotify = Array();
+		if (isset($_SESSION['IM_FLASHED_NOTIFY']))
 		{
-			if (isset($_SESSION['IM_FLASHED_NOTIFY']))
+			foreach ($arUnreadNotify as $value)
 			{
-				$arFlashMessage = array_diff($arUnreadNotify, $_SESSION['IM_FLASHED_NOTIFY']);
-				$_SESSION['IM_FLASHED_NOTIFY'] = array_merge($_SESSION['IM_FLASHED_NOTIFY'], $arFlashMessage);
-
-				foreach ($arUnreadNotify as $key => $value)
+				if (!isset($_SESSION['IM_FLASHED_NOTIFY'][$value]))
 				{
-					if (isset($arFlashMessage[$key]))
-						$arResult[$value] = true;
-					else
-						$arResult[$value] = false;
+					$_SESSION['IM_FLASHED_NOTIFY'][$value] = $value;
+					$arFlashNotify[$value] = true;
 				}
+				else
+					$arFlashNotify[$value] = false;
 			}
-			else
+		}
+		else
+		{
+			$_SESSION['IM_FLASHED_NOTIFY'] = Array();
+			foreach ($arUnreadNotify as $value)
 			{
-				$_SESSION['IM_FLASHED_NOTIFY'] = $arUnreadNotify;
-
-				foreach ($arUnreadNotify as $value)
-					$arResult[$value] = true;
+				$_SESSION['IM_FLASHED_NOTIFY'][$value] = $value;
+				$arFlashNotify[$value] = true;
 			}
 		}
 
-		return $arResult;
+		return $arFlashNotify;
 	}
 
 	public function GetNotify($ID)
@@ -290,17 +348,22 @@ class CIMNotify
 		$arNotify = Array(
 			'id' => $arFields['ID'],
 			'type' => $arFields['NOTIFY_TYPE'],
-			'date' => isset($arFields['TIMESTAMP'])? intval($arFields['TIMESTAMP']): MakeTimeStamp($arFields['DATE_CREATE']),
+			'date' => $arFields['DATE_CREATE'],
+			'silent' => $arFields['NOTIFY_SILENT']? 'Y': 'N',
 			'text' => str_replace('#BR#', '<br>', $CCTP->convertText($arFields['MESSAGE'])),
 			'tag' => strlen($arFields['NOTIFY_TAG'])>0? md5($arFields['NOTIFY_TAG']): '',
-			'original_tag' => $arFields['NOTIFY_TAG']
+			'original_tag' => $arFields['NOTIFY_TAG'],
+			'settingName' => $arFields['NOTIFY_MODULE'].'|'.$arFields['NOTIFY_EVENT']
 		);
-
-		$arUsers = CIMContactList::GetUserData(Array('ID' => $arFields['FROM_USER_ID'], 'DEPARTMENT' => 'N', 'USE_CACHE' => 'Y', 'CACHE_TTL' => 86400));
+		if (!isset($arFields["FROM_USER_DATA"]))
+		{
+			$arUsers = CIMContactList::GetUserData(Array('ID' => $arFields['FROM_USER_ID'], 'DEPARTMENT' => 'N', 'USE_CACHE' => 'Y', 'CACHE_TTL' => 86400));
+			$arFields["FROM_USER_DATA"] = $arUsers['users'];
+		}
 		$arNotify['userId'] = $arFields["FROM_USER_ID"];
-		$arNotify['userName'] = $arUsers['users'][$arFields["FROM_USER_ID"]]['name'];
-		$arNotify['userAvatar'] = $arUsers['users'][$arFields["FROM_USER_ID"]]['avatar'];
-		$arNotify['userLink'] = $arUsers['users'][$arFields["FROM_USER_ID"]]['profile'];
+		$arNotify['userName'] = $arFields["FROM_USER_DATA"][$arFields["FROM_USER_ID"]]['name'];
+		$arNotify['userAvatar'] = $arFields["FROM_USER_DATA"][$arFields["FROM_USER_ID"]]['avatar'];
+		$arNotify['userLink'] = $arFields["FROM_USER_DATA"][$arFields["FROM_USER_ID"]]['profile'];
 
 		if ($arFields['NOTIFY_TYPE'] == IM_NOTIFY_CONFIRM)
 		{
@@ -347,6 +410,7 @@ class CIMNotify
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					self::SetLastId($chatId);
 				}
+				//CUserCounter::Set($this->user_id, 'im_notify', 0, '**', false);
 			}
 			if ($chatId > 0 && CModule::IncludeModule("pull"))
 			{
@@ -372,6 +436,7 @@ class CIMNotify
 						),
 					));
 				}
+				//CIMMessenger::SendBadges($this->user_id);
 			}
 			CIMMessenger::SpeedFileDelete($this->user_id, IM_SPEED_NOTIFY);
 		}
@@ -403,7 +468,11 @@ class CIMNotify
 		if (intval($chatId) <= 0 || intval($lastSendId) <= 0)
 			return false;
 
-		$strSql = "UPDATE b_im_relation SET LAST_SEND_ID = ".intval($lastSendId).", STATUS = ".IM_STATUS_NOTIFY." WHERE CHAT_ID = ".intval($chatId);
+		$strSql = "
+		UPDATE b_im_relation SET
+			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then '".intval($lastSendId)."' else LAST_SEND_ID end),
+			STATUS = ".IM_STATUS_NOTIFY."
+		WHERE CHAT_ID = ".intval($chatId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
@@ -430,6 +499,7 @@ class CIMNotify
 
 			$strSql = "DELETE FROM b_im_message WHERE ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			//CUserCounter::Decrement($this->user_id, 'im_notify', '**', false);
 
 			if (strlen($arRes['NOTIFY_TAG'])>0)
 			{
@@ -447,6 +517,7 @@ class CIMNotify
 						'id' => $ID
 					),
 				));
+				//CIMMessenger::SendBadges($this->user_id);
 			}
 
 			CIMMessenger::SpeedFileDelete($this->user_id, IM_SPEED_NOTIFY);
@@ -510,12 +581,32 @@ class CIMNotify
 			$sqlUser2 = " AND AUTHOR_ID = ".intval($authorId);
 		}
 
-		$dbRes = $DB->Query("SELECT DISTINCT USER_ID FROM b_im_relation R, b_im_message M WHERE M.CHAT_ID = R.CHAT_ID AND M.NOTIFY_TAG = '".$DB->ForSQL($notifyTag)."'".$sqlUser, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while ($arRes = $dbRes->Fetch())
-			CIMMessenger::SpeedFileDelete($arRes['USER_ID'], IM_SPEED_NOTIFY);
+		$dbRes = $DB->Query("SELECT R.USER_ID, R.STATUS FROM b_im_relation R, b_im_message M WHERE M.CHAT_ID = R.CHAT_ID AND M.NOTIFY_TAG = '".$DB->ForSQL($notifyTag)."'".$sqlUser, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$arUsers = Array();
+		while ($row = $dbRes->Fetch())
+		{
+			$count = $row['STATUS'] < IM_STATUS_READ? 1: 0;
+			if (isset($arUsers[$row['USER_ID']]))
+				$arUsers[$row['USER_ID']] += $count;
+			else
+				$arUsers[$row['USER_ID']] = $count;
+		}
+
+		$arUsersSend = Array();
+		foreach ($arUsers as $userId => $count)
+		{
+			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_NOTIFY);
+			//if ($count > 0)
+			//{
+			//	CUserCounter::Decrement($userId, 'im_notify', '**', false);
+			//	$arUsersSend[] = $userId;
+			//}
+		}
 
 		$strSql = "DELETE FROM b_im_message WHERE NOTIFY_TAG = '".$DB->ForSQL($notifyTag)."'".$sqlUser2;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		//CIMMessenger::SendBadges($arUsersSend);
 
 		return true;
 	}
@@ -534,12 +625,32 @@ class CIMNotify
 			$sqlUser2 = " AND AUTHOR_ID = ".intval($authorId);
 		}
 
-		$dbRes = $DB->Query("SELECT DISTINCT USER_ID FROM b_im_relation R, b_im_message M WHERE M.CHAT_ID = R.CHAT_ID AND M.NOTIFY_SUB_TAG = '".$DB->ForSQL($notifySubTag)."'".$sqlUser, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while ($arRes = $dbRes->Fetch())
-			CIMMessenger::SpeedFileDelete($arRes['USER_ID'], IM_SPEED_NOTIFY);
+		$dbRes = $DB->Query("SELECT R.USER_ID, R.STATUS FROM b_im_relation R, b_im_message M WHERE M.CHAT_ID = R.CHAT_ID AND M.NOTIFY_SUB_TAG = '".$DB->ForSQL($notifySubTag)."'".$sqlUser, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$arUsers = Array();
+		while ($row = $dbRes->Fetch())
+		{
+			$count = $row['STATUS'] < IM_STATUS_READ? 1: 0;
+			if (isset($arUsers[$row['USER_ID']]))
+				$arUsers[$row['USER_ID']] += $count;
+			else
+				$arUsers[$row['USER_ID']] = $count;
+		}
+
+		$arUsersSend = Array();
+		foreach ($arUsers as $userId => $count)
+		{
+			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_NOTIFY);
+			//if ($count > 0)
+			//{
+			//	$arUsersSend[] = $userId;
+			//	CUserCounter::Decrement($userId, 'im_notify', '**', false);
+			//}
+		}
 
 		$strSql = "DELETE FROM b_im_message WHERE NOTIFY_SUB_TAG = '".$DB->ForSQL($notifySubTag)."'".$sqlUser2;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		//CIMMessenger::SendBadges($arUsersSend);
 
 		return true;
 	}
@@ -549,23 +660,12 @@ class CIMNotify
 		$count = 0;
 		if (isset($arNotify['unreadNotify']) && !empty($arNotify['unreadNotify']) && isset($arNotify['notify']))
 		{
-			$arGroupNotify = Array();
 			foreach ($arNotify['unreadNotify'] as $key => $value)
 			{
 				if (!isset($arNotify['notify'][$key]))
 					continue;
 
-				$notify = $arNotify['notify'][$key];
-				if ($notify['type'] == 2 && $notify['tag'] != '')
-				{
-					if (!isset($arGroupNotify[$notify['tag']]))
-					{
-						$arGroupNotify[$notify['tag']] = true;
-						$count++;
-					}
-				}
-				else
-					$count++;
+				$count++;
 			}
 		}
 		else
@@ -573,6 +673,30 @@ class CIMNotify
 			$count = CIMMessenger::SpeedFileGet($this->user_id, IM_SPEED_NOTIFY);
 		}
 		return intval($count);
+	}
+
+	public static function SetUnreadCounter($userId)
+	{
+		global $DB;
+
+		return false;
+
+		$userId = intval($userId);
+		if ($userId <= 0)
+			return false;
+
+		$strSql ="
+			SELECT COUNT(M.ID) as CNT
+			FROM b_im_message M
+			INNER JOIN b_im_relation R1 ON M.ID > R1.LAST_ID AND M.CHAT_ID = R1.CHAT_ID
+			WHERE R1.USER_ID = ".$userId." AND R1.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."' AND R1.STATUS < ".IM_STATUS_READ;
+		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($row = $dbRes->Fetch())
+			CUserCounter::Set($userId, 'im_notify', $row['CNT'], '**', false);
+		else
+			CUserCounter::Set($userId, 'im_notify', 0, '**', false);
+
+		return true;
 	}
 }
 ?>

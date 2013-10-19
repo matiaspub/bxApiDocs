@@ -45,7 +45,7 @@ class CSaleUserCards extends CAllSaleUserCards
 	 * <b>LAST_SUM</b> - последняя снятая с карты сумма;</li> <li> <b>LAST_CURRENCY</b> -
 	 * валюта последней снятой с карты суммы;</li> <li> <b>ACTIVE</b> - флаг
 	 * активности;</li> <li> <b>TIMESTAMP_X</b> - дата изменения;</li> <li> <b>LAST_DATE</b> - дата
-	 * последнего использования карты.</li> </ul>
+	 * последнего использования карты.</li> </ul><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.getbyid.php
@@ -178,7 +178,7 @@ class CSaleUserCards extends CAllSaleUserCards
 	 * изменения;</li> <li> <b>LAST_DATE</b> - дата последнего использования
 	 * карты.</li> </ul><p>Если в качестве параметра arGroupBy передается пустой
 	 * массив, то функция вернет число записей, удовлетворяющих
-	 * фильтру.</p>
+	 * фильтру.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.getlist.php
@@ -331,7 +331,7 @@ class CSaleUserCards extends CAllSaleUserCards
 	 * <li> <b>ACTIVE</b> - флаг активности;</li> <li> <b>LAST_DATE</b> - дата последнего
 	 * использования карты.</li> </ul> <p class="note"><b>Замечание</b><br> Перед
 	 * добавлением записи номер карты должен быть зашифрован методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
 	 *
 	 *
 	 *
@@ -425,12 +425,12 @@ class CSaleUserCards extends CAllSaleUserCards
 	 * использования карты.</li> </ul> <p class="note"><b>Замечание</b><br> Если
 	 * меняется номер карты, то перед добавлением записи этот номер
 	 * должен быть зашифрован методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
 	 *
 	 *
 	 *
 	 * @return int <p>Метод возвращает код обновленной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.update.php

@@ -121,12 +121,14 @@ class CFileInput
 		}
 
 		// $arFile - Array with current file or false if it's empty
-		self::$curFileIds = is_array($strFileId) ? $strFileId : array($strFileId);
+		self::$curFileIds = is_array($strFileId) && !array_key_exists("tmp_name", $strFileId)? $strFileId : array($strFileId);
 		self::$curFiles = array();
 		self::$bFileExists = false;
 
 		foreach(self::$curFileIds as $fileId)
 		{
+			if (is_array($fileId))
+				continue;
 			if (strlen($fileId) <= 1 && intVal($fileId) === 0)
 				continue;
 

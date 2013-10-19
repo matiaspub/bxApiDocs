@@ -250,7 +250,8 @@ class CPerfAccel
 			$is_ok =  $this->cache_ttl != 0;
 			foreach($arParams["cache_ttl"] as $ar)
 			{
-				$ar["IS_OK"] = $is_ok;
+				if(!isset($ar["IS_OK"]))
+					$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
@@ -412,6 +413,8 @@ class CPerfAccelAPC extends CPerfAccel
 {
 	var $is_enabled = null;
 	var $is_cache_by_default = null;
+	var $num_files_hint = null;
+	var $user_entries_hint = null;
 
 	public function __construct()
 	{
@@ -425,6 +428,9 @@ class CPerfAccelAPC extends CPerfAccel
 		$apc_cache_by_default = strtolower(ini_get('apc.cache_by_default'));
 		$this->is_cache_by_default = !($apc_cache_by_default=="0" || $apc_cache_by_default=="off");
 		$apc_stat = strtolower(ini_get('apc.stat'));
+		$this->num_files_hint = intval(ini_get('apc.num_files_hint'));
+		$this->user_entries_hint = intval(ini_get('apc.user_entries_hint'));
+
 		$memory = apc_sma_info(true);
 
 		parent::CPerfAccel(
@@ -453,12 +459,25 @@ class CPerfAccelAPC extends CPerfAccel
 					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_SET_REC", array("#value#" => "1")),
 					"IS_OK" => $this->is_cache_by_default,
 				),
+				array(
+					"PARAMETER" => 'apc.num_files_hint',
+					"VALUE" => ini_get('apc.num_files_hint'),
+					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_ZERO_OR_GREATER_THAN_REC", array("#value#" => "20000")),
+					"IS_OK" => $this->num_files_hint==0 || $this->num_files_hint>=20000,
+				),
+				array(
+					"PARAMETER" => 'apc.user_entries_hint',
+					"VALUE" => ini_get('apc.user_entries_hint'),
+					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_ZERO_OR_GREATER_THAN_REC", array("#value#" => "20000")),
+					"IS_OK" => $this->user_entries_hint==0 || $this->user_entries_hint>=20000,
+				),
 			),
 			"cache_ttl" => array(
 				array(
 					"PARAMETER" => 'apc.ttl',
 					"VALUE" => ini_get('apc.ttl'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_GREATER_THAN_ZERO_REC"),
+					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_EQUAL_OR_GREATER_THAN_REC", array("#value#" => 86400)),
+					"IS_OK" => ini_get('apc.ttl')>=86400,
 				),
 			),
 			"max_file_size" => array(

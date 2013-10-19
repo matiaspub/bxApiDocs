@@ -1,13 +1,13 @@
 <?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
 
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/zip.php");
+IncludeModuleLangFile(__FILE__);
 include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/archive.php");
-
-//if (!defined("BX_DIR_PERMISSIONS"))
-	// define("BX_DIR_PERMISSIONS", 0700);
-
-//if (!defined("BX_FILE_PERMISSIONS"))
-	// define("BX_FILE_PERMISSIONS", 0600);
 
 class CZip implements IBXArchive
 {
@@ -15,6 +15,8 @@ class CZip implements IBXArchive
 	public $zipfile = 0;
 	private $arErrors = array();
 	private $fileSystemEncoding = "";
+	private $startFile;
+	private $arHeaders;
 
 	//should be changed via SetOptions
 	private $compress = true;
@@ -111,9 +113,7 @@ class CZip implements IBXArchive
 
 		//starting measuring start time from here (only packing time)
 		// define("ZIP_START_TIME", microtime(true));
-		$res = false;
 		unset($this->tempres);
-		$arResultList = array();
 
 		$arFileList = &$this->_parseFileParams($arFileList);
 
@@ -2661,4 +2661,3 @@ class CZip implements IBXArchive
 	}
 
 }
-?>

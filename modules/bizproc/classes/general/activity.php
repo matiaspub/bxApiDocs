@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <p>Непосредственно от абстрактного класса CBPActivity наследуются действия, которые не могут содержать внутри себя другие действия. Этот класс определяет набор базовых методов, которые необходимы любому действию. Некоторые методы, определенные в классе CBPActivity могут или должны быть переопределены в классе-наследнике.</p> <p>Составные действия наследуются от абстрактного класса <b>CBPCompositeActivity</b>, который в свою очередь наследуется от класса CBPActivity. Класс <b>CBPCompositeActivity</b> обеспечивает поддержку возможности включать внутрь действия дочерние действия. Например, составным действием является стандартное действие <b>CBPParallelActivity</b> (параллельное выполнение), которое содержит в себе дочерние действия, соответствующие веткам параллельного выполнения.</p> <p>Класс <b>CBPCompositeActivity</b> содержит член <b>arActivities</b>, с помощью которого можно обращаться к дочерним действиям.</p> <p>Класс <b>CBPActivity</b> содержит следующие члены, которые можно применять в действиях-наследниках:</p> <ul> <li> <b>workflow</b> – содержит объект-оболочку типа CBPWorkflow для данного бизнес-процесса,</li> <li> <b>parent</b> – содержит родительское действие,</li> <li> <b>executionStatus</b> – статус выполнения действия,</li> <li> <b>executionResult</b> – результат выполнения действия.</li> </ul>
+ * <p>Непосредственно от абстрактного класса CBPActivity наследуются действия, которые не могут содержать внутри себя другие действия. Этот класс определяет набор базовых методов, которые необходимы любому действию. Некоторые методы, определенные в классе CBPActivity могут или должны быть переопределены в классе-наследнике.</p> <p>Составные действия наследуются от абстрактного класса <b>CBPCompositeActivity</b>, который в свою очередь наследуется от класса CBPActivity. Класс <b>CBPCompositeActivity</b> обеспечивает поддержку возможности включать внутрь действия дочерние действия. Например, составным действием является стандартное действие <b>CBPParallelActivity</b> (параллельное выполнение), которое содержит в себе дочерние действия, соответствующие веткам параллельного выполнения.</p> <p>Класс <b>CBPCompositeActivity</b> содержит член <b>arActivities</b>, с помощью которого можно обращаться к дочерним действиям.</p> <p>Класс <b>CBPActivity</b> содержит следующие члены, которые можно применять в действиях-наследниках:</p> <ul> <li> <b>workflow</b> – содержит объект-оболочку типа CBPWorkflow для данного бизнес-процесса,</li> <li> <b>parent</b> – содержит родительское действие,</li> <li> <b>executionStatus</b> – статус выполнения действия,</li> <li> <b>executionResult</b> – результат выполнения действия.</li> </ul> <br>
  *
  *
  *
@@ -229,7 +229,7 @@ abstract class CBPActivity
 	 *
 	 *
 	 *
-	 * @return string <p>Строка, содержащая имя действия.</p>
+	 * @return string <p>Строка, содержащая имя действия.</p><br><br>
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetName.php
 	 * @author Bitrix
@@ -285,8 +285,8 @@ abstract class CBPActivity
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPWorkflow/GetInstanceId.php">CBPWorkflow::GetInstanceId</a>
-	 * </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetInstanceId.php">CBPWorkflow::GetInstanceId</a>
+	 * </li> </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetWorkflowInstanceId.php
@@ -762,7 +762,7 @@ abstract class CBPActivity
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php">RemoveStatusChangeHandler</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php">RemoveStatusChangeHandler</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -803,8 +803,8 @@ abstract class CBPActivity
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php">AddStatusChangeHandler</a></li>
-	 * </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php">AddStatusChangeHandler</a></li>
+	 * </ul><br><br>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php

@@ -30,7 +30,8 @@ CModule::AddAutoloadClasses("vote", array(
 	"CVoteUser" => "classes/".strtolower($DB->type)."/user.php", 
 	"CVote" => "classes/".strtolower($DB->type)."/vote.php",
 	"CVoteCacheManager" => "classes/general/functions.php",
-	"CUserTypeVote" => "classes/general/usertypevote.php"));
+	"CUserTypeVote" => "classes/general/usertypevote.php",
+	"CVoteNotifySchema" => "classes/general/im.php"));
 
 $voteCache = new CVoteCacheManager();
 

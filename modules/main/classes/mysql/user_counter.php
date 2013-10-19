@@ -44,7 +44,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/set.php
 	 * @author Bitrix
 	 */
-	public static function Set($user_id, $code, $value, $site_id = SITE_ID, $tag = '')
+	public static function Set($user_id, $code, $value, $site_id = SITE_ID, $tag = '', $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -104,6 +104,9 @@ class CUserCounter extends CAllUserCounter
 
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
 
+		if ($sendPull)
+			self::SendPullEvent($user_id, $code);
+
 		return true;
 	}
 
@@ -114,16 +117,15 @@ class CUserCounter extends CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param user_i $d  Идентификатор пользователя
+	 * @param user_i $d  11.5.2
 	 *
 	 *
 	 *
-	 * @param cod $e  Код счётчика
+	 * @param cod $e  11.5.2
 	 *
 	 *
 	 *
-	 * @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	 * подставляется текущий сайт.
+	 * @param site_i $d = SITE_ID 11.5.2
 	 *
 	 *
 	 *
@@ -141,7 +143,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/increment.php
 	 * @author Bitrix
 	 */
-	public static function Increment($user_id, $code, $site_id = SITE_ID)
+	public static function Increment($user_id, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -178,8 +180,10 @@ class CUserCounter extends CAllUserCounter
 					self::$counters[$user_id][$site_id][$code] = 1;
 			}
 		}
-
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
+
+		if ($sendPull)
+			self::SendPullEvent($user_id, $code);
 
 		return true;
 	}
@@ -191,15 +195,15 @@ class CUserCounter extends CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param user_i $d  Описание параметра
+	 * @param user_i $d  11.5.6
 	 *
 	 *
 	 *
-	 * @param cod $e  Описание необязательного параметра
+	 * @param cod $e  11.5.6
 	 *
 	 *
 	 *
-	 * @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	 * @param site_i $d = SITE_ID 11.5.6
 	 *
 	 *
 	 *
@@ -217,7 +221,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/decremen.php
 	 * @author Bitrix
 	 */
-	public static function Decrement($user_id, $code, $site_id = SITE_ID)
+	public static function Decrement($user_id, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -257,23 +261,98 @@ class CUserCounter extends CAllUserCounter
 
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
 
+		if ($sendPull)
+			self::SendPullEvent($user_id, $code);
+
 		return true;
 	}
 
-	public static function IncrementWithSelect($sub_select)
+	public static function IncrementWithSelect($sub_select, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
 		if (strlen($sub_select) > 0)
 		{
+			$pullInclude = $sendPull && self::CheckLiveMode();
 			$strSQL = "
-				INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE) (".$sub_select.")
-				ON DUPLICATE KEY UPDATE CNT = CNT + 1
+				INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT) (".$sub_select.")
+				ON DUPLICATE KEY UPDATE CNT = CNT + 1, SENT = ".($pullInclude? 0: 1)."
 			";
 			$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 			self::$counters = false;
 			$CACHE_MANAGER->CleanDir("user_counter");
+
+			if ($pullInclude)
+			{
+				$arSites = Array();
+				$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+				while($row = $res->Fetch())
+					$arSites[] = $row['ID'];
+
+				$strSQL = "
+					SELECT distinct pc.CHANNEL_ID, uc.USER_ID, uc1.SITE_ID, uc1.CODE, uc1.CNT
+					FROM b_user_counter uc
+					INNER JOIN b_user_counter uc1 ON uc1.USER_ID = uc.USER_ID AND uc1.CODE = uc.CODE
+					INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+					WHERE uc.SENT = 0
+				";
+				$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+				$updateId = Array();
+				$pullMessage = Array();
+				while($row = $res->Fetch())
+				{
+					if ($row['SITE_ID'] == '**')
+					{
+						foreach($arSites as $siteId)
+						{
+							if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
+								$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+							else
+								$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+						}
+					}
+					else
+					{
+						if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
+							$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
+						else
+							$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
+					}
+
+					$updateId[] = Array(
+						'USER_ID' => $row['USER_ID'],
+						'SITE_ID' => $row['SITE_ID'],
+						'CODE' => $row['CODE'],
+					);
+				}
+
+				$strSqlValues = "";
+				$strSqlPrefix = "UPDATE b_user_counter SET SENT = 1 WHERE ";
+				foreach($updateId as $ar)
+				{
+					$strSqlValues .= " OR (USER_ID = '".intval($ar['USER_ID'])."' AND SITE_ID = '".$DB->ForSql($ar['SITE_ID'])."' AND CODE = '".$DB->ForSql($ar['CODE'])."')";
+					if(strlen($strSqlValues) > 2048)
+					{
+						$DB->Query($strSqlPrefix.substr($strSqlValues, 4));
+						$strSqlValues = "";
+					}
+				}
+				if($strSqlValues <> '')
+				{
+					$DB->Query($strSqlPrefix.substr($strSqlValues, 4));
+				}
+
+				foreach ($pullMessage as $channelId => $arMessage)
+				{
+					CPullStack::AddByChannel($channelId, Array(
+						'module_id' => 'main',
+						'command' => 'user_counter',
+						'params' => $arMessage,
+					));
+				}
+			}
 		}
 	}
 
@@ -284,16 +363,15 @@ class CUserCounter extends CAllUserCounter
 	 *
 	 *
 	 *
-	 * @param user_i $d  Идентификатор пользователя
+	 * @param user_i $d  11.5.2
 	 *
 	 *
 	 *
-	 * @param cod $e  Код счётчика
+	 * @param cod $e  11.5.2
 	 *
 	 *
 	 *
-	 * @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	 * подставляется текущий сайт.
+	 * @param site_i $d = SITE_ID 11.5.2
 	 *
 	 *
 	 *
@@ -311,7 +389,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clear.php
 	 * @author Bitrix
 	 */
-	public static function Clear($user_id, $code, $site_id = SITE_ID)
+	public static function Clear($user_id, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -355,8 +433,10 @@ class CUserCounter extends CAllUserCounter
 				}
 			}
 		}
-
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
+
+		if ($sendPull)
+			self::SendPullEvent($user_id, $code);
 
 		return true;
 	}

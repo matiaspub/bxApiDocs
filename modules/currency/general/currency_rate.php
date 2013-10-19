@@ -18,7 +18,7 @@ class CAllCurrencyRates
 {
 	
 	/**
-	 * <p>Выполняет проверку полей курса при добавлении или изменении.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	 * <p>Выполняет проверку полей курса при добавлении или изменении.</p>
 	 *
 	 *
 	 *
@@ -26,7 +26,8 @@ class CAllCurrencyRates
 	 * @param ACTIO $N  Равно <b>ADD</b> или <b>UPDATE</b> с учетом регистра. Если значение в другом
 	 * регистре или другое значение, то возвращает <i>false</i> без текста
 	 * ошибки (exception). Если значение равно <b>UPDATE</b>, то проверяется ID. Если
-	 * ID arFields ключа ID удалит его.
+	 * ID &lt;= 0, то возвращается ошибка. В случае наличия в <i>arFields</i> ключа ID
+	 * удалит его.
 	 *
 	 *
 	 *
@@ -249,7 +250,7 @@ class CAllCurrencyRates
 	 *
 	 *
 	 * @return bool <p>В случае успеха возвращает ID изменённого курса, иначе <i>false</i>.
-	 * Текст ошибки выводится через <code>$APPLICATION-&gt;GetException()</code>.</p>
+	 * Текст ошибки выводится через <code>$APPLICATION-&gt;GetException()</code>.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__update.1f36666f.php
@@ -310,7 +311,7 @@ class CAllCurrencyRates
 	 *
 	 * @return bool <p>Возвращает значение <i>True</i> в случае успешного добавления и
 	 * <i>False</i> - в противном случае. Текст ошибки выводится с помощью
-	 * <code>$APPLICATION-&gt;GetException</code>.</p>
+	 * <code>$APPLICATION-&gt;GetException</code>.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__delete.28de3643.php
@@ -369,7 +370,7 @@ class CAllCurrencyRates
 	 * Датских крон стоят 48.7 рублей, то 10 - это количество единиц)</td> </tr>
 	 * <tr> <td>RATE</td> <td>курс валюты (одна из валют сайта должна иметь курс
 	 * "по-умолчанию" 1, она называется базовой, остальные валюты имеют
-	 * курс относительно базовой валюты)</td> </tr> </table>
+	 * курс относительно базовой валюты)</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__getbyid.2c90255f.php

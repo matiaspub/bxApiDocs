@@ -167,7 +167,7 @@ class CSocNetGroup extends CAllSocNetGroup
 
 	
 	/**
-	 * <p>Метод изменяет параметры группы с заданным идентификатором.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</p>
+	 * <p>Метод изменяет параметры группы с заданным идентификатором.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</p>
 	 *
 	 *
 	 *
@@ -504,8 +504,8 @@ class CSocNetGroup extends CAllSocNetGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetById</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetById</a> </li>
 	 * </ul>
 	 *
 	 *

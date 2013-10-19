@@ -84,7 +84,7 @@ class CAllSaleOrderPropsValue
 	 * <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код
 	 * свойства.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
 	 * <td>Значение свойства.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	 * свойства.</td> </tr> </table><p>  </p>
+	 * свойства.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__getbyid.54043fd5.php

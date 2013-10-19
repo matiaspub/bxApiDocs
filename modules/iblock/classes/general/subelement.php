@@ -268,12 +268,9 @@ class CAdminSubList extends CAdminList
 			}
 		}
 
+		$aAllCols = null;
 		if (isset($_REQUEST["mode"]) && $_REQUEST["mode"] == "subsettings")
-		{
-			$aAllCols = array();
-			foreach($this->aHeaders as $i=>$header)
-				$aAllCols[$i] = $header;
-		}
+			$aAllCols = $this->aHeaders;
 
 		if(!$bEmptyCols)
 		{
@@ -281,6 +278,12 @@ class CAdminSubList extends CAdminList
 				if (isset($this->aHeaders[$col]))
 					$this->aHeaders[$col]["__sort"] = $i;
 			uasort($this->aHeaders, create_function('$a, $b', 'if($a["__sort"] == $b["__sort"]) return 0; return ($a["__sort"] < $b["__sort"])? -1 : 1;'));
+		}
+
+		foreach($this->aHeaders as $id=>$arHeader)
+		{
+			if (in_array($id, $this->arVisibleColumns) && !in_array($id, $this->arHideHeaders))
+				$this->aVisibleHeaders[$id] = $arHeader;
 		}
 
 		if (isset($_REQUEST["mode"]) && $_REQUEST["mode"] == "subsettings")
@@ -404,9 +407,10 @@ class CAdminSubList extends CAdminList
 	{
 		global $APPLICATION;
 
-		$db_events = GetModuleEvents("main", "OnAdminSubListDisplay");
-		while($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("main", "OnAdminSubListDisplay", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array(&$this));
+		}
 
 		echo '<div id="form_'.$this->table_id.'" class="adm-sublist">';
 
@@ -826,9 +830,8 @@ class CAdminSubListRow extends CAdminListRow
 		if(!empty($this->aActions))
 			$sMenuItems = htmlspecialcharsbx(CAdminPopup::PhpToJavaScript($this->aActions));
 
-		$aUserOpt = CUserOptions::GetOption("global", "settings");
 ?>
-<tr class="adm-list-table-row<?=(isset($this->aFeatures["footer"]) && $this->aFeatures["footer"] == true? ' footer':'')?><?=$this->bEditMode?' adm-table-row-active' : ''?>"<?=($sMenuItems <> "" && $aUserOpt["context_menu"]<>"N"? ' oncontextmenu="return '.$sMenuItems.';"':'');?><?=($sDefAction <> ""? ' ondblclick="'.$sDefAction.'"'.(!empty($sDefTitle)? ' title="'.GetMessage("admin_lib_list_double_click").' '.$sDefTitle.'"':''):'')?>>
+<tr class="adm-list-table-row<?=(isset($this->aFeatures["footer"]) && $this->aFeatures["footer"] == true? ' footer':'')?><?=$this->bEditMode?' adm-table-row-active' : ''?>"<?=($sMenuItems <> "" ? ' oncontextmenu="return '.$sMenuItems.';"':'');?><?=($sDefAction <> ""? ' ondblclick="'.$sDefAction.'"'.(!empty($sDefTitle)? ' title="'.GetMessage("admin_lib_list_double_click").' '.$sDefTitle.'"':''):'')?>>
 <?
 
 		if(count($this->pList->arActions)>0 || $this->pList->bCanBeEdited):
@@ -968,9 +971,10 @@ class CAdminSubContextMenu extends CAdminContextMenu
 	{
 		$hkInst = CHotKeys::getInstance();
 
-		$db_events = GetModuleEvents("main", "OnAdminSubContextMenuShow");
-		while($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("main", "OnAdminSubContextMenuShow", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array(&$this->items));
+		}
 
 		$bFirst = true;
 		$bNeedSplitClosing = false;
@@ -1664,7 +1668,10 @@ class CAdminSubMessage extends CAdminMessage
 	public static function ShowNote($message)
 	{
 		if(!empty($message))
-			CAdminSubMessage::ShowMessage(array("MESSAGE"=>$message, "TYPE"=>"OK"));
+		{
+			$m = new CAdminSubMessage(array("MESSAGE"=>$message, "TYPE"=>"OK"));
+			echo $m->Show();
+		}
 	}
 }
 ?>

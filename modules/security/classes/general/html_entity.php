@@ -7,47 +7,61 @@ class CSecurityHtmlEntity
 				"/&colon;/i", "/&tab;/i", "/&newline;/i"
 			),
 		"text" => array(
-				":",        "\r",   "\n"
+				":",           "\r",       "\n"
 			),
 		);
 
-	/*
-	Function is used in regular expressions in order to decode characters presented as &#123;
-	*/
-	protected static function decodeCb($in)
+	/**
+	 * Decode characters presented as &#123;
+	 *
+	 * @param string $entity
+	 * @return string
+	 */
+	protected static function decodeCb($entity)
 	{
-		$ad = $in[2];
+		$ad = $entity[2];
 		if($ad == ';')
 			$ad="";
-		$num = intval($in[1]);
+		$num = intval($entity[1]);
 		return chr($num).$ad;
 	}
 
-	/*
-	Function is used in regular expressions in order to decode characters presented as  &#xAB;
-	*/
-	protected static function decodeCbHex($in)
+	/**
+	 * Decode characters presented as  &#xAB;
+	 *
+	 * @param string $entity
+	 * @return string
+	 */
+	protected static function decodeCbHex($entity)
 	{
-		$ad = $in[2];
+		$ad = $entity[2];
 		if($ad==';')
 			$ad="";
-		$num = intval(hexdec($in[1]));
+		$num = intval(hexdec($entity[1]));
 		return chr($num).$ad;
 	}
 
-	/*
-	Decodes string from html codes &#***;
-	One pass!
-	-- Decode only a-zA-Z:().=, because only theese are used in filters
-	*/
-	protected static function decode($str)
+	/**
+	 * Decodes string from html codes &#***; but only a-zA-Z:().=, because only these are used in auditors
+	 * One pass!
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	protected static function decode($string)
 	{
-		$str = preg_replace_callback("/\&\#(\d+)([^\d])/is", array(__CLASS__, "decodeCb"), $str);
-		$str = preg_replace_callback("/\&\#x([\da-f]+)([^\da-f])/is", array(__CLASS__, "decodeCbHex"), $str);
-		$str = preg_replace(self::$htmlMnemonics["html"], self::$htmlMnemonics["text"],$str);
-		return $str;
+		$string = preg_replace_callback("/\&\#(\d+)([^\d])/is", array(__CLASS__, "decodeCb"), $string);
+		$string = preg_replace_callback("/\&\#x([\da-f]+)([^\da-f])/is", array(__CLASS__, "decodeCbHex"), $string);
+		$string = preg_replace(self::$htmlMnemonics["html"], self::$htmlMnemonics["text"],$string);
+		return $string;
 	}
 
+	/**
+	 * Recursive decodes string from html codes &#***; but only a-zA-Z:().=, because only these are used in auditors
+	 *
+	 * @param string $pString
+	 * @return string
+	 */
 	public static function decodeString($pString)
 	{
 		$strY = $pString;

@@ -428,6 +428,28 @@ class CBPCalc
 		return ConvertTimeStamp($newDate, "FULL");
 	}
 
+	private function FunctionDateDiff($args)
+	{
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$date1 = array_shift($ar);
+		$date2 = array_shift($ar);
+		$format = array_shift($ar);
+
+		if ($date1 == null || $date2 == null)
+			return null;
+
+		$df = $GLOBALS["DB"]->DateFormatToPHP(FORMAT_DATETIME);
+		$date1Formatted = \DateTime::createFromFormat($df, $date1);
+		$date2Formatted = \DateTime::createFromFormat($df, $date2);
+
+		$interval = $date1Formatted->diff($date2Formatted);
+
+		return $interval->format($format);
+	}
+
 	private function FunctionFalse()
 	{
 		return false;
@@ -520,7 +542,8 @@ class CBPCalc
 	private $arAvailableFunctions = array(
 		'abs' => array('args' => true, 'func' => 'FunctionAbs'),
 		'and' => array('args' => true, 'func' => 'FunctionAnd'),
-		'dateadd'=> array('args' => true, 'func' => 'FunctionDateAdd'),
+		'dateadd' => array('args' => true, 'func' => 'FunctionDateAdd'),
+		'datediff' => array('args' => true, 'func' => 'FunctionDateDiff'),
 		'false' => array('args' => false, 'func' => 'FunctionFalse'),
 		'if' => array('args' => true, 'func' => 'FunctionIf'),
 		'intval' => array('args' => true, 'func' => 'FunctionIntval'),

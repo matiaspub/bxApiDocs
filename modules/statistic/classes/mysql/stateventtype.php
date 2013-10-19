@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/stateventtype.php");
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типами событий</a>.
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.
  *
  *
  *
@@ -17,7 +17,7 @@ class CStatEventType extends CAllStatEventType
 {
 	
 	/**
-	 * <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типу события</a>.</p>
+	 * <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу события</a>.</p>
 	 *
 	 *
 	 *
@@ -46,10 +46,10 @@ class CStatEventType extends CAllStatEventType
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/conditionset.php">CStatEventType::ConditionSet</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/conditionset.php">CStatEventType::ConditionSet</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
 	 * события"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -79,14 +79,14 @@ class CStatEventType extends CAllStatEventType
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типов событий</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_today_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID типа
 	 * события; </li> <li> <b>s_date_last</b> - дата последнего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">события</a> данного типа; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> данного типа; </li> <li>
 	 * <b>s_date_enter</b> - дата первого события данного типа; </li> <li> <b>s_today_counter</b>
 	 * - количество событий данного типа за сегодня; </li> <li> <b>s_yesterday_counter</b>
 	 * - количество событий данного типа за вчера; </li> <li> <b>s_b_yesterday_counter</b> -
@@ -95,7 +95,7 @@ class CStatEventType extends CAllStatEventType
 	 * количество событий данного типа за указанный период
 	 * <nobr>(<i>filter</i>[<b>DATE1_PERIOD</b>], <i>filter</i>[<b>DATE2_PERIOD</b>])</nobr>; </li> <li> <b>s_name</b> -
 	 * название типа события; </li> <li> <b>s_event1</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
 	 * события; </li> <li> <b>s_event2</b> - идентификатор event2 типа события; </li> <li>
 	 * <b>s_event12</b> - сортировка по "EVENT1, EVENT2"; </li> <li> <b>s_chart</b> - сортировка по
 	 * "DIAGRAM_DEFAULT desc, TOTAL_COUNTER"; </li> <li> <b>s_stat</b> - сортировка по "TODAY_COUNTER desc,
@@ -155,7 +155,7 @@ class CStatEventType extends CAllStatEventType
 	 * группировка результирующего списка, возможные значения: <ul> <li>
 	 * <b>event1</b> - группировка по <i>event1</i>; </li> <li> <b>event2</b> - группировка по
 	 * <i>event2</i>. </li> </ul> </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -207,10 +207,10 @@ class CStatEventType extends CAllStatEventType
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getdynamiclist.php">CStatEventType::GetDynamicList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getdynamiclist.php">CStatEventType::GetDynamicList</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getsimplelist.php">CStatEventType::GetSimpleList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getsimplelist.php">CStatEventType::GetSimpleList</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
 	 * события"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -566,14 +566,14 @@ class CStatEventType extends CAllStatEventType
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типов событий</a> в упрощённом виде.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a> в упрощённом виде.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_event1" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID типа
 	 * события; </li> <li> <b>s_event1</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
 	 * события; </li> <li> <b>s_event2</b> - идентификатор event2 типа события; </li> <li>
 	 * <b>s_name</b> - название типа события; </li> <li> <b>s_description</b> - описание типа
 	 * события. </li> </ul>
@@ -641,10 +641,10 @@ class CStatEventType extends CAllStatEventType
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getdynamiclist.php">CStatEventType::GetDynamicList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getdynamiclist.php">CStatEventType::GetDynamicList</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getlist.php">CStatEventType::GetList</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">Термин "Тип события"</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getlist.php">CStatEventType::GetList</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип события"</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -743,7 +743,7 @@ class CStatEventType extends CAllStatEventType
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> указанного <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типа</a> в разрезе по дням.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> указанного <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа</a> в разрезе по дням.</p>
 	 *
 	 *
 	 *
@@ -816,9 +816,9 @@ class CStatEventType extends CAllStatEventType
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getlist.php">CStatEventType::GetList</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getlist.php">CStatEventType::GetList</a> </li>
 	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstateventtype/getsimplelist.php">CStatEventType::GetSimpleList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getsimplelist.php">CStatEventType::GetSimpleList</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

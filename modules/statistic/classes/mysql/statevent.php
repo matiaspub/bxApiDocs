@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/statevent.php");
 
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событиями</a>.
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.
  *
  *
  *
@@ -17,7 +17,7 @@ class CStatEvent extends CAllStatEvent
 {
 	
 	/**
-	 * <p>Возвращает список идентификаторов <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> по указанному ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителя</a> сайта.</p>
+	 * <p>Возвращает список идентификаторов <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> по указанному ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a> сайта.</p>
 	 *
 	 *
 	 *
@@ -31,7 +31,7 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 *
 	 *
-	 * @param mixed $event3 = false <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Дополнительный параметр
+	 * @param mixed $event3 = false <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Дополнительный параметр
 	 * event3</a> события. Если значение равно "false", то фильтрации по event3 не
 	 * будет.
 	 *
@@ -80,9 +80,9 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/getlist.php">CStatEvent::GetList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Термин "Дополнительный
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getlist.php">CStatEvent::GetList</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин "Дополнительный
 	 * параметр события (event3)"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -119,7 +119,7 @@ class CStatEvent extends CAllStatEvent
 
 	
 	/**
-	 * <p>Добавляет <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событие</a> по заданному <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типу</a> и <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">специальному параметру</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	 * <p>Добавляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу</a> и <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальному параметру</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	 *
 	 *
 	 *
@@ -128,17 +128,17 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 *
 	 *
-	 * @param string $event3  <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Дополнительный параметр
+	 * @param string $event3  <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Дополнительный параметр
 	 * event3</a> события.
 	 *
 	 *
 	 *
-	 * @param string $date  Дата в <a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#format_datetime">текущем
+	 * @param string $date  Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_datetime">текущем
 	 * формате</a>.
 	 *
 	 *
 	 *
-	 * @param string $gid  <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">Специальный параметр</a> в
+	 * @param string $gid  <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Специальный параметр</a> в
 	 * котором закодированы все необходимые данные для добавления
 	 * события.
 	 *
@@ -195,13 +195,13 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/addcurrent.php">CStatEvent::AddCurrent</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addcurrent.php">CStatEvent::AddCurrent</a>
 	 * </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
-	 * событий</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин
-	 * "Событие"</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">Термин
+	 * событий</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	 * "Событие"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
 	 * "Дополнительный параметр события (event3)"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#gid">Термин "Специальный параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный параметр
 	 * события"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -440,26 +440,26 @@ class CStatEvent extends CAllStatEvent
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID события;
 	 * </li> <li> <b>s_site_id</b> - ID сайта; </li> <li> <b>s_type_id</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type">типа события</a>; </li> <li>
-	 * <b>s_event3</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event3">дополнительный
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a>; </li> <li>
+	 * <b>s_event3</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">дополнительный
 	 * параметр event3</a> события; </li> <li> <b>s_date_enter</b> - время создания события;
-	 * </li> <li> <b>s_adv_id</b> - ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv">рекламной
+	 * </li> <li> <b>s_adv_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной
 	 * кампании</a>; </li> <li> <b>s_adv_back</b> - флаг <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_back">возврата</a> либо <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#adv_first">прямого захода</a> по
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврата</a> либо <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямого захода</a> по
 	 * рекламной кампании; </li> <li> <b>s_session_id</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессии</a>; </li> <li> <b>s_guest_id</b> - ID
-	 * <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителя</a>; </li> <li> <b>s_hit_id</b>
-	 * - ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хита</a>; </li> <li> <b>s_url</b> -
-	 * страница где зафиксированно событие; </li> <li> <b>s_referer_url</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">ссылающаяся страница</a>; </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li> <li> <b>s_guest_id</b> - ID
+	 * <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>; </li> <li>
+	 * <b>s_hit_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хита</a>; </li> <li>
+	 * <b>s_url</b> - страница где зафиксированно событие; </li> <li> <b>s_referer_url</b> - <a
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающаяся страница</a>; </li>
 	 * <li> <b>s_redirect_url</b> - страница куда был перенаправлен посетитель после
 	 * фиксации события; </li> <li> <b>s_country_id</b> - ID страны посетителя; </li> <li>
 	 * <b>s_money</b> - денежная сумма. </li> </ul>
@@ -480,10 +480,10 @@ class CStatEvent extends CAllStatEvent
 	 * типа события; </li> <li> <b>EVENT_NAME_EXACT_MATCH</b> - если значение равно "Y", то
 	 * при фильтрации по <b>EVENT_NAME</b> будет искаться точное совпадение; </li>
 	 * <li> <b>EVENT1</b>* - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
 	 * события; </li> <li> <b>EVENT1_EXACT_MATCH</b> - если значение равно "Y", то при
 	 * фильтрации по <b>EVENT1</b> будет искаться точное совпадение; </li> <li>
-	 * <b>EVENT2</b>* - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event_type_id">идентификатор
+	 * <b>EVENT2</b>* - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор
 	 * event2</a> типа события; </li> <li> <b>EVENT2_EXACT_MATCH</b> - если значение равно "Y",
 	 * то при фильтрации по <b>EVENT2</b> будет искаться точное совпадение; </li>
 	 * <li> <b>EVENT3</b>* - дополнительный параметр event3 события; </li> <li>
@@ -523,7 +523,7 @@ class CStatEvent extends CAllStatEvent
 	 * - страница куда был перенаправлен посетитель после фиксации
 	 * события; </li> <li> <b>REDIRECT_URL_EXACT_MATCH</b> - если значение равно "Y", то при
 	 * фильтрации по <b>REDIRECT_URL</b> будет искаться точное совпадение. </li> </ul>
-	 * * - допускается <a href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная
+	 * * - допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	 * логика</a>
 	 *
 	 *
@@ -564,8 +564,8 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cstatevent/getlistbyguest.php">CStatEvent::GetListByGuest</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин "Событие"</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getlistbyguest.php">CStatEvent::GetListByGuest</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -771,7 +771,7 @@ class CStatEvent extends CAllStatEvent
 
 	
 	/**
-	 * <p>Удаляет указанное <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событие</a>.</p>
+	 * <p>Удаляет указанное <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a>.</p>
 	 *
 	 *
 	 *
@@ -796,7 +796,7 @@ class CStatEvent extends CAllStatEvent
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">Термин "Событие"</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *

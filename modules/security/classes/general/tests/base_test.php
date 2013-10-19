@@ -18,6 +18,17 @@ abstract class CSecurityBaseTest
 	}
 
 	/**
+	 * Check test requirements (e.g. max_execution_time)
+	 *
+	 * @param array $pParams
+	 * @return bool
+	 */
+	static public function checkRequirements($pParams = array())
+	{
+		return true;
+	}
+
+	/**
 	 * Run test and return results
 	 * @param array $pParams
 	 * @return array

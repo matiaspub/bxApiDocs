@@ -18,14 +18,17 @@ class CSecuritySiteChecker
 	protected static $dbFields = array("ID", "TEST_DATE", "RESULTS");
 	/** @var CSecurityTemporaryStorage */
 	protected $sessionData = null;
+	protected $isCheckRequirementsNeeded = true;
 
 	/**
 	 * @param array $pTests
 	 * @param bool $pIsFirstStart
+	 * @param bool $pIsCheckRequirementsNeeded
 	 * @throws Exception
 	 */
-	public function __construct($pTests = array(), $pIsFirstStart = false)
+	public function __construct($pTests = array(), $pIsFirstStart = false, $pIsCheckRequirementsNeeded = true)
 	{
+		$this->isCheckRequirementsNeeded = $pIsCheckRequirementsNeeded;
 		$this->sessionData = new CSecurityTemporaryStorage(self::SESSION_DATA_KEY, $pIsFirstStart);
 		$isOk = $this->initializeAvailableTests();
 		if($isOk)
@@ -55,7 +58,23 @@ class CSecuritySiteChecker
 		if(!($test instanceof CSecurityBaseTest))
 			return false;
 
-		$result = $test->check($this->makeParamsForTest($testName, $pParams));
+		try
+		{
+			$testParams = $this->makeParamsForTest($testName, $pParams);
+			if($this->isCheckRequirementsNeeded)
+				$test->checkRequirements($testParams);
+
+			$result = $test->check($testParams);
+		}
+		catch(CSecurityRequirementsException $exception)
+		{
+			$result = array(
+				"name" => $test->getName(),
+				"status" => true,
+				"fatal_error_text" => $exception->getMessage()
+			);
+		}
+
 		if($result)
 		{
 			if(!isset($result["in_progress"]) || !$result["in_progress"])
@@ -72,14 +91,15 @@ class CSecuritySiteChecker
 	 * Run several tests
 	 * @param string|array $pType
 	 * @param bool $pIsFirstStart
+	 * @param bool $pIsCheckRequirementsNeeded
 	 * @return array|bool
 	 */
-	public static function runTestPackage($pType = "", $pIsFirstStart = false)
+	public static function runTestPackage($pType = "", $pIsFirstStart = false, $pIsCheckRequirementsNeeded = true)
 	{
 		try
 		{
 			$tests = CSecurityTestsPackage::getTestsPackage($pType);
-			$dispatcher = new CSecuritySiteChecker($tests, $pIsFirstStart);
+			$dispatcher = new CSecuritySiteChecker($tests, $pIsFirstStart, $pIsCheckRequirementsNeeded);
 			$result = $dispatcher->startTesting();
 			$result["percent"] = $dispatcher->getPercent();
 			if($dispatcher->isAllTestCompleted())

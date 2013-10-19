@@ -1,7 +1,7 @@
 <?
 class CAllSocNetLogCounter
 {
-	public static function GetSubSelect($log_id, $entity_type = false, $entity_id = false, $event_id = false, $created_by_id = false, $arOfEntities = false, $arAdmin = false, $transport = false, $visible = "Y", $type = "L")
+	public static function GetSubSelect($log_id, $entity_type = false, $entity_id = false, $event_id = false, $created_by_id = false, $arOfEntities = false, $arAdmin = false, $transport = false, $visible = "Y", $type = "L", $params = array())
 	{
 		global $DB;
 
@@ -9,6 +9,8 @@ class CAllSocNetLogCounter
 			return false;
 
 		$bGroupCounters = ($type === "group");
+		$params = (is_array($params) ? $params : array());
+		$params['CODE'] = (!empty($params['CODE']) ? $params['CODE'] : ($bGroupCounters ? "SLR0.GROUP_CODE" : "'**'"));
 
 		if ($type == "L" && ($arLog = CSocNetLog::GetByID($log_id)))
 		{
@@ -100,8 +102,14 @@ class CAllSocNetLogCounter
 			}
 			else
 			{
-				$followJoin = " INNER JOIN b_sonet_log_follow LFW ON LFW.USER_ID = U.ID AND (LFW.CODE = 'L".$log_id."' OR LFW.CODE = '**') ";
-				$followWhere = "AND (LFW.USER_ID IS NOT NULL AND LFW.TYPE = 'Y')";
+				$followJoin = " 
+					INNER JOIN b_sonet_log_follow LFW ON LFW.USER_ID = U.ID AND (LFW.CODE = 'L".$log_id."' OR LFW.CODE = '**') 
+					LEFT JOIN b_sonet_log_follow LFW2 ON LFW2.USER_ID = U.ID AND (LFW2.CODE = 'L".$log_id."' AND LFW2.TYPE = 'N')
+				";
+				$followWhere = "
+					AND (LFW.USER_ID IS NOT NULL AND LFW.TYPE = 'Y')
+					AND LFW2.USER_ID IS NULL
+				";
 			}
 		}
 
@@ -118,7 +126,8 @@ class CAllSocNetLogCounter
 			U.ID as ID
 			,1
 			,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
-			,".($bGroupCounters ? "SLR0.GROUP_CODE": "'**'")." as CODE
+			,".$params['CODE']." as CODE,
+			0 as SENT
 		FROM
 			b_user U 
 			INNER JOIN b_sonet_log_right SLR ON SLR.LOG_ID = ".$log_id."

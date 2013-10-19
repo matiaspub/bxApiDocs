@@ -18,7 +18,7 @@ class CCatalogGroup extends CAllCatalogGroup
 {
 	
 	/**
-	 * <p>Функция возвращает параметры типа цен с кодом ID, включая языкозависимые параметры для языка lang </p>
+	 * <p>Функция возвращает параметры типа цен с кодом ID, включая языкозависимые параметры для языка lang.</p>
 	 *
 	 *
 	 *
@@ -32,14 +32,20 @@ class CCatalogGroup extends CAllCatalogGroup
 	 *
 	 *
 	 * @return array <p>Возвращает ассоциативный массив со следующими ключами:</p><table
-	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
-	 * <td>Код типа цены.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название типа
-	 * цены.</td> </tr> <tr> <td>BASE</td> <td>Флаг (Y/N) является ли тип базовым.</td> </tr> <tr>
-	 * <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>CAN_ACCESS</td> <td>Флаг (Y/N) имеет
-	 * ли текущий пользователь право на видеть цены этого типа.</td> </tr> <tr>
-	 * <td>CAN_BUY</td> <td>Флаг (Y/N) имеет ли текущий пользователь право покупать
-	 * товары по ценам этого типа.</td> </tr> <tr> <td>NAME_LANG</td> <td>Название типа
-	 * цены на языке lang</td> </tr> </table><a name="examples"></a>
+	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> <th width="15%">С
+	 * версии</th> </tr> <tr> <td>ID</td> <td>Код типа цены.</td> <td></td> </tr> <tr> <td>NAME</td>
+	 * <td>Внутреннее название типа цены.</td> <td></td> </tr> <tr> <td>BASE</td> <td>Флаг (Y/N)
+	 * является ли тип базовым.</td> <td></td> </tr> <tr> <td>SORT</td> <td>Индекс
+	 * сортировки.</td> <td></td> </tr> <tr> <td>XML_ID</td> <td>Внешний код.</td> <td>12.0.9</td> </tr>
+	 * <tr> <td>CAN_ACCESS</td> <td>Флаг (Y/N) имеет ли текущий пользователь право на
+	 * видеть цены этого типа.</td> <td></td> </tr> <tr> <td>CAN_BUY</td> <td>Флаг (Y/N) имеет ли
+	 * текущий пользователь право покупать товары по ценам этого
+	 * типа.</td> <td></td> </tr> <tr> <td>NAME_LANG</td> <td>Название типа цены на языке lang.</td>
+	 * <td></td> </tr> <tr> <td>CREATED_BY</td> <td>Код пользователя, создавшего тип цен.</td>
+	 * <td>12.5.5</td> </tr> <tr> <td>MODIFIED_BY</td> <td>Код последнего пользователя,
+	 * изменившего тип цен.</td> <td>12.5.5</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
+	 * последнего изменения типа цен.</td> <td>12.5.5</td> </tr> <tr> <td>DATE_CREATE</td>
+	 * <td>Дата создания типа цен.</td> <td>12.5.5</td> </tr> </table><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -65,24 +71,18 @@ class CCatalogGroup extends CAllCatalogGroup
 			return false;
 
 		global $DB, $USER;
-		if (!$USER->IsAdmin())
-		{
-			$strSql =
-				"SELECT CG.ID, CG.NAME, CG.BASE, CG.SORT, CG.XML_ID, IF(CGG.ID IS NULL, 'N', 'Y') as CAN_ACCESS, CGL.NAME as NAME_LANG, IF(CGG1.ID IS NULL, 'N', 'Y') as CAN_BUY ".
-				"FROM b_catalog_group CG ".
-				"	LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$USER->GetGroups().") AND CGG.BUY <> 'Y') ".
-				"	LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$USER->GetGroups().") AND CGG1.BUY = 'Y') ".
-				"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($lang)."') ".
-				"WHERE CG.ID = ".$ID." GROUP BY CG.ID, CG.NAME, CG.BASE, CG.XML_ID, CGL.NAME";
-		}
-		else
-		{
-			$strSql =
-				"SELECT CG.ID, CG.NAME, CG.BASE, CG.SORT, CG.XML_ID, 'Y' as CAN_ACCESS, CGL.NAME as NAME_LANG, 'Y' as CAN_BUY ".
-				"FROM b_catalog_group CG ".
-				"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($lang)."') ".
-				"WHERE CG.ID = ".$ID;
-		}
+
+		$strUserGroups = (CCatalog::IsUserExists() ? $USER->GetGroups() : '2');
+
+		$strSql =
+			"SELECT CG.ID, CG.NAME, CG.BASE, CG.SORT, CG.XML_ID, IF(CGG.ID IS NULL, 'N', 'Y') as CAN_ACCESS, CGL.NAME as NAME_LANG, IF(CGG1.ID IS NULL, 'N', 'Y') as CAN_BUY, ".
+			"CG.CREATED_BY, CG.MODIFIED_BY, ".$DB->DateToCharFunction('CG.TIMESTAMP_X', 'FULL').' as TIMESTAMP_X, '.$DB->DateToCharFunction('CG.DATE_CREATE', 'FULL')." as DATE_CREATE ".
+			"FROM b_catalog_group CG ".
+			"	LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$strUserGroups.") AND CGG.BUY <> 'Y') ".
+			"	LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$strUserGroups.") AND CGG1.BUY = 'Y') ".
+			"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($lang)."') ".
+			"WHERE CG.ID = ".$ID." GROUP BY CG.ID, CG.NAME, CG.BASE, CG.XML_ID, CG.MODIFIED_BY, CG.CREATED_BY, CG.DATE_CREATE, CG.TIMESTAMP_X, CGL.NAME";
+
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($res = $db_res->Fetch())
 			return $res;
@@ -98,14 +98,18 @@ class CCatalogGroup extends CAllCatalogGroup
 	 *
 	 * @param array $arFields  Ассоциативный массив параметров типа цены, ключами которого
 	 * являются названия параметров, а значениями - новые значения.<br>
-	 * Допустимые параметры: <ul> <li>NAME - внутреннее название типа цены;</li>
-	 * <li>SORT - индекс сортировки;</li> <li>USER_GROUP - массив кодов групп
-	 * пользователей, члены которых могут видеть цены этого типа;</li>
-	 * <li>USER_GROUP_BUY - массив кодов групп пользователей, члены которых могут
-	 * покупать товары по ценам этого типа;</li> <li>USER_LANG - ассоциативный
-	 * массив языкозависимых параметров типа цены, ключами которого
-	 * являются коды языков, а значениями - названия этого типа цены на
-	 * соответствующем языке. </li> </ul>
+	 * Допустимые параметры: <ul> <li>BASE - флаг (Y/N) является ли тип базовым
+	 * (если для добавляемого типа цен указано <i>Y</i> и в системе уже есть
+	 * некоторый базовый тип цен, то флаг с существующего типа будет
+	 * снят);</li> <li>NAME - внутреннее название типа цены;</li> <li>SORT - индекс
+	 * сортировки;</li> <li>XML_ID - внешний код;</li> <li>CREATED_BY - ID создателя типа
+	 * цен;</li> <li>MODIFIED_BY - ID последнего изменившего тип цен;</li> <li>USER_GROUP -
+	 * массив кодов групп пользователей, члены которых могут видеть
+	 * цены этого типа;</li> <li>USER_GROUP_BUY - массив кодов групп пользователей,
+	 * члены которых могут покупать товары по ценам этого типа;</li>
+	 * <li>USER_LANG - ассоциативный массив языкозависимых параметров типа
+	 * цены, ключами которого являются коды языков, а значениями -
+	 * названия этого типа цены на соответствующем языке. </li> </ul>
 	 *
 	 *
 	 *
@@ -145,26 +149,62 @@ class CCatalogGroup extends CAllCatalogGroup
 		global $CACHE_MANAGER;
 		global $stackCacheManager;
 		global $CATALOG_BASE_GROUP;
+		global $USER;
 
 		$groupID = 0;
+
+		$arFields1 = array();
+		$intUserID = 0;
+		if (CCatalog::IsUserExists())
+		{
+			$intUserID = intval($USER->GetID());
+			if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
+				$arFields["CREATED_BY"] = $intUserID;
+			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+				$arFields["MODIFIED_BY"] = $intUserID;
+		}
+		if (array_key_exists('TIMESTAMP_X', $arFields))
+			unset($arFields['TIMESTAMP_X']);
+		if (array_key_exists('DATE_CREATE', $arFields))
+			unset($arFields['DATE_CREATE']);
+
+		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
+		$arFields1['DATE_CREATE'] = $DB->GetNowFunction();
 
 		if (!CCatalogGroup::CheckFields("ADD", $arFields, 0))
 			return false;
 
-		$db_events = GetModuleEvents("catalog", "OnBeforeGroupAdd");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnBeforeGroupAdd", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
 				return false;
+		}
 
 		if ($arFields["BASE"] == "Y")
 		{
-			$strSql = "UPDATE b_catalog_group SET BASE = 'N' WHERE BASE = 'Y'";
+			$strUpdate = "BASE = 'N', TIMESTAMP_X = ".$DB->GetNowFunction();
+			if (array_key_exists('MODIFIED_BY', $arFields))
+			{
+				$strUpdate .= ", MODIFIED_BY = ".$arFields["MODIFIED_BY"];
+			}
+			$strSql = "UPDATE b_catalog_group SET ".$strUpdate." WHERE BASE = 'Y'";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if (isset($CATALOG_BASE_GROUP))
 				unset($CATALOG_BASE_GROUP);
 		}
 
 		$arInsert = $DB->PrepareInsert("b_catalog_group", $arFields);
+
+		foreach ($arFields1 as $key => $value)
+		{
+			if (strlen($arInsert[0])>0)
+			{
+				$arInsert[0] .= ", ";
+				$arInsert[1] .= ", ";
+			}
+			$arInsert[0] .= $key;
+			$arInsert[1] .= $value;
+		}
 
 		$strSql = "INSERT INTO b_catalog_group(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -192,8 +232,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			foreach ($arFields["USER_LANG"] as $key => $value)
 			{
 				$strSql =
-					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) ".
-					"VALUES(".$groupID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
+					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) VALUES(".$groupID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
@@ -207,9 +246,15 @@ class CCatalogGroup extends CAllCatalogGroup
 		$stackCacheManager->Clear("catalog_GetQueryBuildArrays");
 		$stackCacheManager->Clear("catalog_discount");
 
-		$events = GetModuleEvents("catalog", "OnGroupUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnGroupAdd", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($groupID, $arFields));
+		}
+		// strange copy-paste bug
+		foreach(GetModuleEvents("catalog", "OnGroupUpdate", true) as $arEvent)
+		{
+			ExecuteModuleEventEx($arEvent, array($groupID, $arFields));
+		}
 
 		return $groupID;
 	}
@@ -227,8 +272,10 @@ class CCatalogGroup extends CAllCatalogGroup
 	 *
 	 * @param array $arFields  Ассоциативный массив параметров типа цены, ключами которого
 	 * являются названия параметров, а значениями - новые значения.
-	 * Допустимые параметры: <ul> <li>NAME - внутреннее название типа цены;</li>
-	 * <li>SORT - индекс сортировки;</li> <li>USER_GROUP - массив кодов групп
+	 * Допустимые параметры: <ul> <li>BASE - флаг (Y/N) является ли тип
+	 * базовым;</li> <li>NAME - внутреннее название типа цены;</li> <li>SORT - индекс
+	 * сортировки;</li> <li>XML_ID - внешний код;</li> <li>MODIFIED_BY - ID последнего
+	 * изменившего тип цен;</li> <li>USER_GROUP - массив кодов групп
 	 * пользователей, члены которых могут видеть цены этого типа;</li>
 	 * <li>USER_GROUP_BUY - массив кодов групп пользователей, члены которых могут
 	 * покупать товары по ценам этого типа;</li> <li>USER_LANG - ассоциативный
@@ -273,28 +320,58 @@ class CCatalogGroup extends CAllCatalogGroup
 		global $CACHE_MANAGER;
 		global $stackCacheManager;
 		global $CATALOG_BASE_GROUP;
+		global $USER;
 
 		$ID = intval($ID);
 		if (0 >= $ID)
 			return false;
 
+		$arFields1 = array();
+		if (array_key_exists('CREATED_BY',$arFields))
+			unset($arFields['CREATED_BY']);
+		if (array_key_exists('DATE_CREATE',$arFields))
+			unset($arFields['DATE_CREATE']);
+		if (array_key_exists('TIMESTAMP_X', $arFields))
+			unset($arFields['TIMESTAMP_X']);
+
+		$intUserID = 0;
+		if (CCatalog::IsUserExists())
+		{
+			$intUserID = intval($USER->GetID());
+			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+				$arFields["MODIFIED_BY"] = $intUserID;
+		}
+		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
+
 		if (!CCatalogGroup::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 
-		$db_events = GetModuleEvents("catalog", "OnBeforeGroupUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnBeforeGroupUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
 				return false;
+		}
 
 		if (isset($arFields["BASE"]) && $arFields["BASE"] == "Y")
 		{
-			$strSql = "UPDATE b_catalog_group SET BASE = 'N' WHERE ID != ".$ID." AND BASE = 'Y'";
+			$strUpdate = "BASE = 'N', TIMESTAMP_X = ".$DB->GetNowFunction();
+			if (array_key_exists('MODIFIED_BY', $arFields))
+			{
+				$strUpdate .= ", MODIFIED_BY = ".$arFields["MODIFIED_BY"];
+			}
+			$strSql = "UPDATE b_catalog_group SET ".$strUpdate." WHERE ID != ".$ID." AND BASE = 'Y'";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if (isset($CATALOG_BASE_GROUP))
 				unset($CATALOG_BASE_GROUP);
 		}
 
 		$strUpdate = $DB->PrepareUpdate("b_catalog_group", $arFields);
+		foreach ($arFields1 as $key => $value)
+		{
+			if (strlen($strUpdate)>0) $strUpdate .= ", ";
+			$strUpdate .= $key."=".$value." ";
+		}
+
 		$strSql = "UPDATE b_catalog_group SET ".$strUpdate." WHERE ID = ".$ID;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -328,8 +405,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			foreach ($arFields["USER_LANG"] as $key => $value)
 			{
 				$strSql =
-					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) ".
-					"VALUES(".$ID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
+					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) VALUES(".$ID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
@@ -343,9 +419,10 @@ class CCatalogGroup extends CAllCatalogGroup
 		$stackCacheManager->Clear("catalog_GetQueryBuildArrays");
 		$stackCacheManager->Clear("catalog_discount");
 
-		$events = GetModuleEvents("catalog", "OnGroupUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnGroupUpdate", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+		}
 
 		return true;
 	}
@@ -362,7 +439,7 @@ class CCatalogGroup extends CAllCatalogGroup
 	 *
 	 *
 	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае </p>
+	 * противном случае </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__delete.dbdc5f0d.php
@@ -383,14 +460,16 @@ class CCatalogGroup extends CAllCatalogGroup
 		{
 			if ($res["BASE"] != "Y")
 			{
-				$db_events = GetModuleEvents("catalog", "OnBeforeGroupDelete");
-				while ($arEvent = $db_events->Fetch())
+				foreach(GetModuleEvents("catalog", "OnBeforeGroupDelete", true) as $arEvent)
+				{
 					if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 						return false;
+				}
 
-				$events = GetModuleEvents("catalog", "OnGroupDelete");
-				while ($arEvent = $events->Fetch())
+				foreach(GetModuleEvents("catalog", "OnGroupDelete", true) as $arEvent)
+				{
 					ExecuteModuleEventEx($arEvent, array($ID));
+				}
 
 				if (!defined("CATALOG_SKIP_CACHE") || !CATALOG_SKIP_CACHE)
 				{
@@ -448,34 +527,32 @@ class CCatalogGroup extends CAllCatalogGroup
 	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
 	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
 	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
-	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
-	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле цен
-	 * каталога.<br><br> Пример фильтра: <pre class="syntax">array("SUBSCRIPTION" =&gt; "Y")</pre>
-	 * Этот фильтр означает "выбрать все записи, в которых значение в
-	 * поле SUBSCRIPTION (флаг "Продажа контента") равно Y".<br><br> Значение по
-	 * умолчанию - пустой массив array() - означает, что результат
-	 * отфильтрован не будет.
+	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
+	 * значение поля меньше или равно передаваемой в фильтр
+	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
+	 * фильтр величины;</b></li> <li> <b>@</b> - оператор может использоваться для
+	 * целочисленных и вещественных данных при передаче набора
+	 * значений (массива). В этом случае при генерации sql-запроса будет
+	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	 * <li> <b>~</b> - значение поля проверяется на соответствие
+	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	 * проверяется на соответствие передаваемой в фильтр строке в
+	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	 * может стоять любое поле цен каталога.<br><br> Пример фильтра: <pre
+	 * class="syntax">array("SUBSCRIPTION" =&gt; "Y")</pre> Этот фильтр означает "выбрать все
+	 * записи, в которых значение в поле SUBSCRIPTION (флаг "Продажа контента")
+	 * равно Y".<br><br> Значение по умолчанию - пустой массив array() - означает,
+	 * что результат отфильтрован не будет.
 	 *
 	 *
 	 *
 	 * @param array $arGroupBy = false Массив полей, по которым группируются записи типов цен каталога.
-	 * Массив имеет вид: <pre class="syntax">array("название_поля1",
-	 * "группирующая_функция2" =&gt; "название_поля2", . . .)</pre> В качестве
-	 * "название_поля<i>N</i>" может стоять любое поле типов цен каталога. В
-	 * качестве группирующей функции могут стоять: <ul> <li> <b> COUNT</b> -
-	 * подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
-	 * <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
-	 * вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	 * суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
-	 * удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
-	 * означает, что результат группироваться не будет.
+	 * Массив имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", .
+	 * . .)</pre> В качестве "название_поля<i>N</i>" может стоять любое поле
+	 * типов цен каталога. <br><br> Если массив пустой, то функция вернет
+	 * число записей, удовлетворяющих фильтру.<br><br> Значение по
+	 * умолчанию - <i>false</i> - означает, что результат группироваться не
+	 * будет.
 	 *
 	 *
 	 *
@@ -498,14 +575,19 @@ class CCatalogGroup extends CAllCatalogGroup
 	 *
 	 * @return CDBResult <p>Объект класса CDBResult, содержащий набор ассоциативных массивов с
 	 * ключами: </p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код типа цены. </td> </tr> <tr> <td>NAME</td> <td>Внутреннее
-	 * название типа цены. </td> </tr> <tr> <td>BASE</td> <td>Флаг (Y/N) является ли тип
-	 * базовым. </td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки. </td> </tr> <tr>
-	 * <td>CAN_ACCESS</td> <td>Флаг (Y/N) имеет ли текущий пользователь право видеть
-	 * цены этого типа. </td> </tr> <tr> <td>CAN_BUY</td> <td>Флаг (Y/N) имеет ли текущий
-	 * пользователь право покупать товары по ценам этого типа. </td> </tr> <tr>
-	 * <td>NAME_LANG</td> <td>Название типа цены на языке lang.</td> </tr> </table><a
-	 * name="examples"></a>
+	 * <th width="15%">С версии</th> </tr> <tr> <td>ID</td> <td>Код типа цены. </td> <td></td> </tr> <tr>
+	 * <td>NAME</td> <td>Внутреннее название типа цены. </td> <td></td> </tr> <tr> <td>BASE</td>
+	 * <td>Флаг (Y/N) является ли тип базовым. </td> <td></td> </tr> <tr> <td>SORT</td>
+	 * <td>Индекс сортировки. </td> <td></td> </tr> <tr> <td>CAN_ACCESS</td> <td>Флаг (Y/N) имеет ли
+	 * текущий пользователь право видеть цены этого типа. </td> <td></td> </tr> <tr>
+	 * <td>CAN_BUY</td> <td>Флаг (Y/N) имеет ли текущий пользователь право покупать
+	 * товары по ценам этого типа. </td> <td></td> </tr> <tr> <td>NAME_LANG</td> <td>Название
+	 * типа цены на языке lang.</td> <td></td> </tr> <tr> <td>XML_ID</td> <td>Внешний код.</td>
+	 * <td>12.0.9</td> </tr> <tr> <td>CREATED_BY</td> <td>Код пользователя, создавшего тип
+	 * цен.</td> <td>12.5.5</td> </tr> <tr> <td>MODIFIED_BY</td> <td>Код последнего пользователя,
+	 * изменившего тип цен.</td> <td>12.5.5</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
+	 * последнего изменения типа цен.</td> <td>12.5.5</td> </tr> <tr> <td>DATE_CREATE</td>
+	 * <td>Дата создания типа цен.</td> <td>12.5.5</td> </tr> </table><a name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -537,7 +619,7 @@ class CCatalogGroup extends CAllCatalogGroup
 		{
 			$arOrder = strval($arOrder);
 			$arFilter = strval($arFilter);
-			if (strlen($arOrder) > 0 && strlen($arFilter) > 0)
+			if ('' != $arOrder && '' != $arFilter)
 				$arOrder = array($arOrder => $arFilter);
 			else
 				$arOrder = array();
@@ -546,18 +628,20 @@ class CCatalogGroup extends CAllCatalogGroup
 			else
 				$arFilter = array();
 			$arGroupBy = false;
-			if ($arNavStartParams != false && strlen($arNavStartParams) > 0)
+			if ($arNavStartParams != false && '' != $arNavStartParams)
 				$arFilter["LID"] = $arNavStartParams;
 			else
 				$arFilter["LID"] = LANGUAGE_ID;
 		}
-		if (!isset($arFilter['LID']))
+		if (!array_key_exists('LID', $arFilter))
 			$arFilter['LID'] = LANGUAGE_ID;
 
+		$strUserGroups = (CCatalog::IsUserExists() ? $USER->GetGroups() : '2');
+
 		if (empty($arSelectFields))
-			$arSelectFields = array("ID", "NAME", "BASE", "SORT", "NAME_LANG", "CAN_ACCESS", "CAN_BUY", "XML_ID");
+			$arSelectFields = array("ID", "NAME", "BASE", "SORT", "NAME_LANG", "CAN_ACCESS", "CAN_BUY", "XML_ID", "MODIFIED_BY", "CREATED_BY", "DATE_CREATE", "TIMESTAMP_X");
 		if ($arGroupBy == false)
-			$arGroupBy = array("ID", "NAME", "BASE", "SORT", "XML_ID", "NAME_LANG");
+			$arGroupBy = array("ID", "NAME", "BASE", "SORT", "XML_ID", "MODIFIED_BY", "CREATED_BY", "DATE_CREATE", "TIMESTAMP_X", "NAME_LANG");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "CG.ID", "TYPE" => "int"),
@@ -565,42 +649,39 @@ class CCatalogGroup extends CAllCatalogGroup
 			"BASE" => array("FIELD" => "CG.BASE", "TYPE" => "char"),
 			"SORT" => array("FIELD" => "CG.SORT", "TYPE" => "int"),
 			"XML_ID" => array("FIELD" => "CG.XML_ID", "TYPE" => "string"),
+			"TIMESTAMP_X" => array("FIELD" => "CG.TIMESTAMP_X", "TYPE" => "datetime"),
+			"MODIFIED_BY" => array("FIELD" => "CG.MODIFIED_BY", "TYPE" => "int"),
+			"DATE_CREATE" => array("FIELD" => "CG.DATE_CREATE", "TYPE" => "datetime"),
+			"CREATED_BY" => array("FIELD" => "CG.CREATED_BY", "TYPE" => "int"),
 			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($arFilter["LID"], 2)."')"),
 		);
-		if (!$USER->IsAdmin())
-		{
-			$arFields["CAN_ACCESS"] = array(
-					"FIELD" => "IF(CGG.ID IS NULL, 'N', 'Y')",
-					"TYPE" => "char",
-					"FROM" => "LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$USER->GetGroups().") AND CGG.BUY <> 'Y')",
-					"GROUPED" => "N"
-				);
-			$arFields["CAN_BUY"] = array(
-					"FIELD" => "IF(CGG1.ID IS NULL, 'N', 'Y')",
-					"TYPE" => "char",
-					"FROM" => "LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$USER->GetGroups().") AND CGG1.BUY = 'Y')",
-					"GROUPED" => "N"
-				);
-		}
-		else
-		{
-			$arFields["CAN_ACCESS"] = array("FIELD" => "'Y'", "TYPE" => "char");
-			$arFields["CAN_BUY"] = array("FIELD" => "'Y'", "TYPE" => "char");
-		}
+
+		$arFields["CAN_ACCESS"] = array(
+			"FIELD" => "IF(CGG.ID IS NULL, 'N', 'Y')",
+			"TYPE" => "char",
+			"FROM" => "LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$strUserGroups.") AND CGG.BUY <> 'Y')",
+			"GROUPED" => "N"
+		);
+		$arFields["CAN_BUY"] = array(
+			"FIELD" => "IF(CGG1.ID IS NULL, 'N', 'Y')",
+			"TYPE" => "char",
+			"FROM" => "LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$strUserGroups.") AND CGG1.BUY = 'Y')",
+			"GROUPED" => "N"
+		);
 
 		$arSqls = CCatalog::_PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 			if (!empty($arSqls["HAVING"]))
-				$strSql .= "HAVING ".$arSqls["HAVING"]." ";
+				$strSql .= " HAVING ".$arSqls["HAVING"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -609,25 +690,31 @@ class CCatalogGroup extends CAllCatalogGroup
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["HAVING"]))
-			$strSql .= "HAVING ".$arSqls["HAVING"]." ";
+			$strSql .= " HAVING ".$arSqls["HAVING"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_group CG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 			if (!empty($arSqls["HAVING"]))
-				$strSql_tmp .= "HAVING ".$arSqls["HAVING"]." ";
+				$strSql_tmp .= " HAVING ".$arSqls["HAVING"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -647,9 +734,10 @@ class CCatalogGroup extends CAllCatalogGroup
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -658,10 +746,10 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	public static function GetListEx($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
-		global $DB, $USER;
+		global $DB;
 
 		if (empty($arSelectFields))
-			$arSelectFields = array("ID", "NAME", "BASE", "SORT", "NAME_LANG", "XML_ID");
+			$arSelectFields = array("ID", "NAME", "BASE", "SORT", "NAME_LANG", "XML_ID", "MODIFIED_BY", "CREATED_BY", "DATE_CREATE", "TIMESTAMP_X");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "CG.ID", "TYPE" => "int"),
@@ -669,28 +757,32 @@ class CCatalogGroup extends CAllCatalogGroup
 			"BASE" => array("FIELD" => "CG.BASE", "TYPE" => "char"),
 			"SORT" => array("FIELD" => "CG.SORT", "TYPE" => "int"),
 			"XML_ID" => array("FIELD" => "CG.XML_ID", "TYPE" => "string"),
+			"TIMESTAMP_X" => array("FIELD" => "CG.TIMESTAMP_X", "TYPE" => "datetime"),
+			"MODIFIED_BY" => array("FIELD" => "CG.MODIFIED_BY", "TYPE" => "int"),
+			"DATE_CREATE" => array("FIELD" => "CG.DATE_CREATE", "TYPE" => "datetime"),
+			"CREATED_BY" => array("FIELD" => "CG.CREATED_BY", "TYPE" => "int"),
 
 			"GROUP_ID" => array("FIELD" => "CG2G.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 			"GROUP_CATALOG_GROUP_ID" => array("FIELD" => "CG2G.CATALOG_GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 			"GROUP_GROUP_ID" => array("FIELD" => "CG2G.GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 			"GROUP_BUY" => array("FIELD" => "CG2G.BUY", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 
-			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql(LANGUAGE_ID, 2)."')"),
+			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".LANGUAGE_ID."')"),
 		);
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && empty($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 			if (!empty($arSqls["HAVING"]))
-				$strSql .= "HAVING ".$arSqls["HAVING"]." ";
+				$strSql .= " HAVING ".$arSqls["HAVING"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -699,25 +791,31 @@ class CCatalogGroup extends CAllCatalogGroup
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group CG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["HAVING"]))
-			$strSql .= "HAVING ".$arSqls["HAVING"]." ";
+			$strSql .= " HAVING ".$arSqls["HAVING"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_group CG ".$arSqls["FROM"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_group CG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 			if (!empty($arSqls["HAVING"]))
-				$strSql_tmp .= "HAVING ".$arSqls["HAVING"]." ";
+				$strSql_tmp .= " HAVING ".$arSqls["HAVING"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -737,9 +835,10 @@ class CCatalogGroup extends CAllCatalogGroup
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -806,19 +905,44 @@ class CCatalogGroup extends CAllCatalogGroup
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group2group CGG ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group2group CGG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return $dbRes;
 	}
 
+	
+	/**
+	 * <p>Функция возвращает языкозависимые названия типов цен.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param array $arrayarFilter = Array() Фильтр задается в виде ассоциативного массива, ключами в котором
+	 * являются названия полей, а значениями - условия на значения.<br>
+	 * Допустимые ключи:<br><ul> <li>ID - код записи;</li> <li>CATALOG_GROUP_ID - код типа
+	 * цен;</li> <li>LID - код языка;</li> <li>NAME - название типа цен в зависимости
+	 * от языка интерфейса. </li> </ul>
+	 *
+	 *
+	 *
+	 * @return CDBResult <p>Объект класса CDBResult, содержащий набор ассоциативных массивов с
+	 * ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	 * </tr> <tr> <td>ID</td> <td>Код записи.</td> </tr> <tr> <td>CATALOG_GROUP_ID</td> <td>Код типа
+	 * цен.</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr> <td>NAME</td> <td>Название типа
+	 * цен в зависимости от языка интерфейса.</td> </tr> </table><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/getlanglist.php
+	 * @author Bitrix
+	 */
 	public static function GetLangList($arFilter = array())
 	{
 		global $DB;
@@ -834,13 +958,13 @@ class CCatalogGroup extends CAllCatalogGroup
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group_lang CGL ".$arSqls["FROM"]." ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_group_lang CGL ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			$strSql .= " WHERE ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 

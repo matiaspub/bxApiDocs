@@ -11,7 +11,8 @@ class CSecurityEvent
 	private $isFileEngineActive = false;
 	private $filePath = "";
 
-	private $isUserInfoNeeded = false;
+	/** @var CSecurityEventMessageFormatter $messageFormatter */
+	private $messageFormatter = null;
 
 	private static $syslogFacilities = array(
 		LOG_SYSLOG   => "LOG_SYSLOG",
@@ -37,6 +38,10 @@ class CSecurityEvent
 		$this->initializeDBEngine(COption::getOptionString("security", "security_event_db_active") == "Y");
 		$this->initializeSyslogEngine(COption::getOptionString("security", "security_event_syslog_active") == "Y");
 		$this->initializeFileEngine(COption::getOptionString("security", "security_event_file_active") == "Y");
+		$this->messageFormatter = new CSecurityEventMessageFormatter(
+			COption::getOptionString("security", "security_event_format"),
+			COption::getOptionString("security", "security_event_userinfo_format")
+		);
 	}
 
 	/**
@@ -48,10 +53,8 @@ class CSecurityEvent
 		{
 			$this->isFileEngineActive = true;
 			$this->filePath = COption::getOptionString("security", "security_event_file_path");
-			if(COption::getOptionString("security", "security_event_collect_user_info") == "Y")
-				$this->isUserInfoNeeded = true;
-			else
-				$this->isUserInfoNeeded = false;
+			if(!checkDirPath($this->filePath))
+				$this->isFileEngineActive = false;
 		}
 		else
 		{
@@ -64,14 +67,7 @@ class CSecurityEvent
 	 */
 	private function initializeDBEngine($pActive = false)
 	{
-		if($pActive)
-		{
-			$this->isDBEngineActive = true;
-		}
-		else
-		{
-			$this->isDBEngineActive = false;
-		}
+		$this->isDBEngineActive = $pActive;
 	}
 
 	/**
@@ -86,11 +82,8 @@ class CSecurityEvent
 				$this->syslogFacility = LOG_USER;
 			else
 				$this->syslogFacility = COption::getOptionString("security", "security_event_syslog_facility");
+
 			$this->syslogPriority = COption::getOptionString("security", "security_event_syslog_priority");
-			if(COption::getOptionString("security", "security_event_collect_user_info") == "Y")
-				$this->isUserInfoNeeded = true;
-			else
-				$this->isUserInfoNeeded = false;
 			openlog("Bitrix WAF", LOG_ODELAY, $this->syslogFacility);
 		}
 		else
@@ -123,16 +116,19 @@ class CSecurityEvent
 		$savedInDB = $savedInFile = $savedInSyslog = false;
 		if($this->isDBEngineActive)
 		{
-			$savedInDB = CEventLog::log($pSeverity, $pAuditType, "security", $pItemName, $pItemDescription);
+			$savedInDB = CEventLog::log($pSeverity, $pAuditType, "security", $pItemName, "=".base64_encode($pItemDescription));
 		}
+		$message = "";
 		if($this->isSyslogEngineActive)
 		{
-			$message = self::formatMessage($pAuditType, $pItemName, $pItemDescription, $this->isUserInfoNeeded);
+			$message = $this->messageFormatter->format($pAuditType, $pItemName, $pItemDescription);
 			$savedInSyslog = syslog($this->syslogPriority, $message);
 		}
 		if($this->isFileEngineActive)
 		{
-			$message = self::formatMessage($pAuditType, $pItemName, $pItemDescription, $this->isUserInfoNeeded);
+			if (!$message)
+				$message = $this->messageFormatter->format($pAuditType, $pItemName, $pItemDescription);
+
 			$message .= "\n";
 			$savedInFile = file_put_contents($this->filePath, $message, FILE_APPEND) > 0;
 		}
@@ -225,50 +221,9 @@ class CSecurityEvent
 		return $result;
 	}
 
-	/**
-	 * @return string
-	 */
-	protected static function getUserInfo()
+	public function getMessageFormatter()
 	{
-		global $USER;
-
-		$userInfo =
-				" | REMOTE_ADDR - ".$_SERVER["REMOTE_ADDR"].
-				" | USER_AGENT - ".$_SERVER["HTTP_USER_AGENT"];
-
-		if(is_object($USER) && ($USER->GetID() > 0))
-			$userInfo .= " | USER_ID - ".$USER->GetID();
-
-		if(isset($_SESSION) && array_key_exists("SESS_GUEST_ID", $_SESSION) && $_SESSION["SESS_GUEST_ID"] > 0)
-			$userInfo .= " | GUEST_ID - ".$_SESSION["SESS_GUEST_ID"];
-
-		return $userInfo;
-	}
-
-	/**
-	 * @param string $pAuditType
-	 * @param string $pItemName
-	 * @param string $pItemDescription
-	 * @param bool   $pIsUserInfoNeeded
-	 * @return string
-	 */
-	protected static function formatMessage($pAuditType, $pItemName, $pItemDescription, $pIsUserInfoNeeded = false)
-	{
-
-		$url = preg_replace("/(&?sessid=[0-9a-z]+)/", "", $_SERVER["REQUEST_URI"]);
-		$description = "=".substr(base64_decode($pItemDescription),0,2000);
-		if($pIsUserInfoNeeded)
-			$userInfo = self::getUserInfo();
-		else
-			$userInfo = "";
-
-		if(!defined("ADMIN_SECTION") || ADMIN_SECTION != true)
-			$siteID = SITE_ID.":";
-		else
-			$siteID = "";
-
-
-		return $pAuditType." - ".$siteID.$url." - ".$pItemName.$description.$userInfo;
+		return $this->messageFormatter;
 	}
 
 	/**

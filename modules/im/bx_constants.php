@@ -2,7 +2,7 @@
 /**
  * IM_REVISION
  */
-define('IM_REVISION', 6);
+define('IM_REVISION', 15);
 
 /**
  * IM_MESSAGE_SYSTEM

@@ -16,6 +16,94 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllCatalog
 {
+	protected static $arCatalogCache = array();
+
+	
+	/**
+	 * <p>Метод служит для проверки (и корректировки, если это возможно) параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a>;</li> <li>
+	 * <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a>.</li>
+	 * </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров привязки инфоблока к модулю
+	 * Торгового каталога. Массив передается по ссылке и его значения
+	 * могут быть изменены функцией. <br> Допустимые ключи: <ul> <li> <b>IBLOCK_ID</b>
+	 * - код (ID) инфоблока;</li> <li> <b>SUBSCRIPTION</b> - флаг "Продажа контента" (Y/N);</li>
+	 * <li> <b>YANDEX_EXPORT</b> - флаг "Экспортировать в Яндекс.Товары" (Y/N);</li> <li>
+	 * <b>VAT_ID</b> - код (ID) типа НДС;</li> <li> <b>PRODUCT_IBLOCK_ID</b> - код (ID) инфоблока
+	 * товаров (для инфоблока торговых предложений);</li> <li> <b>SKU_PROPERTY_ID</b> -
+	 * код (ID) свойства привязки к инфоблоку товаров (для инфоблока
+	 * торговых предложений);</li> </ul>
+	 *
+	 *
+	 *
+	 * @param int $ID = 0] Код (ID) инфоблока.
+	 *
+	 *
+	 *
+	 * @return bool <p> В случае корректности переданных параметров возвращает true,
+	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	 * можно получить текст ошибок.</p><p><b>Обязательные проверки</b></p><ul>
+	 * <li>для <b>CCatalog::Add</b> <ul> <li>ключ IBLOCK_ID присутствует и содержит код (ID)
+	 * существующего инфоблока;</li> <li>если ключ SUBSCRIPTION не существует или
+	 * не равен Y, ему присваивается значение N;</li> <li>если ключ YANDEX_EXPORT не
+	 * существует или не равен Y, ему присваивается значение N;</li> <li>если
+	 * ключ VAT_ID не существует или меньше 0, ему присваивается значение
+	 * 0;</li> <li>PRODUCT_IBLOCK_ID и SKU_PROPERTY_ID оба отсутствуют, оба равны нулю, либо
+	 * отвечают правилу: <ul> <li>PRODUCT_IBLOCK_ID - код (ID) существующего
+	 * инфоблока;</li> <li>SKU_PROPERTY_ID - код (ID) существующего свойства
+	 * инфоблока IBLOCK_ID. Тип свойства - "SKU", свойство одиночное, поле
+	 * LINK_IBLOCK_ID свойства = PRODUCT_IBLOCK_ID.</li> </ul> </li> </ul> <br> </li> <li>для
+	 * <b>CCatalog::Update</b> <ul> <li>инфоблок с кодом ID должен являться торговым
+	 * каталогом;</li> <li>если ключ SUBSCRIPTION существует и не равен Y, ему
+	 * присваивается значение N;</li> <li>если ключ YANDEX_EXPORT существует и не
+	 * равен Y, ему присваивается значение N;</li> <li>если ключ VAT_ID
+	 * существует и меньше 0, ему присваивается значение 0;</li> <li>PRODUCT_IBLOCK_ID
+	 * и SKU_PROPERTY_ID оба отсутствуют либо оба заданы;</li> </ul> </li> </ul>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * $arFields = array(
+	 *    'IBLOCK_ID' =&gt; 2,
+	 *    'YANDEX_EXPORT' =&gt; 'Y'
+	 * );
+	 * $boolResult = CCatalog::CheckFields('ADD',$arFields);
+	 * if ($boolResult == false)
+	 * {
+	 * 	if ($ex = $APPLICATION-&gt;GetException())
+	 * 	{
+	 * 		$strError = $ex-&gt;GetString();
+	 * 		ShowError($strError);
+	 * 	}
+	 * }
+	 * ?&gt;
+	 * </pre>
+	 *
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a></li>
+	 * </ul>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/checkfields.php
+	 * @author Bitrix
+	 */
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
@@ -265,7 +353,7 @@ class CAllCatalog
 
 	
 	/**
-	 * <p>Возвращает массив параметров каталога, включая некоторые параметры, относящиеся к информационному блоку </p>
+	 * <p>Возвращает массив параметров каталога, включая некоторые параметры, относящиеся к информационному блоку. Если инфоблок с кодом $ID не существует или не является торговым каталогом, вернет false.</p>
 	 *
 	 *
 	 *
@@ -274,12 +362,40 @@ class CAllCatalog
 	 *
 	 *
 	 *
-	 * @return array <p>Возвращает ассоциативный массив с ключами</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>SUBSCRIPTION</td> <td>Флаг
-	 * "Продажа контента" </td> </tr> <tr> <td>IBLOCK_ID</td> <td>Код информационного
-	 * блока.</td> </tr> <tr> <td>IBLOCK_TYPE_ID</td> <td>Тип информационного блока.</td> </tr>
-	 * <tr> <td>NAME</td> <td>Название информационного блока.</td> </tr> <tr>
-	 * <td>YANDEX_EXPORT</td> <td>флаг "экспортировать в Яндекс.Товары"</td> </tr> </table>
+	 * @return array <p>Если инфоблок с кодом $ID не существует или не является торговым
+	 * каталогом, вернет false. Иначе возвращает ассоциативный массив с
+	 * ключами:</p><table class="tnormal" width="100%"> <thead><tr> <th width="15%">Ключ</th>
+	 * <th>Описание</th> </tr></thead> <tbody> <tr> <td>IBLOCK_ID</td> <td>Код (ID) информационного
+	 * блока.</td> </tr> <tr> <td>ID</td> <td>Код (ID) информационного блока.</td> </tr> <tr>
+	 * <td>IBLOCK_TYPE_ID</td> <td>Тип информационного блока.</td> </tr> <tr> <td>NAME</td>
+	 * <td>Название информационного блока.</td> </tr> <tr> <td>SUBSCRIPTION</td> <td>Флаг
+	 * "Продажа контента" (Y/N).</td> </tr> <tr> <td>YANDEX_EXPORT</td> <td>Флаг
+	 * "экспортировать в Яндекс.Товары" (Y/N).</td> </tr> <tr> <td>VAT_ID</td> <td>Код (ID)
+	 * типа НДС.</td> </tr> <tr> <td>PRODUCT_ID</td> <td>Код (ID) инфоблока товаров (для
+	 * инфоблока торговых предложений). Для обычного каталога содержит
+	 * 0.</td> </tr> <tr> <td>SKU_PROPERTY_ID</td> <td>Код (ID) свойства привязки к инфоблоку
+	 * товаров (для инфоблока торговых предложений). Для обычного
+	 * каталога содержит 0.</td> </tr> <tr> <td>OFFERS_IBLOCK_ID</td> <td>Код (ID) инфоблока
+	 * торговых предложений (для ситуации, когда торговым каталогом
+	 * являются как инфоблок товаров, так и инфоблок торговых
+	 * предложений). Во всех остальных случаях содержит NULL. Ключ
+	 * используется для совместимости, для получения полной информации
+	 * о связке "инфоблок товаров - инфоблок торговых предложений"
+	 * рекомендуется использовать метод <b>CCatalog::GetByIDExt()</b>.</td> </tr> <tr>
+	 * <td>OFFERS_PROPERTY_ID</td> <td>код (ID) свойства привязки торговых предложений к
+	 * товарам для ситуации, когда торговым каталогом являются как
+	 * инфоблок товаров, так и инфоблок торговых предложений). Во всех
+	 * остальных случаях содержит NULL. Ключ используется для
+	 * совместимости, для получения полной информации о связке
+	 * "инфоблок товаров - инфоблок торговых предложений" рекомендуется
+	 * использовать метод <b>Catalog::GetByIDExt()</b>.</td> </tr> <tr> <td>OFFERS</td> <td>Флаг
+	 * наличия инфоблока торговых предложений (Y/N).</td> </tr> </tbody> </table>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	 * </ul><br><br>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__getbyid.d6f66bc1.php
@@ -289,108 +405,100 @@ class CAllCatalog
 	{
 		global $DB;
 
-		global $CATALOG_CATALOG_CACHE;
-
 		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 
-		if (isset($CATALOG_CATALOG_CACHE[$ID]) && is_array($CATALOG_CATALOG_CACHE[$ID]) && isset($CATALOG_CATALOG_CACHE[$ID]["ID"]))
+		if (array_key_exists($ID, self::$arCatalogCache))
 		{
-			return $CATALOG_CATALOG_CACHE[$ID];
+			return self::$arCatalogCache[$ID];
 		}
 		else
 		{
-			$strSql = "
-				SELECT
-					CI.IBLOCK_ID as IBLOCK_ID
-					,CI.YANDEX_EXPORT
-					,CI.SUBSCRIPTION
-					,CI.VAT_ID
-					,CI.PRODUCT_IBLOCK_ID
-					,CI.SKU_PROPERTY_ID
-					,I.ID as ID
-					,I.IBLOCK_TYPE_ID
-					,I.LID
-					,I.NAME
-					,OFFERS.IBLOCK_ID OFFERS_IBLOCK_ID
-					,OFFERS.SKU_PROPERTY_ID OFFERS_PROPERTY_ID
+			$strSql = "SELECT CI.*, I.ID as ID, I.IBLOCK_TYPE_ID, I.LID, I.NAME,
+					OFFERS.IBLOCK_ID OFFERS_IBLOCK_ID, OFFERS.SKU_PROPERTY_ID OFFERS_PROPERTY_ID
 				FROM
-					b_catalog_iblock CI
-					INNER JOIN b_iblock I ON CI.IBLOCK_ID = I.ID
+					b_catalog_iblock CI INNER JOIN b_iblock I ON CI.IBLOCK_ID = I.ID
 					LEFT JOIN b_catalog_iblock OFFERS ON CI.IBLOCK_ID = OFFERS.PRODUCT_IBLOCK_ID
 				WHERE
-					CI.IBLOCK_ID = ".$ID."
-			";
+					CI.IBLOCK_ID = ".$ID;
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($res = $db_res->Fetch())
 			{
-				$res["OFFERS"] = $res["PRODUCT_IBLOCK_ID"]? "Y": "N";
-				$CATALOG_CATALOG_CACHE[$ID] = $res;
+				$res["OFFERS"] = $res["PRODUCT_IBLOCK_ID"] ? "Y": "N";
+				self::$arCatalogCache[$ID] = $res;
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $CATALOG_CATALOG_CACHE;
+					$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
+				}
 				return $res;
 			}
 		}
-
 		return false;
 	}
 
-	//	!>=		!+<=
 	public static function GetFilterOperation($key)
 	{
+		$arResult = array(
+			'FIELD' => '',
+			'NEGATIVE' => 'N',
+			'OPERATION' => '',
+			'OR_NULL' => 'N'
+		);
 
-		$strNegative = "N";
-		if (substr($key, 0, 1)=="!")
-		{
-			$key = substr($key, 1);
-			$strNegative = "Y";
-		}
+		static $arDoubleModify = array(
+			'>=' => '>=',
+			'<=' => '<='
+		);
 
-		$strOrNull = "N";
-		if (substr($key, 0, 1)=="+")
-		{
-			$key = substr($key, 1);
-			$strOrNull = "Y";
-		}
+		static $arOneModify = array(
+			'>' => '>',
+			'<' => '<',
+			'@' => 'IN',
+			'~' => 'LIKE',
+			'%' => 'QUERY',
+			'=' => '='
+		);
 
-		if (substr($key, 0, 2)==">=")
+		if (0 == strncmp($key, '!', 1))
 		{
-			$key = substr($key, 2);
-			$strOperation = ">=";
-		}
-		elseif (substr($key, 0, 1)==">")
-		{
+			$arResult['NEGATIVE'] = 'Y';
 			$key = substr($key, 1);
-			$strOperation = ">";
+			if (0 == strncmp($key, '+', 1))
+			{
+				$arResult['OR_NULL'] = 'Y';
+				$key = substr($key, 1);
+			}
 		}
-		elseif (substr($key, 0, 2)=="<=")
+		elseif (0 == strncmp($key, '+', 1))
 		{
-			$key = substr($key, 2);
-			$strOperation = "<=";
-		}
-		elseif (substr($key, 0, 1)=="<")
-		{
+			$arResult['OR_NULL'] = 'Y';
 			$key = substr($key, 1);
-			$strOperation = "<";
-		}
-		elseif (substr($key, 0, 1)=="@")
-		{
-			$key = substr($key, 1);
-			$strOperation = "IN";
-		}
-		elseif (substr($key, 0, 1)=="~")
-		{
-			$key = substr($key, 1);
-			$strOperation = "LIKE";
-		}
-		elseif (substr($key, 0, 1)=="%")
-		{
-			$key = substr($key, 1);
-			$strOperation = "QUERY";
-		}
-		else
-		{
-			$strOperation = "=";
+			if (0 == strncmp($key, '!', 1))
+			{
+				$arResult['NEGATIVE'] = 'Y';
+				$key = substr($key, 1);
+			}
 		}
 
-		return array("FIELD" => $key, "NEGATIVE" => $strNegative, "OPERATION" => $strOperation, "OR_NULL" => $strOrNull);
+		$strKeyOp = substr($key, 0, 2);
+		if ('' != $strKeyOp && array_key_exists($strKeyOp, $arDoubleModify))
+		{
+			$arResult['OPERATION'] = $arDoubleModify[$strKeyOp];
+			$arResult['FIELD'] = substr($key, 2);
+			return $arResult;
+		}
+		$strKeyOp = substr($key, 0, 1);
+		if ('' != $strKeyOp && array_key_exists($strKeyOp, $arOneModify))
+		{
+			$arResult['OPERATION'] = $arOneModify[$strKeyOp];
+			$arResult['FIELD'] = substr($key, 1);
+			return $arResult;
+		}
+		$arResult['OPERATION'] = '=';
+		$arResult['FIELD'] = $key;
+		return $arResult;
 	}
 
 	public static function PrepareSql(&$arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields)
@@ -403,12 +511,14 @@ class CAllCatalog
 		$strSqlGroupBy = "";
 		$strSqlOrderBy = "";
 
+		$strDBType = strtoupper($DB->type);
+
 		$arGroupByFunct = array("COUNT", "AVG", "MIN", "MAX", "SUM");
 
 		$arAlreadyJoined = array();
 
 		// GROUP BY -->
-		if (is_array($arGroupBy) && count($arGroupBy)>0)
+		if (!empty($arGroupBy) && is_array($arGroupBy))
 		{
 			$arSelectFields = $arGroupBy;
 			foreach ($arGroupBy as $key => $val)
@@ -438,7 +548,7 @@ class CAllCatalog
 		// SELECT -->
 		$arFieldsKeys = array_keys($arFields);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
 			$strSqlSelect = "COUNT(%%_DISTINCT_%% ".$arFields[$arFieldsKeys[0]]["FIELD"].") as CNT ";
 		}
@@ -448,11 +558,11 @@ class CAllCatalog
 				$arSelectFields = array($arSelectFields);
 
 			if (!isset($arSelectFields)
+				|| empty($arSelectFields)
 				|| !is_array($arSelectFields)
-				|| count($arSelectFields)<=0
 				|| in_array("*", $arSelectFields))
 			{
-				for ($i = 0; $i < count($arFieldsKeys); $i++)
+				for ($i = 0, $intCount = count($arFieldsKeys); $i < $intCount; $i++)
 				{
 					if (isset($arFields[$arFieldsKeys[$i]]["WHERE_ONLY"])
 						&& $arFields[$arFieldsKeys[$i]]["WHERE_ONLY"] == "Y")
@@ -460,31 +570,33 @@ class CAllCatalog
 						continue;
 					}
 
-					if (strlen($strSqlSelect) > 0)
+					if ('' != $strSqlSelect)
 						$strSqlSelect .= ", ";
 
 					if ($arFields[$arFieldsKeys[$i]]["TYPE"] == "datetime")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
+						if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
 							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
 
 						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "FULL")." as ".$arFieldsKeys[$i];
 					}
 					elseif ($arFields[$arFieldsKeys[$i]]["TYPE"] == "date")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
+						if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
 							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
 
 						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "SHORT")." as ".$arFieldsKeys[$i];
 					}
 					else
+					{
 						$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i];
+					}
 
 					if (isset($arFields[$arFieldsKeys[$i]]["FROM"])
 						&& strlen($arFields[$arFieldsKeys[$i]]["FROM"]) > 0
 						&& !in_array($arFields[$arFieldsKeys[$i]]["FROM"], $arAlreadyJoined))
 					{
-						if (strlen($strSqlFrom) > 0)
+						if ('' != $strSqlFrom)
 							$strSqlFrom .= " ";
 						$strSqlFrom .= $arFields[$arFieldsKeys[$i]]["FROM"];
 						$arAlreadyJoined[] = $arFields[$arFieldsKeys[$i]]["FROM"];
@@ -499,7 +611,7 @@ class CAllCatalog
 					$key = strtoupper($key);
 					if (array_key_exists($val, $arFields))
 					{
-						if (strlen($strSqlSelect) > 0)
+						if ('' != $strSqlSelect)
 							$strSqlSelect .= ", ";
 
 						if (in_array($key, $arGroupByFunct))
@@ -510,14 +622,14 @@ class CAllCatalog
 						{
 							if ($arFields[$val]["TYPE"] == "datetime")
 							{
-								if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($val, $arOrder)))
+								if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($val, $arOrder)))
 									$strSqlSelect .= $arFields[$val]["FIELD"]." as ".$val."_X1, ";
 
 								$strSqlSelect .= $DB->DateToCharFunction($arFields[$val]["FIELD"], "FULL")." as ".$val;
 							}
 							elseif ($arFields[$val]["TYPE"] == "date")
 							{
-								if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($val, $arOrder)))
+								if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($val, $arOrder)))
 									$strSqlSelect .= $arFields[$val]["FIELD"]." as ".$val."_X1, ";
 
 								$strSqlSelect .= $DB->DateToCharFunction($arFields[$val]["FIELD"], "SHORT")." as ".$val;
@@ -530,7 +642,7 @@ class CAllCatalog
 							&& strlen($arFields[$val]["FROM"]) > 0
 							&& !in_array($arFields[$val]["FROM"], $arAlreadyJoined))
 						{
-							if (strlen($strSqlFrom) > 0)
+							if ('' != $strSqlFrom)
 								$strSqlFrom .= " ";
 							$strSqlFrom .= $arFields[$val]["FROM"];
 							$arAlreadyJoined[] = $arFields[$val]["FROM"];
@@ -539,32 +651,28 @@ class CAllCatalog
 				}
 			}
 
-			if (strlen($strSqlGroupBy) > 0)
+			if ('' != $strSqlGroupBy)
 			{
-				if (strlen($strSqlSelect) > 0)
+				if ('' != $strSqlSelect)
 					$strSqlSelect .= ", ";
 				$strSqlSelect .= "COUNT(%%_DISTINCT_%% ".$arFields[$arFieldsKeys[0]]["FIELD"].") as CNT";
 			}
 			else
+			{
 				$strSqlSelect = "%%_DISTINCT_%% ".$strSqlSelect;
+			}
 		}
 		// <-- SELECT
 
 		// WHERE -->
 		$arSqlSearch = Array();
 
-		if (!is_array($arFilter))
-			$filter_keys = Array();
-		else
-			$filter_keys = array_keys($arFilter);
+		$filter_keys = (!is_array($arFilter) ? array() : array_keys($arFilter));
 
-		for ($i = 0; $i < count($filter_keys); $i++)
+		for ($i = 0, $intCount = count($filter_keys); $i < $intCount; $i++)
 		{
 			$vals = $arFilter[$filter_keys[$i]];
-			if (!is_array($vals))
-				$vals = array($vals);
-			else
-				$vals = array_values($vals);
+			$vals = (!is_array($vals) ? array($vals) : array_values($vals));
 
 			$key = $filter_keys[$i];
 			$key_res = CCatalog::GetFilterOperation($key);
@@ -573,11 +681,11 @@ class CAllCatalog
 			$strOperation = $key_res["OPERATION"];
 			$strOrNull = $key_res["OR_NULL"];
 
-			if (array_key_exists($key, $arFields))
+			if ('' != $key && array_key_exists($key, $arFields))
 			{
 				$arSqlSearch_tmp = array();
 
-				if (count($vals) > 0)
+				if (!empty($vals))
 				{
 					if ($strOperation == "IN")
 					{
@@ -598,7 +706,7 @@ class CAllCatalog
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
-								if (count($vals) <= 0)
+								if (empty($vals))
 									$arSqlSearch_tmp[] = "(1 = 2)";
 								else
 									$arSqlSearch_tmp[] = (($strNegative == "Y") ? " NOT " : "")."(".$arFields[$key]["FIELD"]." IN (".$val."))";
@@ -609,7 +717,7 @@ class CAllCatalog
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
-								if (count($vals) <= 0)
+								if (empty($vals))
 									$arSqlSearch_tmp[] = "(1 = 2)";
 								else
 									$arSqlSearch_tmp[] = (($strNegative == "Y") ? " NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." (".$val."))";
@@ -620,7 +728,7 @@ class CAllCatalog
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
-								if (count($vals) <= 0)
+								if (empty($vals))
 									$arSqlSearch_tmp[] = "(1 = 2)";
 								else
 									$arSqlSearch_tmp[] = (($strNegative == "Y") ? " NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." (".$val."))";
@@ -631,7 +739,7 @@ class CAllCatalog
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
-								if (count($vals) <= 0)
+								if (empty($vals))
 									$arSqlSearch_tmp[] = "1 = 2";
 								else
 									$arSqlSearch_tmp[] = ($strNegative=="Y"?" NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." (".$val."))";
@@ -642,7 +750,7 @@ class CAllCatalog
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
-								if (count($vals) <= 0)
+								if (empty($vals))
 									$arSqlSearch_tmp[] = "1 = 2";
 								else
 									$arSqlSearch_tmp[] = ($strNegative=="Y"?" NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." (".$val."))";
@@ -651,7 +759,7 @@ class CAllCatalog
 					}
 					else
 					{
-						for ($j = 0; $j < count($vals); $j++)
+						for ($j = 0, $intCountVals = count($vals); $j < $intCountVals; $j++)
 						{
 							$val = $vals[$j];
 
@@ -726,7 +834,7 @@ class CAllCatalog
 				}
 
 				$strSqlSearch_tmp = "";
-				for ($j = 0; $j < count($arSqlSearch_tmp); $j++)
+				for ($j = 0, $intCountSearch = count($arSqlSearch_tmp); $j < $intCountSearch; $j++)
 				{
 					if ($j > 0)
 						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
@@ -757,9 +865,9 @@ class CAllCatalog
 			}
 		}
 
-		for ($i = 0; $i < count($arSqlSearch); $i++)
+		for ($i = 0, $intCount = count($arSqlSearch); $i < $intCount; $i++)
 		{
-			if (strlen($strSqlWhere) > 0)
+			if ('' != $strSqlWhere)
 				$strSqlWhere .= " AND ";
 			$strSqlWhere .= "(".$arSqlSearch[$i].")";
 		}
@@ -792,11 +900,12 @@ class CAllCatalog
 		}
 
 		$strSqlOrderBy = "";
-		DelDuplicateSort($arSqlOrder); for ($i = 0; $i < count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+		for ($i = 0, $intCount = count($arSqlOrder); $i < $intCount; $i++)
 		{
-			if (strlen($strSqlOrderBy) > 0)
+			if ('' != $strSqlOrderBy)
 				$strSqlOrderBy .= ", ";
-			if(strtoupper($DB->type)=="ORACLE")
+			if ($strDBType == "ORACLE")
 			{
 				if(substr($arSqlOrder[$i], -3)=="ASC")
 					$strSqlOrderBy .= $arSqlOrder[$i]." NULLS FIRST";
@@ -827,12 +936,14 @@ class CAllCatalog
 		$strSqlGroupBy = "";
 		$strSqlOrderBy = "";
 
+		$strDBType = strtoupper($DB->type);
+
 		$arGroupByFunct = array("COUNT", "AVG", "MIN", "MAX", "SUM");
 
 		$arAlreadyJoined = array();
 
 		// GROUP BY -->
-		if (is_array($arGroupBy) && count($arGroupBy)>0)
+		if (!empty($arGroupBy) && is_array($arGroupBy))
 		{
 			//$arSelectFields = $arGroupBy;
 			foreach ($arGroupBy as $key => $val)
@@ -841,7 +952,6 @@ class CAllCatalog
 				$key = strtoupper($key);
 				if (array_key_exists($val, $arFields)
 					&& !in_array($key, $arGroupByFunct)
-					/*&& (!array_key_exists("GROUPED", $arFields[$val]) || $arFields[$val]["GROUPED"] != "Y")*/
 					)
 				{
 					if (strlen($strSqlGroupBy) > 0)
@@ -865,7 +975,7 @@ class CAllCatalog
 		// SELECT -->
 		$arFieldsKeys = array_keys($arFields);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
 			$strSqlSelect = "COUNT(%%_DISTINCT_%% ".$arFields[$arFieldsKeys[0]]["FIELD"].") as CNT ";
 		}
@@ -875,11 +985,11 @@ class CAllCatalog
 				$arSelectFields = array($arSelectFields);
 
 			if (!isset($arSelectFields)
+				|| empty($arSelectFields)
 				|| !is_array($arSelectFields)
-				|| count($arSelectFields)<=0
 				|| in_array("*", $arSelectFields))
 			{
-				for ($i = 0; $i < count($arFieldsKeys); $i++)
+				for ($i = 0, $intCount = count($arFieldsKeys); $i < $intCount; $i++)
 				{
 					if (isset($arFields[$arFieldsKeys[$i]]["WHERE_ONLY"])
 						&& $arFields[$arFieldsKeys[$i]]["WHERE_ONLY"] == "Y")
@@ -887,20 +997,20 @@ class CAllCatalog
 						continue;
 					}
 
-					if (strlen($strSqlSelect) > 0)
+					if ('' != $strSqlSelect)
 						$strSqlSelect .= ", ";
 
 					if ($arFields[$arFieldsKeys[$i]]["TYPE"] == "datetime")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
-							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"].", ";
+						if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
+							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
 
 						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "FULL")." as ".$arFieldsKeys[$i];
 					}
 					elseif ($arFields[$arFieldsKeys[$i]]["TYPE"] == "date")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
-							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"].", ";
+						if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
+							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
 
 						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "SHORT")." as ".$arFieldsKeys[$i];
 					}
@@ -926,7 +1036,7 @@ class CAllCatalog
 					$key = strtoupper($key);
 					if (array_key_exists($val, $arFields))
 					{
-						if (strlen($strSqlSelect) > 0)
+						if ('' != $strSqlSelect)
 							$strSqlSelect .= ", ";
 
 						if (in_array($key, $arGroupByFunct))
@@ -937,15 +1047,15 @@ class CAllCatalog
 						{
 							if ($arFields[$val]["TYPE"] == "datetime")
 							{
-								if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($val, $arOrder)))
-									$strSqlSelect .= $arFields[$val]["FIELD"].", ";
+								if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($val, $arOrder)))
+									$strSqlSelect .= $arFields[$val]["FIELD"]." as ".$val."_X1, ";
 
 								$strSqlSelect .= $DB->DateToCharFunction($arFields[$val]["FIELD"], "FULL")." as ".$val;
 							}
 							elseif ($arFields[$val]["TYPE"] == "date")
 							{
-								if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($val, $arOrder)))
-									$strSqlSelect .= $arFields[$val]["FIELD"].", ";
+								if (($strDBType == "ORACLE" || $strDBType == "MSSQL") && (array_key_exists($val, $arOrder)))
+									$strSqlSelect .= $arFields[$val]["FIELD"]." as ".$val."_X1, ";
 
 								$strSqlSelect .= $DB->DateToCharFunction($arFields[$val]["FIELD"], "SHORT")." as ".$val;
 							}
@@ -957,7 +1067,7 @@ class CAllCatalog
 							&& strlen($arFields[$val]["FROM"]) > 0
 							&& !in_array($arFields[$val]["FROM"], $arAlreadyJoined))
 						{
-							if (strlen($strSqlFrom) > 0)
+							if ('' != $strSqlFrom)
 								$strSqlFrom .= " ";
 							$strSqlFrom .= $arFields[$val]["FROM"];
 							$arAlreadyJoined[] = $arFields[$val]["FROM"];
@@ -966,14 +1076,16 @@ class CAllCatalog
 				}
 			}
 
-			if (strlen($strSqlGroupBy) > 0)
+			if ('' != $strSqlGroupBy)
 			{
-				if (strlen($strSqlSelect) > 0)
+				if ('' != $strSqlSelect)
 					$strSqlSelect .= ", ";
 				$strSqlSelect .= "COUNT(%%_DISTINCT_%% ".$arFields[$arFieldsKeys[0]]["FIELD"].") as CNT";
 			}
 			else
+			{
 				$strSqlSelect = "%%_DISTINCT_%% ".$strSqlSelect;
+			}
 		}
 		// <-- SELECT
 
@@ -981,18 +1093,12 @@ class CAllCatalog
 		$arSqlSearch = Array();
 		$arSqlHaving = Array();
 
-		if (!is_array($arFilter))
-			$filter_keys = Array();
-		else
-			$filter_keys = array_keys($arFilter);
+		$filter_keys = (!is_array($arFilter) ? array() : array_keys($arFilter));
 
-		for ($i = 0; $i < count($filter_keys); $i++)
+		for ($i = 0, $intCount = count($filter_keys); $i < $intCount; $i++)
 		{
 			$vals = $arFilter[$filter_keys[$i]];
-			if (!is_array($vals))
-				$vals = array($vals);
-			else
-				$vals = array_values($vals);
+			$vals = (!is_array($vals) ? array($vals) : array_values($vals));
 
 			$key = $filter_keys[$i];
 			$key_res = CCatalog::GetFilterOperation($key);
@@ -1001,11 +1107,11 @@ class CAllCatalog
 			$strOperation = $key_res["OPERATION"];
 			$strOrNull = $key_res["OR_NULL"];
 
-			if (array_key_exists($key, $arFields))
+			if ('' != $key && array_key_exists($key, $arFields))
 			{
 				$arSqlSearch_tmp = array();
 				$arSqlHaving_tmp = array();
-				for ($j = 0; $j < count($vals); $j++)
+				for ($j = 0, $intCountVals = count($vals); $j < $intCountVals; $j++)
 				{
 					$val = $vals[$j];
 
@@ -1033,12 +1139,6 @@ class CAllCatalog
 								$arSqlSearch_tmp1 = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
 							else
 								$arSqlSearch_tmp1 = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".intval($val)." )";
-							/*
-							if (intval($val) <= 0)
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL OR ".$arFields[$key]["FIELD"]." <= 0)";
-							else
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".intval($val)." )";
-							*/
 						}
 						elseif ($arFields[$key]["TYPE"] == "double")
 						{
@@ -1048,12 +1148,6 @@ class CAllCatalog
 								$arSqlSearch_tmp1 = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
 							else
 								$arSqlSearch_tmp1 = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".DoubleVal($val)." )";
-							/*
-							if (DoubleVal($val) <= 0)
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL OR ".$arFields[$key]["FIELD"]." <= 0)";
-							else
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".DoubleVal($val)." )";
-							*/
 						}
 						elseif ($arFields[$key]["TYPE"] == "string" || $arFields[$key]["TYPE"] == "char")
 						{
@@ -1067,13 +1161,6 @@ class CAllCatalog
 									$arSqlSearch_tmp1 = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND NOT" : "OR")." (".$DB->Length($arFields[$key]["FIELD"])." <= 0) ".(($strNegative == "Y") ? "AND NOT" : "OR")." (".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' )";
 								else
 									$arSqlSearch_tmp1 = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' )";
-
-								/*
-								if (strlen($val) <= 0)
-									$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL OR ".$DB->Length($arFields[$key]["FIELD"])."<=0)";
-								else
-									$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' )";
-								*/
 							}
 						}
 						elseif ($arFields[$key]["TYPE"] == "datetime")
@@ -1109,7 +1196,7 @@ class CAllCatalog
 				}
 
 				$strSqlSearch_tmp = "";
-				for ($j = 0; $j < count($arSqlSearch_tmp); $j++)
+				for ($j = 0, $intCountSearchTmp = count($arSqlSearch_tmp); $j < $intCountSearchTmp; $j++)
 				{
 					if ($j > 0)
 						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
@@ -1139,7 +1226,7 @@ class CAllCatalog
 					$arSqlSearch[] = "(".$strSqlSearch_tmp.")";
 
 				$strSqlHaving_tmp = "";
-				for ($j = 0; $j < count($arSqlHaving_tmp); $j++)
+				for ($j = 0, $intCountHavingTmp = count($arSqlHaving_tmp); $j < $intCountHavingTmp; $j++)
 				{
 					if ($j > 0)
 						$strSqlHaving_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
@@ -1165,17 +1252,17 @@ class CAllCatalog
 		}
 
 		$strSqlWhere = "";
-		for ($i = 0; $i < count($arSqlSearch); $i++)
+		for ($i = 0, $intCount = count($arSqlSearch); $i < $intCount; $i++)
 		{
-			if (strlen($strSqlWhere) > 0)
+			if ('' != $strSqlWhere)
 				$strSqlWhere .= " AND ";
 			$strSqlWhere .= "(".$arSqlSearch[$i].")";
 		}
 
 		$strSqlHaving = "";
-		for ($i = 0; $i < count($arSqlHaving); $i++)
+		for ($i = 0, $intCount = count($arSqlHaving); $i < $intCount; $i++)
 		{
-			if (strlen($strSqlHaving) > 0)
+			if ('' != $strSqlHaving)
 				$strSqlHaving .= " AND ";
 			$strSqlHaving .= "(".$arSqlHaving[$i].")";
 		}
@@ -1189,9 +1276,9 @@ class CAllCatalog
 			$order = strtoupper($order);
 
 			if ($order != "ASC")
-				$order = "DESC".(strtoupper($DB->type)=="ORACLE" ? " NULLS LAST" : "");
+				$order = "DESC".($strDBType == "ORACLE" ? " NULLS LAST" : "");
 			else
-				$order = "ASC".(strtoupper($DB->type)=="ORACLE" ? " NULLS FIRST" : "");
+				$order = "ASC".($strDBType == "ORACLE" ? " NULLS FIRST" : "");
 
 			if (array_key_exists($by, $arFields))
 			{
@@ -1210,9 +1297,10 @@ class CAllCatalog
 		}
 
 		$strSqlOrder = "";
-		DelDuplicateSort($arSqlOrder); for ($i = 0; $i < count($arSqlOrder); $i++)
+		DelDuplicateSort($arSqlOrder);
+		for ($i = 0, $intCount = count($arSqlOrder); $i < $intCount; $i++)
 		{
-			if (strlen($strSqlOrder) > 0)
+			if ('' != $strSqlOrder)
 				$strSqlOrder .= ", ";
 			$strSqlOrder .= $arSqlOrder[$i];
 		}
@@ -1230,19 +1318,80 @@ class CAllCatalog
 
 	
 	/**
-	 * <p>Функция служит для добавления новой записи в таблицу привязывания информационного блока к модулю Торгового Каталога. </p>
+	 * <p>Метод служит для добавления новой записи в таблицу привязывания информационного блока к модулю торгового каталога. </p>
 	 *
 	 *
 	 *
 	 *
-	 * @param array $arFields  Массив параметров привязки; должен иметь следующий вид: <pre>$arFields =
-	 * array( "IBLOCK_ID" =&gt; [код инфоблока], "YANDEX_EXPORT" =&gt; [флаг "экспортировать в
-	 * Яндекс.Товары" Y/N], "SUBSCRIPTION" =&gt; [флаг "Продажа контента" Y/N], );</pre>
+	 * @param array $arFields  Массив параметров привязки, который может содержать следующие
+	 * ключи: <ul> <li> <b>IBLOCK_ID</b> - код (ID) инфоблока (обязательный);</li> <li>
+	 * <b>SUBSCRIPTION</b> - флаг "Продажа контента" (Y/N) (необязательный), по
+	 * умолчанию - N;</li> <li> <b>YANDEX_EXPORT</b> - флаг "Экспортировать в
+	 * Яндекс.Товары" (Y/N) (необязательный), по умолчанию - N;</li> <li> <b>VAT_ID</b> -
+	 * код (ID) типа НДС (необязательный), по умолчанию - 0;</li> <li>
+	 * <b>PRODUCT_IBLOCK_ID</b> - код (ID) инфоблока товаров (для инфоблока торговых
+	 * предложений) (необязательный, только вместе с SKU_PROPERTY_ID), по
+	 * умолчанию - 0;</li> <li> <b>SKU_PROPERTY_ID</b> - код (ID) свойства привязки к
+	 * инфоблоку товаров (для инфоблока торговых предложений),
+	 * (необязательный, только вместе с PRODUCT_IBLOCK_ID), по умолчанию - 0;</li> </ul>
+	 * Необязательные ключи, отсутствующие в массиве, получат значения
+	 * по умолчанию.
 	 *
 	 *
 	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного добавления записи и <i>false</i>
-	 * - в противном случае. </p>
+	 * @return bool <p>Возвращает <i>true</i>, если запись успешно добавлена и <i>false</i> - если
+	 * произошла ошибка. Текстовое сообщение об ошибках можно получить
+	 * через $APPLICATION-&gt;GetException().</p><p>Перед добавлением записи в таблицу
+	 * осуществляется проверка параметров привязки методом <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/checkfields.php">CCatalog::CheckFields</a>
+	 * (условия корректности параметров изложены в нем). Если проверка
+	 * прошла успешно, производится запись в базу. Попытка добавить
+	 * больше одной записи с одинаковым IBLOCK_ID вызовет ошибку базы
+	 * данных.</p>
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * Привязка инфоблока к модулю Торгового каталога
+	 * $arFields = array(
+	 * 	'IBLOCK_ID' =&gt; 2,			// код (ID) инфоблока товаров
+	 * 	'YANDEX_EXPORT' =&gt; 'Y',		// экспортировать в Яндекс.Товары с помощью агента
+	 * );
+	 * $boolResult = CCatalog::Add($arFields);
+	 * if ($boolResult == false)
+	 * {
+	 * 	if ($ex = $APPLICATION-&gt;GetException())
+	 * 	{
+	 * 		$strError = $ex-&gt;GetString();
+	 * 		ShowError($strError);
+	 * 	}
+	 * }
+	 * Привязка инфоблока к модулю Торговых предложений как инфоблока торговых предложений
+	 * $arFields = array(
+	 * 	'IBLOCK_ID' =&gt; 2,			// код (ID) инфоблока торговых предложений
+	 * 	'VAT_ID' =&gt; 2,				// код (ID) типа НДС 
+	 * 	'PRODUCT_IBLOCK_ID' =&gt; 10,	// код (ID) инфоблока товаров (может быть привязан или не привязан к модулю торгового каталога)
+	 * 	'SKU_PROPERTY_ID' =&gt; 14		// код (ID) свойства привязки инфоблока с ID=2 к инфоблоку с ID=10 (тип свойства - SKU)
+	 * );
+	 * $boolResult = CCatalog::Add($arFields);
+	 * if ($boolResult == false)
+	 * {
+	 * 	if ($ex = $APPLICATION-&gt;GetException())
+	 * 	{
+	 * 		$strError = $ex-&gt;GetString();
+	 * 		ShowError($strError);
+	 * 	}
+	 * }
+	 * </pre>
+	 *
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/checkfields.php">CCatalog::CheckFields</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a></li>
+	 * </ul>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php
@@ -1252,17 +1401,17 @@ class CAllCatalog
 	{
 		global $DB;
 
-		if (is_set($arFields, 'OFFERS'))
+		if (array_key_exists('OFFERS', $arFields))
 			unset($arFields['OFFERS']);
 		if (!CCatalog::CheckFields("ADD", $arFields, 0))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_catalog_iblock", $arFields);
 
-		$strSql =
-			"INSERT INTO b_catalog_iblock(".$arInsert[0].") ".
-			"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_catalog_iblock(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		CCatalogSKU::ClearCache();
 
 		return true;
 	}
@@ -1280,14 +1429,26 @@ class CAllCatalog
 	 *
 	 * @param array $arFields  Ассоциативный массив новых параметров записи, ключами с котором
 	 * являются названия параметров, а значениями - новые
-	 * значения.<br>Допустимые ключи: <ul> <li> <b>YANDEX_EXPORT </b> - флаг
-	 * "экспортировать в Яндекс.Товары" [Y/N];</li> <li> <b>SUBSCRIPTION </b> - флаг
-	 * "Продажа контента" [Y/N].</li> </ul>
+	 * значения.<br>Допустимые ключи: <ul> <li> <b>SUBSCRIPTION</b> - флаг "Продажа
+	 * контента" (Y/N);</li> <li> <b>YANDEX_EXPORT</b> - флаг "Экспортировать в
+	 * Яндекс.Товары" (Y/N);</li> <li> <b>VAT_ID</b> - код (ID) типа НДС;</li> <li>
+	 * <b>PRODUCT_IBLOCK_ID</b> - код (ID) инфоблока товаров (для инфоблока торговых
+	 * предложений, только вместе с SKU_PROPERTY_ID);</li> <li> <b>SKU_PROPERTY_ID</b> - код (ID)
+	 * свойства привязки к инфоблоку товаров (для инфоблока торговых
+	 * предложений, только вместе с PRODUCT_IBLOCK_ID);</li> </ul>
 	 *
 	 *
 	 *
 	 * @return bool <p>Возвращает <i>true</i> в случае успешного изменения записи и <i>false</i> -
 	 * в противном случае. </p>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/checkfields.php">CCatalog::CheckFields</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a></li>
+	 * </ul><br><br>
+	 *
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php
@@ -1297,27 +1458,35 @@ class CAllCatalog
 	{
 		global $DB;
 		$ID = intval($ID);
-		if (is_set($arFields, 'OFFERS'))
+		if (array_key_exists('OFFERS', $arFields))
 			unset($arFields['OFFERS']);
 
 		if (!CCatalog::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 
 		$strUpdate = $DB->PrepareUpdate("b_catalog_iblock", $arFields);
-		if ('' != trim($strUpdate))
+		if (!empty($strUpdate))
 		{
-			$strSql = "UPDATE b_catalog_iblock SET ".$strUpdate." WHERE IBLOCK_ID = ".$ID." ";
+			$strSql = "UPDATE b_catalog_iblock SET ".$strUpdate." WHERE IBLOCK_ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			if (is_set($GLOBALS["CATALOG_CATALOG_CACHE"],$ID))
-				unset($GLOBALS["CATALOG_CATALOG_CACHE"][$ID]);
+			if (array_key_exists($ID, self::$arCatalogCache))
+			{
+				unset($arCatalogCache[$ID]);
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $CATALOG_CATALOG_CACHE;
+					$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
+				}
+			}
 		}
+		CCatalogSKU::ClearCache();
 		return true;
 	}
 
 	
 	/**
-	 * <p>Функция удаляет привязку информационного блока с кодом ID к торговому каталогу. При этом удаляются так же параметры товаров и предложения, относящиеся к этому каталогу. Описания товаров, относящиеся к элементу информационного блока, остаются неизменными. </p>
+	 * <p>Метод удаляет привязку информационного блока с кодом ID к торговому каталогу. При этом удаляются так же параметры товаров и ценовые предложения, относящиеся к этому каталогу. Описания товаров, относящиеся к элементу информационного блока, остаются неизменными.</p> <p>Перед удалением происходит вызов обработчиков события OnBeforeCatalogDelete.</p>
 	 *
 	 *
 	 *
@@ -1326,8 +1495,8 @@ class CAllCatalog
 	 *
 	 *
 	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного добавления записи и <i>false</i>
-	 * - в противном случае. </p>
+	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления записи и <i>false</i> -
+	 * в противном случае. </p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__delete.b8b22efb.php
@@ -1339,14 +1508,16 @@ class CAllCatalog
 		$ID = intval($ID);
 
 		$bCanDelete = true;
-		$db_events = GetModuleEvents("catalog", "OnBeforeCatalogDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogDelete", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
 				return false;
+		}
 
-		$events = GetModuleEvents("catalog", "OnCatalogDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnCatalogDelete", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, array($ID));
+		}
 
 		$bSuccess = true;
 
@@ -1357,12 +1528,23 @@ class CAllCatalog
 				$bSuccess = false;
 		}
 
-		unset($GLOBALS["CATALOG_CATALOG_CACHE"][$ID]);
-
 		if ($bSuccess)
-			return $DB->Query("DELETE FROM b_catalog_iblock WHERE IBLOCK_ID = ".$ID." ", true);
-		else
-			return false;
+		{
+			if (array_key_exists($ID, self::$arCatalogCache))
+			{
+				unset(self::$arCatalogCache[$ID]);
+				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				{
+					global $CATALOG_CATALOG_CACHE;
+					$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
+				}
+			}
+			CCatalogSKU::ClearCache();
+			CCatalogProduct::ClearCache();
+			return $DB->Query("DELETE FROM b_catalog_iblock WHERE IBLOCK_ID = ".$ID, true);
+		}
+		return false;
+
 	}
 
 	public static function OnIBlockDelete($ID)
@@ -1398,14 +1580,22 @@ class CAllCatalog
 		return "CCatalog::PreGenerateXML(\"".$xml_type."\");";
 	}
 
+/*
+* @deprecated deprecated since catalog 11.0.2
+* @see CCatalogSKU::GetInfoByProductIBlock()
+*/
 	public static function GetSkuInfoByProductID($ID)
 	{
 		return CCatalogSKU::GetInfoByProductIBlock($ID);
 	}
 
+/*
+* @deprecated deprecated since catalog 11.0.2
+* @see CCatalogSKU::GetInfoByLinkProperty()
+*/
 	public static function GetSkuInfoByPropID($ID)
 	{
-		return CCatalog::GetInfoByLinkProperty($ID);
+		return CCatalogSKU::GetInfoByLinkProperty($ID);
 	}
 
 	public static function OnBeforeIBlockElementDelete($ID)
@@ -1416,18 +1606,18 @@ class CAllCatalog
 		$ID = intval($ID);
 		if (0 < $ID)
 		{
-			$rsItems = CIBlockElement::GetList(array(),array('ID' => $ID,'ACTIVE' => ''),false,false,array('ID','IBLOCK_ID'));
-			if ($arItem = $rsItems->Fetch())
+			$intIBlockID = intval(CIBlockElement::GetIBlockByID($ID));
+			if (0 < $intIBlockID)
 			{
-				$arCatalog = CCatalog::GetByIDExt($arItem['IBLOCK_ID']);
-				if (is_array($arCatalog) && ($arCatalog['CATALOG_TYPE'] == 'P' || $arCatalog['CATALOG_TYPE'] == 'X'))
+				$arCatalog = CCatalogSKU::GetInfoByProductIBlock($intIBlockID);
+				if (!empty($arCatalog) && is_array($arCatalog) && 0 < $arCatalog['IBLOCK_ID'] && 0 < $arCatalog['SKU_PROPERTY_ID'])
 				{
-					$arFilter = array('IBLOCK_ID' => $arCatalog['OFFERS_IBLOCK_ID'],'=PROPERTY_'.$arCatalog['OFFERS_PROPERTY_ID'] => $ID,'ACTIVE' => '');
+					$arFilter = array('IBLOCK_ID' => $arCatalog['IBLOCK_ID'],'=PROPERTY_'.$arCatalog['SKU_PROPERTY_ID'] => $ID,'ACTIVE' => '');
 					$rsOffers = CIBlockElement::GetList(array(),$arFilter,false,false,array('ID','IBLOCK_ID'));
 					while($arOffer = $rsOffers->Fetch())
 					{
-						$db_events = GetModuleEvents("iblock", "OnBeforeIBlockElementDelete");
-						while ($arEvent = $db_events->Fetch())
+						foreach(GetModuleEvents("iblock", "OnBeforeIBlockElementDelete", true) as $arEvent)
+						{
 							if(ExecuteModuleEventEx($arEvent, array($arOffer['ID']))===false)
 							{
 								$err = GetMessage("MAIN_BEFORE_DEL_ERR").' '.$arEvent['TO_NAME'];
@@ -1440,6 +1630,7 @@ class CAllCatalog
 								$APPLICATION->ThrowException($err, $err_id);
 								return false;
 							}
+						}
 						if (false == CIBlockElement::Delete($arOffer['ID']))
 						{
 							$APPLICATION->ThrowException(GetMessage('BT_MOD_CATALOG_ERR_CANNOT_DELETE_OFFERS'));
@@ -1454,7 +1645,6 @@ class CAllCatalog
 
 	public static function OnBeforeCatalogDelete($ID)
 	{
-		global $DB;
 		global $APPLICATION;
 
 		$arMsg = array();
@@ -1477,15 +1667,15 @@ class CAllCatalog
 			$APPLICATION->ThrowException($obError);
 			return false;
 		}
-		$db_events = GetModuleEvents("catalog", "OnBeforeCatalogDelete");
-		while($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogDelete", true) as $arEvent)
 		{
 			if (false === ExecuteModuleEventEx($arEvent, array($ID)))
 			{
 				$strError = GetMessage("MAIN_BEFORE_DEL_ERR").' '.$arEvent['TO_NAME'];
-				$ex = $APPLICATION->GetException();
-				if (is_object($ex))
+				if ($ex = $APPLICATION->GetException())
+				{
 					$strError .= ': '.$ex->GetString();
+				}
 				$APPLICATION->ThrowException($strError);
 				return false;
 			}
@@ -1494,11 +1684,36 @@ class CAllCatalog
 		return true;
 	}
 
+	public static function OnBeforeIBlockPropertyDelete($intPropertyID)
+	{
+		global $APPLICATION;
+
+		$intPropertyID = intval($intPropertyID);
+		if (0 >= $intPropertyID)
+			return true;
+		$arSkuInfo = CCatalogSKU::GetInfoByLinkProperty($intPropertyID);
+		if (!empty($arSkuInfo))
+		{
+			$APPLICATION->ThrowException(GetMessage(
+				'BT_MOD_CATALOG_ERR_CANNOT_DELETE_SKU_PROPERTY',
+				array(
+					'#SKU_PROPERTY_ID#' => $arSkuInfo['SKU_PROPERTY_ID'],
+					'#PRODUCT_IBLOCK_ID#' => $arSkuInfo['PRODUCT_IBLOCK_ID'],
+					'#IBLOCK_ID#' => $arSkuInfo['IBLOCK_ID'],
+				)
+			));
+			return false;
+		}
+		return true;
+	}
+
 	public static function GetByIDExt($ID)
 	{
 		$arResult = false;
 		$ID = intval($ID);
-		if (0 >= $ID) return false;
+		if (0 >= $ID)
+			return false;
+
 		$mxPRResult = CCatalog::GetByID($ID);
 		if (false != $mxPRResult)
 		{
@@ -1558,15 +1773,36 @@ class CAllCatalog
 
 		if ($boolResult)
 		{
-			$rsCatalog = CCatalog::GetList(array(),array('PRODUCT_IBLOCK_ID' => $ID));
+			$rsCatalog = CCatalog::GetList(
+				array(),
+				array('PRODUCT_IBLOCK_ID' => $ID),
+				false,
+				false,
+				array('IBLOCK_ID')
+			);
 			if ($arCatalog = $rsCatalog->Fetch())
 			{
-				$arFields = $arCatalog;
-				$arFields['PRODUCT_IBLOCK_ID'] = 0;
-				$arFields['SKU_PROPERTY_ID'] = 0;
-				CCatalog::Update($arCatalog['IBLOCK_ID'],$arFields);
-				if (is_set($GLOBALS["CATALOG_CATALOG_CACHE"],$arCatalog['IBLOCK_ID']))
-					unset($GLOBALS["CATALOG_CATALOG_CACHE"][$arCatalog['IBLOCK_ID']]);
+				$arCatalog['IBLOCK_ID'] = intval($arCatalog['IBLOCK_ID']);
+				$arFields = array(
+					'PRODUCT_IBLOCK_ID' => 0,
+					'SKU_PROPERTY_ID' => 0,
+				);
+				if (CCatalog::Update($arCatalog['IBLOCK_ID'], $arFields))
+				{
+					if (array_key_exists($arCatalog['IBLOCK_ID'], self::$arCatalogCache))
+					{
+						unset(self::$arCatalogCache[$arCatalog['IBLOCK_ID']]);
+						if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+						{
+							global $CATALOG_CATALOG_CACHE;
+							$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
+						}
+					}
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 		if (!$boolResult)
@@ -1574,6 +1810,10 @@ class CAllCatalog
 			$obError = new CAdminException($arMsg);
 			$APPLICATION->ResetException();
 			$APPLICATION->ThrowException($obError);
+		}
+		else
+		{
+			CCatalogSKU::ClearCache();
 		}
 		return $boolResult;
 	}
@@ -1671,6 +1911,7 @@ class CAllCatalog
 		}
 		else
 		{
+			CCatalogSKU::ClearCache();
 			return $intSKUPropID;
 		}
 	}
@@ -1685,6 +1926,13 @@ class CAllCatalog
 		$arFieldsList[] = 'OFFERS_PROPERTY_ID';
 		$arFieldsList = array_unique($arFieldsList);
 		return $arFieldsList;
+	}
+
+	public static function IsUserExists()
+	{
+		global $USER;
+
+		return (isset($USER) && $USER instanceof CUser);
 	}
 }
 ?>

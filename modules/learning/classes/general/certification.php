@@ -110,8 +110,8 @@ class CAllCertification
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#certification">всех полей</a> сертификата.
-	 * Обязательные поля должны быть заполнены.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
+	 * сертификата. Обязательные поля должны быть заполнены.
 	 *
 	 *
 	 *
@@ -156,9 +156,10 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#certification">Поля</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> </ul><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -200,8 +201,8 @@ class CAllCertification
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#certification">всех полей</a> сертификата.
-	 * Обязательные поля должны быть заполнены.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
+	 * сертификата. Обязательные поля должны быть заполнены.
 	 *
 	 *
 	 *
@@ -242,9 +243,9 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#certification">Поля</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/add.php">Add</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -327,8 +328,9 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/add.php">Add</a> </li></ul><a name="examples"></a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li></ul><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -432,7 +434,7 @@ class CAllCertification
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -443,10 +445,10 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php">Поля сертификата</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -501,10 +503,11 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -565,14 +568,14 @@ class CAllCertification
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/add.php">Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/getlist.php">GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

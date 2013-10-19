@@ -26,7 +26,6 @@ class CSocServAuthManager
 						self::$arAuthServices[$serv["ID"]] = $serv;
 				}
 			}
-
 			//services depend on current site
 			$suffix = CSocServAuth::OptionsSuffix();
 			self::$arAuthServices = self::AppyUserSettings($suffix);
@@ -110,6 +109,10 @@ class CSocServAuthManager
 
 	static public function Authorize($service_id)
 	{
+		if($service_id === 'Bitrix24OAuth')
+		{
+			return CSocServBitrixOAuth::gadgetAuthorize();
+		}
 		if(isset(self::$arAuthServices[$service_id]))
 		{
 			$service = self::$arAuthServices[$service_id];
@@ -137,13 +140,13 @@ class CSocServAuthManager
 		return '';
 	}
 
-	static public function SetUniqueKey()
+	public static function SetUniqueKey()
 	{
 		if(!isset($_SESSION["UNIQUE_KEY"]))
 			$_SESSION["UNIQUE_KEY"] = md5(bitrix_sessid_get().uniqid(rand(), true));
 	}
 
-	static public function CheckUniqueKey()
+	public static function CheckUniqueKey()
 	{
 		if(isset($_REQUEST["state"]))
 		{
@@ -232,8 +235,7 @@ class CSocServAuthManager
 					$userId = $userTwit['kp_user_id'];
 					$rsUser = CUser::GetByID($userId);
 					$arUser = $rsUser->Fetch();
-					$events = GetModuleEvents("socialservices", "OnPublishSocServMessage");
-					while($arEvent = $events->Fetch())
+					foreach(GetModuleEvents("socialservices", "OnPublishSocServMessage", true) as $arEvent)
 						ExecuteModuleEventEx($arEvent, array($arUser, $userTwit, $arSiteId));
 				}
 				else
@@ -246,7 +248,7 @@ class CSocServAuthManager
 	public static function PostIntoBuzzAsBlog($userTwit, $arSiteId=array(), $userLogin = '')
 	{
 		global $DB;
-		if(!CModule::IncludeModule("blog"))
+		if(!CModule::IncludeModule("blog") || !CModule::IncludeModule("socialnetwork"))
 			return;
 		$arParams = array();
 		if((IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME')) && $userLogin != '')
@@ -557,6 +559,9 @@ class CSocServAuthManager
 		$counter++;
 		if($counter >= 20)
 		{
+			$oldLastId = COption::GetOptionString('socialservices', 'last_twit_id', '1');
+			if((strlen($lastTwitId) > strlen($oldLastId)) && $oldLastId[0] != 9)
+				$lastTwitId[0] = null;
 			COption::SetOptionString('socialservices', 'last_twit_id', $lastTwitId);
 			$counter = 1;
 		}
@@ -717,8 +722,7 @@ class CSocServAuth
 		$cache_dir = '/bx/socserv_ar_user';
 		$obCache->Clean($cache_id, $cache_dir);
 
-		$events = GetModuleEvents("socialservices", "OnAfterSocServUserUpdate");
-		while($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("socialservices", "OnAfterSocServUserUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
 		return $id;
@@ -734,8 +738,8 @@ class CSocServAuth
 			$arUser = $rsUser->Fetch();
 			if(!$arUser)
 				return false;
-			$db_events = GetModuleEvents("socialservices", "OnBeforeSocServUserDelete");
-			while($arEvent = $db_events->Fetch())
+
+			foreach(GetModuleEvents("socialservices", "OnBeforeSocServUserDelete", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($id));
 
 			$DB->Query("DELETE FROM b_socialservices_user WHERE ID = ".$id." ", true);
@@ -887,32 +891,42 @@ class CSocServAuth
 		$arOAuthKeys = array();
 		if(isset($arFields["OATOKEN"]))
 			$arOAuthKeys["OATOKEN"] = $arFields["OATOKEN"];
-		if(isset($arFields["REFRESH_TOKEN"]))
+		if(isset($arFields["REFRESH_TOKEN"]) && $arFields["REFRESH_TOKEN"] !== '')
 			$arOAuthKeys["REFRESH_TOKEN"] = $arFields["REFRESH_TOKEN"];
 		if(isset($arFields["OATOKEN_EXPIRES"]))
 			$arOAuthKeys["OATOKEN_EXPIRES"] = $arFields["OATOKEN_EXPIRES"];
 
 		$errorCode = SOCSERV_AUTHORISATION_ERROR;
+		$dbSocUser = CSocServAuthDB::GetList(array(), array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']), false, false, array("ID", "USER_ID", "ACTIVE"));
+
 		if($GLOBALS["USER"]->IsAuthorized() && $GLOBALS["USER"]->GetID())
 		{
 			$id = CSocServAuthDB::Add($arFields);
+
 			if($id && $_SESSION["OAUTH_DATA"] && is_array($_SESSION["OAUTH_DATA"]))
 			{
 				CSocServAuthDB::Update($id, $_SESSION["OAUTH_DATA"]);
 				unset($_SESSION["OAUTH_DATA"]);
 			}
+			elseif(!$id && !empty($arOAuthKeys))
+			{
+				if($arUser = $dbSocUser->Fetch())
+				{
+					CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
+				}
+			}
 		}
 		else
 		{
-			$dbSocUser = CSocServAuthDB::GetList(array(), array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']), false, false, array("USER_ID", "ACTIVE"));
-			$dbUsersOld = $GLOBALS["USER"]->GetList($by, $ord, array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-			$dbUsersNew = $GLOBALS["USER"]->GetList($by, $ord, array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+			$dbUsersOld = $GLOBALS["USER"]->GetList($_REQUEST["by"], $_REQUEST["ord"], array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+			$dbUsersNew = $GLOBALS["USER"]->GetList($_REQUEST["by"], $_REQUEST["ord"], array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
 
 			if($arUser = $dbSocUser->Fetch())
 			{
 				if($arUser["ACTIVE"] === 'Y')
 					$USER_ID = $arUser["USER_ID"];
-				CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
+				if(!empty($arOAuthKeys))
+					CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
 			}
 			elseif($arUser = $dbUsersOld->Fetch())
 			{
@@ -924,7 +938,6 @@ class CSocServAuth
 			}
 			elseif(COption::GetOptionString("main", "new_user_registration", "N") == "Y")
 			{
-
 				$arFields['PASSWORD'] = randString(30); //not necessary but...
 				$arFields['LID'] = SITE_ID;
 
@@ -935,7 +948,7 @@ class CSocServAuth
 				$arFieldsUser = $arFields;
 				$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
 				if(!($USER_ID = $GLOBALS["USER"]->Add($arFieldsUser)))
-					return false;
+					return SOCSERV_AUTHORISATION_ERROR;
 				$arFields['CAN_DELETE'] = 'N';
 				$arFields['USER_ID'] = $USER_ID;
 				$id = CSocServAuthDB::Add($arFields);
@@ -970,7 +983,6 @@ class CSocServUtil
 		$arRemove = array("logout", "auth_service_error", "auth_service_id", "MUL_MODE", "SEF_APPLICATION_CUR_PAGE_URL");
 		if($removeParam !== false)
 			$arRemove = array_merge($arRemove, $removeParam);
-
 		return self::ServerName().$GLOBALS['APPLICATION']->GetCurPageParam($addParam, $arRemove);
 	}
 
@@ -1013,9 +1025,6 @@ class CSocServAllMessage
 		$obCache = new CPHPCache;
 		$cache_dir = '/bx/socserv_mes_user';
 		$obCache->Clean($cache_id, $cache_dir);
-		/*$events = GetModuleEvents("socialservices", "OnAfterSocServUserUpdate");
-		while ($arEvent = $events->Fetch())
-			ExecuteModuleEventEx($arEvent, array(&$arFields));*/
 
 		return $id;
 	}
@@ -1030,9 +1039,6 @@ class CSocServAllMessage
 			$arUser = $rsUser->Fetch();
 			if(!$arUser)
 				return false;
-			/*	$db_events = GetModuleEvents("socialservices", "OnBeforeSocServUserDelete");
-				while($arEvent = $db_events->Fetch())
-					ExecuteModuleEventEx($arEvent, array($id));*/
 
 			$DB->Query("DELETE FROM b_socialservices_message WHERE ID = ".$id." ", true);
 			$cache_id = 'socserv_mes_user';

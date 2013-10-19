@@ -58,7 +58,7 @@ class CSecurityXSSDetect
 		$this->extractVariablesFromArray("\$_POST", $_POST);
 		$this->extractVariablesFromArray("\$_COOKIE", $_COOKIE);
 		if(!$this->variables->isEmpty())
-			return $this->safeize($content);
+			return $this->filter($content);
 		else
 			return $content;
 	}
@@ -146,7 +146,7 @@ class CSecurityXSSDetect
 	{
 		if(defined("ANTIVIRUS_CREATE_TRACE"))
 			$this->CreateTrace($pName, $pValue, $pSourceScript);
-		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_XSS2", $pName, "==".base64_encode($pValue));
+		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_XSS2", $pName, $pValue);
 	}
 
 	/**
@@ -262,7 +262,7 @@ class CSecurityXSSDetect
 	 * @param string $pString
 	 * @return string
 	 */
-	protected function safeize($pString)
+	protected function filter($pString)
 	{
 		$stringLen = CUtil::BinStrlen($pString) * 2;
 		CUtil::AdjustPcreBacktrackLimit($stringLen);
@@ -278,7 +278,7 @@ class CSecurityXSSDetect
 	{
 		if(!is_string($pValue))
 			return;
-		if(strlen($pValue) <= 5)
+		if(strlen($pValue) <= 2)
 			return; //too short
 		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/", $pValue))
 			return; //there is no potantially dangerous code
@@ -294,7 +294,7 @@ class CSecurityXSSDetect
 	 * @param string $pName
 	 * @param array $pArray
 	 */
-	protected function extractVariablesFromArray($pName, $pArray)
+	protected function extractVariablesFromArray($pName, array $pArray)
 	{
 		if(is_array($pArray))
 		{

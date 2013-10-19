@@ -39,7 +39,7 @@ class CWiki
 	 *
 	 *
 	 *
-	 * @param array $arFields  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>
+	 * @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>
 	 *
 	 *
 	 *
@@ -67,7 +67,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/Update.php">CWiki::Update</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Update.php">CWiki::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -108,7 +108,7 @@ class CWiki
 	 *
 	 *
 	 *
-	 * @param array $arFields  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
+	 * @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
 	 *
 	 *
 	 *
@@ -133,9 +133,9 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/Add.php">CWiki::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/UpdateCategory.php">CWiki::UpdateCategory</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/UpdateHistory.php">CWiki::UpdateHistory</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Add.php">CWiki::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/UpdateCategory.php">CWiki::UpdateCategory</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/UpdateHistory.php">CWiki::UpdateHistory</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -201,7 +201,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/UpdateHistory.php">CWiki::UpdateHistory</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/UpdateHistory.php">CWiki::UpdateHistory</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -266,7 +266,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/Recover.php">CWiki::Recover</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Recover.php">CWiki::Recover</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -352,7 +352,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -619,7 +619,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/DeleteImage.php">CWiki::DeleteImage</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/DeleteImage.php">CWiki::DeleteImage</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -719,7 +719,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/AddImage.php">CWiki::AddImage</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/AddImage.php">CWiki::AddImage</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -758,7 +758,7 @@ class CWiki
 	 *
 	 *
 	 *
-	 * @param array $arFields  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
+	 * @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
 	 *
 	 *
 	 *
@@ -773,7 +773,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/Update.php">CWiki::Update</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/Update.php">CWiki::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -980,7 +980,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetDefaultPage.php">CWiki::GetDefaultPage</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetDefaultPage.php">CWiki::GetDefaultPage</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1065,7 +1065,7 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/SetDefaultPage.php">CWiki::SetDefaultPage</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/SetDefaultPage.php">CWiki::SetDefaultPage</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -1250,7 +1250,7 @@ class CWiki
 	 *
 	 *
 	 *
-	 * @param array $arFilter  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/getlist.php">GetList</a>
+	 * @param array $arFilter  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php">GetList</a>
 	 *
 	 *
 	 *
@@ -1282,10 +1282,10 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetElementByName.php">CWiki::GetElementByName</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiparser/Parse.php">CWikiParser::Parse</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementByName.php">CWiki::GetElementByName</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/Parse.php">CWikiParser::Parse</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1360,7 +1360,7 @@ class CWiki
 	 *
 	 *
 	 *
-	 * @param array $arFilter  <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblock/getlist.php">GetList</a>
+	 * @param array $arFilter  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php">GetList</a>
 	 *
 	 *
 	 *
@@ -1393,10 +1393,10 @@ class CWiki
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetElementById.php">CWiki::GetElementById</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikiparser/Parse.php">CWikiParser::Parse</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementById.php">CWiki::GetElementById</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/Parse.php">CWikiParser::Parse</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

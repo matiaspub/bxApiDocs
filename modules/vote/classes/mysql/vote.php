@@ -22,7 +22,7 @@ class CVote extends CAllVote
 		$strSql = "
 			SELECT
 				ID as REFERENCE_ID,
-				concat('[',ID,'] ',TITLE) as REFERENCE
+				concat('[', ID, '] ', case when TITLE is null then '' else TITLE end) as REFERENCE
 			FROM b_vote
 			ORDER BY C_SORT, ID
 			";

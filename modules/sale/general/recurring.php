@@ -108,7 +108,7 @@ class CAllSaleRecurring
 	 *
 	 *
 	 * @return int <p>Метод возвращает код измененной записи или False в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.update.php
@@ -146,7 +146,7 @@ class CAllSaleRecurring
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления или <i>false</i>
-	 * в случае ошибки.</p>
+	 * в случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.delete.php
@@ -196,7 +196,7 @@ class CAllSaleRecurring
 	 *
 	 *
 	 *
-	 * @return void <p>Метод не возвращает значений.</p>
+	 * @return void <p>Метод не возвращает значений.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.checkrecurring.php
@@ -242,7 +242,7 @@ class CAllSaleRecurring
 	 *
 	 *
 	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного продления или <i>false</i>
-	 * в случае ошибки.</p>
+	 * в случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.nextpayment.php
@@ -829,7 +829,7 @@ class CAllSaleRecurring
 	 *
 	 *
 	 * @return bool <p>Метод возвращает код отменяемой записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.cancelrecurring.php

@@ -24,7 +24,7 @@ class CSocNetLogRights
 			));
 			
 			if (preg_match('/^U(\d+)$/', $GROUP_CODE, $matches))
-				CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y");
+				CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".intval($LOG_ID));

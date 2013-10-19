@@ -5,6 +5,19 @@ $wswraps = array();
 
 $componentContext = array();
 
+
+/**
+ * 
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php
+ * @author Bitrix
+ */
 class CWebServiceDesc
 {
 	var $wsname;		// webservice name
@@ -66,7 +79,7 @@ class IWebService
 	// May be called by Event to collect CWebServiceDesc on configuring WS.Server
 	
 	/**
-	 * <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ruapi_help/webservice/classes/cwebservicedesc/cwebservicedesc.php">CWebServiceDesc</a> - описателя веб-сервиса. </p>
+	 * <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. </p> <br><br>
 	 *
 	 *
 	 *
@@ -145,7 +158,7 @@ class CWebService
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <buttononclick><code>
+	 * <buttononclick>
 	 * // В компоненте webservice.server
 	 * CWebService::RegisterWebService($arParams["WEBSERVICE_CLASS"]);
 	 * 
@@ -158,7 +171,7 @@ class CWebService
 	 *     "bitrix:webservice.server",
 	 *     "",
 	 *     $arParams
-	 *     );</code></buttononclick>
+	 *     );</buttononclick>
 	 * </pre>
 	 *
 	 *

@@ -34,7 +34,7 @@ class CForumNew extends CAllForumNew
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">списке полей
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
 	 * форума</a>. Обязательные поля должны быть заполнены.
 	 *
 	 *
@@ -55,10 +55,10 @@ class CForumNew extends CAllForumNew
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumnew">Поля форума</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
 	 * <li>Перед добавлением форума следует проверить возможность
 	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -283,9 +283,10 @@ class CForumGroup extends CAllForumGroup
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">списке полей
-	 * групп</a>. В специальное поле "LANG" заносится массив массивов полей
-	 * языковых параметров групп, которые имеют аналогичную структуру.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
+	 * полей групп</a>. В специальное поле "LANG" заносится массив массивов
+	 * полей языковых параметров групп, которые имеют аналогичную
+	 * структуру.
 	 *
 	 *
 	 *
@@ -314,7 +315,7 @@ class CForumGroup extends CAllForumGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -373,9 +374,10 @@ class CForumGroup extends CAllForumGroup
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">списке полей
-	 * групп</a>. В специальное поле "LANG" заносится массив массивов полей
-	 * языковых параметров групп, которые имеют аналогичную структуру.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
+	 * полей групп</a>. В специальное поле "LANG" заносится массив массивов
+	 * полей языковых параметров групп, которые имеют аналогичную
+	 * структуру.
 	 *
 	 *
 	 *
@@ -404,7 +406,7 @@ class CForumGroup extends CAllForumGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -488,10 +490,10 @@ class CForumSmile extends CAllForumSmile
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">списке полей
-	 * смайла</a>. В специальное поле "LANG" заносится массив массивов полей
-	 * языковых параметров смайла, которые имеют аналогичную структуру.
-	 * Обязательные поля должны быть заполнены.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">списке
+	 * полей смайла</a>. В специальное поле "LANG" заносится массив массивов
+	 * полей языковых параметров смайла, которые имеют аналогичную
+	 * структуру. Обязательные поля должны быть заполнены.
 	 *
 	 *
 	 *
@@ -499,7 +501,7 @@ class CForumSmile extends CAllForumSmile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
 	 *
 	 *
 	 * @static

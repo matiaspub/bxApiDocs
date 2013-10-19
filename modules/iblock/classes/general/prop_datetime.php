@@ -45,8 +45,15 @@ class CIBlockPropertyDateTime
 	{
 		$from_name = $strHTMLControlName["VALUE"].'_from';
 		$to_name = $strHTMLControlName["VALUE"].'_to';
-		$from = isset($_REQUEST[$from_name])? $_REQUEST[$from_name]: "";
-		$to = isset($_REQUEST[$to_name])? $_REQUEST[$to_name]: "";
+
+		$lAdmin = new CAdminList($strHTMLControlName["TABLE_ID"]);
+		$lAdmin->InitFilter(array(
+			$from_name,
+			$to_name,
+		));
+
+		$from = isset($GLOBALS[$from_name])? $GLOBALS[$from_name]: "";
+		$to = isset($GLOBALS[$to_name])? $GLOBALS[$to_name]: "";
 
 		return  CAdminCalendar::CalendarPeriod($from_name, $to_name, $from, $to);
 	}

@@ -61,7 +61,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 			{
 				$arOdnoklUser = $gAuth->GetCurrentUser();
 
-				if ($arOdnoklUser['uid'] <> '')
+				if(is_array($arOdnoklUser) && ($arOdnoklUser['uid'] <> ''))
 				{
 					$uid = $arOdnoklUser['uid'];
 					$first_name = $last_name = $gender = "";
@@ -71,9 +71,9 @@ class CSocServOdnoklassniki extends CSocServAuth
 						$last_name = $arOdnoklUser['last_name'];
 					if(isset($arOdnoklUser['gender']) && $arOdnoklUser['gender'] != '')
 					{
-						if ($arOdnoklUser['gender'] == 'male')
+						if($arOdnoklUser['gender'] == 'male')
 							$gender = 'M';
-						elseif ($arOdnoklUser['gender'] == 'female')
+						elseif($arOdnoklUser['gender'] == 'female')
 							$gender = 'F';
 					}
 
@@ -86,7 +86,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 						'PERSONAL_GENDER' => $gender,
 					);
 					if(isset($arOdnoklUser['birthday']))
-						if ($date = MakeTimeStamp($arOdnoklUser['birthday'], "YYYY-MM-DD"))
+						if($date = MakeTimeStamp($arOdnoklUser['birthday'], "YYYY-MM-DD"))
 							$arFields["PERSONAL_BIRTHDAY"] = ConvertTimeStamp($date);
 					if(isset($arOdnoklUser['pic_2']) && self::CheckPhotoURI($arOdnoklUser['pic_2']))
 						if ($arPic = CFile::MakeFileArray($arOdnoklUser['pic_2'].'&name=/'.md5($arOdnoklUser['pic_2']).'.jpg'))
@@ -98,7 +98,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 				}
 			}
 		}
-		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "/auth/" : $GLOBALS["APPLICATION"]->GetCurDir();
+		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "" : $GLOBALS["APPLICATION"]->GetCurDir();
 		if(isset($_REQUEST["state"]))
 		{
 			$arState = array();
@@ -152,7 +152,7 @@ class COdnoklassnikiInterface
 	
 	public function __construct($appID, $appSecret, $appKey, $code=false)
 	{
-		$this->httpTimeout = 10;
+		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->code = $code;

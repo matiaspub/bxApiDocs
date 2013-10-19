@@ -30,7 +30,7 @@ class CIMChat
 		return false;
 	}
 
-	public function GetLastMessage($toChatId, $fromUserId = false, $loadExtraData = false, $bTimeZone = true)
+	public function GetLastMessage($toChatId, $fromUserId = false, $loadExtraData = false, $bTimeZone = true, $limit = true)
 	{
 		global $DB;
 
@@ -44,6 +44,18 @@ class CIMChat
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_EMPTY_CHAT_ID"), "ERROR_TO_CHAT_ID");
 			return false;
 		}
+
+		if ($limit)
+		{
+			$dbType = strtolower($DB->type);
+			if ($dbType== "mysql")
+				$sqlLimit = " AND M.DATE_CREATE > DATE_SUB(NOW(), INTERVAL 30 DAY)";
+			else if ($dbType == "mssql")
+				$sqlLimit = " AND M.DATE_CREATE > dateadd(day, -30, getdate())";
+			else if ($dbType == "oracle")
+				$sqlLimit = " AND M.DATE_CREATE > SYSDATE-30";
+		}
+
 		if (!$bTimeZone)
 			CTimeZone::Disable();
 		$strSql = "
@@ -51,31 +63,40 @@ class CIMChat
 				M.ID,
 				M.CHAT_ID,
 				M.MESSAGE,
-				".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 				M.AUTHOR_ID
 			FROM b_im_message M
 			INNER JOIN b_im_relation R1 ON M.ID >= R1.START_ID AND M.CHAT_ID = R1.CHAT_ID
-			WHERE R1.CHAT_ID = ".$toChatId." AND R1.USER_ID = ".$fromUserId."
-			ORDER BY M.DATE_CREATE DESC, ID DESC
+			WHERE R1.CHAT_ID = ".$toChatId." AND R1.USER_ID = ".$fromUserId." #LIMIT#
+			ORDER BY M.DATE_CREATE DESC
 		";
+		$strSql = $DB->TopSql($strSql, 20);
 		if (!$bTimeZone)
 			CTimeZone::Enable();
 
-		$strSql = $DB->TopSql($strSql, 20);
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($limit)
+		{
+			$dbRes = $DB->Query(str_replace("#LIMIT#", $sqlLimit, $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if (!$dbRes->SelectedRowsCount())
+				$dbRes = $DB->Query(str_replace("#LIMIT#", "", $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		else
+		{
+			$dbRes = $DB->Query(str_replace("#LIMIT#", "", $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
 
 		$arMessages = Array();
 		$arUsersMessage = Array();
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		while ($arRes = $dbRes->Fetch())
 		{
 			$arMessages[$arRes['ID']] = Array(
 				'id' => $arRes['ID'],
 				'senderId' => $arRes['AUTHOR_ID'],
 				'recipientId' => $arRes['CHAT_ID'],
-				'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+				'date' => $arRes['DATE_CREATE'],
 				'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 			);
 
@@ -155,7 +176,7 @@ class CIMChat
 				M1.ID,
 				M1.CHAT_ID,
 				M1.MESSAGE,
-				".$DB->DateToCharFunction('M1.DATE_CREATE')." DATE_CREATE,
+				".$DB->DatetimeToTimestampFunction('M1.DATE_CREATE')." DATE_CREATE,
 				M1.AUTHOR_ID
 				".($bLoadChatInfo? ", C.TITLE CHAT_TITLE": "")."
 			FROM b_im_message M1
@@ -173,7 +194,7 @@ class CIMChat
 		$arMessages = Array();
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
 		{
@@ -181,7 +202,7 @@ class CIMChat
 				'id' => $arRes['ID'],
 				'senderId' => $arRes['AUTHOR_ID'],
 				'recipientId' => $arRes['CHAT_ID'],
-				'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+				'date' => $arRes['DATE_CREATE'],
 				'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 			);
 			if ($bLoadChatInfo)
@@ -227,10 +248,18 @@ class CIMChat
 		if (empty($arFilter['ID']))
 			return false;
 
+		$innerJoin = $whereUser = "";
+		if (isset($arParams['USER_ID']))
+		{
+			$innerJoin = "INNER JOIN b_im_relation R2 ON R1.CHAT_ID = R2.CHAT_ID";
+			$whereUser = "and R2.USER_ID = ".intval($arParams['USER_ID']);
+		}
+
 		$strSql = "
-			SELECT C.ID CHAT_ID, C.TITLE CHAT_TITLE, C.AUTHOR_ID CHAT_OWNER_ID, R.USER_ID RELATION_USER_ID
-			FROM b_im_relation R LEFT JOIN b_im_chat C ON R.CHAT_ID = C.ID
-			WHERE R.CHAT_ID IN (".implode(',', $arFilter['ID']).")
+			SELECT C.ID CHAT_ID, C.TITLE CHAT_TITLE, C.AUTHOR_ID CHAT_OWNER_ID, R1.USER_ID RELATION_USER_ID
+			FROM b_im_relation R1 LEFT JOIN b_im_chat C ON R1.CHAT_ID = C.ID
+			".$innerJoin."
+			WHERE R1.CHAT_ID IN (".implode(',', $arFilter['ID']).") ".$whereUser."
 		";
 
 		$arChat = Array();
@@ -262,43 +291,41 @@ class CIMChat
 		if ($chatId <= 0)
 			return false;
 
-		$bReadMessage = false;
-		if ($lastId == null)
-		{
-			$strSql = "
-				SELECT MAX(M.ID) ID, M.CHAT_ID
-				FROM b_im_message M
-				INNER JOIN b_im_relation R1 ON M.ID >= R1.LAST_ID AND M.CHAT_ID = R1.CHAT_ID
-				WHERE R1.CHAT_ID = ".$chatId." AND R1.USER_ID = ".$this->user_id."
-				GROUP BY M.CHAT_ID
-			";
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($arRes = $dbRes->Fetch())
-				$bReadMessage = CIMMessage::SetLastId($chatId, $this->user_id, $arRes['ID']);
+		$sqlLastId = '';
+		if (intval($lastId) > 0)
+			$sqlLastId = "AND M.ID <= ".intval($lastId);
 
-			$lastId = $arRes['ID'];
-		}
-		else
+		$strSql = "
+			SELECT COUNT(M.ID) CNT, MAX(M.ID) ID, M.CHAT_ID
+			FROM b_im_message M
+			INNER JOIN b_im_relation R1 ON M.ID > R1.LAST_ID ".$sqlLastId." AND M.CHAT_ID = R1.CHAT_ID
+			WHERE R1.CHAT_ID = ".$chatId." AND R1.USER_ID = ".$this->user_id."
+			GROUP BY M.CHAT_ID;
+		";
+		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($arRes = $dbRes->Fetch())
 		{
-			$bReadMessage = CIMMessage::SetLastId($chatId, $this->user_id, intval($lastId));
-		}
-
-		if ($bReadMessage)
-		{
-			CIMMessenger::SpeedFileDelete($this->user_id, IM_SPEED_GROUP);
-			if (CModule::IncludeModule("pull"))
+			$bReadMessage = CIMMessage::SetLastId($chatId, $this->user_id, $arRes['ID']);
+			if ($bReadMessage)
 			{
-				CPushManager::DeleteFromQueue($this->user_id, 'IM_GROUP_'.$chatId);
-				CPullStack::AddByUser($this->user_id, Array(
-					'module_id' => 'im',
-					'command' => 'readMessageChat',
-					'params' => Array(
-						'chatId' => $chatId,
-						'lastId' => $lastId
-					),
-				));
+				//CUserCounter::Decrement($this->user_id, 'im_chat', '**', false, $arRes['CNT']);
+				CIMMessenger::SpeedFileDelete($this->user_id, IM_SPEED_GROUP);
+				if (CModule::IncludeModule("pull"))
+				{
+					CPushManager::DeleteFromQueueBySubTag($this->user_id, 'IM_GROUP');
+					CPullStack::AddByUser($this->user_id, Array(
+						'module_id' => 'im',
+						'command' => 'readMessageChat',
+						'params' => Array(
+							'chatId' => $chatId,
+							'lastId' => $arRes['ID'],
+							'count' => $arRes['CNT']
+						),
+					));
+					//CIMMessenger::SendBadges($this->user_id);
+				}
+				return true;
 			}
-			return true;
 		}
 
 		return false;
@@ -335,7 +362,7 @@ class CIMChat
 		);
 		$bLoadMessage = $bSpeedCheck? CIMMessenger::SpeedFileExists($this->user_id, IM_SPEED_GROUP): false;
 		$count = CIMMessenger::SpeedFileGet($this->user_id, IM_SPEED_GROUP);
-		if (!$bLoadMessage || ($bLoadMessage && $count > 0))
+		if (!$bLoadMessage || ($bLoadMessage && intval($count) > 0))
 		{
 
 			$ssqlLastId = "R1.LAST_ID";
@@ -353,13 +380,12 @@ class CIMChat
 					M.ID,
 					M.CHAT_ID,
 					M.MESSAGE,
-					".$DB->DateToCharFunction('M.DATE_CREATE')." DATE_CREATE,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.AUTHOR_ID,
 					R1.STATUS R1_STATUS
 				FROM b_im_message M
 				INNER JOIN b_im_relation R1 ON M.ID > ".$ssqlLastId." AND M.CHAT_ID = R1.CHAT_ID AND R1.USER_ID != M.AUTHOR_ID
 				WHERE R1.USER_ID = ".$this->user_id." AND R1.MESSAGE_TYPE = '".IM_MESSAGE_GROUP."' ".$ssqlStatus."
-				ORDER BY ID ".($order == "DESC"? "DESC": "ASC")."
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -370,13 +396,7 @@ class CIMChat
 			$arChat = Array();
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
-			if (!$this->bHideLink)
-			{
-				$CCTPM = new CTextParser();
-				$CCTPM->MaxStringLen = 200;
-				$CCTPM->allow = array("HTML" => "N", "ANCHOR" => "N", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
-			}
+			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 
 			while ($arRes = $dbRes->Fetch())
 			{
@@ -386,7 +406,7 @@ class CIMChat
 					'id' => $arRes['ID'],
 					'senderId' => $arRes['AUTHOR_ID'],
 					'recipientId' => $arRes['CHAT_ID'],
-					'date' => MakeTimeStamp($arRes['DATE_CREATE']),
+					'date' => $arRes['DATE_CREATE'],
 					'text' => $arRes['MESSAGE'],
 				);
 				if ($bGroupByChat)
@@ -409,6 +429,7 @@ class CIMChat
 
 				$arChat[$arRes["CHAT_ID"]] = $arRes["CHAT_ID"];
 			}
+
 			if ($bGroupByChat)
 			{
 				foreach ($arMessages as $key => $value)
@@ -421,10 +442,7 @@ class CIMChat
 					else
 					{
 						$arMessages[$key]['text'] = $CCTP->convertText(htmlspecialcharsbx($value['text']));
-						if ($this->bHideLink)
-							$arMessages[$key]['text_mobile'] = $arMessages[$key]['text'];
-						else
-							$arMessages[$key]['text_mobile'] = $CCTPM->convertText(htmlspecialcharsbx($value['text']));
+						$arMessages[$key]['text_mobile'] = $this->bHideLink? strip_tags($CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text']))), '<br>'): $arMessages[$key]['text'];
 
 						$arUsersMessage[$value['conversation']][] = $value['id'];
 
@@ -441,10 +459,7 @@ class CIMChat
 				foreach ($arMessages as $key => $value)
 				{
 					$arMessages[$key]['text'] = $CCTP->convertText(htmlspecialcharsbx($value['text']));
-					if ($this->bHideLink)
-						$arMessages[$key]['text_mobile'] = $arMessages[$key]['text'];
-					else
-						$arMessages[$key]['text_mobile'] = $CCTPM->convertText(htmlspecialcharsbx($value['text']));
+					$arMessages[$key]['text_mobile'] = $this->bHideLink? strip_tags($CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text']))), '<br>'): $arMessages[$key]['text'];
 				}
 			}
 			foreach ($arMark as $chatId => $lastSendId)
@@ -610,7 +625,7 @@ class CIMChat
 			$strSql = "INSERT INTO b_im_relation (CHAT_ID, MESSAGE_TYPE, USER_ID) VALUES (".$chatId.",'".IM_MESSAGE_GROUP."',".$userId.")";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		$message = GetMessage("IM_CHAT_JOIN_".$arUsers[$this->user_id]['gender'], Array('#USER_1_NAME#' => $arUsers[$this->user_id]['name'], '#USER_2_NAME#' => implode(', ', $arUsersName)));
+		$message = GetMessage("IM_CHAT_JOIN_".$arUsers[$this->user_id]['gender'], Array('#USER_1_NAME#' => htmlspecialcharsback($arUsers[$this->user_id]['name']), '#USER_2_NAME#' => implode(', ', $arUsersName)));
 
 		self::AddMessage(Array(
 			"TO_CHAT_ID" => $chatId,
@@ -801,6 +816,9 @@ class CIMChat
 			if (CModule::IncludeModule("pull"))
 				$arOldRelation = CIMChat::GetRelationById($chatId);
 
+			$CIMChat = new CIMChat($userId);
+			$CIMChat->SetReadMessage($chatId);
+
 			$strSql = "DELETE FROM b_im_relation WHERE CHAT_ID = ".$chatId." AND USER_ID = ".$userId;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -831,6 +849,29 @@ class CIMChat
 
 		$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_USER_NOT_FOUND"), "USER_NOT_FOUND");
 		return false;
+	}
+
+	public static function SetUnreadCounter($userId)
+	{
+		return false;
+
+		$userId = intval($userId);
+		if ($userId <= 0)
+			return false;
+
+		global $DB;
+
+		$sqlCounter = "SELECT COUNT(M.ID) as CNT
+						FROM b_im_message M
+						INNER JOIN b_im_relation R1 ON M.ID > R1.LAST_ID AND M.CHAT_ID = R1.CHAT_ID AND R1.MESSAGE_TYPE = '".IM_MESSAGE_GROUP."' AND R1.STATUS < ".IM_STATUS_READ."
+						WHERE R1.USER_ID = ".$userId;
+		$dbRes = $DB->Query($sqlCounter, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($row = $dbRes->Fetch())
+			CUserCounter::Set($userId, 'im_chat', $row['CNT'], '**', false);
+		else
+			CUserCounter::Set($userId, 'im_chat', 0, '**', false);
+
+		return true;
 	}
 }
 ?>

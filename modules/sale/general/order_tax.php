@@ -100,7 +100,7 @@ class CAllSaleOrderTax
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной суммы налога или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__update.7e4a73a5.php
@@ -134,7 +134,7 @@ class CAllSaleOrderTax
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__delete.ae826565.php
@@ -159,7 +159,7 @@ class CAllSaleOrderTax
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__deleteex.b5025ef6.php

@@ -545,31 +545,31 @@ class CAllSaleBasket
 		/** @var $productProvider IBXSaleProductProvider */
 		if ($productProvider = CSaleBasket::GetProductProvider($arBasketItem))
 		{
-			if ($isOrderReserved && $isOrderDeducted) // we need to deduct product
+			if ($isOrderDeducted) // we need to deduct product
 			{
+				$quantityPreviouslyLeftToReserve = ($arBasketItem["RESERVED"] == "Y") ? doubleval($arBasketItem["RESERVE_QUANTITY"]) : 0;
+
 				if (defined("SALE_DEBUG") && SALE_DEBUG)
 				{
 					CSaleHelper::WriteToLog(
-						"Call ::DeductBasketProduct",
+						"Call ::ReserveBasketProduct",
 						array(
 							"arBasketItemID" => $arBasketItem["ID"],
 							"deltaQuantity" => $deltaQuantity,
-							"arStoreBarcodeOrderFormData" => $arStoreBarcodeOrderFormData
+							"quantityPreviouslyLeftToReserve" => $quantityPreviouslyLeftToReserve,
+							"isOrderDeducted" => $isOrderDeducted
 						),
 						"DCPQ2"
 					);
 				}
 
-				$arDeductResult = CSaleBasket::DeductBasketProduct($arBasketItem["ID"], $deltaQuantity, $arStoreBarcodeOrderFormData);
-				if (array_key_exists("ERROR", $arDeductResult))
+				$arRes = CSaleBasket::ReserveBasketProduct($arBasketItem["ID"], $deltaQuantity + $quantityPreviouslyLeftToReserve, $isOrderDeducted);
+				if (array_key_exists("ERROR", $arRes))
 				{
-					CSaleOrder::SetMark($arAdditionalParams["ORDER_ID"], GetMessage("SKGB_DEDUCT_ERROR", array("#MESSAGE#" => $arDeductResult["ERROR"]["MESSAGE"])));
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGB_DEDUCT_ERROR", array("#MESSAGE#" => $arDeductResult["ERROR"]["MESSAGE"])), "DEDUCTION_ERROR");
+					CSaleOrder::SetMark($arAdditionalParams["ORDER_ID"], GetMessage("SKGB_RESERVE_ERROR", array("#MESSAGE#" => $arRes["ERROR"]["MESSAGE"])));
 					return false;
 				}
-			}
-			else if (!$isOrderReserved && $isOrderDeducted) // we need to deduct product
-			{
+
 				if (defined("SALE_DEBUG") && SALE_DEBUG)
 				{
 					CSaleHelper::WriteToLog(
@@ -674,7 +674,7 @@ class CAllSaleBasket
 					$arBasketItem["CANCEL_CALLBACK_FUNC"],
 					$arBasketItem["MODULE"],
 					$arBasketItem["PRODUCT_ID"],
-					$deltaQuantity,
+					abs($deltaQuantity),
 					true
 				);
 			}
@@ -938,12 +938,6 @@ class CAllSaleBasket
 		}
 		unset($arItem);
 
-		if (is_array($arCoupons) && (count($arCoupons) > 0))
-		{
-			foreach(GetModuleEvents("sale", "OnDoBasketOrder", true) as $arEvent)
-				ExecuteModuleEventEx($arEvent, array($userId, $arCoupons, array()));
-		}
-
 		if (defined("SALE_DEBUG") && SALE_DEBUG)
 			CSaleHelper::WriteToLog("Items left in the old basket:", array("arOldItems" => $arOldItems), "DSOB4");
 
@@ -1164,6 +1158,8 @@ class CAllSaleBasket
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$arFields))===false)
 				return false;
 
+		$arOldFields = CSaleBasket::GetByID($ID);
+
 		$strUpdate = $DB->PrepareUpdate("b_sale_basket", $arFields);
 		if(strlen($strUpdate) > 0)
 		{
@@ -1215,6 +1211,9 @@ class CAllSaleBasket
 			}
 		}
 
+		if (isset($arFields["ORDER_ID"]) && intval($arFields["ORDER_ID"]) > 0)
+			CSaleOrderChange::AddRecordsByFields($arFields["ORDER_ID"], $arOldFields, $arFields, array(), "BASKET");
+
 		foreach(GetModuleEvents("sale", "OnBasketUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
 
@@ -1243,20 +1242,25 @@ class CAllSaleBasket
 	 * <b>DELAY</b> - флаг "товар отложен" (Y/N);</li> <li> <b>CAN_BUY</b> - флаг "товар можно
 	 * купить" (Y/N) - может устанавливаться автоматически про наличии
 	 * функции обратного вызова для поддержки актуальности корзины;</li>
-	 * <li> <b>NAME</b> - название товара (обязательное поле);</li> <li> <b>CALLBACK_FUNC</b> -
-	 * название функции обратного вызова для поддержки актуальности
-	 * корзины (подробности в описании метода CSaleBasket::Add);</li> <li> <b>MODULE</b> -
-	 * модуль, добавляющий файл в корзину;</li> <li> <b>NOTES</b> - особые заметки,
-	 * например, тип цены;</li> <li> <b>ORDER_CALLBACK_FUNC</b> - название функции
-	 * обратного вызова для оформления заказа (подробности в описании
-	 * метода CSaleBasket::Add);</li> <li> <b>DETAIL_PAGE_URL</b> - ссылка на страницу
-	 * детального просмотра товара;</li> <li> <b>PROPS</b> - массив свойств товара,
-	 * который сохраняется в корзине. Каждый элемент этого массива
-	 * является массивом следующего формата: <pre class="syntax"><code>array("NAME" =&gt;
-	 * "Название свойства", "CODE" =&gt; "Код свойства", "VALUE" =&gt; "Значение
-	 * свойства", "SORT" =&gt; "Индекс сортировки")</code></pre> Параметр <b>PROPS</b>
-	 * должен содержать массив из всех предыдущих значений, иначе они
-	 * будут затерты. </li> </ul>
+	 * <li> <b>NAME</b> - название товара (обязательное поле);</li> <li> <b>CALLBACK_FUNC<font
+	 * color="#FF0000">*</font></b> - название функции обратного вызова для поддержки
+	 * актуальности корзины (подробности в описании метода CSaleBasket::Add);</li>
+	 * <li> <b>MODULE</b> - модуль, добавляющий файл в корзину;</li> <li> <b>NOTES</b> -
+	 * особые заметки, например, тип цены;</li> <li> <b>ORDER_CALLBACK_FUNC<font
+	 * color="#FF0000">*</font></b> - название функции обратного вызова для
+	 * оформления заказа (подробности в описании метода CSaleBasket::Add);</li> <li>
+	 * <b>DETAIL_PAGE_URL</b> - ссылка на страницу детального просмотра товара;</li>
+	 * <li> <b>PROPS</b> - массив свойств товара, который сохраняется в корзине.
+	 * Каждый элемент этого массива является массивом следующего
+	 * формата: <pre class="syntax"><code>array("NAME" =&gt; "Название свойства", "CODE" =&gt; "Код
+	 * свойства", "VALUE" =&gt; "Значение свойства", "SORT" =&gt; "Индекс
+	 * сортировки")</code></pre> <p>Параметр <b>PROPS</b> должен содержать массив из
+	 * всех предыдущих значений, иначе они будут затерты.</p> </li> <li>
+	 * <b>PRODUCT_PROVIDER_CLASS<font color="#0000FF">**</font></b> - содержит имя класса,
+	 * реализующего интерфейс <b> IBXSaleProductProvider</b>. Торговый каталог
+	 * записывает в это поле имя класса <b>CCatalogProductProvider</b>. Если поле
+	 * пусто, то возникает попытка использовать старые поля:<b>CALLBACK_FUNC</b>,
+	 * <b>ORDER_CALLBACK_FUNC</b>.</li> </ul>
 	 *
 	 *
 	 *
@@ -1393,7 +1397,7 @@ class CAllSaleBasket
 	//************** SELECT ********************//
 	
 	/**
-	 * <p>Функция возвращает параметры записи корзины с кодом ID</p>
+	 * <p>Функция возвращает параметры записи корзины с кодом ID.</p>
 	 *
 	 *
 	 *
@@ -1412,28 +1416,34 @@ class CAllSaleBasket
 	 * товара.</td> </tr> <tr> <td>LID</td> <td>Сайт, на котором сделана покупка.</td> </tr>
 	 * <tr> <td>DELAY</td> <td>Флаг "товар отложен" (Y/N)</td> </tr> <tr> <td>CAN_BUY</td> <td>Флаг
 	 * "товар можно купить" (Y/N)</td> </tr> <tr> <td>NAME</td> <td>Название товара.</td> </tr>
-	 * <tr> <td>CALLBACK_FUNC</td> <td>Название функции обратного вызова для
-	 * поддержки актуальности корзины.</td> </tr> <tr> <td>MODULE</td> <td>Модуль,
-	 * добавляющий товар в корзину.</td> </tr> <tr> <td>NOTES</td> <td>Особые заметки,
-	 * например, тип цены.</td> </tr> <tr> <td>ORDER_CALLBACK_FUNC</td> <td>Название функции
-	 * обратного вызова для оформления заказа.</td> </tr> <tr> <td>DETAIL_PAGE_URL</td>
-	 * <td>Ссылка на страницу детального просмотра товара.</td> </tr> <tr>
-	 * <td>FUSER_ID</td> <td>Внутренний код владельца корзины (не совпадает с
-	 * кодом пользователя) </td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа, в который
-	 * вошла эта запись (товар). Для товаров, которые помещены в корзину,
-	 * но ещё не заказаны, это поле равно NULL. </td> </tr> <tr> <td>DATE_INSERT</td> <td>Дата
-	 * добавления товара в корзину.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата
-	 * последнего изменения записи.</td> </tr> <tr> <td>DISCOUNT_PRICE</td> <td>Скидка на
-	 * товар. Значение устанавливается только после оформления заказа.
-	 * </td> </tr> <tr> <td>CANCEL_CALLBACK_FUNC</td> <td>Название функции обратного вызова
-	 * для отмены заказа. </td> </tr> <tr> <td>PAY_CALLBACK_FUNC</td> <td>Название функции
-	 * обратного вызова, которая вызывается при установке флага заказа
-	 * "Доставка разрешена". </td> </tr> </table><p>Обратите внимание, что этот
-	 * метод возвращает данные, которые были актуальны на момент
-	 * последнего выполнения для этой записи функции обратного вызова
-	 * для поддержки актуальности корзины (либо на момент добавления
-	 * записи, если функция обратного вызова не выполнялась или не
-	 * установлена).</p><a name="examples"></a>
+	 * <tr> <td>CALLBACK_FUNC<font color="#FF0000">*</font> </td> <td>Название функции обратного
+	 * вызова для поддержки актуальности корзины.</td> </tr> <tr> <td>MODULE</td>
+	 * <td>Модуль, добавляющий товар в корзину.</td> </tr> <tr> <td>NOTES</td> <td>Особые
+	 * заметки, например, тип цены.</td> </tr> <tr> <td>ORDER_CALLBACK_FUNC<font color="#FF0000">*</font>
+	 * </td> <td>Название функции обратного вызова для оформления заказа.</td>
+	 * </tr> <tr> <td>DETAIL_PAGE_URL</td> <td>Ссылка на страницу детального просмотра
+	 * товара.</td> </tr> <tr> <td>FUSER_ID</td> <td>Внутренний код владельца корзины (не
+	 * совпадает с кодом пользователя) </td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа,
+	 * в который вошла эта запись (товар). Для товаров, которые помещены в
+	 * корзину, но ещё не заказаны, это поле равно NULL. </td> </tr> <tr>
+	 * <td>DATE_INSERT</td> <td>Дата добавления товара в корзину.</td> </tr> <tr>
+	 * <td>DATE_UPDATE</td> <td>Дата последнего изменения записи.</td> </tr> <tr>
+	 * <td>DISCOUNT_PRICE</td> <td>Скидка на товар. Значение устанавливается только
+	 * после оформления заказа. </td> </tr> <tr> <td>CANCEL_CALLBACK_FUNC<font color="#FF0000">*</font>
+	 * </td> <td>Название функции обратного вызова для отмены заказа. </td> </tr>
+	 * <tr> <td>PAY_CALLBACK_FUNC<font color="#FF0000">*</font> </td> <td>Название функции обратного
+	 * вызова, которая вызывается при установке флага заказа "Доставка
+	 * разрешена". </td> </tr> <tr> <td>PRODUCT_PROVIDER_CLASS<font color="#0000FF">**</font> </td> <td>Имя
+	 * класса, реализующего интерфейс <b> IBXSaleProductProvider</b>. Торговый
+	 * каталог записывает в это поле имя класса <b>CCatalogProductProvider</b>.</td> </tr>
+	 * </table><p><b><font color="#FF0000">*</font></b> - ключи считаются устаревшими, начиная
+	 * с версии 12.5.<br><b><font color="#0000FF">**</font></b> - ключ доступен, начиная с
+	 * версии 12.5.</p><p>Обратите внимание, что этот метод возвращает
+	 * данные, которые были актуальны на момент последнего выполнения
+	 * для этой записи функции обратного вызова для поддержки
+	 * актуальности корзины (либо на момент добавления записи, если
+	 * функция обратного вызова не выполнялась или не установлена).</p><a
+	 * name="examples"></a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -1584,7 +1594,7 @@ class CAllSaleBasket
 
 	
 	/**
-	 * <p>Функция актуализирует параметры записи с кодом ID корзины на основании функции обратного вызова для поддержки актуальности корзины CALLBACK_FUNC</p>
+	 * <p>Функция актуализирует параметры записи с кодом <b>ID</b> корзины на основании провайдера PRODUCT_PROVIDER_CLASS (с версии 12.5) или функции обратного вызова для поддержки актуальности корзины CALLBACK_FUNC (до версии 12.5).</p>
 	 *
 	 *
 	 *
@@ -1594,7 +1604,8 @@ class CAllSaleBasket
 	 *
 	 *
 	 * @param string $CALLBACK_FUNC = "" Название функции обратного вызова для поддержки актуальности
-	 * корзины.
+	 * корзины. Параметр считается <b>устаревшим</b>, начиная с версии 12.5.
+	 * На смену ему пришел <b>PRODUCT_PROVIDER_CLASS</b>.
 	 *
 	 *
 	 *
@@ -1607,6 +1618,18 @@ class CAllSaleBasket
 	 *
 	 *
 	 * @param int $QUANTITY = 0 Количество товара в корзине.
+	 *
+	 *
+	 *
+	 * @param string $RENEWAL = "N" Флаг "Продление подписки" (значения - Y/N).
+	 *
+	 *
+	 *
+	 * @param string $PRODUCT_PROVIDER_CLASS = "" Имя класса, реализующего интерфейс <b> IBXSaleProductProvider</b>. Торговый
+	 * каталог записывает в это поле имя класса <b>CCatalogProductProvider</b>. <br>
+	 * Параметр доступен, начиная с версии 12.5. Если он не задан, то
+	 * возникает попытка использовать устаревший механизм через
+	 * <b>CALLBACK_FUNC</b>.
 	 *
 	 *
 	 *
@@ -2011,6 +2034,7 @@ class CAllSaleBasket
 	public static function OrderReservation($orderID, $bUndoReservation = false)
 	{
 		global $DB;
+		global $APPLICATION;
 
 		if (defined("SALE_DEBUG") && SALE_DEBUG)
 		{
@@ -2029,88 +2053,102 @@ class CAllSaleBasket
 		$arOrder = CSaleOrder::GetByID($orderID);
 		if ($arOrder)
 		{
-			if ($arOrder["DEDUCTED"] != "Y")
+			$obStackExp = $APPLICATION->GetException();
+			if (is_object($obStackExp))
 			{
-				$dbBasketList = CSaleBasket::GetList(
-					array("NAME" => "ASC"),
-					array("ORDER_ID" => $orderID)
-				);
-				while ($arBasket = $dbBasketList->Fetch())
+				$APPLICATION->ResetException();
+			}
+
+			$dbBasketList = CSaleBasket::GetList(
+				array("NAME" => "ASC"),
+				array("ORDER_ID" => $orderID)
+			);
+			while ($arBasket = $dbBasketList->Fetch())
+			{
+				if (defined("SALE_DEBUG") && SALE_DEBUG)
+					CSaleHelper::WriteToLog("Reserving product #".$arBasket["PRODUCT_ID"], array(), "OR2");
+
+				/** @var $productProvider IBXSaleProductProvider */
+				if ($productProvider = CSaleBasket::GetProductProvider($arBasket))
 				{
 					if (defined("SALE_DEBUG") && SALE_DEBUG)
-						CSaleHelper::WriteToLog("Reserving product #".$arBasket["PRODUCT_ID"], array(), "OR2");
+					{
+						CSaleHelper::WriteToLog(
+							"Call ::ReserveProduct",
+							array(
+								"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
+								"QUANTITY_ADD" => $arBasket["QUANTITY"],
+								"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N"
+								),
+							"OR3"
+						);
+					}
 
-					/** @var $productProvider IBXSaleProductProvider */
-					if ($productProvider = CSaleBasket::GetProductProvider($arBasket))
+					if ($arOrder["DEDUCTED"] == "Y") // order already deducted, don't reserve it
+					{
+						$res = array("RESULT" => true, "QUANTITY_RESERVED" => 0);
+
+						if (defined("SALE_DEBUG") && SALE_DEBUG)
+							CSaleHelper::WriteToLog("Order already deducted. Product won't be reserved.", array(), "OR5");
+					}
+					else
+					{
+						$res = $productProvider::ReserveProduct(array(
+							"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
+							"QUANTITY_ADD" => $arBasket["QUANTITY"],
+							"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N",
+						));
+					}
+
+					if ($res["RESULT"])
+					{
+						$arResult[$arBasket["PRODUCT_ID"]] = $res["QUANTITY_RESERVED"];
+
+						$arUpdateFields = array("RESERVED" => ($bUndoReservation) ? "N" : "Y");
+
+						if (!$bUndoReservation && isset($res["QUANTITY_NOT_RESERVED"]))
+						{
+							$arUpdateFields["RESERVE_QUANTITY"] = $res["QUANTITY_NOT_RESERVED"];
+						}
+
+						if (defined("SALE_DEBUG") && SALE_DEBUG)
+							CSaleHelper::WriteToLog("Product #".$arBasket["PRODUCT_ID"]." reserved successfully", array("arUpdateFields" => $arUpdateFields), "OR4");
+
+						CSaleBasket::Update($arBasket["ID"], $arUpdateFields);
+					}
+					else
+					{
+						if (defined("SALE_DEBUG") && SALE_DEBUG)
+							CSaleHelper::WriteToLog("Product #".$arBasket["PRODUCT_ID"]." reservation error", array(), "OR4");
+
+						CSaleBasket::Update($arBasket["ID"], array("RESERVED" => "N"));
+					}
+
+					if ($ex = $APPLICATION->GetException())
 					{
 						if (defined("SALE_DEBUG") && SALE_DEBUG)
 						{
 							CSaleHelper::WriteToLog(
-								"Call ::ReserveProduct",
+								"Call ::ReserveProduct - Exception",
 								array(
-									"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
-									"QUANTITY_ADD" => $arBasket["QUANTITY"],
-									"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N"
-									),
-								"OR3"
+									"ID" => $arBasket["PRODUCT_ID"],
+									"MESSAGE" => $ex->GetString(),
+									"CODE" => $ex->GetID(),
+								),
+								"OR4"
 							);
 						}
 
-						$res = $productProvider::ReserveProduct(array(
-							"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
-							"QUANTITY_ADD" => $arBasket["QUANTITY"],
-							"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N"
-						));
-
-						if ($res["RESULT"])
-						{
-							$arResult[$arBasket["PRODUCT_ID"]] = $res["QUANTITY_RESERVED"];
-
-							$arUpdateFields = array("RESERVED" => "Y");
-							if (!$bUndoReservation && isset($res["QUANTITY_NOT_RESERVED"]))
-							{
-								$arUpdateFields["RESERVE_QUANTITY"] = $res["QUANTITY_NOT_RESERVED"];
-							}
-
-							if (defined("SALE_DEBUG") && SALE_DEBUG)
-								CSaleHelper::WriteToLog("Product #".$arBasket["PRODUCT_ID"]." reserved successfully", array("arUpdateFields" => $arUpdateFields), "OR4");
-
-							CSaleBasket::Update($arBasket["ID"], $arUpdateFields);
-						}
-						else
-						{
-							if (defined("SALE_DEBUG") && SALE_DEBUG)
-								CSaleHelper::WriteToLog("Product #".$arBasket["PRODUCT_ID"]." reservation error", array(), "OR4");
-
-							CSaleBasket::Update($arBasket["ID"], array("RESERVED" => "N"));
-						}
-
-						if ($ex = $GLOBALS["APPLICATION"]->GetException())
-						{
-							if (defined("SALE_DEBUG") && SALE_DEBUG)
-							{
-								CSaleHelper::WriteToLog(
-									"Call ::ReserveProduct - Exception",
-									array(
-										"ID" => $arBasket["PRODUCT_ID"],
-										"MESSAGE" => $ex->GetString(),
-										"CODE" => $ex->GetID(),
-									),
-									"OR4"
-								);
-							}
-
-							$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["ID"] = $arBasket["PRODUCT_ID"];
-							$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["MESSAGE"] = $ex->GetString();
-							$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["CODE"] = $ex->GetID();
-						}
+						$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["ID"] = $arBasket["PRODUCT_ID"];
+						$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["MESSAGE"] = $ex->GetString();
+						$arResult["ERROR"][$arBasket["PRODUCT_ID"]]["CODE"] = $ex->GetID();
 					}
 				}
 			}
-			else // order already deducted, don't reserve it
+			if (is_object($obStackExp))
 			{
-				if (defined("SALE_DEBUG") && SALE_DEBUG)
-					CSaleHelper::WriteToLog("Order already deducted. Don't reserve it.", array(), "OR5");
+				$APPLICATION->ResetException();
+				$APPLICATION->ThrowException($obStackExp);
 			}
 		}
 
@@ -2129,7 +2167,7 @@ class CAllSaleBasket
 	* @param bool $bUndoReservation
 	* @return mixed array
 	*/
-	public static function ReserveBasketProduct($basketID, $deltaQuantity)
+	public static function ReserveBasketProduct($basketID, $deltaQuantity, $isOrderDeducted = false)
 	{
 		if (defined("SALE_DEBUG") && SALE_DEBUG)
 		{
@@ -2176,7 +2214,8 @@ class CAllSaleBasket
 						array(
 							"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
 							"QUANTITY_ADD" => $deltaQuantity,
-							"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N"
+							"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N",
+							"ORDER_DEDUCTED" => ($isOrderDeducted) ? "Y" : "N"
 							),
 						"RBP2"
 					);
@@ -2185,7 +2224,8 @@ class CAllSaleBasket
 				$res = $productProvider::ReserveProduct(array(
 					"PRODUCT_ID" => $arBasket["PRODUCT_ID"],
 					"QUANTITY_ADD" => $deltaQuantity,
-					"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N"
+					"UNDO_RESERVATION" => ($bUndoReservation) ? "Y" : "N",
+					"ORDER_DEDUCTED" => ($isOrderDeducted) ? "Y" : "N"
 				));
 
 				$arResult["RESULT"] = $res["RESULT"];
@@ -2800,7 +2840,14 @@ class CAllSaleUser
 		if (intval($anonUserID) <= 0)
 		{
 			$anonUserEmail = "anonymous_".randString(9)."@example.com";
-			$anonUserID = CSaleUser::DoAutoRegisterUser($anonUserEmail, array("NAME" => GetMessage("SU_ANONYMOUS_USER_NAME")), SITE_ID, $arErrors);
+
+			$anonUserID = CSaleUser::DoAutoRegisterUser(
+				$anonUserEmail,
+				array("NAME" => GetMessage("SU_ANONYMOUS_USER_NAME")),
+				SITE_ID,
+				$arErrors,
+				array("ACTIVE" => "N")
+			);
 
 			if ($anonUserID > 0)
 			{
@@ -2915,9 +2962,13 @@ class CAllSaleUser
 			"PASSWORD_CONFIRM" => $autoPassword,
 			"EMAIL" => $autoEmail,
 			"GROUP_ID" => $arDefaultGroup,
-			"ACTIVE" => "Y",
 			"LID" => $siteId,
 		);
+
+		$arFields["ACTIVE"] = (isset($arOtherFields["ACTIVE"]) && $arOtherFields["ACTIVE"] == "N") ? "N" : "Y";
+		if (isset($arOtherFields["ACTIVE"]))
+			unset($arOtherFields["ACTIVE"]);
+
 		if (is_array($arOtherFields))
 		{
 			foreach ($arOtherFields as $key => $value)

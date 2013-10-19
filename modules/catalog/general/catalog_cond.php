@@ -1705,7 +1705,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 	{
 		$arVatList = array();
 		$arFilter = array();
-		$rsVats = CCatalogVat::GetList(array(), $arFilter, array('ID', 'NAME'));
+		$rsVats = CCatalogVat::GetListEx(array(), $arFilter, false, false, array('ID', 'NAME'));
 		while ($arVat = $rsVats->Fetch())
 		{
 			$arVatList[$arVat['ID']] = $arVat['NAME'];
@@ -1726,6 +1726,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -1748,6 +1749,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_iblock_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -1770,6 +1772,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 					'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y',
@@ -2276,7 +2279,8 @@ class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);
@@ -2290,7 +2294,8 @@ class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 										'popup_url' =>  '/bitrix/admin/cat_section_search.php',
 										'popup_params' => array(
 											'lang' => LANGUAGE_ID,
-											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID']
+											'IBLOCK_ID' => $arProp['LINK_IBLOCK_ID'],
+											'discount' => 'Y'
 										),
 										'param_id' => 'n',
 									);

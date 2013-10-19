@@ -22,7 +22,7 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -60,8 +60,8 @@ class CAllOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89621]Параметры модуля[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/settings.php">Настройки главного модуля</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/coption/getoptionint.php">COption::GetOptionInt</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/settings.php">Настройки главного модуля</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/getoptionint.php">COption::GetOptionInt</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -149,7 +149,7 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -157,11 +157,12 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $value = "" Значение параметра.<br>Необязательный. По умолчанию - "".
+	 * @param string $value = "" Значение параметра. <br> Необязательный. По умолчанию - "".
+	 * Максимальная сохраняемая длина значения - 2000 символов.
 	 *
 	 *
 	 *
-	 * @param mixed $description = false Описание параметра.<br>Необязательный. По умолчанию - "false"
+	 * @param mixed $description = false Описание параметра. <br> Необязательный. По умолчанию - "false"
 	 * (описание отсутствует).
 	 *
 	 *
@@ -189,8 +190,8 @@ class CAllOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89621]Параметры модуля[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/settings.php">Настройки главного модуля</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/coption/setoptionint.php">COption::SetOptionInt</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/settings.php">Настройки главного модуля</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/setoptionint.php">COption::SetOptionInt</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -263,7 +264,7 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -294,7 +295,7 @@ class CAllOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89621]Параметры модуля[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/settings.php">Настройки главного модуля</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/settings.php">Настройки главного модуля</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -353,7 +354,7 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -389,9 +390,9 @@ class CAllOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89621]Параметры модуля[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/settings.php">Настройки главного модуля</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/coption/getoptionstring.php">COption::GetOptionString</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/settings.php">Настройки главного модуля</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/getoptionstring.php">COption::GetOptionString</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -410,7 +411,7 @@ class CAllOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -450,9 +451,9 @@ class CAllOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89621]Параметры модуля[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/settings.php">Настройки главного модуля</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/coption/setoptionstring.php">COption::SetOptionString</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/settings.php">Настройки главного модуля</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/setoptionstring.php">COption::SetOptionString</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -476,7 +477,7 @@ class CAllPageOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -502,7 +503,7 @@ class CAllPageOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89636]Параметры страницы[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpageoption/getoptionint.php">CPageOption::GetOptionInt</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/getoptionint.php">CPageOption::GetOptionInt</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -531,7 +532,7 @@ class CAllPageOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -548,7 +549,7 @@ class CAllPageOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89636]Параметры страницы[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpageoption/setoptionint.php">CPageOption::SetOptionInt</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/setoptionint.php">CPageOption::SetOptionInt</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -576,7 +577,7 @@ class CAllPageOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -637,7 +638,7 @@ class CAllPageOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -663,7 +664,7 @@ class CAllPageOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89636]Параметры страницы[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpageoption/getoptionstring.php">CPageOption::GetOptionString</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/getoptionstring.php">CPageOption::GetOptionString</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -683,7 +684,7 @@ class CAllPageOption
 	 *
 	 *
 	 *
-	 * @param string $module_id  <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	 * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	 *
 	 *
 	 *
@@ -709,7 +710,7 @@ class CAllPageOption
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>[link=89636]Параметры страницы[/link] </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpageoption/setoptionstring.php">CPageOption::SetOptionString</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/setoptionstring.php">CPageOption::SetOptionString</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

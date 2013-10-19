@@ -2,7 +2,7 @@
 
 
 /**
- * 
+ * <br><br>
  *
  *
  *
@@ -91,11 +91,11 @@ class CSOAPRequest extends CSOAPEnvelope
      *
      * <h4>Example</h4> 
      * <pre>
-     * <code>$request-&gt;addSOAPHeader( 
+     * $request-&gt;addSOAPHeader( 
      *     "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
      *     array(
      *         "UnregisteredUser" =&gt; array( "EmailAddress" =&gt; "qwerty@mail.ru" ))
-     *     );</code>
+     *     );
      * </pre>
      *
      *
@@ -148,7 +148,7 @@ class CSOAPRequest extends CSOAPEnvelope
      *
      * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
      * заголовке запроса. См. <a
-     * href="http://dev.1c-bitrix.ruapi_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
+     * href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
      *
      *
      *

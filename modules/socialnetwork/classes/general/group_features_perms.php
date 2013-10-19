@@ -203,7 +203,7 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	 * <p>Изменяет параметры права.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
+	 * <p>Изменяет параметры права.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
 	 *
 	 *
 	 *
@@ -222,9 +222,9 @@ class CAllSocNetFeaturesPerms
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
 	 * </ul>
 	 *
 	 *
@@ -291,7 +291,7 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	 * <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется.</p> <p><b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a>.</p>
+	 * <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется.</p> <p><b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a>.</p>
 	 *
 	 *
 	 *
@@ -346,9 +346,9 @@ class CAllSocNetFeaturesPerms
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
 	 * <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -468,7 +468,7 @@ class CAllSocNetFeaturesPerms
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetFeaturesPerms/GetList.php">CSocNetFeaturesPerms::GetList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetList.php">CSocNetFeaturesPerms::GetList</a>
 	 * </li> </ul>
 	 *
 	 *

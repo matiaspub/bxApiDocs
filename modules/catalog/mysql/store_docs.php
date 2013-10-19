@@ -25,9 +25,7 @@ class CCatalogDocs
 
 		$arInsert = $DB->PrepareInsert("b_catalog_store_docs", $arFields);
 
-		$strSql =
-			"INSERT INTO b_catalog_store_docs (".$arInsert[0].") ".
-				"VALUES(".$arInsert[1].")";
+		$strSql = "INSERT INTO b_catalog_store_docs (".$arInsert[0].") VALUES(".$arInsert[1].")";
 
 		$res = $DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if(!$res)
@@ -39,8 +37,8 @@ class CCatalogDocs
 	static function getList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
-		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("ID", "DOC_TYPE", "SITE_ID", "CONTRACTOR_ID", "CURRENCY", "STATUS", "DATE_DOCUMENT", "TOTAL");
+		if (empty($arSelectFields))
+			$arSelectFields = array("ID", "DOC_TYPE", "SITE_ID", "CONTRACTOR_ID", "CURRENCY", "STATUS", "DATE_DOCUMENT", "TOTAL", "DATE_STATUS");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "CD.ID", "TYPE" => "int"),
@@ -51,8 +49,10 @@ class CCatalogDocs
 			"DATE_CREATE" => array("FIELD" => "CD.DATE_CREATE", "TYPE" => "datetime"),
 			"DATE_MODIFY" => array("FIELD" => "CD.DATE_MODIFY", "TYPE" => "datetime"),
 			"DATE_DOCUMENT" => array("FIELD" => "CD.DATE_DOCUMENT", "TYPE" => "datetime"),
+			"DATE_STATUS" => array("FIELD" => "CD.DATE_STATUS", "TYPE" => "datetime"),
 			"CREATED_BY" => array("FIELD" => "CD.CREATED_BY", "TYPE" => "int"),
 			"MODIFIED_BY" => array("FIELD" => "CD.MODIFIED_BY", "TYPE" => "int"),
+			"STATUS_BY" => array("FIELD" => "CD.STATUS_BY", "TYPE" => "int"),
 			"STATUS" => array("FIELD" => "CD.STATUS", "TYPE" => "string"),
 			"TOTAL" => array("FIELD" => "CD.TOTAL", "TYPE" => "double"),
 
@@ -67,16 +67,13 @@ class CCatalogDocs
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-					"FROM b_catalog_store_docs CD ".
-					"	".$arSqls["FROM"]." ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store_docs CD ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -85,30 +82,31 @@ class CCatalogDocs
 				return false;
 		}
 
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_catalog_store_docs CD ".
-				"	".$arSqls["FROM"]." ";
-		if (strlen($arSqls["WHERE"]) > 0)
-			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-		if (strlen($arSqls["GROUPBY"]) > 0)
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-		if (strlen($arSqls["ORDERBY"]) > 0)
-			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
-		if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])<=0)
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store_docs CD ".$arSqls["FROM"];
+		if (!empty($arSqls["WHERE"]))
+			$strSql .= " WHERE ".$arSqls["WHERE"];
+		if (!empty($arSqls["GROUPBY"]))
+			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+		if (!empty($arSqls["ORDERBY"]))
+			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
+
+		$intTopCount = 0;
+		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-					"FROM b_catalog_store_docs CD ".
-					"	".$arSqls["FROM"]." ";
-			if (strlen($arSqls["WHERE"]) > 0)
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			$intTopCount = intval($arNavStartParams["nTopCount"]);
+		}
+		if ($boolNavStartParams && 0 >= $intTopCount)
+		{
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_store_docs CD ".$arSqls["FROM"];
+			if (!empty($arSqls["WHERE"]))
+				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
+			if (!empty($arSqls["GROUPBY"]))
+				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
-			if (strlen($arSqls["GROUPBY"]) <= 0)
+			if (empty($arSqls["GROUPBY"]))
 			{
 				if ($arRes = $dbRes->Fetch())
 					$cnt = $arRes["CNT"];
@@ -124,9 +122,10 @@ class CCatalogDocs
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
+			if ($boolNavStartParams && 0 < $intTopCount)
+			{
+				$strSql .= " LIMIT ".$intTopCount;
+			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -144,29 +143,4 @@ class CCatalogDocs
 		}
 		return false;
 	}
-}
-
-class CCatalogArrivalDocs extends CAllCatalogArrivalDocs
-{
-
-}
-
-class CCatalogMovingDocs extends CAllCatalogMovingDocs
-{
-
-}
-
-class CCatalogReturnsDocs extends CAllCatalogReturnsDocs
-{
-
-}
-
-class CCatalogDeductDocs extends CAllCatalogDeductDocs
-{
-
-}
-
-class CCatalogUnReservedDocs extends CAllCatalogUnReservedDocs
-{
-
 }

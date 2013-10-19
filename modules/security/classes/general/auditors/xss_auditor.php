@@ -6,11 +6,6 @@ class CSecurityFilterXssAuditor extends CSecurityFilterBaseAuditor
 
 	protected $name = "XSS";
 
-	public function __construct($pChar = "")
-	{
-		$this->setSplittingChar($pChar);
-	}
-
 	/**
 	 * @param string $pString
 	 * @return bool
@@ -73,7 +68,7 @@ class CSecurityFilterXssAuditor extends CSecurityFilterBaseAuditor
 		$_M3 = '(?:[\x09\x0a\x0d\\\\\s]*)';
 		$_M2 = '(?:(?:[\x09\x0a\x0d\\\\\s]|(?:\/\*.*?\*\/))*)';
 
-		$_Al = '(?<![a-z0-9&_])';
+		$_Al = '(?<![a-z0-9&_?])';
 
 		$_Jj = "(?:j|(?:\\\\0*[64]a))";
 		$_Ja = "(?:a|(?:\\\\0*[64]1))";
@@ -140,14 +135,21 @@ class CSecurityFilterXssAuditor extends CSecurityFilterBaseAuditor
 			)),
 
 			"=" => array($this->getSplittingString(2), array(
-				"/([\W]s{$_M}t{$_M})(y{$_M}l{$_M}e{$_WS_OPT}\=)(?!\\s*\"(\\s*[a-z-]+\\s*:\\s*([0-9a-z\\s%,.#-]+|rgb\\s*\\([0-9,\\s]+\\))\\s*;{0,1}) {0,}\\s*\")(?!\\s*&quot;(\\s*[a-z-]+\\s*:\\s*([0-9a-z\\s%,.#-]+|rgb\\s*\\([0-9,\\s]+\\))\\s*;{0,1}) {0,}\\s*&quot;)/is",
+				"/([\W]s{$_M}t{$_M})(y{$_M}l{$_M}e{$_WS_OPT}\=)
+					(?!\\s*
+						(?P<quot>\"|&quot;|')
+						(\\s*[a-z-]+\\s*:\\s*([0-9a-z\\s%,.#!\-'\"]+|rgb\\s*\\([0-9,\\s]+\\))\\s*;?)*
+						\\s*
+						(?P=quot)
+					)
+				/xis",
 				"/(f{$_M}o{$_M}r{$_M})(m{$_M}a{$_M}c{$_M}t{$_M}i{$_M}o{$_M}n{$_WS_OPT}\=)/is",
 				"/{$_Al}(o{$_M}n{$_M})(([a-z]{$_M}){3,}{$_WS_OPT}\=)/is"
 			)),
 
 			":" => array($this->getSplittingString(2), array(
 				"/(u{$_M}r{$_M}n{$_M2}\:{$_M2}s{$_M})(c{$_M}h{$_M}e{$_M}m{$_M}a{$_M}s{$_M}\-{$_M}m{$_M}i{$_M}c{$_M}r{$_M}o{$_M}s{$_M}o{$_M}f{$_M}t{$_M}\-{$_M}c{$_M}o{$_M}m{$_M2}\:)/",
-				"/{$_Al}(d{$_M}a{$_M}t{$_M})(a{$_M}\:)(?![0-9])/is",
+				"/{$_Al}(d{$_M}a{$_M}t{$_M})(a{$_M}\:)(?![0-9]|image)/is",
 			)),
 
 			"-" => array($this->getSplittingString(2), array(

@@ -22,8 +22,9 @@ class CSupportTimetableCache
 	static $arrS = null;
 	static $timeZone = null;
 	static $timeZoneOffset = null;
+	static $MaxSlaResponseTime = null;
 	
-	public static function Possible()
+	public static function Possible($d = "")
 	{
 		if(!class_exists('DateTime'))
 		{
@@ -31,7 +32,14 @@ class CSupportTimetableCache
 		}
 		try
 		{
-			$res = new DateTime(null, new DateTimeZone(date_default_timezone_get()));
+			if(strlen($d) > 0)
+			{
+				$res = new DateTime($d);
+			}
+			else
+			{
+				$res = new DateTime(null, new DateTimeZone(date_default_timezone_get()));
+			}
 		}
 		catch(Exception $e)
 		{
@@ -82,24 +90,58 @@ class CSupportTimetableCache
 	{
 		$moduleID = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/" . $moduleID . "/install/version.php");
-		return "<br>Module: " . $moduleID . " (" . $arModuleVersion["VERSION"] . ")<br>Class: CSupportTimetableCache<br>File: " . __FILE__;
+		return "<br>Module: " . $moduleID . " <br>Class: CSupportTimetableCache<br>File: " . __FILE__;
+	}
+
+	static function GetMaxSlaResponseTime()
+	{
+		global $DB;
+
+		if(self::$MaxSlaResponseTime != null)
+		{
+			return self::$MaxSlaResponseTime;
+		}
+
+		$err_mess = (self::err_mess())."<br>Function: GetMaxSlaResponseTime<br>Line: ";
+		$tabNameSLA = self::SLA;
+		$strSql = "
+			SELECT
+				RESPONSE_TIME,
+				RESPONSE_TIME_UNIT
+			FROM
+				$tabNameSLA
+			";
+		$q = $DB->Query($strSql, false, $err_mess.__LINE__);
+
+		self::$MaxSlaResponseTime = 0;
+		while ($arrR = $q->Fetch())
+		{
+			$ct = CTicketReminder::ConvertResponseTimeUnit($arrR["RESPONSE_TIME"], $arrR["RESPONSE_TIME_UNIT"]);
+			if(self::$MaxSlaResponseTime < $ct)
+			{
+				self::$MaxSlaResponseTime = $ct;
+			}
+		}
+		return self::$MaxSlaResponseTime;
 	}
 	
 	static function GetNumberOfDaysForward()
 	{
-		$supportCacheDaysBackward = COption::GetOptionString("support", "SUPPORT_CACHE_DAYS_BACKWARD");
-		return ($supportCacheDaysBackward < 0 ? 0 : $supportCacheDaysBackward);
+		$supportCacheDaysBackward = intval(COption::GetOptionString("support", "SUPPORT_CACHE_DAYS_BACKWARD", 0));
+		$slaDays = ceil(self::GetMaxSlaResponseTime() / 1440 * 5);
+		return max($supportCacheDaysBackward, $slaDays);
 	}
 	
 	static function GetNumberOfDaysBackward()
 	{
-		$supportCacheDaysForward = COption::GetOptionString("support", "SUPPORT_CACHE_DAYS_FORWARD");
-		return ($supportCacheDaysForward < 0 ? 0 : $supportCacheDaysForward);
+		$supportCacheDaysForward = intval(COption::GetOptionString("support", "SUPPORT_CACHE_DAYS_FORWARD", 0));
+		$slaDays = ceil(self::GetMaxSlaResponseTime() / 1440 * 5 + 20);
+		return max($supportCacheDaysForward, $slaDays);
 	}
 	
 	static function GetDayBegin($d)
 	{
-		if(self::Possible())
+		if(self::Possible("@" . $d))
 		{
 			$localTime =  new DateTime("@" . $d); 
 			$localTime->setTimezone(self::GetTimeZone());
@@ -114,7 +156,7 @@ class CSupportTimetableCache
 	
 	static function GetDayEnd($d)
 	{
-		if(self::Possible())
+		if(self::Possible("@" . $d))
 		{
 			$localTime =  new DateTime("@" . $d); 
 			$localTime->setTimezone(self::GetTimeZone());
@@ -233,10 +275,18 @@ class CSupportTimetableCache
 					}
 					elseif(isset($arrS[$cSLA][$WN]))
 					{
-						foreach($arrS[$cSLA][$WN] as $k => $v)
+						if(count($arrS[$cSLA][$WN]) > 0)
 						{
-							$res0[$dtC]["W"][] = $v;
+							foreach($arrS[$cSLA][$WN] as $k => $v)
+							{
+								$res0[$dtC]["W"][] = $v;
+							}
 						}
+						else
+						{
+							$res0[$dtC]["C"] = true;
+						}
+
 					}
 				}
 				else
@@ -288,7 +338,10 @@ class CSupportTimetableCache
 				uasort($arrW0, array("self", "SortMethodH"));
 				$arrW = self::MergeIntervals($arrW0);
 			}
-			else $arrW = $arrS[self::GetDayNom($dtC)];
+			else
+			{
+				$arrW = $arrS[self::GetDayNom($dtC)];
+			}
 			$arrH0 = (isset($v["H"]) && is_array($v["H"]) && count($v["H"]) > 0) ? $v["H"] : array();
 			uasort($arrH0, array("self", "SortMethodH"));
 			$arrH = self::MergeIntervals($arrH0);
@@ -343,7 +396,55 @@ class CSupportTimetableCache
 		}
 		return $res;
 	}
-	
+
+	static function InsertDefaultValues()
+	{
+		global $DB;
+		$err_mess = (self::err_mess())."<br>Function: InsertDefaultValues<br>Line: ";
+		$t_sla_shedule = self::SLA_SHEDULE;
+
+		$arInsStr = array(
+			"SLA_ID" => 0,
+			"WEEKDAY_NUMBER" => 0,
+			"OPEN_TIME" => "'24H'",
+			"MINUTE_FROM" => 0,
+			"MINUTE_TILL" => 0,
+			"TIMETABLE_ID" => 0,
+
+		);
+
+		$strSql = "
+			SELECT
+				R.TIMETABLE_ID
+			FROM
+				(
+				SELECT
+					T.ID TIMETABLE_ID,
+					SUM(" . CTicket::isnull( "S.ID", 0 ) .") V
+				FROM
+					b_ticket_timetable T
+					LEFT JOIN $t_sla_shedule S
+						ON T.ID = S.TIMETABLE_ID AND S.TIMETABLE_ID > 0
+				GROUP BY
+				T.ID
+				) R
+			WHERE
+				R.V = 0
+			";
+		$q = $DB->Query($strSql, false, $err_mess.__LINE__);
+
+		while ($arrR = $q->Fetch())
+		{
+			for($i=0;$i<=6;$i++)
+			{
+				$arInsStr["WEEKDAY_NUMBER"] = $i;
+				$arInsStr["TIMETABLE_ID"] = intval($arrR["TIMETABLE_ID"]);
+				$DB->Insert($t_sla_shedule, $arInsStr, $err_mess . __LINE__);
+			}
+		}
+
+	}
+
 	static function GetShedule($arFilter)
 	{
 		global $DB;
@@ -392,6 +493,12 @@ class CSupportTimetableCache
 				SLA_ID, WEEKDAY_NUMBER, MINUTE_FROM
 			";
 		$q = $DB->Query($strSql, false, $err_mess.__LINE__);
+
+		if(intval($q->SelectedRowsCount()) <= 0)
+		{
+			self::InsertDefaultValues();
+			$q = $DB->Query($strSql, false, $err_mess.__LINE__);
+		}
 		
 		$res0 = array();
 		$noAdd = array();
@@ -467,7 +574,7 @@ class CSupportTimetableCache
 		return date("H:i", mktime($h, $m, 0, 1, 1, 2000));
 	}
 	
-	static function ToCache($arFilter = array())
+	static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDate = null)
 	{
 		/*
 		$arFilter(
@@ -475,11 +582,43 @@ class CSupportTimetableCache
 		)
 		*/
 		global $DB;
+		$currD = time();
+		$uniq = "";
+		$dbType = strtolower($DB->type);
+
+		if($dbType === "mysql")
+		{
+			$DB->StartUsingMasterOnly();
+
+			$uniq = COption::GetOptionString("main", "server_uniq_id", "");
+			if(strlen($uniq)<=0)
+			{
+				$uniq = md5(uniqid(rand(), true));
+				COption::SetOptionString("main", "server_uniq_id", $uniq);
+			}
+
+			$db_lock = $DB->Query("SELECT GET_LOCK('" . $uniq . "_supportToCache', 0) as L");
+			$ar_lock = $db_lock->Fetch();
+			if($ar_lock["L"] !== "1")
+			{
+				return;
+			}
+
+			//Перед пересчетом проверить в центральной базе что данных действительно нет, на случй здержки передачм данных в дочернюю базу(только для MYSQL)
+			if(is_array($arFromGetEndDate))
+			{
+				$res = self::getEndDate($arFromGetEndDate["SLA"], $arFromGetEndDate["PERIOD_MIN"], $arFromGetEndDate["DATE_FROM"], true);
+				if($res !== null)
+				{
+					return $res;
+				}
+			}
+		}
+
 		$err_mess = (self::err_mess())."<br>Function: toCache<br>Line: ";
 		$timetable_cache = self::TIMETABLE_CACHE;
 		$ndF = self::GetNumberOfDaysForward();
 		$ndB = self::GetNumberOfDaysBackward();
-		$currD = time();
 				
 		$dateF = self::GetDayBegin($currD - $ndB*24*60*60);
 		$dateT = self::GetDayEnd($currD + $ndF*24*60*60);
@@ -487,7 +626,7 @@ class CSupportTimetableCache
 		self::$arrS = self::GetShedule($arFilter);
 		if(count(self::$arrS) <= 0)
 		{
-			return;
+			return null;
 		}
 		self::$arrH = self::GetHolidays(($dateF - 24*60*60), ($dateT + 24*60*60), self::$arrS, $arFilter);
 		
@@ -518,7 +657,9 @@ class CSupportTimetableCache
 		
 		$DB->Query("DELETE FROM $timetable_cache WHERE $strSqlSearch", false, $err_mess . __LINE__);
 		$f = new CSupportTableFields(self::$cache);
-		
+		$colNames = null;
+		$strList = "";
+		$coma = "";
 		foreach($arrSLA as $k => $sla)
 		{
 			$dateC = $dateF;
@@ -541,26 +682,71 @@ class CSupportTimetableCache
 					$f->DATE_TILL = ($dateC + $v2["T"]);
 					$f->W_TIME = $v2["T"] - $v2["F"];
 					$f->W_TIME_INC = $sum;
-										
+
 					CTimeZone::Disable();
-					$DB->Insert($timetable_cache, $f->ToArray(CSupportTableFields::ALL, array(CSupportTableFields::NOT_NULL), true), $err_mess . __LINE__);
+					if($dbType === "mysql")
+					{
+						$arCurrTicketFields = $f->ToArray(CSupportTableFields::ALL, array(), true);
+						if($colNames === null)
+						{
+							$colNames = implode(", ", array_keys($arCurrTicketFields));
+						}
+						$strCurrTicketFields = "(" . implode(",", $arCurrTicketFields) . ")";
+						if(strlen($strList . ", " . $strCurrTicketFields) > 2000)
+						{
+							$strSql = "INSERT INTO " . $timetable_cache . " (" . $colNames. ") VALUES " . $strList;
+							$strList = $strCurrTicketFields;
+						}
+						else
+						{
+							$strList .= $coma . $strCurrTicketFields;
+							$coma = ", ";
+							continue;
+						}
+						$DB->Query($strSql, false, $err_mess . __LINE__);
+					}
+					else
+					{
+						$DB->Insert($timetable_cache, $f->ToArray(CSupportTableFields::ALL, array(CSupportTableFields::NOT_NULL), true), $err_mess . __LINE__);
+					}
 					CTimeZone::Enable();
 				}
-				$dateC += 24*60*60;
+				$dateC = self::GetDayBegin($dateC + 25*60*60);
 			}
 		}
+		if($dbType === "mysql")
+		{
+			if(strlen($strList) > 0)
+			{
+				$strSql = "INSERT INTO " . $timetable_cache . " (" . $colNames. ") VALUES " . $strList;
+				$DB->Query($strSql, false, $err_mess . __LINE__);
+			}
+
+			$DB->Query("SELECT RELEASE_LOCK('" . $uniq . "_supportToCache')");
+			$DB->StopUsingMasterOnly();
+			//CAgent::AddAgent("CSupportTimetableCache::UpdateDiscardedTickets(" . $currD . ");", "support", "N", 5*60);
+		}
+
 		
-		CTicketReminder::RecalculateSupportDeadline($arFilter);
-			
+		if($RSD)
+		{
+			CTicketReminder::RecalculateSupportDeadline($arFilter);
+		}
+		return null;
+	}
+
+	public static function UpdateDiscardedTickets()
+	{
+		return "";
 	}
 	
 	//$dateFrom - время сервера с часовым поясом из настроек текущего пользователя
-	static function getEndDate($sla, $periodMin, $dateFrom)
+	static function getEndDate($sla, $periodMin0, $dateFrom, $secondTry = false)
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: getEndDate<br>Line: ";
 		$sla = intval($sla);
-		$periodMin = intval($periodMin) * 60;
+		$periodMin = intval($periodMin0) * 60;
 		$dateFromTS = MakeTimeStamp($dateFrom) - CTimeZone::GetOffset();
 		$timetableCache = self::TIMETABLE_CACHE;
 								
@@ -585,7 +771,7 @@ class CSupportTimetableCache
 					ON TC.DATE_FROM = PZ.MAX_DATE_FROM AND SLA_ID = $sla";
 		$q = $DB->Query($strSql, false, $err_mess.__LINE__);
 		CTimeZone::Enable();
-			
+
 		if($arrR = $q->Fetch()) 
 		{
 			
@@ -614,7 +800,26 @@ class CSupportTimetableCache
 			$q2 = $DB->Query($strSql, false, $err_mess.__LINE__);
 			//CTimeZone::Enable();
 			
-			if($arrR2 = $q2->Fetch()) return (MakeTimeStamp($arrR2["DATE_TILL"]) - (intval($arrR2["W_TIME_INC"]) - $findD));
+			if($arrR2 = $q2->Fetch())
+			{
+				$ts = MakeTimeStamp($arrR2["DATE_TILL"]) - (intval($arrR2["W_TIME_INC"]) - $findD);
+				$ts2010 = mktime(0, 0, 0, 1, 1, 2010);
+				if($ts > $ts2010)
+				{
+					return $ts;
+				}
+			}
+		}
+
+		if(!$secondTry)
+		{
+			$arOpt = array("SLA" => $sla, "PERIOD_MIN" => $periodMin0, "DATE_FROM" => $dateFrom);
+			$res =  self::ToCache(array( "SLA_ID"=> $sla ), false, $arOpt);
+			if($res !== null)
+			{
+				return $res;
+			}
+			return self::getEndDate($sla, $periodMin0, $dateFrom, true);
 		}
 		return null;
 	}

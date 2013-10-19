@@ -22,7 +22,7 @@ class CSocServOpenID
 				if($identity === false)
 					$identity = $_REQUEST['OPENID_IDENTITY_OPENID'];
 				CSocServAuthManager::SetUniqueKey();
-				$return_to = CSocServUtil::GetCurUrl("auth_service_id=".urlencode($_REQUEST["auth_service_id"])."&check_key=".$_SESSION["UNIQUE_KEY"], array("SEF_APPLICATION_CUR_PAGE_URL", "auth_service_error", "auth_service_id"));
+				$return_to = CSocServUtil::GetCurUrl("auth_service_id=".urlencode($_REQUEST["auth_service_id"])."&check_key=".$_SESSION["UNIQUE_KEY"], array("SEF_APPLICATION_CUR_PAGE_URL", "auth_service_error", "auth_service_id", "login"));
 
 				if($url = $obOpenID->GetRedirectUrl($identity, $return_to))
 					LocalRedirect($url, true);

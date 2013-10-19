@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формами</a>.
+ * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>.
  *
  *
  *
@@ -29,7 +29,7 @@ class CAllForm extends CForm_old
 	// false - в противном случае
 	
 	/**
-	 * <p>Возвращает "true", если текущий пользователь имеет административные <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#module">права</a> на модуль <b>Веб-формы</b>, в противном случае - "false".</p>
+	 * <p>Возвращает "true", если текущий пользователь имеет административные <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">права</a> на модуль <b>Веб-формы</b>, в противном случае - "false".</p>
 	 *
 	 *
 	 *
@@ -50,7 +50,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#module">Права на модуль</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">Права на модуль</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -70,7 +70,7 @@ class CAllForm extends CForm_old
 	// Функция возвращает массивы, содержащие данные по вопросам и полям формы, а также ответы и их значения.
 	
 	/**
-	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросы</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>, а также <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответы на вопросы</a>.</p>
+	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, а также <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответы на вопросы</a>.</p>
 	 *
 	 *
 	 *
@@ -243,9 +243,9 @@ class CAllForm extends CForm_old
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformanswer/getlist.php">CFormAnswer::GetList</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/getlist.php">CFormAnswer::GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -515,7 +515,7 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#form">право доступа к веб-форме</a>:</p> <ul> <li> <b>1</b> - доступ закрыт (форма и ее результаты полностью недоступны); </li> <li> <b>10</b> - заполнение формы (посетитель может только заполнить и сохранить форму); </li> <li> <b>15</b> - редактирование своего результата (посетитель получает возможность видеть список своих результатов, который он может фильтровать и сортировать; также посетитель может просмотреть, изменить и удалить свой результат); </li> <li> <b>20</b> - просмотр всех результатов (посетитель получает возможность просмотра всех активных результатов); </li> <li> <b>25</b> - редактирование всех результатов и просмотр настроек формы (посетитель получает возможность просмотра и редактирования всех результатов в зависимости от их статусов; также, если у него открыт доступ к административной части модуля, доступ на просмотр настроек формы); </li> <li> <b>30</b> - полный доступ (включает в себя все вышеописанные права, а также право на изменение настроек формы). </li> </ul>
+	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">право доступа к веб-форме</a>:</p> <ul> <li> <b>1</b> - доступ закрыт (форма и ее результаты полностью недоступны); </li> <li> <b>10</b> - заполнение формы (посетитель может только заполнить и сохранить форму); </li> <li> <b>15</b> - редактирование своего результата (посетитель получает возможность видеть список своих результатов, который он может фильтровать и сортировать; также посетитель может просмотреть, изменить и удалить свой результат); </li> <li> <b>20</b> - просмотр всех результатов (посетитель получает возможность просмотра всех активных результатов); </li> <li> <b>25</b> - редактирование всех результатов и просмотр настроек формы (посетитель получает возможность просмотра и редактирования всех результатов в зависимости от их статусов; также, если у него открыт доступ к административной части модуля, доступ на просмотр настроек формы); </li> <li> <b>30</b> - полный доступ (включает в себя все вышеописанные права, а также право на изменение настроек формы). </li> </ul>
 	 *
 	 *
 	 *
@@ -552,14 +552,14 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#form">Права на веб-форму</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a> </li>
-	 * </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
+	 * </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -805,7 +805,7 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по текстовым значениям <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросы веб-формы</a> или текстовым значениям <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя однострочное текстовое поле и флаг для установки точности фильтрации.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i> - однострочное текстовое поля<br><b>find_</b><i>filter_sid</i><b>_exact_match</b> - флаг для установки точности фильтрации </p>
+	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы веб-формы</a> или текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя однострочное текстовое поле и флаг для установки точности фильтрации.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i> - однострочное текстовое поля<br><b>find_</b><i>filter_sid</i><b>_exact_match</b> - флаг для установки точности фильтрации </p>
 	 *
 	 *
 	 *
@@ -813,18 +813,18 @@ class CAllForm extends CForm_old
 	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
 	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_text</b>,</nobr><br> где: <ul> <li>
 	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
 	 * тип параметра по которому будет фильтрация, возможны следующие
 	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
 	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
 	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы - значение
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
 	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
 	 * </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
 	 *
@@ -874,11 +874,11 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -897,7 +897,7 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по датам, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопрос</a> веб-формы, либо значений <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы типа "дата". Возвращаемый HTML код включает в себя два поля, предназначенных для ввода интервала дат, а также некоторые вспомогательные элементы (календарь, выпадающий список дней).</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля интервала дат (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле интервала дат (по) </p>
+	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по датам, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы типа "дата". Возвращаемый HTML код включает в себя два поля, предназначенных для ввода интервала дат, а также некоторые вспомогательные элементы (календарь, выпадающий список дней).</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля интервала дат (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле интервала дат (по) </p>
 	 *
 	 *
 	 *
@@ -905,10 +905,10 @@ class CAllForm extends CForm_old
 	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
 	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_USER_date</b>,</nobr><br> где: <ul> <li> <i>FSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы. </li> </ul> Примеры:
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. </li> </ul> Примеры:
 	 * <ul> <li>ANKETA_USER_BIRTHDAY_USER_date </li> <li>ANKETA_DATE_FIELD_USER_date </li> </ul>
 	 *
 	 *
@@ -967,12 +967,12 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -1015,7 +1015,7 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по цифровым значениям, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопрос</a> веб-формы, либо цифровым значениям <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя два поля, предназначенных для ввода числового интервала.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля числового интервала (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле числового интервала (по) </p>
+	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по цифровым значениям, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо цифровым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя два поля, предназначенных для ввода числового интервала.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля числового интервала (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле числового интервала (по) </p>
 	 *
 	 *
 	 *
@@ -1023,18 +1023,18 @@ class CAllForm extends CForm_old
 	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
 	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_integer</b>,</nobr><br> где: <ul> <li>
 	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>, </li> <li> <i>QSID</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, </li> <li> <i>QSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
 	 * тип параметра, по которому будет фильтрация, возможны следующие
 	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
 	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
 	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы - значение
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
 	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_AGE_USER_integer; </li>
 	 * <li>ANKETA_CAR_POWER_ANSWER_VALUE_integer. </li> </ul>
 	 *
@@ -1077,11 +1077,11 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1100,7 +1100,7 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по факту существования значения <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопрос веб-формы</a> или факту существования значения <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы. Возвращаемый HTML код включает в себя флаг множественного выбора (<b>checkbox</b>).</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
+	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос веб-формы</a> или факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. Возвращаемый HTML код включает в себя флаг множественного выбора (<b>checkbox</b>).</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
 	 *
 	 *
 	 *
@@ -1108,18 +1108,18 @@ class CAllForm extends CForm_old
 	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
 	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_exist</b>,</nobr><br> где: <ul> <li>
 	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
 	 * тип параметра по которому будет фильтрация, возможны следующие
 	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
 	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
 	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полей</a> веб-формы - значение
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
 	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
 	 * </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
 	 *
@@ -1155,11 +1155,11 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li>
-	 * </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a>
+	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -1184,17 +1184,17 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля фильтра, представляющего из себя выпадающий список одиночного выбора. Данный выпадающий список может быть использован для фильтрации <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатов</a> по значению <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопрос</a> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>. Значения этого выпадающего списка формируются из значений параметров <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a> - <font color="green">ANSWER_TEXT</font> или <font color="red">ANSWER_VALUE</font>.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
+	 * <p>Возвращает HTML код поля фильтра, представляющего из себя выпадающий список одиночного выбора. Данный выпадающий список может быть использован для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по значению <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Значения этого выпадающего списка формируются из значений параметров <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> - <font color="green">ANSWER_TEXT</font> или <font color="red">ANSWER_VALUE</font>.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $field_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a>.
+	 * @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.
 	 *
 	 *
 	 *
-	 * @param string $parameter_type  Тип параметра <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>,
+	 * @param string $parameter_type  Тип параметра <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>,
 	 * допустимы следующие значения: <ul> <li> <b>ANSWER_TEXT</b>; </li> <li> <b>ANSWER_VALUE</b>.
 	 * </li> </ul>
 	 *
@@ -1203,10 +1203,10 @@ class CAllForm extends CForm_old
 	 * @param string $filter_sid  Идентификатор поля фильтра. Формируется по следующему
 	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_dropdown</b>,</nobr><br> где: <ul>
 	 * <li> <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
 	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
 	 * тип параметра ответа, задаваемый в <i>parameter_type.</i> </li> </ul> Примеры: <ul>
 	 * <li>ANKETA_MARRIED_ANSWER_TEXT_dropdown; </li> <li>ANKETA_CAR_ANSWER_VALUE_dropdown. </li> </ul>
 	 *
@@ -1245,10 +1245,10 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1292,31 +1292,31 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "text", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, обязательным
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
 	 * элементом которого является элемент с ключом <b>VALUE</b> и со
 	 * значением в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>. Как правило таким
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило таким
 	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -1380,7 +1380,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextfield.php">CForm::GetTextField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfield.php">CForm::GetTextField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1406,31 +1406,31 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "password", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, обязательным
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
 	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
 	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
 	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -1493,7 +1493,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getpasswordfield.php">CForm::GetPasswordField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordfield.php">CForm::GetPasswordField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1527,12 +1527,12 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "text".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_text_</b><i>answer_id</i></p>
+	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_text_</b><i>answer_id</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -1611,8 +1611,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextvalue.php">CForm::GetTextValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextvalue.php">CForm::GetTextValue</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1646,12 +1646,12 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "password".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_password_</b><i>answer_id</i></p>
+	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_password_</b><i>answer_id</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -1729,8 +1729,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getpasswordvalue.php">CForm::GetPasswordValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordvalue.php">CForm::GetPasswordValue</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1746,13 +1746,13 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "dropdown" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> выбранного по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция вернет ID данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "dropdown" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> выбранного по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция вернет ID данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -1766,10 +1766,10 @@ class CAllForm extends CForm_old
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -1861,7 +1861,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownfield.php">CForm::GetDropDownField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfield.php">CForm::GetDropDownField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1895,13 +1895,13 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код выпадающего списка одиночного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> из группы ответов типа "dropdown" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_dropdown_</b><i>question_sid</i></p>
+	 * <p>Возвращает HTML код выпадающего списка одиночного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> из группы ответов типа "dropdown" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_dropdown_</b><i>question_sid</i></p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -1911,7 +1911,7 @@ class CAllForm extends CForm_old
 	 * <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; Array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
 	 * <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
 	 * <i>заголовком элемента</i> понимается параметр <font
-	 * color="green">ANSWER_TEXT</font> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * color="green">ANSWER_TEXT</font> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -2016,8 +2016,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdropdownvalue.php">CForm::GetDropDownValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php">CForm::GetDropDownValue</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2033,13 +2033,13 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает массив ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a>, выбранных среди группы ответов типа "<b>multiselect</b>" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет массив ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a>, выбранных по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция добавит данный ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>) в результирующий массив.</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных среди группы ответов типа "<b>multiselect</b>" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция добавит данный ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>) в результирующий массив.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -2053,10 +2053,10 @@ class CAllForm extends CForm_old
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -2138,7 +2138,7 @@ class CAllForm extends CForm_old
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getmultiselectfield.php">CForm::GetMultiSelectField</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectfield.php">CForm::GetMultiSelectField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2169,13 +2169,13 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код списка множественного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a> из группы ответов типа "multiselect" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_multiselect_</b><i>question_sid</i><b>[]</b></p>
+	 * <p>Возвращает HTML код списка множественного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> из группы ответов типа "multiselect" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_multiselect_</b><i>question_sid</i><b>[]</b></p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
@@ -2185,7 +2185,7 @@ class CAllForm extends CForm_old
 	 * <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
 	 * <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
 	 * <i>заголовком ответа</i> понимается параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -2287,8 +2287,8 @@ class CAllForm extends CForm_old
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getmultiselectvalue.php">CForm::GetMultiSelectValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectvalue.php">CForm::GetMultiSelectValue</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2304,31 +2304,31 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "date", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, обязательным
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
 	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
 	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
 	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -2393,7 +2393,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatefield.php">CForm::GetDateField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefield.php">CForm::GetDateField</a>
 	 * </li></ul><a name="examples"></a><a name="examples"></a>
 	 *
 	 *
@@ -2416,17 +2416,17 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "date". В результирующий HTML код будет добавлена иконка, ведущая на страницу с календарем.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля для ввода даты будет сформировано по следующей маске:<br><b>form_date_</b><i>answer_id</i></p>
+	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date". В результирующий HTML код будет добавлена иконка, ведущая на страницу с календарем.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля для ввода даты будет сформировано по следующей маске:<br><b>form_date_</b><i>answer_id</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param string $html_form_name  Имя HTML формы для создания нового <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> или
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> или
 	 * редактирования существующего.<br><code> &lt;form name="<i>html_form_name</i>"
 	 * ...&gt;<br></code> <br>Параметр необязательный. По умолчанию - "form1".
 	 *
@@ -2509,8 +2509,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getdatevalue.php">CForm::GetDateValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatevalue.php">CForm::GetDateValue</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2549,32 +2549,32 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values</i>, инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), в случае если он был выбран среди группы ответов типа "checkbox" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values</i>, не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответом по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values</i>, инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), в случае если он был выбран среди группы ответов типа "checkbox" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values</i>, не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответом по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, с обязательными
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
 	 * ключами: <ul> <li> <b>ID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
 	 * значение этого ключа содержит слово "checked", то ID этого ответа будет
 	 * возвращен данной функцией по умолчанию (т.е. при создании нового <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>). </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -2672,7 +2672,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getcheckboxfield.php">CForm::GetCheckBoxField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxfield.php">CForm::GetCheckBoxField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2703,17 +2703,17 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код флага множественного выбора (checkbox), предназначенного для выбора <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "checkbox" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_checkbox_</b><i>question_sid</i><b>[]</b></p>
+	 * <p>Возвращает HTML код флага множественного выбора (checkbox), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "checkbox" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_checkbox_</b><i>question_sid</i><b>[]</b></p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -2826,8 +2826,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getcheckboxvalue.php">CForm::GetCheckBoxValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxvalue.php">CForm::GetCheckBoxValue</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2844,32 +2844,32 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "radio" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответами по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "radio" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответами по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, с обязательными
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
 	 * ключами: <ul> <li> <b>ID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
 	 * значение этого ключа содержит слово "checked", то ID этого ответа будет
 	 * возвращен данной функцией по умолчанию (т.е. при создании нового <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>). </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -2964,7 +2964,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getradiofield.php">CForm::GetRadioField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiofield.php">CForm::GetRadioField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -2989,17 +2989,17 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код переключателя одиночного выбора (radio-кнопка), предназначенного для выбора <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "radio" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note">Имя результирующего HTML поля будет сформировано по следующей маске: <b>form_radio_</b><i>question_sid</i></p>
+	 * <p>Возвращает HTML код переключателя одиночного выбора (radio-кнопка), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "radio" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note">Имя результирующего HTML поля будет сформировано по следующей маске: <b>form_radio_</b><i>question_sid</i></p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопроса</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -3110,8 +3110,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getradiovalue.php">CForm::GetRadioValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiovalue.php">CForm::GetRadioValue</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -3128,31 +3128,31 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "textarea", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>, обязательным
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
 	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
 	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
 	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
 	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
 	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a> (стандартный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
 	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
 	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
 	 * необязательный. По умолчанию - "false".
 	 *
 	 *
@@ -3218,7 +3218,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextareafield.php">CForm::GetTextAreaField</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareafield.php">CForm::GetTextAreaField</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -3236,12 +3236,12 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код многострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "textarea".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_textarea_</b><i>answer_id</i></p>
+	 * <p>Возвращает HTML код многострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_textarea_</b><i>answer_id</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -3331,8 +3331,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/gettextareavalue.php">CForm::GetTextAreaValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareavalue.php">CForm::GetTextAreaValue</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -3348,12 +3348,12 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Возвращает HTML код поля для загрузки файла. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a> типа "<b>image</b>" или "<b>file</b>".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_</b><i>file_type</i><b>_</b><i>answer_id</i></p>
+	 * <p>Возвращает HTML код поля для загрузки файла. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "<b>image</b>" или "<b>file</b>".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_</b><i>file_type</i><b>_</b><i>answer_id</i></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответа</a>.
+	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
 	 *
 	 *
 	 *
@@ -3512,8 +3512,8 @@ class CAllForm extends CForm_old
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/getfilebyanswerid.php">CFormResult::GetFileByAnswerID</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getfilebyanswerid.php">CFormResult::GetFileByAnswerID</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -3534,7 +3534,7 @@ class CAllForm extends CForm_old
 	// возвращает массивы описывающие поля и вопросы формы
 	
 	/**
-	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форму</a>, <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросы</a> и поля для <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#answer">ответов</a>. Сама функция возвращает ID веб-формы в случае положительного результата, в противном случае - "false".</p>
+	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и поля для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>. Сама функция возвращает ID веб-формы в случае положительного результата, в противном случае - "false".</p>
 	 *
 	 *
 	 *
@@ -3690,7 +3690,7 @@ class CAllForm extends CForm_old
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -3798,7 +3798,7 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 *
-	 * @param int $form_id  ID <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>.
+	 * @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	 *
 	 *
 	 *
@@ -3861,8 +3861,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4295,7 +4295,7 @@ class CAllForm extends CForm_old
 	// добавление/обновление формы
 	
 	/**
-	 * <p>Добавляет новую <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форму</a> или обновляет заданную. Возвращает ID обновленной или добавленной веб-формы в случае положительного результата, в противном случае - "false".</p> <p class="note"><b>Примечание</b><br>При обновлении существующей веб-формы (или при добавлении новой веб-формы), автоматически <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/setmailtemplate.php">обновляется</a> тип почтового события (либо <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/setmailtemplate.php">создаётся</a> новый тип).</p>
+	 * <p>Добавляет новую <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> или обновляет заданную. Возвращает ID обновленной или добавленной веб-формы в случае положительного результата, в противном случае - "false".</p> <p class="note"><b>Примечание</b><br>При обновлении существующей веб-формы (или при добавлении новой веб-формы), автоматически <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">обновляется</a> тип почтового события (либо <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">создаётся</a> новый тип).</p>
 	 *
 	 *
 	 *
@@ -4473,9 +4473,9 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a> <br> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a> <br> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -4712,7 +4712,7 @@ class CAllForm extends CForm_old
 	// копирует веб-форму
 	
 	/**
-	 * <p>Копирует <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форму</a> с ее <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#question">вопросами</a>, <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#field">полями</a> и <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#status">статусами</a>. Возвращает ID новой веб-формы в случае положительного результата, в противном случае - "false".</p>
+	 * <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> с ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. Возвращает ID новой веб-формы в случае положительного результата, в противном случае - "false".</p>
 	 *
 	 *
 	 *
@@ -4754,9 +4754,9 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/copy.php">CFormStatus::Copy</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php">CFormStatus::Copy</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4855,7 +4855,7 @@ class CAllForm extends CForm_old
 	// delete web-form
 	
 	/**
-	 * <p>Удаляет <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-форму</a> со всеми ее <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результатами</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	 * <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> со всеми ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
 	 *
 	 *
 	 *
@@ -4897,10 +4897,10 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -4976,7 +4976,7 @@ class CAllForm extends CForm_old
 	// удаляем результаты формы
 	
 	/**
-	 * <p>Удаляет все <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#result">результаты</a> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	 * <p>Удаляет все <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результаты</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
 	 *
 	 *
 	 *
@@ -4986,11 +4986,11 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions">прав</a> текущего
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
 	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
 	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
 	 * </ul> Для удаления всех результатов веб-формы необходимо иметь <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
 	 * доступ</b> на форму, указанную в параметре <i>form_id</i>.<br><br>Параметр
 	 * необязательный. По умолчанию - "Y" (права необходимо проверить).
 	 *
@@ -5020,8 +5020,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cformresult/reset.php">CFormResult::Reset</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/reset.php">CFormResult::Reset</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -5055,7 +5055,7 @@ class CAllForm extends CForm_old
 	// создает тип почтового события и шаблон на языке формы
 	
 	/**
-	 * <p>Создает или обновляет тип почтового события для <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a>. При необходимости могут быть созданы почтовые шаблоны. Функция возвращает массив идентификаторов новых почтовых шаблонов, если они были созданы.</p> <p class="note"><b>Примечание</b><br>При создании нового типа почтового события, символьный идентификатор этого типа задается в виде <b>FORM_FILLING_</b><i>символьный ID веб-формы</i>.</p>
+	 * <p>Создает или обновляет тип почтового события для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. При необходимости могут быть созданы почтовые шаблоны. Функция возвращает массив идентификаторов новых почтовых шаблонов, если они были созданы.</p> <p class="note"><b>Примечание</b><br>При создании нового типа почтового события, символьный идентификатор этого типа задается в виде <b>FORM_FILLING_</b><i>символьный ID веб-формы</i>.</p>
 	 *
 	 *
 	 *
@@ -5102,8 +5102,8 @@ class CAllForm extends CForm_old
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/mailevents.php">Почтовая система</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -5252,7 +5252,7 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ruapi_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -5277,9 +5277,9 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

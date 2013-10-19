@@ -51,8 +51,8 @@ if($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SUP_RIGHT>="W" && check_bitr
 	COption::SetOptionString($module_id, "DEFAULT_AUTO_CLOSE_DAYS", $DEFAULT_AUTO_CLOSE_DAYS);
 	COption::SetOptionString($module_id, "VIEW_TICKET_DEFAULT_MODE", $VIEW_TICKET_DEFAULT_MODE);
 	COption::SetOptionString($module_id, "ONLINE_AUTO_REFRESH", $ONLINE_AUTO_REFRESH);
-	COption::SetOptionString($module_id, "TICKETS_PER_PAGE", $TICKETS_PER_PAGE);
 	COption::SetOptionString($module_id, "MESSAGES_PER_PAGE", $MESSAGES_PER_PAGE);
+	COption::SetOptionString($module_id, "SHOW_COMMENTS_IN_TICKET_LIST", $SHOW_COMMENTS_IN_TICKET_LIST ?: 'N');
 	COption::SetOptionString($module_id, "SOURCE_MAIL", $SOURCE_MAIL);
 	COption::SetOptionString($module_id, "REINDEX_MSG_S", $REINDEX_MSG_S);
 	if (preg_match_all('|#|'.BX_UTF_PCRE_MODIFIER, $SUPERTICKET_COUPON_FORMAT, $_tmp) && is_array($_tmp[0]) && count($_tmp[0]) >= 6)
@@ -83,8 +83,8 @@ $DEFAULT_RESPONSIBLE_ID = COption::GetOptionString($module_id, "DEFAULT_RESPONSI
 $DEFAULT_AUTO_CLOSE_DAYS = COption::GetOptionString($module_id, "DEFAULT_AUTO_CLOSE_DAYS");
 $VIEW_TICKET_DEFAULT_MODE = COption::GetOptionString($module_id, "VIEW_TICKET_DEFAULT_MODE");
 $ONLINE_AUTO_REFRESH = COption::GetOptionString($module_id, "ONLINE_AUTO_REFRESH");
-$TICKETS_PER_PAGE = COption::GetOptionString($module_id, "TICKETS_PER_PAGE");
 $MESSAGES_PER_PAGE = COption::GetOptionString($module_id, "MESSAGES_PER_PAGE");
+$SHOW_COMMENTS_IN_TICKET_LIST = COption::GetOptionString($module_id, "SHOW_COMMENTS_IN_TICKET_LIST");
 $SOURCE_MAIL = COption::GetOptionString($module_id, "SOURCE_MAIL");
 $SUPERTICKET_COUPON_FORMAT = COption::GetOptionString($module_id, "SUPERTICKET_COUPON_FORMAT");
 $SUPERTICKET_DEFAULT_SLA = COption::GetOptionString($module_id, "SUPERTICKET_DEFAULT_SLA");
@@ -123,7 +123,7 @@ $tabControl->BeginNextTab();
 		<td valign="top"><input type="text" size="5" value="<?echo htmlspecialcharsbx($SUPPORT_MAX_FILESIZE)?>" name="SUPPORT_MAX_FILESIZE"></td>
 	</tr>
 	<tr>
-		<td valign="top"><label for="DEFAULT_VALUE_HIDDEN"><?=GetMessage("SUP_DEFAULT_VALUE_HIDDEN")?></label></td>
+		<td valign="top"><label><?=GetMessage("SUP_DEFAULT_VALUE_HIDDEN")?></label></td>
 		<td valign="top"><?echo InputType("checkbox", "DEFAULT_VALUE_HIDDEN", "Y", $DEFAULT_VALUE_HIDDEN, false, "", 'id="DEFAULT_VALUE_HIDDEN"')?></td>
 	</tr>
 	<tr>
@@ -226,6 +226,10 @@ $tabControl->BeginNextTab();
 		<td valign="top"><input type="text" size="5" value="<?=intval($MESSAGES_PER_PAGE)?>" name="MESSAGES_PER_PAGE"></td>
 	</tr>
 	<tr>
+		<td valign="top"><?=GetMessage("SUP_SHOW_COMMENTS_IN_TICKET_LIST")?></td>
+		<td valign="top"><?echo InputType("checkbox", "SHOW_COMMENTS_IN_TICKET_LIST", "Y", $SHOW_COMMENTS_IN_TICKET_LIST, false, "", 'id="SHOW_COMMENTS_IN_TICKET_LIST"')?></td>
+	</tr>
+	<tr>
 		<td valign="top"><?=GetMessage('SUP_SUPERTICKET_COUPON_FORMAT')?></td>
 		<td valign="top"><input type="text" size="30" value="<?echo htmlspecialcharsbx($SUPERTICKET_COUPON_FORMAT)?>" name="SUPERTICKET_COUPON_FORMAT"></td>
 	</tr>
@@ -278,81 +282,6 @@ $tabControl->BeginNextTab();
 	</tr>
 	
 	<tr>
-		<td valign="top"><? echo GetMessage('SUP_REINDEX_MSG_TIME'); ?></td>
-		<td valign="top">
-			<script type="text/javascript">
-				var reindexAlreadyRunning = false;
-				var reindexStep = 0;
-				function callbackFnOK(datum)
-				{
-					//alert(datum);
-					a = document.getElementById( "REINDEX_A" );
-					var obj = JSON.parse( datum );
-					if( !obj.hasOwnProperty( "LAST_ID" ) )
-					{
-						a.innerHTML = "<? echo GetMessage("SUP_REINDEX_MSG_BTN"); ?>";
-						reindexAlreadyRunning = false;
-						reindexStep = 0;
-						alert( "<? echo GetMessage("SUP_REINDEX_STRANGE_ANSWER"); ?>" );
-						return;
-					}
-					if( obj.LAST_ID == (-1) )
-					{
-						a.innerHTML = "<? echo GetMessage("SUP_REINDEX_MSG_BTN"); ?>";
-						reindexAlreadyRunning = false;
-						reindexStep = 0;
-						alert( "<? echo GetMessage("SUP_REINDEX_END"); ?>" );
-						return;
-					}
-					reindexStep = reindexStep + 1;
-					a.innerHTML = "<? echo GetMessage("SUP_REINDEX_MSG_BTN_IN_PROGRESS"); ?>"+reindexStep;
-					reindexMessagesJS( obj.LAST_ID );
-				}
-				function callbackFnNoOK(datum)
-				{
-					//alert(datum);
-					a = document.getElementById( "REINDEX_A" );
-					a.innerHTML = "<? echo GetMessage("SUP_REINDEX_MSG_BTN"); ?>";
-					reindexAlreadyRunning = false;
-					reindexStep = 0;
-					alert( "<? echo GetMessage("SUP_REINDEX_NO_OK"); ?>" );
-				}
-				function reindexMessagesJS( firstID = 0 )
-				{
-					if( reindexAlreadyRunning == true && firstID == 0 ) return;
-					if( firstID == 0 )
-					{
-						a = document.getElementById( "REINDEX_A" );
-						reindexStep = reindexStep + 1;
-						a.innerHTML = "<? echo GetMessage("SUP_REINDEX_MSG_BTN_IN_PROGRESS"); ?>"+reindexStep;
-					}
-					reindexAlreadyRunning = true; 
-					nextFieldF = document.getElementById( "REINDEX_MSG_S" );
-					var data = {
-						'MY_AJAX' : 'reindexMessAJAX',
-						"b_sessid": '<? echo bitrix_sessid(); ?>',
-						'reindexMessAJAXData' : { 
-							"periodS" : nextFieldF.value,
-							"firstID" : firstID, 
-						}
-					};
-					
-					return BX.ajax({
-						'method': 'POST',
-						'dataType': 'html',
-						'url': "ticket_messages_reindex.php",
-						'data':  data,
-						'onsuccess': callbackFnOK,
-						'onfailure': callbackFnNoOK
-					});
-					
-				}
-			</script>
-			<input id="REINDEX_MSG_S" name="REINDEX_MSG_S" size="5" value="<? echo $REINDEX_MSG_S; ?>"><a id="REINDEX_A" href="#nul" onClick="javascript: reindexMessagesJS();"><? echo GetMessage('SUP_REINDEX_MSG_BTN'); ?></a>
-		</td>
-	</tr>
-		
-	<tr>
 		<td valign="top"><?=GetMessage('SUP_CACHE_DAYS_BACKWARD')?></td>
 		<td valign="top"><input type="text" size="30" value="<? echo intval( $SUPPORT_CACHE_DAYS_BACKWARD ); ?>" name="SUPPORT_CACHE_DAYS_BACKWARD"></td>
 	</tr>
@@ -382,7 +311,7 @@ $tabControl->BeginNextTab();
 				{
 					alert( "<? echo GetMessage("SUP_RESTART_AGENTS_NO_OK"); ?>" );
 				}
-				function restartAgentsJS( firstID = 0 )
+				function restartAgentsJS()
 				{
 					var data = {
 						'MY_AJAX' : 'restartAgentsAJAX',
@@ -421,4 +350,140 @@ function RestoreDefaults()
 <input <?if ($SUP_RIGHT<"W") echo "disabled" ?> type="button" title="<?echo GetMessage("MAIN_HINT_RESTORE_DEFAULTS")?>" OnClick="RestoreDefaults();" value="<?echo GetMessage("MAIN_RESTORE_DEFAULTS")?>">
 <?$tabControl->End();?>
 </form>
+
+
+<?
+$aTabs = array(
+	array("DIV" => "edit21", "TAB" => GetMessage("SUP_SEARCH_NDX_TAB_NAME"), "ICON" => "support_settings", "TITLE" => GetMessage("SUP_SEARCH_NDX_TAB_TITLE")),
+);
+$tabControl = new CAdminTabControl("tabControl2", $aTabs);
+?>
+<h2><?=GetMessage('SUP_SERVICE_OPERAIONS')?></h2>
+<?
+$tabControl->Begin();
+?>
+
+<?
+$tabControl->BeginNextTab();
+?>
+
+<tr>
+	<td valign="top">
+
+		<div id="sup_search_ndx_progressbar">
+
+		</div>
+
+		<div id="sup_search_ndx_progressbar_nil" style="display: none;">
+			<? CAdminMessage::ShowMessage(array(
+				"DETAILS" => "<br>#PROGRESS_BAR#",
+				"HTML" => true,
+				"TYPE" => "PROGRESS",
+				"PROGRESS_TOTAL" => 100,
+				"PROGRESS_VALUE" => 0,
+			)); ?>
+		</div>
+
+		<?=GetMessage('SUP_SEARCH_NDX_INTERVAL')?> <input type="text" style="width: 20px" value="10" id="sup_search_ndx_inerval"> <?=GetMessage('SUP_SEARCH_NDX_INTERVAL_SEC')?>
+
+		<p>
+			<input type="button" value="<?=GetMessage('SUP_SEARCH_NDX_START')?>" id="sup_search_ndx_start">
+			<input type="button" value="<?=GetMessage('SUP_SEARCH_NDX_STOP')?>" style="display: none;" id="sup_search_ndx_stop">
+		</p>
+
+		<script type="text/javascript">
+		BX.ready(function() {
+
+			// start
+			BX.bind(BX('sup_search_ndx_start'), 'click', function() {
+				BX('sup_search_ndx_inerval').disabled = true;
+				BX('sup_search_ndx_progressbar').innerHTML = BX('sup_search_ndx_progressbar_nil').innerHTML;
+				BX('sup_search_ndx_stop').style.display = '';
+				this.disabled = true;
+
+				supSearchNdxGo(0);
+			});
+
+			// stop
+			BX.bind(BX('sup_search_ndx_stop'), 'click', supSearchNdxStop);
+
+		});
+
+		function supSearchNdxStop()
+		{
+			BX('sup_search_ndx_progressbar').innerHTML = '';
+			BX('sup_search_ndx_stop').style.display = 'none';
+			BX('sup_search_ndx_start').disabled = false;
+			BX('sup_search_ndx_inerval').disabled = false;
+		}
+
+		function supSearchNdxGo( firstID )
+		{
+			if (!BX('sup_search_ndx_start').disabled)
+			{
+				return;
+			}
+
+			var data = {
+				'b_sessid': '<? echo bitrix_sessid(); ?>',
+				'action' : 'reindex',
+				'data' : {
+					'interval' : BX('sup_search_ndx_inerval').value,
+					'firstID' : firstID
+				}
+			};
+
+			return BX.ajax({
+				'method': 'POST',
+				'dataType': 'json',
+				'url': 'ticket_messages_reindex.php',
+				'data':  data,
+				'onsuccess': supSearchNdxGoSuccess,
+				'onfailure': supSearchNdxGoFail
+			});
+		}
+
+		function supSearchNdxGoSuccess(response)
+		{
+			if(!BX('sup_search_ndx_start').disabled)
+			{
+				// indexing was stopped
+				return;
+			}
+
+			if (!response)
+			{
+				return supSearchNdxGoFail(response);
+			}
+
+			if (!response.hasOwnProperty("LAST_ID"))
+			{
+				return supSearchNdxGoFail(data);
+			}
+
+			if (response.LAST_ID == (-1))
+			{
+				alert( "<? echo GetMessageJS("SUP_REINDEX_END"); ?>" );
+				supSearchNdxStop();
+				return;
+			}
+
+			BX('sup_search_ndx_progressbar').innerHTML = response.BAR;
+			supSearchNdxGo(response.LAST_ID);
+		}
+
+		function supSearchNdxGoFail(data)
+		{
+			alert( "<? echo GetMessageJS("SUP_REINDEX_STRANGE_ANSWER"); ?>" );
+			supSearchNdxStop();
+		}
+
+
+		</script>
+	</td>
+</tr>
+
+<?$tabControl->End();?>
+
+
 <?endif;?>

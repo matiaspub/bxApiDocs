@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage advertising
+ * @copyright 2001-2013 Bitrix
+ */
+
 global
 	$arrViewedBanners,		// баннеры показанные на данной странице
 	$arrWeightSum,			// сумма весов всех баннеров по контрактам
@@ -65,9 +72,7 @@ class CAdvContract_all
 
 	public static function GetNextSort()
 	{
-		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetNextSort<br>Line: ";
-		global $DB;
-		$rsContracts = CAdvContract::GetList($by="s_sort", $order="desc", array("ID" => "~1", "ID_EXACT_MATCH" => "Y"), $is_filtered);
+		$rsContracts = CAdvContract::GetList($by="s_sort", $order="desc", array("ID" => "~1", "ID_EXACT_MATCH" => "Y"), $is_filtered=false);
 		$arContract = $rsContracts->Fetch();
 		return intval($arContract["SORT"])+10;
 	}
@@ -113,7 +118,7 @@ class CAdvContract_all
 	// возвращает true если заданный пользователь имеет заданную роль на модуль
 	public static function HaveRole($role, $USER_ID=false)
 	{
-		global $DB, $USER, $APPLICATION;
+		global $USER, $APPLICATION;
 
 		if($USER_ID === false && is_object($USER))
 			$USER_ID = $USER->GetID();
@@ -198,7 +203,7 @@ class CAdvContract_all
 	// возвращает массив EMail адресов всех пользователей имеющих заданную роль
 	public static function GetEmailArrayByRole($role)
 	{
-		global $DB, $APPLICATION, $USER;
+		global $USER;
 		if (!is_object($USER)) $USER = new CUser;
 		$arrEMail = array();
 		$arGroups = CAdvContract::GetGroupsByRole($role);
@@ -246,8 +251,6 @@ class CAdvContract_all
 	// возвращает массивы EMail'ов всех пользователей имеющих доступ к заданному контракту (владельцы контракта)
 	public static function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL, &$VIEW_EMAIL, &$EDIT_EMAIL)
 	{
-		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetOwnerEmails<br>Line: ";
-		global $DB, $APPLICATION;
 		$OWNER_EMAIL = array();
 		$VIEW_EMAIL = array();
 		$ADD_EMAIL = array();
@@ -338,7 +341,9 @@ class CAdvContract_all
 			elseif ($isManager) $arrRes[0] = array("VIEW", "ADD");
 			else $arrRes[0] = array();
 
-			if ($CONTRACT_ID>0) $strSqlSearch = " and C.ID= $CONTRACT_ID ";
+			$strSqlSearch = "";
+			if ($CONTRACT_ID>0)
+				$strSqlSearch = " and C.ID= $CONTRACT_ID ";
 			$strSql = "
 				SELECT
 					C.ID,
@@ -453,17 +458,11 @@ class CAdvContract_all
 
 	public static function SendEMail($arContract, $mess="")
 	{
-		$err_mess = (CAdvContract_all::err_mess())."<br>Function: SendEMail<br>Line: ";
-		global $DB, $APPLICATION;
 		$CONTRACT_ID = $arContract["ID"];
 
 		$BCC = array();
-		$EMAIL_TO = array();
-		$MANAGER_EMAIL = array();
-		$ADMIN_EMAIL = array();
 		$OWNER_EMAIL = array();
 		$ADD_EMAIL = array();
-		$STAT_EMAIL = array();
 		$EDIT_EMAIL = array();
 
 		$MANAGER_EMAIL = CAdvContract::GetManagerEmails();
@@ -479,6 +478,7 @@ class CAdvContract_all
 		}
 		else $BCC = $ADMIN_EMAIL;
 
+		$CREATED_BY = $MODIFIED_BY = "";
 		if (intval($arContract["CREATED_BY"])>0)
 		{
 			$rsUser = CUser::GetByID($arContract["CREATED_BY"]);
@@ -499,33 +499,36 @@ class CAdvContract_all
 				$MODIFIED_BY = "[".$arUser["ID"]."] (".$arUser["LOGIN"].") ".$arUser["NAME"]." ".$arUser["LAST_NAME"];
 			}
 		}
-		if (strlen($mess)>0) $mess = "\n".$mess."\n";
-		if (strlen($arContract["DESCRIPTION"])>0) $description = "\n".$arContract["DESCRIPTION"]."\n";
+		if (strlen($mess)>0)
+			$mess = "\n".$mess."\n";
+		$description = "";
+		if (strlen($arContract["DESCRIPTION"])>0)
+			$description = "\n".$arContract["DESCRIPTION"]."\n";
 		$arEventFields = array(
-			"ID"					=> $CONTRACT_ID,
-			"MESSAGE"				=> $mess,
-			"EMAIL_TO"				=> implode(",", $EMAIL_TO),
-			"ADMIN_EMAIL"			=> implode(",", $ADMIN_EMAIL),
-			"ADD_EMAIL"				=> implode(",", $ADD_EMAIL),
-			"STAT_EMAIL"			=> implode(",", $VIEW_EMAIL),
-			"EDIT_EMAIL"			=> implode(",", $EDIT_EMAIL),
-			"OWNER_EMAIL"			=> implode(",", $OWNER_EMAIL),
-			"BCC"					=> implode(",", $BCC),
-			"INDICATOR"				=> GetMessage("AD_".strtoupper($arContract["LAMP"]."_CONTRACT_STATUS")),
-			"ACTIVE"				=> $arContract["ACTIVE"],
-			"NAME"					=> $arContract["NAME"],
-			"DESCRIPTION"			=> $description,
-			"MAX_SHOW_COUNT"		=> $arContract["MAX_SHOW_COUNT"],
-			"SHOW_COUNT"			=> $arContract["SHOW_COUNT"],
-			"MAX_CLICK_COUNT"		=> $arContract["MAX_CLICK_COUNT"],
-			"CLICK_COUNT"			=> $arContract["CLICK_COUNT"],
-			"BANNERS"				=> $arContract["BANNER_COUNT"],
-			"DATE_SHOW_FROM"		=> $arContract["DATE_SHOW_FROM"],
-			"DATE_SHOW_TO"			=> $arContract["DATE_SHOW_TO"],
-			"DATE_CREATE"			=> $arContract["DATE_CREATE"],
-			"CREATED_BY"			=> $CREATED_BY,
-			"DATE_MODIFY"			=> $arContract["DATE_MODIFY"],
-			"MODIFIED_BY"			=> $MODIFIED_BY
+			"ID" => $CONTRACT_ID,
+			"MESSAGE" => $mess,
+			"EMAIL_TO" => implode(",", $EMAIL_TO),
+			"ADMIN_EMAIL" => implode(",", $ADMIN_EMAIL),
+			"ADD_EMAIL" => implode(",", $ADD_EMAIL),
+			"STAT_EMAIL" => implode(",", $VIEW_EMAIL),
+			"EDIT_EMAIL" => implode(",", $EDIT_EMAIL),
+			"OWNER_EMAIL" => implode(",", $OWNER_EMAIL),
+			"BCC" => implode(",", $BCC),
+			"INDICATOR" => GetMessage("AD_".strtoupper($arContract["LAMP"]."_CONTRACT_STATUS")),
+			"ACTIVE" => $arContract["ACTIVE"],
+			"NAME" => $arContract["NAME"],
+			"DESCRIPTION" => $description,
+			"MAX_SHOW_COUNT" => $arContract["MAX_SHOW_COUNT"],
+			"SHOW_COUNT" => $arContract["SHOW_COUNT"],
+			"MAX_CLICK_COUNT" => $arContract["MAX_CLICK_COUNT"],
+			"CLICK_COUNT" => $arContract["CLICK_COUNT"],
+			"BANNERS" => $arContract["BANNER_COUNT"],
+			"DATE_SHOW_FROM" => $arContract["DATE_SHOW_FROM"],
+			"DATE_SHOW_TO" => $arContract["DATE_SHOW_TO"],
+			"DATE_CREATE" => $arContract["DATE_CREATE"],
+			"CREATED_BY" => $CREATED_BY,
+			"DATE_MODIFY" => $arContract["DATE_MODIFY"],
+			"MODIFIED_BY" => $MODIFIED_BY
 		);
 		$arrSITE =  CAdvContract::GetSiteArray($CONTRACT_ID);
 		CEvent::Send("ADV_CONTRACT_INFO", $arrSITE, $arEventFields);
@@ -534,8 +537,8 @@ class CAdvContract_all
 	public static function SendInfo()
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: SendInfo<br>Line: ";
-		global $DB, $APPLICATION;
-		$rsContracts = CAdvContract::GetList($v1, $v2, array("LAMP" => "red", "EMAIL_COUNT_2" => "0"), $v3, "N");
+		global $DB;
+		$rsContracts = CAdvContract::GetList($v1="", $v2="", array("LAMP" => "red", "EMAIL_COUNT_2" => "0"), $v3=false, "N");
 		while ($arContract = $rsContracts->Fetch())
 		{
 			CAdvContract::SendEMail($arContract, "< ".GetMessage("AD_CONTRACT_NOT_ACTIVE")." >");
@@ -551,7 +554,6 @@ class CAdvContract_all
 
 	public static function CheckFilter($arFilter)
 	{
-		$err_mess = (CAdvContract_all::err_mess())."<br>Function: CheckFilter<br>Line: ";
 		global $strError;
 		$str = "";
 		$find_date_modify_1 = $arFilter["DATE_MODIFY_1"];
@@ -570,14 +572,17 @@ class CAdvContract_all
 				$str.= GetMessage("AD_ERROR_FROM_TILL_DATE_MODIFY")."<br>";
 		}
 		$strError .= $str;
-		if (strlen($str)>0) return false; else return true;
+		if (strlen($str)>0)
+			return false;
+		else
+			return true;
 	}
 
 	// получаем массив времени и дней недели связанных с контрактом
 	public static function GetWeekdayArray($CONTRACT_ID)
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetWeekdayArray<br>Line: ";
-		global $DB, $USER;
+		global $DB;
 		$CONTRACT_ID = intval($CONTRACT_ID);
 		if ($CONTRACT_ID<=0) return false;
 		$arrRes = array();
@@ -636,7 +641,7 @@ class CAdvContract_all
 	public static function GetSiteArray($CONTRACT_ID)
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetSiteArray<br>Line: ";
-		global $DB, $USER;
+		global $DB;
 		$CONTRACT_ID = intval($CONTRACT_ID);
 		if ($CONTRACT_ID<=0) return false;
 		$arrRes = array();
@@ -658,7 +663,7 @@ class CAdvContract_all
 	public static function GetPageArray($CONTRACT_ID, $SHOW="SHOW")
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetPageArray<br>Line: ";
-		global $DB, $USER;
+		global $DB;
 		$CONTRACT_ID = intval($CONTRACT_ID);
 		if ($CONTRACT_ID<=0) return false;
 		$arrRes = array();
@@ -745,14 +750,16 @@ class CAdvContract_all
 			"ID"				=> $CONTRACT_ID,
 			"ID_EXACT_MATCH"	=> "Y"
 			);
-		$rs = CAdvContract::GetList($v1, $v2, $arFilter, $v3, $CHECK_RIGHTS);
+		$rs = CAdvContract::GetList($v1="", $v2="", $arFilter, $v3=false, $CHECK_RIGHTS);
 		return $rs;
 	}
 
 	// проверка полей при модификации контракта
 	public static function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
 	{
-		global $DB, $strError, $USER;
+		global $strError;
+		$str = "";
+		$arrPERM = false;
 		if ($CHECK_RIGHTS=="Y")
 		{
 			$arrPERM = CAdvContract::GetUserPermissions($CONTRACT_ID);
@@ -767,18 +774,23 @@ class CAdvContract_all
 			}
 			if (strlen($arFields["DATE_SHOW_TO"])>0)
 			{
-				if (!CheckDateTime($arFields["DATE_SHOW_TO"]." 23:59:59", false, LANGUAGE_ID, "FULL"))
+				if (!CheckDateTime($arFields["DATE_SHOW_TO"]))
 					$str .= GetMessage("AD_ERROR_WRONG_DATE_SHOW_TO_CONTRACT")."<br>";
 			}
 		}
 		else
 		{
-			if ($CONTRACT_ID>0) $str .= GetMessage("AD_ERROR_NOT_ENOUGH_PERMISSIONS_CONTRACT")."<br>";
-			else $str .= GetMessage("AD_ERROR_NOT_ENOUGH_PERMISSIONS_FOR_NEW_CONTRACT")."<br>";
+			if ($CONTRACT_ID>0)
+				$str .= GetMessage("AD_ERROR_NOT_ENOUGH_PERMISSIONS_CONTRACT")."<br>";
+			else
+				$str .= GetMessage("AD_ERROR_NOT_ENOUGH_PERMISSIONS_FOR_NEW_CONTRACT")."<br>";
 		}
 
 		$strError .= $str;
-		if (strlen($str)>0) return false; else return true;
+		if (strlen($str)>0)
+			return false;
+		else
+			return true;
 	}
 
 	// добавляем новый контракт или модифицируем существующий
@@ -934,9 +946,17 @@ class CAdvContract_all
 					$check_activity = "Y";
 					if (strlen($arFields["DATE_SHOW_TO"])>0)
 					{
-						$arFields_i["DATE_SHOW_TO"] = $DB->CharToDateFunction($arFields["DATE_SHOW_TO"]." 23:59:59", "FULL");
+						$time = "";
+						if(defined("FORMAT_DATE") && strlen($arFields["DATE_SHOW_TO"]) <= strlen(FORMAT_DATE))
+						{
+							$time = " 23:59:59";
+						}
+						$arFields_i["DATE_SHOW_TO"] = $DB->CharToDateFunction($arFields["DATE_SHOW_TO"].$time);
 					}
-					else $arFields_i["DATE_SHOW_TO"] = "null";
+					else
+					{
+						$arFields_i["DATE_SHOW_TO"] = "null";
+					}
 				}
 
 				if (in_array("DEFAULT_STATUS_SID", $arrKeys))
@@ -1337,7 +1357,7 @@ class CAdvContract_all
 			if (is_array($arFilter))
 			{
 				$filter_keys = array_keys($arFilter);
-				for ($i=0; $i<count($filter_keys); $i++)
+				for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 				{
 					$key = $filter_keys[$i];
 					$val = $arFilter[$filter_keys[$i]];
@@ -1637,7 +1657,7 @@ class CAdvBanner_all
 			"ID"				=> $BANNER_ID,
 			"ID_EXACT_MATCH"	=> "Y"
 			);
-		$rs = CAdvBanner::GetList($v1, $v2, $arFilter, $v3, $CHECK_RIGHTS);
+		$rs = CAdvBanner::GetList($v1="", $v2="", $arFilter, $v3=false, $CHECK_RIGHTS);
 		return $rs;
 	}
 
@@ -2093,7 +2113,7 @@ class CAdvBanner_all
 				}
 				if (strlen($arFields["DATE_SHOW_TO"])>0)
 				{
-					if (!CheckDateTime($arFields["DATE_SHOW_TO"]." 23:59:59", false, LANGUAGE_ID, "FULL"))
+					if (!CheckDateTime($arFields["DATE_SHOW_TO"]))
 						$str .= GetMessage("AD_ERROR_WRONG_DATE_SHOW_TO_BANNER")."<br>";
 				}
 
@@ -2402,9 +2422,18 @@ class CAdvBanner_all
 				if (in_array("DATE_SHOW_TO", $arrKeys))
 				{
 					if (strlen($arFields["DATE_SHOW_TO"])>0)
-						$arFields_i["DATE_SHOW_TO"] = $DB->CharToDateFunction($arFields["DATE_SHOW_TO"]." 23:59:59", "FULL");
+					{
+						$time = "";
+						if(defined("FORMAT_DATE") && strlen($arFields["DATE_SHOW_TO"]) <= strlen(FORMAT_DATE))
+						{
+							$time = " 23:59:59";
+						}
+						$arFields_i["DATE_SHOW_TO"] = $DB->CharToDateFunction($arFields["DATE_SHOW_TO"].$time);
+					}
 					else
+					{
 						$arFields_i["DATE_SHOW_TO"] = "null";
+					}
 				}
 
 				if (in_array("DATE_SHOW_FIRST", $arrKeys))
@@ -3003,7 +3032,7 @@ class CAdvBanner_all
 
 	
 	/**
-	 * <p>Функция возвращает весь или часть массива, хранящего ключевые слова, заданные для данной страницы с помощью функций <a href="http://dev.1c-bitrix.ruapi_help/advertising/classes/cadvbanner/setdesiredkeywords.php">CAdvBanner::SetDesiredKeywords</a> и <a href="http://dev.1c-bitrix.ruapi_help/advertising/classes/cadvbanner/setrequiredkeywords.php">CAdvBanner::SetRequiredKeywords</a>.</p>
+	 * <p>Функция возвращает весь или часть массива, хранящего ключевые слова, заданные для данной страницы с помощью функций <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setdesiredkeywords.php">CAdvBanner::SetDesiredKeywords</a> и <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setrequiredkeywords.php">CAdvBanner::SetRequiredKeywords</a>.</p>
 	 *
 	 *
 	 *
@@ -4020,6 +4049,8 @@ class CAdvBanner_all
 		$dtformat = "DD.MM.YYYY HH:MI:SS";
 		$stmpfirst = MakeTimeStamp($dt["first"], $dtformat);
 		$stmpfrom = MakeTimeStamp($dt["from"], $dtformat);
+		$stmpto = MakeTimeStamp($dt["to"], $dtformat);
+
 		// Check if FirstShowDate valid, then use it.
 		if ($stmpfirst>0 and $stmpfirst>=$stmpfrom and $stmpto>$stmpfirst)
 		{
@@ -4092,7 +4123,7 @@ class CAdvBanner_all
 		if ($arBanner["FIX_CLICK"]=="Y")
 		{
 			$BegPos=0;
-			while (preg_match("'(<A[^>]+?HREF[\t ]*=[\t ]*(\"|\'))(.*?)((\"|\'))'i",substr($text,$BegPos),$regs))
+			while (preg_match("'(<A[^>]+?HREF[\t ]*=[\t ]*(\"|\\'))(.*?)((\"|\\'))'i",substr($text,$BegPos),$regs))
 			{
 				$BegPos = strpos($text, $regs[1].$regs[3].$regs[5], $BegPos);
 				if($BegPos===false) return '';
@@ -4131,7 +4162,8 @@ class CAdvBanner_all
 	 */
 	public static function GetHTML($arBanner, $bNoIndex=false)
 	{
-		static $flashJs = false;
+		global $APPLICATION;
+
 		$strReturn = "";
 		// обрабатываем изображение
 		if(intval($arBanner["IMAGE_ID"])>0)
@@ -4205,6 +4237,8 @@ class CAdvBanner_all
 						}
 						else
 						{
+							$APPLICATION->AddHeadScript("/bitrix/js/advertising/flash.js");
+
 							$altImgPath = '';
 							$arAltImage = CFile::GetFileArray($arBanner["FLASH_IMAGE"]);
 							if ($arAltImage)
@@ -4212,14 +4246,8 @@ class CAdvBanner_all
 								$altImgPath = $arAltImage["SRC"];
 							}
 
-							$strReturn = '';
 							$test_id = 'id'.RandString(10);
-							if(!$flashJs)
-							{
-								$flashJs = true;
-								$strReturn .= '<script type="text/javascript" src="/bitrix/js/advertising/flash.js"></script>';
-							}
-							$strReturn .= '<div id="'.$test_id.'" style="width: '.$arImage["WIDTH"].'px; height: '.$arImage["HEIGHT"].'px; padding:0; margin:0;">';
+							$strReturn = '<div id="'.$test_id.'" style="width: '.$arImage["WIDTH"].'px; height: '.$arImage["HEIGHT"].'px; padding:0; margin:0;">';
 							$altHref = '';
 							if(trim($arBanner["URL"]) <> '')
 							{
@@ -4719,7 +4747,7 @@ class CAdvBanner_all
 					{
 						$arContracts = array();
 						$arContractTypes = array();
-						$contracts = CAdvContract::GetList($sort="s_sort", $order="desc", array(), $is_filtered);
+						$contracts = CAdvContract::GetList($sort="s_sort", $order="desc", array(), $is_filtered=false);
 						while($arContract = $contracts->Fetch())
 						{
 							$arContracts[] = $arContract;
@@ -4793,7 +4821,7 @@ class CAdvBanner_all
 			if (!$date1_stm && strlen(trim($find_date_1))>0)
 				$str.= GetMessage("AD_ERROR_WRONG_PERIOD_FROM")."<br>";
 			else $date_1_ok = true;
-			if (!$date2_stm && strlen(trim($find_date__2))>0)
+			if (!$date2_stm && strlen(trim($find_date_2))>0)
 				$str.= GetMessage("AD_ERROR_WRONG_PERIOD_TILL")."<br>";
 			elseif ($date_1_ok && $date2_stm <= $date1_stm && strlen($date2_stm)>0)
 				$str.= GetMessage("AD_ERROR_FROM_TILL_PERIOD")."<br>";
@@ -4814,7 +4842,7 @@ class CAdvBanner_all
 			if (is_array($arFilter))
 			{
 				$filter_keys = array_keys($arFilter);
-				for ($i=0; $i<count($filter_keys); $i++)
+				for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 				{
 					$key = $filter_keys[$i];
 					$val = $arFilter[$filter_keys[$i]];
@@ -4974,6 +5002,7 @@ class CAdvBanner_all
 		if ($arFilter["WHAT_SHOW"]!=array("ctr") && in_array("click", $arShow)) $s++;
 		if ($arFilter["WHAT_SHOW"]!=array("ctr") && in_array("visitor", $arShow)) $s++;
 		$total = sizeof($arrLegend)*$s;
+		$color = "";
 		while (list($key, $arr) = each($arrLegend))
 		{
 			if (in_array("ctr", $arShow))
@@ -5024,7 +5053,7 @@ class CAdvBanner_all
 			if (is_array($arFilter))
 			{
 				$filter_keys = array_keys($arFilter);
-				for ($i=0; $i<count($filter_keys); $i++)
+				for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 				{
 					$key = $filter_keys[$i];
 					$val = $arFilter[$filter_keys[$i]];
@@ -5209,6 +5238,7 @@ class CAdvType_all
 	public static function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	{
 		global $DB, $strError;
+		$str = "";
 		$SID = $arFields["SID"];
 		if ($CHECK_RIGHTS=="Y")
 		{
@@ -5334,6 +5364,7 @@ class CAdvType_all
 					else
 						$arFields_i["MODIFIED_BY"] = $USER->GetID();
 
+					$str = "";
 					while (list($field,$value)=each($arFields_i))
 					{
 						if (strlen($value)<=0) $str .= "$field = '', "; else $str .= "$field = $value, ";
@@ -5380,6 +5411,7 @@ class CAdvType_all
 					else
 						$arFields_i["MODIFIED_BY"] = $USER->GetID();
 
+					$str1 = $str2 = "";
 					while (list($field,$value)=each($arFields_i))
 					{
 						$str1 .= $field.", ";
@@ -5393,7 +5425,10 @@ class CAdvType_all
 				}
 			}
 		}
-		else $SID = $arFields["SID"];
+		else
+		{
+			$SID = $arFields["SID"];
+		}
 
 		return $SID;
 	}
@@ -5662,7 +5697,7 @@ class CAdvType_all
 				if (is_array($arFilter))
 				{
 					$filter_keys = array_keys($arFilter);
-					for ($i=0; $i<count($filter_keys); $i++)
+					for ($i=0, $n = count($filter_keys); $i < $n; $i++)
 					{
 						$key = $filter_keys[$i];
 						$val = $arFilter[$filter_keys[$i]];
@@ -5782,5 +5817,3 @@ class CAdvertising
 		return CAdvBanner::Click($BANNER_ID);
 	}
 }
-
-?>

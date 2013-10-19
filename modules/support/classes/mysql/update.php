@@ -7,7 +7,7 @@ class CSupportUpdate extends CAllSupportUpdate
 	{
 		$module_id = "support";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CSupportUpdate<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CSupportUpdate<br>File: ".__FILE__;
 	}
 	
 	public static function GetBD()

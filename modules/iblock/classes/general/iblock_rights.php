@@ -1245,6 +1245,12 @@ class CIBlockElementRights extends CIBlockRights
 			$bAuthorized = false;
 		}
 
+		if ($USER_ID > 0)
+		{
+			$acc = new CAccess;
+			$acc->UpdateCodes();
+		}
+
 		if(!is_array($arID))
 			$sqlID = array(intval($arID));
 		elseif(empty($arID))

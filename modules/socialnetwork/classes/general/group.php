@@ -412,7 +412,7 @@ class CAllSocNetGroup
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -663,7 +663,7 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод создает новую рабочую группу.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ruapi_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
+	 * <p>Метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li> <li> <b>K</b> (Все члены группы ).</li> </ul> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
 	 *
 	 *
 	 *
@@ -672,19 +672,21 @@ class CAllSocNetGroup
 	 *
 	 *
 	 *
-	 * @param array $arFields  Массив параметров новой группы. Допустимые ключи массива:<br> SITE_ID -
-	 * код сайта (обязательное поле),<br> NAME - название группы
-	 * (обязательное поле),<br> DESCRIPTION - описание группы,<br> VISIBLE - флаг Y/N -
-	 * видна ли группа в списке групп,<br> OPENED - флаг Y/N - открыта ли группа
-	 * для свободного вступления,<br> SUBJECT_ID - код темы (обязательное
-	 * поле),<br> KEYWORDS - ключевые слова,<br> IMAGE_ID - иконка группы,<br> INITIATE_PERMS -
-	 * кто имеет право на приглашение пользователей в группу
-	 * (обязательное поле): SONET_ROLES_OWNER - только владелец группы,
-	 * SONET_ROLES_MODERATOR - владелец группы и модераторы группы , SONET_ROLES_USER - все
-	 * члены группы,<br> CLOSED - флаг Y/N - является ли группа архивной,<br> SPAM_PERMS
-	 * - кто имеет право на отправку сообщений в группу (обязательное
+	 * @param array $arFields  Массив параметров новой группы. Допустимые ключи
+	 * массива:<br><b>SITE_ID</b> - код сайта (обязательное поле),<br><b>NAME</b> -
+	 * название группы (обязательное поле),<br><b>DESCRIPTION</b> - описание
+	 * группы,<br><b>VISIBLE</b> - флаг Y/N - видна ли группа в списке
+	 * групп,<br><b>OPENED</b> - флаг Y/N - открыта ли группа для свободного
+	 * вступления,<br><b>SUBJECT_ID</b> - код темы (обязательное поле),<br><b>KEYWORDS</b> -
+	 * ключевые слова,<br><b>IMAGE_ID</b> - иконка группы,<br><b>INITIATE_PERMS</b> - кто
+	 * имеет право на приглашение пользователей в группу (обязательное
 	 * поле): SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец
-	 * группы и модераторы группы , SONET_ROLES_USER - все члены группы. .
+	 * группы и модераторы группы , SONET_ROLES_USER - все члены группы,<br><b>CLOSED</b>
+	 * - флаг Y/N - является ли группа архивной,<br><b>SPAM_PERMS</b> - кто имеет
+	 * право на отправку сообщений в группу (обязательное поле):
+	 * SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец группы и
+	 * модераторы группы, SONET_ROLES_USER - все члены группы, SONET_ROLES_ALL - все
+	 * пользователи.
 	 *
 	 *
 	 *

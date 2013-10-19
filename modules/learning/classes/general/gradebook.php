@@ -3,12 +3,21 @@
 // 2012-04-10 Checked/modified for compatibility with new data model
 
 /**
- * 
+ * <br><br>
  *
  *
  *
  *
  * @return mixed 
+ *
+ *
+ * <h4>Example</h4> 
+ * <pre>
+ * // пример пересчета журнала
+ * $gradebook = new CGradeBook; 
+ * $gradebook-&gt;RecountAttempts($STUDENT_ID,$TEST_ID);
+ * </pre>
+ *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php
@@ -94,7 +103,7 @@ class CAllGradeBook
 	 *
 	 *
 	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">всех полей</a> журнала.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -140,9 +149,9 @@ class CAllGradeBook
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">Поля журнала</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/update.php">Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -180,7 +189,7 @@ class CAllGradeBook
 	 *
 	 *
 	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">всех полей</a> журнала.
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
 	 * Обязательные поля должны быть заполнены. <br>
 	 *
 	 *
@@ -221,9 +230,9 @@ class CAllGradeBook
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">Поля журнала</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/add.php">Add</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/add.php">Add</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -381,7 +390,7 @@ class CAllGradeBook
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -405,10 +414,10 @@ class CAllGradeBook
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#gradebook">Поля журнала</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

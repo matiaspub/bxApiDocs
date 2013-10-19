@@ -29,7 +29,7 @@ class CAllForumPrivateMessage
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
 	 * сообщение"</a>. Обязательные поля должны быть заполнены.
 	 *
 	 *
@@ -61,8 +61,8 @@ class CAllForumPrivateMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное сообщение"</a>
-	 * </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * сообщение"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -172,7 +172,7 @@ class CAllForumPrivateMessage
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
 	 * сообщение"</a>.
 	 *
 	 *
@@ -182,8 +182,8 @@ class CAllForumPrivateMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное сообщение"</a>
-	 * </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * сообщение"</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -393,8 +393,8 @@ class CAllForumPrivateMessage
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное сообщение"</a>
-	 * </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * сообщение"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -467,13 +467,13 @@ class CAllForumPrivateMessage
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	 * <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumprivatemessage">"Приватное
-	 * сообщение"</a> </li> </ul>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
+	 * сообщение"</a> </li> </ul><br><br>
 	 *
 	 *
 	 * @static
@@ -681,7 +681,7 @@ class CALLForumPMFolder
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumpmfolder">"Папка
+	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
 	 * пользователя"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -715,7 +715,7 @@ class CALLForumPMFolder
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
 	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumpmfolder">"Папка пользователя"</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка пользователя"</a>.
 	 *
 	 *
 	 *
@@ -723,7 +723,7 @@ class CALLForumPMFolder
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumpmfolder">"Папка
+	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
 	 * пользователя"</a> </li> </ul>
 	 *
 	 *
@@ -794,12 +794,12 @@ class CALLForumPMFolder
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	 * <li>таблица <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumpmfolder">"Папка
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	 * <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
 	 * пользователя"</a> </li> </ul>
 	 *
 	 *

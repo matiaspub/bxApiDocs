@@ -107,7 +107,12 @@ class CSocNetLogComments extends CAllSocNetLogComments
 							"RATING_ENTITY_ID" => $ID
 						));
 
-					CSocNetLogFollow::Set($arFields["USER_ID"], "L".$arFields["LOG_ID"], "Y");
+					CSocNetLogFollow::Set(
+						$arFields["USER_ID"], 
+						"L".$arFields["LOG_ID"], 
+						"Y", 
+						ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL")
+					);
 
 					$rsLog = CSocNetLog::GetList(
 						array(),
@@ -132,8 +137,8 @@ class CSocNetLogComments extends CAllSocNetLogComments
 								array("TYPE")
 							);
 
-							$arLogFoillow = $rsLogFollow->Fetch();
-							if (!$arLogFoillow)
+							$arLogFollow = $rsLogFollow->Fetch();
+							if (!$arLogFollow)
 								CSocNetLogFollow::Set($arLog["USER_ID"], "L".$arFields["LOG_ID"], "Y");
 						}
 					}

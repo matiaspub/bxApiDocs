@@ -127,18 +127,6 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * Return host name for site checking
-	 * @return string
-	 */
-	protected function getHostName()
-	{
-		$sheme = (CMain::IsHTTPS() ? "https" : "http")."://";
-		$url = self::getDomainName();
-		$url .= ($_SERVER["SERVER_PORT"] && strpos($url, ":") === false) ? ":".$_SERVER["SERVER_PORT"] : "";
-		return $sheme.$url;
-	}
-
-	/**
 	 * Generate payload for request to Bitrix
 	 * @param string $pAction - "check" or "receive_results"
 	 * @param bool $pCollectSystemInformation
@@ -234,6 +222,31 @@ class CSecurityCloudMonitorRequest
 	protected static function getSystemInformation()
 	{
 		return CSecuritySystemInformation::getSystemInformation();
+	}
+
+	/**
+	 * Return host name for site checking
+	 * @return string
+	 */
+	protected function getHostName()
+	{
+		$sheme = (CMain::IsHTTPS() ? "https" : "http")."://";
+		$serverPort = self::getServerPort();
+		$url = self::getDomainName();
+		$url .= ($serverPort && strpos($url, ":") === false) ? ":".$serverPort : "";
+		return $sheme.$url;
+	}
+
+	/**
+	 * Return current server port, except 80 and 443
+	 * @return int|bool
+	 */
+	protected static function getServerPort()
+	{
+		if($_SERVER["SERVER_PORT"] && !in_array($_SERVER["SERVER_PORT"], array(80, 443)))
+			return $_SERVER["SERVER_PORT"];
+		else
+			return false;
 	}
 
 	/**

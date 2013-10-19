@@ -17,6 +17,60 @@ $GLOBALS["CATALOG_BASE_GROUP"] = array();
  */
 class CAllCatalogGroup
 {
+	
+	/**
+	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
+	 * <br><ul> <li> <b>ADD</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>;</li>
+	 * <li> <b>UPDATE</b> - для метода <a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</li>
+	 * </ul>
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Ассоциативный массив параметров типа цены. Допустимые ключи: <ul>
+	 * <li>BASE - Флаг (Y/N) является ли тип базовым.</li> <li>NAME - Внутреннее
+	 * название типа цены. Ключ является обязательным, если $ACTION = 'ADD'.</li>
+	 * <li>SORT - Индекс сортировки.</li> <li>XML_ID - Внешний код.</li> <li>CREATED_BY - ID
+	 * создателя типа цен.</li> <li>MODIFIED_BY - ID последнего изменившего тип
+	 * цен.</li> <li>USER_GROUP - Массив кодов групп пользователей, члены которых
+	 * могут видеть цены этого типа. Ключ является обязательным, если
+	 * $ACTION = 'ADD'.</li> <li>USER_GROUP_BUY - Массив кодов групп пользователей, члены
+	 * которых могут покупать товары по ценам этого типа. Ключ является
+	 * обязательным, если $ACTION = 'ADD'.</li> <li>USER_LANG - Ассоциативный массив
+	 * языкозависимых параметров типа цены, ключами которого являются
+	 * коды языков, а значениями - названия этого типа цены на
+	 * соответствующем языке.</li> </ul>
+	 *
+	 *
+	 *
+	 * @param int $ID = 0 Код типа цен. Параметр является необязательным и имеет смысл
+	 * только для $ACTION = 'UPDATE'.
+	 *
+	 *
+	 *
+	 * @return bool <p> В случае корректности переданных параметров возвращает true,
+	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	 * можно получить текст ошибок.</p>
+	 *
+	 *
+	 * <h4>See Also</h4> 
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a></li>
+	 * <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a></li>
+	 * </ul><br><br>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/checkfields.php
+	 * @author Bitrix
+	 */
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
@@ -24,26 +78,40 @@ class CAllCatalogGroup
 		$boolResult = true;
 		$arMsg = array();
 
-		if (is_set($arFields, "NAME") || $strAction=="ADD")
+		if (array_key_exists("NAME", $arFields) || $strAction=="ADD")
 		{
 			$arFields["NAME"] = trim($arFields["NAME"]);
-			if (0 >= strlen($arFields["NAME"]))
+			if ('' == $arFields["NAME"])
 			{
 				$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('BT_MOD_CAT_GROUP_ERR_EMPTY_NAME'));
 				$boolResult = false;
 			}
 		}
 
-		if ((is_set($arFields, "BASE") || $ACTION=="ADD") && $arFields["BASE"] != "Y")
+		if ((array_key_exists("BASE", $arFields) || $ACTION=="ADD") && $arFields["BASE"] != "Y")
 		{
 			$arFields["BASE"] = "N";
 		}
 
-		if (is_set($arFields, "SORT") || $ACTION=="ADD")
+		if (array_key_exists("SORT", $arFields) || $ACTION=="ADD")
 		{
 			$arFields["SORT"] = intval($arFields["SORT"]);
 			if (0 >= $arFields["SORT"])
 				$arFields["SORT"] = 100;
+		}
+
+		if (array_key_exists('CREATED_BY', $arFields))
+		{
+			$arFields['CREATED_BY'] = intval($arFields['CREATED_BY']);
+			if (0 >= $arFields['CREATED_BY'])
+				$arFields['CREATED_BY'] = false;
+		}
+
+		if (array_key_exists('MODIFIED_BY', $arFields))
+		{
+			$arFields['MODIFIED_BY'] = intval($arFields['MODIFIED_BY']);
+			if (0 >= $arFields['MODIFIED_BY'])
+				$arFields['MODIFIED_BY'] = false;
 		}
 
 		if (is_set($arFields, 'USER_GROUP') || $ACTION=="ADD")
@@ -122,22 +190,29 @@ class CAllCatalogGroup
 		if (!is_array($arUserGroups))
 			$arUserGroups = array($arUserGroups);
 
-		if (count($arUserGroups) <= 0)
-			$arUserGroups = $USER->GetUserGroupArray();
+		if (empty($arUserGroups))
+		{
+			$arUserGroups = (CCatalog::IsUserExists() ? $USER->GetUserGroupArray() : array(2));
+		}
 
 		$arUserGroupsFilter = array();
-		for ($i = 0, $cnt = count($arUserGroups); $i < $cnt; $i++)
+		foreach ($arUserGroups as &$intUserGroupID)
 		{
-			$arUserGroups[$i] = IntVal($arUserGroups[$i]);
-			if ($arUserGroups[$i] > 0)
-				$arUserGroupsFilter[] = $arUserGroups[$i];
+			$intUserGroupID = intval($intUserGroupID);
+			if (0 < $intUserGroupID)
+				$arUserGroupsFilter[] = $intUserGroupID;
 		}
+		if (isset($intUserGroupID))
+			unset($intUserGroupID);
+
+		if (!is_array($arCatalogGroupsFilter))
+			$arCatalogGroupsFilter = array($arCatalogGroupsFilter);
 
 		$arResult = array();
 		$arResult["view"] = array();
 		$arResult["buy"] = array();
 
-		if (count($arUserGroupsFilter) <= 0)
+		if (empty($arUserGroupsFilter))
 			return $arResult;
 
 		$arData = array();
@@ -147,11 +222,11 @@ class CAllCatalogGroup
 			$dbPriceGroups = CCatalogGroup::GetGroupsList(array("GROUP_ID" => $arUserGroupsFilter));
 			while ($arPriceGroup = $dbPriceGroups->Fetch())
 			{
-				$arPriceGroup["CATALOG_GROUP_ID"] = IntVal($arPriceGroup["CATALOG_GROUP_ID"]);
+				$arPriceGroup["CATALOG_GROUP_ID"] = intval($arPriceGroup["CATALOG_GROUP_ID"]);
 
 				$key = (($arPriceGroup["BUY"] == "Y") ? "buy" : "view");
 				if ($key == "view")
-					if (count($arCatalogGroupsFilter) > 0)
+					if (!empty($arCatalogGroupsFilter))
 						if (!in_array($arPriceGroup["CATALOG_GROUP_ID"], $arCatalogGroupsFilter))
 							continue;
 
@@ -164,7 +239,7 @@ class CAllCatalogGroup
 
 		$cacheTime = CATALOG_CACHE_DEFAULT_TIME;
 		if (defined("CATALOG_CACHE_TIME"))
-			$cacheTime = IntVal(CATALOG_CACHE_TIME);
+			$cacheTime = intval(CATALOG_CACHE_TIME);
 
 		global $CACHE_MANAGER;
 		if ($CACHE_MANAGER->Read($cacheTime, "catalog_group_perms"))
@@ -176,12 +251,12 @@ class CAllCatalogGroup
 			$dbPriceGroups = CCatalogGroup::GetGroupsList(array());
 			while ($arPriceGroup = $dbPriceGroups->Fetch())
 			{
-				$arPriceGroup["GROUP_ID"] = IntVal($arPriceGroup["GROUP_ID"]);
-				$arPriceGroup["CATALOG_GROUP_ID"] = IntVal($arPriceGroup["CATALOG_GROUP_ID"]);
+				$arPriceGroup["GROUP_ID"] = intval($arPriceGroup["GROUP_ID"]);
+				$arPriceGroup["CATALOG_GROUP_ID"] = intval($arPriceGroup["CATALOG_GROUP_ID"]);
 
 				$key = (($arPriceGroup["BUY"] == "Y") ? "buy" : "view");
 
-				$arData[$arPriceGroup["GROUP_ID"]][$key][] = IntVal($arPriceGroup["CATALOG_GROUP_ID"]);
+				$arData[$arPriceGroup["GROUP_ID"]][$key][] = intval($arPriceGroup["CATALOG_GROUP_ID"]);
 			}
 			$CACHE_MANAGER->Set("catalog_group_perms", $arData);
 		}
@@ -200,7 +275,7 @@ class CAllCatalogGroup
 		$arResult["view"] = array_unique($arResult["view"]);
 		$arResult["buy"] = array_unique($arResult["buy"]);
 
-		if (count($arCatalogGroupsFilter) > 0)
+		if (!empty($arCatalogGroupsFilter))
 		{
 			$arTmp = array();
 			foreach ($arResult["view"] as $i => $arView)
@@ -235,7 +310,7 @@ class CAllCatalogGroup
 		{
 			$cacheTime = CATALOG_CACHE_DEFAULT_TIME;
 			if (defined("CATALOG_CACHE_TIME"))
-				$cacheTime = IntVal(CATALOG_CACHE_TIME);
+				$cacheTime = intval(CATALOG_CACHE_TIME);
 
 			global $CACHE_MANAGER;
 			if ($CACHE_MANAGER->Read($cacheTime, "catalog_group_".LANGUAGE_ID, "catalog_group"))
@@ -271,7 +346,7 @@ class CAllCatalogGroup
 	 * @return array <p>Функция возвращает ассоциативный массив с ключами:</p><table
 	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
 	 * <td>Код базового типа цен.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название
-	 * базового типа цен.</td> </tr> </table>
+	 * базового типа цен.</td> </tr> </table><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__getbasegroup.e06a3542.php

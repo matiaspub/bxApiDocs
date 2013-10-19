@@ -79,9 +79,9 @@ class CAllForumTopic
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserupdatetopic.php">CForumTopic::CanUserUpdateTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CForumTopic::CanUserUpdateTopic</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -150,9 +150,9 @@ class CAllForumTopic
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -240,9 +240,9 @@ class CAllForumTopic
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
 	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserupdatetopic.php">CForumTopic::CanUserUpdateTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CForumTopic::CanUserUpdateTopic</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -373,8 +373,8 @@ class CAllForumTopic
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">списке полей
-	 * темы</a>. Обязательные поля должны быть заполнены.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">списке
+	 * полей темы</a>. Обязательные поля должны быть заполнены.
 	 *
 	 *
 	 *
@@ -382,13 +382,13 @@ class CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
 	 * <li>Перед добавлением темы следует проверить возможность
 	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
 	 * </li> <li>Для добавления и изменения сообщения и темы рекомендуется
 	 * пользоваться высокоуровневой функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -509,8 +509,8 @@ class CAllForumTopic
 	 *
 	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
 	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">списке полей
-	 * темы</a>.
+	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">списке
+	 * полей темы</a>.
 	 *
 	 *
 	 *
@@ -525,13 +525,13 @@ class CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
 	 * <li>Перед изменением темы следует проверить возможность изменения
 	 * методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserupdatetopic.php">CanUserUpdateTopic</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CanUserUpdateTopic</a> </li>
 	 * <li>Для добавления и изменения сообщения и темы можно
 	 * воспользоваться высокоуровневой функцией <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul>
 	 *
 	 *
 	 * @static
@@ -908,7 +908,7 @@ class CAllForumTopic
 	 * <h4>See Also</h4> 
 	 * <ul><li>Перед удалением темы следует проверить возможность удаления
 	 * методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
 	 * </li></ul>
 	 *
 	 *
@@ -1001,7 +1001,7 @@ class CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1089,7 +1089,7 @@ class CAllForumTopic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *

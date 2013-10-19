@@ -2345,9 +2345,9 @@ class CAllSocNetUserToGroup
 	 *
 	 * @param array $arGroup  Массив, содержащий параметры группы. Этот массив возвращается
 	 * методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetByID</a> или
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetByID</a> или
 	 * может быть получен с памощью метода <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a>.
 	 *
 	 *
 	 *
@@ -2386,7 +2386,7 @@ class CAllSocNetUserToGroup
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/socialnetwork/classes/CSocNetUser/IsCurrentUserModuleAdmin.php">CSocNetUser::IsCurrentUserModuleAdmin</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsCurrentUserModuleAdmin.php">CSocNetUser::IsCurrentUserModuleAdmin</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

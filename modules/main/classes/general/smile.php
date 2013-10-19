@@ -44,7 +44,7 @@ class CSmile
 
 		if (isset($arFields['IMAGE']) && (!in_array(strtolower(GetFileExtension($arFields['IMAGE'])), Array('png', 'jpg', 'gif')) || !CBXVirtualIo::GetInstance()->ValidateFilenameString($arFields['IMAGE'])))
 			$aMsg[] = array("id"=>"IMAGE", "text"=> GetMessage("MAIN_SMILE_IMAGE_ERROR"));
-		
+
 		if(isset($arFields['IMAGE']) && (!isset($arFields['IMAGE_WIDTH']) || intval($arFields['IMAGE_WIDTH']) <= 0))
 			$aMsg["IMAGE_XY"] = array("id"=>"IMAGE_XY", "text"=> GetMessage("MAIN_SMILE_IMAGE_XY_ERROR"));
 
@@ -541,12 +541,12 @@ class CSmile
 					$csvFile->SetFieldsType("R");
 					$csvFile->SetFirstHeader(false);
 					while($smile = $csvFile->Fetch())
-                    {
-                        if (defined('BX_UTF') && BX_UTF && $res["LID"] == 'ru')
-                            $smile[1] = $GLOBALS['APPLICATION']->ConvertCharset($smile[1], 'windows-1251', 'utf-8');
+					{
+						if (defined('BX_UTF') && BX_UTF && $res["LID"] == 'ru')
+							$smile[1] = $GLOBALS['APPLICATION']->ConvertCharset($smile[1], 'windows-1251', 'utf-8');
 
-                        $arLang[$smile[0]][$res["LID"]] = $smile[1];
-                    }
+						$arLang[$smile[0]][$res["LID"]] = $smile[1];
+					}
 				}
 			}
 

@@ -392,6 +392,80 @@ class CIBlockParameters
 		}
 		return $arIBlockType;
 	}
+
+	public static function GetElementSortFields($arFields = array(), $arOptions = array())
+	{
+		$arResult = array();
+		if (!is_array($arFields))
+			$arFields = array($arFields);
+		if (!is_array($arOptions))
+			$arOptions = array();
+		$boolLowerCase = (array_key_exists('KEY_LOWERCASE', $arOptions) && 'Y' == $arOptions['KEY_LOWERCASE'] ? true: false);
+		$arSortFields = array(
+			"SHOWS" => GetMessage("IBLOCK_SORT_FIELD_SHOWS"),
+			"SORT" => GetMessage("IBLOCK_SORT_FIELD_SORT"),
+			"TIMESTAMP_X" => GetMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
+			"NAME" => GetMessage("IBLOCK_SORT_FIELD_NAME"),
+			"ID" => GetMessage("IBLOCK_SORT_FIELD_ID"),
+			"ACTIVE_FROM" => GetMessage("IBLOCK_SORT_FIELD_ACTIVE_FROM"),
+			"ACTIVE_TO" => GetMessage("IBLOCK_SORT_FIELD_ACTIVE_TO"),
+		);
+		if (!empty($arFields))
+		{
+			foreach ($arFields as &$strFieldName)
+			{
+				if (array_key_exists($strFieldName, $arSortFields))
+					$arResult[$strFieldName] = $arSortFields[$strFieldName];
+			}
+			if (isset($strFieldName))
+				unset($strFieldName);
+		}
+		else
+		{
+			$arResult = $arSortFields;
+		}
+		if ($boolLowerCase)
+		{
+			$arResult = array_change_key_case($arResult, CASE_LOWER);
+		}
+		return $arResult;
+	}
+
+	public static function GetSectionSortFields($arFields = array(), $arOptions = array())
+	{
+		$arResult = array();
+		if (!is_array($arFields))
+			$arFields = array($arFields);
+		if (!is_array($arOptions))
+			$arOptions = array();
+		$boolLowerCase = (array_key_exists('KEY_LOWERCASE', $arOptions) && 'Y' == $arOptions['KEY_LOWERCASE'] ? true: false);
+		$arSortFields = array(
+			"SORT" => GetMessage("IBLOCK_SORT_FIELD_SORT"),
+			"TIMESTAMP_X" => GetMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
+			"NAME" => GetMessage("IBLOCK_SORT_FIELD_NAME"),
+			"ID" => GetMessage("IBLOCK_SORT_FIELD_ID"),
+			"DEPTH_LEVEL" => GetMessage("IBLOCK_SORT_FIELD_DEPTH_LEVEL"),
+		);
+		if (!empty($arFields))
+		{
+			foreach ($arFields as &$strFieldName)
+			{
+				if (array_key_exists($strFieldName, $arSortFields))
+					$arResult[$strFieldName] = $arSortFields[$strFieldName];
+			}
+			if (isset($strFieldName))
+				unset($strFieldName);
+		}
+		else
+		{
+			$arResult = $arSortFields;
+		}
+		if ($boolLowerCase)
+		{
+			$arResult = array_change_key_case($arResult, CASE_LOWER);
+		}
+		return $arResult;
+	}
 }
 
 ?>

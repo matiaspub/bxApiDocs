@@ -20,19 +20,19 @@ Class CIdeaManagmentNotify {
         return $this->arNotification;
     }
     
-    static public function GetEmailNotify()
+    public function GetEmailNotify()
     {
         $Activity = self::EMAIL;
         return new $Activity($this);
     }
     
-    static public function GetSonetNotify()
+    public function GetSonetNotify()
     {
         $Activity = self::SONET;
         return new $Activity($this);
     }
     
-    static public function GetNotify($CustomNotifyClassName){
+    public function GetNotify($CustomNotifyClassName){
         if(class_exists($CustomNotifyClassName))
             return new $CustomNotifyClassName($this);
         

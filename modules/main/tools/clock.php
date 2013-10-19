@@ -20,7 +20,10 @@ class CClock
 
 	public static function Show($arParams)
 	{
+
 		CClock::Init($arParams);
+		$GLOBALS['APPLICATION']->AddHeadScript('/bitrix/js/main/utils.js');
+
 		// Show input
 		switch ($arParams['view'])
 		{
@@ -33,34 +36,34 @@ class CClock
 				?>
 				<select id="<?=$arParams['inputId']?>" name="<?=$arParams['inputName']?>">
 					<?
-						for ($i = 0; $i < 24; $i++)
-						{
-							$h = ($i < 10) ? '0'.$i : $i;
-							?><option value="<?=$h?>:00"><?=$h?>:00</option><?
-							if ($arParams['step']) {?><option value="<?=$h?>:30"><?=$h?>:30</option><?}
-						}
+					for ($i = 0; $i < 24; $i++)
+					{
+						$h = ($i < 10) ? '0'.$i : $i;
+						?><option value="<?=$h?>:00"><?=$h?>:00</option><?
+						if ($arParams['step']) {?><option value="<?=$h?>:30"><?=$h?>:30</option><?}
+					}
 					?>
 				</select>
 				<?
 				break;
 			case 'inline':
-?>
+				?>
 				<input type="hidden" id="<?=$arParams['inputId']?>" name="<?=$arParams['inputName']?>"  value="<?=$arParams['initTime']?>" />
 				<div id="<?=$arParams['inputId']?>_clock"></div>
-<script type="text/javascript">
-if (!window.bxClockLoaders)
-{
-	window.bxClockLoaders = [];
-	window.onload = function() {
-		for (var i=0; i<window.bxClockLoaders.length; i++)
-			setTimeout(window.bxClockLoaders[i], 20*i + 20);
-		window.bxClockLoaders = null;
-	}
-}
+				<script type="text/javascript">
+					if (!window.bxClockLoaders)
+					{
+						window.bxClockLoaders = [];
+						window.onload = function() {
+							for (var i=0; i<window.bxClockLoaders.length; i++)
+								setTimeout(window.bxClockLoaders[i], 20*i + 20);
+							window.bxClockLoaders = null;
+						}
+					}
 
-window.bxClockLoaders.push("bxShowClock_<?=$arParams['inputId']?>('<?=$arParams['inputId']?>_clock');");
-</script>
-<?
+					window.bxClockLoaders.push("bxShowClock_<?=$arParams['inputId']?>('<?=$arParams['inputId']?>_clock');");
+				</script>
+				<?
 				break;
 			default: //input
 				?><input id="<?=$arParams['inputId']?>" name="<?=$arParams['inputName']?>" type="text" value="<?=$arParams['initTime']?>" size="<?=IsAmPmMode() ? 6 : 4?>" title="<?=$arParams['inputTitle']?>" /><?
@@ -74,28 +77,7 @@ window.bxClockLoaders.push("bxShowClock_<?=$arParams['inputId']?>('<?=$arParams[
 
 		//Init JS and append CSS
 		?><script>
-		function bxc_load_css()
-		{
-			if (!window.BXClockStyles)
-				window.BXClockStyles = jsUtils.loadCSSFile(['<?=CUtil::GetAdditionalFileURL("/bitrix/themes/.default/clock.css")?>']);
-		}
-		if (!window.phpVars)
-			phpVars = {ADMIN_THEME_ID:'.default'};
-		if (!window.jsUtils)
-		{
-			setTimeout(function(){
-				var oScript = document.body.appendChild(document.createElement('script'));
-				oScript.src = '/bitrix/js/main/utils.js';
-				if (document.attachEvent && navigator.userAgent.toLowerCase().indexOf('opera') == -1)
-					oScript.onreadystatechange = function(){if (oScript.readyState == 'loaded'){bxc_load_css();}};
-				else
-					oScript.onload = function(){setTimeout(bxc_load_css, 50);};
-			}, 50);
-		}
-		else
-		{
-			bxc_load_css();
-		}
+		BX.loadCSS("/bitrix/themes/.default/clock.css");
 
 		function bxLoadClock_<?=$arParams['inputId']?>(callback)
 		{
@@ -138,7 +120,7 @@ window.bxClockLoaders.push("bxShowClock_<?=$arParams['inputId']?>('<?=$arParams[
 				obClock.Show(id);
 			});
 		}
-		</script><?
+	</script><?
 	}
 }
 ?>

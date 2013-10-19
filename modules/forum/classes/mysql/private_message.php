@@ -25,9 +25,16 @@ class CForumPrivateMessage extends CAllForumPrivateMessage
 		$strSqlOrder = "";
 		$strSqlFrom = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
+		if (is_array($bCount) && empty($arAddParams)){
+			$arAddParams = $bCount;
+			$bCount = false;
+			$iNum = 0;
+		}
 		$arAddParams = (is_array($arAddParams) ? $arAddParams : array($arAddParams));
 		if (is_set($arAddParams, "nameTemplate"))
 			$arAddParams["sNameTemplate"] = $arAddParams["nameTemplate"];
+		$arAddParams["bCount"] = (!!$bCount || !!$arAddParams["bCount"]);
+		$arAddParams["nTopCount"] = ($iNum > 0 ? $iNum : ($arAddParams["nTopCount"] > 0 ? $arAddParams["nTopCount"] : 0));
 
 		foreach ($arFilter as $key => $val)
 		{
@@ -86,19 +93,19 @@ class CForumPrivateMessage extends CAllForumPrivateMessage
 					break;
 			}
 		}
-		if (count($arSqlSearch) > 0)
+		if (!empty($arSqlSearch))
 			$strSqlSearch = " AND (".implode(") AND (", $arSqlSearch).") ";
-		
-		if ($bCount)
+
+		$iCnt = 0;
+		if ($arAddParams["bCount"] || is_set($arAddParams, "bDescPageNumbering"))
 		{
-			$strSql = 
-			"SELECT COUNT(PM.ID) AS CNT 
-				FROM b_forum_private_message PM 
-				WHERE (1=1) ".$strSqlSearch;
+			$strSql = "SELECT COUNT(PM.ID) AS CNT FROM b_forum_private_message PM WHERE (1=1) ".$strSqlSearch;
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			return ($db_res && ($res = $db_res->Fetch()) ? intval($res["CNT"]) : 0);
+			$iCnt = ($db_res && ($res = $db_res->Fetch()) ? intval($res["CNT"]) : 0);
+			if ($arAddParams["bCount"])
+				return $iCnt;
 		}
-		
+
 		foreach ($arOrder as $by=>$order)
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
@@ -120,7 +127,7 @@ class CForumPrivateMessage extends CAllForumPrivateMessage
 			}
 		}
 		DelDuplicateSort($arSqlOrder); 
-		if(count($arSqlOrder) > 0)
+		if(!empty($arSqlOrder))
 			$strSqlOrder = " ORDER BY ".implode(", ", $arSqlOrder);
 
 		$strSql = 
@@ -149,12 +156,14 @@ class CForumPrivateMessage extends CAllForumPrivateMessage
 			WHERE 1=1 ".$strSqlSearch."
 			".$strSqlOrder;
 
-		$iNum = IntVal($iNum);
-		if ($iNum>0)
-		{
-			$strSql .= " LIMIT 0,".$iNum;
+		if (is_set($arAddParams, "bDescPageNumbering")) {
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
+		} else {
+			if ($arAddParams["nTopCount"] > 0)
+				$strSql .= " LIMIT 0,".$arAddParams["nTopCount"];
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		return $db_res;
 	}
 }

@@ -555,8 +555,8 @@ class CCourseImport
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourseimport/index.php">CCourseImport</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourseimport/ccourseimport.php">CCourseImport</a> </li></ul><a
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourseimport/index.php">CCourseImport</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourseimport/ccourseimport.php">CCourseImport</a> </li></ul><a
 	 * name="examples"></a>
 	 *
 	 *

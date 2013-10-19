@@ -31,9 +31,9 @@ class CFile extends CAllFile
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

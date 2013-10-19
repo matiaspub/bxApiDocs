@@ -98,9 +98,7 @@ class CSalePaySystem extends CAllSalePaySystem
 	 * ассоциативных массивов параметров платежных систем с
 	 * ключами:</p><table width="100%" class="tnormal"><tbody> <tr> <th width="15%">Ключ</th>
 	 * <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код платежной системы.</td> </tr> <tr>
-	 * <td>LID</td> <td>Сайт, на котором работает эта система.</td> </tr> <tr> <td>CURRENCY</td>
-	 * <td>Валюта, с которой работает эта система.</td> </tr> <tr> <td>NAME</td>
-	 * <td>Название платежной системы.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N)
+	 * <td>NAME</td> <td>Название платежной системы.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N)
 	 * активности системы.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td> </tr>
 	 * <tr> <td>DESCRIPTION</td> <td>Описание платежной системы.</td> </tr> <tr> <td>PSA_ID</td>
 	 * <td>Код обработчика платежной системы (возвращается, если в
@@ -263,16 +261,15 @@ class CSalePaySystem extends CAllSalePaySystem
 	 *
 	 * @param array $arFields  Ассоциативный массив параметров новой платежной системы, в
 	 * котором ключами являются названия параметров, а значениями -
-	 * соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>LID</b> - сайт
-	 * платежной системы;</li> <li> <b> CURRENCY</b> - валюта платежной системы;</li>
-	 * <li> <b> NAME</b> - название платежной системы;</li> <li> <b>ACTIVE</b> - флаг (Y/N)
-	 * активности платежной системы;</li> <li> <b>SORT</b> - индекс сортировки;</li>
-	 * <li> <b>DESCRIPTION</b> - описание.</li> </ul>
+	 * соответствующие значения.<br> Допустимые ключи: <ul> <li> <b> CURRENCY</b> -
+	 * валюта платежной системы;</li> <li> <b> NAME</b> - название платежной
+	 * системы;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности платежной системы;</li>
+	 * <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>DESCRIPTION</b> - описание.</li> </ul>
 	 *
 	 *
 	 *
 	 * @return int <p>Возвращается код измененной записи или <i>false</i> в случае
-	 * ошибки.</p>
+	 * ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystem/csalepaysystem__add.eba446b8.php

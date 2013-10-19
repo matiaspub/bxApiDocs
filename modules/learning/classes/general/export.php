@@ -81,10 +81,10 @@ class CCoursePackage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -170,8 +170,7 @@ class CCoursePackage
 	 *
 	 *
 	 *
-	 * @param int $PACKAGE_DIR  Путь (относительно корня сайта) к директории, куда будет
-	 * скопирован архив курса.
+	 * @param int $PACKAGE_DIR  5.1.2
 	 *
 	 *
 	 *
@@ -215,10 +214,10 @@ class CCoursePackage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -323,11 +322,11 @@ class CCoursePackage
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php

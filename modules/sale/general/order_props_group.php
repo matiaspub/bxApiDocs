@@ -18,7 +18,7 @@ class CAllSaleOrderPropsGroup
 {
 	
 	/**
-	 * <p>Функция возвращает параметры группы свойств заказа с кодом ID </p>
+	 * <p>Функция возвращает параметры группы свойств заказа с кодом ID.</p>
 	 *
 	 *
 	 *
@@ -95,6 +95,34 @@ class CAllSaleOrderPropsGroup
 		return True;
 	}
 
+	
+	/**
+	 * <p>Функция обновляет параметры группы заказов с кодом ID на параметры из массива arFields </p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  Код группы заказов.
+	 *
+	 *
+	 *
+	 * @param array $arFields  Ассоциативный массив параметров группы свойств, в котором
+	 * ключами являются названия параметров, а значениями - новые
+	 * значения.<br><br> Допустимые ключи: <ul> <li> <b>PERSON_TYPE_ID</b> - тип
+	 * плательщика;</li> <li> <b>NAME</b> - название группы (группа привязывается
+	 * к типу плательщика, тип плательщика привязывается к сайту, сайт
+	 * привязывается к языку, название задается на этом языке);</li> <li>
+	 * <b>SORT</b> - индекс сортировки.</li> </ul>
+	 *
+	 *
+	 *
+	 * @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
+	 * ошибки.</p><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__update.169e4e27.php
+	 * @author Bitrix
+	 */
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -123,7 +151,7 @@ class CAllSaleOrderPropsGroup
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__delete.cae2758a.php

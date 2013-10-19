@@ -14,12 +14,12 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_INCLUDE",
 			"critical" => CSecurityCriticalLevel::HIGHT
 		),
-//		"phpFopen" => array(
-//			"method" => "isPhpIniVarOff",
-//			"params" => array("allow_url_fopen"),
-//			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_FOPEN",
-//			"critical" => CSecurityCriticalLevel::MIDDLE
-//		),
+		"phpFopen" => array(
+			"method" => "isPhpIniVarOff",
+			"params" => array("allow_url_fopen"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_FOPEN",
+			"critical" => CSecurityCriticalLevel::MIDDLE
+		),
 		"aspTags" => array(
 			"method" => "isPhpIniVarOff",
 			"params" => array("asp_tags"),

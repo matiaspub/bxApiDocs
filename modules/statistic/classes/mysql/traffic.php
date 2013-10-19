@@ -17,7 +17,7 @@ class CTraffic extends CAllTraffic
 {
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> в разрезе по часам, дням недели и месяцам.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> в разрезе по часам, дням недели и месяцам.</p>
 	 *
 	 *
 	 *
@@ -206,7 +206,7 @@ class CTraffic extends CAllTraffic
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a>, коэфициенты оценки внимательности посетителей в разрезе по дням.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>, коэфициенты оценки внимательности посетителей в разрезе по дням.</p>
 	 *
 	 *
 	 *
@@ -216,9 +216,9 @@ class CTraffic extends CAllTraffic
 	 * <b>s_hosts</b> - количество хостов; </li> <li> <b>s_sessions</b> - количество сессий;
 	 * </li> <li> <b>s_events</b> - количество событий; </li> <li> <b>s_guests</b> - количество
 	 * посетителей; </li> <li> <b>s_new_guests</b> - количество <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#new_guest">новых посетителей</a>; </li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a>; </li> <li>
 	 * <b>s_favorites</b> - количество посетителей, добавивших сайт в "<a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#favorites">Избранное</a>". </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>". </li> </ul>
 	 *
 	 *
 	 *
@@ -263,7 +263,7 @@ class CTraffic extends CAllTraffic
 	 * добавивших сайт в "Избранное"; </li> <li> <b>SITE_ID</b>* - ID сайта; </li> <li>
 	 * <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
 	 * <b>SITE_ID</b> будет искаться вхождение. </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -315,7 +315,7 @@ class CTraffic extends CAllTraffic
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a>
 	 * </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/traffic.php">Отчет "Динамика
 	 * посещаемости"</a> </li> </ul><a name="examples"></a>
 	 *
@@ -496,7 +496,7 @@ class CTraffic extends CAllTraffic
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#event">событий</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p> <p class="note">При фильтрации по сайту (<i>filter</i>[<b>SITE_ID</b>]), будут доступны только данные по хитам, хостам, сессиям, событиям. Данные по посетителям будут отсутствовать, т.к. текущая версия модуля предполагает, что посетитель один на весь портал.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p> <p class="note">При фильтрации по сайту (<i>filter</i>[<b>SITE_ID</b>]), будут доступны только данные по хитам, хостам, сессиям, событиям. Данные по посетителям будут отсутствовать, т.к. текущая версия модуля предполагает, что посетитель один на весь портал.</p>
 	 *
 	 *
 	 *
@@ -517,13 +517,13 @@ class CTraffic extends CAllTraffic
 	 * время ведения статистики [TOTAL_GUESTS] =&gt; суммарное количество
 	 * посетителей за все время ведения статистики [TOTAL_FAVORITES] =&gt;
 	 * суммарное количество посетителей, добавивших сайт в "<a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#favorites">Избранное</a>" за все время
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>" за все время
 	 * ведения статистики [TODAY_HITS] =&gt; количество хитов за сегодня
 	 * [TODAY_SESSIONS] =&gt; количество сессий за сегодня [TODAY_EVENTS] =&gt; количество
 	 * событий за сегодня [TODAY_HOSTS] =&gt; количество хостов за сегодня
 	 * [TODAY_GUESTS] =&gt; суммарное количество посетителей за сегодня
 	 * [TODAY_NEW_GUESTS] =&gt; количество <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#new_guest">новых посетителей</a> за
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> за
 	 * сегодня [TODAY_FAVORITES] =&gt; количество посетителей, добавивших сайт в
 	 * "Избранное", за сегодня [YESTERDAY_HITS] =&gt; количество хитов за вчера
 	 * [YESTERDAY_SESSIONS] =&gt; количество сессий за вчера [YESTERDAY_EVENTS] =&gt;
@@ -544,7 +544,7 @@ class CTraffic extends CAllTraffic
 	 * [PERIOD_NEW_GUESTS] =&gt; количество новых посетителей за установленный
 	 * период времени [PERIOD_FAVORITES] =&gt; количество посетителей, добавивших
 	 * сайт в "Избранное", за установленный период времени [ONLINE_GUESTS] =&gt;
-	 * количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#online">посетителей в
+	 * количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в
 	 * online</a> )</pre><p></p>
 	 *
 	 *
@@ -570,7 +570,7 @@ class CTraffic extends CAllTraffic
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cuseronline/getguestcount.php">CUserOnline::GetGuestCount</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getguestcount.php">CUserOnline::GetGuestCount</a>
 	 * </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
 	 * статистика"</a> </li> </ul><a name="examples"></a>
 	 *
@@ -691,7 +691,7 @@ class CTraffic extends CAllTraffic
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">ссылающихся сайтов</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	 *
 	 *
 	 *
@@ -769,8 +769,8 @@ class CTraffic extends CAllTraffic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/creferer/index.php">Класс "CReferer"</a> </li>
-	 * <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/creferer/index.php">Класс "CReferer"</a>
+	 * </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
 	 * статистика"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -854,7 +854,7 @@ class CTraffic extends CAllTraffic
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковых фраз</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
+	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковых фраз</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	 *
 	 *
 	 *
@@ -928,7 +928,7 @@ class CTraffic extends CAllTraffic
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/classes/cphrase/index.php">Класс "CPhrase"</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cphrase/index.php">Класс "CPhrase"</a> </li>
 	 * <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
 	 * статистика"</a> </li> </ul><a name="examples"></a>
 	 *

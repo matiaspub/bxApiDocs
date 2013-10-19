@@ -616,9 +616,11 @@ if (empty($arRunErrors))
 			if($bNeedGroups)
 			{
 				$i = 0;
-				$rsSections = CIBlockElement::GetElementGroups($arIBlockElement["ID"],true);
+				$rsSections = CIBlockElement::GetElementGroups($arIBlockElement["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 				while($arSection = $rsSections->Fetch())
 				{
+					if (0 < intval($arSection['ADDITIONAL_PROPERTY_ID']))
+						continue;
 					if (!array_key_exists($arSection['ID'],$arCacheChains))
 					{
 						$arPath = array();

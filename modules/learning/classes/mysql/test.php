@@ -58,7 +58,7 @@ class CTest extends CAllTest
 	 * без ответа на текущий вопрос, пользователь может изменять свои
 	 * ответы.</li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
 	 * умолчанию "R". Список прав доступа см. в <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
 	 * <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
 	 * значение "N" - права доступа не проверяются.</li> </ul> Перед названием
 	 * фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не
@@ -70,7 +70,7 @@ class CTest extends CAllTest
 	 *
 	 *
 	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -150,10 +150,10 @@ class CTest extends CAllTest
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/classes/ctest/getbyid.php">GetByID</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/learning/fields.php#test">Поля теста</a></li> </ul><a
+	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getbyid.php">GetByID</a> </li> <li><a
+	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a></li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

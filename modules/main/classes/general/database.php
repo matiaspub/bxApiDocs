@@ -183,7 +183,7 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -249,9 +249,9 @@ class CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -315,9 +315,9 @@ class CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -414,10 +414,10 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	 * с датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -542,11 +542,11 @@ class CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/convertdatetime.php">ConvertDateTime</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с датой и
-	 * временем</a> </li> </ul><a name="examples"></a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/convertdatetime.php">ConvertDateTime</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
+	 * датой и временем</a> </li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -694,83 +694,6 @@ class CAllDatabase
 		return $strResult;
 	}
 
-	
-	/**
-	 * <p>Функция выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь функцией <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь функцией <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $sql  SQL запрос.
-	 *
-	 *
-	 *
-	 * @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
-	 * возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
-	 * ошибки функция прекращает выполнение всей
-	 * страницы.<br>Необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
-	 * данная функция CDatabase::Query. Если в SQL запросе будет ошибка и если в
-	 * файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
-	 * то на экране будет выведена данная информация и сам SQL запрос.
-	 *
-	 *
-	 *
-	 * @return CDBResult
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function GetByID($ID, $GET_BY_SID="N")
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: GetByID&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$where = ($GET_BY_SID=="N") ? " F.ID = '".intval($ID)."' " : " F.VARNAME='".$DB-&gt;ForSql($ID,50)."' ";
-	 * 	$strSql = "
-	 * 		SELECT
-	 * 			F.*,
-	 * 			F.FIRST_SITE_ID,
-	 * 			F.FIRST_SITE_ID									LID,
-	 * 			F.VARNAME,
-	 * 			F.VARNAME										SID,
-	 * 			".$DB-&gt;DateToCharFunction("F.TIMESTAMP_X")."	TIMESTAMP_X,
-	 * 			count(distinct D1.ID)							C_FIELDS,
-	 * 			count(distinct D2.ID)							QUESTIONS,
-	 * 			count(distinct S.ID)							STATUSES
-	 * 		FROM b_form F
-	 * 		LEFT JOIN b_form_status S ON (S.FORM_ID = F.ID)
-	 * 		LEFT JOIN b_form_field D1 ON (D1.FORM_ID = F.ID and D1.ADDITIONAL='Y')
-	 * 		LEFT JOIN b_form_field D2 ON (D2.FORM_ID = F.ID and D2.ADDITIONAL&lt;&gt;'Y')
-	 * 		WHERE 
-	 * 			$where
-	 * 		GROUP BY 
-	 * 			F.ID
-	 * 		";
-	 * 	$res = <b>$DB-&gt;Query</b>($strSql, false, $err_mess.__LINE__);
-	 * 	return $res;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
-	 * @author Bitrix
-	 */
 	public static function Query($strSql, $bIgnoreErrors=false)
 	{
 		//is extended
@@ -780,7 +703,7 @@ class CAllDatabase
 	//query with CLOB
 	
 	/**
-	 * <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.).</p> <p>В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <p class="note">Только для Oracle версии!</p>
+	 * <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.).</p> <p>В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol>
 	 *
 	 *
 	 *
@@ -846,10 +769,10 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -905,9 +828,9 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -970,7 +893,7 @@ class CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1034,7 +957,7 @@ class CAllDatabase
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1095,8 +1018,8 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/runsqlbatch.php">CDatabase::RunSqlBatch</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/runsqlbatch.php">CDatabase::RunSqlBatch</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1288,9 +1211,9 @@ class CAllDatabase
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/index.php">Функции для работы с
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
 	 * датой и временем</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1501,9 +1424,9 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -1518,7 +1441,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
 	 *
 	 *
 	 *
@@ -1545,7 +1468,7 @@ class CAllDBResult
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1559,7 +1482,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество записей, измененных SQL-командами "INSERT", "UPDATE" или "DELETE".</p>
+	 * <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
 	 *
 	 *
 	 *
@@ -1603,7 +1526,7 @@ class CAllDBResult
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1642,7 +1565,7 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1685,7 +1608,7 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
+	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
 	 * </li></ul><a name="examples"></a>
 	 *
 	 *
@@ -1710,7 +1633,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает "false", если все записи умещаются в одну страницу. В противном случае "true".</p> <p class="note">Перед использованием данной функции необходимо вызвать <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
+	 * <p>Функция возвращает <i>false</i>, если все записи умещаются в одну страницу. В противном случае <i>true</i>.</p> <p class="note">Перед использованием данной функции необходимо вызвать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
 	 *
 	 *
 	 *
@@ -1737,9 +1660,9 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1756,7 +1679,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция выводит ссылки для постраничной навигации. Перед использованием данной функции необходимо вызвать метод <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова функции необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre>
+	 * <p>Функция выводит ссылки для постраничной навигации. Перед использованием данной функции необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова функции необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre>
 	 *
 	 *
 	 *
@@ -1855,11 +1778,11 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cpageoption/index.php">Класс CPageOption</a></li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li>
+	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/index.php">Класс CPageOption</a></li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php
@@ -2109,9 +2032,9 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -2130,7 +2053,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки функция вернет false.</p>
+	 * <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки функция вернет <i>false</i>.</p>
 	 *
 	 *
 	 *
@@ -2169,10 +2092,10 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php
@@ -2223,7 +2146,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данной функции применяется как правило для составления идентификатора кэша, который в свою очередь используется в функциях классов <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/index.php">CPHPCache</a>.</p>
+	 * <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данной функции применяется как правило для составления идентификатора кэша, который в свою очередь используется в функциях классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">CPHPCache</a>.</p>
 	 *
 	 *
 	 *
@@ -2296,9 +2219,9 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cpagecache/index.php">Класс CPageCache</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cphpcache/index.php">Класс CPHPCache</a> </li> </ul><a
-	 * name="examples"></a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">Класс CPageCache</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">Класс CPHPCache</a> </li>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -2420,7 +2343,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данную функцию <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы </p> <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться функций <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>.
+	 * <p>Функция разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данную функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>.
 	 *
 	 *
 	 *
@@ -2459,12 +2382,12 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -2526,7 +2449,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция инициализирует объект класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива.</p>
+	 * <p>Функция инициализирует объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива.</p>
 	 *
 	 *
 	 *
@@ -2604,7 +2527,7 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то функция вернет "false".</p> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при [link=89638#make]создании основных файлов компонентов[/link].</p>
+	 * <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то функция вернет "false".</p> <p><b>Примечания</b>:</p> <ul> <li>Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</li> <li>Когда явно не требуются возможности NavNext лучше использовать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.</li> </ul>
 	 *
 	 *
 	 *
@@ -2644,10 +2567,10 @@ class CAllDBResult
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
 	 * </ul><a name="examples"></a>
 	 *
 	 *
@@ -2685,7 +2608,7 @@ class CAllDBResult
 		return $this->GetPageNavStringEx($dummy, $navigationTitle, $templateName, $showAlways, $parentComponent);
 	}
 
-	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
+	public function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;

@@ -38,7 +38,7 @@ class CAllIMContactList
 				{
 					$cache_id = 'im_structure_'.$iblock_id;
 					$obIMCache = new CPHPCache;
-					$cache_dir = '/bx/im/structure';
+					$cache_dir = '/bx/imc/structure';
 
 					if($obIMCache->InitCache($ttl, $cache_id, $cache_dir))
 					{
@@ -118,7 +118,7 @@ class CAllIMContactList
 		{
 			$cache_id = 'im_user_sg_'.$USER->GetID();
 			$obSGCache = new CPHPCache;
-			$cache_dir = '/bx/im/sonet';
+			$cache_dir = '/bx/imc/sonet';
 
 			if($obSGCache->InitCache($ttl, $cache_id, $cache_dir))
 			{
@@ -283,7 +283,7 @@ class CAllIMContactList
 			$nameTemplateSite = CSite::GetNameFormat(false);
 			$cache_id = 'im_contact_list_'.$nameTemplate.'_'.$nameTemplateSite.(!empty($arExtranetUsers)? '_'.$USER->GetID(): '');
 			$obCLCache = new CPHPCache;
-			$cache_dir = '/bx/im/contact';
+			$cache_dir = '/bx/imc/contact';
 
 			$arUsersToGroup = array();
 			$arUserInGroupStructure = array();
@@ -305,7 +305,7 @@ class CAllIMContactList
 			}
 			else
 			{
-				$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "IS_ONLINE"));
+				$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "IS_ONLINE"), 'ONLINE_INTERVAL' => 180);
 				if ($bIntranetEnable)
 					$arExtParams['SELECT'] = array('UF_DEPARTMENT');
 
@@ -430,7 +430,7 @@ class CAllIMContactList
 
 					$cache_id = 'im_user_sg_'.$USER->GetID();
 					$obSGCache = new CPHPCache;
-					$cache_dir = '/bx/im/sonet';
+					$cache_dir = '/bx/imc/sonet';
 
 					if($obSGCache->InitCache($ttl, $cache_id, $cache_dir))
 					{
@@ -588,7 +588,7 @@ class CAllIMContactList
 			if ($cache_ttl <= 0)
 				$cache_ttl = defined("BX_COMP_MANAGED_CACHE") ? 18144000 : 1800;
 			$cache_id = 'bx_mob_recent_list3_'.(is_object($USER)? $USER->GetID(): 'AGENT').'_'.$arFilter['ID'].'_'.$nameTemplate.'_'.$nameTemplateSite.'_'.$getDepartment.'_'.LANGUAGE_ID;
-			$cache_dir = '/bx/im/rec';
+			$cache_dir = '/bx/imc/rec';
 
 			if($obCache->InitCache($cache_ttl, $cache_id, $cache_dir))
 			{
@@ -618,7 +618,7 @@ class CAllIMContactList
 			}
 		}
 
-		$arSelect = array('FIELDS' => array("ID", "LAST_NAME", "NAME", "LOGIN", "PERSONAL_PHOTO", "SECOND_NAME", "IS_ONLINE", "PERSONAL_BIRTHDAY", "PERSONAL_GENDER"));
+		$arSelect = array('FIELDS' => array("ID", "LAST_NAME", "NAME", "LOGIN", "PERSONAL_PHOTO", "SECOND_NAME", "IS_ONLINE", "PERSONAL_BIRTHDAY", "PERSONAL_GENDER"), 'ONLINE_INTERVAL' => 180);
 		if($bIntranetEnable && $getDepartment)
 			$arSelect['SELECT'] = array('UF_DEPARTMENT');
 
@@ -735,7 +735,7 @@ class CAllIMContactList
 		}
 
 		global $USER;
-		if(!isset($arFilter['ID']) && !IsModuleInstalled('intranet') && is_object($USER))
+		if(!isset($arParams['ID']) && !IsModuleInstalled('intranet') && is_object($USER))
 		{
 			$arID[] = $USER->GetID();
 			if (CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
@@ -753,7 +753,7 @@ class CAllIMContactList
 		}
 
 		$arUsers = Array();
-		$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '120'), array('FIELDS' => array("ID")));
+		$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
 		while ($arUser = $dbUsers->GetNext(false, false))
 		{
 			if (!empty($arID) && !in_array($arUser["ID"], $arID))
@@ -808,11 +808,11 @@ class CAllIMContactList
 		$sqlDateFunction = 'NULL';
 		$dbType = strtolower($DB->type);
 		if ($dbType== "mysql")
-			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 120 SECOND)";
+			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 180 SECOND)";
 		else if ($dbType == "mssql")
-			$sqlDateFunction = "dateadd(SECOND, -120, getdate())";
+			$sqlDateFunction = "dateadd(SECOND, -180, getdate())";
 		else if ($dbType == "oracle")
-			$sqlDateFunction = "SYSDATE-(1/24/60/60*120)";
+			$sqlDateFunction = "SYSDATE-(1/24/60/60*180)";
 
 		$DB->Query("UPDATE b_user SET LAST_ACTIVITY_DATE = ".$sqlDateFunction." WHERE ID = ".$userId);
 
@@ -824,12 +824,7 @@ class CAllIMContactList
 
 	public static function SetCurrentTab($userId)
 	{
-		$userId = intval($userId);
-		if (intval($userId)<=0)
-			$userId = null;
-		CUserOptions::SetOption('IM', 'currentTab', $userId);
-
-		return true;
+		return CIMMessenger::SetCurrentTab($userId);
 	}
 
 	public static function UpdateRecent($entityId, $messageId, $isChat = false, $userId = false)
@@ -845,8 +840,8 @@ class CAllIMContactList
 			if ($userId == $entityId)
 				return false;
 
-			$userId = intval($userId);
-			$sqlUserId = 'USER_ID = '.($userId<=0? $GLOBALS['USER']->GetID(): $userId).' AND';
+			$userId = $userId<=0? intval($GLOBALS['USER']->GetID()): intval($userId);
+			$sqlUserId = 'USER_ID = '.($userId).' AND';
 		}
 
 		global $DB;
@@ -860,7 +855,7 @@ class CAllIMContactList
 		if (!$isChat)
 		{
 			$obCache = new CPHPCache();
-			$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($userId));
+			$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($userId));
 			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_MESSAGE);
 		}
 		else
@@ -869,7 +864,7 @@ class CAllIMContactList
 			$arRel = CIMChat::GetRelationById($entityId);
 			foreach ($arRel as $rel)
 			{
-				$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($rel['USER_ID']));
+				$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($rel['USER_ID']));
 				CIMMessenger::SpeedFileDelete($rel['USER_ID'], IM_SPEED_GROUP);
 			}
 		}
@@ -902,7 +897,7 @@ class CAllIMContactList
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		$obCache = new CPHPCache();
-		$obCache->CleanDir('/bx/im/rec'.CIMMessenger::GetCachePath($userId));
+		$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($userId));
 
 		return true;
 	}
@@ -913,9 +908,7 @@ class CAllIMContactList
 
 		$bLoadUnreadMessage = isset($arParams['LOAD_UNREAD_MESSAGE']) && $arParams['LOAD_UNREAD_MESSAGE'] == 'Y'? true: false;
 		$bTimeZone = isset($arParams['USE_TIME_ZONE']) && $arParams['USE_TIME_ZONE'] == 'N'? false: true;
-
-		// Convert old version, if needed
-		CIMConvert::RecentList();
+		$bSmiles = isset($arParams['USE_SMILES']) && $arParams['USE_SMILES'] == 'N'? false: true;
 
 		$nameTemplate = COption::GetOptionString("im", "user_name_template", "#LAST_NAME# #NAME#", SITE_ID);
 		$nameTemplateSite = CSite::GetNameFormat(false);
@@ -927,7 +920,7 @@ class CAllIMContactList
 
 		$cache_ttl = 2592000;
 		$cache_id = $GLOBALS['USER']->GetID();
-		$cache_dir = '/bx/im/rec'.CIMMessenger::GetCachePath($cache_id);
+		$cache_dir = '/bx/imc/rec'.CIMMessenger::GetCachePath($cache_id);
 		$obCache = new CPHPCache();
 		if($obCache->InitCache($cache_ttl, $cache_id, $cache_dir))
 		{
@@ -942,7 +935,7 @@ class CAllIMContactList
 			$strSql = "
 				SELECT
 					R.ITEM_TYPE, R.ITEM_ID,
-					R.ITEM_MID M_ID, M.AUTHOR_ID M_AUTHOR_ID, M.MESSAGE M_MESSAGE, ".$DB->DateToCharFunction('M.DATE_CREATE')." M_DATE_CREATE,
+					R.ITEM_MID M_ID, M.AUTHOR_ID M_AUTHOR_ID, M.MESSAGE M_MESSAGE, ".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." M_DATE_CREATE,
 					C.TITLE C_TITLE, C.AUTHOR_ID C_OWNER_ID,
 					U.LOGIN, U.NAME, U.LAST_NAME, U.PERSONAL_PHOTO, U.SECOND_NAME, U.PERSONAL_BIRTHDAY, U.PERSONAL_GENDER
 				FROM
@@ -957,12 +950,11 @@ class CAllIMContactList
 			$toDelete = Array();
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 255;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => "N", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => ($bSmiles? "Y": "N"), "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arRes = $dbRes->GetNext(true, false))
 			{
 				$arRes['ITEM_TYPE'] = trim($arRes['ITEM_TYPE']);
-				$arRes['M_DATE_CREATE'] = MakeTimeStamp($arRes['M_DATE_CREATE']);
 				if ($arRes['M_DATE_CREATE']+2592000 < time())
 				{
 					$toDelete[$arRes['ITEM_TYPE']][] = $arRes['ITEM_ID'];
@@ -976,10 +968,10 @@ class CAllIMContactList
 						'id' => $arRes['M_ID'],
 						'senderId' => $arRes['M_AUTHOR_ID'],
 						'date' => $arRes['M_DATE_CREATE'],
-						'text' => $CCTP->convertText($arRes['M_MESSAGE'])
+						'text' => $CCTP->convertText(preg_replace("/\[s\].*?\[\/s\]/i", "", $arRes['M_MESSAGE']))
 					)
 				);
-				$item['MESSAGE']['text'] = preg_replace("/------------------------------------------------------(.*)------------------------------------------------------/mi", " [".GetMessage('IM_QUOTE')."] ", strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" ", " ", " ", " "), $item['MESSAGE']['text'])));
+				$item['MESSAGE']['text'] = preg_replace("/------------------------------------------------------(.*)------------------------------------------------------/mi", " [".GetMessage('IM_QUOTE')."] ", strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), $item['MESSAGE']['text']), "<img>"));
 				if ($arRes['ITEM_TYPE'] == IM_MESSAGE_PRIVATE)
 				{
 					$arUsers[] = $arRes['ITEM_ID'];
@@ -1044,7 +1036,8 @@ class CAllIMContactList
 				'LOAD_DEPARTMENT' => 'N',
 				'ORDER' => 'ASC',
 				'GROUP_BY_CHAT' => 'Y',
-				'USE_TIME_ZONE' => $bTimeZone? 'Y': 'N'
+				'USE_TIME_ZONE' => $bTimeZone? 'Y': 'N',
+				'USE_SMILES' => $bSmiles? 'Y': 'N'
 			));
 			foreach ($ar['message'] as $data)
 			{
@@ -1059,8 +1052,9 @@ class CAllIMContactList
 					'id' => $data['id'],
 					'senderId' => $data['senderId'],
 					'date' => $data['date'],
-					'text' => $data['text']
+					'text' => preg_replace("/------------------------------------------------------(.*)------------------------------------------------------/mi", " [".GetMessage('IM_QUOTE')."] ", strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" ", " ", " ", " "), $data['text']), "<img>"))
 				);
+
 				$arRecent[$data['senderId']]['COUNTER'] = $data['counter'];
 			}
 
@@ -1072,6 +1066,7 @@ class CAllIMContactList
 				'ORDER' => 'ASC',
 				'GROUP_BY_CHAT' => 'Y',
 				'USER_LOAD' => 'N',
+				'USE_SMILES' => $bSmiles? 'Y': 'N',
 				'USE_TIME_ZONE' => $bTimeZone? 'Y': 'N'
 			));
 			foreach ($ar['message'] as $data)

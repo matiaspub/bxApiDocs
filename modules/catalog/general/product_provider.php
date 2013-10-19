@@ -125,9 +125,23 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 				return $arResult;
 		}
 
-		if ($arCatalogProduct = CCatalogProduct::GetByID($productID))
+		$rsProducts = CCatalogProduct::GetList(
+		array(),
+		array('ID' => $productID),
+		false,
+		false,
+		array(
+			'ID',
+			'CAN_BUY_ZERO',
+			'QUANTITY_TRACE',
+			'QUANTITY',
+			'WEIGHT',
+			)
+		);
+
+		if ($arCatalogProduct = $rsProducts->Fetch())
 		{
-			if ($arCatalogProduct["CAN_BUY_ZERO"]!="Y" && ($arCatalogProduct["QUANTITY_TRACE"]=="Y" && doubleval($arCatalogProduct["QUANTITY"]) < doubleVal($quantity)))
+			if ('Y' != $arCatalogProduct["CAN_BUY_ZERO"] && 'Y' == $arCatalogProduct["QUANTITY_TRACE"] && 0 >= doubleval($arCatalogProduct["QUANTITY"]))
 				return $arResult;
 		}
 		else
@@ -250,7 +264,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 		{
 			if (!empty($arPrice["PRICE"]["CATALOG_GROUP_ID"]))
 			{
-				$rsCatGroups = CCatalogGroup::GetList(array(),array('ID' => $arPrice["PRICE"]["CATALOG_GROUP_ID"]),false,array('nTopCount' => 1),array('ID','NAME','NAME_LANG'));
+				$rsCatGroups = CCatalogGroup::GetListEx(array(),array('ID' => $arPrice["PRICE"]["CATALOG_GROUP_ID"]),false,false,array('ID','NAME','NAME_LANG'));
 				if ($arCatGroup = $rsCatGroups->Fetch())
 				{
 					$arPrice["PRICE"]["CATALOG_GROUP_NAME"] = (!empty($arCatGroup['NAME_LANG']) ? $arCatGroup['NAME_LANG'] : $arCatGroup['NAME']);
@@ -266,42 +280,32 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 		}
 
 		$arResult = array(
-				"PRODUCT_PRICE_ID" => $arPrice["PRICE"]["ID"],
-				"PRICE" => $currentPrice,
-				"VAT_RATE" => $arPrice['PRICE']['VAT_RATE'],
-				"CURRENCY" => $arPrice["PRICE"]["CURRENCY"],
-				"QUANTITY" => $quantity,
-				"WEIGHT" => 0,
-				"NAME" => $arProduct["~NAME"],
-				"CAN_BUY" => "Y",
-				"DETAIL_PAGE_URL" => $arProduct['DETAIL_PAGE_URL'],
-				"NOTES" => $arPrice["PRICE"]["CATALOG_GROUP_NAME"],
-				"DISCOUNT_PRICE" => $currentDiscount,
-			);
+			"PRODUCT_PRICE_ID" => $arPrice["PRICE"]["ID"],
+			"PRICE" => $currentPrice,
+			"VAT_RATE" => $arPrice['PRICE']['VAT_RATE'],
+			"CURRENCY" => $arPrice["PRICE"]["CURRENCY"],
+			"QUANTITY" => $quantity,
+			"WEIGHT" => intval($arCatalogProduct["WEIGHT"]),
+			"NAME" => $arProduct["~NAME"],
+			"CAN_BUY" => "Y",
+			"DETAIL_PAGE_URL" => $arProduct['~DETAIL_PAGE_URL'],
+			"NOTES" => $arPrice["PRICE"]["CATALOG_GROUP_NAME"],
+			"DISCOUNT_PRICE" => $currentDiscount,
+		);
 		if (!empty($arPrice["DISCOUNT_LIST"]))
 		{
 			$arResult["DISCOUNT_VALUE"] = (100*$currentDiscount/($currentDiscount+$currentPrice))."%";
 			$arResult["DISCOUNT_NAME"] = "[".$arPrice["DISCOUNT"]["ID"]."] ".$arPrice["DISCOUNT"]["NAME"];
 			$arResult['DISCOUNT_LIST'] = $arDiscountList;
 
-			if (strlen($arPrice["DISCOUNT"]["COUPON"])>0)
+			if (!empty($arPrice["DISCOUNT"]["COUPON"]))
 			{
 				$arResult["DISCOUNT_COUPON"] = $arPrice["DISCOUNT"]["COUPON"];
 			}
 			if (!empty($arCouponList))
 			{
-				foreach ($arCouponList as &$strOneCoupon)
-				{
-					$mxApply = CCatalogDiscountCoupon::CouponApply($intUserID, $strOneCoupon);
-				}
-				if (isset($strOneCoupon))
-					unset($strOneCoupon);
+				$mxApply = CCatalogDiscountCoupon::CouponApply($intUserID, $arCouponList);
 			}
-		}
-
-		if ($arCatalogProduct)
-		{
-			$arResult["WEIGHT"] = intval($arCatalogProduct["WEIGHT"]);
 		}
 
 		if (0 < $intUserID)
@@ -360,6 +364,10 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 			return $arRes;
 		}
 
+		$disableReservation = (COption::GetOptionString("catalog", "enable_reservation", "Y") == "N"
+			&& COption::GetOptionString("sale", "product_reserve_condition", "O") != "S"
+			&& COption::GetOptionString('catalog','default_use_store_control','N') != "Y") ? true : false;
+
 		if (intval($arParams["UNDO_RESERVATION"]) != "Y")
 			$arParams["UNDO_RESERVATION"] = "N";
 
@@ -375,64 +383,85 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 
 		if ($arProduct = $rsProducts->Fetch())
 		{
-			if ($arProduct["QUANTITY_TRACE"] == "N")
+			if ($disableReservation)
 			{
-				$arRes["RESULT"] = true;
-				$arFields["QUANTITY_RESERVED"] = 0;
 				$startReservedQuantity = 0;
+
+				if ($arParams["UNDO_RESERVATION"] != "Y")
+					$arFields = array("QUANTITY" => $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"]);
+				else
+					$arFields = array("QUANTITY" => $arProduct["QUANTITY"] + $arParams["QUANTITY_ADD"]);
+
+				$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
 			}
 			else
 			{
-				$startReservedQuantity = $arProduct["QUANTITY_RESERVED"];
-
-				if ($arParams["UNDO_RESERVATION"] == "N")
+				if ($arProduct["QUANTITY_TRACE"] == "N" || (isset($arParams["ORDER_DEDUCTED"]) && $arParams["ORDER_DEDUCTED"] == "Y"))
 				{
-					if ($arProduct["CAN_BUY_ZERO"] == "Y")
-					{
-						$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] + $arParams["QUANTITY_ADD"];
+					$arRes["RESULT"] = true;
+					$arFields["QUANTITY_RESERVED"] = 0;
+					$startReservedQuantity = 0;
+				}
+				else
+				{
+					$startReservedQuantity = $arProduct["QUANTITY_RESERVED"];
 
-						if ($arProduct["NEGATIVE_AMOUNT_TRACE"] == "Y")
-						{
-							//reserve value, quantity will be negative
-							$arFields["QUANTITY"] = $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"];
-						}
-						else
-						{
-							$arFields["QUANTITY"] = 0;
-						}
-
-						$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
-					}
-					else //CAN_BUY_ZERO = N
+					if ($arParams["UNDO_RESERVATION"] == "N")
 					{
-						if ($arProduct["QUANTITY"] >= $arParams["QUANTITY_ADD"])
+						if ($arProduct["CAN_BUY_ZERO"] == "Y")
 						{
-							$arFields["QUANTITY"] = $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"];
 							$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] + $arParams["QUANTITY_ADD"];
+
+							if ($arProduct["QUANTITY"] >= $arParams["QUANTITY_ADD"])
+							{
+								$arFields["QUANTITY"] = $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"];
+							}
+							elseif ($arProduct["QUANTITY"] < $arParams["QUANTITY_ADD"])
+							{
+								if ($arProduct["NEGATIVE_AMOUNT_TRACE"] == "Y")
+								{
+									//reserve value, quantity will be negative
+									$arFields["QUANTITY"] = $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"];
+								}
+								else
+								{
+									$arFields["QUANTITY"] = 0;
+								}
+							}
+
+							$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
 						}
-						elseif ($arProduct["QUANTITY"] < $arParams["QUANTITY_ADD"])
+						else //CAN_BUY_ZERO = N
 						{
-							//reserve only possible value, quantity = 0
+							if ($arProduct["QUANTITY"] >= $arParams["QUANTITY_ADD"])
+							{
+								$arFields["QUANTITY"] = $arProduct["QUANTITY"] - $arParams["QUANTITY_ADD"];
+								$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] + $arParams["QUANTITY_ADD"];
+							}
+							elseif ($arProduct["QUANTITY"] < $arParams["QUANTITY_ADD"])
+							{
+								//reserve only possible value, quantity = 0
 
-							$arRes["QUANTITY_NOT_RESERVED"] = $arParams["QUANTITY_ADD"] - $arProduct["QUANTITY"];
+								$arRes["QUANTITY_NOT_RESERVED"] = $arParams["QUANTITY_ADD"] - $arProduct["QUANTITY"];
 
-							$arFields["QUANTITY"] = 0;
-							$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] + $arProduct["QUANTITY"];
+								$arFields["QUANTITY"] = 0;
+								$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] + $arProduct["QUANTITY"];
 
-							$GLOBALS["APPLICATION"]->ThrowException(GetMessage("RSRV_QUANTITY_NOT_ENOUGH_ERROR", self::GetProductCatalogInfo($arParams["PRODUCT_ID"])), "ERROR_NOT_ENOUGH_QUANTITY");
+								$GLOBALS["APPLICATION"]->ThrowException(GetMessage("RSRV_QUANTITY_NOT_ENOUGH_ERROR", self::GetProductCatalogInfo($arParams["PRODUCT_ID"])), "ERROR_NOT_ENOUGH_QUANTITY");
+							}
+
+							$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
 						}
+					}
+					else //undo reservation
+					{
+						$arFields["QUANTITY"] = $arProduct["QUANTITY"] + $arParams["QUANTITY_ADD"];
+						$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] - $arParams["QUANTITY_ADD"];
 
 						$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
 					}
-				}
-				else //undo reservation
-				{
-					$arFields["QUANTITY"] = $arProduct["QUANTITY"] + $arParams["QUANTITY_ADD"];
-					$arFields["QUANTITY_RESERVED"] = $arProduct["QUANTITY_RESERVED"] - $arParams["QUANTITY_ADD"];
-
-					$arRes["RESULT"] = CCatalogProduct::Update($arParams["PRODUCT_ID"], $arFields);
-				}
-			} //quantity trace
+				} //quantity trace
+			}
 		} //product found
 		else
 		{
@@ -460,6 +489,16 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 		$arFields = array();
 
 		$strUseStoreControl = COption::GetOptionString('catalog','default_use_store_control','N');
+
+		$disableReservation = (COption::GetOptionString("catalog", "enable_reservation", "Y") == "N"
+			&& COption::GetOptionString("sale", "product_reserve_condition", "O") != "S"
+			&& $strUseStoreControl != "Y") ? true : false;
+
+		if ($disableReservation)
+		{
+			$arRes["RESULT"] = true;
+			return $arRes;
+		}
 
 		if (intval($arParams["PRODUCT_ID"]) <= 0)
 		{
@@ -490,7 +529,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 			array('ID' => $arParams["PRODUCT_ID"]),
 			false,
 			false,
-			array('ID', 'QUANTITY', 'QUANTITY_RESERVED')
+			array('ID', 'QUANTITY', 'QUANTITY_RESERVED', 'QUANTITY_TRACE')
 		);
 
 		if ($arProduct = $rsProducts->Fetch())
@@ -895,7 +934,7 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 			return array();
 
 		$dbProduct = CIBlockElement::GetList(array(), array("ID" => $productID), false, false, array('ID', 'IBLOCK_ID', 'NAME'));
-		if ($arProduct = $dbProduct->GetNext())
+		if ($arProduct = $dbProduct->Fetch())
 		{
 			if ($arProduct["IBLOCK_ID"] > 0)
 				$arProduct["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arProduct["IBLOCK_ID"], $productID);
@@ -907,5 +946,4 @@ class CCatalogProductProvider implements IBXSaleProductProvider
 		);
 	}
 }
-
 ?>

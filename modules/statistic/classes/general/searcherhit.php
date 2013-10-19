@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CSearcherHit</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">хитах поисковых систем</a> (проиндекированных страниц).
+ * <b>CSearcherHit</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитах поисковых систем</a> (проиндекированных страниц).
  *
  *
  *
@@ -16,18 +16,18 @@ class CSearcherHit
 {
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">хитов поисковых систем</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитов поисковых систем</a>.</p>
 	 *
 	 *
 	 *
 	 *
 	 * @param string &$by = "s_date_hit" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID хита; </li>
 	 * <li> <b>s_site_id</b> - ID сайта; </li> <li> <b>s_date_hit</b> - дата хита; </li> <li> <b>s_searcher_id</b>
-	 * - ID <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search">поисковой системы</a>; </li>
-	 * <li> <b>s_user_agent</b> - <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_useragent">UserAgent
+	 * - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системы</a>; </li>
+	 * <li> <b>s_user_agent</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_useragent">UserAgent
 	 * поисковой системы</a>; </li> <li> <b>s_ip</b> - <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#ip">IP адрес</a> поисковой системы; </li>
-	 * <li> <b>s_url</b> - адрес проиндексированной страницы. </li> </ul>
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#ip">IP адрес</a> поисковой системы;
+	 * </li> <li> <b>s_url</b> - адрес проиндексированной страницы. </li> </ul>
 	 *
 	 *
 	 *
@@ -43,7 +43,7 @@ class CSearcherHit
 	 * <b>SEARCHER_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
 	 * <b>SEARCHER_ID</b> будет искаться вхождение; </li> <li> <b>URL</b>* - адрес
 	 * проиндексированной страницы; </li> <li> <b>URL_404</b> - была ли <a
-	 * href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a> на
+	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на
 	 * проиндексированной странице: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> - не
 	 * была. </li> </ul> </li> <li> <b>SEARCHER</b>* - название поисковой системы; </li> <li>
 	 * <b>SEARCHER_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
@@ -57,7 +57,7 @@ class CSearcherHit
 	 * искаться точное совпадение; </li> <li> <b>SITE_ID</b>* - ID сайта; </li> <li>
 	 * <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
 	 * <b>SITE_ID</b> будет искаться вхождение. </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -97,7 +97,7 @@ class CSearcherHit
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#search_hit">Термин "Хит
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">Термин "Хит
 	 * поисковой системы"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

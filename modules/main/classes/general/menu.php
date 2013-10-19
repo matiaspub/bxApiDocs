@@ -94,7 +94,7 @@ class CMenu
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04708"
-	 * >Меню</a></li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a>
+	 * >Меню</a></li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenu.php">CMain::GetMenu</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
@@ -510,7 +510,7 @@ class CMenu
 
 	
 	/**
-	 * <p>Возвращает HTML представляющий из себя меню. В отличие от функции <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> шаблон меню будет подключаться только один раз.</p> <p class="note">В шаблоне меню, используемом данной функцией, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
+	 * <p>Возвращает HTML представляющий из себя меню. В отличие от функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> шаблон меню будет подключаться только один раз.</p> <p class="note">В шаблоне меню, используемом данной функцией, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
 	 *
 	 *
 	 *
@@ -532,9 +532,9 @@ class CMenu
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04708" >Меню</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
+	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> </li>
+	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -629,9 +629,9 @@ class CMenu
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04708"
 	 * >Меню</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmenu/getmenuhtmlex.php">CMenu::GetMenuHtmlEx</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtmlex.php">CMenu::GetMenuHtmlEx</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *

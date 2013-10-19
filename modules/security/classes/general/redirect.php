@@ -24,22 +24,23 @@ class CSecurityRedirect
 		if($skip_security_check)
 			return;
 
+		/** global CMain $APPLICATION */
 		global $APPLICATION;
 
 		$url_l = str_replace(array("\r", "\n"), "", $url);
-		if(
-			preg_match("/@(?=.*?[\\/?:])/", $url_l, $a)
-			&& !preg_match("/^(http|https|ftp):\\/\\//i", $url_l)
-		)
-		{
-			$url_l = "http://".$url_l;
-		}
 
 		//In case of absolute url will check if server to be redirected is our
 		$bSkipCheck = false;
 		if(preg_match("/^(http|https):\\/\\/(.*?)\\//i", $url_l, $arMatch))
 		{
-			if(defined("SITE_ID"))
+			if(defined("BX24_HOST_NAME"))
+			{
+				$arSite = array(
+					"SERVER_NAME" => BX24_HOST_NAME,
+					"DOMAINS" => ""
+				);
+			}
+			elseif(defined("SITE_ID"))
 			{
 				$rsSite = CSite::GetByID(SITE_ID);
 				$arSite = $rsSite->Fetch();
@@ -55,7 +56,7 @@ class CSecurityRedirect
 				{
 					$bSkipCheck = true;
 				}
-				else
+				elseif($arSite["DOMAINS"])
 				{
 					$arDomains = explode("\n", str_replace("\r", "\n", $arSite["DOMAINS"]));
 					foreach($arDomains as $domain)
@@ -109,7 +110,7 @@ class CSecurityRedirect
 							"SECURITY",
 							"SECURITY_REDIRECT",
 							$APPLICATION->GetCurPage(),
-							"==".base64_encode($url)
+							$url
 					);
 
 				if(COption::GetOptionString("security", "redirect_action") == "show_message")
@@ -157,7 +158,7 @@ class CSecurityRedirect
 				<table cellpadding="0" cellspacing="0">
 					<tbody><tr>
 						<td><div class="icon"></div></td>
-						<td><?echo $html_mess?></td>
+						<td><?=$html_mess?></td>
 					</tr>
 				</tbody></table>
 			</div>
@@ -208,10 +209,10 @@ class CSecurityRedirect
 			$_SESSION["LOCAL_REDIRECTS"] = array("C" => 0, "R" => $_SERVER["HTTP_REFERER"]);
 
 		if(COption::GetOptionString("security", "redirect_href_sign") == "Y")
-			$content = preg_replace_callback("#(<a\\s[^>/]*?href\\s*=\\s*)(['\"])(.+?)(\\2)#i", array("CSecurityRedirect", "ReplaceHREF"), $content);
+			$content = preg_replace_callback("#(<a\\s[^>/]*?href\\s*=\\s*)(['\"])(.+?)(\\2)#i", array("self", "ReplaceHREF"), $content);
 	}
 
-	function ReplaceHREF($matches)
+	protected static function ReplaceHREF($matches)
 	{
 		static $arUrls = false;
 		static $sid = false;
@@ -219,9 +220,9 @@ class CSecurityRedirect
 
 		if(!$arUrls)
 		{
-			$arUrls = CSecurityRedirect::GetUrls();
+			$arUrls = self::GetUrls();
 			$sid = COption::GetOptionString("security", "redirect_sid").$_SERVER["REMOTE_ADDR"];
-			$arDomains = CSecurityRedirect::GetDomains();
+			$arDomains = self::GetDomains();
 			foreach($arDomains as $i => $domain)
 				$arDomains[$i] = preg_quote($domain, "/");
 			$strDomains = "/.*(".implode("|", $arDomains).")$/";
@@ -248,6 +249,10 @@ class CSecurityRedirect
 
 	public static function GetUrls()
 	{
+		/**
+		 * global CDatabase $DB
+		 * global CCacheManager $CACHE_MANAGER
+		 */
 		global $DB, $CACHE_MANAGER;
 		if(CACHED_b_sec_redirect_url !== false)
 		{
@@ -278,6 +283,10 @@ class CSecurityRedirect
 
 	public static function GetDomains()
 	{
+		/**
+		 * global CDatabase $DB
+		 * global CCacheManager $CACHE_MANAGER
+		 */
 		global $DB, $CACHE_MANAGER;
 		if(CACHED_b_lang_domain !== false)
 		{
@@ -345,6 +354,10 @@ class CSecurityRedirect
 
 	public static function Update($arUrls)
 	{
+		/**
+		 * global CDatabase $DB
+		 * global CCacheManager $CACHE_MANAGER
+		 */
 		global $DB, $CACHE_MANAGER;
 
 		if(is_array($arUrls))
@@ -387,6 +400,7 @@ class CSecurityRedirect
 
 	public static function GetList()
 	{
+		/** global CDatabase $DB */
 		global $DB;
 		$res = $DB->Query("SELECT URL, PARAMETER_NAME, IS_SYSTEM from b_sec_redirect_url ORDER BY IS_SYSTEM DESC, SORT ASC");
 		return $res;

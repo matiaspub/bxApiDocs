@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CReferer</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">ссылающихся сайтах</a>.
+ * <b>CReferer</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтах</a>.
  *
  *
  *
@@ -16,7 +16,7 @@ class CReferer
 {
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">ссылающихся сайтов (страниц)</a>.</p>
+	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов (страниц)</a>.</p>
 	 *
 	 *
 	 *
@@ -26,7 +26,7 @@ class CReferer
 	 * <li>при группировке по ссылающейся странице (<i>filter</i>["<b>GROUP</b>"]="U"): <ul>
 	 * <li> <b>s_url_from</b> - ссылающаяся страница; </li> <li> <b>s_quantity</b> - количество
 	 * заходов с ссылающейся страницы; </li> <li> <b>s_average_hits</b> - среднее
-	 * количество <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#hit">хитов</a>,
+	 * количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>,
 	 * производимое посетителями заходящими с той или ссылающейся
 	 * страницы. </li> </ul> </li> <li>при группировке по ссылающемуся домену
 	 * (<i>filter</i>["<b>GROUP</b>"]="S"): <ul> <li> <b>s_url_from</b> - ссылающийся домен; </li> <li>
@@ -65,14 +65,14 @@ class CReferer
 	 * <b>FROM</b> будет искаться точное совпадение; </li> <li> <b>TO</b>* - страница на
 	 * которую пришли; </li> <li> <b>TO_EXACT_MATCH</b> - если значение равно "Y", то при
 	 * фильтрации по <b>TO</b> будет искаться точное совпадение; </li> <li>
-	 * <b>TO_404</b> - была ли <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#404">404 ошибка</a>
+	 * <b>TO_404</b> - была ли <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a>
 	 * на странице, на которую пришли, возможные значения: <ul> <li> <b>Y</b> -
 	 * была; </li> <li> <b>N</b> - не была. </li> </ul> </li> <li> <b>SITE_ID</b> - ID сайта на который
 	 * пришли; </li> <li> <b>GROUP</b> - группировка результирующего списка;
 	 * возможные значения: <ul> <li> <b>S</b> - группировка по ссылающемуся
 	 * домену (сайту); </li> <li> <b>U</b> - группировка по ссылающейся странице.
 	 * </li> </ul> </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложная логика</a>
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	 *
 	 *
 	 *
@@ -130,7 +130,7 @@ class CReferer
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/statistic/terms.php#referer">Термин "Ссылающийся
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">Термин "Ссылающийся
 	 * сайт (страница)"</a> </li> </ul><a name="examples"></a>
 	 *
 	 *

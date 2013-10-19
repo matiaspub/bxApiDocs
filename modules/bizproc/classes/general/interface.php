@@ -56,7 +56,7 @@ interface IBPWorkflowDocument
 	*/
 	
 	/**
-	 * <p>Метод возвращает свойства (поля) документа в виде ассоциативного массива вида </p> <pre class="syntax">array(<br> код_свойства =&gt; значение,<br> ...<br>)<br></pre> Определены все свойства, которые возвращает метод <a href="http://dev.1c-bitrix.ruapi_help/bizproc/interface/IBPWorkflowDocument/GetDocumentFields.php">GetDocumentFields</a>. <p></p>
+	 * <p>Метод возвращает свойства (поля) документа в виде ассоциативного массива вида </p> <pre class="syntax">array(<br> код_свойства =&gt; значение,<br> ...<br>)<br></pre> Определены все свойства, которые возвращает метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentFields.php">GetDocumentFields</a>. <p></p>
 	 *
 	 *
 	 *
@@ -88,7 +88,7 @@ interface IBPWorkflowDocument
 	*/
 	
 	/**
-	 * <p>Метод возвращает массив свойств (полей), которые имеет документ данного типа. Метод <a href="http://dev.1c-bitrix.ruapi_help/bizproc/interface/IBPWorkflowDocument/GetDocument.php">GetDocument</a> возвращает значения свойств для заданного документа. Возвращаемый массив имеет вид </p> <pre class="syntax">array(<br> код_свойства =&gt; array(<br> "NAME" =&gt; название_свойства,<br> "TYPE" =&gt; тип_свойства<br> ), <br> ...<br>)<br></pre> <p></p>
+	 * <p>Метод возвращает массив свойств (полей), которые имеет документ данного типа. Метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocument.php">GetDocument</a> возвращает значения свойств для заданного документа. Возвращаемый массив имеет вид </p> <pre class="syntax">array(<br> код_свойства =&gt; array(<br> "NAME" =&gt; название_свойства,<br> "TYPE" =&gt; тип_свойства<br> ), <br> ...<br>)<br></pre> <p></p>
 	 *
 	 *
 	 *
@@ -132,7 +132,7 @@ interface IBPWorkflowDocument
 	 * @param array $arFields  Массив значений свойств документа в виде <pre class="syntax">array(<br>
 	 * код_свойства =&gt; значение,<br> ...<br>)<br></pre> Коды свойств
 	 * соответствуют кодам свойств, возвращаемым методом <a
-	 * href="http://dev.1c-bitrix.ruapi_help/bizproc/interface/IBPWorkflowDocument/GetDocumentFields.php">GetDocumentFields</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentFields.php">GetDocumentFields</a>.
 	 *
 	 *
 	 *
@@ -487,7 +487,7 @@ interface IBPWorkflowDocument
 	*/
 	
 	/**
-	 * <p>Метод возвращает массив произвольной структуры, содержащий всю информацию о документе. По этому массиву документ восстанавливается методом <a href="http://dev.1c-bitrix.ruapi_help/bizproc/interface/IBPWorkflowDocument/RecoverDocumentFromHistory.php">RecoverDocumentFromHistory</a>.</p>
+	 * <p>Метод возвращает массив произвольной структуры, содержащий всю информацию о документе. По этому массиву документ восстанавливается методом <a href="http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/RecoverDocumentFromHistory.php">RecoverDocumentFromHistory</a>.</p>
 	 *
 	 *
 	 *
@@ -512,7 +512,7 @@ interface IBPWorkflowDocument
 	*/
 	
 	/**
-	 * <p>Метод восстанавливает указанный документ из массива. Массив создается методом <a href="http://dev.1c-bitrix.ruapi_help/bizproc/interface/IBPWorkflowDocument/GetDocumentForHistory.php">GetDocumentForHistory</a>.</p>
+	 * <p>Метод восстанавливает указанный документ из массива. Массив создается методом <a href="http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentForHistory.php">GetDocumentForHistory</a>.</p>
 	 *
 	 *
 	 *

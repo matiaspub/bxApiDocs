@@ -158,7 +158,7 @@ class CAllSaleOrderPropsVariant
 	 *
 	 *
 	 * @return int <p>Возвращается код добавленного варианта значения или <i>false</i> в
-	 * случае ошибки.</p>
+	 * случае ошибки.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__update.c68428cc.php
@@ -227,7 +227,7 @@ class CAllSaleOrderPropsVariant
 	 *
 	 *
 	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p>
+	 * противном случае.</p><br><br>
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__deleteall.d5643ee4.php

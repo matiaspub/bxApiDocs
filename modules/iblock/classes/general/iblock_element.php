@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
+ * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
  *
  *
  *
@@ -24,7 +24,7 @@ class _CIBElement
 	 *
 	 *
 	 *
-	 * @return array <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">полями элемента
+	 * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
 	 * информационного блока</a>
 	 *
 	 *
@@ -43,12 +43,12 @@ class _CIBElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockresult/getnext.php">GetNext()</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#felement">Поля элемента
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">GetNext()</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элемента
 	 * информационного блока </a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul><a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -387,7 +387,7 @@ class _CIBElement
 	 *
 	 *
 	 *
-	 * @return array <a href="http://dev.1c-bitrix.ruapi_help/iblock/fields.php#fproperty">полей
+	 * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">полей
 	 * свойства</a><br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i>
 	 *
 	 *
@@ -459,10 +459,10 @@ class _CIBElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getproperty.php">GetProperty()</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/_cibelement/index.php">_CIBElement</a>::<a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/_cibelement/getproperties.php">GetProperties()</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getproperty.php">GetProperty()</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a>::<a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getproperties.php">GetProperties()</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -483,7 +483,7 @@ class _CIBElement
 	 *
 	 *
 	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>
+	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -494,8 +494,8 @@ class _CIBElement
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/iblock/classes/ciblockelement/getelementgroups.php">CIBlockElement::GetElementGroups</a>
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getelementgroups.php">CIBlockElement::GetElementGroups</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *

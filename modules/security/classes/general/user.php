@@ -60,7 +60,7 @@ class CSecurityUser
 	 * @param bool $pActiveOnly
 	 * @return bool|array
 	 */
-	protected static function getSecurityUserInfo($pUserId, $pActiveOnly = false)
+	public static function getSecurityUserInfo($pUserId, $pActiveOnly = false)
 	{
 		/**	 @global CDataBase $DB */
 		global $DB;

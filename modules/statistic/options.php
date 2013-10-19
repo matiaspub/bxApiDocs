@@ -92,7 +92,7 @@ if ($STAT_RIGHT>="R"):
 			"SEARCHER_DAYS" => Array("SEARCHER_DAYS", GetMessage("STAT_OPT_TIME_SEARCHER_DAYS"), Array("text", 5), "CStatistics::CleanUpSearcherDynamic();","b_stat_searcher_day"),
 
 			6 => GetMessage("STAT_OPT_TIME_GEO_SECTION"),
-			"CITY_DAYS" => Array("COUNTRY_DAYS", GetMessage("STAT_OPT_TIME_CITY_DAYS"), Array("text", 5), "CStatistics::CleanUpCities();","b_stat_city_day"),
+			"CITY_DAYS" => Array("CITY_DAYS", GetMessage("STAT_OPT_TIME_CITY_DAYS"), Array("text", 5), "CStatistics::CleanUpCities();","b_stat_city_day"),
 			"COUNTRY_DAYS" => Array("COUNTRY_DAYS", GetMessage("STAT_OPT_TIME_COUNTRY_DAYS"), Array("text", 5), "CStatistics::CleanUpCountries();","b_stat_country_day"),
 
 			7 => GetMessage("STAT_OPT_TIME_GUEST_SECTION"),
@@ -163,8 +163,8 @@ if ($STAT_RIGHT>="R"):
 				{
 					if (is_array($arOption))
 					{
-						$name=$arOption[0];
-						$val=$$name;
+						$name = $arOption[0];
+						$val = $_REQUEST[$name];
 						$type = $arOption[2][0];
 						if($type=="checkbox" && $val!="Y")
 							$val="N";
@@ -506,8 +506,7 @@ if ($STAT_RIGHT>="R"):
 				</tr>
 				<?
 				$selected = CCity::GetHandler();
-				$rsEvents = GetModuleEvents($module_id, "OnCityLookup");
-				while($arEvent = $rsEvents->Fetch()):
+				foreach (GetModuleEvents($module_id, "OnCityLookup", true) as $arEvent):
 					$ob = ExecuteModuleEventEx($arEvent);
 					$arDescr = $ob->GetDescription();?>
 					<tr>
@@ -517,7 +516,7 @@ if ($STAT_RIGHT>="R"):
 						<td style="text-align:center"><?echo $arDescr["IS_INSTALLED"]? ($arDescr["CAN_LOOKUP_CITY"]? GetMessage("MAIN_YES"): GetMessage("MAIN_NO")): "-"?></td>
 						<td style="text-align:center"><input type="radio" name="IP_LOOKUP_CLASS" value="<?echo $arDescr["CLASS"]?>" <?echo ($arDescr["CLASS"] == $selected? "checked": "")?>></td>
 					</tr>
-				<?endwhile?>
+				<?endforeach?>
 			</table>
 
 			<?

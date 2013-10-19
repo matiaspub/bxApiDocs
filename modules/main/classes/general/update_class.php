@@ -19,7 +19,7 @@ if (!function_exists("file_get_contents"))
 	}
 }
 
-//if (!defined("US_SHARED_KERNEL_PATH"))
+if (!defined("US_SHARED_KERNEL_PATH"))
 	// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 class CUpdateSystem

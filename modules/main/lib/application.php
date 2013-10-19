@@ -425,9 +425,9 @@ abstract class Application
 		// define("BX_CRONTAB_SUPPORT", defined("BX_CRONTAB"));
 
 		if(!defined("BX_FILE_PERMISSIONS"))
-			// define("BX_FILE_PERMISSIONS", 0600);
+			// define("BX_FILE_PERMISSIONS", 0644);
 		if(!defined("BX_DIR_PERMISSIONS"))
-			// define("BX_DIR_PERMISSIONS", 0700);
+			// define("BX_DIR_PERMISSIONS", 0755);
 	}
 
 	/**

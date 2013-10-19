@@ -7,6 +7,8 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 	protected $errno = 0;
 	protected $errstr = '';
 	protected $result = '';
+	protected $verb = '';
+	protected $url = '';
 
 	public function GetLastRequestStatus()
 	{
@@ -107,6 +109,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 
 	public static function _GetToken($host, $user, $key)
 	{
+		global $APPLICATION;
 		static $results = array();
 		$cache_id = "v0|".$host."|".$user."|".$key;
 
@@ -129,8 +132,16 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 				$obRequest->additional_headers["X-Auth-User"] = $user;
 				$obRequest->additional_headers["X-Auth-Key"] = $key;
 				$obRequest->Query("GET", $host, 80, "/v1.0");
+				if($obRequest->status == 412)
+				{
+					$APPLICATION->ResetException();
+					$obRequest = new CHTTP;
+					$obRequest->additional_headers["X-Auth-User"] = $user;
+					$obRequest->additional_headers["X-Auth-Key"] = $key;
+					$obRequest->Query("GET", $host, 80, "/auth/v1.0");
+				}
 
-				if($obRequest->status == 204)
+				if($obRequest->status == 204 || $obRequest->status == 200)
 				{
 					if(preg_match("#^http://(.*?)(|:\d+)(/.*)\$#", $obRequest->headers["X-Storage-Url"], $arStorage))
 					{
@@ -177,10 +188,10 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 		}
 
 		@$obRequest->Query(
-			$verb,
+			$this->verb = $verb,
 			$arToken["X-Storage-Host"],
 			$arToken["X-Storage-Port"],
-			$arToken["X-Storage-Urn"]."/".$bucket.$RequestURI.$params,
+			$this->url = $arToken["X-Storage-Urn"]."/".$bucket.$RequestURI.$params,
 			$content,
 			$arToken["X-Storage-Proto"],
 			$ContentType
@@ -604,7 +615,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			$data
 		);
 
-		if(is_object($obRequest) && $obRequest->result && $this->status == 201)
+		if(is_object($obRequest) && $this->status == 201)
 		{
 			$NS["partsCount"]++;
 			return true;
@@ -632,7 +643,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			)
 		);
 
-		if(is_object($obRequest) && $obRequest->result && $this->status == 201)
+		if(is_object($obRequest) && $this->status == 201)
 		{
 			$obRequest = $this->SendRequest(
 				$arBucket["SETTINGS"],
@@ -647,7 +658,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 				)
 			);
 
-			if(is_object($obRequest) && $obRequest->result && $this->status == 201)
+			if(is_object($obRequest) && $this->status == 201)
 				$result = true;
 			else
 				$result = false;

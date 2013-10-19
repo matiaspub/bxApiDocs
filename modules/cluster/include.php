@@ -1,6 +1,6 @@
 <?
 if(!defined("CACHED_b_cluster_dbnode")) // define("CACHED_b_cluster_dbnode", 360000);
-
+global $DB;
 $db_type = strtolower($DB->type);
 CModule::AddAutoloadClasses(
 	"cluster",

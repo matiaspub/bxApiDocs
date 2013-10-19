@@ -49,7 +49,7 @@ class CSocServTwitter extends CSocServAuth
 				$twUser = $tw->GetUserInfo($arResult["user_id"]);
 
 				$first_name = $last_name = "";
-				if($twUser["name"] <> '')
+				if(is_array($twUser) && ($twUser["name"] <> ''))
 				{
 					$aName = explode(" ", $twUser["name"]);
 					$first_name = $aName[0];
@@ -82,7 +82,7 @@ class CSocServTwitter extends CSocServAuth
 
 		$aRemove = array("logout", "auth_service_error", "auth_service_id", "oauth_token", "oauth_verifier", "check_key", "current_fieldset");
 		$url = $GLOBALS['APPLICATION']->GetCurPageParam(($bSuccess === true ? '' : 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
-		if(CModule::IncludeModule("socialnetwork"))
+		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
 			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
 		echo '
 <script type="text/javascript">
@@ -94,7 +94,7 @@ window.close();
 		die();
 	}
 
-	static public function GetUserMessage($socServUserArray, $sinceId=0)
+	static public function GetUserMessage($socServUserArray, $sinceId = '1')
 	{
 		$result = array();
 		$token = false;
@@ -154,9 +154,9 @@ class CTwitterInterface
 	protected $tokenSecret = false;
 	protected $oauthArray;
 
-	public function __construct($appID, $appSecret, $token=false, $tokenVerifier=false, $tokenSecret=false)
+	public function __construct($appID, $appSecret, $token = false, $tokenVerifier = false, $tokenSecret = false)
 	{
-		$this->httpTimeout = 10;
+		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->token = $token;
@@ -279,25 +279,29 @@ class CTwitterInterface
 			"Content-type" => "application/x-www-form-urlencoded",
 		);
 		$result = @CHTTP::sGetHeader(self::SEARCH_URL."?count=100&include_entities=false&q=".urlencode($hash)."&since_id=".$sinceId, $arHeaders, $this->httpTimeout);
-		if(!defined("BX_UTF"))
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
-		$arResult = CUtil::JsObjectToPhp($result);
-		//if(isset($arResult["search_metadata"]["next_results"]))
-		//	$arTwits = self::GetAllPages($arResult);
-		if(!empty($arTwits) && is_array($arTwits) && is_array($arResult["statuses"]))
-			$arResult["statuses"] = array_merge($arResult["statuses"], $arTwits);
-		if(is_array($arResult["statuses"]))
-			foreach($arResult["statuses"] as $key => $value)
-			{
-				if(!$find = array_search($value["user"]["id_str"], $socServUserArray[0]))
-					unset($arResult["statuses"][$key]);
-				else
+		if($result)
+		{
+			if(!defined("BX_UTF"))
+				$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
+			$arResult = CUtil::JsObjectToPhp($result);
+			//if(isset($arResult["search_metadata"]["next_results"]))
+			//	$arTwits = self::GetAllPages($arResult);
+			if(!empty($arTwits) && is_array($arTwits) && is_array($arResult["statuses"]))
+				$arResult["statuses"] = array_merge($arResult["statuses"], $arTwits);
+			if(is_array($arResult["statuses"]))
+				foreach($arResult["statuses"] as $key => $value)
 				{
-					$arResult["statuses"][$key]["kp_user_id"] = $find;
-					$arResult["statuses"][$key]["user_perms"] = self::GetUserPerms($value["user"]["id_str"]);
+					if(!$find = array_search($value["user"]["id_str"], $socServUserArray[0]))
+						unset($arResult["statuses"][$key]);
+					else
+					{
+						$arResult["statuses"][$key]["kp_user_id"] = $find;
+						$arResult["statuses"][$key]["user_perms"] = self::GetUserPerms($value["user"]["id_str"]);
+					}
 				}
-			}
-		return $arResult;
+			return $arResult;
+		}
+		return false;
 	}
 
 	private function GetAllPages($arResult)
@@ -455,6 +459,9 @@ class CTwitterInterface
 
 	protected function BuildSignature($sigString)
 	{
+		if(!function_exists("hash_hmac"))
+			return null;
+
 		$key = implode('&',
 			$this->urlencode(
 				array(

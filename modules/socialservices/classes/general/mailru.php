@@ -47,7 +47,7 @@ class CSocServMyMailRu extends CSocServAuth
 			{
 				$arMRUser = $gAuth->GetCurrentUser();
 
-				if($arMRUser['0']['uid'] <> '')
+				if(is_array($arMRUser) && ($arMRUser['0']['uid'] <> ''))
 				{
 					$email = $first_name = $last_name = $gender = "";
 					if($arMRUser['0']['first_name'] <> '')
@@ -93,7 +93,7 @@ class CSocServMyMailRu extends CSocServAuth
 				}
 			}
 		}
-		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "/auth/" : $GLOBALS["APPLICATION"]->GetCurDir();
+		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "" : $GLOBALS["APPLICATION"]->GetCurDir();
 		if(isset($_REQUEST["state"]))
 		{
 			$arState = array();
@@ -132,7 +132,7 @@ class CMailRuOAuthInterface
 
 	public function __construct($appID, $appSecret, $code=false)
 	{
-		$this->httpTimeout =10;
+		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->code = $code;

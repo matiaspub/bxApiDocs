@@ -58,6 +58,11 @@ class CAjax
 						$sSrcFile = "/bitrix".substr($sSrcFile, strlen($sRealBitrix));
 						$bSrcFound = true;
 					}
+					elseif(strpos($sSrcFile, substr($sRealBitrix, 0, -6)) === 0)
+					{
+						$sSrcFile = substr($sSrcFile, strlen($sRealBitrix) - 7);
+						$bSrcFound = true;
+					}
 					else
 					{
 						// special hack
@@ -121,7 +126,7 @@ class CAjax
 		return $url;
 	}
 
-	// $text = htmlspecialchars;
+	// $text = htmlspecialchar
 	static function GetLinkEx($real_url, $public_url, $text, $container_id, $additional = '')
 	{
 		if (!$public_url) $public_url = $real_url;
@@ -137,7 +142,7 @@ class CAjax
 		);
 	}
 
-	// $text - no htmlspecialchars
+	// $text - no htmlspecialchar
 	public static function GetLink($url, $text, $container_id, $additional = '')
 	{
 		return CAjax::GetLinkEx($url, false, htmlspecialcharsbx($text), htmlspecialcharsbx($container_id), $additional);

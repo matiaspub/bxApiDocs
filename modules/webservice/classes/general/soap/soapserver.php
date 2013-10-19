@@ -2,7 +2,7 @@
 
 
 /**
- * 
+ * <br><br>
  *
  *
  *
@@ -282,7 +282,7 @@ class CWSSOAPResponser extends CSOAPServerResponser
 
 
 /**
- * 
+ * <br><br>
  *
  *
  *
@@ -296,7 +296,6 @@ class CWSSOAPResponser extends CSOAPServerResponser
  * обработчики SOAP. Обычно SOAP-обработчик создаётся в компоненте, сохраняется в массив в 
  * <b>$arParams["SOAPSERVER_RESPONSER"]</b> и далее, когда включается компонент 
  * webservice.server, выполняется следующий код. 
- * <code>
  * // В компоненте обработчика
  * 
  * // Создаем экземпляр обработчика
@@ -322,7 +321,7 @@ class CWSSOAPResponser extends CSOAPServerResponser
  *     $server-&gt;AddServerResponser($arParams["SOAPSERVER_RESPONSER"][$i]);
  * }
  * 
- * $result = $server-&gt;ProcessRequest();	</code>
+ * $result = $server-&gt;ProcessRequest();
  * </pre>
  *
  *

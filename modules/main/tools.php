@@ -128,7 +128,7 @@ function InputType($strType, $strName, $strValue, $strCmp, $strPrintValue=false,
  */
 
 /**
- * <p>Возвращает HTML код тега &lt;select&gt; (выпадающий список с единственным вариантом выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+ * <p>Возвращает HTML код тега &lt;select&gt; (выпадающий список с единственным вариантом выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
  *
  *
  *
@@ -138,9 +138,9 @@ function InputType($strType, $strName, $strValue, $strCmp, $strPrintValue=false,
  *
  *
  * @param CDBResult $values  Элементы списка. Объект типа <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий набор
- * записей, каждая из которых должна иметь по два: "REFERENCE_ID" (значение
- * элемента списка) и "REFERENCE" (заголовок элемента списка).
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
+ * набор записей, каждая из которых должна иметь по два: "REFERENCE_ID"
+ * (значение элемента списка) и "REFERENCE" (заголовок элемента списка).
  *
  *
  *
@@ -186,7 +186,7 @@ function InputType($strType, $strName, $strValue, $strCmp, $strPrintValue=false,
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -230,7 +230,7 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  */
 
 /**
- * <p>Возвращает HTML код тега &lt;select multiple&gt; (выпадающий список с множественными вариантами выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+ * <p>Возвращает HTML код тега &lt;select multiple&gt; (выпадающий список с множественными вариантами выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
  *
  *
  *
@@ -240,9 +240,9 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  *
  *
  * @param CDBResult $values  Элементы списка. Объект типа <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий набор
- * записей, каждая из которых должна иметь по два: "REFERENCE_ID" (значение
- * элемента списка) и "REFERENCE" (заголовок элемента списка).
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
+ * набор записей, каждая из которых должна иметь по два: "REFERENCE_ID"
+ * (значение элемента списка) и "REFERENCE" (заголовок элемента списка).
  *
  *
  *
@@ -304,7 +304,7 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -419,7 +419,7 @@ function SelectBoxM($strBoxName, $a, $arr, $strDetText = "", $strDetText_selecte
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -535,7 +535,7 @@ function SelectBoxMFromArray($strBoxName, $a, $arr, $strDetText = "", $strDetTex
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectbox.php">SelectBox</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectbox.php">SelectBox</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -643,8 +643,8 @@ function SelectBoxFromArray(
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendardate.php">CalendarDate</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendardate.php">CalendarDate</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -733,8 +733,8 @@ function Calendar($sFieldName, $sFormName="skform", $sFromName="", $sToName="")
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendar.php">Calendar</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendar.php">Calendar</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -819,8 +819,8 @@ function CalendarDate($sFromName, $sFromVal, $sFormName="skform", $size="10", $p
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendar.php">Calendar</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/calendardate.php">CalendarDate</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendar.php">Calendar</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendardate.php">CalendarDate</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -1009,7 +1009,7 @@ function GetNumMonth ($month)
  * следующие обозначения: <ul> <li> <b>YYYY</b> - год </li> <li> <b>MM</b> - месяц </li> <li>
  * <b>DD</b> - день </li> <li> <b>HH</b> - часы </li> <li> <b>MI</b> - минуты </li> <li> <b>SS</b> -
  * секунды </li> </ul> Необязательный параметр. По умолчанию равен
- * константе <a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#format_datetime">
+ * константе <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_datetime">
  * FORMAT_DATETIME</a>, хранящей текущий формат времени сайта или языка (для
  * административной части).
  *
@@ -1074,9 +1074,9 @@ function GetNumMonth ($month)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/converttimestamp.php">ConvertTimeStamp</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/addtotimestamp.php">AddToTimeStamp</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/date/parsedatetime.php">ParseDateTime</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/converttimestamp.php">ConvertTimeStamp</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/addtotimestamp.php">AddToTimeStamp</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/date/parsedatetime.php">ParseDateTime</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -1191,7 +1191,7 @@ function MakeTimeStamp($datetime, $format=false)
  * допустимые в системе, а именно: <ul> <li> <b>YYYY</b> - год </li> <li> <b>MM</b> -
  * месяц </li> <li> <b>DD</b> - день </li> <li> <b>HH</b> - часы </li> <li> <b>MI</b> - минуты </li>
  * <li> <b>SS</b> - секунды</li> </ul> Необязательный параметр. По умолчанию
- * равен константе <a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#format_datetime">
+ * равен константе <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_datetime">
  * FORMAT_DATETIME</a>, хранящей текущий формат времени сайта или языка (для
  * административной части).
  *
@@ -1280,11 +1280,11 @@ function MakeTimeStamp($datetime, $format=false)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
  * </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a> </li>
- * </ul><a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a>
+ * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
+ * </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1374,8 +1374,8 @@ function ParseDateTime($datetime, $format=false)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/converttimestamp.php">ConvertTimeStamp</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li> <li>
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/converttimestamp.php">ConvertTimeStamp</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -1437,9 +1437,9 @@ function AddToTimeStamp($arrAdd, $stmp=false)
  * <ul> <li> <b>YYYY</b> - год </li> <li> <b>MM</b> - месяц </li> <li> <b>DD</b> - день </li> <li> <b>HH</b> -
  * часы </li> <li> <b>MI</b> - минуты </li> <li> <b>SS</b> - секунды </li> </ul>
  * Необязательный параметр. По умолчанию равен константе <a
- * href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#format_datetime"> FORMAT_DATETIME</a>, хранящей
- * текущий формат времени сайта или языка (для административной
- * части).
+ * href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_datetime"> FORMAT_DATETIME</a>,
+ * хранящей текущий формат времени сайта или языка (для
+ * административной части).
  *
  *
  *
@@ -1461,8 +1461,8 @@ function AddToTimeStamp($arrAdd, $stmp=false)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
- * </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/formatdate.php">CDataBase::FormatDate</a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+ * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDataBase::FormatDate</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -1517,11 +1517,11 @@ function ConvertDateTime($datetime, $to_format=false, $from_site=false, $bSearch
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/addtotimestamp.php">AddToTimeStamp</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/dateformattophp.php">CDataBase::DateFormatToPHP</a> </li>
- * </ul><a name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li> <li>
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/addtotimestamp.php">AddToTimeStamp</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php">CDataBase::DateFormatToPHP</a>
+ * </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1641,7 +1641,7 @@ function convertTimeToMilitary ($strTime, $fromFormat = 'H:MI T', $toFormat = 'H
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> </li>
  * </ul><a name="examples"></a>
  *
  *
@@ -1954,7 +1954,7 @@ function FormatDate($format="", $timestamp="", $now=false)
 			break;
 		case "f":
 			if(LANGUAGE_ID == "en")
-				$result .= date($format_part, $timestamp);
+				$result .= date("F", $timestamp);
 			else
 				$result .= GetMessage("MONTH_".date("n", $timestamp));
 			break;
@@ -2586,7 +2586,7 @@ function GetRandomCode($len=8)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/insertspaces.php">InsertSpaces</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/insertspaces.php">InsertSpaces</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -2638,7 +2638,7 @@ function TruncateText($strText, $intLen)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/truncatetext.php">TruncateText</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/truncatetext.php">TruncateText</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -2753,7 +2753,7 @@ function utf8win1251($s)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/tolower.php">ToLower</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/tolower.php">ToLower</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -2817,7 +2817,7 @@ function ToUpper($str, $lang = false)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/toupper.php">ToUpper</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/toupper.php">ToUpper</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -3294,7 +3294,7 @@ function convert_to_mailto($s, $link_class="")
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/htmltotxt.php">HTMLToTxt</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/htmltotxt.php">HTMLToTxt</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -3435,7 +3435,7 @@ function TxtToHTML(
 }
 
 /*********************************
-Конвертация HTML в текст
+Convertation of HTML to text
 *********************************/
 
 
@@ -3473,7 +3473,7 @@ function TxtToHTML(
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/string/txttohtml.php">TxtToHTML</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/string/txttohtml.php">TxtToHTML</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -3604,7 +3604,7 @@ function FormatText($strText, $strTextType="text")
  *
  * <h4>See Also</h4> 
  * <ul><li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/string/htmlspecialcharsback.php">htmlspecialcharsBack</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/string/htmlspecialcharsback.php">htmlspecialcharsBack</a>
  * </li></ul><a name="examples"></a>
  *
  *
@@ -3678,8 +3678,8 @@ function htmlspecialcharsbx($string, $flags=ENT_COMPAT)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php">Права для новых файлов
- * и каталогов</a> </li> </ul><a name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php">Права для новых
+ * файлов и каталогов</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -3719,7 +3719,7 @@ function CheckDirPath($path, $bPermission=true)
  *
  * @param string $to  Абсолютный путь к каталогу, в который надо скопировать. Путь
  * указанный в данном параметре будет предварительно проверен
- * функцией <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/checkdirpath.php">CheckDirPath</a>.
+ * функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/checkdirpath.php">CheckDirPath</a>.
  *
  *
  *
@@ -3761,7 +3761,7 @@ function CheckDirPath($path, $bPermission=true)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/copyfile.php">CFile::CopyFile</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/copyfile.php">CFile::CopyFile</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -3847,7 +3847,7 @@ function CopyDirFiles($path_from, $path_to, $ReWrite = True, $Recursive = False,
  *
  *
  *
- * @param string $path  Путь относительно корня к удаляемому каталогу (файлу).
+ * @param string $path  Путь относительно корня сайта к удаляемому каталогу (файлу).
  *
  *
  *
@@ -3865,8 +3865,8 @@ function CopyDirFiles($path_from, $path_to, $ReWrite = True, $Recursive = False,
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -3951,8 +3951,8 @@ function DeleteDirFilesEx($path)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul><a
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -4015,9 +4015,9 @@ function DeleteDirFiles($frDir, $toDir, $arExept = array())
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a> </li> </ul><a
- * name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a> </li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -4042,7 +4042,7 @@ function GetScriptFileExt()
 	if($FILEMAN_SCRIPT_EXT !== false)
 		return $FILEMAN_SCRIPT_EXT;
 
-	$script_files = COption::GetOptionString("fileman", "~script_files", "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp");
+	$script_files = COption::GetOptionString("fileman", "~script_files", "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp,var");
 	$arScriptFiles = array();
 	foreach(explode(",", strtolower($script_files)) as $ext)
 		if(($e = trim($ext)) != "")
@@ -4192,10 +4192,10 @@ function GetDirectoryIndex($path, $strDirIndex=false)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> </ul>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> </ul>
  *
  *
  * @static
@@ -4239,7 +4239,7 @@ function GetDirIndexArray($strDirIndex=false)
 
 
 /**
- * <p>Возвращает путь к странице относительно корня.</p> <p>В функцию может поступить URL относительно корня с параметрами, в этом случае функция вернет путь к странице без параметров. </p> <p>Если в функцию поступает путь без указания файла, например: <b>/ru/about/</b>, то функция попытается самостоятельно определить индексный файл каталога и если определит его например, как <b>index.php</b>, то в результате вернет значение <b>/ru/about/index.php</b>.</p> <p class="note">Алгоритм определения индексного файла представлен в описании функции <a href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+ * <p>Возвращает путь к странице относительно корня.</p> <p>В функцию может поступить URL относительно корня с параметрами, в этом случае функция вернет путь к странице без параметров. </p> <p>Если в функцию поступает путь без указания файла, например: <b>/ru/about/</b>, то функция попытается самостоятельно определить индексный файл каталога и если определит его например, как <b>index.php</b>, то в результате вернет значение <b>/ru/about/index.php</b>.</p> <p class="note">Алгоритм определения индексного файла представлен в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
  *
  *
  *
@@ -4268,10 +4268,10 @@ function GetDirIndexArray($strDirIndex=false)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/file/getdirindex.php">GetDirIndex</a> </li> </ul>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a>
+ * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a> </li> </ul>
  *
  *
  * @static
@@ -4358,7 +4358,7 @@ function GetFileFromURL($page, $get_index_page=null)
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li></ul><a
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li></ul><a
  * name="examples"></a>
  *
  *
@@ -4518,7 +4518,7 @@ function removeDocRoot($path)
 }
 
 /*********************************************************************
-Языковые файлы
+Language files
 *********************************************************************/
 
 function GetMessageJS($name, $aReplace=false)
@@ -4552,9 +4552,9 @@ function GetMessageJS($name, $aReplace=false)
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/localization/includemodulelangfile.php">IncludeModuleLangFile</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includemodulelangfile.php">IncludeModuleLangFile</a>
  * </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -4624,10 +4624,10 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
 	if($bFirstCall)
 	{
 		$bFirstCall = false;
-		$fname = $_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/user_lang/".LANGUAGE_ID."/lang.php";
-		if(file_exists($fname))
+		$fname = getLocalPath("php_interface/user_lang/".LANGUAGE_ID."/lang.php");
+		if($fname !== false)
 		{
-			$arMess = __IncludeLang($fname, true, true);
+			$arMess = __IncludeLang($_SERVER["DOCUMENT_ROOT"].$fname, true, true);
 			foreach($arMess as $key=>$val)
 				$GLOBALS["MESS"][str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"].$key))] = $val;
 		}
@@ -4647,7 +4647,7 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
 
 
 /**
- * <p>Предназначена для подключения языковых файлов для скриптов лежащих в каталоге текущего шаблона сайта. Как правило используется в [link=89637]компонентах[/link], либо в прологе и/или эпилоге сайта.</p> <p>Алгоритм поиска языкового файла: </p> <ol> <li>Сначала языковой файл будет искаться в каталоге <br><br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Если файл не найден, он будет искаться в каталоге <br><br><b>/bitrix/templates/.default/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Затем если файл не найден, он будет искаться дистрибутиве модуля, т.е. в каталоге <br><br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> </ol> <p>В общем случае, под "<i>относительный путь к скрипту</i>", понимается путь к файлу относительно каталога <b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b>.</p> <p>В частном случае, при подключении компонент, под "<i>относительный путь к скрипту</i>", понимается путь для подключения компонента передаваемый в функцию <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> в качестве первого параметра.</p>
+ * <p>Предназначена для подключения языковых файлов для скриптов лежащих в каталоге текущего шаблона сайта. Как правило используется в [link=89637]компонентах[/link], либо в прологе и/или эпилоге сайта.</p> <p>Алгоритм поиска языкового файла: </p> <ol> <li>Сначала языковой файл будет искаться в каталоге <br><br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Если файл не найден, он будет искаться в каталоге <br><br><b>/bitrix/templates/.default/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Затем если файл не найден, он будет искаться дистрибутиве модуля, т.е. в каталоге <br><br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> </ol> <p>В общем случае, под "<i>относительный путь к скрипту</i>", понимается путь к файлу относительно каталога <b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b>.</p> <p>В частном случае, при подключении компонент, под "<i>относительный путь к скрипту</i>", понимается путь для подключения компонента передаваемый в функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> в качестве первого параметра.</p>
  *
  *
  *
@@ -4679,7 +4679,7 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
  * <h4>See Also</h4> 
  * <ul> <li>[link=89630]Что такое "языковые файлы"[/link] </li> <li>[link=89639]Языковые
  * файлы компонент[/link] </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/localization/includemodulelangfile.php">IncludeModuleLangFile</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includemodulelangfile.php">IncludeModuleLangFile</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -4795,7 +4795,7 @@ function IncludeTemplateLangFile($filepath, $lang=false)
  * <h4>See Also</h4> 
  * <ul> <li>[link=89630]Что такое "языковые файлы"[/link] </li> <li>[link=89617]Языковые
  * файлы модулей[/link] </li> <li> <a
- * href="http://dev.1c-bitrix.ruapi_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
  * </li> </ul><a name="examples"></a>
  *
  *
@@ -4818,7 +4818,7 @@ function IncludeModuleLangFile($filepath, $lang=false, $bReturnArray=false)
 		$module_name = substr($rel_path, 0, $p);
 		$rel_path = substr($rel_path, $p+1);
 		$BX_DOC_ROOT = rtrim(preg_replace("'[\\\\/]+'", "/", $_SERVER["DOCUMENT_ROOT"]), "/ ");
-		$module_path = $BX_DOC_ROOT.BX_ROOT.$module_path.$module_name;
+		$module_path = $BX_DOC_ROOT.getLocalPath($module_path.$module_name);
 	}
 	elseif(strpos($filepath, "/.last_version/") !== false)
 	{
@@ -4862,7 +4862,7 @@ function LangSubst($lang)
 }
 
 /*********************************************************************
-Отладка
+Debugging
 *********************************************************************/
 
 
@@ -5103,7 +5103,7 @@ function mydump($thing, $maxdepth=-1, $depth=0)
 
 
 /**
- * <p>Отсылает по E-Mail сообщение об ошибке.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>ERROR_EMAIL</b>, содержащая E-Mail адрес на который будут отправляться сообщения об ошибках. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>ERROR_EMAIL</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Помимо текста ошибки, в письмо будут включены: </p> <ul> <li> <b>HTTP_GET_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа GET </li> <li> <b>HTTP_POST_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа POST </li> <li> <b>HTTP_COOKIE_VARS</b> - массив переменных хранящихся у посетителя на локальной машине (cookie) </li> <li> <b>HTTP_SERVER_VARS</b> - массив стандартных серверных переменных </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/connect.php">CDataBase::Connect</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> (только для Oracle версии) </li> </ul>
+ * <p>Отсылает по E-Mail сообщение об ошибке.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>ERROR_EMAIL</b>, содержащая E-Mail адрес на который будут отправляться сообщения об ошибках. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>ERROR_EMAIL</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Помимо текста ошибки, в письмо будут включены: </p> <ul> <li> <b>HTTP_GET_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа GET </li> <li> <b>HTTP_POST_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа POST </li> <li> <b>HTTP_COOKIE_VARS</b> - массив переменных хранящихся у посетителя на локальной машине (cookie) </li> <li> <b>HTTP_SERVER_VARS</b> - массив стандартных серверных переменных </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDataBase::Connect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> (только для Oracle версии) </li> </ul>
  *
  *
  *
@@ -5112,7 +5112,7 @@ function mydump($thing, $maxdepth=-1, $depth=0)
  *
  *
  *
- * @param string $module_id = "" <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>,
+ * @param string $module_id = "" <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который сохраняет сообщение.<br>Необязательный параметр, по
  * умолчанию - "".
  *
@@ -5160,7 +5160,7 @@ function SendError($error)
 
 
 /**
- * <p>Функция добавляет новую запись в log-файл.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>LOG_FILENAME</b>, содержащая абсолютный путь к log-файлу. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>LOG_FILENAME</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> </ul> <p class="note">Log-файл накапливает все добавленные в него сообщения. Для очистки log-файла его можно просто удалить с диска.</p> <p class="note">Существует возможность записывать в отдельный отладочный файл все запросы к базе данных и время их выполнения, для этого необходимо инициализировать <a href="http://dev.1c-bitrix.ruapi_help/main/general/magic_vars.php#dbdebugtofile">переменную $DBDebugToFile</a>, значением "true" в файле <b>/bitrix/php_interface/dbconn.php</b>.</p>
+ * <p>Функция добавляет новую запись в log-файл.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>LOG_FILENAME</b>, содержащая абсолютный путь к log-файлу. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>LOG_FILENAME</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> </ul> <p class="note">Log-файл накапливает все добавленные в него сообщения. Для очистки log-файла его можно просто удалить с диска.</p> <p class="note">Существует возможность записывать в отдельный отладочный файл все запросы к базе данных и время их выполнения, для этого необходимо инициализировать <a href="http://dev.1c-bitrix.ru/api_help/main/general/magic_vars.php#dbdebugtofile">переменную $DBDebugToFile</a>, значением "true" в файле <b>/bitrix/php_interface/dbconn.php</b>.</p>
  *
  *
  *
@@ -5169,7 +5169,7 @@ function SendError($error)
  *
  *
  *
- * @param string $module_id = "" <a href="http://dev.1c-bitrix.ruapi_help/main/general/identifiers.php">Идентификатор модуля</a>,
+ * @param string $module_id = "" <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который сохраняет сообщение.<br>Необязательный параметр, по
  * умолчанию - "".
  *
@@ -5200,7 +5200,7 @@ function SendError($error)
  *
  *
  * <h4>See Also</h4> 
- * <br><a href="http://dev.1c-bitrix.ruapi_help/main/general/magic_vars.php#dbdebug">Специальные
+ * <br><a href="http://dev.1c-bitrix.ru/api_help/main/general/magic_vars.php#dbdebug">Специальные
  * переменные включающие отладку</a><a name="examples"></a>
  *
  *
@@ -5212,6 +5212,10 @@ function AddMessage2Log($sText, $sModule = "", $traceDepth = 6, $bShowArgs = fal
 {
 	if (defined("LOG_FILENAME") && strlen(LOG_FILENAME)>0)
 	{
+		if(!is_string($sText))
+		{
+			$sText = var_export($sText, true);
+		}
 		if (strlen($sText)>0)
 		{
 			ignore_user_abort(true);
@@ -5426,7 +5430,7 @@ function UnQuoteAll()
 }
 
 /*********************************************************************
-Прочие функции
+Other functions
 *********************************************************************/
 
 /**
@@ -5794,7 +5798,8 @@ function IsIE()
  *
  * @param string $language_id = LANGUAGE_ID Идентификатор языка в котором необходимо вернуть название
  * страны.<br>Необязательный параметр. По умолчанию - <a
- * href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий язык).
+ * href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий
+ * язык).
  *
  *
  *
@@ -5821,14 +5826,15 @@ function GetCountryByID($id, $lang=LANGUAGE_ID)
 
 
 /**
- * <p>Возвращает массив стран с названиями на заданном языке. Формат возвращаемого массива позволяет его использовать в функциях <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, <a href="http://dev.1c-bitrix.ruapi_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a> без предварительной подготовки.</p> <p class="note">Массив стран задается в файлах <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
+ * <p>Возвращает массив стран с названиями на заданном языке. Формат возвращаемого массива позволяет его использовать в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a> без предварительной подготовки.</p> <p class="note">Массив стран задается в файлах <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
  *
  *
  *
  *
  * @param string $language_id = LANGUAGE_ID Идентификатор языка в котором необходимо вернуть названия
  * стран.<br>Необязательный параметр. По умолчанию - <a
- * href="http://dev.1c-bitrix.ruapi_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий язык).
+ * href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий
+ * язык).
  *
  *
  *
@@ -6484,17 +6490,21 @@ function check_email($email, $bStrict=false)
 			$email = $arr[1];
 	}
 
+	//http://tools.ietf.org/html/rfc2821#section-4.5.3.1
+	//4.5.3.1. Size limits and minimums
 	if(strlen($email) > 320)
 	{
-		//http://tools.ietf.org/html/rfc2821#section-4.5.3.1
-		//4.5.3.1. Size limits and minimums
 		return false;
 	}
 
-	if(preg_match("#^[=_.0-9a-z+~'!\$&*^`|\\#%/?{}-]+@(([-0-9a-z_]+\\.)+)([a-z0-9-]{2,10})$#i", $email))
+	//http://tools.ietf.org/html/rfc2822#section-3.2.4
+	//3.2.4. Atom
+	static $atom = "=_0-9a-z+~'!\$&*^`|\\#%/?{}-";
+
+	//"." can't be in the beginning or in the end of local-part
+	//dot-atom-text = 1*atext *("." 1*atext)
+	if(preg_match("#^[".$atom."]+(\\.[".$atom."]+)*@(([-0-9a-z_]+\\.)+)([a-z0-9-]{2,10})$#i", $email))
 	{
-		//http://tools.ietf.org/html/rfc2822#section-3.2.4
-		//3.2.4. Atom
 		return true;
 	}
 	else
@@ -6611,6 +6621,170 @@ class CJSCore
 		'use' => CJSCore::USE_ADMIN|CJSCore::USE_PUBLIC
 	));
 	*/
+	
+	/**
+	 * <p>Функция регистрирует собственные расширения.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param my_extensio $n  имя расширения
+	 *
+	 *
+	 *
+	 * @param  $array  Массив параметров расширения: <ul> <li> <b>js</b> - Путь до файла
+	 * расширения;</li> <li> <b>css</b> - Путь до файла css расширения;</li> <li> <b>lang</b> -
+	 * Путь до языкового файла расширения;</li> <li> <b>rel</b> - Список
+	 * "зависимостей". При подключении собственного расширения
+	 * зависимости будут подключены автоматически.</li> <li> <b>skip_core</b> - При
+	 * подключении расширения не требуется подключение <b>core.js</b>.</li> </ul>
+	 *
+	 *
+	 *
+	 * @param j $s  
+	 *
+	 *
+	 *
+	 * @param pat $h  
+	 *
+	 *
+	 *
+	 * @param t $o  
+	 *
+	 *
+	 *
+	 * @param j $s  
+	 *
+	 *
+	 *
+	 * @param my_ex $t  
+	 *
+	 *
+	 *
+	 * @param j $s  
+	 *
+	 *
+	 *
+	 * @param cs $s  
+	 *
+	 *
+	 *
+	 * @param pat $h  
+	 *
+	 *
+	 *
+	 * @param t $o  
+	 *
+	 *
+	 *
+	 * @param cs $s  
+	 *
+	 *
+	 *
+	 * @param my_ex $t  
+	 *
+	 *
+	 *
+	 * @param cs $s  
+	 *
+	 *
+	 *
+	 * @param lan $g  
+	 *
+	 *
+	 *
+	 * @param pat $h  
+	 *
+	 *
+	 *
+	 * @param t $o  
+	 *
+	 *
+	 *
+	 * @param lan $g  
+	 *
+	 *
+	 *
+	 * @param LANGUAGE_I $D  
+	 *
+	 *
+	 *
+	 * @param lan $g  
+	 *
+	 *
+	 *
+	 * @param ph $p  
+	 *
+	 *
+	 *
+	 * @param re $l  
+	 *
+	 *
+	 *
+	 * @param  $Array  
+	 *
+	 *
+	 *
+	 * @param aja $x  
+	 *
+	 *
+	 *
+	 * @param popu $p  
+	 *
+	 *
+	 *
+	 * @param l $s  
+	 *
+	 *
+	 *
+	 * @param skip_cor $e  
+	 *
+	 *
+	 *
+	 * @param  $false  
+	 *
+	 *
+	 *
+	 * @param  $true  
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * &lt;?
+	 * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+	 * $APPLICATION-&gt;SetTitle("Свои расширения");
+	 * 
+	 *    CJSCore::RegisterExt("db_js_demo", Array(
+	 *       "js" =&gt;    "/script_demo.js",
+	 *       "lang" =&gt;   "/lang_js.php",
+	 *       "rel" =&gt;   array('jquery')
+	 *    ));
+	 *    CJSCore::Init(array("db_js_demo"));
+	 * ?&gt;
+	 * &lt;div id="hideBlock" style="display:none;"&gt;
+	 *    &lt;h1&gt;Hello&lt;/h1&gt;
+	 *    &lt;p&gt;text&lt;/p&gt;
+	 * &lt;/div&gt;
+	 * &lt;script&gt;
+	 *    window.BXDEBUG = true;
+	 * BX.ready(function(){
+	 *    BX.PREFIXName('HELLO');
+	 *    //BX.PREFIXName.testJQ('#demo');
+	 * });
+	 * &lt;/script&gt;
+	 * &lt;p id="demo"&gt;click Me&lt;/p&gt;
+	 * &lt;?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?&gt;
+	 * </pre>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/my_extension/index.php
+	 * @author Bitrix
+	 */
 	public static function RegisterExt($name, $arPaths)
 	{
 		if(isset($arPaths['use']))
@@ -6633,6 +6807,48 @@ class CJSCore
 		self::$arRegisteredExt[$name] = $arPaths;
 	}
 
+	
+	/**
+	 * <table width="100%" class="tnormal"><tbody> <tr> <th width="30%">Метод</th> <th>Описание</th> <th width="7%">С версии</th> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/easing.php">BX.easing</a></td> <td>Конструктор.</td> <td>12.5</td> </tr> <tr> <td>BX.easing.prototype.animate</td> <td>Запускает анимацию.</td> <td>12.5</td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/easing_prototype_animateprogress.php">BX.easing.prototype.animateProgress</a></td> <td>Редко используемый метод. Запускает анимацию, но на каждой итерации вместо функции-обработчика <b>step</b>, вызывается функция-обработчик <b>progress</b>.</td> <td>12.5</td> </tr> <tr> <td>BX.easing.prototype.stop(completed)</td> <td>Останавливает анимацию на текущем шаге. Если completed=true, то дополнительно выполнится функция-обработчик окончания анимации.</td> <td>12.5</td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/animation.php">Анимационные функции</a></td> <td>Функции, которые позволяют делать различного вида плавные анимации.</td> <td>12.5</td> </tr> </tbody></table>
+	 *
+	 *
+	 *
+	 *
+	 * @param arra $y  12.5
+	 *
+	 *
+	 *
+	 * @param f $x  12.5
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * var banner = BX("my-banner");
+	 * var easing = new BX.easing({
+	 * 	duration : 500,
+	 * 	start : { height : 0, opacity : 0 },
+	 * 	finish : { height : 100, opacity: 100 },
+	 * 	transition : BX.easing.transitions.quart,
+	 * 	step : function(state){
+	 * 		banner.style.height = state.height + "px";
+	 * 		banner.style.opacity = state.opacity/100;
+	 * 	},
+	 * 	complete : function() {
+	 * 		banner.style.display = "none";
+	 * 	}
+	 * });
+	 * easing.animate();
+	 * </pre>
+	 *
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/index.php
+	 * @author Bitrix
+	 */
 	public static function Init($arExt = array(), $bReturn = false)
 	{
 		global $USER;
@@ -7622,24 +7838,46 @@ class CHTTP
 
 	public function Post($url, $arPostData)
 	{
-		$postdata = '';
-		if (is_array($arPostData))
-		{
-			foreach ($arPostData as $k => $v)
-			{
-				if (strlen($postdata) > 0)
-				{
-					$postdata .= '&';
-				}
-				$postdata .= urlencode($k) . '=' . urlencode($v);
-			}
-		}
+		$postdata = CHTTP::PrepareData($arPostData);
 
 		if($this->HTTPQuery('POST', $url, $postdata))
 		{
 			return $this->result;
 		}
 		return false;
+	}
+
+	public static function PrepareData($arPostData, $prefix = '')
+	{
+		$str = '';
+
+		if(!is_array($arPostData))
+		{
+			$str = $arPostData;
+		}
+		else
+		{
+			foreach ($arPostData as $key => $value)
+			{
+				$name = $prefix == "" ? urlencode($key) : $prefix."[".urlencode($key)."]";
+
+				if(is_array($value))
+				{
+					$str .= CHTTP::PrepareData($value, $name);
+				}
+				else
+				{
+					$str .= '&'.$name.'='.urlencode($value);
+				}
+			}
+		}
+
+		if($prefix == '' && substr($str, 0, 1) == '&')
+		{
+			$str = substr($str, 1);
+		}
+
+		return $str;
 	}
 
 	public function HTTPQuery($method, $url, $postdata = '')
@@ -7691,7 +7929,7 @@ class CHTTP
 		return true;
 	}
 
-	public function Query($method, $host, $port, $path, $postdata = false, $proto = '', $post_content_type = 'N')
+	public function Query($method, $host, $port, $path, $postdata = false, $proto = '', $post_content_type = 'N', $dont_wait_answer = false)
 	{
 		$this->status = 0;
 		$this->result = '';
@@ -7735,6 +7973,12 @@ class CHTTP
 					fwrite($fp, $postdata);
 				}
 				fwrite($fp, "\r\n");
+			}
+
+			if ($dont_wait_answer)
+			{
+				fclose($fp);
+				return true;
 			}
 
 			$headers = "";
@@ -8206,7 +8450,7 @@ class CHTTP
 			$uri = substr($uri, 0, $pos);
 
 		$uri = trim($uri);
-		return preg_match("#(?:/|2f|^|\\\\|5c)(?:(?:%0*(25)*2e)|\.){2,}(?:/|%0*(25)*2f|\\\\|%0*(25)*5c|$)#", $uri) ? true : false;
+		return preg_match("#(?:/|2f|^|\\\\|5c)(?:(?:%0*(25)*2e)|\.){2,}(?:/|%0*(25)*2f|\\\\|%0*(25)*5c|$)#i", $uri) ? true : false;
 	}
 }
 
@@ -8464,7 +8708,7 @@ function CheckSerializedData($str, $max_depth = 200)
  *
  *
  * <h4>See Also</h4> 
- * <li> <a href="http://ru2.php.net/manual/en/function.mail.php">mail</a> <br><br> </li>
+ * <li> <a href="http://ru2.php.net/manual/en/function.mail.php">mail</a> <br><br> </li><br><br>
  *
  *
  * @static

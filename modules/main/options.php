@@ -1,13 +1,29 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
+/**
+ * Bitrix vars
+ * @global CUser $USER
+ * @global CMain $APPLICATION
+ * @global CDatabase $DB
+ */
+
 IncludeModuleLangFile(__FILE__);
 IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/admin/task_description.php");
 
 if(!$USER->CanDoOperation('view_other_settings') && !$USER->CanDoOperation('edit_other_settings'))
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 
+$mid = $_REQUEST["mid"];
+
 $arGROUPS = array();
 $groups = array();
-$z = CGroup::GetList($v1, $v2, array("ACTIVE"=>"Y", "ADMIN"=>"N", "ANONYMOUS"=>"N"));
+$z = CGroup::GetList(($v1=""), ($v2=""), array("ACTIVE"=>"Y", "ADMIN"=>"N", "ANONYMOUS"=>"N"));
 while($zr = $z->Fetch())
 {
 	$ar = array();
@@ -18,7 +34,7 @@ while($zr = $z->Fetch())
 	$groups[$zr["ID"]] = $zr["NAME"]." [".$zr["ID"]."]";
 }
 
-if($_SERVER["REQUEST_METHOD"] == "GET" && $USER->CanDoOperation('edit_other_settings') && $_REQUEST["RestoreDefaults"] <> '' && check_bitrix_sessid())
+if($_SERVER["REQUEST_METHOD"] == "GET" && $USER->IsAdmin() && $_REQUEST["RestoreDefaults"] <> '' && check_bitrix_sessid())
 {
 	$aSaveVal = array(
 		array("NAME"=>"admin_passwordh", "DEF"=>""),
@@ -95,11 +111,11 @@ $arAllOptions = array(
 		Array("optimize_css_files", GetMessage("MAIN_OPTIMIZE_CSS"), "N", Array("checkbox", "Y")),
 		Array("optimize_js_files", GetMessage("MAIN_OPTIMIZE_JS"), "N", Array("checkbox", "Y")),
 		Array("compres_css_js_files", GetMessage("MAIN_COMPRES_CSS_JS"), "N", Array("checkbox", "Y")),
-/*
+
 		GetMessage("MAIN_OPTIMIZE_TRANSLATE_SETTINGS"),
-		Array("translate_key_bing", GetMessage("MAIN_TRANSLATE_KEY_BING"), "", Array("text", 30)),
-		Array("translate_key_bing_hint", "", BeginNote().GetMessage("MAIN_TRANSLATE_KEY_BING_HINT").EndNote(), Array("statichtml", "")),
-*/
+		Array("translate_key_yandex", GetMessage("MAIN_TRANSLATE_KEY_YANDEX"), "", Array("text", 30)),
+		Array("translate_key_yandex_hint", "", BeginNote().GetMessage("MAIN_TRANSLATE_KEY_YANDEX_HINT").EndNote(), Array("statichtml", "")),
+
 		GetMessage("MAIN_OPT_TIME_ZONES"),
 		array("curr_time", GetMessage("MAIN_OPT_TIME_ZONES_LOCAL"), GetMessage("MAIN_OPT_TIME_ZONES_DIFF")." ".date('O')." (".date('Z').")<br>".GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD")." ".(date('I')? GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD_S") : GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD_ST"))."<br>".GetMessage("MAIN_OPT_TIME_ZONES_DIFF_DATE")." ".date('r'), array("statichtml")),
 	),
@@ -228,7 +244,6 @@ $panel .= '</div><a href="javascript:void(0)" class="bx-action-href" onclick="BX
 $arAllOptions["main"][] = GetMessage("main_sett_public_panel");
 $arAllOptions["main"][] = Array("", GetMessage("main_sett_public_panel_show"), $panel, Array("statichtml"));
 
-
 if(CRsaSecurity::Possible())
 {
 	$sec = new CRsaSecurity();
@@ -259,14 +274,15 @@ $arAllOptions["auth"][] = GetMessage("MAIN_OPTION_SESS");
 $arAllOptions["auth"][] = Array("session_expand", GetMessage("MAIN_OPTION_SESS_EXPAND"), "Y", Array("checkbox", "Y"));
 $arAllOptions["auth"][] = Array("session_show_message", GetMessage("MAIN_OPTION_SESS_MESS"), "Y", Array("checkbox", "Y"));
 
-if($REQUEST_METHOD=="POST" && strlen($Update)>0 && ($USER->CanDoOperation('edit_other_settings') && $USER->CanDoOperation('edit_groups')) && check_bitrix_sessid())
+$SET_LICENSE_KEY = "";
+if($_SERVER["REQUEST_METHOD"]=="POST" && strlen($_POST["Update"])>0 && ($USER->CanDoOperation('edit_other_settings') && $USER->CanDoOperation('edit_groups')) && check_bitrix_sessid())
 {
-	if(LICENSE_KEY !== $SET_LICENSE_KEY)
+	if(LICENSE_KEY !== $_POST["SET_LICENSE_KEY"])
 	{
-		$SET_LICENSE_KEY = preg_replace("/[^A-Za-z0-9_.-]/", "", $SET_LICENSE_KEY);
+		$SET_LICENSE_KEY = preg_replace("/[^A-Za-z0-9_.-]/", "", $_POST["SET_LICENSE_KEY"]);
 
 		file_put_contents(
-			$DOCUMENT_ROOT.BX_ROOT."/license_key.php",
+			$_SERVER["DOCUMENT_ROOT"].BX_ROOT."/license_key.php",
 			"<"."? $"."LICENSE_KEY = \"".EscapePHPString($SET_LICENSE_KEY)."\"; ?".">"
 		);
 	}
@@ -278,7 +294,7 @@ if($REQUEST_METHOD=="POST" && strlen($Update)>0 && ($USER->CanDoOperation('edit_
 			__AdmSettingsSaveOption("main", $option);
 		}
 	}
-	COption::SetOptionString("main", "admin_lid", $admin_lid);
+	COption::SetOptionString("main", "admin_lid", $_POST["admin_lid"]);
 	COption::SetOptionString("main", "show_panel_for_users", serialize($_POST["show_panel_for_users"]));
 
 	$cleanup_days = COption::GetOptionInt("main", "new_user_registration_cleanup_days", 7);
@@ -347,16 +363,16 @@ if($REQUEST_METHOD=="POST" && strlen($Update)>0 && ($USER->CanDoOperation('edit_
 		LocalRedirect("/bitrix/admin/settings.php?lang=".LANGUAGE_ID."&mid=".urlencode($mid)."&tabControl_active_tab=".urlencode($_REQUEST["tabControl_active_tab"])."&back_url_settings=".urlencode($_REQUEST["back_url_settings"]));
 }
 
-if(strlen($SET_LICENSE_KEY)<=0)
+if($SET_LICENSE_KEY == "")
 	$SET_LICENSE_KEY = LICENSE_KEY;
 
-if ($REQUEST_METHOD=="POST" && $stop_site=="Y" && $USER->CanDoOperation('edit_other_settings') && check_bitrix_sessid())
+if ($_SERVER["REQUEST_METHOD"]=="POST" && $_POST["stop_site"]=="Y" && $USER->CanDoOperation('edit_other_settings') && check_bitrix_sessid())
 {
 	COption::SetOptionString("main", "site_stopped", "Y");
 	CAdminMessage::ShowNote(GetMessage("MAIN_OPTION_PUBL_CLOSES"));
 }
 
-if ($REQUEST_METHOD=="POST" && $start_site=="Y" && $USER->CanDoOperation('edit_other_settings') && check_bitrix_sessid())
+if ($_SERVER["REQUEST_METHOD"]=="POST" && $_POST["start_site"]=="Y" && $USER->CanDoOperation('edit_other_settings') && check_bitrix_sessid())
 {
 	COption::SetOptionString("main", "site_stopped", "N");
 	CAdminMessage::ShowNote(GetMessage("MAIN_OPTION_PUBL_OPENED"));
@@ -516,7 +532,7 @@ foreach($arGROUPS as $value):
 		$show_subord = (in_array($v,$arSubordTasks));
 		?>
 		<div<?echo $show_subord? '' : ' style="display:none"';?>>
-			<div style="padding:6px 0px 6px 0px"><?=GetMessage('SUBORDINATE_GROUPS');?>:</div>
+			<div style="padding:6px 0 6px 0"><?=GetMessage('SUBORDINATE_GROUPS');?>:</div>
 			<select name="subordinate_groups_<?=$value["ID"]?>[]" multiple size="6">
 			<?
 			$arSubordinateGroups = CGroup::GetSubordinateGroups($value["ID"]);
@@ -552,7 +568,7 @@ foreach($arGROUPS as $group):
 		echo SelectBoxFromArray("", $arTasks, "", GetMessage("MAIN_DEFAULT"), 'onchange="taskSelectOnchange(this)"');
 		?>
 		<div style="display:none">
-			<div style="padding:6px 0px 6px 0px"><?=GetMessage('SUBORDINATE_GROUPS');?>:</div>
+			<div style="padding:6px 0 6px 0"><?=GetMessage('SUBORDINATE_GROUPS');?>:</div>
 			<select name="" multiple size="6">
 			<?
 			foreach($arGROUPS as $v_gr)
@@ -628,7 +644,7 @@ BX.ready(function(){
 <?if($_REQUEST["back_url_settings"] <> ""):?>
 <input type="button" name="" value="<?echo GetMessage("MAIN_OPT_CANCEL")?>" title="<?echo GetMessage("MAIN_OPT_CANCEL_TITLE")?>" onclick="window.location='<?echo htmlspecialcharsbx(CUtil::JSEscape($_REQUEST["back_url_settings"]))?>'">
 <?endif?>
-<input <?if (!$USER->CanDoOperation('edit_other_settings')) echo "disabled" ?> type="button" title="<?echo GetMessage("MAIN_HINT_RESTORE_DEFAULTS")?>" OnClick="RestoreDefaults();" value="<?echo GetMessage("MAIN_RESTORE_DEFAULTS")?>">
+<input <?if (!$USER->IsAdmin()) echo "disabled" ?> type="button" title="<?echo GetMessage("MAIN_HINT_RESTORE_DEFAULTS")?>" OnClick="RestoreDefaults();" value="<?echo GetMessage("MAIN_RESTORE_DEFAULTS")?>">
 <input type="hidden" name="Update" value="Y">
 <input type="hidden" name="back_url_settings" value="<?echo htmlspecialcharsbx($_REQUEST["back_url_settings"])?>">
 <?$tabControl->End();?>
@@ -638,7 +654,7 @@ $message = null;
 
 if(
 	!IsModuleInstalled("controller")
-	&& $REQUEST_METHOD == "POST"
+	&& $_SERVER["REQUEST_METHOD"] == "POST"
 	&& (strlen($controller_join) > 0 || strlen($controller_remove) > 0 || strlen($controller_save_proxy) > 0)
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
@@ -652,7 +668,7 @@ if(
 
 if(
 	!IsModuleInstalled("controller")
-	&& $REQUEST_METHOD == "POST"
+	&& $_SERVER["REQUEST_METHOD"] == "POST"
 	&& (strlen($controller_join) > 0 && strlen($controller_save_proxy) <= 0)
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
@@ -684,7 +700,7 @@ if(
 $bControllerRemoveError = false;
 if(
 	!IsModuleInstalled("controller")
-	&& $REQUEST_METHOD == "POST"
+	&& $_SERVER["REQUEST_METHOD"] == "POST"
 	&& (strlen($controller_remove) > 0 && strlen($controller_save_proxy) <= 0)
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
@@ -693,7 +709,9 @@ if(
 {
 	$controller_url = COption::GetOptionString("main", "controller_url", "");
 	if(strlen($controller_login)<=0 || strlen($controller_password)<=0)
+	{
 		LocalRedirect($controller_url."/bitrix/admin/controller_member_edit.php?lang=".LANGUAGE_ID.'&act=unregister&member_id='.urlencode(COption::GetOptionString("main", "controller_member_id", "")).'&back_url='.urlencode(($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+	}
 	else
 	{
 		if(!CControllerClient::RemoveFromController($controller_login, $controller_password))
@@ -887,7 +905,7 @@ if(COption::GetOptionString("main", "controller_member", "N")!="Y"):
 <?$tabControl->BeginNextTab();?>
 <tr>
 <td align="left">
-<IFRAME style="width:0px; height:0px; border:none;" src="javascript:void(0)" name="frame_disk_quota" id="frame_disk_quota"></IFRAME>
+<IFRAME style="width:0; height:0; border:none;" src="javascript:void(0)" name="frame_disk_quota" id="frame_disk_quota"></IFRAME>
 <?
 	$arParam = array();
 	$usedSpace = 0;
@@ -954,8 +972,7 @@ window.onStepDone = function(name){
 	}
 	if (result['stop'] == true)
 		CheckButtons();
-	return;
-}
+};
 
 function CheckButtons(handle)
 {
@@ -999,7 +1016,7 @@ function StartReCount(step)
 	{
 		if (elem[tmp].checked == true)
 		{
-			id = elem[tmp].id;
+			var id = elem[tmp].id;
 			name = elem[tmp].value;
 		}
 		elem[tmp].disabled = true;
@@ -1008,7 +1025,7 @@ function StartReCount(step)
 	{
 		CloseWaitWindow();
 		result['stop'] = false;
-		result['done'] = true
+		result['done'] = true;
 		ShowWaitWindow();
 		if (step == 'from_the_last')
 		{
@@ -1022,7 +1039,6 @@ function StartReCount(step)
 		document.getElementById('butt_cont').disabled = true;
 		document.getElementById('butt_stop').disabled = false;
 	}
-	return;
 }
 
 function StopReCount()
@@ -1036,7 +1052,6 @@ function StopReCount()
 	CloseWaitWindow();
 	result['stop'] = true;
 	result['done'] = true;
-	return;
 }
 
 function DoNext(name, id, recount)
@@ -1061,7 +1076,7 @@ function DoNext(name, id, recount)
 	else
 	{
 		StopReCount();
-		return true;
+		return;
 	}
 	setTimeout('DoNext(\''+name+'\', \''+id+'\')', 1000);
 }

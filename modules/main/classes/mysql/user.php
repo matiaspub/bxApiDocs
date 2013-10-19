@@ -25,32 +25,32 @@ class CUser extends CAllUser
 	 * @param array $fields  Массив значений полей, в качестве ключей данного массива
 	 * допустимо использовать: <ul> <li> <b>LOGIN</b><font color="red">*</font> - логин (имя
 	 * входа) </li> <li> <b>NAME</b> - имя пользователя </li> <li> <b>LAST_NAME</b> - фамилия
-	 * пользователя </li> <li> <b>EMAIL</b><font color="red">*</font> - E-Mail адрес пользователя
-	 * </li> <li> <b>PASSWORD</b><font color="red">*</font> - пароль пользователя </li> <li>
-	 * <b>CONFIRM_PASSWORD</b><font color="red">*</font> - подтверждение пароля (должно быть
-	 * равным <b>PASSWORD</b>) </li> <li> <b>GROUP_ID</b> - массив ID групп к которым будет
-	 * приписан пользователь </li> <li> <b>ACTIVE</b> - флаг активности
-	 * пользователя [Y|N] </li> <li> <b>LID</b> - ID сайта по умолчанию для
-	 * уведомлений </li> <li> <b>ADMIN_NOTES</b> - заметки администратора </li> <li>
-	 * <b>XML_ID</b> - ID пользователя для связи с внешними источниками
-	 * (например, ID пользователя в какой-либо внешний базе) </li> <li>
-	 * <b>EXTERNAL_AUTH_ID</b> - код источника [link=89611]внешней авторизации[/link] </li> <li>
-	 * <b>PERSONAL_PROFESSION</b> - наименование профессии </li> <li> <b>PERSONAL_WWW</b> -
-	 * персональная WWW-страница </li> <li> <b>PERSONAL_ICQ</b> - ICQ </li> <li> <b>PERSONAL_GENDER</b> -
-	 * пол ["M" - мужчина; "F" - женщина] </li> <li> <b>PERSONAL_BIRTHDAY</b> - дата рождения в
-	 * формате текущего сайта (или текущего языка для административной
-	 * части) </li> <li> <b>PERSONAL_PHOTO</b> - массив описывающий фотографию,
-	 * допустимы следующие ключи этого массива: <ul> <li> <b>name</b> - имя файла
-	 * </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный путь на
-	 * сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> - если
-	 * значение равно "Y", то изображение будет удалено </li> <li> <b>MODULE_ID</b> -
-	 * идентификатор главного модуля - "main" </li> </ul> </li> <li> <b>PERSONAL_PHONE</b> -
-	 * телефон </li> <li> <b>PERSONAL_FAX</b> - факс </li> <li> <b>PERSONAL_MOBILE</b> - мобильный
-	 * телефон </li> <li> <b>PERSONAL_PAGER</b> - пэйджер </li> <li> <b>PERSONAL_STREET</b> - улица, дом
-	 * </li> <li> <b>PERSONAL_MAILBOX</b> - почтовый ящик </li> <li> <b>PERSONAL_CITY</b> - город </li> <li>
-	 * <b>PERSONAL_STATE</b> - область / край </li> <li> <b>PERSONAL_ZIP</b> - индекс </li> <li>
-	 * <b>PERSONAL_COUNTRY</b> - страна </li> <li> <b>PERSONAL_NOTES</b> - личные заметки </li> <li>
-	 * <b>WORK_COMPANY</b> - наименование компании </li> <li> <b>WORK_DEPARTMENT</b> -
+	 * пользователя </li> <li> <b>SECOND_NAME</b> - отчество пользователя </li> <li>
+	 * <b>EMAIL</b><font color="red">*</font> - E-Mail адрес пользователя </li> <li> <b>PASSWORD</b><font
+	 * color="red">*</font> - пароль пользователя </li> <li> <b>CONFIRM_PASSWORD</b><font
+	 * color="red">*</font> - подтверждение пароля (должно быть равным <b>PASSWORD</b>)
+	 * </li> <li> <b>GROUP_ID</b> - массив ID групп к которым будет приписан
+	 * пользователь </li> <li> <b>ACTIVE</b> - флаг активности пользователя [Y|N] </li>
+	 * <li> <b>LID</b> - ID сайта по умолчанию для уведомлений </li> <li> <b>ADMIN_NOTES</b> -
+	 * заметки администратора </li> <li> <b>XML_ID</b> - ID пользователя для связи с
+	 * внешними источниками (например, ID пользователя в какой-либо
+	 * внешний базе) </li> <li> <b>EXTERNAL_AUTH_ID</b> - код источника [link=89611]внешней
+	 * авторизации[/link] </li> <li> <b>PERSONAL_PROFESSION</b> - наименование профессии </li>
+	 * <li> <b>PERSONAL_WWW</b> - персональная WWW-страница </li> <li> <b>PERSONAL_ICQ</b> - ICQ </li> <li>
+	 * <b>PERSONAL_GENDER</b> - пол ["M" - мужчина; "F" - женщина] </li> <li> <b>PERSONAL_BIRTHDAY</b> -
+	 * дата рождения в формате текущего сайта (или текущего языка для
+	 * административной части) </li> <li> <b>PERSONAL_PHOTO</b> - массив описывающий
+	 * фотографию, допустимы следующие ключи этого массива: <ul> <li> <b>name</b>
+	 * - имя файла </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный
+	 * путь на сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> -
+	 * если значение равно "Y", то изображение будет удалено </li> <li>
+	 * <b>MODULE_ID</b> - идентификатор главного модуля - "main" </li> </ul> </li> <li>
+	 * <b>PERSONAL_PHONE</b> - телефон </li> <li> <b>PERSONAL_FAX</b> - факс </li> <li> <b>PERSONAL_MOBILE</b> -
+	 * мобильный телефон </li> <li> <b>PERSONAL_PAGER</b> - пэйджер </li> <li> <b>PERSONAL_STREET</b> -
+	 * улица, дом </li> <li> <b>PERSONAL_MAILBOX</b> - почтовый ящик </li> <li> <b>PERSONAL_CITY</b> -
+	 * город </li> <li> <b>PERSONAL_STATE</b> - область / край </li> <li> <b>PERSONAL_ZIP</b> - индекс
+	 * </li> <li> <b>PERSONAL_COUNTRY</b> - страна </li> <li> <b>PERSONAL_NOTES</b> - личные заметки </li>
+	 * <li> <b>WORK_COMPANY</b> - наименование компании </li> <li> <b>WORK_DEPARTMENT</b> -
 	 * департамент / отдел </li> <li> <b>WORK_POSITION</b> - должность </li> <li> <b>WORK_WWW</b> -
 	 * WWW-страница компании </li> <li> <b>WORK_PHONE</b> - рабочий телефон </li> <li>
 	 * <b>WORK_FAX</b> - рабочий факс </li> <li> <b>WORK_PAGER</b> - рабочий пэйджер </li> <li>
@@ -105,9 +105,9 @@ class CUser extends CAllUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/index.php#flds">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php#flds">Поля CUser</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -247,7 +247,7 @@ class CUser extends CAllUser
 
 	
 	/**
-	 * <p>Возвращает список пользователей в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список пользователей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -336,7 +336,7 @@ class CUser extends CAllUser
 	 * <sup>1</sup>* <b>ADMIN_NOTES</b> - комментарий администратора (доступен для
 	 * просмотра и редактирования только администратору сайта) </li> </ul>
 	 * <sup>1</sup> - в данных полях допускается <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/general/filter.php">сложные условия</a>. Сложные
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложные условия</a>. Сложные
 	 * условия для данного поля работают только при указании: <b>ID</b>. При
 	 * указании <b>!ID</b> и <b>&gt;ID</b>, сложные условия работать не будут. <br> * -
 	 * поиск по "KEYWORDS" по сути является поиском по полям отмеченных
@@ -359,9 +359,9 @@ class CUser extends CAllUser
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cuser/getbylogin.php">CUser::GetByLogin</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbylogin.php">CUser::GetByLogin</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -780,8 +780,16 @@ class CUser extends CAllUser
 
 	
 	/**
-	 * 
+	 * <p>Метод предназначен для определения статуса "Сейчас на сайте" по ID пользователя.</p>
 	 *
+	 *
+	 *
+	 *
+	 * @param $i $d  ID пользователя
+	 *
+	 *
+	 *
+	 * @param $interva $l = 120 Время в секундах
 	 *
 	 *
 	 *
@@ -790,13 +798,9 @@ class CUser extends CAllUser
 	 *
 	 * <h4>Example</h4> 
 	 * <pre>
-	 * <br><br>
+	 * Задать время последней активности пользователя в секундах:GLOBAL $USER;
+	 * CUser::SetLastActivityDate( $USER-&gt;GetID() );
 	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -838,7 +842,7 @@ class CGroup extends CAllGroup
 	 *
 	 *
 	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/index.php#flds">полей</a> вида
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">полей</a> вида
 	 * array("поле"=&gt;"значение" [, ...]).
 	 *
 	 *
@@ -865,9 +869,9 @@ class CGroup extends CAllGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/delete.php">CGroup::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/update.php">CGroup::Update</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php">CGroup::Delete</a> </li> <li> <a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -977,7 +981,7 @@ class CGroup extends CAllGroup
 
 	
 	/**
-	 * <p>Возвращает список групп в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает список групп в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -1047,8 +1051,8 @@ class CGroup extends CAllGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/getbyid.php">CGroup::GetByID</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/getbyid.php">CGroup::GetByID</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1643,7 +1647,7 @@ class CGroup extends CAllGroup
 
 	
 	/**
-	 * <p>Возвращает группу пользователей по ее коду <i>ID</i> в виде объекта класса <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	 * <p>Возвращает группу пользователей по ее коду <i>ID</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	 *
 	 *
 	 *
@@ -1673,8 +1677,8 @@ class CGroup extends CAllGroup
 	 *
 	 *
 	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ruapi_help/main/reference/cgroup/getlist.php">CGroup::GetList</a> </li> </ul><a
+	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
+	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/getlist.php">CGroup::GetList</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
