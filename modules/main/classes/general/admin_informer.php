@@ -213,6 +213,62 @@ class CAdminInformer
 			self::AddItem($qAIParams);
 		}
 
+		if($USER->IsAdmin() && in_array(LANGUAGE_ID, array("ru", "ua")))
+		{
+			$cModules = COption::GetOptionString("main", "mp_modules_date", "");
+			$arModules = array();
+			if(strlen($cModules) > 0)
+				$arModules = unserialize($cModules);
+
+			$mCnt = count($arModules);
+			if($mCnt > 0)
+			{
+				foreach($arModules as $id => $module)
+				{
+					if(isModuleInstalled($module["ID"]))
+					{
+						if($module["TMS"]+3600*24*14 < time())
+						{
+							$script = "
+							<script type=\"text/javascript\">
+							function hideMpAnswer(el, module)
+							{
+								if(el.parentNode.parentNode.parentNode)
+									BX.hide(el.parentNode.parentNode.parentNode);
+									BX.ajax({
+										'method': 'POST',
+										'dataType': 'html',
+										'url': '/bitrix/admin/partner_modules.php',
+										'data': 'module='+module+'&".bitrix_sessid_get()."&act=unnotify',
+										'async': true,
+										'processData': false
+
+									});
+							}
+							</script>";
+							
+							$arParams = array(
+									'TITLE' => GetMessage("top_panel_ai_marketplace"),
+									'COLOR' => 'green',
+									'FOOTER' => "<a href=\"javascript:void(0)\" onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\" style=\"float: right !important; font-size: 0.8em !important;\">".GetMessage("top_panel_ai_marketplace_hide")."</a><a href=\"http://marketplace.1c-bitrix.".LANGUAGE_ID."/solutions/#ID#/#comments\" target=\"_blank\" onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\">".GetMessage("top_panel_ai_marketplace_add")."</a>",
+									GetMessage("top_panel_ai_marketplace_link", array("#ID#" => $module["ID"], "#ADIT#" => "")),
+									'ALERT' => true,
+									'HTML' => GetMessage("top_panel_ai_marketplace_descr", array("#NAME#" => $module["NAME"], "#ID#" => $module["ID"])).$script,
+								);
+							self::AddItem($arParams);
+						}
+					}
+					else
+						unset($arModules[$id]);
+				}
+				if($mCnt != count($arModules))
+				{
+					COption::SetOptionString("main", "mp_modules_date", serialize($arModules));
+				}
+			}
+
+		}
+
 		foreach(GetModuleEvents("main", "OnAdminInformerInsertItems", true) as $arHandler)
 			ExecuteModuleEventEx($arHandler);
 

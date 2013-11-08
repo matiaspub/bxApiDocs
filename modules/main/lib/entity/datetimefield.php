@@ -13,6 +13,6 @@ namespace Bitrix\Main\Entity;
  * @package bitrix
  * @subpackage main
  */
-class DatetimeField extends DateField
+class DatetimeField extends ScalarField
 {
 }

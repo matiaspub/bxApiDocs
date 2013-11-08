@@ -13,14 +13,10 @@ class CWikiNotifySchema
 			"wiki" => array(
 				"comment" => Array(
 					"NAME" => GetMessage("WIKI_NS_COMMENT"),
-					"MAIL" => true,
-					"XMPP" => false,
 				),
 /*
 				"mention" => Array(
 					"NAME" => GetMessage("WIKI_NS_MENTION"),
-					"MAIL" => true,
-					"XMPP" => false,
 				),
 */
 			),

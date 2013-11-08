@@ -1,7 +1,10 @@
 <?php
 namespace Bitrix\Main\Component;
 
-class ParametersTable extends \Bitrix\Main\Entity\DataManager
+use Bitrix\Main\Entity\DataManager;
+
+class ParametersTable
+	extends DataManager
 {
 	const SEF_MODE = 'Y';
 	const NOT_SEF_MODE = 'N';
@@ -70,7 +73,7 @@ class ParametersTable extends \Bitrix\Main\Entity\DataManager
 		// event PRE
 
 		// delete
-		$connection = \Bitrix\Main\Application::getDbConnection();
+		$connection = \Bitrix\Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$tableName = static::getEntity()->getDBTableName();

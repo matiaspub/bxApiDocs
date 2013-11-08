@@ -49,7 +49,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			// Initializing list of sites.
 			$result = Bitrix\Main\SiteTable::getList(array('select' => array('LID', 'DEF', 'NAME')));
 			$i = 0;
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$sitelist[$row['LID']] = $row['NAME'];
 				if (++$i === 1) self::$defaultSiteId = $row['LID'];
@@ -66,7 +66,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				'select' => array('STATUS_ID', 'NAME'),
 				'filter' => array('=LID' => LANGUAGE_ID)
 			));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$statuslist[$row['STATUS_ID']] = $row['NAME'];
 			}
@@ -79,7 +79,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				'select' => array('ID', 'LID', 'NAME')/*,
 				'filter' => array('=ACTIVE', 'Y')*/
 			));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$personTypes[$row['ID']] = array('LID' => $row['LID'], 'NAME' => $row['NAME']);
 			}
@@ -90,7 +90,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				'select' => array('ID', 'LID', 'NAME')/*,
 				'filter' => array('=ACTIVE', 'Y')*/
 			));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$paySystemList[$row['ID']] = array('value' => $row['NAME'], 'site_id' => $row['LID']);
 			}
@@ -101,7 +101,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 				'select' => array('ID', 'NAME', 'LID')/*,
 				'filter' => array('=ACTIVE', 'Y')*/
 			));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$deliveryList[$row['ID']] = array('value' => $row['NAME'], 'site_id' => $row['LID']);
 			}
@@ -109,7 +109,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			$result = Bitrix\Sale\DeliveryHandlerTable::getList(array(
 				'select' => array('HID', 'NAME', 'LID')
 			));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$deliveryList[$row['HID']] = array('value' => $row['NAME'], 'site_id' => $row['LID']);
 			}
@@ -154,7 +154,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 
 			// Initialization of the list of warehouses.
 			$result = Bitrix\Catalog\StoreTable::getList(array('select' => array('ID', 'TITLE')));
-			while ($row = $result->Fetch())
+			while ($row = $result->fetch())
 			{
 				self::$productStores[$row['ID']] = $row['TITLE'];
 			}

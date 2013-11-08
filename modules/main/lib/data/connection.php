@@ -39,6 +39,7 @@ abstract class Connection
 			return;
 		}
 
+		$this->isConnected = false;
 		$this->disconnectInternal();
 	}
 
@@ -46,6 +47,11 @@ abstract class Connection
 	{
 		$this->connectInternal();
 		return $this->resource;
+	}
+
+	public function isConnected()
+	{
+		return $this->isConnected;
 	}
 
 	abstract protected function connectInternal();

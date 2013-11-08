@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 class CBitrixCloudBackup
 {
@@ -37,13 +37,14 @@ class CBitrixCloudBackup
 
 		try {
 			$web_service = new CBitrixCloudBackupWebService();
+			$web_service->setTimeout(10);
 			$this->infoXML = $web_service->actionGetInformation();
 		}
 		catch (CBitrixCloudException $e)
 		{
 			return false;
 		}
-		/** @var CDataXMLNode $node */
+		$node = /*.(CDataXMLNode).*/ null;
 		$node = $this->infoXML->SelectNodes("/control/quota/allow");
 		if (is_object($node))
 			$this->quota = CBitrixCloudCDNQuota::parseSize($node->textContent());
@@ -57,6 +58,7 @@ class CBitrixCloudBackup
 			$nodeFiles = $node->elementsByName("file");
 			foreach($nodeFiles as $nodeFile)
 			{
+				/* @var CDataXMLNode $nodeFile */
 				$size = CBitrixCloudCDNQuota::parseSize($nodeFile->getAttribute("size"));
 				$name = $nodeFile->getAttribute("name");
 				$this->total_size += $size;
@@ -106,7 +108,7 @@ class CBitrixCloudBackup
 		return $this->total_size;
 	}
 	/**
-	 * Returns timestamp of ythe last saved backup
+	 * Returns timestamp of the last saved backup
 	 *
 	 * @return int
 	 *
@@ -117,14 +119,15 @@ class CBitrixCloudBackup
 		return $this->last_backup_time;
 	}
 	/**
+	 * Returns bucket object for backup operation.
 	 *
 	 * @param string $operation
 	 * @param string $check_word
 	 * @param string $file_name
 	 * @return CBitrixCloudBackupBucket
-	 *
+	 * @throws CBitrixCloudException
 	 */
-	private function _getBucket($operation, $check_word, $file_name) /*. throws CBitrixCloudException .*/
+	private function _getBucket($operation, $check_word, $file_name)
 	{
 		if (!CModule::IncludeModule('clouds'))
 			throw new CBitrixCloudException("Module clouds not installed.");
@@ -153,32 +156,35 @@ class CBitrixCloudBackup
 		);
 	}
 	/**
+	 * Returns bucket object for downloading backup file.
 	 *
 	 * @param string $check_word
 	 * @param string $file_name
 	 * @return CBitrixCloudBackupBucket
-	 *
+	 * @throws CBitrixCloudException
 	 */
-	public function getBucketToReadFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function getBucketToReadFile($check_word, $file_name)
 	{
 		return $this->_getBucket("read", $check_word, $file_name);
 	}
 	/**
+	 * Returns bucket object for uploading backup file.
 	 *
 	 * @param string $check_word
 	 * @param string $file_name
 	 * @return CBitrixCloudBackupBucket
-	 *
+	 * @throws CBitrixCloudException
 	 */
-	public function getBucketToWriteFile($check_word, $file_name) /*. throws CBitrixCloudException .*/
+	public function getBucketToWriteFile($check_word, $file_name)
 	{
 		return $this->_getBucket("write", $check_word, $file_name);
 	}
 	/**
+	 * Deletes state stored in the database.
 	 *
 	 * @return CBitrixCloudBackup
 	 */
-	public function clearOptions()
+	static public function clearOptions()
 	{
 		CBitrixCloudOption::getOption("backup_files")->delete();
 		CBitrixCloudOption::getOption("backup_quota")->delete();
@@ -187,6 +193,7 @@ class CBitrixCloudBackup
 		return $this;
 	}
 	/**
+	 * Saves state into the database.
 	 *
 	 * @return CBitrixCloudBackup
 	 */
@@ -200,18 +207,19 @@ class CBitrixCloudBackup
 		}
 		ksort($arFiles);
 		CBitrixCloudOption::getOption("backup_files")->setArrayValue($arFiles);
-		CBitrixCloudOption::getOption("backup_quota")->setStringValue($this->quota);
-		CBitrixCloudOption::getOption("backup_total_size")->setStringValue($this->total_size);
-		CBitrixCloudOption::getOption("backup_last_backup_time")->setStringValue($this->last_backup_time);
+		CBitrixCloudOption::getOption("backup_quota")->setStringValue((string)$this->quota);
+		CBitrixCloudOption::getOption("backup_total_size")->setStringValue((string)$this->total_size);
+		CBitrixCloudOption::getOption("backup_last_backup_time")->setStringValue((string)$this->last_backup_time);
 		return $this;
 	}
 	/**
+	 * Restores state from the database.
 	 *
 	 * @return CBitrixCloudBackup
 	 */
 	public function loadFromOptions()
 	{
-		$this->files = array();
+		$this->files = /*.(array[int][string]string).*/ array();
 		foreach(CBitrixCloudOption::getOption("backup_files")->getArrayValue() as $FILE_NAME => $FILE_SIZE)
 		{
 			$this->files[] = array(
@@ -227,6 +235,7 @@ class CBitrixCloudBackup
 	}
 	/**
 	 * Shows information about CDN free space in Admin's informer popup
+	 *
 	 * @return void
 	 */
 	static public function OnAdminInformerInsertItems()
@@ -239,22 +248,22 @@ class CBitrixCloudBackup
 		$backup = self::getInstance();
 		$backup->loadFromOptions();
 		$last_request_time_option = CBitrixCloudOption::getOption("backup_last_backup_time");
-		if (
-			$backup->getQuota() <= 0
-			&& intval($last_request_time_option->getStringValue()) <= 0
-		)
+		try
 		{
-			$last_request_time_option->setStringValue(time());
-			try
+			if (
+				$backup->getQuota() <= 0
+				&& $last_request_time_option->getIntegerValue() <= 0
+			)
 			{
+				$last_request_time_option->setStringValue((string)time());
 				$backup->_getInformation(true);
 				$backup->saveToOptions();
 			}
-			catch (Exception $e)
-			{
-				///TODO show error to user
-				return;
-			}
+		}
+		catch (CBitrixCloudException $e)
+		{
+			///TODO show error to user
+			return;
 		}
 
 		if ( $backup->getQuota() <= 0 )
@@ -264,7 +273,6 @@ class CBitrixCloudBackup
 		if (empty($arFiles))
 		{
 			$PROGRESS_FREE = 100;
-			$USAGE = "0";
 			$AVAIL = $backup->getQuota();
 			$ALLOWED = CFile::FormatSize($backup->getQuota(), 0);
 			$CDNAIParams["ALERT"] = true;
@@ -278,7 +286,6 @@ class CBitrixCloudBackup
 				$AVAIL = 0.0;
 
 			$PROGRESS_FREE = round($AVAIL/$backup->getQuota()*100);
-			$USAGE = CFile::FormatSize($backup->getUsage(), 0);
 			$ALLOWED = CFile::FormatSize($backup->getQuota(), 0);
 			$CDNAIParams["ALERT"] = true;
 			$MESS = '<span class="adm-informer-strong-text">'.GetMessage("BCL_BACKUP_AI_LAST_TIME").': '.FormatDate(array(
@@ -295,7 +302,6 @@ class CBitrixCloudBackup
 				$AVAIL = 0.0;
 
 			$PROGRESS_FREE = round($AVAIL/$backup->getQuota()*100);
-			$USAGE = CFile::FormatSize($backup->getUsage(), 0);
 			$ALLOWED = CFile::FormatSize($backup->getQuota(), 0);
 			$CDNAIParams["ALERT"] = false;
 			$MESS = GetMessage("BCL_BACKUP_AI_LAST_TIME").': '.FormatDate(array(
@@ -326,5 +332,83 @@ class CBitrixCloudBackup
 			CAdminInformer::AddItem($CDNAIParams);
 		}
 	}
+	/*
+	 * Registers new backup job with the remote service.
+	 * Returns empty string on success.
+	 *
+	 * @param string $secret_key
+	 * @param string $url
+	 * @param int $time
+	 * @param array $weekdays
+	 * @return string
+	 *
+	 */
+	static public function addBackupJob($secret_key, $url, $time = 0, $weekdays = array())
+	{
+		try {
+			$web_service = new CBitrixCloudBackupWebService();
+			$web_service->actionAddBackupJob($secret_key, $url, $time, $weekdays);
+			return "";
+		}
+		catch (CBitrixCloudException $e)
+		{
+			return $e->getMessage();//."[".htmlspecialcharsEx($e->getErrorCode())."]";
+		}
+	}
+	/*
+	 * Cancels backup job with the remote service.
+	 * Returns empty string on success.
+	 *
+	 * @return string
+	 *
+	 */
+	static public function deleteBackupJob()
+	{
+		try {
+			$web_service = new CBitrixCloudBackupWebService();
+			$web_service->actionDeleteBackupJob();
+			return "";
+		}
+		catch (CBitrixCloudException $e)
+		{
+			return $e->getMessage();//."[".htmlspecialcharsEx($e->getErrorCode())."]";
+		}
+	}
+
+	static public function getBackupJob()
+	{
+		try {
+			$web_service = new CBitrixCloudBackupWebService();
+			$infoXML = $web_service->actionGetBackupJob();
+		}
+		catch (CBitrixCloudException $e)
+		{
+			return $e->getMessage();//."[".htmlspecialcharsEx($e->getErrorCode())."]";
+		}
+
+		$result = array();
+		$jobList = $infoXML->SelectNodes("/control/JobList");
+		if (is_object($jobList))
+		{
+			$jobEntries = $jobList->elementsByName("JobEntry");
+			foreach ($jobEntries as $jobEntry)
+			{
+				$info  = array();
+				foreach($jobEntry->children() as $field)
+				{
+					$name = $field->name();
+					$value = $field->textContent();
+					$info[$name] = $value;
+				}
+				$result[] = array(
+					"URL" => $info["Url"],
+					"TIME" => $info["Time"],
+					"WEEK_DAYS" => explode(",", $info["WeekDays"]),
+					"STATUS" => $info["Status"],
+					"FINISH_TIME" => $info["FinishTime"],
+				);
+			}
+		}
+		return $result;
+	}
 }
-?>

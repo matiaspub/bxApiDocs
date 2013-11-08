@@ -1,10 +1,22 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
+/**
+ * Bitrix vars
+ * @global CUser $USER
+ * @global CMain $APPLICATION
+ * @global CDatabase $DB
+ */
+
 // define("START_EXEC_EPILOG_AFTER_1", microtime());
 $GLOBALS["BX_STATE"] = "EA";
 
-if(!isset($USER))		{global $USER;}
-if(!isset($APPLICATION)){global $APPLICATION;}
-if(!isset($DB))			{global $DB;}
+global $USER, $APPLICATION, $DB;
 
 foreach(GetModuleEvents("main", "OnEpilog", true) as $arEvent)
 	ExecuteModuleEventEx($arEvent);
@@ -27,8 +39,10 @@ foreach($arAllEvents as $arEvent)
 if(!IsModuleInstalled("compression") && !defined("ADMIN_AJAX_MODE") && ($_REQUEST["mode"] != 'excel'))
 {
 	$bShowTime = ($_SESSION["SESS_SHOW_TIME_EXEC"] == 'Y');
-	$bShowStat = ($GLOBALS["DB"]->ShowSqlStat && $GLOBALS["USER"]->CanDoOperation('edit_php'));
-	if($bShowTime || $bShowStat)
+	$bShowStat = ($DB->ShowSqlStat && $USER->CanDoOperation('edit_php'));
+	$bShowCacheStat = (\Bitrix\Main\Data\Cache::getShowCacheStat() && ($canEditPHP || $_SESSION["SHOW_CACHE_STAT"]=="Y"));
+
+	if($bShowTime || $bShowStat || $bShowCacheStat)
 	{
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/debug_info.php");
 	}
@@ -37,4 +51,3 @@ if(!IsModuleInstalled("compression") && !defined("ADMIN_AJAX_MODE") && ($_REQUES
 $DB->Disconnect();
 
 CMain::ForkActions();
-?>

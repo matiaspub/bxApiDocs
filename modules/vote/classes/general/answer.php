@@ -96,7 +96,7 @@ class CAllVoteAnswer
 		global $DB, $CACHE_MANAGER;
 		$arBinds = array();
 		$ID = intVal($ID);
-		$err_mess = (CAllVoteQuestion::err_mess())."<br>Function: Update<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: Update<br>Line: ";
 
 		if ($ID <= 0 || !CVoteAnswer::CheckFields("UPDATE", $arFields, $ID))
 			return false;
@@ -130,7 +130,7 @@ class CAllVoteAnswer
 	public static function Delete($ID, $QUESTION_ID = false, $VOTE_ID = false)
 	{
 		global $DB, $CACHE_MANAGER;
-		$err_mess = (CAllVoteAnswer::err_mess())."<br>Function: Delete<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: Delete<br>Line: ";
 /***************** Event onBeforeVoteAnswerDelete ******************/
 		$events = GetModuleEvents("vote", "onBeforeVoteAnswerDelete");
 		while ($arEvent = $events->Fetch()) {
@@ -173,7 +173,7 @@ class CAllVoteAnswer
 
 	public static function GetList($QUESTION_ID, $by="s_c_sort", $order="asc", $arFilter=array())
 	{
-		$err_mess = (CAllVoteAnswer::err_mess())."<br>Function: GetList<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB;
 		$QUESTION_ID = intval($QUESTION_ID);
 		$arSqlSearch = Array();
@@ -229,7 +229,7 @@ class CAllVoteAnswer
 
 	public static function GetListEx($arOrder = array("ID" => "ASC"), $arFilter=array(), $arAddParams = array())
 	{
-		$err_mess = (CAllVoteAnswer::err_mess())."<br>Function: GetListEx<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: GetListEx<br>Line: ";
 		global $DB;
 		
 		$arSqlSearch = Array();
@@ -329,7 +329,7 @@ class CAllVoteAnswer
 
 	public static function GetGroupAnswers($ANSWER_ID)
 	{
-		$err_mess = (CAllVoteAnswer::err_mess())."<br>Function: GetGroupAnswers<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: GetGroupAnswers<br>Line: ";
 		global $DB;
 		$ANSWER_ID = intval($ANSWER_ID);
 		$strSql = "

@@ -858,12 +858,6 @@ class CAllUserTypeEntity extends CDBResult
 		global $DB, $CACHE_MANAGER, $USER_FIELD_MANAGER;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
 
-		if(CACHED_b_user_field !== false)
-			$CACHE_MANAGER->CleanDir("b_user_field");
-
-		if(is_object($USER_FIELD_MANAGER))
-			$USER_FIELD_MANAGER->CleanCache();
-
 		$rs = true;
 		$rsFields = $this->GetList(array(), array("ENTITY_ID"=>$entity_id));
 		//We need special handling of file and enum type properties
@@ -888,9 +882,15 @@ class CAllUserTypeEntity extends CDBResult
 		if($bDropTable)
 		{
 			$DB->Query("DROP SEQUENCE SQ_B_UTM_".$entity_id, true);
-			$DB->Query("DROP TABLE b_uts_".strtolower($entity_id), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-			$rs = $DB->Query("DROP TABLE b_utm_".strtolower($entity_id), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			$DB->Query("DROP TABLE b_uts_".strtolower($entity_id), true, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			$rs = $DB->Query("DROP TABLE b_utm_".strtolower($entity_id), true, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 		}
+
+		if(CACHED_b_user_field !== false)
+			$CACHE_MANAGER->CleanDir("b_user_field");
+
+		if(is_object($USER_FIELD_MANAGER))
+			$USER_FIELD_MANAGER->CleanCache();
 
 		return $rs;
 	}

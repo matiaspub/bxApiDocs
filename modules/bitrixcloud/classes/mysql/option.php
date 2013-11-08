@@ -1,5 +1,4 @@
 <?
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bitrixcloud/classes/general/option.php");
 class CBitrixCloudOption extends CAllBitrixCloudOption
 {
 	/**

@@ -160,7 +160,7 @@ class CIBlockResult extends CDBResult
 		$this->nameTemplate = $nameTemplate;
 	}
 
-	public function Fetch()
+	public static function Fetch()
 	{
 		/** @global CCacheManager $CACHE_MANAGER */
 		global $CACHE_MANAGER;

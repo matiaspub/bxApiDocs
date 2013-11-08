@@ -28,8 +28,9 @@ class UserTable extends Entity\DataManager
 
 	public static function getMap()
 	{
-//		$connection = Application::getDbConnection();
-//		$helper = $connection->getSqlHelper();
+		$connection = Application::getConnection();
+		$helper = $connection->getSqlHelper();
+
 		global $DB;
 
 		return array(
@@ -71,6 +72,9 @@ class UserTable extends Entity\DataManager
 					$DB->datetimeToDateFunction('%s'), 'LAST_LOGIN'
 				)
 			),
+			'LAST_ACTIVITY_DATE' => array(
+				'data_type' => 'datetime'
+			),
 			'NAME' => array(
 				'data_type' => 'string'
 			),
@@ -104,6 +108,17 @@ class UserTable extends Entity\DataManager
 //					$helper->getConcatFunction("%s","' '", "UPPER(".$helper->getSubstrFunction("%s", 1, 1).")", "'.'"),
 					$DB->concat("%s","' '", "UPPER(".$DB->substr("%s", 1, 1).")", "'.'"),
 					'LAST_NAME', 'NAME'
+				)
+			),
+			'IS_ONLINE' => array(
+				'data_type' => 'boolean',
+				'values' => array('N', 'Y'),
+				'expression' => array(
+					'CASE WHEN %s > '.$helper->addSecondsToDateTime('(-%%USER_IS_ONLINE_INTERVAL%%)').' THEN \'Y\' ELSE \'N\' END',
+					'LAST_ACTIVITY_DATE',
+				),
+				'options' => array(
+					'USER_IS_ONLINE_INTERVAL' => 120 // sec
 				)
 			),
 			'EXTERNAL_AUTH_ID' => array(
@@ -141,7 +156,7 @@ class UserTable extends Entity\DataManager
 				"   )";
 		}
 
-		$connection = Application::getDbConnection();
+		$connection = Application::getConnection();
 		return $connection->queryScalar($sql);
 	}
 }

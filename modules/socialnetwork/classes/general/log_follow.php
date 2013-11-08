@@ -118,7 +118,12 @@ class CSocNetLogFollow
 		if ($type != "Y")
 			$type = "N";
 
-		$strSQL = "INSERT INTO b_sonet_log_follow (USER_ID, CODE, TYPE, FOLLOW_DATE) VALUES(".$user_id.", '".$code."', '".$type."', ".($follow_date ? $DB->CharToDateFunction($follow_date) : $DB->CurrentTimeFunction()).")";
+		if (preg_match('/(\d+)/', $code, $matches))
+			$ref_id = intval($matches[1]);
+		else
+			$ref_id = 0;
+
+		$strSQL = "INSERT INTO b_sonet_log_follow (USER_ID, CODE, REF_ID, TYPE, FOLLOW_DATE) VALUES(".$user_id.", '".$code."', ".$ref_id.", '".$type."', ".($follow_date ? $DB->CharToDateFunction($follow_date) : $DB->CurrentTimeFunction()).")";
 		if ($DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__))
 		{
 			if (
@@ -283,6 +288,84 @@ class CSocNetLogFollow
 		}
 	}
 
+	public static function GetExactValueByRating($user_id, $rating_type_id, $rating_entity_id)
+	{
+		global $DB;
+
+		if (
+			intval($user_id) <= 0
+			|| strlen($rating_type_id) <= 0
+			|| intval($rating_entity_id) <= 0
+		)
+			return false;
+
+		$arPostTypeID = array(
+			"BLOG_POST", 
+			"FORUM_TOPIC", 
+			"IBLOCK_ELEMENT", 
+			"BITRIX24_NEW_USER", 
+			"INTRANET_NEW_USER", 
+			"LOG_ENTRY"
+		);
+
+		$arCommentTypeID = array(
+			"BLOG_COMMENT", 
+			"FORUM_POST", 
+			"BITRIX24_NEW_USER_COMMENT", 
+			"INTRANET_NEW_USER_COMMENT",
+			"LOG_COMMENT"
+		);
+
+		if (
+			in_array($rating_type_id, $arCommentTypeID)
+			|| 
+			(
+				!in_array($rating_type_id, $arCommentTypeID)
+				&& !in_array($rating_type_id, $arPostTypeID)
+			)
+		)
+		{
+			$strSQL = "SELECT TYPE FROM b_sonet_log_follow LFW 
+				INNER JOIN b_sonet_log_comment LC ON 
+					LC.RATING_TYPE_ID = '".$rating_type_id."' 
+					AND LC.RATING_ENTITY_ID = ".intval($rating_entity_id)." 
+					AND LFW.REF_ID = LC.LOG_ID 
+					AND LFW.CODE = ".$DB->Concat("'L'", "LC.LOG_ID")." 
+				WHERE  
+					LFW.USER_ID = ".intval($user_id);
+
+			$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($arRes = $dbRes->Fetch())
+				$strRes = $arRes["TYPE"];
+		}
+
+		if (
+			in_array($rating_type_id, $arPostTypeID)
+			|| 
+			(
+				!in_array($rating_type_id, $arCommentTypeID)
+				&& !in_array($rating_type_id, $arPostTypeID)
+				&& !$strRes
+			)
+		)
+		{
+			$strSQL = "SELECT TYPE FROM b_sonet_log_follow LFW 
+				INNER JOIN b_sonet_log L ON 
+					L.RATING_TYPE_ID = '".$rating_type_id."' 
+					AND L.RATING_ENTITY_ID = ".intval($rating_entity_id)." 
+					AND LFW.REF_ID = L.ID 
+					AND LFW.CODE = ".$DB->Concat("'L'", "L.ID")." 
+				WHERE  
+					LFW.USER_ID = ".intval($user_id);
+
+			$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($arRes = $dbRes->Fetch())
+				$strRes = $arRes["TYPE"];
+		}
+
+		return $strRes;
+	}
+
 	public static function GetList($arFilter = Array(), $arSelectFields = array())
 	{
 		global $DB;
@@ -294,6 +377,7 @@ class CSocNetLogFollow
 		$arFields = array(
 			"USER_ID" => Array("FIELD" => "SLF.USER_ID", "TYPE" => "int"),
 			"CODE" => Array("FIELD" => "SLF.CODE", "TYPE" => "string"),
+			"REF_ID" => Array("FIELD" => "SLF.REF_ID", "TYPE" => "int"),
 			"TYPE" => array("FIELD" => "SLF.TYPE", "TYPE" => "char"),
 			"FOLLOW_DATE" => Array("FIELD" => "SLF.FOLLOW_DATE", "TYPE" => "datetime"),
 		);

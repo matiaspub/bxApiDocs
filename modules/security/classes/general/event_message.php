@@ -6,7 +6,7 @@
 * @copyright 2001-2013 Bitrix
 */
 
-class CSecurityEventMessageFormatter
+final class CSecurityEventMessageFormatter
 {
 	const AUDIT_TYPE = "#AUDIT_TYPE#";
 	const SITE_ID = "#SITE_ID#";
@@ -46,25 +46,25 @@ class CSecurityEventMessageFormatter
 	);
 
 	/**
-	 * @param string $pMessageFormat
-	 * @param string $pUserInfoFormat
+	 * @param string $messageFormat
+	 * @param string $userInfoFormat
 	 */
-	public function __construct($pMessageFormat = "", $pUserInfoFormat = "")
+	public function __construct($messageFormat = "", $userInfoFormat = "")
 	{
-		if ($pMessageFormat)
-			$this->messageFormat = $pMessageFormat;
+		if ($messageFormat)
+			$this->messageFormat = $messageFormat;
 		else
 			$this->messageFormat = self::getDefaultMessageFormat();
 
-		if ($pUserInfoFormat)
-			$this->userInfoFormat = $pUserInfoFormat;
+		if ($userInfoFormat)
+			$this->userInfoFormat = $userInfoFormat;
 		else
 			$this->userInfoFormat = self::getDefaultUserInfoFormat();
 
-		$this->isUserInfoNeeded = strpos($pMessageFormat, self::USER_INFO) !== false;
-		$this->isB64MessageNeeded = strpos($pMessageFormat, self::VARIABLE_VALUE_BASE64) !== false;
+		$this->isUserInfoNeeded = strpos($messageFormat, self::USER_INFO) !== false;
+		$this->isB64MessageNeeded = strpos($messageFormat, self::VARIABLE_VALUE_BASE64) !== false;
 
-		if(!defined("ADMIN_SECTION") || ADMIN_SECTION != true)
+		if (!defined("ADMIN_SECTION") || ADMIN_SECTION != true)
 			$this->siteId = SITE_ID;
 
 		$this->userInfo = $this->getUserInfo();
@@ -110,28 +110,28 @@ class CSecurityEventMessageFormatter
 	}
 
 	/**
-	 * @param string $pAuditType
-	 * @param string $pItemName
-	 * @param string $pItemDescription
+	 * @param string $auditType
+	 * @param string $itemName
+	 * @param string $itemDescription
 	 * @return string
 	 */
-	public function format($pAuditType, $pItemName, $pItemDescription)
+	public function format($auditType, $itemName, $itemDescription)
 	{
-		$description = substr($pItemDescription,0,2000);
+		$description = substr($itemDescription,0,2000);
 
 		$replacement = array(
-			self::AUDIT_TYPE => $pAuditType,
+			self::AUDIT_TYPE => $auditType,
 			self::SITE_ID => $this->siteId,
 			self::USER_INFO => $this->userInfo,
 			self::URL => $this->url,
-			self::VARIABLE_NAME => $pItemName,
+			self::VARIABLE_NAME => $itemName,
 			self::VARIABLE_VALUE => $description
 		);
 
-		if($this->isB64MessageNeeded)
+		if ($this->isB64MessageNeeded)
 			$replacement[self::VARIABLE_VALUE_BASE64] = base64_encode($description);
 
-		if(defined("BX24_HOST_NAME"))
+		if (defined("BX24_HOST_NAME"))
 			$replacement[self::BX24_HOST] = BX24_HOST_NAME;
 
 		return str_replace(
@@ -144,14 +144,14 @@ class CSecurityEventMessageFormatter
 	/**
 	 * @return string
 	 */
-	protected function getUserInfo()
+	private function getUserInfo()
 	{
 		if (!$this->isUserInfoNeeded)
 			return "";
 
 		global $USER;
 
-		if(is_object($USER))
+		if (is_object($USER))
 			$userId = $USER->GetID();
 		else
 			$userId = 0;

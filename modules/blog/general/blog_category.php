@@ -44,6 +44,11 @@ class CAllBlogCategory
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCT_EMPTY_BLOG_ID"), "EMPTY_BLOG_ID");
 				return false;
 			}
+
+			if(strlen($arFields["NAME"]) > 255)
+			{
+				$arFields["NAME"] = substr($arFields["NAME"], 0, 255);
+			}
 			$dbCategory = CBlogCategory::GetList(array(), array("BLOG_ID" => $blogID, "NAME" => $arFields["NAME"]));
 			while($arCategory = $dbCategory->Fetch())
 			{

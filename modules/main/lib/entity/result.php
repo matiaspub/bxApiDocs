@@ -12,6 +12,8 @@ class Result
 {
 	protected $isSuccess;
 
+	protected $wereErrorsChecked = false;
+
 	/** @var EntityError[] */
 	protected $errors;
 
@@ -23,11 +25,16 @@ class Result
 
 	/**
 	 * Returns result status
+	 * Within the core and events should be called with internalCall flag
+	 *
+	 * @param bool $internalCall
 	 *
 	 * @return bool
 	 */
-	public function isSuccess()
+	public function isSuccess($internalCall = false)
 	{
+		$this->wereErrorsChecked = !$internalCall;
+
 		return $this->isSuccess;
 	}
 
@@ -49,6 +56,8 @@ class Result
 	 */
 	public function getErrors()
 	{
+		$this->wereErrorsChecked = true;
+
 		return $this->errors;
 	}
 
@@ -59,6 +68,8 @@ class Result
 	 */
 	public function getErrorMessages()
 	{
+		$this->wereErrorsChecked = true;
+
 		$messages = array();
 
 		foreach($this->errors as $error)
@@ -78,6 +89,16 @@ class Result
 		{
 			foreach($errors as $error)
 				$this->addError($error);
+		}
+	}
+
+	public function __destruct()
+	{
+		if (!$this->isSuccess && !$this->wereErrorsChecked)
+		{
+			// nobody interested in my errors :(
+			// make a warning (usually it should be written in log)
+			trigger_error(join('; ', $this->getErrorMessages()), E_USER_WARNING);
 		}
 	}
 }

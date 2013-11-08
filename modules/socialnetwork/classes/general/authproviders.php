@@ -85,6 +85,9 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 	{
 		global $USER;
 
+		if(is_array($arParams["socnetgroups"]) && $arParams["socnetgroups"]["disabled"] == "true")
+			return false;
+
 		$currElements = '';
 		if(is_array($arParams[$this->id]) && ($group_id = intval($arParams[$this->id]["group_id"])) > 0)
 		{

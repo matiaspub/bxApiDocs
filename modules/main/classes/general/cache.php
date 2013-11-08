@@ -15,138 +15,125 @@ interface ICacheBackend
 	public static function IsCacheExpired($path);
 }
 
-class CPHPCache
+class CCacheDebug
 {
-	/** @var ICacheBackend */
-	var $_cache;
-	var $content;
-	var $vars;
-	var $TTL;
-	var $uniq_str;
-	var $basedir;
-	var $initdir;
-	var $filename;
-	var $bStarted = false;
-	var $bInit = "NO";
-
-	public function __construct()
+	static $arCacheDebug = array();
+	static $ShowCacheStat = false;
+	static $skipUntil = array(
+		"ccachedebug->add" => true,
+		"cphpcache->initcache" => true,
+		"cphpcache->startdatacache" => true,
+		"cphpcache->enddatacache" => true,
+		"cphpcache->clean" => true,
+		"cphpcache->cleandir" => true,
+		"cpagecache->initcache" => true,
+		"cpagecache->startdatacache" => true,
+		"cpagecache->enddatacache" => true,
+		"cpagecache->clean" => true,
+		"cpagecache->cleandir" => true,
+		"ccachemanager->read" => true,
+		"ccachemanager->setimmediate" => true,
+		"ccachemanager->clean" => true,
+		"ccachemanager->cleandir" => true,
+		"ccachemanager->cleanall" => true,
+		"cbitrixcomponent->startresultcache" => true,
+	);
+	public static function add($size, $path, $basedir, $initdir, $filename, $operation)
 	{
-		$this->CPHPCache();
-	}
-
-	public function CPHPCache()
-	{
-		$this->_cache = $this->_new_cache_object();
-	}
-
-	function _new_cache_object()
-	{
-		static $cache_type = false;
-		if($cache_type === false)
+		$prev = array();
+		$found = -1;
+		foreach(Bitrix\Main\Diag\Helper::getBackTrace(8) as $i => $tr)
 		{
-			$isOK = false;
-			if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/memcache.php"))
+			$func = $tr["class"].$tr["type"].$tr["function"];
+
+			if ($found < 0 && !isset(self::$skipUntil[strtolower($func)]))
 			{
-				include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/memcache.php");
-				if(defined("BX_MEMCACHE_CLUSTER") && extension_loaded('memcache'))
-				{
-					include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/classes/general/memcache_cache.php");
-					$obCache = new CPHPCacheMemcacheCluster;
-					if($obCache->IsAvailable())
-					{
-						$cache_type = "CPHPCacheMemcacheCluster";
-						$isOK = true;
-					}
-				}
+				$found = count(self::$arCacheDebug);
+				self::$arCacheDebug[$found] = array(
+					"TRACE" => array(),
+					"path" => $path,
+					"basedir" => $basedir,
+					"initdir" => $initdir,
+					"filename" => $filename,
+					"cache_size" => $size,
+					"callee_func" => $prev["class"].$prev["type"].$prev["function"],
+					"operation" => $operation,
+				);
+				self::$arCacheDebug[$found]["TRACE"][] = array(
+					"func" => $prev["class"].$prev["type"].$prev["function"],
+					"args" => array(),
+					"file" => $prev["file"],
+					"line" => $prev["line"],
+				);
 			}
-			//There is no cluster configuration
-			if($cache_type === false)
+
+			if ($found > -1)
 			{
-				if(defined("BX_CACHE_TYPE"))
+				if (count(self::$arCacheDebug[$found]["TRACE"]) < 8)
 				{
-					switch(BX_CACHE_TYPE)
+					$args = array();
+					if (is_array($tr["args"]))
 					{
-						case "memcache":
-						case "CPHPCacheMemcache":
-							if(extension_loaded('memcache') && defined("BX_MEMCACHE_HOST"))
+						foreach ($tr["args"] as $k1 => $v1)
+						{
+							if (is_array($v1))
 							{
-								include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_memcache.php");
-								$cache_type = "CPHPCacheMemcache";
+								foreach ($v1 as $k2 => $v2)
+								{
+									if (is_scalar($v2))
+										$args[$k1][$k2] = $v2;
+									elseif (is_object($v2))
+										$args[$k1][$k2] = get_class($v2);
+									else
+										$args[$k1][$k2] = gettype($v2);
+								}
 							}
-							break;
-						case "eaccelerator":
-						case "CPHPCacheEAccelerator":
-							if(extension_loaded('eaccelerator'))
+							else
 							{
-								include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_eaccelerator.php");
-								$cache_type = "CPHPCacheEAccelerator";
+								if (is_scalar($v1))
+									$args[$k1] = $v1;
+								elseif (is_object($v1))
+									$args[$k1] = get_class($v1);
+								else
+									$args[$k1] = gettype($v1);
 							}
-							break;
-						case "apc":
-						case "CPHPCacheAPC":
-							if(extension_loaded('apc'))
-							{
-								include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_apc.php");
-								$cache_type = "CPHPCacheAPC";
-							}
-							break;
-						case "xcache":
-						case "CPHPCacheXCache":
-							if(extension_loaded('xcache'))
-							{
-								include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_xcache.php");
-								$cache_type = "CPHPCacheXCache";
-							}
-							break;
-						default:
-							if(defined("BX_CACHE_CLASS_FILE") && file_exists(BX_CACHE_CLASS_FILE))
-							{
-								include_once(BX_CACHE_CLASS_FILE);
-								$cache_type = BX_CACHE_TYPE;
-							}
-							break;
+						}
 					}
+
+					self::$arCacheDebug[$found]["TRACE"][] = array(
+						"func" => $func,
+						"args" => $args,
+						"file" => $tr["file"],
+						"line" => $tr["line"],
+					);
 				}
 				else
 				{
-					include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_files.php");
-					$cache_type = "CPHPCacheFiles";
+					break;
 				}
 			}
-
-			//Probe the cache backend class
-			if(!$isOK && class_exists($cache_type))
-			{
-				$obCache = new $cache_type;
-				if ($obCache instanceof ICacheBackend)
-					$isOK = $obCache->IsAvailable();
-			}
-
-			//Bulletproof files cache
-			if(!$isOK)
-			{
-				include_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/cache_files.php");
-				$cache_type = "CPHPCacheFiles";
-			}
+			$prev = $tr;
 		}
+	}
+}
 
-		$cache = new $cache_type;
-		return $cache;
+class CPHPCache
+{
+	/**
+	 * @var Bitrix\Main\Data\Cache
+	 */
+	private $cache;
+
+	public function __construct()
+	{
+		$this->cache = \Bitrix\Main\Data\Cache::createInstance();
 	}
 
-	public static function GetPath($uniq_str)
+	static public function Clean($uniq_str, $initdir = false, $basedir = "cache")
 	{
-		$un = md5($uniq_str);
-		return substr($un, 0, 2)."/".$un.".php";
-	}
-
-	public static function Clean($uniq_str, $initdir = false, $basedir = "cache")
-	{
-		if(is_object($this) && is_object($this->_cache))
+		if(is_object($this) && ($this instanceof CPHPCache))
 		{
-			$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
-			$filename = CPHPCache::GetPath($uniq_str);
-			return $this->_cache->clean($basedir, $initdir, "/".$filename);
+			return $this->cache->clean($uniq_str, $initdir, $basedir);
 		}
 		else
 		{
@@ -184,8 +171,7 @@ class CPHPCache
 	 */
 	public function CleanDir($initdir = false, $basedir = "cache")
 	{
-		$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
-		return $this->_cache->clean($basedir, $initdir);
+		return $this->cache->cleanDir($initdir, $basedir);
 	}
 
 	
@@ -274,50 +260,7 @@ class CPHPCache
 	 */
 	public function InitCache($TTL, $uniq_str, $initdir=false, $basedir = "cache")
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION, $USER;
-		if($initdir === false)
-			$initdir = $APPLICATION->GetCurDir();
-
-		$this->basedir = BX_PERSONAL_ROOT."/".$basedir."/";
-		$this->initdir = $initdir;
-		$this->filename = "/".CPHPCache::GetPath($uniq_str);
-		$this->TTL = $TTL;
-		$this->uniq_str = $uniq_str;
-
-		$this->vars = false;
-
-		if($TTL<=0)
-			return false;
-
-		if(isset($_GET["clear_cache_session"]) || isset($_GET["clear_cache"]))
-		{
-			if(is_object($USER) && $USER->CanDoOperation('cache_control'))
-			{
-				if(isset($_GET["clear_cache_session"]))
-				{
-					if(strtoupper($_GET["clear_cache_session"])=="Y")
-						$_SESSION["SESS_CLEAR_CACHE"] = "Y";
-					elseif(strlen($_GET["clear_cache_session"]) > 0)
-						unset($_SESSION["SESS_CLEAR_CACHE"]);
-				}
-
-				if(isset($_GET["clear_cache"]) && strtoupper($_GET["clear_cache"])=="Y")
-					return false;
-			}
-		}
-
-		if(isset($_SESSION["SESS_CLEAR_CACHE"]) && $_SESSION["SESS_CLEAR_CACHE"] == "Y")
-			return false;
-
-		$arAllVars = array("CONTENT" => "", "VARS" => "");
-		if(!$this->_cache->read($arAllVars, $this->basedir, $this->initdir, $this->filename, $this->TTL))
-			return false;
-
-		$GLOBALS["CACHE_STAT_BYTES"] += $this->_cache->read;
-		$this->content = $arAllVars["CONTENT"];
-		$this->vars = $arAllVars["VARS"];
-		return true;
+		return $this->cache->initCache($TTL, $uniq_str, $initdir, $basedir);
 	}
 
 	
@@ -397,7 +340,7 @@ class CPHPCache
 	 */
 	public function Output()
 	{
-		echo $this->content;
+		return $this->cache->output();
 	}
 
 	
@@ -468,7 +411,7 @@ class CPHPCache
 	 */
 	public function GetVars()
 	{
-		return $this->vars;
+		return $this->cache->getVars();
 	}
 
 	
@@ -573,37 +516,20 @@ class CPHPCache
 	{
 		$narg = func_num_args();
 		if($narg<=0)
-			$TTL = $this->TTL;
+			return $this->cache->startDataCache();
 		if($narg<=1)
-			$uniq_str = $this->uniq_str;
+			return $this->cache->startDataCache($TTL);
 		if($narg<=2)
-			$initdir = $this->initdir;
+			return $this->cache->startDataCache($TTL, $uniq_str);
 		if($narg<=3)
-			$vars = $this->vars;
+			return $this->cache->startDataCache($TTL, $uniq_str, $initdir);
 
-		if($this->InitCache($TTL, $uniq_str, $initdir, $basedir))
-		{
-			$this->Output();
-			return false;
-		}
-
-		if($TTL<=0)
-			return true;
-
-		ob_start();
-		$this->vars = $vars;
-		$this->bStarted = true;
-
-		return true;
+		return $this->cache->startDataCache($TTL, $uniq_str, $initdir, $vars, $basedir);
 	}
 
 	public function AbortDataCache()
 	{
-		if(!$this->bStarted)
-			return;
-		$this->bStarted = false;
-
-		ob_end_flush();
+		$this->cache->abortDataCache();
 	}
 
 	/**
@@ -687,22 +613,7 @@ class CPHPCache
 	 */
 	public function EndDataCache($vars=false)
 	{
-		if(!$this->bStarted)
-			return;
-		$this->bStarted = false;
-
-		$arAllVars = array(
-			"CONTENT" => ob_get_contents(),
-			"VARS" => ($vars!==false? $vars: $this->vars),
-		);
-
-		$this->_cache->write($arAllVars, $this->basedir, $this->initdir, $this->filename, $this->TTL);
-		$GLOBALS["CACHE_STAT_BYTES"] += $this->_cache->written;
-
-		if(strlen(ob_get_contents()) > 0)
-			ob_end_flush();
-		else
-			ob_end_clean();
+		$this->cache->endDataCache($vars);
 	}
 
 	
@@ -755,9 +666,9 @@ class CPHPCache
 	 */
 	public static function IsCacheExpired($path)
 	{
-		if(is_object($this) && is_object($this->_cache))
+		if(is_object($this) && ($this instanceof CPHPCache))
 		{
-			return $this->_cache->IsCacheExpired($path);
+			return $this->cache->isCacheExpired($path);
 		}
 		else
 		{
@@ -780,7 +691,7 @@ class CPageCache
 
 	public function __construct()
 	{
-		$this->_cache = CPHPCache::_new_cache_object();
+		$this->_cache = \Bitrix\Main\Data\Cache::createCacheEngine();
 	}
 
 	public static function GetPath($uniq_str)
@@ -795,6 +706,8 @@ class CPageCache
 		{
 			$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
 			$filename = CPageCache::GetPath($uniq_str);
+			if (\Bitrix\Main\Data\Cache::getShowCacheStat())
+				\Bitrix\Main\Diag\CacheTracker::add(0, "", $basedir, $initdir, "/".$filename, "C");
 			return $this->_cache->clean($basedir, $initdir, "/".$filename);
 		}
 		else
@@ -807,6 +720,8 @@ class CPageCache
 	public function CleanDir($initdir = false, $basedir = "cache")
 	{
 		$basedir = BX_PERSONAL_ROOT."/".$basedir."/";
+		if (\Bitrix\Main\Data\Cache::getShowCacheStat())
+			\Bitrix\Main\Diag\CacheTracker::add(0, "", $basedir, $initdir, "", "C");
 		return $this->_cache->clean($basedir, $initdir);
 	}
 
@@ -884,7 +799,25 @@ class CPageCache
 		if(!$this->_cache->read($this->content, $this->basedir, $this->initdir, $this->filename, $this->TTL))
 			return false;
 
-		$GLOBALS["CACHE_STAT_BYTES"] += $this->_cache->read;
+//		$GLOBALS["CACHE_STAT_BYTES"] += $this->_cache->read;
+		if (\Bitrix\Main\Data\Cache::getShowCacheStat())
+		{
+			$read = 0;
+			$path = '';
+			if ($this->_cache instanceof \Bitrix\Main\Data\ICacheEngineStat)
+			{
+				$read = $this->_cache->getReadBytes();
+				$path = $this->_cache->getCachePath();
+			}
+			elseif ($this->_cache instanceof \ICacheBackend)
+			{
+				$read = $this->_cache->read;
+				$path = $this->_cache->path;
+			}
+
+			\Bitrix\Main\Diag\CacheTracker::addCacheStatBytes($read);
+			\Bitrix\Main\Diag\CacheTracker::add($read, $path, $this->basedir, $this->initdir, $this->filename, "R");
+		}
 		return true;
 	}
 
@@ -1060,7 +993,24 @@ class CPageCache
 		$arAllVars = ob_get_contents();
 
 		$this->_cache->write($arAllVars, $this->basedir, $this->initdir, $this->filename, $this->TTL);
-		$GLOBALS["CACHE_STAT_BYTES"] += $this->_cache->written;
+
+		if (\Bitrix\Main\Data\Cache::getShowCacheStat())
+		{
+			$written = 0;
+			$path = '';
+			if ($this->_cache instanceof \Bitrix\Main\Data\ICacheEngineStat)
+			{
+				$written = $this->_cache->getWrittenBytes();
+				$path = $this->_cache->getCachePath();
+			}
+			elseif ($this->_cache instanceof \ICacheBackend)
+			{
+				$written = $this->_cache->written;
+				$path = $this->_cache->path;
+			}
+			\Bitrix\Main\Diag\CacheTracker::addCacheStatBytes($written);
+			\Bitrix\Main\Diag\CacheTracker::add($written, $path, $this->basedir, $this->initdir, $this->filename, "W");
+		}
 
 		if(strlen($arAllVars)>0)
 			ob_end_flush();
@@ -1242,282 +1192,97 @@ function BXClearCache($full=false, $initdir="")
 // of the set of variables
 class CCacheManager
 {
-	private $isMySql;
+	/**
+	 * @var Bitrix\Main\Data\ManagedCache
+	 */
+	private $manager;
+
 	public function __construct()
 	{
-		global $DB;
-		$this->isMySql = ($DB->type == "MYSQL");
+		$this->manager = \Bitrix\Main\Application::getInstance()->getManagedCache();
 	}
 
-	/** @var CPHPCache[] */
-	var $CACHE = array();
-	var $CACHE_PATH = array();
-	var $VARS = array();
-	var $TTL = array();
 	// Tries to read cached variable value from the file
 	// Returns true on success
 	// overwise returns false
 	public function Read($ttl, $uniqid, $table_id=false)
 	{
-		global $DB;
-		if(isset($this->CACHE[$uniqid]))
-		{
-			return true;
-		}
-		else
-		{
-			$this->CACHE[$uniqid] = new CPHPCache;
-			$this->CACHE_PATH[$uniqid] = $DB->type.($table_id===false?"":"/".$table_id);
-			$this->TTL[$uniqid] = $ttl;
-			return $this->CACHE[$uniqid]->InitCache($ttl, $uniqid, $this->CACHE_PATH[$uniqid], "managed_cache");
-		}
+		return $this->manager->read($ttl, $uniqid, $table_id);
 	}
+
 	// This method is used to read the variable value
 	// from the cache after successfull Read
 	public function Get($uniqid)
 	{
-		if(array_key_exists($uniqid, $this->VARS))
-			return $this->VARS[$uniqid];
-		elseif(isset($this->CACHE[$uniqid]))
-			return $this->CACHE[$uniqid]->GetVars();
-		else
-			return false;
+		return $this->manager->get($uniqid);
 	}
+
 	// Sets new value to the variable
 	public function Set($uniqid, $val)
 	{
-		if(isset($this->CACHE[$uniqid]))
-			$this->VARS[$uniqid]=$val;
+		$this->manager->set($uniqid, $val);
 	}
 
 	public function SetImmediate($uniqid, $val)
 	{
-		if(isset($this->CACHE[$uniqid]))
-		{
-			$obCache = new CPHPCache;
-			$obCache->StartDataCache($this->TTL[$uniqid], $uniqid, $this->CACHE_PATH[$uniqid], $val, "managed_cache");
-			$obCache->EndDataCache();
-
-			unset($this->CACHE[$uniqid]);
-			unset($this->CACHE_PATH[$uniqid]);
-			unset($this->VARS[$uniqid]);
-		}
+		$this->manager->setImmediate($uniqid, $val);
 	}
+
 	// Marks cache entry as invalid
 	public function Clean($uniqid, $table_id=false)
 	{
-		global $DB;
-		$obCache = new CPHPCache;
-		$obCache->Clean($uniqid, $DB->type.($table_id===false?"":"/".$table_id), "managed_cache");
-		if(isset($this->CACHE[$uniqid]))
-		{
-			unset($this->CACHE[$uniqid]);
-			unset($this->CACHE_PATH[$uniqid]);
-			unset($this->VARS[$uniqid]);
-		}
+		$this->manager->clean($uniqid, $table_id);
 	}
+
 	// Marks cache entries associated with the table as invalid
 	public function CleanDir($table_id)
 	{
-		global $DB;
-		$strPath = $DB->type."/".$table_id;
-		foreach($this->CACHE_PATH as $uniqid=>$Path)
-		{
-			if($Path==$strPath)
-			{
-				unset($this->CACHE[$uniqid]);
-				unset($this->CACHE_PATH[$uniqid]);
-				unset($this->VARS[$uniqid]);
-			}
-		}
-		$obCache = new CPHPCache;
-		$obCache->CleanDir($DB->type."/".$table_id, "managed_cache");
+		$this->manager->cleanDir($table_id);
 	}
+
 	// Clears all managed_cache
 	public function CleanAll()
 	{
-		$this->CACHE = array();
-		$this->CACHE_PATH = array();
-		$this->VARS = array();
-		$this->TTL = array();
-		$obCache = new CPHPCache;
-		$obCache->CleanDir(false, "managed_cache");
-
-		if(defined("BX_COMP_MANAGED_CACHE"))
-			$this->ClearByTag(true);
+		$this->manager->cleanAll();
 	}
+
 	// Use it to flush cache to the files.
 	// Caution: only at the end of all operations!
-	public static function _Finalize()
+	static public function _Finalize()
 	{
-		global $CACHE_MANAGER;
-		$obCache = new CPHPCache;
-		foreach($CACHE_MANAGER->CACHE as $uniqid=>$val)
-		{
-			if(array_key_exists($uniqid, $CACHE_MANAGER->VARS))
-			{
-				$obCache->StartDataCache($CACHE_MANAGER->TTL[$uniqid], $uniqid, $CACHE_MANAGER->CACHE_PATH[$uniqid],  $CACHE_MANAGER->VARS[$uniqid], "managed_cache");
-				$obCache->EndDataCache();
-			}
-		}
+		\Bitrix\Main\Data\ManagedCache::finalize();
 	}
 
 	/*Components managed(tagged) cache*/
 
-	var $comp_cache_stack = array();
-	var $SALT = false;
-	var $DBCacheTags = array();
-	var $bWasTagged = false;
-
-	public function InitDBCache($path)
-	{
-		global $DB;
-		if (!isset($this->DBCacheTags[$path]))
-		{
-			$this->DBCacheTags[$path] = array();
-			$rs = $DB->Query("
-				SELECT TAG
-				FROM b_cache_tag
-				WHERE SITE_ID = '".$DB->ForSQL(SITE_ID, 2)."'
-				AND CACHE_SALT = '".$DB->ForSQL($this->SALT, 4)."'
-				AND RELATIVE_PATH = '".$DB->ForSQL($path, 4)."'
-			");
-			while($ar = $rs->Fetch())
-			{
-				$this->DBCacheTags[$path][$ar["TAG"]] = true;
-			}
-		}
-	}
-
-	public function InitCompSalt()
-	{
-		if($this->SALT === false)
-		{
-			if($_SERVER["SCRIPT_NAME"] == "/bitrix/urlrewrite.php" && isset($_SERVER["REAL_FILE_PATH"]))
-				$SCRIPT_NAME = $_SERVER["REAL_FILE_PATH"];
-			elseif($_SERVER["SCRIPT_NAME"] == "/404.php" && isset($_SERVER["REAL_FILE_PATH"]))
-				$SCRIPT_NAME = $_SERVER["REAL_FILE_PATH"];
-			else
-				$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
-
-			$this->SALT = "/".substr(md5($SCRIPT_NAME), 0, 3);
-		}
-	}
-
 	public function GetCompCachePath($relativePath)
 	{
-		global $BX_STATE;
-		$this->InitCompSalt();
-
-		if($BX_STATE === "WA")
-			$salt = $this->SALT;
-		else
-			$salt = "/".substr(md5($BX_STATE), 0, 3);
-
-		$path = "/".SITE_ID.$relativePath.$salt;
-		return $path;
+		return $this->manager->getCompCachePath($relativePath);
 	}
 
 	public function StartTagCache($relativePath)
 	{
-		array_unshift($this->comp_cache_stack, array($relativePath, array()));
+		$this->manager->startTagCache($relativePath);
 	}
 
 	public function EndTagCache()
 	{
-		global $DB;
-		$this->InitCompSalt();
-
-		if($this->bWasTagged)
-		{
-			$sqlSITE_ID = $DB->ForSQL(SITE_ID, 2);
-			$sqlCACHE_SALT = $this->SALT;
-
-			$strSqlPrefix = "
-				INSERT ".($this->isMySql? "IGNORE": "")." INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
-				VALUES
-			";
-			$maxValuesLen = $this->isMySql? 2048: 0;
-			$strSqlValues = "";
-
-			foreach($this->comp_cache_stack as $arCompCache)
-			{
-				$path = $arCompCache[0];
-				if(strlen($path))
-				{
-					$this->InitDBCache($path);
-					$sqlRELATIVE_PATH = $DB->ForSQL($path, 255);
-					$sql = ",\n('".$sqlSITE_ID."', '".$sqlCACHE_SALT."', '".$sqlRELATIVE_PATH."',";
-					foreach($arCompCache[1] as $tag => $t)
-					{
-						if(!isset($this->DBCacheTags[$path][$tag]))
-						{
-							$strSqlValues .= $sql." '".$DB->ForSQL($tag, 50)."')";
-							if(strlen($strSqlValues) > $maxValuesLen)
-							{
-								$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
-								$strSqlValues = "";
-							}
-							$this->DBCacheTags[$path][$tag] = true;
-						}
-					}
-				}
-			}
-			if($strSqlValues <> '')
-			{
-				$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
-			}
-		}
-
-		array_shift($this->comp_cache_stack);
+		$this->manager->endTagCache();
 	}
 
 	public function AbortTagCache()
 	{
-		array_shift($this->comp_cache_stack);
+		$this->manager->abortTagCache();
 	}
 
 	public function RegisterTag($tag)
 	{
-		if(count($this->comp_cache_stack))
-		{
-			$this->comp_cache_stack[0][1][$tag] = true;
-			$this->bWasTagged = true;
-		}
+		$this->manager->registerTag($tag);
 	}
 
 	public function ClearByTag($tag)
 	{
-		global $DB;
-
-		if($tag === true)
-			$sqlWhere = " WHERE TAG <> '*'";
-		else
-			$sqlWhere = "  WHERE TAG = '".$DB->ForSQL($tag)."'";
-
-		$arDirs = array();
-		$rs = $DB->Query("SELECT * FROM b_cache_tag".$sqlWhere);
-		while($ar = $rs->Fetch())
-			$arDirs[$ar["RELATIVE_PATH"]] = $ar;
-		$DB->Query("DELETE FROM b_cache_tag".$sqlWhere);
-
-		$obCache = new CPHPCache;
-		foreach($arDirs as $path => $ar)
-		{
-			$DB->Query("
-				DELETE FROM b_cache_tag
-				WHERE SITE_ID = '".$DB->ForSQL($ar["SITE_ID"])."'
-				AND CACHE_SALT = '".$DB->ForSQL($ar["CACHE_SALT"])."'
-				AND RELATIVE_PATH = '".$DB->ForSQL($ar["RELATIVE_PATH"])."'
-			");
-
-			if(preg_match("/^managed:(.+)$/", $path, $match))
-				$this->CleanDir($match[1]);
-			else
-				$obCache->CleanDir($path);
-
-			unset($this->DBCacheTags[$path]);
-		}
+		$this->manager->clearByTag($tag);
 	}
 }
 
@@ -1525,6 +1290,18 @@ global $CACHE_MANAGER;
 $CACHE_MANAGER = new CCacheManager;
 
 $GLOBALS["CACHE_STAT_BYTES"] = 0;
+//magic parameters: show cache usage statistics
+$show_cache_stat = "";
+if(array_key_exists("show_cache_stat", $_GET))
+{
+	$show_cache_stat = (strtoupper($_GET["show_cache_stat"]) == "Y"? "Y":"");
+	setcookie("show_cache_stat", $show_cache_stat, false, "/");
+}
+elseif(array_key_exists("show_cache_stat", $_COOKIE))
+{
+	$show_cache_stat = $_COOKIE["show_cache_stat"];
+}
+CCacheDebug::$ShowCacheStat = ($show_cache_stat === "Y");
 
 /*****************************************************************************************************/
 /************************  CStackCacheManager  *******************************************************/

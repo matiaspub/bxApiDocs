@@ -1,4 +1,4 @@
-<?
+<?php
 class CBitrixCloudCDNServerGroup
 {
 	private $name = "";
@@ -137,11 +137,10 @@ class CBitrixCloudCDNServerGroups
 		$groups = /*.(array[string]string).*/ array();
 		foreach ($this->groups as $group_name => $group)
 		{
-			/** @var CBitrixCloudCDNServerGroup $group */
+			/* @var CBitrixCloudCDNServerGroup $group */
 			$groups[$group_name] = implode(",", $group->getServers());
 		}
 		$option->setArrayValue($groups);
 		return $this;
 	}
 }
-?>

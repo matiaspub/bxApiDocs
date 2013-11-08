@@ -115,10 +115,7 @@ class CSecurityXSSDetect
 	 */
 	protected function setAction($pAction)
 	{
-		if(CSecurityFilter::isActionValid($pAction))
-		{
-			$this->action = $pAction;
-		}
+		$this->action = $pAction;
 	}
 
 	/**

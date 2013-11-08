@@ -261,6 +261,60 @@ class CIMMail
 
 		return "CIMMail::MailMessageAgent();";
 	}
+
+	/**
+	 * duplicate CIntranetUtils::IsExternalMailAvailable()
+	 * for performance reasons
+	 */
+	public static function IsExternalMailAvailable()
+	{
+		global $USER;
+
+		if (!is_object($USER) || !$USER->IsAuthorized())
+			return false;
+
+		if (!IsModuleInstalled('mail'))
+			return false;
+
+		if (COption::GetOptionString('intranet', 'allow_external_mail', 'Y') != 'Y')
+			return false;
+
+		if (isset($_SESSION['aExtranetUser_'.$USER->GetID()][SITE_ID]))
+		{
+			if (!$_SESSION['aExtranetUser_'.$USER->GetID()][SITE_ID])
+				return false;
+		}
+		else if (CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser())
+			return false;
+
+		if (!IsModuleInstalled('dav'))
+			return true;
+
+		if (COption::GetOptionString('dav', 'exchange_server', '') == '')
+			return true;
+
+		if (COption::GetOptionString('dav', 'agent_mail', 'N') != 'Y')
+			return true;
+
+		if (COption::GetOptionString('dav', 'exchange_use_login', 'Y') == 'Y')
+			return false;
+
+		if (!CUserOptions::GetOption('dav', 'davex_mailbox'))
+		{
+			$arUser = CUser::GetList(
+				$by = 'ID', $order = 'ASC',
+				array('ID_EQUAL_EXACT' => $USER->GetID()),
+				array('SELECT' => array('UF_BXDAVEX_MAILBOX'), 'FIELDS' => array('ID'))
+			)->Fetch();
+
+			CUserOptions::SetOption('dav', 'davex_mailbox', empty($arUser['UF_BXDAVEX_MAILBOX']) ? 'N' : 'Y');
+		}
+
+		if (CUserOptions::GetOption('dav', 'davex_mailbox') == 'Y')
+			return false;
+
+		return true;
+	}
 }
 
 ?>

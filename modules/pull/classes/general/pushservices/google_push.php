@@ -1,18 +1,7 @@
 <?
 
-class CGoogleMessage
+class CGoogleMessage extends CPushMessage
 {
-	protected $_aDeviceTokens = array();
-	protected $_sText;
-	protected $_nBadge;
-	protected $_sSound;
-	protected $_nExpiryValue = 7200;
-
-	protected $_mCustomIdentifier;
-	protected $_sTitle;
-	public $_sound;
-	public $_sParams = array();
-
 	public function __construct($sDeviceToken = null)
 	{
 		if (isset($sDeviceToken)) {
@@ -20,37 +9,10 @@ class CGoogleMessage
 		}
 	}
 
-	public function addRecipient($sDeviceToken)
-	{
-		$this->_aDeviceTokens[] = $sDeviceToken;
-	}
-
-	public function setText($sText)
-	{
-		$this->_sText = $sText;
-	}
-
-	public function setTitle($sTitle)
-	{
-		$this->_sTitle = $sTitle;
-	}
-
-	public function setCustomProperty($string1, $params)
-	{
-		$this->_sParams[$string1] = $params;
-	}
-
-	public function setSound($sound = true)
-	{
-		$this->_sound = true;
-	}
-
-	public function setExpiry($nExpiryValue)
-	{
-		if (is_int($nExpiryValue))
-			$this->_nExpiryValue = $nExpiryValue;
-	}
-
+	/**
+	 * Returns batch of the message
+	 * @return string
+	 */
 	public function getBatch()
 	{
 
@@ -58,7 +20,7 @@ class CGoogleMessage
 			"data" => array(
 					'contentTitle' => $this->_sTitle,
 					"contentText" => $this->_sText,
-					"messageParams"=>$this->_sParams
+					"messageParams"=>$this->_aCustomProperties
 				),
 			"time_to_live" => $this->_nExpiryValue,
 			"registration_ids" => $this->_aDeviceTokens
@@ -72,63 +34,45 @@ class CGoogleMessage
 
 		return base64_encode($batch);
 	}
-
 }
 
-class CGooglePush
+class CGooglePush extends CPushService
 {
-	static public function GetBatch($arMessages = Array())
+	public function __construct()
 	{
-		global $APPLICATION;
-		if(is_array($arMessages) && count($arMessages)<=0)
-		return false;
-		$batch_modificator = ";3;";
+		$this->allowEmptyMessage = false;
+	}
 
-		$batch = "";
-		foreach($arMessages as $token=>$messages)
-		{
-			if(!count($messages))
-				continue;
-			$mess = 0;
-			$messCount = count($messages);
-			while($mess<$messCount)
-			{
-				if (strlen(trim($messages[$mess]["MESSAGE"])) <= 0)
-				{
-					$mess++;
-					continue;
-				}
+	/**
+	 * Returns the final batch for the Android's push notification
+	 *
+	 * @param array $messageData
+	 *
+	 * @return bool|string
+	 */
+	public function getBatch($messageData = Array())
+	{
+		$arGroupedMessages = self::getGroupedByAppID($messageData);
+		if (is_array($arGroupedMessages) && count($arGroupedMessages) <= 0)
+			return false;
 
-				if ("UTF-8"!=toupper(SITE_CHARSET))
-					$messages[$mess] = $APPLICATION->ConvertCharsetArray($messages[$mess], SITE_CHARSET, "utf-8");
+		$batch = $this->getBatchWithModifier($arGroupedMessages,";3;");
 
-				$text = $messages[$mess]["MESSAGE"];
-
-				$message = new CGoogleMessage($token);
-				$message->setText($text);
-				if($messages[$mess]["TITLE"])
-					$message->setTitle($messages[$mess]["TITLE"]);
-				$message->setSound();
-				$message->setExpiry(14400);
-
-				if($messages[$mess]["PARAMS"])
-				{
-					$params = $messages[$mess]["PARAMS"];
-					if(is_array($messages[$mess]["PARAMS"]))
-						$params = json_encode($messages[$mess]["PARAMS"]);
-					$message->setCustomProperty('params', $params);
-				}
-
-				if(strlen($batch) > 0)
-				$batch.= ";";
-				$batch.= $message->getBatch();
-				$mess++;
-			}
-		}
-
-		if(strlen($batch) == 0)
+		if (strlen($batch) == 0)
 			return $batch;
-		return  $batch_modificator.$batch;
+
+		return $batch;
+	}
+
+	/**
+	 * Gets message instance
+	 * @param $token
+	 *
+	 * @return CGoogleMessage
+	 */
+	public static function getMessageInstance($token)
+	{
+		return new CGoogleMessage($token);
 	}
 }
 ?>

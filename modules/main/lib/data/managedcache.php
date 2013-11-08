@@ -1,6 +1,8 @@
 <?php
 namespace Bitrix\Main\Data;
 
+use Bitrix\Main;
+
 class ManagedCache
 {
 	/**
@@ -17,20 +19,37 @@ class ManagedCache
 	private $salt = false;
 	private $dbCacheTags = false;
 	private $wasTagged = false;
+	private $isMySql = false;
+
+	public function __construct()
+	{
+		$this->isMySql = (static::getDbType() === "MYSQL");
+	}
+
+	private static function getDbType()
+	{
+		static $type = null;
+		if ($type === null)
+		{
+			$cm = Main\Application::getInstance()->getConnectionPool();
+			$type = $cm->getDefaultConnectionType();
+		}
+		return $type;
+	}
 
 	// Tries to read cached variable value from the file
 	// Returns true on success
-	// overwise returns false
+	// otherwise returns false
 	public function read($ttl, $uniqueId, $tableId = false)
 	{
-		if (array_key_exists($uniqueId, $this->cache))
+		if (isset($this->cache[$uniqueId]))
 		{
 			return true;
 		}
 		else
 		{
 			$this->cache[$uniqueId] = Cache::createInstance();
-			$this->cachePath[$uniqueId] = strtoupper(\Bitrix\Main\Application::getDbConnection()->getType()).($tableId === false ? "" : "/".$tableId);
+			$this->cachePath[$uniqueId] = static::getDbType().($tableId === false ? "" : "/".$tableId);
 			$this->ttl[$uniqueId] = $ttl;
 			return $this->cache[$uniqueId]->initCache($ttl, $uniqueId, $this->cachePath[$uniqueId], "managed_cache");
 		}
@@ -42,7 +61,7 @@ class ManagedCache
 	{
 		if (array_key_exists($uniqueId, $this->vars))
 			return $this->vars[$uniqueId];
-		elseif (array_key_exists($uniqueId, $this->cache))
+		elseif (isset($this->cache[$uniqueId]))
 			return $this->cache[$uniqueId]->getVars();
 		else
 			return false;
@@ -51,13 +70,15 @@ class ManagedCache
 	// Sets new value to the variable
 	public function set($uniqueId, $val)
 	{
-		if(array_key_exists($uniqueId, $this->cache))
+		if(isset($this->cache[$uniqueId]))
+		{
 			$this->vars[$uniqueId] = $val;
+		}
 	}
 
 	public function setImmediate($uniqueId, $val)
 	{
-		if(array_key_exists($uniqueId, $this->cache))
+		if(isset($this->cache[$uniqueId]))
 		{
 			$obCache = Cache::createInstance();
 			$obCache->startDataCache($this->ttl[$uniqueId], $uniqueId, $this->cachePath[$uniqueId], $val, "managed_cache");
@@ -75,10 +96,10 @@ class ManagedCache
 		$obCache = Cache::createInstance();
 		$obCache->clean(
 			$uniqueId,
-			strtoupper(\Bitrix\Main\Application::getDbConnection()->getType()).($tableId === false ? "" : "/".$tableId),
+			static::getDbType().($tableId === false ? "" : "/".$tableId),
 			"managed_cache"
 		);
-		if(array_key_exists($uniqueId, $this->cache))
+		if(isset($this->cache[$uniqueId]))
 		{
 			unset($this->cache[$uniqueId]);
 			unset($this->cachePath[$uniqueId]);
@@ -89,7 +110,7 @@ class ManagedCache
 	// Marks cache entries associated with the table as invalid
 	public function cleanDir($tableId)
 	{
-		$dbType = strtoupper(\Bitrix\Main\Application::getDbConnection()->getType());
+		$dbType = static::getDbType();
 		$strPath = $dbType."/".$tableId;
 		foreach ($this->cachePath as $uniqueId => $Path)
 		{
@@ -121,35 +142,38 @@ class ManagedCache
 
 	// Use it to flush cache to the files.
 	// Causion: only at the end of all operations!
-	public function finalize()
+	public static function finalize()
 	{
+		$cacheManager = Main\Application::getInstance()->getManagedCache();
 		$obCache = Cache::createInstance();
-		foreach ($this->cache as $uniqueId => $val)
+		foreach ($cacheManager->cache as $uniqueId => $val)
 		{
-			if (array_key_exists($uniqueId, $this->vars))
+			if (array_key_exists($uniqueId, $cacheManager->vars))
 			{
-				$obCache->startDataCache($this->ttl[$uniqueId], $uniqueId, $this->cachePath[$uniqueId], $this->vars[$uniqueId], "managed_cache");
+				$obCache->startDataCache($cacheManager->ttl[$uniqueId], $uniqueId, $cacheManager->cachePath[$uniqueId], $cacheManager->vars[$uniqueId], "managed_cache");
 				$obCache->endDataCache();
 			}
 		}
 	}
 
-	private function initDbCache()
+	private function initDbCache($path)
 	{
-		if (!$this->dbCacheTags)
+		if (!isset($this->dbCacheTags[$path]))
 		{
-			$this->dbCacheTags = array();
+			$this->dbCacheTags[$path] = array();
 
-			$con = \Bitrix\Main\Application::getDbConnection();
+			$con = Main\Application::getConnection();
+			$sqlHelper = $con->getSqlHelper();
+
 			$rs = $con->query("
-				SELECT *
+				SELECT TAG
 				FROM b_cache_tag
-				WHERE SITE_ID = '".$con->getSqlHelper()->forSql(SITE_ID, 2)."'
-				AND CACHE_SALT = '".$con->getSqlHelper()->forSql($this->salt, 4)."'
+				WHERE SITE_ID = '".$sqlHelper->forSql(SITE_ID, 2)."'
+				AND CACHE_SALT = '".$sqlHelper->forSql($this->salt, 4)."'
+				AND RELATIVE_PATH = '".$sqlHelper->forSql($path, 4)."'
 			");
 			while ($ar = $rs->fetch())
 			{
-				$path = $ar["RELATIVE_PATH"];
 				$this->dbCacheTags[$path][$ar["TAG"]] = true;
 			}
 		}
@@ -159,7 +183,7 @@ class ManagedCache
 	{
 		if ($this->salt === false)
 		{
-			$context = \Bitrix\Main\Application::getInstance()->getContext();
+			$context = Main\Application::getInstance()->getContext();
 			$server = $context->getServer();
 			$scriptName = $server->get("SCRIPT_NAME");
 			if ($scriptName == "/bitrix/urlrewrite.php" && (($v = $server->get("REAL_FILE_PATH")) != null))
@@ -197,37 +221,48 @@ class ManagedCache
 
 		if ($this->wasTagged)
 		{
-			$this->initDbCache();
-
-			$con = \Bitrix\Main\Application::getDbConnection();
+			$con = Main\Application::getConnection();
 			$sqlHelper = $con->getSqlHelper();
 
 			// TODO: SITE_ID
 			$siteIdForSql = $sqlHelper->forSql(SITE_ID, 2);
 			$cacheSaltForSql = $this->salt;
 
+			$strSqlPrefix = "
+				INSERT ".($this->isMySql ? "IGNORE": "")." INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
+				VALUES
+			";
+			$maxValuesLen = $this->isMySql ? 2048: 0;
+			$strSqlValues = "";
+
 			foreach ($this->compCacheStack as $arCompCache)
 			{
 				$path = $arCompCache[0];
 				if (strlen($path))
 				{
+					$this->initDbCache($path);
 					$sqlRELATIVE_PATH = $sqlHelper->forSql($path, 255);
 
-					$sql = "INSERT INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
-						VALUES ('".$siteIdForSql."', '".$cacheSaltForSql."', '".$sqlRELATIVE_PATH."',";
-
-					if (!isset($this->dbCacheTags[$path]))
-						$this->dbCacheTags[$path] = array();
+					$sql = ",\n('".$siteIdForSql."', '".$cacheSaltForSql."', '".$sqlRELATIVE_PATH."',";
 
 					foreach ($arCompCache[1] as $tag => $t)
 					{
 						if (!isset($this->dbCacheTags[$path][$tag]))
 						{
-							$con->queryExecute($sql." '".$sqlHelper->forSql($tag, 50)."')");
+							$strSqlValues .= $sql." '".$sqlHelper->forSql($tag, 50)."')";
+							if (strlen($strSqlValues) > $maxValuesLen)
+							{
+								$con->queryExecute($strSqlPrefix.substr($strSqlValues, 2));
+								$strSqlValues = "";
+							}
 							$this->dbCacheTags[$path][$tag] = true;
 						}
 					}
 				}
+			}
+			if ($strSqlValues <> '')
+			{
+				$con->queryExecute($strSqlPrefix.substr($strSqlValues, 2));
 			}
 		}
 
@@ -250,7 +285,7 @@ class ManagedCache
 
 	public function clearByTag($tag)
 	{
-		$con = \Bitrix\Main\Application::getDbConnection();
+		$con = Main\Application::getConnection();
 		$sqlHelper = $con->getSqlHelper();
 
 		if ($tag === true)

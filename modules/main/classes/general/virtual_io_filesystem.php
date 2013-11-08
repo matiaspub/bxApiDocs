@@ -178,7 +178,9 @@ class CBXVirtualIoFileSystem
 		if ($path == "")
 			return null;
 
-		$res = preg_replace("'[\\\\/]+'", "/", $path);
+		//slashes doesn't matter for Windows
+		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0? "'[\\\\/]+'" : "'[/]+'");
+		$res = preg_replace($pattern, "/", $path);
 
 		if (($p = strpos($res, "\0")) !== false)
 			$res = substr($res, 0, $p);
@@ -641,6 +643,9 @@ class CBXVirtualDirectoryFileSystem
 		return $this->pathEncoded;
 	}
 
+	/**
+	 * @return CBXVirtualDirectoryFileSystem[]|CBXVirtualFileFileSystem[]
+	 */
 	public function GetChildren()
 	{
 		$arResult = array();

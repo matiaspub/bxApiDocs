@@ -3,6 +3,27 @@ namespace Bitrix\Main\Diag;
 
 class Debug
 {
+	protected static $timeLabels = array();
+
+	public static function startTimeLabel($name)
+	{
+		if (!isset(static::$timeLabels[$name]))
+			static::$timeLabels[$name] = array();
+		static::$timeLabels[$name]['start'] = microtime(true);
+	}
+
+	public static function endTimeLabel($name)
+	{
+		if (!isset(static::$timeLabels[$name]))
+			static::$timeLabels[$name] = array();
+		static::$timeLabels[$name]['time'] += microtime(true) - static::$timeLabels[$name]['start'];
+	}
+
+	public static function getTimeLabels()
+	{
+		return static::$timeLabels;
+	}
+
 	public static function dump($var, $varName = "", $return = false)
 	{
 		if ($return)

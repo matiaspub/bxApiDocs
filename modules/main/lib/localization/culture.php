@@ -9,6 +9,8 @@ namespace Bitrix\Main\Localization;
 
 use Bitrix\Main\Entity;
 
+Loc::loadMessages(__FILE__);
+
 class CultureTable extends Entity\DataManager
 {
 	const LEFT_TO_RIGHT = 'Y';
@@ -63,5 +65,43 @@ class CultureTable extends Entity\DataManager
 				'values' => array(self::RIGHT_TO_LEFT, self::LEFT_TO_RIGHT),
 			),
 		);
+	}
+
+	public static function update($primary, array $data)
+	{
+		$result = parent::update($primary, $data);
+		if(CACHED_b_lang !== false && $result->isSuccess())
+		{
+			$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+			$cache->cleanDir("b_lang");
+		}
+		return $result;
+	}
+
+	public static function delete($id)
+	{
+		//We know for sure that languages and sites can refer to the culture.
+		//Other entities should place CultureOnBeforeDelete event handler.
+
+		$result = new Entity\DeleteResult();
+
+		$res = LanguageTable::getList(array('filter' => array('=CULTURE_ID' => $id)));
+		while(($language = $res->fetch()))
+		{
+			$result->addError(new Entity\EntityError(Loc::getMessage("culture_err_del_lang", array("#LID#" => $language["LID"]))));
+		}
+
+		$res = \Bitrix\Main\SiteTable::getList(array('filter' => array('=CULTURE_ID' => $id)));
+		while(($site = $res->fetch()))
+		{
+			$result->addError(new Entity\EntityError(Loc::getMessage("culture_err_del_site", array("#LID#" => $site["LID"]))));
+		}
+
+		if(!$result->isSuccess())
+		{
+			return $result;
+		}
+
+		return parent::delete($id);
 	}
 }

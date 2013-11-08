@@ -1,106 +1,70 @@
 <?php
+
 IncludeModuleLangFile(__FILE__);
+use \Bitrix\Security\Filter;
 
 class CSecurityFilter
 {
 	const DEFAULT_REQUEST_ORDER = "GP";
-
-	private $action = "filter";
 	private $doBlock = false;
-	private $doLog = false;
-	private $foundVars = array();
 	private $isUserBlocked = false;
-	/** @var CSecurityFilterBaseAuditor[] */
-	private $auditors = array();
+	private $action = "filter";
+	/** @var \Bitrix\Security\Filter\Request $requestFilter */
+	private $requestFilter = null;
+	/** @var \Bitrix\Security\Filter\Server $serverFilter */
+	private $serverFilter = null;
+	/** @var \Bitrix\Main\Context $context */
+	private $context = null;
+	private $splittingChar = '';
 
-	private static $validActions = array("none", "clear", "filter");
-
-	public function __construct($pCustomOptions = array(), $pChar = "")
+	public function __construct($customOptions = array(), $char = "")
 	{
-		if(isset($pCustomOptions["action"]))
+		if(isset($customOptions["action"]))
 		{
-			$this->setAction($pCustomOptions["action"]);
+			$this->action = $customOptions["action"];
 		}
 		else
 		{
-			$this->setAction(COption::getOptionString("security", "filter_action"));
+			$this->action = \COption::getOptionString("security", "filter_action");
 		}
 
-		if(isset($pCustomOptions["stop"]))
+		if(isset($customOptions["stop"]))
 		{
-			$this->setStop($pCustomOptions["stop"]);
+			$this->doBlock = $customOptions["stop"];
 		}
 		else
 		{
-			$this->setStop(COption::getOptionString("security", "filter_stop"));
+			$this->doBlock = \COption::getOptionString("security", "filter_stop");
 		}
 
-		if(isset($pCustomOptions["log"]))
-		{
-			$this->setLog($pCustomOptions["log"]);
-		}
-		else
-		{
-			$this->setLog(COption::getOptionString("security", "filter_log"));
-		}
-
-		$this->auditors = array();
-		$this->auditors["XSS"] = new CSecurityFilterXssAuditor($pChar);
-		$this->auditors["SQL"] = new CSecurityFilterSqlAuditor($pChar);
-		$this->auditors["PHP"] = new CSecurityFilterPathAuditor($pChar);
+		$this->requestFilter = new Filter\Request($customOptions);
+		$this->serverFilter = new Filter\Server($customOptions);
+		$this->context = \Bitrix\Main\Application::getInstance()->getContext();
+		$this->splittingChar = $char;
 	}
 
-	/**
-	 *
-	 */
 	public static function OnBeforeProlog()
 	{
 		if(CSecurityFilterMask::Check(SITE_ID, $_SERVER["REQUEST_URI"]))
 			return;
 
-		$filter = new CSecurityFilter;
-		$filter->process();
-	}
-
-	/**
-	 * Main filtering loop also sets up global vars GET POST COOKIE and some $_SERVER keys
-	 */
-	public function process()
-	{
-		global $HTTP_GET_VARS, $HTTP_POST_VARS, $HTTP_COOKIE_VARS, $HTTP_REQUEST_VARS;
-
-		if($this->currentUserHaveRightsForSkip())
+		if(self::currentUserHaveRightsForSkip())
 		{
 			if(
-				$_SERVER["REQUEST_METHOD"] === "POST"
-				&& check_bitrix_sessid()
-				&& empty($_POST['____SECFILTER_CONVERT_JS'])
+				check_bitrix_sessid()
+				&& (
+					!isset($_POST['____SECFILTER_CONVERT_JS'])
+					|| !$_POST['____SECFILTER_CONVERT_JS']
+				)
 			)
 			{
 				return;
 			}
 		}
 
-		//Do not touch those variables who did not come from REQUEST
-		self::cleanGlobals();
-		$originalPostVars = $_POST;
-
-		$_GET = $this->filterArray($_GET, "\$_GET");
-		$_POST = $this->filterArray($_POST, "\$_POST", "/^File\d+_\d+$/");
-		$_COOKIE = $this->filterArray($_COOKIE, "\$_COOKIE");
-		$_SERVER = $this->filterServerArray($_SERVER);
-
-		self::reconstructRequest();
-		self::restoreGlobals();
-
-		$HTTP_GET_VARS = $_GET;
-		$HTTP_POST_VARS = $_POST;
-		$HTTP_COOKIE_VARS = $_COOKIE;
-		$HTTP_REQUEST_VARS = $_REQUEST;
-
-		$this->doPostProccessActions($originalPostVars);
+		$filter = new CSecurityFilter;
+		$filter->process();
 	}
-
 
 	/**
 	 * @return bool
@@ -257,114 +221,79 @@ class CSecurityFilter
 	}
 
 	/**
-	 * @param $pAction
-	 * @return bool
-	 */
-	public static function isActionValid($pAction)
-	{
-		return in_array($pAction, self::getValidActions());
-	}
-
-	/**
-	 * Returns the filtered value after checking CSecurityFilterXssAuditor
+	 * ATTENTION! Do "NOTHING" since 14.0.0
 	 * @deprecated deprecated since version 12.0.8
 	 * @param string $pValue
 	 * @param string $pAction
 	 * @return string
 	 */
-	public function testXSS($pValue, $pAction = "clear")
+	static public function testXSS($pValue, $pAction = "clear")
 	{
-		$this->setStop("N");
-		$this->setLog("N");
-		if($pAction == "replace")
-			$this->setAction("filter");
-		else
-			$this->setAction("clear");
-		unset($this->auditors["SQL"]);
-		unset($this->auditors["PHP"]);
+		return $pValue;
+	}
 
-		return $this->filterVar($pValue, 'fakeVar');
+	protected function process()
+	{
+		$auditors = array(
+			'XSS' => new Filter\Auditor\Xss($this->splittingChar),
+			'SQL' => new Filter\Auditor\Sql($this->splittingChar),
+			'PHP' => new Filter\Auditor\Path($this->splittingChar)
+		);
+		$this->requestFilter->setAuditors($auditors);
+		$this->serverFilter->setAuditors($auditors);
+		$this->getHttpRequest()->addFilter($this->requestFilter);
+		$this->context->getServer()->addFilter($this->serverFilter);
+
+		if ($this->isSomethingChanged())
+		{
+			$this->overrideSuperGlobals();
+			$this->doPostProccessActions();
+		}
+	}
+
+	protected function overrideSuperGlobals()
+	{
+		global $HTTP_GET_VARS, $HTTP_POST_VARS, $HTTP_COOKIE_VARS, $HTTP_REQUEST_VARS;
+
+		self::cleanGlobals();
+
+		$httpRequest = $this->getHttpRequest();
+		$_GET = $httpRequest->getQueryList()->toArray();
+		$_POST = $httpRequest->getPostList()->toArray();
+		$_COOKIE = $httpRequest->getCookieRawList()->toArray();
+
+		self::reconstructRequest();
+		self::restoreGlobals();
+
+		$HTTP_GET_VARS = $_GET;
+		$HTTP_POST_VARS = $_POST;
+		$HTTP_COOKIE_VARS = $_COOKIE;
+		$HTTP_REQUEST_VARS = $_REQUEST;
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function isSomethingChanged()
+	{
+		return count($this->requestFilter->getChangedVars()) > 0;
 	}
 
 	/**
 	 * @return array
 	 */
-	protected static function getValidActions()
+	protected function getChangedVars()
 	{
-		return self::$validActions;
+		return $this->requestFilter->getChangedVars() + $this->serverFilter->getChangedVars();
 	}
-
 
 	/**
-	 * @param $pAction
+	 * @return \Bitrix\Main\HttpRequest
 	 */
-	protected function setAction($pAction)
+	protected function getHttpRequest()
 	{
-		if(self::isActionValid($pAction))
-		{
-			$this->action = $pAction;
-		}
+		return $this->context->getRequest();
 	}
-
-
-	/**
-	 * @param $pStop
-	 */
-	protected function setStop($pStop)
-	{
-		if(is_string($pStop) && $pStop == "Y")
-		{
-			$this->doBlock = true;
-		}
-		else
-		{
-			$this->doBlock = false;
-		}
-	}
-
-
-	/**
-	 * @param $pLog
-	 */
-	protected function setLog($pLog)
-	{
-		if(is_string($pLog) && $pLog == "Y")
-		{
-			$this->doLog = true;
-		}
-		else
-		{
-			$this->doLog = false;
-		}
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	protected function isFilterAction()
-	{
-		return ($this->action === "filter");
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	protected function isClearAction()
-	{
-		return ($this->action === "clear");
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	protected function isNeedShowForm()
-	{
-		return (count($this->getFoundVars()) > 0 && $this->action !== "none");
-	}
-
 
 	/**
 	 * @return bool
@@ -374,172 +303,23 @@ class CSecurityFilter
 		return $this->doBlock;
 	}
 
-
 	/**
 	 * @return bool
 	 */
-	protected function isLogNeeded()
+	protected function isNeedShowForm()
 	{
-		return $this->doLog;
-	}
-
-
-	/**
-	 * @param $pString
-	 * @return bool
-	 */
-	protected static function AdjustPcreBacktrackLimit($pString)
-	{
-		if(!is_string($pString))
+		if ($this->action === "none")
 			return false;
 
-		$strlen = CUtil::BinStrlen($pString) * 2;
-		CUtil::AdjustPcreBacktrackLimit($strlen);
-		return true;
+		return
+			count($this->requestFilter->getChangedVars()) > 0
+			|| count($this->serverFilter->getChangedVars()) > 0;
 	}
-
-
-	/**
-	 * @param $pValue
-	 * @param $pName
-	 */
-	protected function pushFoundVar($pValue, $pName)
-	{
-		if(!is_array($this->foundVars))
-			$this->foundVars = array();
-
-		$this->foundVars[$pName] = $pValue;
-	}
-
-
-	/**
-	 * @return array
-	 */
-	protected function getFoundVars()
-	{
-		return $this->foundVars;
-	}
-
-
-	/**
-	 * @param $pValue
-	 * @param $pName
-	 * @return string
-	 */
-	protected function filterVar($pValue, $pName)
-	{
-		if(preg_match("/^[A-Za-z0-9_.,-]*$/", $pValue))
-			return $pValue;
-
-		self::AdjustPcreBacktrackLimit($pValue);
-		$checkedValue = CSecurityHtmlEntity::decodeString($pValue);
-
-		$bFound = false;
-		foreach($this->auditors as $auditName => $auditor)
-		{
-			if($auditor->process($checkedValue))
-			{
-				$bFound = true;
-				$this->pushFoundVar($pValue, $pName);
-
-				if($this->isBlockNeeded())
-				{
-					$this->blockCurrentUser();
-				}
-			
-				if($this->isLogNeeded())
-				{
-					$this->logVariable($pValue, $pName, $auditName);
-				}
-
-				if($this->isFilterAction())
-				{
-					$checkedValue = $auditor->getValidString();
-				}
-				elseif($this->isClearAction())
-				{
-					$checkedValue = "";
-					break;
-				}
-
-			}
-		}
-		if($bFound)
-			return $checkedValue;
-		else
-			return $pValue;
-	}
-
-
-	/**
-	 * @param $pArray
-	 * @return array
-	 */
-	protected function filterServerArray(array $pArray)
-	{
-		if(!is_array($pArray))
-			return $pArray;
-
-		$array = $pArray;
-
-		foreach($array as $key => $value)
-		{
-			if(strpos($key, "HTTP_")===0)
-			{
-				$array[$key] = $this->filterVar($array[$key], '$_SERVER["'.$key.'"]');
-			}
-
-		}
-		$array["QUERY_STRING"] = $this->filterVar($array["QUERY_STRING"], '$_SERVER["QUERY_STRING"]');
-		$array["REQUEST_URI"] = $this->filterVar($array["REQUEST_URI"], '$_SERVER["REQUEST_URI"]');
-		$array["SCRIPT_URL"] = $this->filterVar($array["SCRIPT_URL"], '$_SERVER["SCRIPT_URL"]');
-		$array["SCRIPT_URI"] = $this->filterVar($array["SCRIPT_URI"], '$_SERVER["SCRIPT_URI"]');
-		return $array;
-	}
-
-
-	/**
-	 * @param array $pArray
-	 * @param string $pName
-	 * @param string $pSkipKeyPreg
-	 * @return array
-	 */
-	protected function filterArray(array $pArray, $pName, $pSkipKeyPreg = '')
-	{
-		if(!is_array($pArray))
-			return $pArray;
-
-		$array = $pArray;
-		
-		foreach($array as $key => $value)
-		{
-			if($pSkipKeyPreg && preg_match($pSkipKeyPreg, $key))
-				continue;
-
-			$filteredKey =  $this->filterVar($key, $pName."['".$key."']");
-			if($filteredKey != $key)
-			{
-				unset($array[$key]);
-				$key = $filteredKey;
-			}
-
-			if(is_array($value))
-			{
-				$array[$key] = $this->filterArray($value, $pName."['".$key."']", $pSkipKeyPreg);
-			}
-			else
-			{
-				$array[$key] = $this->filterVar($value, $pName."['".$key."']");
-			}
-		}
-		return $array;
-	}
-
 
 	/**
 	 * @return bool
 	 */
-	protected function currentUserHaveRightsForSkip()
+	protected static function currentUserHaveRightsForSkip()
 	{
 		/** @global CUser $USER */
 		global $USER;
@@ -557,7 +337,7 @@ class CSecurityFilter
 	{
 		static $blocked = array();
 
-		if($this->currentUserHaveRightsForSkip())
+		if(self::currentUserHaveRightsForSkip())
 			return;
 
 		if(is_string($pIP) && $pIP != "")
@@ -590,19 +370,6 @@ class CSecurityFilter
 			$this->isUserBlocked = true;
 		}
 	}
-
-
-	/**
-	 * @param string $pValue
-	 * @param string $pName
-	 * @param string $pAuditorName
-	 * @return bool
-	 */
-	protected static function logVariable($pValue, $pName, $pAuditorName)
-	{
-		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_".$pAuditorName, $pName, $pValue);
-	}
-
 
 	/**
 	 * @return array
@@ -653,6 +420,10 @@ class CSecurityFilter
 		}
 	}
 
+	/**
+	 * @param string $pType
+	 * @return array
+	 */
 	protected static function getSuperGlobalArray($pType)
 	{
 		switch($pType)
@@ -702,22 +473,26 @@ class CSecurityFilter
 	{
 		foreach($_REQUEST as $key => $value)
 		{
-			if(!array_key_exists($key, self::getSafetyGlobals()) && empty($GLOBALS[$key]))
+			if(!array_key_exists($key, self::getSafetyGlobals())
+				&& !(
+				isset($GLOBALS[$key])
+				|| array_key_exists($key, $GLOBALS)
+				)
+			)
 			{
 				$GLOBALS[$key] = $value;
 			}
 		}
 	}
 
-
-	/**
-	 * @param array $originalPostVars
-	 */
-	protected function doPostProccessActions($originalPostVars = array())
+	protected function doPostProccessActions()
 	{
 		if($this->currentUserHaveRightsForSkip() && $this->isNeedShowForm())
 		{
-			$this->showForm($originalPostVars);
+			$postVars = $this->getHttpRequest()->getPostList()->toArrayRaw();
+			if (!$postVars)
+				$postVars = array();
+			$this->showForm($postVars);
 		}
 		elseif($this->isUserBlocked && CSecurityIPRule::IsActive())
 		{
@@ -731,15 +506,30 @@ class CSecurityFilter
 	 */
 	protected function showForm($originalPostVars = array())
 	{
-		if(empty($_POST['____SECFILTER_CONVERT_JS']))
+		if(!isset($_POST['____SECFILTER_CONVERT_JS']) || empty($_POST['____SECFILTER_CONVERT_JS']))
 		{
 			if(
 				//intranet tasks folder created
-				($_GET["bx_task_action_request"] == "Y" && $_GET["action"] == "folder_edit")
+				(
+					isset($_GET["bx_task_action_request"])
+					&& $_GET["bx_task_action_request"] === "Y"
+					&& isset($_GET["action"])
+					&& $_GET["action"] === "folder_edit"
+				)
 				//or create ticket with wizard
-				|| ($_POST['AJAX_CALL'] == "Y" && $_GET['show_wizard'] == "Y")
+				|| (
+					isset($_GET['show_wizard'])
+					&& $_GET['show_wizard'] === "Y"
+					&& isset($_POST['AJAX_CALL'])
+					&& $_POST['AJAX_CALL'] === "Y"
+				)
 				//or by bitrix:search.title
-				|| ($_POST['ajax_call'] == "y" && !empty($_POST['q']))
+				|| (
+					isset($_POST['q'])
+					&& !empty($_POST['q'])
+					&& isset($_POST['ajax_call'])
+					&& $_POST['ajax_call'] === "y"
+				)
 				//or by constant defined on the top of the page
 				|| defined('BX_SECURITY_SHOW_MESSAGE')
 			)
@@ -822,7 +612,7 @@ class CSecurityFilter
 								<td class="head" align="center"><?echo getMessage("SECURITY_FILTER_FORM_VARNAME")?></td>
 								<td class="head" align="center"><?echo getMessage("SECURITY_FILTER_FORM_VARDATA")?></td>
 							</tr>
-							<?foreach($this->getFoundVars() as $var_name => $str):?>
+							<?foreach($this->getChangedVars() as $var_name => $str):?>
 							<tr valign="top">
 								<td><?echo htmlspecialcharsbx($var_name)?></td>
 								<td><?echo htmlspecialcharsbx($str)?></td>

@@ -38,7 +38,6 @@ class CAllUserCounter
 	 */
 	public static function GetValue($user_id, $code, $site_id = SITE_ID)
 	{
-		global $DB;
 		$user_id = intval($user_id);
 
 		if ($user_id <= 0)

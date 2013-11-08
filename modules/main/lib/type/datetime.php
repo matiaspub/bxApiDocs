@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\Type;
 
+use Bitrix\Main;
+use Bitrix\Main\Context;
+
 class DateTime
 {
 	const DATE_WITH_TIME = 0;
@@ -13,22 +16,22 @@ class DateTime
 
 	public function __construct($time = null, $format = null, \DateTimeZone $timezone = null)
 	{
-		if (($time == null) || ($time === "") || (strtolower($time) == 'now'))
+		if (($time === null) || ($time === ""))
 		{
-			if ($timezone == null)
+			if ($timezone === null)
 				$this->value = new \DateTime();
 			else
 				$this->value = new \DateTime(null, $timezone);
 		}
 		else
 		{
-			if ($format == null)
+			if ($format === null)
 				$format = self::DATE_WITH_TIME;
 
 			if (($format === self::DATE_WITH_TIME) || ($format === self::DATE_WITHOUT_TIME))
 				$format = static::getFormatFromCulture($format);
 
-			if ($timezone == null)
+			if ($timezone === null)
 				$this->value = \DateTime::createFromFormat($format, $time);
 			else
 				$this->value = \DateTime::createFromFormat($format, $time, $timezone);
@@ -124,7 +127,7 @@ class DateTime
 		return $obj;
 	}
 
-	public function toString($type = self::DATE_WITH_TIME, \Bitrix\Main\Localization\Culture $culture = null)
+	public function toString($type = self::DATE_WITH_TIME, Context\Culture $culture = null)
 	{
 		$format = static::getFormatFromCulture($type, $culture);
 		return $this->format($format);
@@ -135,11 +138,11 @@ class DateTime
 		return $this->toString();
 	}
 
-	protected static function getFormatFromCulture($type = self::DATE_WITH_TIME, \Bitrix\Main\Localization\Culture $culture = null)
+	protected static function getFormatFromCulture($type = self::DATE_WITH_TIME, Context\Culture $culture = null)
 	{
 		if ($culture == null)
 		{
-			$context = \Bitrix\Main\Application::getInstance()->getContext();
+			$context = Main\Application::getInstance()->getContext();
 			$culture = $context->getCulture();
 		}
 		$format = ($type == self::DATE_WITH_TIME) ? $culture->getDateTimeFormat() : $culture->getDateFormat();
@@ -187,4 +190,11 @@ class DateTime
 		return $result;
 	}
 
+	/**
+	 * @return \DateTime
+	 */
+	public function getValue()
+	{
+		return $this->value;
+	}
 }

@@ -1632,13 +1632,29 @@ class CBPHelper
 
 		$arKeys = array_keys($ar);
 		$ind = -1;
+		$indn = -1;
 		foreach ($arKeys as $key)
 		{
 			$ind++;
-			if ($key."!" !== $ind."!" && "".$key !== "n".$ind)
+			if ($key."!" !== $ind."!")
 			{
-				$fl = true;
-				break;
+				if (substr($key, 0, 1) === 'n')
+				{
+					$indn++;
+					if (($indn === 0) && ("".$key === "n1"))
+						$indn++;
+
+					if ("".$key !== "n".$indn)
+					{
+						$fl = true;
+						break;
+					}
+				}
+				else
+				{
+					$fl = true;
+					break;
+				}
 			}
 		}
 

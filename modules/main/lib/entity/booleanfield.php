@@ -68,6 +68,18 @@ class BooleanField extends ScalarField
 		return $value;
 	}
 
+	public function getValidators()
+	{
+		$validators = parent::getValidators();
+
+		if ($this->validation === null)
+		{
+			$validators[] = new Validator\Enum;
+		}
+
+		return $validators;
+	}
+
 	public function getValues()
 	{
 		return $this->values;

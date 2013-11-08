@@ -11,25 +11,17 @@ class CCalendarNotifySchema
 	{
 		return array(
 			"calendar" => array(
-				"invite" => Array(
-					"NAME" => GetMessage('EC_NS_INVITE'),
-					"MAIL" => true,
-					"XMPP" => true,
-				),
+//				"invite" => Array(
+//					"NAME" => GetMessage('EC_NS_INVITE'),
+//				),
 				"reminder" => Array(
 					"NAME" => GetMessage('EC_NS_REMINDER'),
-					"MAIL" => true,
-					"XMPP" => true,
 				),
 				"change" => Array(
 					"NAME" => GetMessage('EC_NS_CHANGE'),
-					"MAIL" => true,
-					"XMPP" => true,
 				),
 				"info" => Array(
 					"NAME" => GetMessage('EC_NS_INFO'),
-					"MAIL" => true,
-					"XMPP" => true,
 				),
 			),
 		);

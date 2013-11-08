@@ -19,12 +19,12 @@ class String
 		return strrpos($haystack, $needle);
 	}
 
-	public static function htmlspecialchars($string, $flags = ENT_COMPAT)
+	public static function htmlEncode($string, $flags = ENT_COMPAT)
 	{
 		return htmlspecialchars($string, $flags, (defined("BX_UTF") ? "UTF-8" : "ISO-8859-1"));
 	}
 
-	public static function htmlspecialchars_decode($string, $flags = ENT_COMPAT)
+	public static function htmlDecode($string, $flags = ENT_COMPAT)
 	{
 		return htmlspecialchars_decode($string, $flags);
 	}
@@ -33,4 +33,6 @@ class String
 	{
 		return function_exists('mb_strlen') ? mb_strlen($str, 'latin1') : strlen($str);
 	}
+
+
 }

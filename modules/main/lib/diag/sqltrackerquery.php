@@ -20,7 +20,7 @@ class SqlTrackerQuery
 		$this->tracker = $tracker;
 	}
 
-	public function startQuery($sql, array $arBinds = array())
+	public function startQuery($sql, array $arBinds = null)
 	{
 		$this->sql = $sql;
 		$this->arBinds = $arBinds;
@@ -31,7 +31,7 @@ class SqlTrackerQuery
 	{
 		$this->finishTime = Helper::getCurrentMicrotime();
 		$this->time = $this->finishTime - $this->startTime;
-		$this->trace = (function_exists("debug_backtrace") ? debug_backtrace() : null);
+		$this->trace = Helper::getBackTrace(8);
 
 		$this->tracker->addTime($this->time);
 	}
@@ -47,5 +47,13 @@ class SqlTrackerQuery
 		$this->time += $this->finishTime - $this->startTime;
 
 		$this->tracker->addTime($this->time);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getSql()
+	{
+		return $this->sql;
 	}
 }

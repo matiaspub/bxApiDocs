@@ -52,18 +52,22 @@ class CBackup
 			$REAL_DOCUMENT_ROOT_SITE = realpath(DOCUMENT_ROOT_SITE);
 
 		## Ignore paths
-		$ignore_path = array(
-			BX_PERSONAL_ROOT."/cache",
-			BX_PERSONAL_ROOT."/cache_image",
-			BX_PERSONAL_ROOT."/managed_cache",
-			BX_PERSONAL_ROOT."/managed_flags",
-			BX_PERSONAL_ROOT."/stack_cache",
-			BX_PERSONAL_ROOT."/html_pages",
-			BX_PERSONAL_ROOT."/tmp",
-			BX_ROOT."/tmp",
-			BX_ROOT."/help",
-			BX_ROOT."/updates",
-		);
+		static $ignore_path;
+		if (!$ignore_path)
+			$ignore_path = array(
+				BX_PERSONAL_ROOT."/cache",
+				BX_PERSONAL_ROOT."/cache_image",
+				BX_PERSONAL_ROOT."/managed_cache",
+				BX_PERSONAL_ROOT."/managed_flags",
+				BX_PERSONAL_ROOT."/stack_cache",
+				BX_PERSONAL_ROOT."/html_pages",
+				BX_PERSONAL_ROOT."/tmp",
+				BX_ROOT."/tmp",
+				BX_ROOT."/help",
+				BX_ROOT."/updates",
+				'/'.COption::GetOptionString("main", "upload_dir", "upload")."/tmp",
+				'/'.COption::GetOptionString("main", "upload_dir", "upload")."/resize_cache",
+			);
 
 		foreach($ignore_path as $value)
 			if(DOCUMENT_ROOT_SITE.$value == $path)
@@ -232,7 +236,7 @@ class CBackup
 
 			$arState = array('TABLES' => array());
 			$arTables = array();
-			$rsTables = $DB->Query("SHOW TABLES", false, '', array("fixed_connection"=>true));
+			$rsTables = $DB->Query("SHOW FULL TABLES WHERE TABLE_TYPE NOT LIKE 'VIEW'", false, '', array("fixed_connection"=>true));
 			while($arTable = $rsTables->Fetch())
 			{
 				list($key, $table) = each($arTable);
@@ -271,6 +275,17 @@ class CBackup
 				$arState['TABLES'][$table] = array(
 					"TABLE_NAME" => $table,
 					"KEY_COLUMN" => $key_column,
+					"LAST_ID" => 0
+				);
+			}
+			$rsTables = $DB->Query("SHOW FULL TABLES WHERE TABLE_TYPE LIKE 'VIEW'", false, '', array("fixed_connection"=>true));
+			while($arTable = $rsTables->Fetch())
+			{
+				list($key, $table) = each($arTable);
+				
+				$arState['TABLES'][$table] = array(
+					"TABLE_NAME" => $table,
+					"KEY_COLUMN" => false,
 					"LAST_ID" => 0
 				);
 			}
@@ -338,16 +353,16 @@ class CBackup
 				{
 					$strSelect = "
 						SELECT *
-						FROM ".$arTable["TABLE_NAME"]."
-						".($arTable["LAST_ID"] ? "WHERE ".$arTable["KEY_COLUMN"]." > '".$arTable["LAST_ID"]."'": "")."
-						ORDER BY ".$arTable["KEY_COLUMN"]."
+						FROM `".$arTable["TABLE_NAME"]."`
+						".($arTable["LAST_ID"] ? "WHERE `".$arTable["KEY_COLUMN"]."` > '".$arTable["LAST_ID"]."'": "")."
+						ORDER BY `".$arTable["KEY_COLUMN"]."`
 						LIMIT ".$LIMIT;
 				}
 				else
 				{
 					$strSelect = "
 						SELECT *
-						FROM ".$arTable["TABLE_NAME"]."
+						FROM `".$arTable["TABLE_NAME"]."`
 						LIMIT ".($arTable["LAST_ID"] ? $arTable["LAST_ID"].", ": "").$LIMIT;
 				}
 
@@ -440,205 +455,6 @@ class CBackup
 			return true;
 		return false;
 	}
-
-	/* Deprecated */
-	public static function BaseDump($arc_name="", $tbl_num, $start_row, &$TotalTables = 0)
-	{
-		global $DB;
-
-		$last_row = $start_row;
-		$ret = array('st_row' => $last_row);
-		$mem = 32; // Minimum required value
-
-		$sql = "SHOW TABLES;";
-		$res = $DB->Query($sql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$ptab = Array();
-		while($row = $res->Fetch())
-		{
-			$ar = each($row);
-			$table = $ar[1];
-			$ptab[] = $table;
-		}
-
-		if (!$f = fopen($arc_name,"a"))
-			RaiseErrorAndDie('Can\'t open file: '.$arc_name);
-		$i = $tbl_num;
-
-		$dump = "";
-		$TotalTables = count($ptab);
-
-		while($i <= ($TotalTables - 1) && haveTime())
-		{
-			if (!strlen($ptab[$i]))
-				continue;
-
-			if($last_row == -1)
-			{
-				$table = $ptab[$i];
-				$drop = !IntOption('dump_base_skip_stat') || !preg_match("#^b_stat#i",$table); // РµСЃР»Рё РЅРµ РїРµСЂРµРЅРѕСЃРёРј СЃС‚Р°С‚РёСЃС‚РёРєСѓ, С‚Рѕ РЅРµ СѓРґР°Р»СЏРµРј СЃС‚Р°СЂСѓСЋ СЃС‚Р°С‚РёСЃС‚РёРєСѓ РїСЂРё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРё 
-				if ($dump = CBackup::createTable($ptab[$i], $drop))
-					fwrite($f, $dump."\n");
-				else
-					$row_next = -1;
-
-				$next = false;
-				$ret["num"] = $i;
-				$ret["st_row"] = 0;
-				$last_row = 0;
-			}
-
-			if ($dump)
-			{
-				$res = $DB->Query("SELECT count(*) as count FROM `$ptab[$i]`");
-				$row_count = $res->Fetch();
-
-				if($row_count["count"] > 0)
-				{
-					if($ptab[$i] == 'b_xml_tree')
-						$row_next = -1;
-					elseif(IntOption('dump_base_skip_stat') && preg_match('#^b_stat#i',$ptab[$i]))
-						$row_next = -1;
-					elseif(IntOption('dump_base_skip_search') && preg_match("#^(b_search_content_site|b_search_content_group|b_search_content_stem|b_search_content_title|b_search_tags|b_search_content_freq|b_search_content|b_search_suggest)$#i",$ptab[$i]))
-						$row_next = -1;
-					elseif(IntOption('dump_base_skip_log') && $ptab[$i] == 'b_event_log')
-						$row_next = -1;
-					elseif (CTar::strpos($dump, 'DEFINER VIEW'))
-						$row_next = -1;
-					else
-						$row_next = CBackup::getData($ptab[$i], $f, $row_count["count"], $last_row, $mem);
-				}
-				else
-					$row_next = -1;
-			}
-
-			if($row_next > 0)
-			{
-				$last_row = $row_next;
-				$ret["num"] = $i;
-				$ret["st_row"] = $last_row;
-			}
-			else
-			{
-				$ret["num"] = ++$i;
-				$ret["st_row"] = -1;
-				$last_row = -1;
-			}
-		}
-
-		fclose($f);
-
-		if(!($i <= (count($ptab) - 1)))
-			$ret["end"] = true;
-
-		return $ret;
-	}
-
-	public static function createTable($table_name, $drop = true)
-	{
-		global $DB;
-		$com_marker = "--";
-		$sql = "SHOW CREATE TABLE `".$table_name."`";
-
-		$res = $DB->Query($sql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$row = $res->Fetch();
-
-		$com = "\n\n";
-		$com .= $com_marker. " --------------------------------------------------------" ."\n";
-		$com .= $com_marker. " \n";
-		$com .= $com_marker. " Table structure for table `".$table_name."`\n";
-		$com .= $com_marker. " \n";
-		$com .= "\n";
-
-		$string = $row['Create Table'];
-		if (!$string)
-			$string = $row['Create View'];
-
-		if (strpos($string, 'ENGINE=MEMORY'))
-			return false;
-
-		return $com."\n\n\n".($drop ? "DROP TABLE IF EXISTS `".$table_name."`;\n".$string : str_replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',$string)).';';
-	}
-
-	public static function getData($table, $file, $row_count, $last_row = 0, $mem)
-	{
-		global $DB;
-		$com_marker = "--";
-		$dump = "";
-		$step = "";
-
-		$com = "\n" .$com_marker. " \n";
-		$com .= $com_marker. " Dumping data for table  `".$table."`\n";
-		$com .= $com_marker. " \n";
-		$com .= "\n";
-
-		fwrite($file, $com."\n");
-
-		$sql = "SHOW COLUMNS FROM `$table`";
-		$res = $DB->Query($sql);
-		$num = Array();
-		$i = 0;
-
-		//РћРїСЂРµРґРµР»СЏРµРј С‚РёРї РїРѕР»СЏ
-		while($row = $res->Fetch())
-		{
-			if(preg_match("/^(\w*int|year|float|double|decimal)/", $row["Type"]))
-				$meta[$i] = 0;
-			elseif(preg_match("/^(\w*binary)/", $row["Type"]))
-			{
-				$meta[$i] = 1;
-			} else
-				$meta[$i] = 2;
-			$i++;
-		}
-
-		$sql = "SHOW TABLE STATUS LIKE '$table'";
-		$res = $DB->Query($sql);
-		$tbl_info = $res->Fetch();
-		$step = 1+round($mem * 1048576 * 0.5 / ($tbl_info["Avg_row_length"] + 1));
-
-		$DB->Query("LOCK TABLE `$table` WRITE",true);
-		while(($last_row <= ($row_count-1)) && haveTime())
-		{
-			$sql = "SELECT * FROM `$table` LIMIT $last_row, $step";
-			$res = $DB->Query($sql);
-
-			while($row = $res->Fetch())
-			{
-				$i = 0;
-				foreach($row as $key => $val)
-				{
-					if (!isset($val) || is_null($val))
-							$row[$key] = 'NULL';
-					else
-						switch($meta[$i])
-						{
-							case 0:
-								$row[$key] = $val;
-							break;
-							case 1:
-								if (empty($val) && $val != '0')
-									$row[$key] = '\'\'';
-								else
-									$row[$key] = '0x' . bin2hex($val);
-							break;
-							case 2:
-								$row[$key] = "'".$DB->ForSql($val)."'";
-							break;
-						}
-					$i++;
-				}
-				fwrite($file, "INSERT INTO `".$table."` VALUES (".implode(",", $row).");\n");
-			}
-			$last_row += $step;
-		}
-		$DB->Query("UNLOCK TABLES",true);
-
-		if($last_row >= ($row_count-1))
-			return -1;
-		else
-			return $last_row;
-	}
-
 }
 
 class CDirScan
@@ -1007,7 +823,7 @@ class CTar
 
 		if (0 === ($this->gzip ? gzseek($this->res, $NewPos) : fseek($this->res, $NewPos)))
 			return true;
-		return $this->Error('File seek error (file: '.$this->file.', position: '.$BackupPos.')');
+		return $this->Error('File seek error (file: '.$this->file.', position: '.$NewPos.')');
 	}
 
 	public function SkipTo($Block)
@@ -1627,7 +1443,7 @@ class CTarCheck extends CTar
 	public function extractFile()
 	{
 		$header = $this->readHeader();
-		if($h === false || $header === 0)
+		if($header === false || $header === 0)
 			return $header;
 
 		return $this->SkipFile();

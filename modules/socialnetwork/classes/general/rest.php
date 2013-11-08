@@ -16,7 +16,10 @@ class CSocNetLogRestService extends IRestService
 				"sonet_group.get" => array("CSocNetLogRestService", "getGroup"),
 				"sonet_group.create" => array("CSocNetLogRestService", "createGroup"),
 				"sonet_group.update" => array("CSocNetLogRestService", "updateGroup"),
+				"sonet_group.delete" => array("CSocNetLogRestService", "deleteGroup"),
 				"sonet_group.user.get" => array("CSocNetLogRestService", "getGroupUsers"),
+				"sonet_group.user.invite" => array("CSocNetLogRestService", "inviteGroupUsers"),
+				"sonet_group.user.request" => array("CSocNetLogRestService", "requestGroupUser"),
 				"sonet_group.user.groups" => array("CSocNetLogRestService", "getUserGroups"),
 				"sonet_group.feature.access" => array("CSocNetLogRestService", "getGroupFeatureAccess"),
 			),
@@ -63,36 +66,94 @@ class CSocNetLogRestService extends IRestService
 
 	public static function createGroup($arFields)
 	{
+		if (!is_set($arFields, "SITE_ID") || strlen($arFields["SITE_ID"]) <= 0)
+			$arFields["SITE_ID"] = array(SITE_ID);
+
+		if (!is_set($arFields, "SUBJECT_ID") || intval($arFields["SUBJECT_ID"]) <= 0)
+		{
+			$rsSubject = CSocNetGroupSubject::GetList(
+				array("SORT" => "ASC"),
+				array("SITE_ID" => SITE_ID),
+				false,
+				false,
+				array("ID")
+			);
+			if ($arSubject = $rsSubject->Fetch())
+				$arFields["SUBJECT_ID"] = $arSubject["ID"];
+		}
+
 		$groupID = CSocNetGroup::CreateGroup($GLOBALS["USER"]->GetID(), $arFields, false);
 
 		if($groupID <= 0)
 			throw new Exception('Cannot create group');
-			
+
 		return $groupID;
 	}
 
-	public static function updateGroup($groupID, $arFields)
+	public static function updateGroup($arFields)
 	{
+		$groupID = $arFields['GROUP_ID'];
+		unset($arFields['GROUP_ID']);
+
 		if(intval($groupID) <= 0)
 			throw new Exception('Wrong group ID');
 
 		$dbRes = CSocNetGroup::GetList(array(), array(
-			'ID' => $groupID,
-			'CHECK_PERMISSIONS' => 'Y'
+			"ID" => $groupID,
+			"CHECK_PERMISSIONS" => "Y"
 		));
 		$arGroup = $dbRes->Fetch();
 		if(is_array($arGroup))
 		{
-			$res = CSocNetGroup::Update($arGroup["ID"], $arFields, false);
-			if(intval($res) <= 0)
-				throw new Exception('Cannot update group');			
+			if (
+				$arGroup["OWNER_ID"] == $GLOBALS["USER"]->GetID()
+				|| CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false)
+			)
+			{
+				$res = CSocNetGroup::Update($arGroup["ID"], $arFields, false);
+				if(intval($res) <= 0)
+					throw new Exception('Cannot update group');
+			}
+			else
+				throw new Exception('User has no permissions to update group');
 
 			return $res;
 		}
 		else
 			throw new Exception('Socialnetwork group not found');
 
-		return $groupID;
+		return false;
+	}
+
+	public static function deleteGroup($arFields)
+	{
+		$groupID = $arFields['GROUP_ID'];
+
+		if(intval($groupID) <= 0)
+			throw new Exception('Wrong group ID');
+
+		$dbRes = CSocNetGroup::GetList(array(), array(
+			"ID" => $groupID,
+			"CHECK_PERMISSIONS" => "Y"
+		));
+		$arGroup = $dbRes->Fetch();
+		if(is_array($arGroup))
+		{
+			if (
+				$arGroup["OWNER_ID"] == $GLOBALS["USER"]->GetID()
+				|| CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false)
+			)
+			{
+				if (!CSocNetGroup::Delete($arGroup["ID"]))
+					throw new Exception('Cannot delete group');
+			}
+			else
+				throw new Exception('User has no permissions to delete group');
+		}
+		else
+			throw new Exception('Socialnetwork group not found');
+
+		return true;
 	}
 
 	public static function getGroup($arFields, $n, $server)
@@ -167,6 +228,81 @@ class CSocNetLogRestService extends IRestService
 		}
 	}
 
+	public static function inviteGroupUsers($arFields)
+	{
+		global $USER;
+
+		$groupID = $arFields['GROUP_ID'];
+		$arUserID = $arFields['USER_ID'];
+		$message = $arFields['MESSAGE'];
+
+		if(intval($groupID) <= 0)
+			throw new Exception('Wrong group ID');
+
+		if (
+			(is_array($arUserID) && count($arUserID) <= 0)
+			|| (!is_array($arUserID) && intval($arUserID) <= 0)
+		)
+			throw new Exception('Wrong user IDs');
+
+		if (!is_array($arUserID))
+			$arUserID = array($arUserID);
+
+		$arSuccessID = array();
+
+		$dbRes = CSocNetGroup::GetList(array(), array(
+			"ID" => $groupID,
+			"CHECK_PERMISSIONS" => $USER->GetID(),
+		));
+		$arGroup = $dbRes->Fetch();
+		if(is_array($arGroup))
+		{
+			foreach($arUserID as $user_id)
+			{
+				$isCurrentUserTmp = ($USER->GetID() == $user_id);
+				$canInviteGroup = CSocNetUserPerms::CanPerformOperation($USER->GetID(), $user_id, "invitegroup", CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false));
+				$user2groupRelation = CSocNetUserToGroup::GetUserRole($user_id, $arGroup["ID"]);
+
+				if (
+					!$isCurrentUserTmp && $canInviteGroup && !$user2groupRelation
+					&& CSocNetUserToGroup::SendRequestToJoinGroup($USER->GetID(), $user_id, $arGroup["ID"], $message, true)
+				)
+					$arSuccessID[] = $user_id;
+			}
+		}
+		else
+			throw new Exception('Socialnetwork group not found');
+
+		return $arSuccessID;
+	}
+
+	public static function requestGroupUser($arFields)
+	{
+		$groupID = $arFields['GROUP_ID'];
+		$message = $arFields['MESSAGE'];
+
+		if(intval($groupID) <= 0)
+			throw new Exception('Wrong group ID');
+
+		$dbRes = CSocNetGroup::GetList(array(), array(
+			"ID" => $groupID,
+			"CHECK_PERMISSIONS" => "Y"
+		));
+		$arGroup = $dbRes->Fetch();
+		if(is_array($arGroup))
+		{
+			$url = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER["HTTP_HOST"].CComponentEngine::MakePathFromTemplate("/workgroups/group/#group_id#/requests/", array("group_id" => $arGroup["ID"]));
+
+			if (!CSocNetUserToGroup::SendRequestToBeMember($GLOBALS["USER"]->GetID(), $arGroup["ID"], $message, $url, false))
+				throw new Exception('Cannot request to join group');
+
+			return true;
+		}
+		else
+			throw new Exception('Socialnetwork group not found');
+	}
+
+
 	public static function getUserGroups($arFields, $n, $server)
 	{
 		global $USER;
@@ -187,7 +323,7 @@ class CSocNetLogRestService extends IRestService
 
 		return $res;
 	}
-	
+
 	public static function getGroupFeatureAccess($arFields)
 	{
 		global $arSocNetFeaturesSettings;
@@ -203,14 +339,14 @@ class CSocNetLogRestService extends IRestService
 
 		if (
 			strlen($feature) <= 0
-			|| !array_key_exists($feature, $arSocNetFeaturesSettings) 
+			|| !array_key_exists($feature, $arSocNetFeaturesSettings)
 			|| !array_key_exists("allowed", $arSocNetFeaturesSettings[$feature])
 			|| !in_array(SONET_ENTITY_GROUP, $arSocNetFeaturesSettings[$feature]["allowed"])
 		)
 		{
 			throw new Exception("Wrong feature");
 		}
-		
+
 		if (
 			strlen($operation) <= 0
 			|| !array_key_exists("operations", $arSocNetFeaturesSettings[$feature])

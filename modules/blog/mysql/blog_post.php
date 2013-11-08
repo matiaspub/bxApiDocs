@@ -24,10 +24,11 @@ class CBlogPost extends CAllBlogPost
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_POST", 0, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforePostAdd");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforePostAdd", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
 				return false;
+		}
 
 		if (
 			array_key_exists("ATTACH_IMG", $arFields)
@@ -67,8 +68,7 @@ class CBlogPost extends CAllBlogPost
 
 			$ID = IntVal($DB->LastID());
 
-			$db_events = GetModuleEvents("blog", "OnBeforePostUserFieldUpdate");
-			while ($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("blog", "OnBeforePostUserFieldUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array("BLOG_POST", $ID, $arFields));
 
 			$GLOBALS["USER_FIELD_MANAGER"]->Update("BLOG_POST", $ID, $arFields);
@@ -86,8 +86,7 @@ class CBlogPost extends CAllBlogPost
 			if(array_key_exists("SOCNET_RIGHTS", $arFields))
 				$arFields["SC_PERM"] = CBlogPost::AddSocNetPerms($ID, $arFields["SOCNET_RIGHTS"], $arPost);
 
-			$db_events = GetModuleEvents("blog", "OnPostAdd");
-			while ($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("blog", "OnPostAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
 
 			if (CModule::IncludeModule("search"))
@@ -177,6 +176,9 @@ class CBlogPost extends CAllBlogPost
 							if(is_array($arFields["SC_PERM"]))
 							{
 								$arSearchIndex["PERMISSIONS"] = $arFields["SC_PERM"];
+								if(!in_array("U".$arPost["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+									$arSearchIndex["PERMISSIONS"][] = "U".$arPost["AUTHOR_ID"];
+
 								$sgId = array();
 								foreach($arFields["SC_PERM"] as $perm)
 								{
@@ -207,7 +209,7 @@ class CBlogPost extends CAllBlogPost
 		return $ID;
 	}
 
-	public static function Update($ID, $arFields)
+	public static function Update($ID, $arFields, $bSearchIndex = true)
 	{
 		global $DB;
 
@@ -230,10 +232,11 @@ class CBlogPost extends CAllBlogPost
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_POST", $ID, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforePostUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforePostUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$arFields))===false)
 				return false;
+		}
 
 		$arOldPost = CBlogPost::GetByID($ID);
 
@@ -272,8 +275,7 @@ class CBlogPost extends CAllBlogPost
 
 			unset($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID]);
 
-			$db_events = GetModuleEvents("blog", "OnBeforePostUserFieldUpdate");
-			while ($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("blog", "OnBeforePostUserFieldUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array("BLOG_POST", $ID, $arFields));
 
 			$GLOBALS["USER_FIELD_MANAGER"]->Update("BLOG_POST", $ID, $arFields);
@@ -303,11 +305,10 @@ class CBlogPost extends CAllBlogPost
 				$arFields["SC_PERM"] = CBlogPost::UpdateSocNetPerms($ID, $arFields["SOCNET_RIGHTS"], $arNewPost);
 			}
 
-			$db_events = GetModuleEvents("blog", "OnPostUpdate");
-			while ($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("blog", "OnPostUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
 
-			if (CModule::IncludeModule("search"))
+			if ($bSearchIndex && CModule::IncludeModule("search"))
 			{
 				$newPostPerms = CBlogUserGroup::GetGroupPerms(1, $arNewPost["BLOG_ID"], $ID, BLOG_PERMS_POST);
 				$arBlog = CBlog::GetByID($arNewPost["BLOG_ID"]);
@@ -424,6 +425,9 @@ class CBlogPost extends CAllBlogPost
 						}
 						else
 							$arSearchIndex["PERMISSIONS"] = CBlogPost::GetSocnetPermsCode($ID);
+
+						if(!in_array("U".$arNewPost["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+							$arSearchIndex["PERMISSIONS"][] = "U".$arNewPost["AUTHOR_ID"];
 
 						if(is_array($arSearchIndex["PERMISSIONS"]))
 						{
@@ -621,6 +625,8 @@ class CBlogPost extends CAllBlogPost
 			"SOCNET_BLOG_READ" => array("FIELD" => "BSR.BLOG_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_blog_socnet BSR ON (P.BLOG_ID = BSR.BLOG_ID)"),
 			"BLOG_SOCNET_GROUP_ID" => array("FIELD" => "B.SOCNET_GROUP_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog B ON (P.BLOG_ID = B.ID)"),
 			"SOCNET_GROUP_ID" => array("FIELD" => "SR1.ENTITY_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog_socnet_rights SR1 ON (P.ID = SR1.POST_ID AND SR1.ENTITY_TYPE = 'SG')"),
+			"SOCNET_SITE_ID" => array("FIELD" => "SLS.SITE_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log BSL ON (BSL.EVENT_ID in ('blog_post', 'blog_post_micro', 'blog_post_important') AND BSL.SOURCE_ID = P.ID) ".
+				"LEFT JOIN b_sonet_log_site SLS ON BSL.ID = SLS.LOG_ID")
 		);
 		foreach ($arFilter as $key => $val)
 		{

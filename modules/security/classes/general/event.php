@@ -4,7 +4,7 @@ class CSecurityEvent
 {
 	private static $instance = null;
 
-	private $isDBEngineActive = true;
+	private $isDBEngineActive = false;
 	private $isSyslogEngineActive = false;
 	private $syslogFacility = "";
 	private $syslogPriority = "";
@@ -33,101 +33,42 @@ class CSecurityEvent
 		LOG_DEBUG   => "LOG_DEBUG"
 	);
 
-	private function __construct()
-	{
-		$this->initializeDBEngine(COption::getOptionString("security", "security_event_db_active") == "Y");
-		$this->initializeSyslogEngine(COption::getOptionString("security", "security_event_syslog_active") == "Y");
-		$this->initializeFileEngine(COption::getOptionString("security", "security_event_file_active") == "Y");
-		$this->messageFormatter = new CSecurityEventMessageFormatter(
-			COption::getOptionString("security", "security_event_format"),
-			COption::getOptionString("security", "security_event_userinfo_format")
-		);
-	}
-
-	/**
-	 * @param bool $pActive
-	 */
-	private function initializeFileEngine($pActive = false)
-	{
-		if($pActive)
-		{
-			$this->isFileEngineActive = true;
-			$this->filePath = COption::getOptionString("security", "security_event_file_path");
-			if(!checkDirPath($this->filePath))
-				$this->isFileEngineActive = false;
-		}
-		else
-		{
-			$this->isFileEngineActive = false;
-		}
-	}
-
-	/**
-	 * @param bool $pActive
-	 */
-	private function initializeDBEngine($pActive = false)
-	{
-		$this->isDBEngineActive = $pActive;
-	}
-
-	/**
-	 * @param bool $pActive
-	 */
-	private function initializeSyslogEngine($pActive = false)
-	{
-		if($pActive)
-		{
-			$this->isSyslogEngineActive = true;
-			if(self::isRunOnWin())
-				$this->syslogFacility = LOG_USER;
-			else
-				$this->syslogFacility = COption::getOptionString("security", "security_event_syslog_facility");
-
-			$this->syslogPriority = COption::getOptionString("security", "security_event_syslog_priority");
-			openlog("Bitrix WAF", LOG_ODELAY, $this->syslogFacility);
-		}
-		else
-		{
-			$this->isSyslogEngineActive = false;
-		}
-	}
-
 	/**
 	 * @return CSecurityEvent
 	 */
 	public static function getInstance()
 	{
-		if(is_null(self::$instance))
+		if (is_null(self::$instance))
 		{
-			self::$instance = new CSecurityEvent();
+			self::$instance = new static();
 		}
 		return self::$instance;
 	}
 
 	/**
-	 * @param string $pSeverity
-	 * @param string $pAuditType
-	 * @param string $pItemName
-	 * @param string $pItemDescription
+	 * @param string $severity
+	 * @param string $auditType
+	 * @param string $itemName
+	 * @param string $itemDescription
 	 * @return bool
 	 */
-	public function doLog($pSeverity, $pAuditType, $pItemName, $pItemDescription)
+	public function doLog($severity, $auditType, $itemName, $itemDescription)
 	{
 		$savedInDB = $savedInFile = $savedInSyslog = false;
-		if($this->isDBEngineActive)
+		if ($this->isDBEngineActive)
 		{
-			$savedInDB = CEventLog::log($pSeverity, $pAuditType, "security", $pItemName, "=".base64_encode($pItemDescription));
+			$savedInDB = CEventLog::log($severity, $auditType, "security", $itemName, "=".base64_encode($itemDescription));
 		}
 		$message = "";
-		if($this->isSyslogEngineActive)
+		if ($this->isSyslogEngineActive)
 		{
-			$message = $this->messageFormatter->format($pAuditType, $pItemName, $pItemDescription);
+			$message = $this->messageFormatter->format($auditType, $itemName, $itemDescription);
 			$savedInSyslog = syslog($this->syslogPriority, $message);
 		}
-		if($this->isFileEngineActive)
+		if ($this->isFileEngineActive)
 		{
 			if (!$message)
-				$message = $this->messageFormatter->format($pAuditType, $pItemName, $pItemDescription);
+				$message = $this->messageFormatter->format($auditType, $itemName, $itemDescription);
 
 			$message .= "\n";
 			$savedInFile = file_put_contents($this->filePath, $message, FILE_APPEND) > 0;
@@ -140,7 +81,7 @@ class CSecurityEvent
 	 */
 	public static function getSyslogPriorities()
 	{
-		return self::$syslogPriorities;
+		return static::$syslogPriorities;
 	}
 
 	/**
@@ -148,20 +89,20 @@ class CSecurityEvent
 	 */
 	public static function getSyslogFacilities()
 	{
-		if(self::isRunOnWin())
+		if (static::isRunOnWin())
 			return array(LOG_USER => "LOG_USER");
 		else
-			return self::$syslogFacilities;
+			return static::$syslogFacilities;
 	}
 
 	/**
 	 * Return WAF events count for Admin's informer popup and Admin's gadget
-	 * @param string $pTimestamp  - from date
+	 * @param string $timestamp  - from date
 	 * @return integer
 	 */
-	public function getEventsCount($pTimestamp = '')
+	public function getEventsCount($timestamp = '')
 	{
-		if(!$this->isDBEngineActive)
+		if (!$this->isDBEngineActive)
 			return 0;
 
 		/**
@@ -173,18 +114,18 @@ class CSecurityEvent
 		$cacheId = 'sec_events_count';
 		$cacheDir = '/security/events';
 		
-		if($CACHE_MANAGER->read($ttl, $cacheId, $cacheDir))
+		if ($CACHE_MANAGER->read($ttl, $cacheId, $cacheDir))
 		{
 			$result = $CACHE_MANAGER->get($cacheId);
 		}
 		else
 		{
-			if(strlen($pTimestamp) <= 0)
+			if (strlen($timestamp) <= 0)
 			{
 				$days = COption::getOptionInt("main", "event_log_cleanup_days", 7);
-				if($days > 7)
+				if ($days > 7)
 					$days = 7;
-				$pTimestamp = convertTimeStamp(time()-$days*24*3600+CTimeZone::getOffset());
+				$timestamp = convertTimeStamp(time()-$days*24*3600+CTimeZone::getOffset());
 			}
 
 			$arAudits = array(
@@ -205,12 +146,12 @@ class CSecurityEvent
 				AND
 					(MODULE_ID = 'security' and MODULE_ID is not null)
 				AND
-					TIMESTAMP_X >= ".$DB->charToDateFunction($DB->forSQL($pTimestamp))."
+					TIMESTAMP_X >= ".$DB->charToDateFunction($DB->forSQL($timestamp))."
 			";
 
 			$res = $DB->query($strSql, false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 
-			if($arRes = $res->fetch())
+			if ($arRes = $res->fetch())
 				$result = $arRes["COUNT"];
 			else
 				$result = 0;
@@ -226,6 +167,47 @@ class CSecurityEvent
 		return $this->messageFormatter;
 	}
 
+	private function __construct()
+	{
+		if (COption::getOptionString("security", "security_event_db_active") === "Y")
+			$this->initializeDBEngine();
+
+		if (COption::getOptionString("security", "security_event_syslog_active") == "Y")
+			$this->initializeSyslogEngine();
+
+		if (COption::getOptionString("security", "security_event_file_active") == "Y")
+			$this->initializeFileEngine();
+
+		$this->messageFormatter = new CSecurityEventMessageFormatter(
+			COption::getOptionString("security", "security_event_format"),
+			COption::getOptionString("security", "security_event_userinfo_format")
+		);
+	}
+
+	private function initializeFileEngine()
+	{
+		$this->filePath = COption::getOptionString("security", "security_event_file_path");
+		if (checkDirPath($this->filePath))
+			$this->isFileEngineActive = true;
+	}
+
+	private function initializeDBEngine()
+	{
+		$this->isDBEngineActive = true;
+	}
+
+	private function initializeSyslogEngine()
+	{
+		$this->isSyslogEngineActive = true;
+		if (self::isRunOnWin())
+			$this->syslogFacility = LOG_USER;
+		else
+			$this->syslogFacility = COption::getOptionString("security", "security_event_syslog_facility");
+
+		$this->syslogPriority = COption::getOptionString("security", "security_event_syslog_priority");
+		openlog("Bitrix WAF", LOG_ODELAY, $this->syslogFacility);
+	}
+
 	/**
 	 * @return bool
 	 */
@@ -234,19 +216,7 @@ class CSecurityEvent
 		return (strtoupper(substr(PHP_OS, 0, 3)) === "WIN");
 	}
 
-	/**
-	 *
-	 */
-	private function __clone()
-	{
-		/* ... @return Singleton */
-	}
+	private function __clone() {}
 
-	/**
-	 *
-	 */
-	private function __wakeup()
-	{
-		/* ... @return Singleton */
-	}
+	private function __wakeup() {}
 }

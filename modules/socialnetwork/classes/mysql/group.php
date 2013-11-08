@@ -216,7 +216,7 @@ class CSocNetGroup extends CAllSocNetGroup
 	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/Update.php
 	 * @author Bitrix
 	 */
-	public static function Update($ID, $arFields, $bAutoSubscribe = true)
+	public static function Update($ID, $arFields, $bAutoSubscribe = true, $bClearCommonTag = true)
 	{
 		global $DB;
 
@@ -362,7 +362,8 @@ class CSocNetGroup extends CAllSocNetGroup
 			unset($GLOBALS["SONET_GROUP_CACHE"][$ID]);
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
+				if ($bClearCommonTag)
+					$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$ID);
 			}

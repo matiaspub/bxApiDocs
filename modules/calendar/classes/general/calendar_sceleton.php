@@ -190,7 +190,7 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 	public static function InitJS($JSConfig)
 	{
 		global $APPLICATION;
-		CUtil::InitJSCore(array('ajax', 'window', 'popup', 'access', 'date'));
+		CUtil::InitJSCore(array('ajax', 'window', 'popup', 'access', 'date', 'viewer', 'socnetlogdest'));
 
 		$JSConfig['days'] = self::GetWeekDays();
 		$JSConfig['month'] = array(GetMessage('EC_JAN'), GetMessage('EC_FEB'), GetMessage('EC_MAR'), GetMessage('EC_APR'), GetMessage('EC_MAY'), GetMessage('EC_JUN'), GetMessage('EC_JUL'), GetMessage('EC_AUG'), GetMessage('EC_SEP'), GetMessage('EC_OCT'), GetMessage('EC_NOV'), GetMessage('EC_DEC'));
@@ -205,44 +205,23 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 			'/bitrix/js/calendar/cal-dialogs.js',
 			'/bitrix/js/calendar/cal-week.js',
 			'/bitrix/js/calendar/cal-events.js',
-			'/bitrix/js/calendar/cal-controlls.js'
+			'/bitrix/js/calendar/cal-controlls.js',
+			'/bitrix/js/calendar/cal-planner.js'
 		);
-		$arCSS = array();
-
-		//if (!$USER->IsAuthorized()) // For anonymus  users
-		//{
-		//	$arJS[] = '/bitrix/js/main/utils.js';
-		//	$arCSS[] = '/bitrix/themes/.default/pubstyles.css';
-		//}
 
 		for($i = 0, $l = count($arJS); $i < $l; $i++)
-			$arJS[$i] .= '?v='.filemtime($_SERVER['DOCUMENT_ROOT'].$arJS[$i]);
-
-		for($i = 0, $l = count($arCSS); $i < $l; $i++)
-			$arCSS[$i] .= '?v='.filemtime($_SERVER['DOCUMENT_ROOT'].$arCSS[$i]);
+		{
+			$APPLICATION->AddHeadScript($arJS[$i]);
+		}
 
 		?>
-		<script>
+		<script type="text/javascript">
 		<?self::Localization();?>
 		<?CCalendarPlanner::Localization();?>
 
-		BX.ready(function()
-			{
-				window.bxRunEC = function()
-				{
-					if (!window.JCEC || !window.ECMonthSelector || !window.ECUserControll  || !window.JSECEvent)
-						return setTimeout(window.bxRunEC, 100);
-
-					<? /* new JCEC(<?=$Params['JSConfig']?>, <?=$Params['JS_arEvents']?>, <?=$Params['JS_arSPEvents']?>); */?>
-					new JCEC(<?= CUtil::PhpToJSObject($JSConfig)?>);
-				};
-
-				<?if (count($arCSS) > 0):?>
-				BX.loadCSS(<?= '["'.implode($arCSS, '","').'"]'?>);
-				<?endif;?>
-				BX.loadScript(<?= '["'.implode($arJS, '","').'"]'?>, bxRunEC);
-			}
-		);
+		BX.ready(function(){
+			new JCEC(<?= CUtil::PhpToJSObject($JSConfig)?>);
+		});
 		</script>
 		<?
 	}
@@ -255,14 +234,14 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 		if (!$Params['bReadOnly'])
 		{
 			self::DialogAddEventSimple($Params);
-			self::DialogEditEvent($Params);
+			//self::DialogEditEvent($Params);
 			self::DialogEditSection($Params);
 
 			self::DialogExternalCalendars($Params);
 		}
 		self::DialogSettings($Params);
 
-		self::DialogViewEvent($Params);
+		//self::DialogViewEvent($Params);
 		self::DialogExportCalendar($Params);
 		self::DialogMobileCon($Params);
 
@@ -469,7 +448,9 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 			'NoCalendarsAlert' => 'EC_NO_CALENDARS_ALERT',
 			'EventMRCheckWarn' => 'EC_MR_CHECK_PERIOD_WARN',
 			'CalDavConWait' => 'EC_CAL_DAV_CON_WAIT',
-			'Refresh' => 'EC_CAL_DAV_REFRESH'
+			'Refresh' => 'EC_CAL_DAV_REFRESH',
+			'acc_status_absent' => 'EC_PRIVATE_ABSENT',
+			'acc_status_busy' => 'EC_ACCESSIBILITY_B'
 		);
 
 ?>
@@ -514,11 +495,91 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 <?
 	}
 
-	private static function DialogEditEvent($Params)
+	public static function DialogEditEvent($Params)
 	{
-		global $APPLICATION;
+		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/tools/clock.php");
+		global $APPLICATION, $USER_FIELD_MANAGER;
+
 		$id = $Params['id'];
-		$bWideDate = strpos(FORMAT_DATETIME, 'MMMM') !== false;
+		$event = $Params['event'];
+
+		$event['~DT_FROM_TS'] = $event['DT_FROM_TS'];
+		$event['~DT_TO_TS'] = $event['DT_TO_TS'];
+		$event['DT_FROM_TS'] = $Params['fromTs'];
+		$event['DT_TO_TS'] = $Params['fromTs'] + $event['DT_LENGTH'];
+
+		$UF = $USER_FIELD_MANAGER->GetUserFields("CALENDAR_EVENT", $event['ID'], LANGUAGE_ID);
+
+		$event['UF_CRM_CAL_EVENT'] = $UF['UF_CRM_CAL_EVENT'];
+		if (empty($event['UF_CRM_CAL_EVENT']['VALUE']))
+			$event['UF_CRM_CAL_EVENT'] = false;
+
+		$event['UF_WEBDAV_CAL_EVENT'] = $UF['UF_WEBDAV_CAL_EVENT'];
+		if (empty($event['UF_WEBDAV_CAL_EVENT']['VALUE']))
+			$event['UF_WEBDAV_CAL_EVENT'] = false;
+
+		$userId = CCalendar::GetCurUserId();
+
+		$arHost = CCalendar::GetUser($userId, true);
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
+		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
+		$Params['host'] = $arHost;
+
+		if ($event['IS_MEETING'])
+		{
+			$attendees = array(
+				'y' => array(
+					'users' => array(),
+					'count' => 4,
+					'countMax' => 8,
+					'title' => GetMessage('EC_ATT_Y'),
+					'id' => "bxview-att-cont-y-".$event['ID']
+				),
+				'n' => array(
+					'users' => array(),
+					'count' => 2,
+					'countMax' => 3,
+					'title' => GetMessage('EC_ATT_N'),
+					'id' => "bxview-att-cont-n-".$event['ID']
+				),
+				'q' => array(
+					'users' => array(),
+					'count' => 2,
+					'countMax' => 3,
+					'title' => GetMessage('EC_ATT_Q'),
+					'id' => "bxview-att-cont-q-".$event['ID']
+				)
+			);
+
+			$userIds = array();
+			foreach ($event['~ATTENDEES'] as $i => $att)
+			{
+				$userIds[] = $att["USER_ID"];
+				if ($userId == $att["USER_ID"])
+					$curUserStatus = $att['STATUS'];
+				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
+				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
+			}
+
+			$acc = CCalendar::CheckUsersAccessibility(array(
+				'users' => $userIds,
+				'from' => $event['DT_FROM'],
+				'to' => $event['DT_TO'],
+				'eventId' => $event['ID']
+			));
+
+			foreach($event['~ATTENDEES'] as $i => $att)
+				$event['~ATTENDEES'][$i]['ACC'] = $acc[$att['USER_ID']];
+		}
+
+		if ($event['IS_MEETING'] && empty($event['ATTENDEES_CODES']))
+			$event['ATTENDEES_CODES'] = CCalendarEvent::CheckEndUpdateAttendeesCodes($event);
+
+		$Params['event'] = $event;
+		$Params['UF'] = $UF;
+		$fileRes = CCalendarSceleton::__GetFileUploadHtml($Params);
 
 		$arTabs = array(
 			array('name' => GetMessage('EC_EDEV_EVENT'), 'title' => GetMessage('EC_EDEV_EVENT_TITLE'), 'id' => $id."ed-tab-0", 'active' => true),
@@ -526,58 +587,109 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 			array('name' => GetMessage('EC_EDEV_GUESTS'), 'title' => GetMessage('EC_EDEV_GUESTS_TITLE'), 'id' => $id."ed-tab-2", "show" => !!$Params['bSocNet']),
 			array('name' => GetMessage('EC_EDEV_ADD_TAB'), 'title' => GetMessage('EC_EDEV_ADD_TAB_TITLE'), 'id' => $id."ed-tab-3")
 		);
+
+		$addWidthStyle = IsAmPmMode() ? ' ampm-width' : '';
 ?>
+
+<script>
+	BX.message({
+		EC_MPF_IMAGE: '<?=GetMessageJS("EC_MPF_IMAGE_TITLE")?>',
+		EC_MPF_FILE: '<?=GetMessageJS("EC_MPF_INSERT_FILE")?>',
+		EC_MPF_FILE_INSERT_IN_TEXT: '<?=GetMessageJS("EC_MPF_FILE_INSERT_IN_TEXT")?>',
+		EC_MPF_FILE_IN_TEXT: '<?=GetMessageJS("EC_MPF_FILE_IN_TEXT")?>',
+
+		EC_MPF_IMAGE_LINK: '<?=GetMessageJS("EC_MPF_IMAGE_LINK")?>',
+		EC_FPF_VIDEO: '<?=GetMessageJS("EC_FPF_VIDEO")?>',
+		EC_BPC_VIDEO_P: '<?= GetMessageJS("EC_BPC_VIDEO_P")?>',
+		EC_BPC_VIDEO_PATH_EXAMPLE: '<?= GetMessageJS("EC_BPC_VIDEO_PATH_EXAMPLE")?>',
+		EC_MPF_VIDEO_SIZE: '<?=GetMessageJS("EC_MPF_VIDEO_SIZE")?>'
+	});
+
+	window.__ATTENDEES_ACC = null;
+		<?if($event['IS_MEETING'] && is_array($event['~ATTENDEES'])):?>
+	window.__ATTENDEES_ACC = <?= CUtil::PhpToJSObject($event['~ATTENDEES'])?>;
+	<?endif;?>
+</script>
+
+<form enctype="multipart/form-data" method="POST" name="event_edit_form">
+<input type="hidden" value="Y" name="skip_unescape"/>
+<input id="event-id<?=$id?>" type="hidden" value="0" name="id"/>
+<input id="event-month<?=$id?>" type="hidden" value="0" name="month"/>
+<input id="event-year<?=$id?>" type="hidden" value="0" name="year"/>
 <div id="bxec_edit_ed_<?=$id?>" class="bxec-popup">
-	<div style="width: 520px; height: 1px;"></div>
+	<div style="width: 610px; height: 1px;"></div>
 	<div class="bxec-d-tabs" id="<?=$id?>_edit_tabs">
 		<?foreach($arTabs as $tab):?>
-			<div class="bxec-d-tab <?if($tab['active'])echo'bxec-d-tab-act';?>" title="<?=$tab['title']?>" id="<?=$tab['id']?>" <?if($tab['show'] === false)echo'style="display:none;"';?>>
+			<div class="bxec-d-tab <?if($tab['active'])echo'bxec-d-tab-act';?>" title="<?=$tab['title']?>" id="<?=$tab['id']?>" <?if($tab['show'] === false) echo'style="display:none;"';?>>
 				<b></b><div><span><?=$tab['name']?></span></div><i></i>
 			</div>
 		<?endforeach;?>
 	</div>
 	<div class="bxec-d-cont"  id="<?=$id?>_edit_ed_d_tabcont">
 		<?/* ####### TAB 0 : MAIN ####### */?>
-		<div id="<?=$id?>ed-tab-0-cont" class="bxec-d-cont-div<?= ($Params['bAMPM'] ? ' bxec-d-cont-div-ampm' : '')?><?= ($bWideDate ? ' bxec-d-cont-div-wide-date' : '')?>">
+		<div id="<?=$id?>ed-tab-0-cont" class="bxec-d-cont-div" style="display: block;">
 			<div class="bxc-meeting-edit-note"><?= GetMessage('EC_EDIT_MEETING_NOTE')?></div>
 
-			<div class="bxec-popup-row bxec-popup-row-from-to">
-				<div style="margin-top: 16px;">
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-calendar">
-					<label class="bxec-from-to-lbl bxec-field-lbl-imp" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_DATE_FROM')?></label>
-					<input id="<?=$id?>edev-from"  type="text"/></span>
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-time"><?CClock::Show(array('inputId' => $id.'edev_from_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_FROM')));?><i class="bxec-time-icon"></i></span>
-				&mdash;
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-calendar">
-					<label class="bxec-from-to-lbl" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_DATE_TO')?></label>
-					<input id="<?=$id?>edev-to"  type="text"/></span>
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-time"><?CClock::Show(array('inputId' => $id.'edev_to_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_TO')));?><i class="bxec-time-icon"></i></span>
-				<div class="bxec-cal-icon-bogus"><?$APPLICATION->IncludeComponent("bitrix:main.calendar",	"",Array("FORM_NAME" => "","INPUT_NAME" => "","INPUT_VALUE" => "","SHOW_TIME" => "N","HIDE_TIMEBAR" => "Y","SHOW_INPUT" => "N"),false, array("HIDE_ICONS" => "Y"));?></div>
+			<div class="bxec-from-to-reminder" id="feed-cal-from-to-cont<?=$id?>">
+				<input id="event-from-ts<?=$id?>" type="hidden" value="" name="from_ts"/>
+				<input id="event-to-ts<?=$id?>" type="hidden" value="" name="to_ts"/>
+				<div class="bxec-from-to-reminder-inner">
+			<span class="bxec-date">
+				<label class="bxec-date-label" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_FROM_DATE_TIME')?></label>
+				<label class="bxec-date-label-full-day" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_DATE_FROM')?></label>
+				<input id="feed-cal-event-from<?=$id?>" type="text" class="calendar-inp calendar-inp-cal"/>
+			</span>
+			<span class="bxec-time<?=$addWidthStyle?>"><?CClock::Show(array('inputId' => 'feed_cal_event_from_time'.$id, 'inputTitle' => GetMessage('EC_EDEV_TIME_FROM'), 'showIcon' => false));?></span>
+			<span class="bxec-mdash">&mdash;</span>
+			<span class="bxec-date">
+				<label class="bxec-date-label" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_TO_DATE_TIME')?></label>
+				<label class="bxec-date-label-full-day" for="<?=$id?>edev-from"><?=GetMessage('EC_EDEV_DATE_TO')?></label>
+				<input id="feed-cal-event-to<?=$id?>" type="text" class="calendar-inp calendar-inp-cal"/>
+			</span>
+			<span class="bxec-time<?=$addWidthStyle?>"><?CClock::Show(array('inputId' => 'feed_cal_event_to_time'.$id, 'inputTitle' => GetMessage('EC_EDEV_TIME_TO'), 'showIcon' => false));?></span>
+
+					<div class="bxec-reminder-collapsed" id="feed-cal-reminder-cont<?=$id?>">
+						<input class="bxec-check" type="checkbox" id="event-reminder<?=$id?>" value="Y" name="remind[checked]"/>
+						<label class="bxec-rem-lbl" for="event-reminder<?=$id?>"><?= GetMessage('EC_EDEV_REMIND_EVENT')?></label>
+						<label class="bxec-rem-lbl-for" for="event-reminder<?=$id?>"><?= GetMessage('EC_EDEV_REMIND_FOR')?>:</label>
+						<span class="bxec-rem-value">
+							<input class="calendar-inp" id="event_remind_count<?=$id?>" type="text" style="width: 30px" size="2" name="remind[count]">
+							<select id="event_remind_type<?=$id?>" class="calendar-select" name="remind[type]" style="width: 106px;">
+								<option value="min" selected="true"><?=GetMessage('EC_EDEV_REM_MIN')?></option>
+								<option value="hour"><?=GetMessage('EC_EDEV_REM_HOUR')?></option>
+								<option value="day"><?=GetMessage('EC_EDEV_REM_DAY')?></option>
+							</select>
+							<?=GetMessage('ECLF_REM_DE_VORHER')?>
+						</span>
+					</div>
+
+					<div style="display:none;"><?$APPLICATION->IncludeComponent("bitrix:main.calendar",	"",Array("FORM_NAME" => "","INPUT_NAME" => "","INPUT_VALUE" => "","SHOW_TIME" => "N","HIDE_TIMEBAR" => "Y","SHOW_INPUT" => "N"),false, array("HIDE_ICONS" => "Y"));?></div>
 				</div>
 
-				<div class="bxec-popup-row-checkbox bxec-popup-row-full-day">
-					<input type="checkbox" id="<?=$id?>_full_day" value="Y" />
-					<label style="display: inline-block;" for="<?=$id?>_full_day"><?= GetMessage('EC_FULL_DAY')?></label>
+				<div class="bxec-full-day">
+					<input type="checkbox" id="event-full-day<?=$id?>" value="Y" name="skip_time"/>
+					<label style="display: inline-block;" for="event-full-day<?=$id?>"><?= GetMessage('EC_FULL_DAY')?></label>
 				</div>
 			</div>
 
 			<div class="bxec-popup-row">
-				<div class="bxec-field-label"><label class="bxec-field-lbl-imp" for="<?=$id?>_edit_ed_name"><?= GetMessage('EC_T_NAME')?></label></div>
-				<span class="bxec-field-val-2 bxec-field-title-inner" style="width: <?= ($Params['bAMPM'] ? 495 : 440)?>px;"><input type="text" id="<?=$id?>_edit_ed_name" /></span>
+				<input name="name" placeholder="<?= GetMessage('EC_T_EVENT_NAME')?>" type="text" id="<?=$id?>_edit_ed_name" class="calendar-inp bxec-inp-active" style="width: 500px; font-size: 18px!important;"/>
 			</div>
 
 			<div class="bxec-popup-row" id="<?=$id?>_location_cnt">
 				<span class="bxec-field-label-edev"><label for="<?=$id?>_planner_location1"><?=GetMessage('EC_LOCATION')?>:</label></span>
 				<span class="bxec-field-val-2 bxecpl-loc-cont" >
-				<input size="37" style="width: 246px;" id="<?=$id?>_planner_location1" type="text"  title="<?=GetMessage('EC_LOCATION_TITLE')?>" value="<?= GetMessage('EC_PL_SEL_MEET_ROOM')?>" class="ec-label" />
+				<input class="calendar-inp" style="width: 272px;" id="<?=$id?>_planner_location1" type="text"  title="<?=GetMessage('EC_LOCATION_TITLE')?>" value="<?= GetMessage('EC_PL_SEL_MEET_ROOM')?>" class="ec-label" />
 				</span>
+				<input id="event-location-old<?=$id?>" type="hidden" value="" name="location[OLD]"/>
+				<input id="event-location-new<?=$id?>" type="hidden" value="" name="location[NEW]"/>
 			</div>
 
 			<?if($Params['bIntranet']):?>
 			<div class="bxec-popup-row bxec-ed-meeting-vis">
 				<span class="bxec-field-label-edev"><label for="<?=$id?>_bxec_accessibility"><?=GetMessage('EC_ACCESSIBILITY')?>:</label></span>
 				<span class="bxec-field-val-2" >
-				<select id="<?=$id?>_bxec_accessibility" style="width: 210px;">
+				<select  class="calendar-select" id="<?=$id?>_bxec_accessibility" name="accessibility" style="width: 310px;">
 					<option value="busy" title="<?=GetMessage('EC_ACCESSIBILITY_B')?>"><?=GetMessage('EC_ACCESSIBILITY_B')?></option>
 					<option value="quest" title="<?=GetMessage('EC_ACCESSIBILITY_Q')?>"><?=GetMessage('EC_ACCESSIBILITY_Q')?></option>
 					<option value="free" title="<?=GetMessage('EC_ACCESSIBILITY_F')?>"><?=GetMessage('EC_ACCESSIBILITY_F')?></option>
@@ -590,47 +702,18 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 			<div class="bxec-popup-row" id="<?=$id?>_sect_cnt">
 				<span class="bxec-field-label-edev"><label for="<?=$id?>_edit_ed_calend_sel"><?=GetMessage('EC_T_CALENDAR')?>:</label></span>
 				<span class="bxec-field-val-2" >
-				<select id="<?=$id?>_edit_ed_calend_sel"></select><span id="<?=$id?>_edit_sect_sel_warn" class="bxec-warn" style="display: none;"><?=GetMessage('EC_T_CALEN_DIS_WARNING')?></span>
+				<select name="section" id="<?=$id?>_edit_ed_calend_sel" class="calendar-select" style="width: 310px;"></select><span id="<?=$id?>_edit_sect_sel_warn" class="bxec-warn" style="display: none;"><?=GetMessage('EC_T_CALEN_DIS_WARNING')?></span>
 				</span>
 			</div>
 
-			<!-- Color -->
-			<div class="bxec-popup-row">
-				<span class="bxec-field-label-edev" style="vertical-align:top;"><label for="<?=$id?>-event-color-inp"><?=GetMessage('EC_T_COLOR')?>:</label></span>
-				<span  class="bxec-field-val-2" style="width: 300px;">
-				<?CCalendarSceleton::DisplayColorSelector($id, 'event', $Params['colors']);?>
-				</span>
-			</div>
 		</div>
 		<?/* ####### END TAB 0 ####### */?>
 
 		<?/* ####### TAB 1 : DESCRIPTION - LHE ####### */?>
-		<div id="<?=$id?>ed-tab-1-cont" class="bxec-d-cont-div bxec-lhe">
-		<?
-		CModule::IncludeModule("fileman");
-		$LHE = new CLightHTMLEditor;
-		$LHE->Show(array(
-			'id' => 'LHEEvDesc',
-			'width' => '500',
-			'height' => '285',
-			'inputId' => $id.'_edit_ed_desc',
-			'content' => '',
-			'bUseFileDialogs' => false,
-			'bFloatingToolbar' => false,
-			'toolbarConfig' => array(
-				'Bold', 'Italic', 'Underline', 'RemoveFormat',
-				'CreateLink', 'DeleteLink', 'Image',
-				'BackColor', 'ForeColor',
-				'InsertOrderedList', 'InsertUnorderedList',
-				'FontSizeList'
-				,'Source'
-			),
-			'BBCode' => true,
-			'jsObjName' => 'pLHEEvDesc',
-			'bInitByJS' => true,
-			'bSaveOnBlur' => false
-		));
-		?>
+		<div id="<?=$id?>ed-tab-1-cont" class="bxec-d-cont-div bxec-d-cont-div-lhe">
+			<div class="bxec-lhe">
+				<?CCalendarSceleton::__ShowEditorHtml($Params);?>
+			</div>
 		</div>
 		<?/* ####### END TAB 1 ####### */?>
 
@@ -638,30 +721,11 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		/* ####### TAB 2 : GUESTS ####### */
 		if($Params['bSocNet']):?>
 		<div id="<?=$id?>ed-tab-2-cont" class="bxec-d-cont-div">
+			<a id="<?=$id?>_planner_link" href="javascript:void(0);" title="<?=GetMessage('EC_PLANNER_TITLE')?>" class="bxex-planner-link"><i></i><?=GetMessage('EC_PLANNER2')?></a>
+			<?CCalendarSceleton::__ShowAttendeesDestinationHtml($Params)?>
 			<div class="bxc-att-cont-cont">
-				<a id="<?=$id?>_planner_link" href="javascript:void(0);" title="<?=GetMessage('EC_PLANNER_TITLE')?>" class="bxex-planner-link"><i></i><?=GetMessage('EC_PLANNER2')?></a>
-			<?
-			$isExtranetGroup = false;
-
-			if ($Params["bSocNet"] && $Params["type"] == "group" && intval($Params["ownerId"]) > 0 && CModule::IncludeModule("extranet"))
-				$isExtranetGroup = CExtranet::IsExtranetSocNetGroup($Params["ownerId"]);
-
-			$APPLICATION->IncludeComponent(
-			"bitrix:intranet.user.selector.new", "", array(
-					"MULTIPLE" => "Y",
-					"NAME" => "BXCalUserSelect",
-					"VALUE" => array(),
-					"POPUP" => "Y",
-					"ON_CHANGE" => "bxcUserSelectorOnchange",
-					"NAME_TEMPLATE" => CCalendar::GetUserNameTemplate(),
-					"SITE_ID" => SITE_ID,
-					"SHOW_EXTRANET_USERS" => $isExtranetGroup ? "FROM_EXACT_GROUP" : "NONE",
-					"EX_GROUP" => $isExtranetGroup ? $Params["ownerId"] : ""
-				), null, array("HIDE_ICONS" => "Y")
-			);
-			?>
 				<span class="bxc-add-guest-link"  id="<?=$id?>_user_control_link"></span>
-				<div id="<?=$id?>_attendees_cont" class="bxc-attendees-cont">
+				<div id="<?=$id?>_attendees_cont" class="bxc-attendees-cont" style="display: none;">
 					<div class="bxc-owner-cont">
 						<div class="bxc-owner-cont">
 							<span class="bxc-owner-title"><span><?= GetMessage('EC_EDEV_HOST')?>:</span></span>
@@ -677,219 +741,491 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 				</div>
 			</div>
 
-			<div id="<?=$id?>_add_meeting_params">
-				<div class="bxec-add-meet-text"><a id="<?=$id?>_add_meet_text" href="javascript:void(0);"><?=GetMessage('EC_ADD_METTING_TEXT')?></a></div>
-				<div class="bxec-meet-text" id="<?=$id?>_meet_text_cont">
-					<div class="bxec-mt-d"><?=GetMessage('EC_METTING_TEXT')?> (<a id="<?=$id?>_hide_meet_text" href="javascript:void(0);" title="<?=GetMessage('EC_HIDE_METTING_TEXT_TITLE')?>"><?=GetMessage('EC_HIDE')?></a>): </div><br />
-					<textarea  class="bxec-mt-t" cols="63" id="<?=$id?>_meeting_text" rows="3"></textarea>
-				</div>
-
-				<div class="bxec-popup-row bxec-popup-row-checkbox">
-					<input type="checkbox" id="<?=$id?>_ed_open_meeting" value="Y" />
-					<label style="display: inline-block;" for="<?=$id?>_ed_open_meeting"><?=GetMessage('EC_OPEN_MEETING')?></label>
-				</div>
-				<div class="bxec-popup-row bxec-popup-row-checkbox">
-					<input type="checkbox" id="<?=$id?>_ed_notify_status" value="Y"/>
-					<label for="<?=$id?>_ed_notify_status"><?=GetMessage('EC_NOTIFY_STATUS')?></label>
-				</div>
-				<div class="bxec-popup-row bxec-popup-row-checkbox" id="<?=$id?>_ed_reivite_cont">
-					<input type="checkbox" id="<?=$id?>_ed_reivite" value="Y"/>
-					<label for="<?=$id?>_ed_reivite"><?=GetMessage('EC_REINVITE')?></label>
-				</div>
-			</div>
 		</div>
 		<?/* ####### END TAB 2 ####### */?>
 		<?endif; /* bSocNet */?>
 
 		<?/* ####### TAB 3 : ADDITIONAL INFO ####### */?>
 		<div id="<?=$id?>ed-tab-3-cont" class="bxec-d-cont-div">
-			<?if($Params['bSocNet']):?>
-			<!-- Remind cont -->
-			<div class="bxec-popup-row bxec-ed-meeting-vis" id="<?=$id?>_remind_cnt">
-				<div class="bxec-popup-row-title"><?=GetMessage('EC_EDEV_REMINDER')?></div>
-				<div>
-					<input id="<?=$id?>_bxec_reminder" type="checkbox" value="Y">
-					<label for="<?=$id?>_bxec_reminder"><?=GetMessage('EC_EDEV_REMIND_EVENT')?></label>
-					<span id="<?=$id?>_bxec_rem_cont" style="display: none;">
-					<?=GetMessage('EC_EDEV_FOR')?>
-					<input id="<?=$id?>_bxec_rem_count" type="text" style="width: 30px" size="2">
-					<select id="<?=$id?>_bxec_rem_type">
-						<option value="min" selected="true"><?=GetMessage('EC_EDEV_REM_MIN')?></option>
-						<option value="hour"><?=GetMessage('EC_EDEV_REM_HOUR')?></option>
-						<option value="day"><?=GetMessage('EC_EDEV_REM_DAY')?></option>
+			<div class="bxec-popup-row-title"><?= GetMessage('EC_T_REPEATING')?></div>
+
+			<div class="bxec-popup-row-repeat" id="<?=$id?>_edit_ed_rep_cont">
+				<div class="bxec-popup-row-2" id="<?=$id?>_edit_ed_rep_tr">
+					<input id="event-rrule-byday<?=$id?>" type="hidden" value="0" name="rrule[BYDAY]"/>
+					<input id="event-rrule-until<?=$id?>" type="hidden" value="0" name="rrule[UNTIL]"/>
+					<input id="<?=$id?>_edit_ed_rep_check" type="checkbox" value="Y" name="rrule_enabled"/>
+					<label for="<?=$id?>_edit_ed_rep_check" style="display: inline-block; margin: 3px 0 0 0; vertical-align:top;"><?=GetMessage('EC_T_REPEAT_CHECK_LABEL')?></label>
+				</div>
+
+				<div class="bxec-popup-row-bordered bxec-popup-repeat-details">
+
+					<label for="<?=$id?>_edit_ed_rep_sel" class="event-grid-repeat-label"><?=GetMessage('EC_T_REPEAT')?>:</label>
+					<select id="<?=$id?>_edit_ed_rep_sel" class="calendar-select" name="rrule[FREQ]" style="width: 175px;">
+						<option value="DAILY"><?=GetMessage('EC_T_REPEAT_DAILY')?></option>
+						<option value="WEEKLY"><?=GetMessage('EC_T_REPEAT_WEEKLY')?></option>
+						<option value="MONTHLY"><?=GetMessage('EC_T_REPEAT_MONTHLY')?></option>
+						<option value="YEARLY"><?=GetMessage('EC_T_REPEAT_YEARLY')?></option>
 					</select>
-					<?=GetMessage('EC_JS_DE_VORHER')?>
+
+					<span class="event-grid-repeat-cont">
+						<span class="event-grid-rep-phrases" id="<?=$id?>_edit_ed_rep_phrase1"></span>
+						<select id="<?=$id?>_edit_ed_rep_count" class="calendar-select" name="rrule[INTERVAL]">
+							<?for ($i = 1; $i < 36; $i++):?>
+								<option value="<?=$i?>"><?=$i?></option>
+							<?endfor;?>
+						</select>
+						<span class="event-grid-rep-phrases" id="<?=$id?>_edit_ed_rep_phrase2"></span>
+
+						<span id="<?=$id?>_edit_ed_rep_week_days" class="bxec-rep-week-days">
+							<?
+							$week_days = CCalendarSceleton::GetWeekDays();
+							for($i = 0; $i < 7; $i++):
+								$id_ = $id.'bxec_week_day_'.$i;?>
+								<input id="<?=$id_?>" type="checkbox" value="<?= $week_days[$i][2]?>">
+								<label for="<?=$id_?>" title="<?=$week_days[$i][0]?>"><?=$week_days[$i][1]?></label>
+								<?if($i == 2){echo '<br>';}?>
+							<?endfor;?>
+						</span>
 					</span>
+
+				</div>
+
+				<div class="bxec-popup-row-bordered bxec-popup-repeat-details">
+					<label for="<?=$id_?>edit-ev-rep-diap-to" style="display: inline-block; margin: 8px 3px 0 0; vertical-align:top;"><?=GetMessage('EC_T_DIALOG_STOP_REPEAT')?>:</label>
+					<input class="calendar-inp calendar-inp-cal" id="<?=$id?>edit-ev-rep-diap-to" type="text" style="width: 150px;"/>
+				</div>
+			</div>
+
+			<div class="bxec-popup-row-title"><?= GetMessage('EC_EDEV_ADD_TAB')?></div>
+			<div class="bxec-popup-row-2">
+				<?=GetMessage('EC_IMPORTANCE_TITLE')?>:
+				<select id="<?=$id?>_bxec_importance" class="calendar-select" name="importance" style="width: 250px;">
+					<option value="high" style="font-weight: bold;"><?=GetMessage('EC_IMPORTANCE_H')?></option>
+					<option value="normal" selected="true"><?=GetMessage('EC_IMPORTANCE_N')?></option>
+					<option value="low" style="color: #909090;"><?=GetMessage('EC_IMPORTANCE_L')?></option>
+				</select>
+			</div>
+
+			<?if($Params['type'] == 'user'):?>
+			<div class="bxec-popup-row-bordered bxec-popup-row-private">
+				<input id="<?=$id?>_bxec_private" type="checkbox" value="Y" title="<?=GetMessage('EC_PRIVATE_NOTICE')?>" name="private_event">
+				<label for="<?=$id?>_bxec_private" title="<?=GetMessage('EC_PRIVATE_NOTICE')?>"><?=GetMessage('EC_PRIVATE_EVENT')?></label>
+				<div><?= GetMessage('EC_PRIVATE_NOTICE')?></div>
+			</div>
+			<?endif;?>
+
+			<!-- Color -->
+			<div class="bxec-popup-row-bordered bxec-popup-row-color">
+				<input id="<?=$id?>_bxec_color" type="hidden" value="" name="color" />
+				<input id="<?=$id?>_bxec_text_color" type="hidden" value="" name="text_color" />
+				<label class="bxec-color-label" for="<?=$id?>-event-color-inp"><?=GetMessage('EC_T_COLOR')?>:</label>
+				<div class="bxec-color-selector-cont">
+				<?CCalendarSceleton::DisplayColorSelector($id, 'event');?>
+				</div>
+			</div>
+
+			<!-- Userfields -->
+			<? if (isset($UF['UF_CRM_CAL_EVENT'])):?>
+			<div id="<?=$id?>bxec_uf_group" class="bxec-popup-row-bordered">
+				<?$crmUF = $UF['UF_CRM_CAL_EVENT'];?>
+				<label for="event-crm<?=$id?>" class="bxec-uf-crm-label"><?= htmlspecialcharsbx($crmUF["EDIT_FORM_LABEL"])?>:</label>
+				<div class="bxec-uf-crm-cont">
+					<?$APPLICATION->IncludeComponent(
+						"bitrix:system.field.edit",
+						$crmUF["USER_TYPE"]["USER_TYPE_ID"],
+						array(
+							"bVarsFromForm" => false,
+							"arUserField" => $crmUF,
+							"form_name" => 'event_edit_form'
+						), null, array("HIDE_ICONS" => "Y")
+					);?>
 				</div>
 			</div>
 			<?endif;?>
-			<table class="bxec-reminder-table" style="width: 100%;">
-				<tr class="bxec-edev-ad-title"><td colSpan="2"><?=GetMessage('EC_T_REPEATING')?></td></tr>
-				<?/* Repeat row start*/?>
-				<tr id="<?=$id?>_edit_ed_rep_tr"  class="bxec-edit-ed-rep"><td class="bxec-edit-ed-repeat"><?=GetMessage('EC_T_REPEAT')?>:</td><td class="bxec-ed-lp">
-				<select id="<?=$id?>_edit_ed_rep_sel">
-					<option value="NONE"><?=GetMessage('EC_T_REPEAT_NONE')?></option>
-					<option value="DAILY"><?=GetMessage('EC_T_REPEAT_DAILY')?></option>
-					<option value="WEEKLY"><?=GetMessage('EC_T_REPEAT_WEEKLY')?></option>
-					<option value="MONTHLY"><?=GetMessage('EC_T_REPEAT_MONTHLY')?></option>
-					<option value="YEARLY"><?=GetMessage('EC_T_REPEAT_YEARLY')?></option>
-				</select>
-				<div id="<?=$id?>_edit_ed_repeat_sect" style="display: none; width: 310px;">
-				<span id="<?=$id?>_edit_ed_rep_phrase1"></span>
-				<select id="<?=$id?>_edit_ed_rep_count">
-					<?for ($i = 1; $i < 36; $i++):?>
-						<option value="<?=$i?>"><?=$i?></option>
-					<?endfor;?>
-				</select>
-				<span id="<?=$id?>_edit_ed_rep_phrase2"></span>
-				<br>
-				<div id="<?=$id?>_edit_ed_rep_week_days" class="bxec-rep-week-days">
-					<?for($i = 0; $i < 7; $i++):
-						$id_ = $id.'bxec_week_day_'.$i;?>
-					<input id="<?=$id_?>" type="checkbox" value="<?= $Params['week_days'][$i][2]?>">
-					<label for="<?=$id_?>" title="<?=$Params['week_days'][$i][0]?>"><?=$Params['week_days'][$i][1]?></label>
-					<?endfor;?>
-				</div>
-				<div>
-					<label for="<?=$id_?>edit-ev-rep-diap-to" style="display: inline-block; margin: 3px 0 0 0; vertical-align:top;"><?=GetMessage('EC_T_DIALOG_STOP_REPEAT')?>:</label>
-					<span class="bxec-rep2-inner"><input id="<?=$id?>edit-ev-rep-diap-to"  type="text"/></span>
-				</div>
-				</td></tr>
-				<?/* Repeat row end*/?>
-
-				<tr class="bxec-edev-ad-title"><td colSpan="2"><?=GetMessage('EC_EDDIV_SPECIAL_NOTES')?></td></tr>
-				<tr>
-					<td colspan="2">
-					<?=GetMessage('EC_IMPORTANCE_TITLE')?>:
-					<select id="<?=$id?>_bxec_importance">
-						<option value="high" style="font-weight: bold;"><?=GetMessage('EC_IMPORTANCE_H')?></option>
-						<option value="normal" selected="true"><?=GetMessage('EC_IMPORTANCE_N')?></option>
-						<option value="low" style="color: #909090;"><?=GetMessage('EC_IMPORTANCE_L')?></option>
-					</select>
-					</td>
-				</tr>
-				<?if($Params['type'] == 'user'):?>
-				<tr>
-					<td colspan="2">
-					<input id="<?=$id?>_bxec_private" type="checkbox" value="Y" title="<?=GetMessage('EC_PRIVATE_NOTICE')?>">
-					<label for="<?=$id?>_bxec_private" title="<?=GetMessage('EC_PRIVATE_NOTICE')?>"><?=GetMessage('EC_PRIVATE_EVENT')?></label>
-					<div style="font-size: 90%; color: #5D5D5D;"><?= GetMessage('EC_PRIVATE_NOTICE')?></div>
-					</td>
-				</tr>
-				<?endif;?>
-			</table>
-			<div id="<?=$id?>bxec_uf_group" class="bxec-popup-row" style="display: none">
-				<div class="bxec-popup-row-title"><?= GetMessage('EC_EDEV_ADD_TAB')?></div>
-				<div id="<?=$id?>bxec_uf_cont"></div>
-			</div>
 		</div>
 		<?/* ####### END TAB 3 ####### */?>
 	</div>
 </div>
+
+	<div class="bxec-d-files" id="bxed_file_cont_<?=$id?>" style="display: none;">
+		<?= $fileRes['UPLOAD_WEBDAV_ELEMENT_HTML'];?>
+		<script>
+			window.__UPLOAD_WEBDAV_ELEMENT_CID = '<?= CUtil::JSEscape($fileRes["UPLOAD_WEBDAV_ELEMENT_CID"]);?>';
+			window.__UPLOAD_WEBDAV_ELEMENT_VALUE = <?= CUtil::PhpToJSObject($fileRes['UPLOAD_WEBDAV_ELEMENT_VALUE'])?>;
+		</script>
+	</div>
+</form>
 <?
 	}
 
-	private static function DialogViewEvent($Params)
+	public static function DialogViewEvent($Params)
 	{
+		global $APPLICATION, $USER_FIELD_MANAGER;
+
 		$id = $Params['id'];
+		$event = $Params['event'];
+
+		$event['~DT_FROM_TS'] = $event['DT_FROM_TS'];
+		$event['~DT_TO_TS'] = $event['DT_TO_TS'];
+		$event['DT_FROM_TS'] = $Params['fromTs'];
+		$event['DT_TO_TS'] = $Params['fromTs'] + $event['DT_LENGTH'];
+
+		$UF = $USER_FIELD_MANAGER->GetUserFields("CALENDAR_EVENT", $event['ID'], LANGUAGE_ID);
+
+		$event['UF_CRM_CAL_EVENT'] = $UF['UF_CRM_CAL_EVENT'];
+		if (empty($event['UF_CRM_CAL_EVENT']['VALUE']))
+			$event['UF_CRM_CAL_EVENT'] = false;
+
+		$event['UF_WEBDAV_CAL_EVENT'] = $UF['UF_WEBDAV_CAL_EVENT'];
+		if (empty($event['UF_WEBDAV_CAL_EVENT']['VALUE']))
+			$event['UF_WEBDAV_CAL_EVENT'] = false;
+
+		$event['FROM_WEEK_DAY'] = FormatDate('D', $event['DT_FROM_TS']);
+		$event['FROM_MONTH_DAY'] = FormatDate('j', $event['DT_FROM_TS']);
+
+		$arHost = CCalendar::GetUser($event['MEETING_HOST'], true);
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
+		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
+		$curUserStatus = '';
+		$userId = CCalendar::GetCurUserId();
+
+		$viewComments = CCalendar::IsPersonal($event['CAL_TYPE'], $event['OWNER_ID'], $userId) || CCalendarSect::CanDo('calendar_view_full', $event['SECT_ID'], $userId);
+
+		if ($event['IS_MEETING'] && empty($event['ATTENDEES_CODES']))
+			$event['ATTENDEES_CODES'] = CCalendarEvent::CheckEndUpdateAttendeesCodes($event);
+
+		if ($event['IS_MEETING'])
+		{
+			$attendees = array(
+				'y' => array(
+					'users' => array(),
+					'count' => 4,
+					'countMax' => 8,
+					'title' => GetMessage('EC_ATT_Y'),
+					'id' => "bxview-att-cont-y-".$event['ID']
+				),
+				'n' => array(
+					'users' => array(),
+					'count' => 2,
+					'countMax' => 3,
+					'title' => GetMessage('EC_ATT_N'),
+					'id' => "bxview-att-cont-n-".$event['ID']
+				),
+				'q' => array(
+					'users' => array(),
+					'count' => 2,
+					'countMax' => 3,
+					'title' => GetMessage('EC_ATT_Q'),
+					'id' => "bxview-att-cont-q-".$event['ID']
+				)
+			);
+
+			foreach ($event['~ATTENDEES'] as $i => $att)
+			{
+				if ($userId == $att["USER_ID"])
+				{
+					$curUserStatus = $att['STATUS'];
+					$viewComments = true;
+				}
+				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
+				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
+			}
+		}
+
 		$arTabs = array(
 			array('name' => GetMessage('EC_BASIC'), 'title' => GetMessage('EC_BASIC_TITLE'), 'id' => $id."view-tab-0", 'active' => true),
-			array('name' => GetMessage('EC_T_DESC'), 'title' => GetMessage('EC_T_DESC_TITLE'), 'id' => $id."view-tab-1"),
-			array('name' => GetMessage('EC_EDEV_ADD_TAB'), 'title' => GetMessage('EC_EDEV_ADD_TAB_TITLE'), 'id' => $id."view-tab-2")
+			array('name' => GetMessage('EC_EDEV_ADD_TAB'), 'title' => GetMessage('EC_EDEV_ADD_TAB_TITLE'), 'id' => $id."view-tab-1")
 		);
 		?>
 <div id="bxec_view_ed_<?=$id?>" class="bxec-popup">
-	<div style="width: 500px; height: 1px;"></div>
+	<div style="width: 700px; height: 1px;"></div>
 	<div class="bxec-d-tabs" id="<?=$id?>_viewev_tabs">
 		<?foreach($arTabs as $tab):?>
-			<div class="bxec-d-tab <?if($tab['active'])echo'bxec-d-tab-act';?>" title="<?= (isset($tab['title']) ? $tab['title'] : $tab['name'])?>" id="<?=$tab['id']?>" <?if($tab['show'] === false)echo'style="display:none;"';?>>
+			<div class="bxec-d-tab <?if($tab['active']) echo'bxec-d-tab-act';?>" title="<?= (isset($tab['title']) ? $tab['title'] : $tab['name'])?>" id="<?= $tab['id']?>" <?if($tab['show'] === false) echo'style="display:none;"';?>>
 				<b></b><div><span><?=$tab['name']?></span></div><i></i>
 			</div>
 		<?endforeach;?>
 	</div>
-	<div class="bxec-d-cont"  id="<?=$id?>_edit_sect_tabcont">
+	<div class="bxec-d-cont">
 <?/* ####### TAB 0 : BASIC ####### */?>
-<div id="<?=$id?>view-tab-0-cont" class="bxec-d-cont-div">
-	<table style="width: 100%;">
-		<tr><td align="left" class="bxec-ed-lp" style="height: 23px; width: 60px;"><?=GetMessage('EC_T_NAME')?>:</td><td class="bxec-ed-lp" style="width: 380px;"><div class="bxec-view-name" id="<?=$id?>view-name-cnt"></div></td></tr>
-		<tr><td colSpan="2" class="bxec-view-ed-per" id="<?=$id?>view-period"></td></tr>
-		<tr id="<?=$id?>view-repeat-cnt"><td class="bxec-par-name"><?=GetMessage('EC_T_REPEAT')?>:</td><td class="bxec-par-cont"></td></tr>
-		<tr id="<?=$id?>view-loc-cnt"><td align="left" class="bxec-ed-lp" title="<?=GetMessage('EC_LOCATION_TITLE')?>" style="white-space: nowrap;"><?=GetMessage('EC_LOCATION')?>:</td><td class="bxec-ed-lp" style="padding-left: 5px;" id="<?=$id?>view-location"></td></tr>
+<div id="<?=$id?>view-tab-0-cont" class="bxec-d-cont-div" style="display: block;">
+	<div class="bx-cal-view-icon">
+		<div class="bx-cal-view-icon-day"><?= $event['FROM_WEEK_DAY']?></div>
+		<div class="bx-cal-view-icon-date"><?= $event['FROM_MONTH_DAY']?></div>
+	</div>
+	<div class="bx-cal-view-text">
+		<table>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?= GetMessage('EC_T_NAME')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><span class="bx-cal-view-name"><?= htmlspecialcharsEx($event['NAME'])?></span></td>
+			</tr>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?= GetMessage('EC_DATE')?>:</td>
+				<td class="bx-cal-view-text-cell-r bx-cal-view-from-to">
+					<?= CCalendar::GetFromToHtml($event['DT_FROM_TS'], $event['DT_TO_TS'], $event['DT_SKIP_TIME'] == 'Y', $event['DT_LENGTH']);?>
+				</td>
+			</tr>
+			<?if ($event['RRULE'] !== ''):?>
+				<?
+				$event['RRULE'] = CCalendarEvent::ParseRRULE($event['RRULE']);
+				switch ($event['RRULE']['FREQ'])
+				{
+					case 'DAILY':
+						if ($event['RRULE']['INTERVAL'] == 1)
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_DAY');
+						else
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_DAY_1', array('#DAY#' => $event['RRULE']['INTERVAL']));
+						break;
+					case 'WEEKLY':
 
-		<?if($Params['bSocNet']):?>
-		<tr id="<?=$id?>view-meet-text-cnt"><td class="bxec-par-name" colSpan="2"><span class="bxec-meet-text-lbl"><?=GetMessage('EC_MEETING_TEXT2')?>:</span><div class="bxec-vd-meet-text" id="<?=$id?>_view_ed_meet_text"></div></td></tr>
+						$daysList = array();
+						foreach ($event['RRULE']['BYDAY'] as $day)
+							$daysList[] = GetMessage('EC_'.$day);
+						$daysList = implode(', ', $daysList);
+						if ($event['RRULE']['INTERVAL'] == 1)
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_WEEK', array('#DAYS_LIST#' => $daysList));
+						else
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_WEEK_1', array('#WEEK#' => $event['RRULE']['INTERVAL'], '#DAYS_LIST#' => $daysList));
+						break;
+					case 'MONTHLY':
+						if ($event['RRULE']['INTERVAL'] == 1)
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_MONTH');
+						else
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_MONTH_1', array('#MONTH#' => $event['RRULE']['INTERVAL']));
+						break;
+					case 'YEARLY':
+						if ($event['RRULE']['INTERVAL'] == 1)
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR', array('#DAY#' => 0, '#MONTH#' => 0));
+						else
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR_1', array('#YEAR#' => $event['RRULE']['INTERVAL'], '#DAY#' => 0, '#MONTH#' => 0));
+						break;
+				}
 
-		<tr id="<?=$id?>attendees_cnt"><td colSpan="2" class="bxc-att-cell">
-			<div id="<?=$id?>view_att_cont" class="bxc-attendees-cont bxc-attendees-cont-view">
-				<div class="bxc-owner-cont">
-					<span class="bxc-owner-title"><span><?= GetMessage('EC_EDEV_HOST')?>:</span></span>
-					<span class="bxc-owner-value"><a id="<?=$id?>view_host_link" href="javascript:void(0);"></a></span>
-				</div>
-				<div class="bxc-no-att-notice"> - <?= GetMessage('EC_NO_ATTENDEES')?> - </div>
-				<div class="bxc-att-title">
-					<span><?= GetMessage('EC_EDEV_GUESTS')?>:</span>
-					<div id="<?=$id?>view_att_summary"></div>
-				</div>
-				<div class="bxc-att-cont" id="<?=$id?>view_att_list"></div>
-			</div>
-		</td></tr>
+				$repeatHTML .= '<br>'.GetMessage('EC_RRULE_FROM', array('#FROM_DATE#' => FormatDate(CCalendar::DFormat(false), $event['~DT_FROM_TS'])));
+				if (date('dmY', $event['RRULE']['UNTIL']) != '01012038')
+					$repeatHTML .= ' '.GetMessage('EC_RRULE_UNTIL', array('#UNTIL_DATE#' => FormatDate(CCalendar::DFormat(false), $event['RRULE']['UNTIL'])));
+				?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_T_REPEAT')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><?= $repeatHTML?></td>
+			</tr>
+			<?endif;?>
+			<?if (!empty($event['LOCATION'])):?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?= GetMessage('EC_LOCATION')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><span class="bx-cal-location"><?= htmlspecialcharsEx(CCalendar::GetTextLocation($event['LOCATION']))?></span></td>
+			</tr>
+			<?endif;?>
+		</table>
+	</div>
 
-		<tr id="<?=$id?>confirm_cnt"><td colSpan="2" class="bxc-confirm-row">
-			<div id="<?=$id?>status-conf-cnt1" class="bxc-conf-cnt">
-				<span><?= GetMessage('EC_ACCEPTED_STATUS')?></span>
-				<a class="bxc-decline-link" href="javascript:void(0)" title="<?= GetMessage('EC_EDEV_CONF_N_TITLE')?>" id="<?=$id?>decline-link-1"><?= GetMessage('EC_EDEV_CONF_N')?></a>
-			</div>
+	<?if (!empty($event['~DESCRIPTION'])):?>
+	<div class="bx-cal-view-description">
+		<div class="feed-cal-view-desc-title"><?= GetMessage('EC_T_DESC')?>:</div>
+		<div class="bx-cal-view-desc-cont"><?= $event['~DESCRIPTION']?></div>
+	</div>
+	<?endif;?>
 
-			<div id="<?=$id?>status-conf-cnt2" class="bxc-conf-cnt">
-				<span class="popup-window-button popup-window-button-accept" id="<?=$id?>accept-link-2" title="<?= GetMessage('EC_EDEV_CONF_Y_TITLE')?>"><span class="popup-window-button-left"></span><span class="popup-window-button-text"><?= GetMessage('EC_ACCEPT_MEETING')?></span><span class="popup-window-button-right"></span></span>
-				<a class="bxc-decline-link" href="javascript:void(0)" title="<?= GetMessage('EC_EDEV_CONF_N_TITLE')?>" id="<?=$id?>decline-link-2"><?= GetMessage('EC_EDEV_CONF_N')?></a>
-			</div>
+	<?if ($event['UF_WEBDAV_CAL_EVENT']):?>
+	<div class="bx-cal-view-files" id="bx-cal-view-files-<?=$id?><?=$event['ID']?>">
+		<?$APPLICATION->IncludeComponent(
+			"bitrix:system.field.view",
+			$event['UF_WEBDAV_CAL_EVENT']["USER_TYPE"]["USER_TYPE_ID"],
+			array("arUserField" => $event['UF_WEBDAV_CAL_EVENT']),
+			null,
+			array("HIDE_ICONS"=>"Y")
+		);?>
+	</div>
+	<?endif;?>
 
-			<div id="<?=$id?>status-conf-cnt3" class="bxc-conf-cnt">
-				<span class="bxc-conf-label" title="<?= GetMessage('EC_OPEN_MEETING_TITLE')?>"><?= GetMessage('EC_OPEN_MEETING')?>:</span>
-				<span class="popup-window-button popup-window-button-accept" id="<?=$id?>accept-link-3" title="<?= GetMessage('EC_EDEV_CONF_Y_TITLE')?>"><span class="popup-window-button-left"></span><span class="popup-window-button-text"><?= GetMessage('EC_ACCEPT_MEETING')?></span><span class="popup-window-button-right"></span></span>
-			</div>
+	<?if ($event['UF_CRM_CAL_EVENT']):?>
+	<div class="bx-cal-view-crm">
+		<div class="bxec-crm-title"><?= htmlspecialcharsbx($event['UF_CRM_CAL_EVENT']["EDIT_FORM_LABEL"])?>:</div>
+		<?$APPLICATION->IncludeComponent(
+			"bitrix:system.field.view",
+			$event['UF_CRM_CAL_EVENT']["USER_TYPE"]["USER_TYPE_ID"],
+			array("arUserField" => $event['UF_CRM_CAL_EVENT']),
+			null,
+			array("HIDE_ICONS"=>"Y")
+		);?>
+	</div>
+	<?endif;?>
 
-			<div id="<?=$id?>status-conf-cnt4" class="bxc-conf-cnt">
-				<span class="bxc-conf-label"><?= GetMessage('EC_DECLINE_INFO')?></span>. <a href="javascript:void(0)" title="<?= GetMessage('EC_ACCEPT_MEETING_2')?>" id="<?=$id?>accept-link-4"><?= GetMessage('EC_ACCEPT_MEETING')?></a>
-				<span class="bxc-decline-notice" id="<?=$id?>decline-notice"><?= GetMessage('EC_DECLINE_NOTICE')?></span>
-			</div>
-
-			<div id="<?=$id?>status-conf-comment" class="bxc-conf-cnt">
-				<span class="bxec-status-com">
-					<input class="bxc-st-dis" type="text"  title="<?= GetMessage('EC_STATUS_COMMENT_TITLE')?>"  id="<?=$id?>conf-comment-inp" value=" - <?= GetMessage('EC_STATUS_COMMENT')?> - "/>
-				</span>
-			</div>
-		</td></tr>
-	<?endif; /*if($Params['bSocNet'])*/?>
-	</table>
-</div>
-<?/* ####### END TAB 0 ####### */?>
-
-<?/* ####### TAB 1 : DESCRIPTION ####### */?>
-<div id="<?=$id?>view-tab-1-cont" class="bxec-d-cont-div">
-	<div class="bxec-view-ed-desc-cont" id="<?=$id?>_view_ed_desc"></div>
-</div>
-<?/* ####### END TAB 1 ####### */?>
-
-<?/* ####### TAB 2 : ADDITIONAL ####### */?>
-<div id="<?=$id?>view-tab-2-cont" class="bxec-d-cont-div">
-	<table style="width: 100%;">
-		<tr id="<?=$id?>view-sect-cnt"><td class="bxec-par-name" colSpan="2"><?=GetMessage('EC_T_CALENDAR')?>:&nbsp;&nbsp;<span id="<?=$id?>view-ed-sect"></span></td></tr>
-		<tr id="<?=$id?>view-spec-cnt" class="bxec-edev-ad-title"><td colSpan="2"><?=GetMessage('EC_EDDIV_SPECIAL_NOTES')?></td></tr>
-		<tr id="<?=$id?>view-import-cnt"><td class="bxec-par-name"  colSpan="2"><?=GetMessage('EC_IMPORTANCE_TITLE')?>:&nbsp;&nbsp;<span id="<?=$id?>_view_ed_imp"></span></td></tr>
-		<?if($Params['bIntranet']):?>
-		<tr id="<?=$id?>view-accessab-cnt"><td class="bxec-par-name"  colSpan="2"><?=GetMessage('EC_ACCESSIBILITY_TITLE')?>:&nbsp;&nbsp;<span id="<?=$id?>_view_ed_accessibility"></span></td></tr>
-		<tr id="<?=$id?>view-priv-cnt"><td class="bxec-par-name"  colSpan="2" style="font-weight: bold;"><?=GetMessage('EC_PRIVATE_EVENT')?></td></tr>
-		<?endif;?>
-	</table>
 	<div id="<?=$id?>bxec_view_uf_group" class="bxec-popup-row" style="display: none;">
 		<div class="bxec-popup-row-title"><?= GetMessage('EC_EDEV_ADD_TAB')?></div>
 		<div id="<?=$id?>bxec_view_uf_cont"></div>
 	</div>
-</div>
-<?/* ####### END TAB 2 ####### */?>
+
+	<?if($Params['bSocNet'] && $event['IS_MEETING']):?>
+	<div class="bx-cal-view-meeting-cnt">
+		<table>
+			<tr>
+				<td class="bx-cal-view-att-cell-l bx-cal-bot-border"><span><?= GetMessage('EC_EDEV_HOST')?>:</span></td>
+				<td class="bx-cal-view-att-cell-r bx-cal-bot-border">
+					<a title="<?= htmlspecialcharsbx($arHost['DISPLAY_NAME'])?>" href="<?= $arHost['URL']?>" target="_blank" class="bxcal-att-popup-img bxcal-att-popup-att-full"><span class="bxcal-att-popup-avatar-outer"><span class="bxcal-att-popup-avatar"><img src="<?= $arHost['AVATAR_SRC']?>" width="<?= $Params['AVATAR_SIZE']?>" height="<?= $Params['AVATAR_SIZE']?>" /></span></span><span class="bxcal-att-name"><?= htmlspecialcharsbx($arHost['DISPLAY_NAME'])?></span></a>
+				</td>
+			</tr>
+			<tr>
+				<td class="bx-cal-view-att-cell-l"></td>
+				<td class="bx-cal-view-att-cell-r" style="padding-top: 5px;">
+					<div class="bx-cal-view-title"><?= GetMessage('EC_EDEV_GUESTS')?></div>
+					<div class="bx-cal-att-dest-cont">
+						<?
+						$arDest = CCalendar::GetFormatedDestination($event['ATTENDEES_CODES']);
+						$cnt = count($arDest);
+						for($i = 0; $i < $cnt; $i++ )
+						{
+							$dest = $arDest[$i];
+							?><span class="bx-cal-att-dest-block"><?= $dest['TITLE']?></span><?
+							if ($i < count($arDest) - 1){echo ', ';}
+						}
+						?>
+					</div>
+				</td>
+			</tr>
+
+			<?foreach($attendees as $arAtt):
+				if (empty($arAtt['users']))
+					continue;
+				?>
+			<tr>
+				<td class="bx-cal-view-att-cell-l"><?= $arAtt['title']?>:</td>
+				<td class="bx-cal-view-att-cell-r">
+					<div class="bx-cal-view-att-cont" id="<?= $arAtt['id']?>">
+						<?
+						$cnt = 0;
+						$bShowAll = count($arAtt['users']) <= $arAtt['countMax'];
+						foreach($arAtt['users'] as $att)
+						{
+							$cnt++;
+							if (!$bShowAll && $cnt > $arAtt['count'])
+							{
+								?>
+								<a title="<?= htmlspecialcharsbx($att['DISPLAY_NAME'])?>" href="<?= $att['URL']?>" target="_blank" class="bxcal-att-popup-img bxcal-att-popup-img-hidden"><span class="bxcal-att-popup-avatar-outer"><span class="bxcal-att-popup-avatar"><img src="<?= $att['AVATAR_SRC']?>" width="<?= $Params['AVATAR_SIZE']?>" height="<?= $Params['AVATAR_SIZE']?>" /></span></span><span class="bxcal-att-name"><?= htmlspecialcharsbx($att['DISPLAY_NAME'])?></span></a>
+								<?
+							}
+							else // Display attendee
+							{
+								?>
+								<a title="<?= htmlspecialcharsbx($att['DISPLAY_NAME'])?>" href="<?= $att['URL']?>" target="_blank" class="bxcal-att-popup-img"><span class="bxcal-att-popup-avatar-outer"><span class="bxcal-att-popup-avatar"><img src="<?= $att['AVATAR_SRC']?>" width="<?= $Params['AVATAR_SIZE']?>" height="<?= $Params['AVATAR_SIZE']?>" /></span></span><span class="bxcal-att-name"><?= htmlspecialcharsbx($att['DISPLAY_NAME'])?></span></a>
+								<?
+							}
+						}
+						if (!$bShowAll)
+						{
+							?>
+							<span data-bx-more-users="<?= $arAtt['id']?>" class="bxcal-more-attendees"><?= CCalendar::GetMoreAttendeesMessage(count($arAtt['users']) - $arAtt['count'])?></span>
+						<?
+						}?>
+					</div>
+				</td>
+			</tr>
+			<?endforeach;/*foreach($attendees as $arAtt)*/?>
+
+			<?if (!empty($event['MEETING']['TEXT'])):?>
+			<tr>
+				<td class="bx-cal-view-att-cell-l" style="padding-top: 3px;"><?=GetMessage('EC_MEETING_TEXT2')?>:</td>
+				<td class="bx-cal-view-att-cell-r"><pre><?= htmlspecialcharsEx($event['MEETING']['TEXT'])?></pre></td>
+			</tr>
+			<?endif; /*if (!empty($event['MEETING']['TEXT']))*/?>
+		</table>
+
+		<div class="bxc-confirm-row">
+			<?if($curUserStatus == 'Q'): /* User still haven't take a decision*/?>
+				<div id="<?=$id?>status-conf-cnt2" class="bxc-conf-cnt">
+					<span data-bx-set-status="Y" class="popup-window-button popup-window-button-accept" title="<?= GetMessage('EC_EDEV_CONF_Y_TITLE')?>"><span class="popup-window-button-left"></span><span class="popup-window-button-text"><?= GetMessage('EC_ACCEPT_MEETING')?></span><span class="popup-window-button-right"></span></span>
+					<a data-bx-set-status="N" class="bxc-decline-link" href="javascript:void(0)" title="<?= GetMessage('EC_EDEV_CONF_N_TITLE')?>" id="<?=$id?>decline-link-2"><?= GetMessage('EC_EDEV_CONF_N')?></a>
+				</div>
+			<?elseif($curUserStatus == 'Y'):/* User accepts inviting */?>
+				<div id="<?=$id?>status-conf-cnt1" class="bxc-conf-cnt">
+					<span><?= GetMessage('EC_ACCEPTED_STATUS')?></span>
+					<a data-bx-set-status="N" class="bxc-decline-link" href="javascript:void(0)" title="<?= GetMessage('EC_EDEV_CONF_N_TITLE')?>"><?= GetMessage('EC_EDEV_CONF_N')?></a>
+				</div>
+			<?elseif($curUserStatus == 'N'): /* User declines inviting*/?>
+				<div class="bxc-conf-cnt">
+					<span class="bxc-conf-label"><?= GetMessage('EC_DECLINE_INFO')?></span>. <a data-bx-set-status="Y" href="javascript:void(0)" title="<?= GetMessage('EC_ACCEPT_MEETING_2')?>"><?= GetMessage('EC_ACCEPT_MEETING')?></a>
+				</div>
+			<?elseif ($event['MEETING']['OPEN']): /* it's open meeting*/?>
+				<div class="bxc-conf-cnt">
+					<span class="bxc-conf-label" title="<?= GetMessage('EC_OPEN_MEETING_TITLE')?>"><?= GetMessage('EC_OPEN_MEETING')?>:</span>
+					<span data-bx-set-status="Y" class="popup-window-button popup-window-button-accept" title="<?= GetMessage('EC_EDEV_CONF_Y_TITLE')?>"><span class="popup-window-button-left"></span><span class="popup-window-button-text"><?= GetMessage('EC_ACCEPT_MEETING')?></span><span class="popup-window-button-right"></span></span>
+				</div>
+			<?endif;?>
+		</div>
 	</div>
+
+	<?endif; /*$event['IS_MEETING'])*/?>
+</div>
+<?/* ####### END TAB 0 ####### */?>
+
+<?/* ####### TAB 1 : ADDITIONAL ####### */?>
+<div id="<?=$id?>view-tab-1-cont" class="bxec-d-cont-div">
+	<div class="bx-cal-view-text-additional">
+		<table>
+			<?if ($Params['sectionName'] != ''):?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_T_CALENDAR')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><?= htmlspecialcharsEx($Params['sectionName'])?></td>
+			</tr>
+			<?endif;?>
+			<?if ($event['IMPORTANCE'] != ''):?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_IMPORTANCE_TITLE')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><?= GetMessage("EC_IMPORTANCE_".strtoupper($event['IMPORTANCE']))?></td>
+			</tr>
+			<?endif;?>
+			<?if ($event['ACCESSIBILITY'] != '' && $Params['bIntranet']):?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_ACCESSIBILITY_TITLE')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><?= GetMessage("EC_ACCESSIBILITY_".strtoupper($event['ACCESSIBILITY']))
+					?></td>
+			</tr>
+			<?endif;?>
+			<?if ($event['PRIVATE_EVENT'] && $Params['bIntranet']):?>
+			<tr>
+				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_EDDIV_SPECIAL_NOTES')?>:</td>
+				<td class="bx-cal-view-text-cell-r"><?=GetMessage('EC_PRIVATE_EVENT')?></td>
+			</tr>
+			<?endif;?>
+		</table>
+	</div>
+</div>
+<?/* ####### END TAB 1 ####### */?>
+	</div>
+
+	<?if ($viewComments):?>
+	<div class="bxec-d-cont-comments-title">
+		<?= GetMessage('EC_COMMENTS')?>
+	</div>
+	<div class="bxec-d-cont bxec-d-cont-comments">
+		<?
+		if ($userId == $event['OWNER_ID'])
+			$permission = "Y";
+		else
+			$permission = 'M';
+		$set = CCalendar::GetSettings();
+
+		// A < E < I < M < Q < U < Y
+		// A - NO ACCESS, E - READ, I - ANSWER
+		// M - NEW TOPIC
+		// Q - MODERATE, U - EDIT, Y - FULL_ACCESS
+		$APPLICATION->IncludeComponent("bitrix:forum.comments", "bitrix24", array(
+				"FORUM_ID" => $set['forum_id'],
+				"ENTITY_TYPE" => "EV", //
+				"ENTITY_ID" => $event['ID'], //Event id
+				"ENTITY_XML_ID" => "EVENT_".$event['ID'], //
+				"PERMISSION" => $permission, //
+				"URL_TEMPLATES_PROFILE_VIEW" => $set['path_to_user'],
+				"SHOW_RATING" => "Y"
+			),
+			false,
+			array('HIDE_ICONS' => 'Y')
+		);
+		?>
+	</div>
+	<?endif;?>
 </div>
 <?
 	}
@@ -912,9 +1248,9 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 			</div>
 		<?endforeach;?>
 	</div>
-	<div class="bxec-d-cont"  id="<?=$id?>_edit_sect_tabcont">
+	<div class="bxec-d-cont">
 <?/* ####### TAB 0 : MAIN ####### */?>
-<div id="<?=$id?>sect-tab-0-cont" class="bxec-d-cont-div">
+<div id="<?=$id?>sect-tab-0-cont" class="bxec-d-cont-div" style="display: block;">
 	<!-- Title -->
 	<div class="bxec-popup-row">
 		<span class="bxec-field-label-2"><label for="<?=$id?>_edcal_name"><?=GetMessage('EC_T_NAME')?>:</label></span>
@@ -1092,7 +1428,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 	</div>
 	<div class="bxec-d-cont"  id="<?=$id?>_set_tabcont">
 <?/* ####### TAB 0 : PERSONAL ####### */?>
-<div id="<?=$id?>set-tab-0-cont" class="bxec-d-cont-div">
+<div id="<?=$id?>set-tab-0-cont" class="bxec-d-cont-div" style="display: block;">
 
 	<!-- default meeting calendar -->
 	<?if($bInPersonal):?>
@@ -1295,13 +1631,13 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 	public static function GetWeekDays()
 	{
 		return array(
-			array(GetMessage('EC_MON_F'), GetMessage('EC_MON'), 'MO'),
-			array(GetMessage('EC_TUE_F'), GetMessage('EC_TUE'), 'TU'),
-			array(GetMessage('EC_WEN_F'), GetMessage('EC_WEN'), 'WE'),
-			array(GetMessage('EC_THU_F'), GetMessage('EC_THU'), 'TH'),
-			array(GetMessage('EC_FRI_F'), GetMessage('EC_FRI'), 'FR'),
-			array(GetMessage('EC_SAT_F'), GetMessage('EC_SAT'), 'SA'),
-			array(GetMessage('EC_SAN_F'), GetMessage('EC_SAN'), 'SU')
+			array(GetMessage('EC_MO_F'), GetMessage('EC_MO'), 'MO'),
+			array(GetMessage('EC_TU_F'), GetMessage('EC_TU'), 'TU'),
+			array(GetMessage('EC_WE_F'), GetMessage('EC_WE'), 'WE'),
+			array(GetMessage('EC_TH_F'), GetMessage('EC_TH'), 'TH'),
+			array(GetMessage('EC_FR_F'), GetMessage('EC_FR'), 'FR'),
+			array(GetMessage('EC_SA_F'), GetMessage('EC_SA'), 'SA'),
+			array(GetMessage('EC_SU_F'), GetMessage('EC_SU'), 'SU')
 		);
 	}
 
@@ -1421,8 +1757,14 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		}
 	}
 
-	public static function DisplayColorSelector($id, $key = 'sect', $colors)
+	public static function DisplayColorSelector($id, $key = 'sect', $colors = false)
 	{
+		if (!$colors)
+			$colors = array(
+				'#CEE669','#E6A469','#98AEF6','#7DDEC2','#B592EC','#D98E85','#F6EA68','#DDBFEB','#FF8D89','#FFCEFF',
+				'#3ABF54','#BF793A','#1C1CD8','#4BB798','#855CC5','#B25D52','#FFBD26','#C48297','#E53D37','#7DF5FF'
+			);
+
 		?>
 		<div  class="bxec-color-inp-cont">
 			<input class="bxec-color-inp" id="<?=$id?>-<?=$key?>-color-inp"/>
@@ -1430,6 +1772,205 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		</div>
 		<div class="bxec-color-cont" id="<?=$id?>-<?=$key?>-color-cont">
 		<?foreach($colors as $i => $color):?><span class="bxec-color-it"><a id="<?=$id?>-<?=$key?>-color-<?=$i?>" style="background-color:<?= $color?>" href="javascript:void(0);"></a></span><?endforeach;?>
+		</div>
+		<?
+	}
+
+
+
+	public static function __ShowEditorHtml($Params = array())
+	{
+		if (!CModule::IncludeModule("fileman"))
+			return;
+
+		$id = $Params['id'];
+		AddEventHandler("fileman", "OnIncludeLightEditorScript", array("CCalendarSceleton", "__CustomizeLightEditor"));
+		?>
+		<div id="bx_cal_editor_cont_<?= $id?>">
+			<?
+			$LHE = new CLightHTMLEditor;
+			$LHE->Show(array(
+				'id' => 'LHEEvDesc',
+				'width' => '603',
+				'height' => '280',
+				'inputId' => $id.'_edit_ed_desc',
+				'inputName' => 'desc',
+				'content' => $Params['event']['DESCRIPTION'],
+				'toolbarConfig' => array(
+					'Bold', 'Italic', 'Underline', 'RemoveFormat',
+					'Image',
+					'BackColor', 'ForeColor',
+					'InsertOrderedList', 'InsertUnorderedList',
+					'FontSizeList',
+					'Source',
+					'CreateLink',
+					'InputVideo'
+				),
+				'BBCode' => true,
+				'jsObjName' => 'pLHEEvDesc',
+				'bInitByJS' => false,
+				'bRecreate' => true,
+				'bSaveOnBlur' => false
+			));
+			?>
+			<!-- Buttons-->
+			<div class="cal-edittor-but-wrap">
+				<span class="cal-edittor-but feed-add-file" id="bx_cal_file_<?= $id?>" title="<?= GetMessage('ECLF_LHE_UPLOAD_FILE')?>"></span>
+				<span class="cal-edittor-but feed-add-link" id="bx_cal_link_<?= $id?>" title="<?= GetMessage('ECLF_LHE_CREATE_LINK')?>"></span>
+				<span class="cal-edittor-but feed-add-video" id="bx_cal_video_<?= $id?>" title="<?= GetMessage('ECLF_LHE_VIDEO')?>"></span>
+				<div class="cal-edittor-but-more-open"><span title="<?= GetMessage('ECLF_LHE_SHOW_PANEL')?>" class="cal-edittor-editor-btn" id="cal-editor-show-panel-btn"></span></div>
+			</div>
+		</div>
+		<?
+	}
+
+	public static function __CustomizeLightEditor($id = false, $templateFolder = "")
+	{
+		?>
+		<script>
+			(function(window){
+				function checkEditorCustomizedGrid()
+				{
+					if (!window.ModifyEditorForCalendarGrid)
+						return setTimeout(checkEditorCustomizedGrid, 20);
+					window.ModifyEditorForCalendarGrid();
+				}
+				checkEditorCustomizedGrid();
+			})(window);
+		</script>
+		<?
+	}
+
+	public static function __GetFileUploadHtml($Params = array())
+	{
+		global $APPLICATION;
+		$result = array();
+
+		if (!function_exists("__main_post_form_get_cid_webdav_cal"))
+		{
+			public static function __main_post_form_get_cid_webdav_cal($arResult = false, $arParams = false)
+			{
+				static $CID = false;
+
+				if ($arResult === false && $arParams === false)
+					return $CID;
+				if ($arParams['EDIT'] == 'Y')
+					$CID = $arResult['UID'];
+				return true;
+			}
+		}
+
+		ob_start();
+		$eventHandlerID = AddEventHandler("webdav", "webdav.user.field", "__main_post_form_get_cid_webdav_cal");
+		$APPLICATION->IncludeComponent(
+			"bitrix:system.field.edit",
+			"webdav_element",
+			array("arUserField" => $Params['UF']['UF_WEBDAV_CAL_EVENT']),
+			null,
+			array("HIDE_ICONS" => "Y")
+		);
+		RemoveEventHandler("webdav", "webdav.user.field", $eventHandlerID);
+		$result["UPLOAD_WEBDAV_ELEMENT_HTML"] = ob_get_clean();
+		$result["UPLOAD_WEBDAV_ELEMENT_CID"] = __main_post_form_get_cid_webdav_cal();
+
+		$result['UPLOAD_WEBDAV_ELEMENT_VALUE'] = $Params['UF']['UF_WEBDAV_CAL_EVENT']['VALUE'];
+
+		return $result;
+	}
+
+	public static function __ShowAttendeesDestinationHtml($Params = array())
+	{
+		$id = $Params['id'];
+		$DESTINATION = CCalendar::GetSocNetDestination(false, $Params['event']['ATTENDEES_CODES']);
+		?>
+		<div id="event-grid-att<?= $id?>" class="event-grid-dest-block">
+			<div class="event-grid-dest-wrap-outer">
+				<div class="event-grid-dest-label"><?=GetMessage("EC_EDEV_GUESTS")?>:</div>
+				<div class="event-grid-dest-wrap" id="event-grid-dest-cont">
+					<span id="event-grid-dest-item"></span>
+					<span class="feed-add-destination-input-box" id="event-grid-dest-input-box">
+						<input type="text" value="" class="feed-add-destination-inp" id="event-grid-dest-input">
+					</span>
+					<a href="#" class="feed-add-destination-link" id="event-grid-dest-add-link"></a>
+					<script>
+						BX.message({
+							'BX_FPD_LINK_1':'<?=GetMessageJS("EC_DESTINATION_1")?>',
+							'BX_FPD_LINK_2':'<?=GetMessageJS("EC_DESTINATION_2")?>'
+						});
+						window.editEventDestinationFormName = top.editEventDestinationFormName = 'edit_event_<?=randString(6)?>';
+						//
+						BX.SocNetLogDestination.init({
+							name : editEventDestinationFormName,
+							searchInput : BX('event-grid-dest-input'),
+							extranetUser :  false,
+							bindMainPopup : { 'node' : BX('event-grid-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
+							bindSearchPopup : { 'node' : BX('event-grid-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
+							callback : {
+								select : BxEditEventGridSelectCallback,
+								unSelect : BxEditEventGridUnSelectCallback,
+								openDialog : BxEditEventGridOpenDialogCallback,
+								closeDialog : BxEditEventGridCloseDialogCallback,
+								openSearch : BxEditEventGridOpenDialogCallback,
+								closeSearch : BxEditEventGridCloseSearchCallback
+							},
+							items : {
+								users : <?=(empty($DESTINATION['USERS'])? '{}': CUtil::PhpToJSObject($DESTINATION['USERS']))?>,
+								groups : <?=(
+									$DESTINATION["EXTRANET_USER"] == 'Y'
+								|| (array_key_exists("DENY_TOALL", $DESTINATION) && $DESTINATION["DENY_TOALL"])
+									? '{}'
+									: "{'UA' : {'id':'UA','name': '".(!empty($DESTINATION['DEPARTMENT']) ? GetMessageJS("MPF_DESTINATION_3"): GetMessageJS("MPF_DESTINATION_4"))."'}}"
+								)?>,
+								sonetgroups : <?=(empty($DESTINATION['SONETGROUPS'])? '{}': CUtil::PhpToJSObject($DESTINATION['SONETGROUPS']))?>,
+								department : <?=(empty($DESTINATION['DEPARTMENT'])? '{}': CUtil::PhpToJSObject($DESTINATION['DEPARTMENT']))?>,
+								departmentRelation : <?=(empty($DESTINATION['DEPARTMENT_RELATION'])? '{}': CUtil::PhpToJSObject($DESTINATION['DEPARTMENT_RELATION']))?>
+							},
+							itemsLast : {
+								users : <?=(empty($DESTINATION['LAST']['USERS'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['USERS']))?>,
+								sonetgroups : <?=(empty($DESTINATION['LAST']['SONETGROUPS'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['SONETGROUPS']))?>,
+								department : <?=(empty($DESTINATION['LAST']['DEPARTMENT'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['DEPARTMENT']))?>,
+								groups : <?=($DESTINATION["EXTRANET_USER"] == 'Y'? '{}': "{'UA':true}")?>
+							},
+							itemsSelected : <?=(empty($DESTINATION['SELECTED'])? '{}': CUtil::PhpToJSObject($DESTINATION['SELECTED']))?>
+						});
+					</script>
+				</div>
+			</div>
+
+			<!-- Meeting host -->
+			<div class="event-grid-host-cont">
+				<span class="event-grid-host-cont-label"><?= GetMessage('EC_EDEV_HOST')?>:</span>
+				<a title="<?= htmlspecialcharsbx($Params['host']['DISPLAY_NAME'])?>" href="<?= $Params['host']['URL']?>" target="_blank" class="bxcal-user"><span class="bxcal-user-avatar-outer"><span class="bxcal-user-avatar"><img src="<?= $Params['host']['AVATAR_SRC']?>" width="<?= $Params['AVATAR_SIZE']?>" height="<?= $Params['AVATAR_SIZE']?>" /></span></span><span class="bxcal-user-name"><?= htmlspecialcharsbx($Params['host']['DISPLAY_NAME'])?></span></a>
+
+			</div>
+
+			<!-- Attendees cont -->
+			<div class="event-grid-attendees-cont">
+				<div id="event-edit-att-y" class="event-grid-attendees-cont-y"></div>
+				<div id="event-edit-att-n" class="event-grid-attendees-cont-n"></div>
+				<div id="event-edit-att-q" class="event-grid-attendees-cont-q"></div>
+			</div>
+		</div>
+
+		<div id="event-grid-meeting-params<?= $id?>" class="event-grid-params">
+			<div class="bxec-add-meet-text"><a id="<?=$id?>_add_meet_text" href="javascript:void(0);"><?=GetMessage('EC_ADD_METTING_TEXT')?></a></div>
+			<div class="bxec-meet-text" id="<?=$id?>_meet_text_cont">
+				<div class="bxec-mt-d"><?=GetMessage('EC_METTING_TEXT')?> (<a id="<?=$id?>_hide_meet_text" href="javascript:void(0);" title="<?=GetMessage('EC_HIDE_METTING_TEXT_TITLE')?>"><?=GetMessage('EC_HIDE')?></a>): </div><br />
+				<textarea name="meeting_text" class="bxec-mt-t" cols="63" id="<?=$id?>_meeting_text" rows="3"></textarea>
+			</div>
+
+			<div class="bxec-popup-row bxec-popup-row-checkbox">
+				<input type="checkbox" id="<?=$id?>_ed_open_meeting" value="Y" name="open_meeting"/>
+				<label style="display: inline-block;" for="<?=$id?>_ed_open_meeting"><?=GetMessage('EC_OPEN_MEETING')?></label>
+			</div>
+			<div class="bxec-popup-row bxec-popup-row-checkbox">
+				<input type="checkbox" id="<?=$id?>_ed_notify_status" value="Y" name="meeting_notify"/>
+				<label for="<?=$id?>_ed_notify_status"><?=GetMessage('EC_NOTIFY_STATUS')?></label>
+			</div>
+			<div class="bxec-popup-row bxec-popup-row-checkbox" id="<?=$id?>_ed_reivite_cont">
+				<input type="checkbox" id="<?=$id?>_ed_reivite" value="Y" name="meeting_reinvite"/>
+				<label for="<?=$id?>_ed_reivite"><?=GetMessage('EC_REINVITE')?></label>
+			</div>
 		</div>
 		<?
 	}

@@ -27,11 +27,17 @@ class Context
 	/** @var string */
 	private $language;
 
+	/** @var string */
+	private $site;
+
 	/** @var Environment */
 	protected $env;
 
 	/** @var \Bitrix\Main\Context\Culture */
 	protected $culture;
+
+	/** @var array */
+	protected $params;
 
 	/**
 	 * Creates new instance of context.
@@ -51,12 +57,19 @@ class Context
 	 * @param Server $server
 	 * @param Environment $env
 	 */
-	public function initialize(Request $request, Response $response, Server $server, Environment $env)
+	public function initialize(Request $request, Response $response = null, Server $server, array $params = array())
 	{
 		$this->request = $request;
 		$this->response = $response;
 		$this->server = $server;
-		$this->env = $env;
+		$this->params = $params;
+	}
+
+	public function getEnvironment()
+	{
+		if ($this->env === null)
+			$this->env = new Environment($this->params["env"]);
+		return $this->env;
 	}
 
 	/**
@@ -106,6 +119,8 @@ class Context
 	 */
 	public function getCulture()
 	{
+		if ($this->culture === null)
+			$this->culture = new Context\Culture();
 		return $this->culture;
 	}
 
@@ -117,6 +132,16 @@ class Context
 	public function getLanguage()
 	{
 		return $this->language;
+	}
+
+	/**
+	 * Returns current site
+	 *
+	 * @return string
+	 */
+	public function getSite()
+	{
+		return $this->site;
 	}
 
 	/**
@@ -137,6 +162,16 @@ class Context
 	public function setLanguage($language)
 	{
 		$this->language = $language;
+	}
+
+	/**
+	 * Sets site of the context.
+	 *
+	 * @param string $site
+	 */
+	public function setSite($site)
+	{
+		$this->site = $site;
 	}
 
 	/**

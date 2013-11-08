@@ -1000,7 +1000,7 @@ class CAllRatings
 					'USER_VOTE' => 0,
 					'USER_HAS_VOTED' => 'N',
 					'USER_VOTE_LIST' => Array(),
-					'TOTAL_VALUE' => floatval($row['TOTAL_VALUE']),
+					'TOTAL_VALUE' => $row['TOTAL_VALUE'],
 					'TOTAL_VOTES' => intval($row['TOTAL_VOTES']),
 					'TOTAL_POSITIVE_VOTES' => intval($row['TOTAL_POSITIVE_VOTES']),
 					'TOTAL_NEGATIVE_VOTES' => intval($row['TOTAL_NEGATIVE_VOTES']),
@@ -1014,7 +1014,7 @@ class CAllRatings
 
 			$res = $DB->Query($sql, false, $err_mess.__LINE__);
 			while($row = $res->Fetch())
-				$arResult[$row['ENTITY_ID']]['USER_VOTE_LIST'][$row['USER_ID']] = floatval($row['VALUE']);
+				$arResult[$row['ENTITY_ID']]['USER_VOTE_LIST'][$row['USER_ID']] = $row['VALUE'];
 
 			$CACHE_MANAGER->Set($cache_id, $arResult);
 		}

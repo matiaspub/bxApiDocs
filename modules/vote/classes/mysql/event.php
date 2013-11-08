@@ -70,7 +70,8 @@ class CVoteEvent extends CAllVoteEvent
 						if ($strOperation == "IN")
 						{
 							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_map("intval", $val);
+							$str = ($strNegative=="Y"?" NOT ":"")."(".$key." IN (".implode(",", $val)."))";
 						}
 					}
 					$arSqlSearch[] = $str;

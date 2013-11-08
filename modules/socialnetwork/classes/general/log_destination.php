@@ -6,7 +6,9 @@ class CSocNetLogDestination
 	{
 		global $USER;
 
-		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$USER->GetID()]))
+		$userId = intval($USER->GetID());
+
+		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$userId]))
 		{
 			$arLastSelected = CUserOptions::GetOption("socialnetwork", "log_destination", array());
 			if (
@@ -22,12 +24,12 @@ class CSocNetLogDestination
 
 			if (is_array($arLastSelected))
 			{
-				if (!isset($arLastSelected[$USER->GetID()]))
-					$arLastSelected['U'.$USER->GetID()] = 'U'.$USER->GetID();
+				if (!isset($arLastSelected[$userId]))
+					$arLastSelected['U'.$userId] = 'U'.$userId;
 			}
 			else
 			{
-				$arLastSelected['U'.$USER->GetID()] = 'U'.$USER->GetID();
+				$arLastSelected['U'.$userId] = 'U'.$userId;
 			}
 
 			$count = 0;
@@ -41,10 +43,10 @@ class CSocNetLogDestination
 
 				$arUsers[$userId] = $userId;
 			}
-			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$USER->GetID()] = array_reverse($arUsers);
+			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$userId] = array_reverse($arUsers);
 		}
 
-		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$USER->GetID()];
+		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetLastUser"][$userId];
 	}
 
 	public static function GetLastSocnetGroup()
@@ -106,8 +108,6 @@ class CSocNetLogDestination
 
 	public static function GetStucture($arParams = Array())
 	{
-		global $USER;
-
 		$bIntranetEnable = false;
 		if(IsModuleInstalled('intranet') && IsModuleInstalled('iblock'))
 			$bIntranetEnable = true;
@@ -189,18 +189,19 @@ class CSocNetLogDestination
 	{
 		global $USER;
 
-		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$USER->GetID()]))
-		{
-			$arUsers = Array();
-			$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
+		$userId = intval($USER->GetID());
 
+		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$userId]))
+		{
+			$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
+			$arFilter = Array();
 			if (CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser())
 			{
-				$arSelect = Array($USER->GetId());
+				$arSelect = Array($userId);
 				$rsGroups = CSocNetUserToGroup::GetList(
 					array("GROUP_NAME" => "ASC"),
 					array(
-						"USER_ID" => $USER->GetID(),
+						"USER_ID" => $userId,
 						"<=ROLE" => SONET_ROLES_USER,
 						"GROUP_SITE_ID" => SITE_ID,
 						"GROUP_ACTIVE" => "Y",
@@ -266,16 +267,16 @@ class CSocNetLogDestination
 					'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION']?$arUser['PERSONAL_PROFESSION']:'&nbsp;'),
 				);
 			}
-			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$USER->GetID()] = $arUsers;
+			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$userId] = $arUsers;
 		}
-		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$USER->GetID()];
+		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetExtranetUser"][$userId];
 	}
 
 	public static function GetUsers($arParams = Array(), $bSelf = true)
 	{
 		global $USER;
 
-		$userId = $USER->GetID();
+		$userId = intval($USER->GetID());
 
 		$arFilter = Array('ACTIVE' => 'Y');
 		$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
@@ -379,12 +380,14 @@ class CSocNetLogDestination
 	{
 		global $USER;
 
-		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$USER->GetID()]))
+		$userId = intval($USER->GetID());
+
+		if(!isset($GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$userId]))
 		{
 			$arSubordinateDepts = array();
 
 			if (CModule::IncludeModule("intranet"))
-				$arSubordinateDepts = CIntranetUtils::GetSubordinateDepartments($USER->GetID(), true);
+				$arSubordinateDepts = CIntranetUtils::GetSubordinateDepartments($userId, true);
 
 			$arFilter = Array(
 				"ACTIVE" => "Y",
@@ -399,7 +402,7 @@ class CSocNetLogDestination
 			if (isset($arParams["id"]))
 			{
 				if (empty($arParams["id"]))
-					$arFilter["ID"] = $USER->GetId();
+					$arFilter["ID"] = $userId;
 				else
 				{
 					$arSelect = array();
@@ -441,10 +444,10 @@ class CSocNetLogDestination
 				)
 					$arMedalUsers['U'.$arUser["ID"]] = $arGratUsers['U'.$arUser["ID"]];
 			}
-			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$USER->GetID()] = array("GRAT" => $arGratUsers, "MEDAL" => $arMedalUsers);
+			$GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$userId] = array("GRAT" => $arGratUsers, "MEDAL" => $arMedalUsers);
 		}
 
-		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$USER->GetID()];
+		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$userId];
 	}
 
 	public static function SearchUsers($search, $nameTemplate = "", $bSelf = true, $bEmployeesOnly = false)
@@ -514,7 +517,7 @@ class CSocNetLogDestination
 			$rsGroups = CSocNetUserToGroup::GetList(
 				array("GROUP_NAME" => "ASC"),
 				array(
-					"USER_ID" => $USER->GetID(),
+					"USER_ID" => intval($USER->GetID()),
 					"<=ROLE" => SONET_ROLES_USER,
 					"GROUP_SITE_ID" => SITE_ID,
 					"GROUP_ACTIVE" => "Y",
@@ -582,6 +585,8 @@ class CSocNetLogDestination
 	{
 		global $USER;
 
+		$userId = intval($USER->GetID());
+
 		$arSocnetGroups = array();
 		$arSelect = Array();
 		if (isset($arParams['id']))
@@ -597,7 +602,7 @@ class CSocNetLogDestination
 		$rsGroups = CSocNetUserToGroup::GetList(
 			array("GROUP_NAME" => "ASC"),
 			array(
-				"USER_ID" => $USER->GetID(),
+				"USER_ID" => $userId,
 				"ID" => $arSelect,
 				"<=ROLE" => SONET_ROLES_USER,
 				"GROUP_SITE_ID" => SITE_ID,
@@ -637,7 +642,7 @@ class CSocNetLogDestination
 		if (isset($arParams['features']) && !empty($arParams['features']))
 			self::GetSocnetGroupFilteredByFeaturePerms($arSocnetGroupsTmp, $arParams['features']);
 
-		foreach ($arSocnetGroupsTmp as $key => $value)
+		foreach ($arSocnetGroupsTmp as $value)
 		{
 			$value['id'] = 'SG'.$value['id'];
 			$arSocnetGroups[$value['id']] = $value;

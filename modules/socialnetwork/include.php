@@ -149,17 +149,20 @@ $arClasses = array(
 	"CSocNetEventUserView" => "classes/".$DBType."/event_user_view.php",
 	"CSocNetLog" => "classes/".$DBType."/log.php",
 	"CSocNetLogTools" => "classes/general/log_tools.php",
+	"CSocNetLogToolsPhoto" => "classes/general/log_tools_photo.php",
+	"CSocNetForumComments" => "classes/general/log_forum_comments.php",
 	"CSocNetLogRights" => "classes/general/log_rights.php",
 	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
 	"CSocNetLogFollow" => "classes/general/log_follow.php",
 	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
 	"CSocNetLogRestService" => "classes/general/rest.php",	
 	"logTextParser" => "classes/general/log_tools.php",
-	"CSocNetPhotoCommentEvent" => "classes/general/log_tools.php",
+	"CSocNetPhotoCommentEvent" => "classes/general/log_tools_photo.php",
 	"CSocNetLogComments" => "classes/".$DBType."/log_comments.php",
 	"CSocNetLogEvents" => "classes/".$DBType."/log_events.php",
 	"CSocNetLogCounter" => "classes/".$DBType."/log_counter.php",
 	"CSocNetLogFavorites" => "classes/".$DBType."/log_favorites.php",
+	"CSocNetSubscription" => "classes/".$DBType."/subscription.php",
 	"CSocNetSearch" => "classes/general/search.php",
 	"CSocNetSearchReindex" => "classes/general/search_reindex.php",
 	"CSocNetTextParser" => "classes/general/functions.php",
@@ -286,7 +289,7 @@ if (COption::GetOptionString("socialnetwork", "allow_photo_user", "Y") == "Y" ||
 					"EVENT_ID" => "photo_comment",
 					"OPERATION" => "view",
 					"OPERATION_ADD"	=> "view",
-					"ADD_CALLBACK" => array("CSocNetLogTools", "AddComment_Photo"),
+					"ADD_CALLBACK" => array("CSocNetPhotoCommentEvent", "AddComment_Photo"),
 					"CLASS_FORMAT" => "CSocNetLogTools",
 					"METHOD_FORMAT"	=> "FormatComment_Photo"
 				)
@@ -415,7 +418,7 @@ if ($bIntranet)
 					"COMMENT_EVENT"	=> array(
 						"EVENT_ID" => "tasks_comment",
 						"OPERATION" => "view",
-						"OPERATION_ADD"	=> "view",
+						"OPERATION_ADD"	=> "log_rights",
 						"ADD_CALLBACK" => array("CSocNetLogTools", "AddComment_Tasks"),
 						"CLASS_FORMAT" => "CSocNetLogTools",
 						"METHOD_FORMAT"	=> "FormatComment_Forum"
@@ -782,12 +785,12 @@ while ($arEvent = $events->Fetch())
 
 global $arSocNetUserOperations;
 $arSocNetUserOperations = array(
-	"invitegroup" 	=> SONET_RELATIONS_TYPE_AUTHORIZED,
-	"message" 		=> SONET_RELATIONS_TYPE_AUTHORIZED,
-	"videocall" 	=> SONET_RELATIONS_TYPE_AUTHORIZED,
-	"viewfriends" 	=> COption::GetOptionString("socialnetwork", "default_user_viewfriends", SONET_RELATIONS_TYPE_ALL),
-	"viewgroups" 	=> COption::GetOptionString("socialnetwork", "default_user_viewgroups", SONET_RELATIONS_TYPE_ALL),
-	"viewprofile" 	=> COption::GetOptionString("socialnetwork", "default_user_viewprofile", SONET_RELATIONS_TYPE_ALL),
+	"invitegroup" => SONET_RELATIONS_TYPE_AUTHORIZED,
+	"message" => SONET_RELATIONS_TYPE_AUTHORIZED,
+	"videocall" => SONET_RELATIONS_TYPE_AUTHORIZED,
+	"viewfriends" => COption::GetOptionString("socialnetwork", "default_user_viewfriends", SONET_RELATIONS_TYPE_ALL),
+	"viewgroups" => COption::GetOptionString("socialnetwork", "default_user_viewgroups", SONET_RELATIONS_TYPE_ALL),
+	"viewprofile" => COption::GetOptionString("socialnetwork", "default_user_viewprofile", SONET_RELATIONS_TYPE_ALL),
 );
 
 global $arSocNetUserEvents;
@@ -853,7 +856,7 @@ if (!CBXFeatures::IsFeatureEnabled("Friends"))
 	$arSocNetAllowedSubscribeEntityTypesDesc[SONET_SUBSCRIBE_ENTITY_USER]["HAS_MY"] = "N";
 }
 
-//if (!defined("CACHED_b_sonet_group_subjects"))
+if (!defined("CACHED_b_sonet_group_subjects"))
 	// define("CACHED_b_sonet_group_subjects", 3600);
 
 class CSocNetUpdater

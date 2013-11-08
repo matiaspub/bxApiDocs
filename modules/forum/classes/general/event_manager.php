@@ -7,7 +7,7 @@
 #############################################
 class ForumEventManager
 {
-	public function ForumEventManager()
+	public static function ForumEventManager()
 	{
 		if (IsModuleInstalled("iblock")) {
 			AddEventHandler("forum", "onAfterMessageAdd", array(&$this, "updateIBlockPropertyAfterAddingMessage"));

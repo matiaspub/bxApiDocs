@@ -1,53 +1,72 @@
 <?php
 namespace Bitrix\Main;
 
-use \Bitrix\Main\Web;
-use \Bitrix\Main\Text;
+use Bitrix\Main\Config;
+use Bitrix\Main\Type;
 
 class HttpRequest
 	extends Request
 {
 	/**
-	 * @var System\ReadonlyDictionary
+	 * @var Type\ParameterDictionary
 	 */
 	protected $queryString;
 
 	/**
-	 * @var System\ReadonlyDictionary
+	 * @var Type\ParameterDictionary
 	 */
 	protected $postData;
 
 	/**
-	 * @var System\ReadonlyDictionary
+	 * @var Type\ParameterDictionary
 	 */
 	protected $files;
 
 	/**
-	 * @var System\ReadonlyDictionary
+	 * @var Type\ParameterDictionary
 	 */
 	protected $cookies;
+
+	/**
+	 * @var Type\ParameterDictionary
+	 */
+	protected $cookiesRaw;
 
 	public function __construct(Server $server, array $queryString, array $postData, array $files, array $cookies)
 	{
 		$request = array_merge($queryString, $postData);
 		parent::__construct($server, $request);
 
-		$this->queryString = new \Bitrix\Main\System\ReadonlyDictionary($queryString);
-		$this->postData = new \Bitrix\Main\System\ReadonlyDictionary($postData);
-		$this->files = new \Bitrix\Main\System\ReadonlyDictionary($files);
+		$this->queryString = new Type\ParameterDictionary($queryString);
+		$this->postData = new Type\ParameterDictionary($postData);
+		$this->files = new Type\ParameterDictionary($files);
+		$this->cookiesRaw = new Type\ParameterDictionary($cookies);
+		$this->cookies = new Type\ParameterDictionary($this->prepareCookie($cookies));
+	}
 
-		$cookiePrefix = \Bitrix\Main\Config\Option::get("main", "cookie_name", "BITRIX_SM")."_";
-		$cookiePrefixLength = strlen($cookiePrefix);
+	public function addFilter(Type\IRequestFilter $filter)
+	{
+		$filteredValues = $filter->filter(array(
+			"get" => $this->queryString->arValues,
+			"post" => $this->postData->arValues,
+			"files" => $this->files->arValues,
+			"cookie" => $this->cookiesRaw->arValues
+			));
 
-		$cookiesNew = array();
-		foreach ($cookies as $name => $value)
+		if (isset($filteredValues['get']))
+			$this->queryString->setValuesNoDemand($filteredValues['get']);
+		if (isset($filteredValues['post']))
+			$this->postData->setValuesNoDemand($filteredValues['post']);
+		if (isset($filteredValues['files']))
+			$this->files->setValuesNoDemand($filteredValues['files']);
+		if (isset($filteredValues['cookie']))
 		{
-			$nameNew = $name;
-			if (strpos($name, $cookiePrefix) === 0)
-				$nameNew = substr($name, $cookiePrefixLength);
-			$cookiesNew[$nameNew] = $value;
+			$this->cookiesRaw->setValuesNoDemand($filteredValues['cookie']);
+			$this->cookies = new Type\ParameterDictionary($this->prepareCookie($filteredValues['cookie']));
 		}
-		$this->cookies = new \Bitrix\Main\System\ReadonlyDictionary($cookiesNew);
+
+		if (isset($filteredValues['get']) || isset($filteredValues['post']))
+			$this->arValues = array_merge($this->queryString->arValues, $this->postData->arValues);
 	}
 
 	public function getQuery($name)
@@ -88,6 +107,16 @@ class HttpRequest
 	public function getCookieList()
 	{
 		return $this->cookies;
+	}
+
+	public function getCookieRaw($name)
+	{
+		return $this->cookiesRaw->get($name);
+	}
+
+	public function getCookieRawList()
+	{
+		return $this->cookiesRaw;
 	}
 
 	public function getRemoteAddress()
@@ -139,7 +168,7 @@ class HttpRequest
 			return $this->requestedFile;
 
 		$page = $this->getRequestUri();
-		if ($page == "")
+		if (empty($page))
 			return $this->requestedFile = parent::getRequestedPage();
 
 		$page = urldecode($page);
@@ -187,5 +216,28 @@ class HttpRequest
 			$this->arValues += $vars;
 			$this->queryString->arValues += $vars;
 		}
+	}
+
+	/**
+	 * @param array $cookies
+	 * @return array
+	 */
+	protected function prepareCookie(array $cookies)
+	{
+		static $cookiePrefix = null;
+		if ($cookiePrefix === null)
+			$cookiePrefix = Config\Option::get("main", "cookie_name", "BITRIX_SM")."_";
+
+		$cookiePrefixLength = strlen($cookiePrefix);
+
+		$cookiesNew = array();
+		foreach ($cookies as $name => $value)
+		{
+			if (strpos($name, $cookiePrefix) !== 0)
+				continue;
+
+			$cookiesNew[substr($name, $cookiePrefixLength)] = $value;
+		}
+		return $cookiesNew;
 	}
 }

@@ -240,9 +240,25 @@ class CBPVirtualDocument
 
 			if (($arFieldType["Type"] == "S:employee") && COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y")
 				$fieldValueTmp2 = CBPHelper::StripUserPrefix($fieldValueTmp2);
+			if ($arFieldType["Type"] == "E:EList")
+			{
+				static $fl = true;
+				if ($fl)
+					$GLOBALS["APPLICATION"]->AddHeadScript('/bitrix/js/iblock/iblock_edit.js');
+				$fl = false;
+			}
 
-			foreach ($fieldValueTmp2 as &$fld)
-				$fld = array("VALUE" => $fld);
+			$fieldValueTmp21 = array();
+			foreach ($fieldValueTmp2 as $k => $fld)
+			{
+				if ($fld === null || $fld === "")
+					continue;
+				if (is_array($fld) && isset($fld["VALUE"]))
+					$fieldValueTmp21[$k] = $fld;
+				else
+					$fieldValueTmp21[$k] = array("VALUE" => $fld);
+			}
+			$fieldValueTmp2 = $fieldValueTmp21;
 
 			echo call_user_func_array(
 				$customMethodNameMulty,
@@ -660,9 +676,9 @@ class CBPVirtualDocument
 							}
 						}
 
-						if (($value !== null) && !array_key_exists("GetLength", $arCustomType))
+						if (($value !== null) && !array_key_exists("GetLength", $arCustomType) && !array_key_exists("CheckFields", $arCustomType))
 						{
-							if (strlen($value) == 0)
+							if (!is_array($value) && (strlen($value) == 0) || is_array($value) && (count($value) == 0 || count($value) == 1 && isset($value["VALUE"]) && !is_array($value["VALUE"]) && strlen($value["VALUE"]) == 0))
 								$value = null;
 						}
 

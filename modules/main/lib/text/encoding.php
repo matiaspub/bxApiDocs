@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\Text;
 
+use Bitrix\Main\Application;
+use Bitrix\Main\Config\Configuration;
+
 class Encoding
 {
 	const PATH_TO_CONVERT_TABLES = "/bitrix/modules/main/cvtables/";
@@ -97,11 +100,11 @@ class Encoding
 	public static function convertEncodingToCurrent($string)
 	{
 		$isUtf8String = self::detectUtf8($string);
-		$isUtf8Config = \Bitrix\Main\Application::isUtfMode();
+		$isUtf8Config = Application::isUtfMode();
 
 		$currentCharset = null;
 
-		$context = \Bitrix\Main\Application::getInstance()->getContext();
+		$context = Application::getInstance()->getContext();
 		if ($context != null)
 		{
 			$culture = $context->getCulture();
@@ -110,7 +113,7 @@ class Encoding
 		}
 
 		if ($currentCharset == null)
-			$currentCharset = \Bitrix\Main\Config\Configuration::getValue("DefaultCharset");
+			$currentCharset = Configuration::getValue("default_charset");
 
 		if ($currentCharset == null)
 			$currentCharset = "Windows-1251";

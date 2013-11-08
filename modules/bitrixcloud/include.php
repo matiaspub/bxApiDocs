@@ -1,10 +1,11 @@
-<?
+<?php
 if (!defined("CACHED_b_bitrixcloud_option"))
 	// define("CACHED_b_bitrixcloud_option", 36000);
 
 global $DB;
 $db_type = strtolower($DB->type);
 CModule::AddAutoloadClasses("bitrixcloud", array(
+	"CAllBitrixCloudOption" => "classes/general/option.php",
 	"CBitrixCloudOption" => "classes/".$db_type."/option.php",
 	"CBitrixCloudWebService" => "classes/general/webservice.php",
 	"CBitrixCloudCDNWebService" => "classes/general/cdn_webservice.php",
@@ -19,6 +20,10 @@ CModule::AddAutoloadClasses("bitrixcloud", array(
 	"CBitrixCloudCDNLocation" => "classes/general/cdn_location.php",
 	"CBitrixCloudBackupWebService" => "classes/general/backup_webservice.php",
 	"CBitrixCloudBackup" => "classes/general/backup.php",
+	"CBitrixCloudMonitoringWebService" => "classes/general/monitoring_webservice.php",
+	"CBitrixCloudMonitoring" =>  "classes/general/monitoring.php",
+	"CBitrixCloudMonitoringResult" => "classes/general/monitoring_result.php",
+	"CBitrixCloudMobile" => "classes/general/mobile.php"
 ));
 
 if(CModule::IncludeModule('clouds'))
@@ -27,6 +32,11 @@ if(CModule::IncludeModule('clouds'))
 		"CBitrixCloudBackupBucket" => "classes/general/backup_bucket.php",
 	));
 }
+
+CJSCore::RegisterExt('mobile_monitoring', array(
+	'js' => '/bitrix/js/bitrixcloud/mobile_monitoring.js',
+	'lang' => '/bitrix/modules/bitrixcloud/lang/'.LANGUAGE_ID.'/js_mobile_monitoring.php'
+));
 
 class CBitrixCloudException extends Exception
 {
@@ -47,4 +57,3 @@ class CBitrixCloudException extends Exception
 		return $this->debug_info;
 	}
 }
-?>

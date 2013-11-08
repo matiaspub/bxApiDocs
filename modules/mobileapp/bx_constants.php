@@ -34,5 +34,15 @@ define('BX_PULL_SKIP_LS', true);
  */
 define('BX_SKIP_PULL_INIT', true);
 
+/**
+ * BX_PULL_SKIP_WEBSOCKET
+ */
+define('BX_PULL_SKIP_WEBSOCKET', true);
+
+/**
+ * BX_PULL_SKIP_INIT
+ */
+define('BX_PULL_SKIP_INIT', true);
+
 
 ?>

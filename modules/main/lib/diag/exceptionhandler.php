@@ -10,6 +10,10 @@ class ExceptionHandler
 	private $handledErrorsTypes;
 	private $exceptionErrorsTypes;
 
+	private $catchOverflowMemory = false;
+	private $memoryReserveLimit = 65536;
+	private $memoryReserve;
+
 	private $ignoreSilence = false;
 
 	private $assertionThrowsException = true;
@@ -19,23 +23,30 @@ class ExceptionHandler
 	 * @var ExceptionHandlerLog
 	 */
 	private $handlerLog = null;
+	private $handlerLogCreator = null;
 
 	/**
 	 * @var IExceptionHandlerOutput
 	 */
-	private $handlerOutput;
+	private $handlerOutput = null;
+	private $handlerOutputCreator = null;
 
 	private $isInitialized = false;
 
 	public function __construct()
 	{
-		$this->handledErrorsTypes = E_ALL & ~E_STRICT;
-		$this->exceptionErrorsTypes = E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT;
+		$this->handledErrorsTypes = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+		$this->exceptionErrorsTypes = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
 	}
 
 	public function setDebugMode($debug)
 	{
 		$this->debug = $debug;
+	}
+
+	public function setOverflowMemoryCatching($catchOverflowMemory)
+	{
+		$this->catchOverflowMemory = $catchOverflowMemory;
 	}
 
 	public function setHandledErrorsTypes($handledErrorsTypes)
@@ -66,7 +77,7 @@ class ExceptionHandler
 	/**
 	 * @param \Bitrix\Main\Diag\ExceptionHandlerLog $handlerLog
 	 */
-	public function setHandlerLog(\Bitrix\Main\Diag\ExceptionHandlerLog $handlerLog = null)
+	public function setHandlerLog(ExceptionHandlerLog $handlerLog = null)
 	{
 		$this->handlerLog = $handlerLog;
 	}
@@ -74,7 +85,7 @@ class ExceptionHandler
 	/**
 	 * @param \Bitrix\Main\Diag\IExceptionHandlerOutput $handlerOutput
 	 */
-	public function setHandlerOutput(\Bitrix\Main\Diag\IExceptionHandlerOutput $handlerOutput)
+	public function setHandlerOutput(IExceptionHandlerOutput $handlerOutput)
 	{
 		$this->handlerOutput = $handlerOutput;
 	}
@@ -94,15 +105,44 @@ class ExceptionHandler
 		}
 	}
 
-	public function initialize(IExceptionHandlerOutput $exceptionHandlerOutput, ExceptionHandlerLog $exceptionHandlerLog = null)
+	protected function getHandlerOutput()
+	{
+		if ($this->handlerOutput === null)
+		{
+			$h = $this->handlerOutputCreator;
+			if (is_callable($h))
+				$this->handlerOutput = call_user_func_array($h, array());
+		}
+
+		return $this->handlerOutput;
+	}
+
+	protected function getHandlerLog()
+	{
+		if ($this->handlerLog === null)
+		{
+			$h = $this->handlerLogCreator;
+			if (is_callable($h))
+				$this->handlerLog = call_user_func_array($h, array());
+		}
+
+		return $this->handlerLog;
+	}
+
+	public function initialize($exceptionHandlerOutputCreator, $exceptionHandlerLogCreator = null)
 	{
 		if ($this->isInitialized)
 			return;
 
 		$this->initializeEnvironment();
 
-		$this->handlerOutput = $exceptionHandlerOutput;
-		$this->handlerLog = $exceptionHandlerLog;
+		$this->handlerOutputCreator = $exceptionHandlerOutputCreator;
+		$this->handlerLogCreator = $exceptionHandlerLogCreator;
+
+		if ($this->catchOverflowMemory)
+		{
+			$this->memoryReserve = str_repeat('b', $this->memoryReserveLimit);
+		}
 
 		set_error_handler(array($this, "handleError"), $this->handledErrorsTypes);
 		set_exception_handler(array($this, "handleException"));
@@ -127,7 +167,7 @@ class ExceptionHandler
 	public function handleException(\Exception $exception)
 	{
 		$this->writeToLog($exception, ExceptionHandlerLog::UNCAUGHT_EXCEPTION);
-		$out = $this->handlerOutput;
+		$out = $this->getHandlerOutput();
 		$out->renderExceptionMessage($exception, $this->debug);
 		die();
 	}
@@ -165,6 +205,7 @@ class ExceptionHandler
 
 	public function handleFatalError()
 	{
+		unset($this->memoryReserve);
 		if ($error = error_get_last())
 		{
 			if (in_array($error['type'], array(E_ERROR, E_USER_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_RECOVERABLE_ERROR)))
@@ -177,10 +218,8 @@ class ExceptionHandler
 
 	protected function writeToLog($exception, $logType = null)
 	{
-		if (!is_null($this->handlerLog))
-		{
-			$log = $this->handlerLog;
+		$log = $this->getHandlerLog();
+		if ($log !== null)
 			$log->write($exception, $logType);
-		}
 	}
 }

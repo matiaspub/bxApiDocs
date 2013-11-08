@@ -3,7 +3,7 @@ namespace Bitrix\Main\DB;
 
 class Paginator
 {
-	public static function query($sql, DbConnection $connection, $numberOfRecords, $pageNumber, $numberOfRecordsPerPage, $backward = false)
+	public static function query($sql, Connection $connection, $numberOfRecords, $pageNumber, $numberOfRecordsPerPage, $backward = false)
 	{
 		list($offset, $limit) = self::calculateQueryLimits(
 			$numberOfRecords, $pageNumber, $numberOfRecordsPerPage, $backward

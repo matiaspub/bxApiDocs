@@ -81,34 +81,48 @@ class CClock
 
 		function bxLoadClock_<?=$arParams['inputId']?>(callback)
 		{
+<?
+		if($arParams['view'] != 'inline'):
+?>
 			if (!window.JCClock && !window.jsUtils)
 			{
 				return setTimeout(function(){bxLoadClock_<?=$arParams['inputId']?>(callback);}, 50);
 			}
-
+<?
+		endif;
+?>
 			if (!window.JCClock)
 			{
-				return jsUtils.loadJSFile(['<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/clock.js")?>'], function() {bxLoadClock_<?=$arParams['inputId']?>(callback)});
+				if(!!window.bClockLoading)
+				{
+					return setTimeout(function(){bxLoadClock_<?=$arParams['inputId']?>(callback);}, 50);
+				}
+				else
+				{
+					window.bClockLoading = true;
+					return BX.loadScript(['<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/clock.js")?>'], function() {bxLoadClock_<?=$arParams['inputId']?>(callback)});
+				}
 			}
 
+			delete window.bClockLoading;
+
 			var obId = 'bxClock_<?=$arParams['inputId']?>';
-			if (!window[obId])
-				window[obId] = new JCClock({
-					step: <?=$arParams['step']?>,
-					initTime: '<?=$arParams['initTime']?>',
-					showIcon: <? echo $arParams['showIcon'] ? 'true' : 'false';?>,
-					inputId: '<?=$arParams['inputId']?>',
-					iconId: '<?=$arParams['inputId'].'_icon'?>',
-					zIndex: <?= isset($arParams['zIndex']) ? intval($arParams['zIndex']) : 0 ?>,
-					AmPmMode: <? echo $arParams['am_pm_mode'] ? 'true' : 'false';?>,
-					MESS: {
-						Insert: '<?=GetMessageJS('BX_CLOCK_INSERT')?>',
-						Close: '<?=GetMessageJS('BX_CLOCK_CLOSE')?>',
-						Hours: '<?=GetMessageJS('BX_CLOCK_HOURS')?>',
-						Minutes: '<?=GetMessageJS('BX_CLOCK_MINUTES')?>',
-						Up: '<?=GetMessageJS('BX_CLOCK_UP')?>',
-						Down: '<?=GetMessageJS('BX_CLOCK_DOWN')?>'
-					}
+			window[obId] = new JCClock({
+				step: <?=$arParams['step']?>,
+				initTime: '<?=$arParams['initTime']?>',
+				showIcon: <? echo $arParams['showIcon'] ? 'true' : 'false';?>,
+				inputId: '<?=$arParams['inputId']?>',
+				iconId: '<?=$arParams['inputId'].'_icon'?>',
+				zIndex: <?= isset($arParams['zIndex']) ? intval($arParams['zIndex']) : 0 ?>,
+				AmPmMode: <? echo $arParams['am_pm_mode'] ? 'true' : 'false';?>,
+				MESS: {
+					Insert: '<?=GetMessageJS('BX_CLOCK_INSERT')?>',
+					Close: '<?=GetMessageJS('BX_CLOCK_CLOSE')?>',
+					Hours: '<?=GetMessageJS('BX_CLOCK_HOURS')?>',
+					Minutes: '<?=GetMessageJS('BX_CLOCK_MINUTES')?>',
+					Up: '<?=GetMessageJS('BX_CLOCK_UP')?>',
+					Down: '<?=GetMessageJS('BX_CLOCK_DOWN')?>'
+				}
 				});
 
 			return callback.apply(window, [window[obId]]);

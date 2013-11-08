@@ -1,17 +1,9 @@
-<?
+<?php
 class CBitrixCloudCDNQuota
 {
 	private $expires = 0;
 	private $allowed = 0.0;
 	private $traffic = 0.0;
-	/**
-	 *
-	 * @return void
-	 *
-	 */
-	static public function __construct()
-	{
-	}
 	/**
 	 *
 	 * @return float
@@ -154,4 +146,3 @@ class CBitrixCloudCDNQuota
 		return $this;
 	}
 }
-?>

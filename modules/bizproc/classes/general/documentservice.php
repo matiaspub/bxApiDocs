@@ -68,7 +68,13 @@ class CBPDocumentService
 			CModule::IncludeModule($moduleId);
 
 		if (class_exists($entity))
-			return call_user_func_array(array($entity, "PublishDocument"), array($documentId));
+		{
+			$r = call_user_func_array(array($entity, "PublishDocument"), array($documentId));
+			if ($r)
+				$r = array($moduleId, $entity, $r);
+
+			return $r;
+		}
 
 		return false;
 	}

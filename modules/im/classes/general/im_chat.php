@@ -256,7 +256,7 @@ class CIMChat
 		}
 
 		$strSql = "
-			SELECT C.ID CHAT_ID, C.TITLE CHAT_TITLE, C.AUTHOR_ID CHAT_OWNER_ID, R1.USER_ID RELATION_USER_ID
+			SELECT C.ID CHAT_ID, C.TITLE CHAT_TITLE, C.CALL_TYPE CHAT_CALL_TYPE, C.AUTHOR_ID CHAT_OWNER_ID, R1.USER_ID RELATION_USER_ID, R1.CALL_STATUS, R1.MESSAGE_TYPE CHAT_TYPE
 			FROM b_im_relation R1 LEFT JOIN b_im_chat C ON R1.CHAT_ID = C.ID
 			".$innerJoin."
 			WHERE R1.CHAT_ID IN (".implode(',', $arFilter['ID']).") ".$whereUser."
@@ -264,6 +264,7 @@ class CIMChat
 
 		$arChat = Array();
 		$arUserInChat = Array();
+		$arUserCallStatus = Array();
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->GetNext(true, false))
 		{
@@ -273,12 +274,15 @@ class CIMChat
 					'id' => $arRes["CHAT_ID"],
 					'name' => $arRes["CHAT_TITLE"],
 					'owner' => $arRes["CHAT_OWNER_ID"],
+					'call' => $arRes["CHAT_CALL_TYPE"],
+					'type' => $arRes["CHAT_TYPE"],
 				);
 			}
 			$arUserInChat[$arRes["CHAT_ID"]][] = $arRes["RELATION_USER_ID"];
+			$arUserCallStatus[$arRes["CHAT_ID"]][$arRes["RELATION_USER_ID"]] = $arRes["CALL_STATUS"];
 		}
 
-		$result = array('chat' => $arChat, 'userInChat' => $arUserInChat);
+		$result = array('chat' => $arChat, 'userInChat' => $arUserInChat, 'userCallStatus' => $arUserCallStatus);
 
 		return $result;
 	}
@@ -442,7 +446,7 @@ class CIMChat
 					else
 					{
 						$arMessages[$key]['text'] = $CCTP->convertText(htmlspecialcharsbx($value['text']));
-						$arMessages[$key]['text_mobile'] = $this->bHideLink? strip_tags($CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text']))), '<br>'): $arMessages[$key]['text'];
+						$arMessages[$key]['text_mobile'] = strip_tags(preg_replace("/<img.*?data-code=\"([^\"]*)\".*?>/i", "$1", $CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text'])))) , '<br>');
 
 						$arUsersMessage[$value['conversation']][] = $value['id'];
 
@@ -459,7 +463,7 @@ class CIMChat
 				foreach ($arMessages as $key => $value)
 				{
 					$arMessages[$key]['text'] = $CCTP->convertText(htmlspecialcharsbx($value['text']));
-					$arMessages[$key]['text_mobile'] = $this->bHideLink? strip_tags($CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text']))), '<br>'): $arMessages[$key]['text'];
+					$arMessages[$key]['text_mobile'] = strip_tags(preg_replace("/<img.*?data-code=\"([^\"]*)\".*?>/i", "$1", $CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text'])))) , '<br>');
 				}
 			}
 			foreach ($arMark as $chatId => $lastSendId)
@@ -541,6 +545,7 @@ class CIMChat
 				$message = GetMessage("IM_CHAT_CHANGE_TITLE_".$arUsers['GENDER'], Array('#USER_NAME#' => $arUsers['NAME'], '#CHAT_TITLE#' => $title));
 				self::AddMessage(Array(
 					"TO_CHAT_ID" => $chatId,
+					"FROM_USER_ID" => $this->user_id,
 					"MESSAGE" 	 => $message,
 					"SYSTEM"	 => 'Y',
 				));
@@ -561,6 +566,7 @@ class CIMChat
 					));
 				}
 			}
+
 			return true;
 		}
 		return false;
@@ -629,9 +635,11 @@ class CIMChat
 
 		self::AddMessage(Array(
 			"TO_CHAT_ID" => $chatId,
+			"FROM_USER_ID" => $this->user_id,
 			"MESSAGE" 	 => $message,
 			"SYSTEM"	 => 'Y',
 		));
+
 		return $chatId;
 	}
 
@@ -645,6 +653,7 @@ class CIMChat
 	public function AddUser($chatId, $userId)
 	{
 		global $DB;
+
 		$chatId = intval($chatId);
 		if ($chatId <= 0)
 		{
@@ -741,15 +750,17 @@ class CIMChat
 			self::AddMessage(Array(
 				"TO_CHAT_ID" => $chatId,
 				"MESSAGE" 	 => $message,
+				"FROM_USER_ID" => $this->user_id,
 				"SYSTEM"	 => 'Y',
 			));
+
 			return true;
 		}
 		$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_AUTHORIZE_ERROR"), "AUTHORIZE_ERROR");
 		return false;
 	}
 
-	static public function DeleteUser($chatId, $userId, $checkPermission = true)
+	public function DeleteUser($chatId, $userId, $checkPermission = true)
 	{
 		global $DB;
 		$chatId = intval($chatId);
@@ -822,6 +833,13 @@ class CIMChat
 			$strSql = "DELETE FROM b_im_relation WHERE CHAT_ID = ".$chatId." AND USER_ID = ".$userId;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+			self::AddMessage(Array(
+				"TO_CHAT_ID" => $chatId,
+				"MESSAGE" 	 => $message,
+				"FROM_USER_ID" => $this->user_id,
+				"SYSTEM"	 => 'Y',
+			));
+
 			foreach ($arOldRelation as $rel)
 			{
 				CPullStack::AddByUser($rel['USER_ID'], Array(
@@ -836,11 +854,7 @@ class CIMChat
 				));
 			}
 
-			self::AddMessage(Array(
-				"TO_CHAT_ID" => $chatId,
-				"MESSAGE" 	 => $message,
-				"SYSTEM"	 => 'Y',
-			));
+
 
 			CIMContactList::DeleteRecent($chatId, true, $userId);
 

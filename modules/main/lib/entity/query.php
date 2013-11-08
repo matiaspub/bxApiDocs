@@ -74,10 +74,6 @@ class Query
 
 	protected $replaced_aliases;
 
-	protected
-		$DB;
-
-
 	/**
 	 * @param Base|Query|string $source
 	 * @throws \Exception
@@ -102,8 +98,6 @@ class Query
 				'Unknown source type "%s" for new %s', gettype($source), __CLASS__
 			));
 		}
-
-		$this->DB = $GLOBALS['DB'];
 	}
 
 	public function getSelect()
@@ -180,9 +174,14 @@ class Query
 		return $this->order;
 	}
 
-	public function setOrder(array $order)
+	public function setOrder($order)
 	{
 		$this->order = array();
+
+		if (!is_array($order))
+		{
+			$order = array($order);
+		}
 
 		foreach ($order as $k => $v)
 		{
@@ -318,9 +317,9 @@ class Query
 	{
 		$this->is_executing = true;
 
-		$build_parts = $this->buildQuery(true);
+		$query = $this->buildQuery();
 
-		$result = $this->query($build_parts);
+		$result = $this->query($query);
 
 		$this->is_executing = false;
 
@@ -531,6 +530,7 @@ class Query
 				continue;
 			}
 
+			$is_having = false;
 			if (!is_numeric($filter_def))
 			{
 				$csw_result = \CSQLWhere::makeOperation($filter_def);
@@ -579,6 +579,11 @@ class Query
 
 	protected function buildJoinMap()
 	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+
+		$aliasLength = $helper->getAliasLength();
+
 		// list of used joins
 		$done = array();
 
@@ -673,7 +678,7 @@ class Query
 						{
 							$table_alias = $prev_alias.'_'.strtolower($ref_field->getName());
 
-							if (strlen($table_alias.$this->table_alias_postfix) > $this->DB->alias_length)
+							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
 								$table_alias = 'TALIAS'.$this->table_alias_postfix.'_' . (++$talias_count);
 							}
@@ -689,7 +694,7 @@ class Query
 							$table_alias = Base::camel2snake($dst_entity->getName()) . '_' . strtolower($ref_field->getName());
 							$table_alias = $prev_alias.'_'.$table_alias;
 
-							if (strlen($table_alias.$this->table_alias_postfix) > $this->DB->alias_length)
+							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
 								$table_alias = 'TALIAS'.$this->table_alias_postfix.'_' . (++$talias_count);
 							}
@@ -758,6 +763,9 @@ class Query
 		$sql = array();
 		$csw = new \CSQLWhere;
 
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+
 		foreach ($this->join_map as $join)
 		{
 			// prepare csw fields
@@ -767,7 +775,7 @@ class Query
 			// sql
 			$sql[] = sprintf('%s JOIN %s %s ON %s',
 				$join['type'], $join['table'],
-				$this->DB->escL . $join['alias'] . $this->DB->escR,
+				$helper->getLeftQuote() . $join['alias'] . $helper->getRightQuote(),
 				trim($csw->getQuery($join['reference']))
 			);
 		}
@@ -873,16 +881,24 @@ class Query
 
 		foreach ($this->order_chains as $chain)
 		{
-			$sql[] = $chain->getSqlDefinition() . ' ' . $this->order[$chain->getDefinition()];
+			$sort = isset($this->order[$chain->getDefinition()])
+				? $this->order[$chain->getDefinition()]
+				: $this->order[$chain->getAlias()];
+
+			$sql[] = $chain->getSqlDefinition() . ' ' . $sort;
 		}
 
 		return join(', ', $sql);
 	}
 
-	protected function buildQuery($returnBuildParts = false)
+	protected function buildQuery()
 	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+
 		if ($this->query_build_parts === null)
 		{
+
 			foreach ($this->select as $key => $value)
 			{
 				$this->addToSelectChain($value, is_numeric($key) ? '' : $key);
@@ -903,8 +919,6 @@ class Query
 
 			$this->buildJoinMap();
 
-			// ------------------
-
 			$sqlSelect = $this->buildSelect();
 			$sqlJoin = $this->buildJoin();
 			$sqlWhere = $this->buildWhere();
@@ -913,34 +927,30 @@ class Query
 			$sqlOrder = $this->buildOrder();
 
 			$sqlFrom = $this->init_entity->getDBTableName();
-			$sqlFrom .= ' '.$this->DB->escL . strtolower($this->init_entity->getCode()) . $this->table_alias_postfix . $this->DB->escR;
+			$sqlFrom .= ' '.$helper->getLeftQuote() . strtolower($this->init_entity->getCode()) . $this->table_alias_postfix . $helper->getRightQuote();
 			$sqlFrom .= ' '.$sqlJoin;
 
 			$this->query_build_parts = array_filter(array(
-				'SELECT' => $sqlSelect, 'FROM' => $sqlFrom,
-				'WHERE' => $sqlWhere, 'GROUP BY' => $sqlGroup,
-				'HAVING' => $sqlHaving, 'ORDER BY' => $sqlOrder
+				'SELECT' => $sqlSelect,
+				'FROM' => $sqlFrom,
+				'WHERE' => $sqlWhere,
+				'GROUP BY' => $sqlGroup,
+				'HAVING' => $sqlHaving,
+				'ORDER BY' => $sqlOrder
 			));
-		}
-
-		if ($returnBuildParts)
-		{
-			return $this->query_build_parts;
 		}
 
 		$build_parts = $this->query_build_parts;
 
 		foreach ($build_parts as $k => &$v)
 		{
-			if (strlen($v))
-			{
-				$v = $k . ' ' . $v;
-			}
+			$v = $k . ' ' . $v;
 		}
 
 		$query = join("\n", $build_parts);
 
-		list($query, ) = $this->replaceSelectAliases($query);
+		list($query, $replaced) = $this->replaceSelectAliases($query);
+		$this->replaced_aliases = $replaced;
 
 		if (!empty($this->options))
 		{
@@ -950,21 +960,12 @@ class Query
 			}
 		}
 
-		if (empty($this->limit))
+		if ($this->limit > 0)
 		{
-			return $query;
+			$query = $helper->getTopSql($query, $this->limit, $this->offset);
 		}
-		elseif (array_key_exists('nPageTop', $this->limit))
-		{
-			$query = $this->DB->topSql($query, intval($this->limit['nPageTop']));
-			return $query;
-		}
-		else
-		{
-			// can't get "paginated" query through DB, return base query
-			// yes, it is BUG
-			return $query;
-		}
+
+		return $query;
 	}
 
 	protected function getFilterCswFields(&$filter)
@@ -1067,6 +1068,11 @@ class Query
 
 	protected function prepareJoinReference($reference, $alias_this, $alias_ref)
 	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+		$leftQuote = $helper->getLeftQuote();
+		$rightQuote = $helper->getRightQuote();
+
 		$new = array();
 
 		foreach ($reference as $k => $v)
@@ -1090,13 +1096,13 @@ class Query
 
 				if (strpos($field, 'this.') === 0)
 				{
-					$k = str_replace('this.', $this->DB->escL.$alias_this.$this->DB->escR.'.'.$this->DB->escL, $k);
-					$k .= $this->DB->escR;
+					$k = str_replace('this.', $leftQuote.$alias_this.$rightQuote.'.'.$leftQuote, $k);
+					$k .= $rightQuote;
 				}
 				elseif (strpos($field, 'ref.') === 0)
 				{
-					$k = str_replace('ref.', $this->DB->escL.$alias_ref.$this->DB->escR.'.'.$this->DB->escL, $k);
-					$k .= $this->DB->escR;
+					$k = str_replace('ref.', $leftQuote.$alias_ref.$rightQuote.'.'.$leftQuote, $k);
+					$k .= $rightQuote;
 				}
 				else
 				{
@@ -1185,6 +1191,12 @@ class Query
 		return false;
 	}
 
+	/**
+	 * The most magic method. Do not edit without strong need, and for sure run tests after.
+	 *
+	 * @param QueryChain $chain
+	 * @param array      $storages
+	 */
 	protected function collectExprChains(QueryChain $chain, $storages = array('hidden'))
 	{
 		$last_elem = $chain->getLastElement();
@@ -1256,6 +1268,23 @@ class Query
 			$this->{$storage_name}[$opt_key] = $reg_chain;
 		}
 
+		// get default options from expressions
+		if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+		{
+			$options = $chain->getLastElement()->getValue()->getOptions();
+
+			if (!empty($options))
+			{
+				foreach ($options as $option => $value)
+				{
+					if (!isset($this->options[$option]))
+					{
+						$this->options[$option] = $value;
+					}
+				}
+			}
+		}
+
 		return $reg_chain;
 	}
 
@@ -1277,54 +1306,28 @@ class Query
 		return false;
 	}
 
-	protected function query($build_parts)
+	protected function query($query)
 	{
-		// nosql support with new platform only
-		if(file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/d7.php"))
+		// check nosql configuration
+		$configuration = $this->init_entity->getConnection()->getConfiguration();
+
+		if (isset($configuration['handlersocket']['read']))
 		{
-			// check nosql configuration
-			$configuration = $this->init_entity->getConnection()->getConfiguration();
+			$nosqlConnectionName = $configuration['handlersocket']['read'];
 
-			if (isset($configuration['handlersocket']['read']))
+			$nosqlConnection = \Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection($nosqlConnectionName);
+			$isNosqlCapable = NosqlPrimarySelector::checkQuery($nosqlConnection, $this);
+
+			if ($isNosqlCapable)
 			{
-				$nosqlConnectionName = $configuration['handlersocket']['read'];
+				$nosqlResult = NosqlPrimarySelector::relayQuery($nosqlConnection, $this);
 
-				$nosqlConnection = \Bitrix\Main\Application::getInstance()->getDbConnectionPool()->getConnection($nosqlConnectionName);
-				$isNosqlCapable = NosqlPrimarySelector::checkQuery($nosqlConnection, $this);
-
-				if ($isNosqlCapable)
-				{
-					$nosqlResult = NosqlPrimarySelector::relayQuery($nosqlConnection, $this);
-
-					$result = new \CDBResult();
-					$result->initFromArray($nosqlResult);
-
-					return $result;
-				}
+				return new \Bitrix\Main\DB\ArrayResult($nosqlResult, $nosqlConnection);
 			}
 		}
 
-
-		foreach ($build_parts as $k => &$v)
-		{
-			if (strlen($v))
-			{
-				$v = $k . ' ' . $v;
-			}
-		}
-
-		if (!empty($this->options))
-		{
-			foreach ($this->options as $opt => $value)
-			{
-				$build_parts = str_replace('%'.$opt.'%', $value, $build_parts);
-			}
-		}
-
-		$query = join("\n", $build_parts);
-
-		list($query, $replaced_aliases) = $this->replaceSelectAliases($query);
-
+/*
+Vadim: this is for paging but currently is not used
 		if ($this->count_total || !is_null($this->offset))
 		{
 			$cnt_body_elements = $build_parts;
@@ -1339,34 +1342,13 @@ class Query
 
 			// select count
 			$cnt_query = 'SELECT COUNT(1) AS TMP_ROWS_CNT FROM ('.$cnt_query.') xxx';
-			$result = $this->DB->query($cnt_query);
-			$result = $result->fetch();
-			$cnt = $result["TMP_ROWS_CNT"];
+			$cnt = $connection->queryScalar($cnt_query);
 		}
+*/
+		$connection = \Bitrix\Main\Application::getConnection();
 
-		if (empty($this->limit))
-		{
-			$result = $this->DB->query($query);
-			$result->arReplacedAliases = $replaced_aliases;
-		}
-		elseif (!empty($this->limit) && is_null($this->offset))
-		{
-			$query = $this->DB->topSql($query, intval($this->limit));
-			$result = $this->DB->query($query);
-			$result->arReplacedAliases = $replaced_aliases;
-		}
-		else
-		{
-			// main query
-			$result = new \CDBResult();
-			$result->arReplacedAliases = $replaced_aliases;
-			$db_limit = array(
-				'nPageSize' => $this->limit,
-				'iNumPage' => $this->offset ? (($this->offset / $this->limit) + 1) : 1,
-				'bShowAll' => true
-			);;
-			$result->navQuery($query, $cnt, $db_limit);
-		}
+		$result = $connection->query($query);
+		$result->setReplacedAliases($this->replaced_aliases);
 
 		$this->last_query = $query;
 
@@ -1375,11 +1357,17 @@ class Query
 
 	protected function replaceSelectAliases($query)
 	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+
+		$length = (int) $helper->getAliasLength();
+		$leftQuote = $helper->getLeftQuote();
+		$rightQuote = $helper->getRightQuote();
+
 		$replaced = array();
-		$length = (int) $this->DB->alias_length;
 
 		preg_match_all(
-			'/ AS '.preg_quote($this->DB->escL).'([a-z0-9_]{'.($length+1).',})'.preg_quote($this->DB->escR).'/i',
+			'/ AS '.preg_quote($leftQuote).'([a-z0-9_]{'.($length+1).',})'.preg_quote($rightQuote).'/i',
 			$query, $matches
 		);
 
@@ -1391,14 +1379,12 @@ class Query
 				$replaced[$newAlias] = $alias;
 
 				$query = str_replace(
-					' AS ' . $this->DB->escL . $alias . $this->DB->escR,
-					' AS ' . $this->DB->escL . $newAlias . $this->DB->escR . '/* '.$alias.' */',
+					' AS ' . $leftQuote . $alias . $rightQuote,
+					' AS ' . $leftQuote . $newAlias . $rightQuote . '/* '.$alias.' */',
 					$query
 				);
 			}
 		}
-
-		$this->replaced_aliases = $replaced;
 
 		return array($query, $replaced);
 	}
@@ -1474,7 +1460,7 @@ class Query
 
 	public function getQuery()
 	{
-		return $this->buildQuery(false);
+		return $this->buildQuery();
 	}
 
 	public function getLastQuery()

@@ -13,7 +13,7 @@ namespace Bitrix\Main\Entity;
  * @package bitrix
  * @subpackage main
  */
-class DateField extends ScalarField
+class DateField extends DatetimeField
 {
 	public function getValidators()
 	{

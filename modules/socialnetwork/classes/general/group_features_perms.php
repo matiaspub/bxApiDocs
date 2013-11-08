@@ -1223,7 +1223,7 @@ class CAllSocNetFeaturesPerms
 							$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_group");
 						}
 						elseif ($type == SONET_ENTITY_USER)
-							$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".intval($id / 100));
+							$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_CARD_".intval($id / TAGGED_user_card_size));
 
 						$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_features_".$type."_".$id);
 					}

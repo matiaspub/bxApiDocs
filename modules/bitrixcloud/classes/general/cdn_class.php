@@ -1,4 +1,4 @@
-<?
+<?php
 class CBitrixCloudCDNClass
 {
 	private $name = "";
@@ -45,7 +45,7 @@ class CBitrixCloudCDNClass
 	 *
 	 * @param string $name
 	 * @param array[int]string $extensions
-	 *
+	 * @return void
 	 */
 	public function __construct($name, $extensions)
 	{
@@ -135,11 +135,10 @@ class CBitrixCloudCDNClasses
 		$classes = /*.(array[string]string).*/ array();
 		foreach ($this->classes as $class_name => $file_class)
 		{
-			/** @var CBitrixCloudCDNClass $file_class */
+			/* @var CBitrixCloudCDNClass $file_class */
 			$classes[$class_name] = implode(",", $file_class->getExtensions());
 		}
 		$option->setArrayValue($classes);
 		return $this;
 	}
 }
-?>

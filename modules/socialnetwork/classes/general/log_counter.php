@@ -124,7 +124,7 @@ class CAllSocNetLogCounter
 		$strSQL = "
 		SELECT DISTINCT
 			U.ID as ID
-			,1
+			,1 as CNT
 			,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
 			,".$params['CODE']." as CODE,
 			0 as SENT

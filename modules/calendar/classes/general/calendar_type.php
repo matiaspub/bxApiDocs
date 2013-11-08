@@ -277,10 +277,8 @@ class CCalendarType
 
 	public static function GetOperations($xmlId, $userId = false)
 	{
-		global $USER;
-
 		if ($userId === false)
-			$userId = $USER->GetId();
+			$userId = CCalendar::GetCurUserId();
 
 		$arCodes = array();
 		$rCodes = CAccess::GetUserCodes($userId);

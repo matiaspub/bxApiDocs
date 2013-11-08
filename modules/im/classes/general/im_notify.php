@@ -87,9 +87,6 @@ class CIMNotify
 
 				$strSql = $DB->TopSql($strSql, 20);
 				$dbRes = $DB->Query(str_replace("#LIMIT#", $sqlLimit, $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-				if (!$dbRes->SelectedRowsCount())
-					$dbRes = $DB->Query(str_replace("#LIMIT#", "", $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 			else
 			{
@@ -245,7 +242,7 @@ class CIMNotify
 		return $arNotify;
 	}
 
-	public static function GetUnsendNotify($order = "DESC")
+	public static function GetUnsendNotify($order = "ASC")
 	{
 		global $DB;
 
@@ -398,7 +395,7 @@ class CIMNotify
 				{
 					$id = $arRes['ID'];
 					$chatId = intval($arRes['CHAT_ID']);
-					$strSql ="UPDATE b_im_message SET NOTIFY_READ = 'Y' WHERE CHAT_ID = ".$chatId." AND NOTIFY_TYPE > '".IM_NOTIFY_CONFIRM."' AND ID <= ".$id."";
+					$strSql ="UPDATE b_im_message SET NOTIFY_READ = 'Y' WHERE CHAT_ID = ".$chatId." AND NOTIFY_READ='N' AND NOTIFY_TYPE > '".IM_NOTIFY_CONFIRM."' AND ID <= ".$id."";
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					self::SetLastId($chatId, $id);
 				}
@@ -406,7 +403,7 @@ class CIMNotify
 				{
 					$id = $arRes['ID'];
 					$chatId = intval($arRes['CHAT_ID']);
-					$strSql ="UPDATE b_im_message SET NOTIFY_READ = 'Y' WHERE ID = ".$id." AND NOTIFY_TYPE > '".IM_NOTIFY_CONFIRM."'";
+					$strSql ="UPDATE b_im_message SET NOTIFY_READ = 'Y' WHERE CHAT_ID = ".$chatId." AND NOTIFY_READ='N' AND NOTIFY_TYPE > '".IM_NOTIFY_CONFIRM."' AND ID = ".$id." ";
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					self::SetLastId($chatId);
 				}
@@ -471,7 +468,7 @@ class CIMNotify
 		$strSql = "
 		UPDATE b_im_relation SET
 			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then '".intval($lastSendId)."' else LAST_SEND_ID end),
-			STATUS = ".IM_STATUS_NOTIFY."
+			STATUS = '".IM_STATUS_NOTIFY."'
 		WHERE CHAT_ID = ".intval($chatId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -651,6 +648,22 @@ class CIMNotify
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		//CIMMessenger::SendBadges($arUsersSend);
+
+		return true;
+	}
+
+	public static function DeleteByModule($moduleId, $moduleEvent = '')
+	{
+		global $DB;
+		if (strlen($moduleId) <= 0)
+			return false;
+
+		$sqlEvent = '';
+		if (strlen($moduleEvent) > 0)
+			$sqlEvent = " AND NOTIFY_EVENT = '".$DB->ForSQL($moduleEvent)."'";
+
+		$strSql = "DELETE FROM b_im_message WHERE NOTIFY_MODULE = '".$DB->ForSQL($moduleId)."'".$sqlEvent;
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
 	}

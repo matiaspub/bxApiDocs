@@ -35,6 +35,14 @@ $bShowPathForSites = true;
 if (count($arSites) <= 1)
 	$bShowPathForSites = false;
 
+$arForums = array();
+if (CModule::IncludeModule("forum"))
+{
+	$db = CForumNew::GetListEx();
+	while ($ar = $db->GetNext())
+		$arForums[$ar["ID"]] = "[".$ar["ID"]."] ".$ar["NAME"];
+}
+
 if ($REQUEST_METHOD == "POST" && isset($_REQUEST['save_type']) && $_REQUEST['save_type'] == 'Y' && check_bitrix_sessid())
 {
 	//CUtil::JSPostUnEscape();
@@ -115,7 +123,12 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 			'denied_superpose_types' => array(),
 			'pathes_for_sites' => isset($_REQUEST['pathes_for_sites']),
 			'pathes' => $_REQUEST['pathes'],
-			'dep_manager_sub' => isset($_REQUEST['dep_manager_sub'])
+			'dep_manager_sub' => isset($_REQUEST['dep_manager_sub']),
+
+			'forum_id' =>  isset($_REQUEST['calendar_forum_id']),
+			//'comment_allow_edit' =>  isset($_REQUEST['calendar_comment_allow_edit']),
+			//'comment_allow_remove' =>  isset($_REQUEST['calendar_comment_allow_remove']),
+			//'max_upload_files_in_comments' =>  isset($_REQUEST['calendar_max_upload_files_in_comments'])
 		);
 
 		foreach($arTypes as $type)
@@ -372,6 +385,43 @@ BX.ready(function(){
 		</td>
 	</tr>
 	<?endif?>
+
+
+	<!-- Comments settings -->
+	<tr class="heading"><td colSpan="2"><?= GetMessage('CAL_COMMENTS_SETTINGS')?></td></tr>
+	<tr>
+		<td align="right"><?= GetMessage("CAL_COMMENTS_FORUM")?>:</td>
+		<td>
+			<select name="calendar_forum_id">
+				<option value="0">&nbsp;</option>
+				<? foreach ($arForums as $key => $value):?>
+					<option value="<?= $key ?>"<?= $SET['forum_id'] == $key ? " selected" : "" ?>><?=  $value?></option>
+				<? endforeach?>
+			</select>
+		</td>
+	</tr>
+<?/*
+	<tr>
+		<td align="right"><?= GetMessage("CAL_COMMENTS_ALLOW_EDIT")?>:</td>
+		<td>
+			<input type="checkbox" name="calendar_comment_allow_edit" value="Y"<?= $SET['comment_allow_edit'] ? " checked" : "" ?> />
+		</td>
+	</tr>
+	<tr>
+		<td align="right"><?= GetMessage("CAL_COMMENTS_ALLOW_REMOVE")?>:</td>
+		<td>
+			<input type="checkbox" name="calendar_comment_allow_remove" value="Y"<?= $SET['comment_allow_remove'] ? " checked" : "" ?> />
+		</td>
+	</tr>
+	<tr>
+		<td align="right"><?= GetMessage('CAL_MAX_UPLOAD_FILES_IN_COMMENTS')?>:</td>
+		<td><input type="text" size="40" value="<?= $SET['max_upload_files_in_comments']?>" name="calendar_max_upload_files_in_comments">
+		</td>
+	</tr>
+*/?>
+	<!-- END Comments settings -->
+
+
 
 <?$tabControl->BeginNextTab();?>
 	<tr class="">

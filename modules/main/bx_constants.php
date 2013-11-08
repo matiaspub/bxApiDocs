@@ -52,7 +52,7 @@ define('SITE_TEMPLATE_ID', $siteTemplateId);
 /**
  * Содержит время начала работы страницы в формате возвращаемом функцией <a href="/api_help/main/functions/date/getmicrotime.php">getmicrotime</a>.
  */
-define('START_EXEC_TIME', microtime);
+define('START_EXEC_TIME', microtime(true));
 
 /**
  * Если подключена служебная часть пролога, то данная константа будет инициализирована значением "true". Как правило эту константу используют во включаемых файлах в целях безопасности, когда необходимо убедиться, что пролог подключен и все необходимые права проверены.
@@ -62,12 +62,12 @@ define('B_PROLOG_INCLUDED', true);
 /**
  * Текущая версия главного модуля.
  */
-define('SM_VERSION', "12.5.13");
+define('SM_VERSION', "14.0.3");
 
 /**
  * Дата выпуска текущей версии главного модуля.
  */
-define('SM_VERSION_DATE', "2013-08-23 15:00:00");
+define('SM_VERSION_DATE', "2013-10-24 12:00:00");
 
 /**
  * Если необходимо подключать пролог административной части, то значение данной константы - "true".
@@ -217,7 +217,7 @@ define('BX_FILE_PERMISSIONS', 0644);
  *        Пример: 
  *         <pre>define("BX_DIR_PERMISSIONS", 0755);</pre>
  */
-define('BX_DIR_PERMISSIONS', 0755);
+define('BX_DIR_PERMISSIONS', 0700);
 
 /**
  * Инициализация данной константы значением "true" позволит отключить все модули системы за исключением главного и модуля "<a href="../../../../../fileman/help/ru/index.php.html">Управление структурой</a>". 	 
@@ -511,27 +511,27 @@ define('BX_WIZARD_CANCEL_ID', "__install_cancel");
 /**
  * ZIP_START_TIME
  */
-define('ZIP_START_TIME', microtime);
+define('ZIP_START_TIME', microtime(true));
 
 /**
  * START_EXEC_EPILOG_AFTER_1
  */
-define('START_EXEC_EPILOG_AFTER_1', microtime);
+define('START_EXEC_EPILOG_AFTER_1', microtime());
 
 /**
  * START_EXEC_EVENTS_1
  */
-define('START_EXEC_EVENTS_1', microtime);
+define('START_EXEC_EVENTS_1', microtime());
 
 /**
  * START_EXEC_EVENTS_2
  */
-define('START_EXEC_EVENTS_2', microtime);
+define('START_EXEC_EVENTS_2', microtime());
 
 /**
  * START_EXEC_EPILOG_BEFORE_1
  */
-define('START_EXEC_EPILOG_BEFORE_1', microtime);
+define('START_EXEC_EPILOG_BEFORE_1', microtime());
 
 /**
  * ADMIN_AJAX_MODE
@@ -546,12 +546,12 @@ define('BITRIX_STATIC_PAGES', true);
 /**
  * START_EXEC_PROLOG_AFTER_1
  */
-define('START_EXEC_PROLOG_AFTER_1', microtime);
+define('START_EXEC_PROLOG_AFTER_1', microtime());
 
 /**
  * START_EXEC_PROLOG_AFTER_2
  */
-define('START_EXEC_PROLOG_AFTER_2', microtime);
+define('START_EXEC_PROLOG_AFTER_2', microtime());
 
 /**
  * ADMIN_SECTION_LOAD_AUTH
@@ -561,7 +561,7 @@ define('ADMIN_SECTION_LOAD_AUTH', 1);
 /**
  * START_EXEC_PROLOG_BEFORE_1
  */
-define('START_EXEC_PROLOG_BEFORE_1', microtime);
+define('START_EXEC_PROLOG_BEFORE_1', microtime());
 
 /**
  * BX_PUBLIC_MODE
@@ -576,7 +576,7 @@ define('BX_URLREWRITE', true);
 /**
  * POST_FORM_ACTION_URI
  */
-define('POST_FORM_ACTION_URI', htmlspecialcharsbx);
+define('POST_FORM_ACTION_URI', htmlspecialcharsbx($_SERVER["REQUEST_URI"]));
 
 /**
  * BX_CHECK_SHORT_URI
@@ -611,7 +611,7 @@ define('BX_SEARCH_ADMIN', true);
 /**
  * ADMIN_THEME_ID
  */
-define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme);
+define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme());
 
 /**
  * BX_COMP_MANAGED_CACHE
@@ -656,7 +656,7 @@ define('LANG_ADMIN_LID', $arLang["LANGUAGE_ID"]);
 /**
  * LICENSE_KEY
  */
-define('LICENSE_KEY', $dispatcher->getLicenseKey);
+define('LICENSE_KEY', $dispatcher->getLicenseKey());
 
 /**
  * BX_UTF_PCRE_MODIFIER
@@ -746,7 +746,7 @@ define('ADMIN_MODULE_ICON', '<a href="'.BX_ROOT.'/admin/index.php?lang='.LANG.'"
 /**
  * START_TIME
  */
-define('START_TIME', time);
+define('START_TIME', time());
 
 /**
  * LOCK_FILE
@@ -756,7 +756,7 @@ define('LOCK_FILE', $_SERVER['DOCUMENT_ROOT'].'/bitrix/backup/auto_lock');
 /**
  * DOCUMENT_ROOT
  */
-define('DOCUMENT_ROOT', rtrim);
+define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
 
 /**
  * DOCUMENT_ROOT_SITE
@@ -767,6 +767,21 @@ define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
  * BX_PUBLIC_TOOLS
  */
 define('BX_PUBLIC_TOOLS', true);
+
+/**
+ * CLI
+ */
+define('CLI', php_sapi_name() == 'cli');
+
+/**
+ * BX_SECURITY_SHOW_MESSAGE
+ */
+define('BX_SECURITY_SHOW_MESSAGE', 1);
+
+/**
+ * NOT_CHECK_FILE_PERMISSIONS
+ */
+define('NOT_CHECK_FILE_PERMISSIONS', true);
 
 
 ?>

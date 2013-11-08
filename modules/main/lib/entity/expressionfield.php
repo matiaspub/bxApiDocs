@@ -46,6 +46,8 @@ class ExpressionField extends Field
 
 	protected $hasSubquery;
 
+	protected $options;
+
 
 	protected static
 		$aggrFunctionsMYSQL = array('AVG', 'BIT_AND', 'BIT_OR', 'BIT_XOR', 'COUNT',
@@ -85,6 +87,11 @@ class ExpressionField extends Field
 		if (!($this->valueField instanceof ScalarField))
 		{
 			throw new \Exception('expression field can only be a scalar type.');
+		}
+
+		if (isset($parameters['options']))
+		{
+			$this->options = $parameters['options'];
 		}
 	}
 
@@ -165,6 +172,14 @@ class ExpressionField extends Field
 		}
 
 		return $this->buildFromChains;
+	}
+
+	/**
+	 * @return array|null
+	 */
+	public function getOptions()
+	{
+		return $this->options;
 	}
 
 	public static function checkAggregation($expression)

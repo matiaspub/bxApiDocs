@@ -26,6 +26,18 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_ASP",
 			"critical" => CSecurityCriticalLevel::HIGHT
 		),
+		"httpOnly" => array(
+			"method" => "isPhpIniVarOn",
+			"params" => array("session.cookie_httponly"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_HTTPONLY",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
+		"cookieOnly" => array(
+			"method" => "isPhpIniVarOn",
+			"params" => array("session.use_only_cookies"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_COOKIEONLY",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
 	);
 
 	static public function __construct()
@@ -76,6 +88,16 @@ class CSecurityPhpConfigurationTest extends CSecurityBaseTest
 	protected function isPhpIniVarOff($pName)
 	{
 		return (intval(ini_get($pName)) == 0 || strtolower(trim(ini_get($pName))) == "off");
+	}
+
+	/**
+	 * @param string $pName
+	 * @return bool
+	 * @since 14.0.0
+	 */
+	protected function isPhpIniVarOn($pName)
+	{
+		return (intval(ini_get($pName)) == 1 || strtolower(trim(ini_get($pName))) == "on");
 	}
 
 }

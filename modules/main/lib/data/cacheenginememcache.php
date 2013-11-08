@@ -81,7 +81,7 @@ class CacheEngineMemcache
 					$initDirVersion = "";
 				}
 
-				self::$obMemcache->replace(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|/".$filename, "", 0, 1);
+				self::$obMemcache->replace(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|".$filename, "", 0, 1);
 			}
 			else
 			{
@@ -128,7 +128,7 @@ class CacheEngineMemcache
 			$initDirVersion = "";
 		}
 
-		$arAllVars = self::$obMemcache->get(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|/".$filename);
+		$arAllVars = self::$obMemcache->get(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|".$filename);
 
 		if($arAllVars === false || $arAllVars === '')
 			return false;
@@ -161,7 +161,7 @@ class CacheEngineMemcache
 			$initDirVersion = "";
 		}
 
-		self::$obMemcache->set(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|/".$filename, $arAllVars, 0, time()+intval($TTL));
+		self::$obMemcache->set(self::$baseDirVersion[$baseDir]."|".$initDirVersion."|".$filename, $arAllVars, 0, time()+intval($TTL));
 	}
 
 	public static function isCacheExpired($path)

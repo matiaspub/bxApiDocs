@@ -115,6 +115,7 @@ class CIMSettings
 		{
 			$arDefault = Array(
 				'status' => 'online',
+				'sshNotify' => true,
 				'viewOffline' => true,
 				'viewGroup' => true,
 				'enableSound' => true,

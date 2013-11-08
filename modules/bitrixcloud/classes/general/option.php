@@ -1,4 +1,4 @@
-<?
+<?php
 abstract class CAllBitrixCloudOption
 {
 	private $name = "";
@@ -97,6 +97,67 @@ abstract class CAllBitrixCloudOption
 	}
 	/**
 	 *
+	 * @param array[string]string $value
+	 * @return void
+	 *
+	 */
+	private function _update_db($value)
+	{
+		global $DB;
+		if (!is_array($value))
+			$value = array();
+
+		reset($value);
+		$rs = $DB->Query("
+			select ID, SORT, PARAM_KEY, PARAM_VALUE
+			from b_bitrixcloud_option
+			where NAME = '".$DB->ForSQL($this->name)."'
+			order by ID
+		");
+
+		$sort = 0;
+		while (list($key, $val) = each($value))
+		{
+			if ($db_row = $rs->fetch())
+			{
+				if (
+					"".$db_row["PARAM_VALUE"]."" !== "".$val.""
+					|| "".$db_row["PARAM_KEY"]."" !== "".$key.""
+					|| "".$db_row["SORT"]."" !== "".$sort.""
+				)
+				{
+					$DB->Query("
+						UPDATE b_bitrixcloud_option SET
+							PARAM_KEY = '".$DB->ForSql($key, 50)."'
+							,PARAM_VALUE = '".$DB->ForSql($val, 200)."'
+							,SORT = ".$sort."
+						WHERE ID = ".$db_row["ID"]."
+					");
+				}
+			}
+			else
+			{
+				$DB->Add("b_bitrixcloud_option", array(
+					"NAME" => $this->name,
+					"SORT" => (string)$sort,
+					"PARAM_KEY" => $key,
+					"PARAM_VALUE" => $val,
+				));
+			}
+			$sort++;
+		}
+
+		if ($db_row = $rs->fetch())
+		{
+			$DB->Query("
+				DELETE FROM b_bitrixcloud_option
+				WHERE NAME = '".$DB->ForSql($this->name, 50)."'
+				AND ID >= ".$db_row["ID"]."
+			");
+		}
+	}
+	/**
+	 *
 	 * @return array[string]string
 	 *
 	 */
@@ -142,6 +203,16 @@ abstract class CAllBitrixCloudOption
 		return (string)current($value);
 	}
 	/**
+	 *
+	 * @return int
+	 *
+	 */
+	public function getIntegerValue()
+	{
+		$value = $this->getArrayValue();
+		return (integer)current($value);
+	}
+	/**
 	 * @param array[string]string $value
 	 * @return void
 	 *
@@ -155,8 +226,7 @@ abstract class CAllBitrixCloudOption
 			if ($stored !== $value)
 			{
 				$this->value = null;
-				$this->_delete_db();
-				$this->_write_db($value);
+				$this->_update_db($value);
 				if (CACHED_b_bitrixcloud_option !== false)
 					$CACHE_MANAGER->Clean("b_bitrixcloud_option");
 			}
@@ -182,4 +252,3 @@ abstract class CAllBitrixCloudOption
 		$this->setArrayValue(/*.(array[string]string).*/ array());
 	}
 }
-?>

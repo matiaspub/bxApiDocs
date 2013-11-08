@@ -45,6 +45,7 @@ class CAllSocNetUser
 			CSocNetLog::DeleteNoDemand($ID);
 			CSocNetLogComments::DeleteNoDemand($ID);
 			CSocNetFeatures::DeleteNoDemand($ID);
+			CSocNetSubscription::DeleteEx($ID);
 
 			CUserOptions::DeleteOption("socialnetwork", "~menu_".SONET_ENTITY_USER."_".$ID, false, 0);
 		}
@@ -74,11 +75,13 @@ class CAllSocNetUser
 	{
 		if (array_key_exists("ACTIVE", $arFields) && defined("GLOBAL_ACTIVE_VALUE") && GLOBAL_ACTIVE_VALUE != $arFields["ACTIVE"]):
 
+			$arGroups = array();
 			$dbResult = CSocNetUserToGroup::GetList(array(), array("USER_ID" => $arFields["ID"]), false, false, array("GROUP_ID"));
 			while ($arResult = $dbResult->Fetch())
 				$arGroups[] = $arResult["GROUP_ID"];
 
-			for ($i = 0; $i < count($arGroups); $i++)
+			$cnt = count($arGroups);
+			for ($i = 0; $i < $cnt; $i++)
 				CSocNetGroup::SetStat($arGroups[$i]);
 
 		endif;
@@ -521,6 +524,91 @@ class CAllSocNetUser
 		}
 		else
 			return false;
+	}
+
+	public static function GetFields($bAdditional = false)
+	{
+		$arRes = array(
+			"ID" => GetMessage("SONET_UP1_ID"),
+			"LOGIN" => GetMessage("SONET_UP1_LOGIN"),
+			"NAME" => GetMessage("SONET_UP1_NAME"),
+			"SECOND_NAME" => GetMessage("SONET_UP1_SECOND_NAME"),
+			"LAST_NAME" => GetMessage("SONET_UP1_LAST_NAME"),
+			"EMAIL" => GetMessage("SONET_UP1_EMAIL"),
+			"TIME_ZONE" => GetMessage("SONET_UP1_TIME_ZONE"),
+			"LAST_LOGIN" => GetMessage("SONET_UP1_LAST_LOGIN"),
+			"DATE_REGISTER" => GetMessage("SONET_UP1_DATE_REGISTER"),
+			"LID" => GetMessage("SONET_UP1_LID"),
+			"PASSWORD" => GetMessage("SONET_UP1_PASSWORD"),
+			"PERSONAL_BIRTHDAY" => GetMessage("SONET_UP1_PERSONAL_BIRTHDAY"),
+			"PERSONAL_BIRTHDAY_YEAR" => GetMessage("SONET_UP1_PERSONAL_BIRTHDAY_YEAR"),
+			"PERSONAL_BIRTHDAY_DAY" => GetMessage("SONET_UP1_PERSONAL_BIRTHDAY_DAY"),
+
+			"PERSONAL_PROFESSION" => GetMessage("SONET_UP1_PERSONAL_PROFESSION"),
+			"PERSONAL_WWW" => GetMessage("SONET_UP1_PERSONAL_WWW"),
+			"PERSONAL_ICQ" => GetMessage("SONET_UP1_PERSONAL_ICQ"),
+			"PERSONAL_GENDER" => GetMessage("SONET_UP1_PERSONAL_GENDER"),
+			"PERSONAL_PHOTO" => GetMessage("SONET_UP1_PERSONAL_PHOTO"),
+			"PERSONAL_NOTES" => GetMessage("SONET_UP1_PERSONAL_NOTES"),
+
+			"PERSONAL_PHONE" => GetMessage("SONET_UP1_PERSONAL_PHONE"),
+			"PERSONAL_FAX" => GetMessage("SONET_UP1_PERSONAL_FAX"),
+			"PERSONAL_MOBILE" => GetMessage("SONET_UP1_PERSONAL_MOBILE"),
+			"PERSONAL_PAGER" => GetMessage("SONET_UP1_PERSONAL_PAGER"),
+
+			"PERSONAL_COUNTRY" => GetMessage("SONET_UP1_PERSONAL_COUNTRY"),
+			"PERSONAL_STATE" => GetMessage("SONET_UP1_PERSONAL_STATE"),
+			"PERSONAL_CITY" => GetMessage("SONET_UP1_PERSONAL_CITY"),
+			"PERSONAL_ZIP" => GetMessage("SONET_UP1_PERSONAL_ZIP"),
+			"PERSONAL_STREET" => GetMessage("SONET_UP1_PERSONAL_STREET"),
+			"PERSONAL_MAILBOX" => GetMessage("SONET_UP1_PERSONAL_MAILBOX"),
+
+			"WORK_COMPANY" => GetMessage("SONET_UP1_WORK_COMPANY"),
+			"WORK_DEPARTMENT" => GetMessage("SONET_UP1_WORK_DEPARTMENT"),
+			"WORK_POSITION" => GetMessage("SONET_UP1_WORK_POSITION"),
+			"WORK_WWW" => GetMessage("SONET_UP1_WORK_WWW"),
+			"WORK_PROFILE" => GetMessage("SONET_UP1_WORK_PROFILE"),
+			"WORK_LOGO" => GetMessage("SONET_UP1_WORK_LOGO"),
+			"WORK_NOTES" => GetMessage("SONET_UP1_WORK_NOTES"),
+
+			"WORK_PHONE" => GetMessage("SONET_UP1_WORK_PHONE"),
+			"WORK_FAX" => GetMessage("SONET_UP1_WORK_FAX"),
+			"WORK_PAGER" => GetMessage("SONET_UP1_WORK_PAGER"),
+
+			"WORK_COUNTRY" => GetMessage("SONET_UP1_WORK_COUNTRY"),
+			"WORK_STATE" => GetMessage("SONET_UP1_WORK_STATE"),
+			"WORK_CITY" => GetMessage("SONET_UP1_WORK_CITY"),
+			"WORK_ZIP" => GetMessage("SONET_UP1_WORK_ZIP"),
+			"WORK_STREET" => GetMessage("SONET_UP1_WORK_STREET"),
+			"WORK_MAILBOX" => GetMessage("SONET_UP1_WORK_MAILBOX"),
+		);
+
+		if (IsModuleInstalled("forum"))
+		{
+			$arRes["FORUM_SHOW_NAME"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_SHOW_NAME");
+			$arRes["FORUM_DESCRIPTION"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_DESCRIPTION");
+			$arRes["FORUM_INTERESTS"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_INTERESTS");
+			$arRes["FORUM_SIGNATURE"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_SIGNATURE");
+			$arRes["FORUM_AVATAR"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_AVATAR");
+			$arRes["FORUM_HIDE_FROM_ONLINE"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_HIDE_FROM_ONLINE");
+			$arRes["FORUM_SUBSC_GET_MY_MESSAGE"] = GetMessage("SONET_UP1_FORUM_PREFIX").GetMessage("SONET_UP1_FORUM_SUBSC_GET_MY_MESSAGE");
+		}
+
+		if (IsModuleInstalled("blog"))
+		{
+			$arRes["BLOG_ALIAS"] = GetMessage("SONET_UP1_BLOG_PREFIX").GetMessage("SONET_UP1_BLOG_ALIAS");
+			$arRes["BLOG_DESCRIPTION"] = GetMessage("SONET_UP1_BLOG_PREFIX").GetMessage("SONET_UP1_BLOG_DESCRIPTION");
+			$arRes["BLOG_INTERESTS"] = GetMessage("SONET_UP1_BLOG_PREFIX").GetMessage("SONET_UP1_BLOG_INTERESTS");
+			$arRes["BLOG_AVATAR"] = GetMessage("SONET_UP1_BLOG_PREFIX").GetMessage("SONET_UP1_BLOG_AVATAR");
+		}
+
+		return $arRes;
+	}
+
+	public static function GetFieldsMap($bAdditional = false)
+	{
+		$arUserFields = CSocNetUser::GetFields($bAdditional);
+		return array_keys($arUserFields);
 	}
 
 }

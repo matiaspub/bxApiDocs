@@ -16,6 +16,7 @@ class CPHPCacheFiles
 	//cache stats
 	var $written = false;
 	var $read = false;
+	var $path = "";
 
 	public static function IsAvailable()
 	{
@@ -179,6 +180,7 @@ class CPHPCacheFiles
 		/* We suppress warning here in order not to break
 		the compression under Zend Server */
 		$this->read = @filesize($fn);
+		$this->path = $fn;
 
 		if(intval($datecreate) < (mktime() - $TTL))
 			return false;
@@ -224,6 +226,7 @@ class CPHPCacheFiles
 			}
 
 			$this->written = fwrite($handle, $contents);
+			$this->path = $fn;
 			$len = function_exists('mb_strlen')? mb_strlen($contents, 'latin1'): strlen($contents);
 
 			fclose($handle);

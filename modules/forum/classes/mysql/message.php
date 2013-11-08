@@ -654,6 +654,12 @@ class CForumMessage extends CAllForumMessage
 					else
 						$arSqlSearch[] = ($strNegative=="Y"?" FM.".$key." IS NULL OR NOT ":"")."(FM.".$key." ".$strOperation." '".$DB->ForSql($val)."' )";
 					break;
+				case "APPROVED_AND_MINE":
+					if ($val >= 0)
+						$arSqlSearch[] = "(FM.APPROVED='Y' OR (FM.APPROVED != 'Y' AND FM.AUTHOR_ID=".intval($val)."))";
+					else
+						$arSqlSearch[] = "(FM.APPROVED='Y')";
+					break;
 				case "PARAM2":
 				case "ID":
 				case "AUTHOR_ID":
@@ -977,6 +983,12 @@ class CForumFiles extends CAllForumFiles
 						$arSqlSearch[] = ($strNegative=="Y"?" FM.".$key." IS NULL OR NOT ":"")."(FM.".$key." ".$strOperation." '".$DB->ForSql($val)."' )";
 					break;
 				// to table b_forum_message
+				case "APPROVED_AND_MINE":
+					if ($val >= 0)
+						$arSqlSearch[] = "(FM.APPROVED='Y' OR (FM.APPROVED != 'Y' AND FM.AUTHOR_ID=".intval($val)."))";
+					else
+						$arSqlSearch[] = "(FM.APPROVED='Y')";
+					break;
 				case "PARAM2":
 				case "FORUM_ID":
 				case "TOPIC_ID":

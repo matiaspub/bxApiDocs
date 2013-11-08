@@ -825,40 +825,43 @@ function BPAShowSelector(id, type, mode, arCurValues)
 		$bIn = false;
 		foreach ($arModule as $sModule)
 		{
-			if($handle = opendir($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates'))
+			if (file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates'))
 			{
-				$bIn = true;
-				while(false !== ($file = readdir($handle)))
+				if($handle = opendir($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates'))
 				{
-					if(!is_file($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates/'.$file))
-						continue;
-					$arFields = false;
-					include($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates/'.$file);
-					if(is_array($arFields))
+					$bIn = true;
+					while(false !== ($file = readdir($handle)))
 					{
-						/*
-						 * If DOCUMENT_TYPE not defined, use current documentType
-						 * Overwise check if DOCUMENT_TYPE equals to current documentType
-						 */
-						if (!array_key_exists("DOCUMENT_TYPE", $arFields))
-							$arFields["DOCUMENT_TYPE"] = $documentType;
-						elseif($arFields["DOCUMENT_TYPE"] != $documentType)
+						if(!is_file($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates/'.$file))
 							continue;
-						
-						$arFields["SYSTEM_CODE"] = $file;
-						if(is_object($GLOBALS['USER']))
-							$arFields["USER_ID"] = $GLOBALS['USER']->GetID();
-						$arFields["MODIFIER_USER"] = new CBPWorkflowTemplateUser(CBPWorkflowTemplateUser::CurrentUser);
-						try
+						$arFields = false;
+						include($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$sModule.'/templates/'.$file);
+						if(is_array($arFields))
 						{
-							CBPWorkflowTemplateLoader::Add($arFields);
-						}
-						catch (Exception $e)
-						{
+							/*
+							 * If DOCUMENT_TYPE not defined, use current documentType
+							 * Overwise check if DOCUMENT_TYPE equals to current documentType
+							 */
+							if (!array_key_exists("DOCUMENT_TYPE", $arFields))
+								$arFields["DOCUMENT_TYPE"] = $documentType;
+							elseif($arFields["DOCUMENT_TYPE"] != $documentType)
+								continue;
+
+							$arFields["SYSTEM_CODE"] = $file;
+							if(is_object($GLOBALS['USER']))
+								$arFields["USER_ID"] = $GLOBALS['USER']->GetID();
+							$arFields["MODIFIER_USER"] = new CBPWorkflowTemplateUser(CBPWorkflowTemplateUser::CurrentUser);
+							try
+							{
+								CBPWorkflowTemplateLoader::Add($arFields);
+							}
+							catch (Exception $e)
+							{
+							}
 						}
 					}
+					closedir($handle);
 				}
-				closedir($handle);
 			}
 			if ($bIn)
 				break;

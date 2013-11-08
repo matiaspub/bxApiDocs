@@ -10,60 +10,105 @@ class CBlogUserOptions
 {
 	protected static $__USER_OPTIONS_CACHE;
 
-	public static function GetList($arOrder = array("ID" => "ASC"), $arFilter = array())
+	public static function GetList($arOrder = array("ID" => "ASC"), $arFilter = array(), $arAddParams = array())
 	{
 		global $DB;
 
-		$arSqlSearch = array();
-		foreach ($arFilter as $key => $val)
+		$arFields = array(
+			"ID" => array("FIELD" => "BPP.ID", "TYPE" => "int"),
+			"POST_ID" => array("FIELD" => "BPP.POST_ID", "TYPE" => "int"),
+			"USER_ID" => array("FIELD" => "BPP.USER_ID", "TYPE" => "int"),
+			"NAME" => array("FIELD" => "BPP.NAME", "TYPE" => "string"),
+			"VALUE" => array("FIELD" => "BPP.VALUE", "TYPE" => "string"),
+			"RANK" => ($arOrder["OWNER_ID"] > 0 ? array(
+				"FIELD" => "RV0.RANK",
+				"TYPE" => "int",
+				"FROM" =>
+					"\n\tLEFT JOIN (\n\t\t".
+						"SELECT MAX(RV2.VOTE_WEIGHT) as VOTE_WEIGHT, RV2.ENTITY_ID \n\t\t".
+						"FROM b_rating_user RV2 \n\t\t".
+						"GROUP BY RV2.ENTITY_ID) RV ON (RV.ENTITY_ID = BPP.USER_ID)\n\t".
+					"LEFT JOIN (\n\t\t".
+						"SELECT RV1.OWNER_ID, SUM(case when RV1.ID is not null then 1 else 0 end) as RANK \n\t\t".
+						"FROM b_rating_vote RV1 \n\t\t".
+						"WHERE RV1.USER_ID = ".$arOrder["OWNER_ID"]."\n\t\t".
+						"GROUP BY RV1.OWNER_ID) RV0 ON (RV0.OWNER_ID = BPP.USER_ID)"
+				) : array (
+					"FIELD" => "RV.RANK",
+					"TYPE" => "string",
+					"FROM" =>
+						"\n\tLEFT JOIN (".
+						"\n\t\tSELECT MAX(RV2.VOTE_WEIGHT) as VOTE_WEIGHT, RV2.ENTITY_ID, 0 as RANK ".
+						"\n\t\tFROM b_rating_user RV2".
+						"\n\t\tGROUP BY RV2.ENTITY_ID) RV ON (RV.ENTITY_ID = BPP.USER_ID)")),
+			"USER_ACTIVE" => array("FIELD" => "U.ACTIVE", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)"),
+			"USER_NAME" => array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)"),
+			"USER_LAST_NAME" => array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)"),
+			"USER_SECOND_NAME" => array("FIELD" => "U.SECOND_NAME", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)"),
+			"USER_LOGIN" => array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)"),
+			"USER_PERSONAL_PHOTO" => array("FIELD" => "U.PERSONAL_PHOTO", "TYPE" => "string", "FROM" => "\n\tINNER JOIN b_user U ON (BPP.USER_ID = U.ID)")
+		);
+		$arSelect = array_diff(array_keys($arFields), array("RANK"));
+		$arSelect = (is_array($arAddParams["SELECT"]) && !empty($arAddParams["SELECT"]) ? array_intersect($arAddParams["SELECT"], $arSelect) : $arSelect);
+
+		$arSql = CBlog::PrepareSql($arFields, array(), $arFilter, false, $arSelect);
+
+		$arSql["SELECT"] = (str_replace("%%_DISTINCT_%%", "", $arSql["SELECT"]));
+
+		$iCnt = 0;
+		if ($arAddParams["bCount"] || array_key_exists("bDescPageNumbering", $arAddParams))
 		{
-			$key = strtoupper($key);
-			switch ($key)
-			{
-			case "ID":
-			case "POST_ID":
-			case "USER_ID":
-				$val = intval($val);
-				$arSqlSearch[] = ($val > 0 ? "BPP.".$key." IS NULL" : "BPP.".$key."=".$val);
-				break;
-			case "NAME":
-				$arSqlSearch[] = "BPP.NAME = '".$DB->ForSql($val, 50)."'";
-				break;
-			case "NAME_MASK":
-				$arSqlSearch[] = GetFilterQuery("BPP.NAME", $val);
-				break;
-			}
+			$strSql = "SELECT COUNT(BPP.ID) AS CNT  \n".
+				"FROM b_blog_post_param BPP ".$arSql["FROM"]."\n".
+				(empty($arSql["GROUPBY"]) ? "" : "GROUP BY ".$arSql["GROUPBY"]."\n").
+				"WHERE ".(empty($arSql["WHERE"]) ? "1 = 1" : $arSql["WHERE"]);
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($arAddParams["bCount"])
+				return $db_res;
+			$iCnt = ($db_res && ($res = $db_res->Fetch()) ? intval($res["CNT"]) : 0);
 		}
 
-		$strSql = "
-			SELECT BPP.ID, BPP.USER_ID, BPP.POST_ID, BPP.NAME, BPP.VALUE
-			FROM b_blog_post_param BPP
-			WHERE 1 = 1
-			".(empty($arSqlSearch) ? "" : " AND (".implode($arSqlSearch, ") AND (").")")."
-		";
-
-		$arSqlOrder = array();
-		if (is_array($arOrder))
+		// ORDER BY -->
+		$arSqlOrder = Array();
+		foreach ($arOrder as $by => $order)
 		{
-			foreach ($arOrder as $by => $order)
+			$by = strtoupper($by);
+			$order = (strtoupper($order) != "ASC" ? "DESC" : "ASK");
+			if (array_key_exists($by, $arFields) && !array_key_exists($by, $arSqlOrder))
 			{
-				$by = strtoupper($by);
-				$order = strtoupper($order);
-				if ($order != "ASC")
-					$order = "DESC";
+				if(strtoupper($DB->type)=="ORACLE")
+					$order .= ($order == "ASC" ? " NULLS FIRST" : " NULLS LAST");
 
-				if ($by == "ID")
-					$arSqlOrder[$by] = " BP.ID ".$order." ";
-				elseif ($by == "USER_ID")
-					$arSqlOrder[$by] = " BP.USER_ID ".$order." ";
-				elseif ($by == "POST_ID")
-					$arSqlOrder[$by] = " BP.POST_ID ".$order." ";
-				elseif ($by == "NAME")
-					$arSqlOrder[$by] = " BP.NAME ".$order." ";
+				if (isset($arFields[$by]["FROM"]) && !empty($arFields[$by]["FROM"]) && strpos($arSql["FROM"], $arFields[$by]["FROM"]) === false)
+					$arSql["FROM"] .= " ".$arFields[$by]["FROM"];
+				if ($by == "RANK")
+				{
+					$arSql["SELECT"] .= ", ".$arFields["RANK"]["FIELD"];
+					$arSqlOrder[$by] = (IsModuleInstalled("intranet") ? "RV.VOTE_WEIGHT ".$order.", RANK ".$order :
+						"RANK ".$order.", RV.VOTE_WEIGHT ".$order);
+				}
+				else
+					$arSqlOrder[$by] = (array_key_exists("ORDER", $arFields[$by])? $arFields[$by]["ORDER"]: $arFields[$by]["FIELD"])." ".$order;
 			}
 		}
-		$strSqlOrder = (!empty($arSqlOrder) ? "ORDER BY ".implode(", ", $arSqlOrder) : "");
-		return $DB->Query($strSql.$strSqlOrder, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		DelDuplicateSort($arSqlOrder);
+		$arSql["ORDERBY"] = implode(", ", $arSqlOrder);
+		// <-- ORDER BY
+
+		$strSql =
+			"SELECT ".$arSql["SELECT"]."\n".
+			"FROM b_blog_post_param BPP".$arSql["FROM"]."\n".
+			"WHERE ".(empty($arSql["WHERE"]) ? "1 = 1" : $arSql["WHERE"]).
+			(empty($arSql["ORDERBY"]) ? "" : "\nORDER BY ".$arSql["ORDERBY"]);
+
+		if (is_set($arAddParams, "bDescPageNumbering")) {
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
+		} else {
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+
+		return $db_res;
 	}
 
 	public static function GetOption($post_id, $name, $default_value = false, $user_id = false)

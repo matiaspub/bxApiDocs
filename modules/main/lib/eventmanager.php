@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main;
 
+use Bitrix\Main\Diag;
+use Bitrix\Main\IO;
+
 class EventManager
 {
 	/**
@@ -11,8 +14,8 @@ class EventManager
 	private $handlers = array();
 	private $isHandlersLoaded = false;
 
-	private $mailHandlers = array();
-	private $componentHandlers = array();
+	//private $mailHandlers = array();
+	//private $componentHandlers = array();
 
 	static $cacheKey = "b_module_to_module";
 
@@ -39,15 +42,13 @@ class EventManager
 	private function addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, $version)
 	{
 		$arEvent = array(
+			"FROM_MODULE_ID" => $fromModuleId,
+			"MESSAGE_ID" => $eventType,
 			"CALLBACK" => $callback,
 			"SORT" => $sort,
-			"INCLUDE_FILE" => $includeFile,
-			"NAME" => $this->formatEventName(
-				array(
-					"CALLBACK" => $callback,
-				)
-			),
-			"VERSION" => $version
+			"FULL_PATH" => $includeFile,
+			"VERSION" => $version,
+			"TO_NAME" => $this->formatEventName(array("CALLBACK" => $callback)),
 		);
 
 		$fromModuleId = strtoupper($fromModuleId);
@@ -56,14 +57,27 @@ class EventManager
 		if (!isset($this->handlers[$fromModuleId]) || !is_array($this->handlers[$fromModuleId]))
 			$this->handlers[$fromModuleId] = array();
 
-		if (!isset($this->handlers[$fromModuleId][$eventType]) || !is_array($this->handlers[$fromModuleId][$eventType]))
-			$this->handlers[$fromModuleId][$eventType] = array();
+		$arEvents = &$this->handlers[$fromModuleId];
 
-		$iEventHandlerKey = count($this->handlers[$fromModuleId][$eventType]);
+		if (!isset($arEvents[$eventType]) || !is_array($arEvents[$eventType]))
+		{
+			$arEvents[$eventType] = array($arEvent);
+			$iEventHandlerKey = 0;
+		}
+		else
+		{
+			$newEvents = array();
+			$iEventHandlerKey = count($arEvents[$eventType]);
+			foreach ($arEvents[$eventType] as $key => $value)
+			{
+				if ($value["SORT"] > $arEvent["SORT"])
+					$newEvents[$iEventHandlerKey] = $arEvent;
 
-		$this->handlers[$fromModuleId][$eventType][$iEventHandlerKey] = $arEvent;
-
-		uasort($this->handlers[$fromModuleId][$eventType], create_function('$a, $b', 'if ($a["SORT"] == $b["SORT"]) return 0; return ($a["SORT"] < $b["SORT"]) ? -1 : 1;'));
+				$newEvents[$key] = $value;
+			}
+			$newEvents[$iEventHandlerKey] = $arEvent;
+			$arEvents[$eventType] = $newEvents;
+		}
 
 		return $iEventHandlerKey;
 	}
@@ -80,10 +94,8 @@ class EventManager
 	 * @param bool $includeFile
 	 * @param int $sort
 	 * @return int
-	 *
-	 * @deprecated Deprecated for new kernel
 	 */
-	public function addEventHandlerOld($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
+	public function addEventHandlerCompatible($fromModuleId, $eventType, $callback, $includeFile = false, $sort = 100)
 	{
 		return $this->addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, 1);
 	}
@@ -109,7 +121,7 @@ class EventManager
 	{
 		$toMethodArg = ((!is_array($toMethodArg) || is_array($toMethodArg) && empty($toMethodArg)) ? "" : serialize($toMethodArg));
 
-		$con = Application::getDbConnection();
+		$con = Application::getConnection();
 		$sqlHelper = $con->getSqlHelper();
 
 		$strSql =
@@ -128,11 +140,21 @@ class EventManager
 		$managedCache->clean(self::$cacheKey);
 	}
 
-	public static function registerEventHandler($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $sort = 100, $toPath = "", $toMethodArg = array())
+	public function registerEventHandler($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $sort = 100, $toPath = "", $toMethodArg = array())
+	{
+		$this->registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, 2);
+	}
+
+	public function registerEventHandlerCompatible($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $sort = 100, $toPath = "", $toMethodArg = array())
+	{
+		$this->registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, 1);
+	}
+
+	public static function registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, $version)
 	{
 		$toMethodArg = ((!is_array($toMethodArg) || is_array($toMethodArg) && empty($toMethodArg)) ? "" : serialize($toMethodArg));
 
-		$con = Application::getDbConnection();
+		$con = Application::getConnection();
 		$sqlHelper = $con->getSqlHelper();
 
 		$sort = intval($sort);
@@ -143,6 +165,7 @@ class EventManager
 		$toMethod = $sqlHelper->forSql($toMethod);
 		$toPath = $sqlHelper->forSql($toPath);
 		$toMethodArg = $sqlHelper->forSql($toMethodArg);
+		$version = intval($version);
 
 		$res = $con->query(
 			"SELECT 'x' ".
@@ -162,7 +185,7 @@ class EventManager
 				"INSERT INTO b_module_to_module (SORT, FROM_MODULE_ID, MESSAGE_ID, TO_MODULE_ID, ".
 				"	TO_CLASS, TO_METHOD, TO_PATH, TO_METHOD_ARG, VERSION) ".
 				"VALUES (".$sort.", '".$fromModuleId."', '".$eventType."', '".$toModuleId."', ".
-				"   '".$toClass."', '".$toMethod."', '".$toPath."', '".$toMethodArg."', 2)"
+				"   '".$toClass."', '".$toMethod."', '".$toPath."', '".$toMethodArg."', ".$version.")"
 			);
 
 			$managedCache = Application::getInstance()->getManagedCache();
@@ -173,7 +196,7 @@ class EventManager
 	private function formatEventName($arEvent)
 	{
 		$strName = '';
-		if (array_key_exists("CALLBACK", $arEvent))
+		if (isset($arEvent["CALLBACK"]))
 		{
 			if (is_array($arEvent["CALLBACK"]))
 				$strName .= (is_object($arEvent["CALLBACK"][0]) ? get_class($arEvent["CALLBACK"][0]) : $arEvent["CALLBACK"][0]).'::'.$arEvent["CALLBACK"][1];
@@ -184,10 +207,10 @@ class EventManager
 		}
 		else
 		{
-			$strName .= $arEvent["CLASS"].'::'.$arEvent["METHOD"];
+			$strName .= $arEvent["TO_CLASS"].'::'.$arEvent["TO_METHOD"];
 		}
-		if (isset($arEvent['MODULE_ID']) && !empty($arEvent['MODULE_ID']))
-			$strName .= ' ('.$arEvent['MODULE_ID'].')';
+		if (isset($arEvent['TO_MODULE_ID']) && !empty($arEvent['TO_MODULE_ID']))
+			$strName .= ' ('.$arEvent['TO_MODULE_ID'].')';
 		return $strName;
 	}
 
@@ -202,9 +225,10 @@ class EventManager
 		{
 			$arEvents = array();
 
-			$con = Application::getDbConnection();
+			$con = Application::getConnection();
 			$rs = $con->query("
-				SELECT *
+				SELECT FROM_MODULE_ID, MESSAGE_ID, SORT, TO_MODULE_ID, TO_PATH,
+					TO_CLASS, TO_METHOD, TO_METHOD_ARG, VERSION
 				FROM b_module_to_module m2m
 					INNER JOIN b_module m ON (m2m.TO_MODULE_ID = m.ID)
 				ORDER BY SORT
@@ -213,9 +237,9 @@ class EventManager
 			{
 				$ar['TO_NAME'] = $this->formatEventName(
 					array(
-						"MODULE_ID" => $ar["TO_MODULE_ID"],
-						"CLASS" => $ar["TO_CLASS"],
-						"METHOD" => $ar["TO_METHOD"]
+						"TO_MODULE_ID" => $ar["TO_MODULE_ID"],
+						"TO_CLASS" => $ar["TO_CLASS"],
+						"TO_METHOD" => $ar["TO_METHOD"]
 					)
 				);
 				$ar["~FROM_MODULE_ID"] = strtoupper($ar["FROM_MODULE_ID"]);
@@ -235,51 +259,58 @@ class EventManager
 			$arEvents = array();
 
 		$handlers = $this->handlers;
+		$noHandlers = empty($this->handlers);
 
+		// compatibility with former event manager
 		foreach ($arEvents as $ar)
 			$this->handlers[$ar["~FROM_MODULE_ID"]][$ar["~MESSAGE_ID"]][] = array(
 				"SORT" => $ar["SORT"],
-				"MODULE_ID" => $ar["TO_MODULE_ID"],
-				"PATH" => $ar["TO_PATH"],
-				"CLASS" => $ar["TO_CLASS"],
-				"METHOD" => $ar["TO_METHOD"],
-				"METHOD_ARG" => $ar["TO_METHOD_ARG"],
+				"TO_MODULE_ID" => $ar["TO_MODULE_ID"],
+				"TO_PATH" => $ar["TO_PATH"],
+				"TO_CLASS" => $ar["TO_CLASS"],
+				"TO_METHOD" => $ar["TO_METHOD"],
+				"TO_METHOD_ARG" => $ar["TO_METHOD_ARG"],
 				"VERSION" => $ar["VERSION"],
-				"NAME" => $ar["TO_NAME"],
+				"TO_NAME" => $ar["TO_NAME"],
 			);
 
-		// need to re-sort because of AddEventHandler() calls
-		$funcSort = create_function('$a, $b', 'if ($a["SORT"] == $b["SORT"]) return 0; return ($a["SORT"] < $b["SORT"]) ? -1 : 1;');
-		foreach (array_keys($handlers) as $moduleId)
-			foreach (array_keys($handlers[$moduleId]) as $event)
-				uasort($this->handlers[$moduleId][$event], $funcSort);
+		if (!$noHandlers)
+		{
+			// need to re-sort because of AddEventHandler() calls (before loadEventHandlers)
+			$funcSort = create_function('$a, $b', 'if ($a["SORT"] == $b["SORT"]) return 0; return ($a["SORT"] < $b["SORT"]) ? -1 : 1;');
+			foreach (array_keys($handlers) as $moduleId)
+				foreach (array_keys($handlers[$moduleId]) as $event)
+					uasort($this->handlers[$moduleId][$event], $funcSort);
+		}
 
 		$this->isHandlersLoaded = true;
 	}
 
+	/*
 	private function loadMailEventHandlers()
 	{
 		$this->mailHandlers = array(
-			/*"OnEvent" => array(
+			"OnEvent" => array(
 				"MODULE" => "main",
 				"EVENT" => "SomeMailEvent",
-			),*/
+			),
 		);
 	}
 
 	private function loadComponentEventHandlers()
 	{
 		$this->componentHandlers = array(
-			/*"OnEvent" => array(
+			"OnEvent" => array(
 				array(
 					"COMPONENT" => "bitrix:lists.edit",
 					"METHOD" => "SomeHandler",
 				),
-			),*/
+			),
 		);
 	}
+	*/
 
-	private function findEventHandlers($eventModuleId, $eventType, array $filter = null)
+	public function findEventHandlers($eventModuleId, $eventType, array $filter = null)
 	{
 		if (!$this->isHandlersLoaded)
 			$this->loadEventHandlers();
@@ -300,7 +331,7 @@ class EventManager
 			$handlers = array();
 			foreach ($handlersTmp as $handler)
 			{
-				if (in_array($handler["MODULE_ID"], $filter))
+				if (in_array($handler["TO_MODULE_ID"], $filter))
 					$handlers[] = $handler;
 			}
 		}
@@ -308,6 +339,7 @@ class EventManager
 		return $handlers;
 	}
 
+	/*
 	private function findMailEventHandlers($eventModuleId, $eventType, array $filter = null)
 	{
 		if (empty($this->mailHandlers))
@@ -365,6 +397,7 @@ class EventManager
 
 		return $handlers;
 	}
+	*/
 
 	public function send(Event $event)
 	{
@@ -372,6 +405,7 @@ class EventManager
 		foreach ($handlers as $handler)
 			$this->sendToEventHandler($handler, $event);
 
+		/*
 		$handlers = $this->findMailEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
 		foreach ($handlers as $handler)
 			$this->sendToMailEventHandler($handler, $event);
@@ -379,6 +413,7 @@ class EventManager
 		$handlers = $this->findComponentEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
 		foreach ($handlers as $handler)
 			$this->sendToComponentEventHandler($handler, $event);
+		*/
 	}
 
 	private function sendToEventHandler(array $handler, Event $event)
@@ -388,25 +423,25 @@ class EventManager
 			$result = true;
 			$event->addDebugInfo($handler);
 
-			if (isset($handler["MODULE_ID"]) && !empty($handler["MODULE_ID"]))
+			if (isset($handler["TO_MODULE_ID"]) && !empty($handler["TO_MODULE_ID"]) && ($handler["TO_MODULE_ID"] != 'main'))
 			{
-				$result = Loader::includeModule($handler["MODULE_ID"]);
+				$result = Loader::includeModule($handler["TO_MODULE_ID"]);
 			}
-			elseif (isset($handler["PATH"]) && !empty($handler["PATH"]))
+			elseif (isset($handler["TO_PATH"]) && !empty($handler["TO_PATH"]))
 			{
-				$path = ltrim($handler["PATH"], "/");
+				$path = ltrim($handler["TO_PATH"], "/");
 				if (($path = Loader::getLocal($path)) !== false)
 					$result = include_once($path);
 			}
-			elseif (isset($handler["INCLUDE_FILE"]) && !empty($handler["INCLUDE_FILE"]) && \Bitrix\Main\IO\File::isFileExists($handler["INCLUDE_FILE"]))
+			elseif (isset($handler["FULL_PATH"]) && !empty($handler["FULL_PATH"]) && IO\File::isFileExists($handler["FULL_PATH"]))
 			{
-				$result = include_once($handler["INCLUDE_FILE"]);
+				$result = include_once($handler["FULL_PATH"]);
 			}
 
 			$event->addDebugInfo($result);
 
-			if (isset($handler["METHOD_ARG"]) && is_array($handler["METHOD_ARG"]) && count($handler["METHOD_ARG"]))
-				$args = $handler["METHOD_ARG"];
+			if (isset($handler["TO_METHOD_ARG"]) && is_array($handler["TO_METHOD_ARG"]) && !empty($handler["TO_METHOD_ARG"]))
+				$args = $handler["TO_METHOD_ARG"];
 			else
 				$args = array();
 
@@ -416,16 +451,16 @@ class EventManager
 				$args = array_merge($args, array_values($event->getParameters()));
 
 			$callback = null;
-			if (array_key_exists("CALLBACK", $handler))
+			if (isset($handler["CALLBACK"]))
 				$callback = $handler["CALLBACK"];
-			elseif (!empty($handler["CLASS"]) && !empty($handler["METHOD"]) && class_exists($handler["CLASS"]))
-				$callback = array($handler["CLASS"], $handler["METHOD"]);
+			elseif (!empty($handler["TO_CLASS"]) && !empty($handler["TO_METHOD"]) && class_exists($handler["TO_CLASS"]))
+				$callback = array($handler["TO_CLASS"], $handler["TO_METHOD"]);
 
 			if ($callback != null)
 				$result = call_user_func_array($callback, $args);
 
 			if (($result != null) && !($result instanceof EventResult))
-				$result = new EventResult(EventResult::UNDEFINED, $result, $handler["MODULE_ID"]);
+				$result = new EventResult(EventResult::UNDEFINED, $result, $handler["TO_MODULE_ID"]);
 
 			$event->addDebugInfo($result);
 
@@ -441,6 +476,7 @@ class EventManager
 		}
 	}
 
+	/*
 	private function sendToMailEventHandler($handler, Event $event)
 	{
 		//$result = call_user_func_array(array($handler["CLASS"], $handler["METHOD"]), array($event));
@@ -452,4 +488,5 @@ class EventManager
 		//$result = call_user_func_array(array($handler["CLASS"], $handler["METHOD"]), array($event));
 		$event->addResult(new EventResult(EventResult::SUCCESS));
 	}
+	*/
 }

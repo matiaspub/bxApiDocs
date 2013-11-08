@@ -33,16 +33,16 @@ class CAllPullStack
 
 
 	// add a message to stack
-	public static function AddByChannel($channelId, $arMessage = Array())
+	public static function AddByChannel($channelId, $arParams = Array())
 	{
 		global $DB;
 
-		if (strlen($arMessage['module_id']) > 0 || strlen($arMessage['command']) > 0)
+		if (strlen($arParams['module_id']) > 0 || strlen($arParams['command']) > 0)
 		{
 			$arData = Array(
-				'module_id' => $arMessage['module_id'],
-				'command' => $arMessage['command'],
-				'params' => is_array($arMessage['params'])?$arMessage['params']: Array(),
+				'module_id' => $arParams['module_id'],
+				'command' => $arParams['command'],
+				'params' => is_array($arParams['params'])? $arParams['params']: Array(),
 			);
 			if (CPullOptions::GetNginxStatus())
 			{
@@ -63,17 +63,18 @@ class CAllPullStack
 				$result = $id? '{"channel": "'.$channelId.'", "id": "'.$id.'"}': false;
 			}
 
-			if (isset($arMessage['push_text']) && strlen($arMessage['push_text'])>0
-			&& isset($arMessage['push_user']) && intval($arMessage['push_user'])>0)
+			if (isset($arParams['push_text']) && strlen($arParams['push_text'])>0
+			&& isset($arParams['push_user']) && intval($arParams['push_user'])>0)
 			{
 				$CPushManager = new CPushManager();
 				$CPushManager->AddQueue(Array(
-					'USER_ID' => $arMessage['push_user'],
-					'MESSAGE' => str_replace("\n", " ", $arMessage['push_text']),
-					'PARAMS' => $arMessage['push_params'],
-					'BADGE' => isset($arMessage['push_badge'])? intval($arMessage['push_badge']): '',
-					'TAG' => isset($arMessage['push_tag'])? $arMessage['push_tag']: '',
-					'SUB_TAG' => isset($arMessage['push_sub_tag'])? $arMessage['push_sub_tag']: '',
+					'USER_ID' => $arParams['push_user'],
+					'MESSAGE' => str_replace("\n", " ", $arParams['push_text']),
+					'PARAMS' => $arParams['push_params'],
+					'BADGE' => isset($arParams['push_badge'])? intval($arParams['push_badge']): '',
+					'TAG' => isset($arParams['push_tag'])? $arParams['push_tag']: '',
+					'SUB_TAG' => isset($arParams['push_sub_tag'])? $arParams['push_sub_tag']: '',
+					'APP_ID' => isset($arParams['push_app_id'])? $arParams['push_app_id']: '',
 				));
 			}
 			return $result;

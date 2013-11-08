@@ -28,8 +28,8 @@ class CCalendarSect
 			"OWNER_ID" => Array("FIELD_NAME" => "CS.OWNER_ID", "FIELD_TYPE" => "int"),
 			"CREATED_BY" => Array("FIELD_NAME" => "CS.CREATED_BY", "FIELD_TYPE" => "int"),
 			"PARENT_ID" => Array("FIELD_NAME" => "CS.PARENT_ID", "FIELD_TYPE" => "int"),
-			"TIMESTAMP_X" => Array("FIELD_NAME" => $DB->DateToCharFunction("CS.TIMESTAMP_X").' as TIMESTAMP_X', "FIELD_TYPE" => "date"),
-			"DATE_CREATE" => Array("FIELD_NAME" => $DB->DateToCharFunction("CS.DATE_CREATE").' as DATE_CREATE', "FIELD_TYPE" => "date"),
+			"TIMESTAMP_X" => Array("~FIELD_NAME" => "CS.TIMESTAMP_X", "FIELD_NAME" => $DB->DateToCharFunction("CS.TIMESTAMP_X").' as TIMESTAMP_X', "FIELD_TYPE" => "date"),
+			"DATE_CREATE" => Array("~FIELD_NAME" => "CS.DATE_CREATE", "FIELD_NAME" => $DB->DateToCharFunction("CS.DATE_CREATE").' as DATE_CREATE', "FIELD_TYPE" => "date"),
 			"DAV_EXCH_CAL" => Array("FIELD_NAME" => "CS.DAV_EXCH_CAL", "FIELD_TYPE" => "string"), // Exchange calendar
 			"DAV_EXCH_MOD" => Array("FIELD_NAME" => "CS.DAV_EXCH_MOD", "FIELD_TYPE" => "string"), // Exchange calendar modification label
 			"CAL_DAV_CON" => Array("FIELD_NAME" => "CS.CAL_DAV_CON", "FIELD_TYPE" => "string"), // CalDAV connection
@@ -42,7 +42,7 @@ class CCalendarSect
 
 	public static function GetList($Params = array())
 	{
-		global $DB, $USER;
+		global $DB;
 		$arFilter = $Params['arFilter'];
 		$arOrder = isset($Params['arOrder']) ? $Params['arOrder'] : Array('SORT' => 'asc');
 		$Params['joinTypeInfo'] = !!$Params['joinTypeInfo'];
@@ -97,9 +97,12 @@ class CCalendarSect
 			}
 
 			$strOrderBy = '';
-			foreach($arOrder as $by=>$order)
+			foreach($arOrder as $by => $order)
 				if(isset($arFields[strtoupper($by)]))
-					$strOrderBy .= $arFields[strtoupper($by)]["FIELD_NAME"].' '.(strtolower($order)=='desc'?'desc'.(strtoupper($DB->type) == "ORACLE"?" NULLS LAST":""):'asc'.(strtoupper($DB->type)=="ORACLE"?" NULLS FIRST":"")).',';
+				{
+					$byName = isset($arFields[strtoupper($by)]["~FIELD_NAME"]) ? $arFields[strtoupper($by)]["~FIELD_NAME"] : $arFields[strtoupper($by)]["FIELD_NAME"];
+					$strOrderBy .= $byName.' '.(strtolower($order)=='desc'?'desc'.(strtoupper($DB->type) == "ORACLE"?" NULLS LAST":""):'asc'.(strtoupper($DB->type)=="ORACLE"?" NULLS FIRST":"")).',';
+				}
 
 			if(strlen($strOrderBy)>0)
 				$strOrderBy = "ORDER BY ".rtrim($strOrderBy, ",");
@@ -202,7 +205,7 @@ class CCalendarSect
 
 		if ($checkPermissions && count($arSectionIds) > 0)
 		{
-			$userId = $Params['userId'] ? intVal($Params['userId']) : $USER->GetID();
+			$userId = $Params['userId'] ? intVal($Params['userId']) : CCalendar::GetCurUserId();
 			$arPerm = CCalendarSect::GetArrayPermissions($arSectionIds);
 
 			$res = array();
@@ -475,12 +478,12 @@ class CCalendarSect
 
 	public static function Edit($Params)
 	{
-		global $DB, $USER;
+		global $DB;
 		$arFields = $Params['arFields'];
 		if(!self::CheckFields($arFields))
 			return false;
 
-		$userId = intVal(isset($Params['userId']) ? $Params['userId'] : $USER->GetID());
+		$userId = intVal(isset($Params['userId']) ? $Params['userId'] : CCalendar::GetCurUserId());
 		//if (!CCalendarSect::CanDo('calendar_edit_section', $ID))
 		//	return CCalendar::ThrowError('EC_ACCESS_DENIED');
 
@@ -507,8 +510,8 @@ class CCalendarSect
 			if (!isset($arFields['DATE_CREATE']))
 				$arFields['DATE_CREATE'] = CCalendar::Date(mktime());
 
-			if ((!isset($arFields['CREATED_BY']) || !$arFields['CREATED_BY']) && $USER)
-				$arFields['CREATED_BY'] = $USER->IsAuthorized() ? $USER->GetID() : '';
+			if ((!isset($arFields['CREATED_BY']) || !$arFields['CREATED_BY']))
+				$arFields['CREATED_BY'] = CCalendar::GetCurUserId();
 
 			unset($arFields['ID']);
 			$ID = CDatabase::Add("b_calendar_section", $arFields, array('DESCRIPTION'));
@@ -704,9 +707,8 @@ class CCalendarSect
 
 	public static function GetOperations($sectId, $userId = false)
 	{
-		global $USER;
 		if (!$userId)
-			$userId = intVal($USER->GetId());
+			$userId = CCalendar::GetCurUserId();
 
 		$arCodes = array();
 		$rCodes = CAccess::GetUserCodes($userId);
@@ -766,8 +768,7 @@ class CCalendarSect
 
 	public static function GetExportLink($sectionId, $type = '', $ownerId = false)
 	{
-		global $USER;
-		$userId = $USER->IsAuthorized() ? $USER->GetID() : '';
+		$userId = CCalendar::GetCurUserId();
 		$params = '';
 		if ($type !== false)
 			$params .=  '&type='.strtolower($type);
@@ -778,8 +779,7 @@ class CCalendarSect
 
 	public static function GetSPExportLink()
 	{
-		global $USER;
-		$userId = $USER->IsAuthorized() ? $USER->GetID() : '';
+		$userId = CCalendar::GetCurUserId();
 		return '&user_id='.$userId.'&sign='.CCalendarSect::GetSign($userId, 'superposed_calendars');
 	}
 
@@ -1083,7 +1083,6 @@ END:VEVENT'."\n";
 	public static function CheckAuthHash()
 	{
 		global $USER;
-
 		if (strlen($_REQUEST['bx_hit_hash']) > 0) // $_REQUEST['bx_hit_hash']
 			return $USER->LoginHitByHash();
 

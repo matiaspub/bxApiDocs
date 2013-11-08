@@ -21,7 +21,7 @@ Class CIdeaManagmentIdea
         return $this;
     }
     
-    public function SetCategoryListID($ID)
+    static public function SetCategoryListID($ID)
     {
         if(intval($ID)>0)
             self::$CategoryIB = intval($ID);

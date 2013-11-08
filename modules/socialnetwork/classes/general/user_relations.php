@@ -354,17 +354,13 @@ class CAllSocNetUserRelations
 			return false;
 
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) > 0)
-		{
 			$arOrderBy = array(
 				"RAND" => "ASC"
 			);
-		}
 		else
-		{
 			$arOrderBy = array(
 				"DATE_UPDATE" => "DESC"
 			);
-		}
 
 		$dbResult = CSocNetUserRelations::GetList(
 			$arOrderBy,
@@ -800,7 +796,7 @@ class CAllSocNetUserRelations
 				"FROM_USER_ID" => intval($senderUserID),
 				"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
 				"NOTIFY_MODULE" => "socialnetwork",
-				"NOTIFY_EVENT" => "invite_user",
+				"NOTIFY_EVENT" => "invite_user_btn",
 				"NOTIFY_TAG" => "SOCNET|INVITE_USER|".intval($targetUserID)."|".intval($ID),
 				"NOTIFY_TITLE" => str_replace("#USER#", $senderUser, GetMessage("SONET_U_INVITE_CONFIRM_TITLE")),
 				"NOTIFY_MESSAGE" => str_replace("#TEXT#", $message, GetMessage("SONET_U_INVITE_CONFIRM_TEXT")),
@@ -927,89 +923,12 @@ class CAllSocNetUserRelations
 						"FROM_USER_ID" => $senderUserID,
 						"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 						"NOTIFY_MODULE" => "socialnetwork",
-						"NOTIFY_EVENT" => "invite_user",
+						"NOTIFY_EVENT" => "inout_user",
 						"NOTIFY_TAG" => "SOCNET|INVITE_USER_CONFIRM",
 						"NOTIFY_MESSAGE" => GetMessage("SONET_UR_AGREE_FRIEND_MESSAGE"),
 					);
 					CIMNotify::Add($arMessageFields);
 				}
-				else
-				{
-					$arMessageFields = array(
-						"FROM_USER_ID" => $senderUserID,
-						"TO_USER_ID" => $arResult["FIRST_USER_ID"],
-						"MESSAGE" => GetMessage("SONET_UR_AGREE_FRIEND_MESSAGE"),
-						"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-						"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM
-					);
-					CSocNetMessages::Add($arMessageFields);
-				}
-
-				$logID = CSocNetLog::Add(
-					array(
-						"ENTITY_TYPE" => SONET_ENTITY_USER,
-						"ENTITY_ID" => $senderUserID,
-						"EVENT_ID" => "system_friends",
-						"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-						"TITLE_TEMPLATE" => false,
-						"TITLE" => "friend",
-						"MESSAGE" => $arResult["FIRST_USER_ID"],
-						"URL" => false,
-						"MODULE_ID" => false,
-						"CALLBACK_FUNC" => false,
-						"USER_ID" => $arResult["FIRST_USER_ID"]
-					),
-					false
-				);
-				if (intval($logID) > 0)
-				{
-					CSocNetLog::Update($logID, array("TMP_ID" => $logID));
-
-					$perm = CSocNetUserPerms::GetOperationPerms($senderUserID, "viewfriends");
-					if (in_array($perm, array(SONET_RELATIONS_TYPE_FRIENDS2, SONET_RELATIONS_TYPE_FRIENDS)))
-						CSocNetLogRights::Add($logID, array("SA", "U".$senderUserID, "S".SONET_ENTITY_USER.$senderUserID."_".$perm));
-					elseif ($perm == SONET_RELATIONS_TYPE_NONE)
-						CSocNetLogRights::Add($logID, array("SA", "U".$senderUserID));
-					elseif ($perm == SONET_RELATIONS_TYPE_AUTHORIZED)
-						CSocNetLogRights::Add($logID, array("SA", "AU"));
-					elseif ($perm == SONET_RELATIONS_TYPE_ALL)
-						CSocNetLogRights::Add($logID, array("SA", "G2"));					
-
-					$tmpID = $logID;
-				}
-
-				$logID = CSocNetLog::Add(
-					array(
-						"ENTITY_TYPE" => SONET_ENTITY_USER,
-						"ENTITY_ID" => $arResult["FIRST_USER_ID"],
-						"EVENT_ID" => "system_friends",
-						"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-						"TITLE_TEMPLATE" => false,
-						"TITLE" => "friend",
-						"MESSAGE" => $senderUserID,
-						"URL" => false,
-						"MODULE_ID" => false,
-						"CALLBACK_FUNC" => false,
-						"USER_ID" => $senderUserID,
-						"TMP_ID" => (intval($tmpID) > 0 ? $tmpID : false),
-					),
-					false
-				);
-
-				if (intval($logID) > 0)
-				{
-					$perm = CSocNetUserPerms::GetOperationPerms($arResult["FIRST_USER_ID"], "viewfriends");
-					if (in_array($perm, array(SONET_RELATIONS_TYPE_FRIENDS2, SONET_RELATIONS_TYPE_FRIENDS)))
-						CSocNetLogRights::Add($logID, array("SA", "U".$arResult["FIRST_USER_ID"], "S".SONET_ENTITY_USER.$arResult["FIRST_USER_ID"]."_".$perm));
-					elseif ($perm == SONET_RELATIONS_TYPE_NONE)
-						CSocNetLogRights::Add($logID, array("SA", "U".$arResult["FIRST_USER_ID"]));
-					elseif ($perm == SONET_RELATIONS_TYPE_AUTHORIZED)
-						CSocNetLogRights::Add($logID, array("SA", "AU"));
-					elseif ($perm == SONET_RELATIONS_TYPE_ALL)
-						CSocNetLogRights::Add($logID, array("SA", "G2"));	
-
-					CSocNetLog::SendEvent($logID, "SONET_NEW_EVENT", $tmpID);						
-				}		
 			}
 			else
 			{
@@ -1121,22 +1040,11 @@ class CAllSocNetUserRelations
 						"FROM_USER_ID" => $senderUserID,
 						"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 						"NOTIFY_MODULE" => "socialnetwork",
-						"NOTIFY_EVENT" => "invite_user",
+						"NOTIFY_EVENT" => "inout_user",
 						"NOTIFY_TAG" => "SOCNET|INVITE_USER_REJECT",
 						"NOTIFY_MESSAGE" => GetMessage("SONET_UR_REJECT_FRIEND_MESSAGE"),
 					);
 					CIMNotify::Add($arMessageFields);
-				}
-				else
-				{
-					$arMessageFields = array(
-						"FROM_USER_ID" => $senderUserID,
-						"TO_USER_ID" => $arResult["FIRST_USER_ID"],
-						"MESSAGE" => GetMessage("SONET_UR_REJECT_FRIEND_MESSAGE"),
-						"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-						"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM
-					);
-					CSocNetMessages::Add($arMessageFields);
 				}
 			}
 			else
@@ -1211,71 +1119,33 @@ class CAllSocNetUserRelations
 
 		if (CSocNetUserRelations::Delete($arRelation["ID"]))
 		{
-			$logID = CSocNetLog::Add(
-				array(
-					"ENTITY_TYPE" => SONET_ENTITY_USER,
-					"ENTITY_ID" => $senderUserID,
-					"EVENT_ID" => "system_friends",
-					"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-					"TITLE_TEMPLATE" => false,
-					"TITLE" => "unfriend",
-					"MESSAGE" => $targetUserID,
-					"URL" => false,
-					"MODULE_ID" => false,
-					"CALLBACK_FUNC" => false,
-					"USER_ID" => $targetUserID,
-				),
-				false
-			);
-			if (intval($logID) > 0)
+			$rsUser = CUser::GetByID($senderUserID);
+			if ($arUser = $rsUser->Fetch())
 			{
-				CSocNetLog::Update($logID, array("TMP_ID" => $logID));
-
-				$perm = CSocNetUserPerms::GetOperationPerms($senderUserID, "viewfriends");
-				if (in_array($perm, array(SONET_RELATIONS_TYPE_FRIENDS2, SONET_RELATIONS_TYPE_FRIENDS)))
-					CSocNetLogRights::Add($logID, array("SA", "U".$senderUserID, "S".SONET_ENTITY_USER.$senderUserID."_".$perm));
-				elseif ($perm == SONET_RELATIONS_TYPE_NONE)
-					CSocNetLogRights::Add($logID, array("SA", "U".$senderUserID));
-				elseif ($perm == SONET_RELATIONS_TYPE_AUTHORIZED)
-					CSocNetLogRights::Add($logID, array("SA", "AU"));
-				elseif ($perm == SONET_RELATIONS_TYPE_ALL)
-					CSocNetLogRights::Add($logID, array("SA", "G2"));
-
-				$tmpID = $logID;
+				switch ($arUser["PERSONAL_GENDER"])
+				{
+					case "M":
+						$gender_suffix = "_M";
+						break;
+					case "F":
+						$gender_suffix = "_F";
+							break;
+					default:
+						$gender_suffix = "";
+				}
 			}
 
-			$logID2 = CSocNetLog::Add(
-				array(
-					"ENTITY_TYPE" => SONET_ENTITY_USER,
-					"ENTITY_ID" => $targetUserID,
-					"EVENT_ID" => "system_friends",
-					"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-					"TITLE_TEMPLATE" => false,
-					"TITLE" => "unfriend",
-					"MESSAGE" => $senderUserID,
-					"URL" => false,
-					"MODULE_ID" => false,
-					"CALLBACK_FUNC" => false,
-					"USER_ID" => $senderUserID,
-					"TMP_ID" => (intval($tmpID) > 0 ? $tmpID : false),
-				),
-				false
+			$arMessageFields = array(
+				"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+				"FROM_USER_ID" => $senderUserID,
+				"TO_USER_ID" => $targetUserID,
+				"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+				"NOTIFY_MODULE" => "socialnetwork",
+				"NOTIFY_EVENT" => "inout_user",
+				"NOTIFY_TAG" => "SOCNET|FRIENDS|".intval($arRelation["ID"]),
+				"NOTIFY_MESSAGE" => GetMessage("SONET_UR_IM_UNFRIEND".$gender_suffix),
 			);
-
-			if (intval($logID2) > 0)
-			{
-				$perm = CSocNetUserPerms::GetOperationPerms($targetUserID, "viewfriends");
-				if (in_array($perm, array(SONET_RELATIONS_TYPE_FRIENDS2, SONET_RELATIONS_TYPE_FRIENDS)))
-					CSocNetLogRights::Add($logID2, array("SA", "U".$targetUserID, "S".SONET_ENTITY_USER.$targetUserID."_".$perm));
-				elseif ($perm == SONET_RELATIONS_TYPE_NONE)
-					CSocNetLogRights::Add($logID2, array("SA", "U".$targetUserID));
-				elseif ($perm == SONET_RELATIONS_TYPE_AUTHORIZED)
-					CSocNetLogRights::Add($logID2, array("SA", "AU"));
-				elseif ($perm == SONET_RELATIONS_TYPE_ALL)
-					CSocNetLogRights::Add($logID2, array("SA", "G2"));
-			}
-
-			CSocNetLog::SendEvent($logID, "SONET_NEW_EVENT", $tmpID);			
+			CIMNotify::Add($arMessageFields);
 
 			if ($arRelation["RELATION"] == SONET_RELATIONS_FRIEND)
 				$GLOBALS["DB"]->Query("DELETE FROM b_sonet_event_user_view WHERE

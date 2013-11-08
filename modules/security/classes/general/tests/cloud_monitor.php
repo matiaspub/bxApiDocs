@@ -6,14 +6,14 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	const MAX_CHECKING_REQUEST_REPEATE_COUNT = 5;
 	const MAX_RESULTS_REQUEST_REPEATE_COUNT = 50;
 
-	protected $internalName = "CloudMonitor";
+	protected $internalName = 'CloudMonitor';
 	/** @var CSecurityTemporaryStorage */
 	protected $sessionData = null;
 	protected $checkingResults = array();
 
 	static public function __construct()
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client.php");
+		require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/classes/general/update_client.php');
 		IncludeModuleLangFile(__FILE__);
 	}
 
@@ -25,7 +25,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	public function check($pParams)
 	{
 		$this->initializeParams($pParams);
-		$testID = $this->getParam("TEST_ID", $this->internalName);
+		$testID = $this->getParam('TEST_ID', $this->internalName);
 		$this->sessionData = new CSecurityTemporaryStorage($testID);
 
 		if($this->isCheckRequestNotSended())
@@ -48,12 +48,12 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	{
 		if(!is_array($this->checkingResults))
 			$this->checkingResults = array();
-		if(!isset($this->checkingResults["name"]))
-			$this->checkingResults["name"] = $this->getName();
-		if(!isset($this->checkingResults["timeout"]))
-			$this->checkingResults["timeout"] = $this->getTimeout();
-		if(!isset($this->checkingResults["status"]))
-			$this->checkingResults["in_progress"] = true;
+		if(!isset($this->checkingResults['name']))
+			$this->checkingResults['name'] = $this->getName();
+		if(!isset($this->checkingResults['timeout']))
+			$this->checkingResults['timeout'] = $this->getTimeout();
+		if(!isset($this->checkingResults['status']))
+			$this->checkingResults['in_progress'] = true;
 		return $this->checkingResults;
 	}
 
@@ -62,14 +62,14 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function receiveResults()
 	{
-		if($this->sessionData->getInt("results_repeat_count") > self::MAX_RESULTS_REQUEST_REPEATE_COUNT)
-			$this->stopChecking(GetMessage("SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE"));
+		if($this->sessionData->getInt('results_repeat_count') > self::MAX_RESULTS_REQUEST_REPEATE_COUNT)
+			$this->stopChecking(GetMessage('SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE'));
 
-		$response = new CSecurityCloudMonitorRequest("get_results", $this->getCheckingToken());
+		$response = new CSecurityCloudMonitorRequest('get_results', $this->getCheckingToken());
 		if($response->isOk())
 		{
 			$this->sessionData->flushData();
-			$results = $response->getValue("results");
+			$results = $response->getValue('results');
 			if(is_array($results) && count($results) > 0)
 			{
 				$isSomethingFound = true;
@@ -83,19 +83,19 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 				$errors = array();
 			}
 			$this->setCheckingResult(array(
-				"problem_count" => $problemCount,
-				"errors" => $errors,
-				"status" => !$isSomethingFound
+				'problem_count' => $problemCount,
+				'errors' => $errors,
+				'status' => !$isSomethingFound
 			));
 
 		}
 		elseif($response->isFatalError())
 		{
-			$this->stopChecking($response->getValue("error_text"));
+			$this->stopChecking($response->getValue('error_text'));
 		}
 		else
 		{
-			$this->sessionData->increment("results_repeat_count");
+			$this->sessionData->increment('results_repeat_count');
 		}
 	}
 
@@ -104,7 +104,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function isCheckRequestNotSended()
 	{
-		return ($this->getParam("STEP", 0) === 0 || $this->sessionData->getBool("repeat_request"));
+		return ($this->getParam('STEP', 0) === 0 || $this->sessionData->getBool('repeat_request'));
 	}
 
 	/**
@@ -112,34 +112,34 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function doCheckRequest()
 	{
-		$response = new CSecurityCloudMonitorRequest("check");
+		$response = new CSecurityCloudMonitorRequest('check');
 		if($response->isOk())
 		{
 			$this->sessionData->flushData();
-			$this->setTimeOut($response->getValue("processing_time"));
-			$this->setCheckingToken($response->getValue("testing_token"));
+			$this->setTimeOut($response->getValue('processing_time'));
+			$this->setCheckingToken($response->getValue('testing_token'));
 		}
 		elseif($response->isFatalError())
 		{
-			$this->stopChecking($response->getValue("error_text"));
+			$this->stopChecking($response->getValue('error_text'));
 		}
 		else
 		{
-			if($this->sessionData->getBool("repeat_request"))
+			if($this->sessionData->getBool('repeat_request'))
 			{
-				if($this->sessionData->getInt("check_repeat_count") > self::MAX_CHECKING_REQUEST_REPEATE_COUNT)
+				if($this->sessionData->getInt('check_repeat_count') > self::MAX_CHECKING_REQUEST_REPEATE_COUNT)
 				{
-					$this->stopChecking(GetMessage("SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE"));
+					$this->stopChecking(GetMessage('SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE'));
 				}
 				else
 				{
-					$this->sessionData->increment("check_repeat_count");
+					$this->sessionData->increment('check_repeat_count');
 				}
 			}
 			else
 			{
 				$this->sessionData->flushData();
-				$this->sessionData->setData("repeat_request", true);
+				$this->sessionData->setData('repeat_request', true);
 			}
 		}
 	}
@@ -149,9 +149,9 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function setCheckingToken($pToken)
 	{
-		if(is_string($pToken) && $pToken != "")
+		if(is_string($pToken) && $pToken != '')
 		{
-			$this->sessionData->setData("testing_token", $pToken);
+			$this->sessionData->setData('testing_token', $pToken);
 		}
 	}
 
@@ -160,7 +160,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function getCheckingToken()
 	{
-		return $this->sessionData->getString("testing_token");
+		return $this->sessionData->getString('testing_token');
 	}
 
 	/**
@@ -170,7 +170,7 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	{
 		if(intval($pTimeOut) > 0 )
 		{
-			$this->sessionData->setData("timeout", $pTimeOut);
+			$this->sessionData->setData('timeout', $pTimeOut);
 		}
 	}
 
@@ -185,10 +185,10 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	/**
 	 * @param string $pMessage
 	 */
-	protected function stopChecking($pMessage = "")
+	protected function stopChecking($pMessage = '')
 	{
-		$this->checkingResults["status"] = true;
-		$this->checkingResults["fatal_error_text"] = $pMessage;
+		$this->checkingResults['status'] = true;
+		$this->checkingResults['fatal_error_text'] = $pMessage;
 	}
 
 	/**
@@ -202,19 +202,23 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 		$count = 0;
 		foreach($pResults as $result)
 		{
-			if(isset($result["name"]))
+			if(isset($result['name']))
 			{
-				$formattedResult[$count]["title"] = $result["name"];
-				$formattedResult[$count]["critical"] = isset($result["critical"])? $result["critical"]: CSecurityCriticalLevel::LOW;
+				$formattedResult[$count]['title'] = $result['name'];
+				$formattedResult[$count]['critical'] = isset($result['critical'])? $result['critical']: CSecurityCriticalLevel::LOW;
 			}
-			if(isset($result["detail"]))
+			if(isset($result['detail']))
 			{
-				$formattedResult[$count]["detail"] = $result["detail"];
+				$formattedResult[$count]['detail'] = $result['detail'];
 			}
-			if(isset($result["recommendation"]))
+			if(isset($result['recommendation']))
 			{
-				$formattedResult[$count]["recommendation"] = $result["recommendation"];
-				$formattedResult[$count]["recommendation"] .= isset($result["additional_info"])? "<br>".$result["additional_info"]: "";
+				$formattedResult[$count]['recommendation'] = $result['recommendation'];
+				$formattedResult[$count]['recommendation'] .= isset($result['additional_info'])? '<br>'.$result['additional_info']: '';
+			}
+			if ($result['requests_errors'])
+			{
+				$formattedResult[$count]['requests_errors'] = $result['requests_errors'];
 			}
 			$count++;
 		}
@@ -226,9 +230,9 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	 */
 	protected function getTimeout()
 	{
-		if($this->sessionData->getString("timeout") > 0)
+		if($this->sessionData->getString('timeout') > 0)
 		{
-			return intval($this->sessionData->getString("timeout"));
+			return intval($this->sessionData->getString('timeout'));
 		}
 		else
 		{

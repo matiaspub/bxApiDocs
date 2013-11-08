@@ -1,12 +1,35 @@
 <?php
 namespace Bitrix\Main\DB;
 
-class MysqliSqlHelper
-	extends SqlHelper
+class MysqliSqlHelper extends SqlHelper
 {
+
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getLeftQuote()
+	{
+		return '`';
+	}
+
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getRightQuote()
+	{
+		return '`';
+	}
+
 	static public function getQueryDelimiter()
 	{
 		return ';';
+	}
+
+	static public function getAliasLength()
+	{
+		return 256;
 	}
 
 	public function forSql($value, $maxLength = 0)
@@ -28,6 +51,16 @@ class MysqliSqlHelper
 	static public function getCurrentDateFunction()
 	{
 		return "CURDATE()";
+	}
+
+	static public function addSecondsToDateTime($seconds, $from = null)
+	{
+		if ($from === null)
+		{
+			$from = static::getCurrentDateTimeFunction();
+		}
+
+		return 'DATE_ADD('.$from.', INTERVAL '.$seconds.' SECOND)';
 	}
 
 	static public function getConcatFunction()
@@ -53,15 +86,15 @@ class MysqliSqlHelper
 
 	static public function getDatetimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
 	{
-		$customOffset = $value->getOffset();
+		$customOffset = $value->getValue()->getOffset();
 
 		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getOffset();
+		$serverOffset = $serverTime->getValue()->getOffset();
 
 		$diff = $customOffset - $serverOffset;
 		$valueTmp = clone $value;
 
-		$valueTmp->sub(new \DateInterval(sprintf("PT%sS", $diff)));
+		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
 
 		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
 		$date = "'".$valueTmp->format($format)."'";
@@ -77,6 +110,60 @@ class MysqliSqlHelper
 	static public function getDatetimeToDateFunction($value)
 	{
 		return 'DATE('.$value.')';
+	}
+
+	static public function formatDate($format, $field = null)
+	{
+		static $search  = array(
+			"YYYY",
+			"MMMM",
+			"MM",
+			"MI",
+			"DD",
+			"HH",
+			"GG",
+			"G",
+			"SS",
+			"TT",
+			"T"
+		);
+		static $replace = array(
+			"%Y",
+			"%M",
+			"%m",
+			"%i",
+			"%d",
+			"%H",
+			"%h",
+			"%l",
+			"%s",
+			"%p",
+			"%p"
+		);
+
+		foreach ($search as $k=>$v)
+		{
+			$format = str_replace($v, $replace[$k], $format);
+		}
+
+		if (strpos($format, '%H') === false)
+		{
+			$format = str_replace("H", "%h", $format);
+		}
+
+		if (strpos($format, '%M') === false)
+		{
+			$format = str_replace("M", "%b", $format);
+		}
+
+		if($field === null)
+		{
+			return $format;
+		}
+		else
+		{
+			return "DATE_FORMAT(".$field.", '".$format."')";
+		}
 	}
 
 	static public function getToCharFunction($expr, $length = 0)
@@ -95,7 +182,7 @@ class MysqliSqlHelper
 			if (array_key_exists($columnName, $arFields))
 			{
 				$strInsert1 .= ", `".$columnName."`";
-				$strInsert2 .= ", ".$this->convertValueToDb($arFields[$columnName], $columnInfo["TYPE"]);
+				$strInsert2 .= ", ".$this->convertValueToDb($arFields[$columnName], $columnInfo);
 			}
 			elseif (array_key_exists("~".$columnName, $arFields))
 			{
@@ -113,31 +200,19 @@ class MysqliSqlHelper
 		return array($strInsert1, $strInsert2, array());
 	}
 
-	public function prepareUpdate($tableName, $arFields)
-	{
-		$strUpdate = "";
-
-		$arColumns = $this->dbConnection->getTableFields($tableName);
-		foreach ($arColumns as $columnName => $columnInfo)
-		{
-			if (array_key_exists($columnName, $arFields))
-				$strUpdate .= ", `".$columnName."` = ".$this->convertValueToDb($arFields[$columnName], $columnInfo["TYPE"]);
-			elseif (array_key_exists("~".$columnName, $arFields))
-				$strUpdate .= ", `".$columnName."` = ".$arFields["~".$columnName];
-		}
-
-		if ($strUpdate != "")
-			$strUpdate = " ".substr($strUpdate, 2)." ";
-
-		return array($strUpdate, array());
-	}
-
-	protected function convertValueToDb($value, $type)
+	protected function convertValueToDb($value, array $columnInfo)
 	{
 		if ($value === null)
+		{
 			return "NULL";
+		}
 
-		switch ($type)
+		if ($value instanceof SqlExpression)
+		{
+			return $value->compile();
+		}
+
+		switch ($columnInfo["TYPE"])
 		{
 			case "datetime":
 				if (empty($value))
@@ -163,5 +238,21 @@ class MysqliSqlHelper
 		}
 
 		return $result;
+	}
+
+	static public function getTopSql($sql, $limit, $offset = 0)
+	{
+		$offset = intval($offset);
+		$limit = intval($limit);
+
+		if ($offset > 0 && $limit <= 0)
+			throw new \Bitrix\Main\ArgumentException("Limit must be set if offset is set");
+
+		if ($limit > 0)
+		{
+			$sql .= "\nLIMIT ".$offset.", ".$limit."\n";
+		}
+
+		return $sql;
 	}
 }

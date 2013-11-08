@@ -18,6 +18,7 @@ class blogTextParser extends CTextParser
 		$this->ajaxPage = $GLOBALS["APPLICATION"]->GetCurPageParam("", array("bxajaxid", "logout"));
 		$this->blogImageSizeEvents = GetModuleEvents("blog", "BlogImageSize", true);
 		$this->arUserfields = array();
+		$arSmiles = array();
 
 		$this->smiles = array();
 		if($CACHE_MANAGER->Read(60*60*24*365, "b_blog_smile"))
@@ -47,10 +48,13 @@ class blogTextParser extends CTextParser
 				return (strlen($a["TYPING"]) > strlen($b["TYPING"])) ? -1 : 1;
 			}
 
-			foreach ($arSmiles as $LID => $arSmilesLID)
+			if(!empty($arSmiles))
 			{
-				uasort($arSmilesLID, 'sortlen');
-				$arSmiles[$LID] = $arSmilesLID;
+				foreach ($arSmiles as $LID => $arSmilesLID)
+				{
+					uasort($arSmilesLID, 'sortlen');
+					$arSmiles[$LID] = $arSmilesLID;
+				}
 			}
 
 			$CACHE_MANAGER->Set("b_blog_smile", $arSmiles);
@@ -267,18 +271,10 @@ class blogTextParser extends CTextParser
 		$text = preg_replace($arPattern, $arReplace, $text);
 		$text = str_replace("&shy;", "", $text);
 
-		$dbSite = CSite::GetByID(SITE_ID);
-		$arSite = $dbSite -> Fetch();
-		$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
+		$serverName = ((defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0) ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", ""));
 		if (strlen($serverName) <=0)
-		{
-			if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME)>0)
-				$serverName = SITE_SERVER_NAME;
-			else
-				$serverName = COption::GetOptionString("main", "server_name", "");
-			if (strlen($serverName) <=0)
 				$serverName = $_SERVER["SERVER_NAME"];
-		}
+
 		$this->arImages = $arImages;
 		$this->serverName = $serverName;
 		$text = preg_replace("/\[img([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_blog_image('', '\\2', '', 'mail')", $text);
@@ -512,6 +508,12 @@ class blogTextParser extends CTextParser
 		$text = strip_tags($text);
 		$text = preg_replace(
 			array(
+				"/\<(\/)(quote|code)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
+				"/\[(\/)(code|quote|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
+			" ",
+			$text);
+		$text = preg_replace(
+			array(
 				"/\<(\/?)(quote|code|font|color|video)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
 				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
 			"",
@@ -651,9 +653,11 @@ class CBlogTools
 					$arFile["FILE_SIZE"] = CFile::FormatSize($arFile["FILE_SIZE"]);
 					?>
 						<div id="wdif-doc-<?=$arFile['ID']?>" class="feed-com-file-wrap">
+							<div class="feed-con-file-name-wrap">
 							<div class="feed-con-file-icon feed-file-icon-<?=htmlspecialcharsbx($arFile['EXTENSION'])?>"></div>
 							<a target="_blank" href="<?=htmlspecialcharsbx($arFile['LINK'])?>" class="feed-com-file-name"><?=htmlspecialcharsbx($arFile['ORIGINAL_NAME'])?></a>
 							<span class="feed-con-file-size">(<?=$arFile['FILE_SIZE']?>)</span>
+							</div>
 						</div>
 					<?
 				}

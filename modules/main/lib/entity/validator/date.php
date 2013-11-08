@@ -9,7 +9,7 @@
 namespace Bitrix\Main\Entity\Validator;
 
 use Bitrix\Main\Entity;
-use \Bitrix\Main\Config\ConfigurationException;
+use Bitrix\Main\Type;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -22,6 +22,12 @@ class Date extends Base
 {
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
+		if ($value instanceof Type\DateTime)
+		{
+			// self-validating object
+			return true;
+		}
+
 		if (CheckDateTime($value, FORMAT_DATE))
 		{
 			return true;

@@ -497,7 +497,6 @@ class CWikiSocnet
 		}
 		else
 		{
-			$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
 			$arAllow = array(
 				"HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y",
 				"IMG" => "Y", "LOG_IMG" => "N",
@@ -511,18 +510,33 @@ class CWikiSocnet
 				"VIDEO" => "Y", "LOG_VIDEO" => "N"
 			);
 
-
-			$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
+			if (CModule::IncludeModule("forum"))
+			{
+				$parserLog = new forumTextParser(LANGUAGE_ID);
+				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
+			}
+			else
+			{
+				$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
+			}
 
 			if (
 				$arParams["MOBILE"] != "Y"
 				&& $arParams["NEW_TEMPLATE"] != "Y"
 			)
 			{
-				$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
-					$parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow),
-					500
-				);
+				if (CModule::IncludeModule("forum"))
+					$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
+						$parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow),
+						500
+					);
+				else
+					$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
+						$parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow),
+						500
+					);
+
 				$arResult["EVENT_FORMATTED"]["IS_MESSAGE_SHORT"] = CSocNetLogTools::FormatEvent_IsMessageShort($arResult["EVENT_FORMATTED"]["MESSAGE"], $arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"]);
 			}
 		}
@@ -673,7 +687,7 @@ class CWikiSocnet
 								$arParams["TITLE"] = TruncateText($arParams["TITLE"], 100);
 								$arParams["TITLE_OUT"] = TruncateText($arParams["TITLE"], 255);
 
-								$arTmp = CWikiSocnet::__ProcessPath(array("ELEMENT_URL" => $arLog["URL"]), $arElement["CREATED_BY"]);
+								$arTmp = CSocNetLogTools::ProcessPath(array("ELEMENT_URL" => $arLog["URL"]), $arElement["CREATED_BY"]);
 								$serverName = $arTmp["SERVER_NAME"];
 								$url = $arTmp["URLS"]["ELEMENT_URL"];
 
@@ -772,67 +786,7 @@ class CWikiSocnet
 
 	public static function __ProcessPath($arUrl, $user_id)
 	{
-		static $arIntranetUsers, $arSiteData, $extranet_site_id, $intranet_site_id;
-
-		if (!is_array($arUrl))
-			$arUrl = array($arUrl);
-
-		if (
-			CModule::IncludeModule("extranet")
-			&& !$arIntranetUsers
-		)
-		{
-			$extranet_site_id = CExtranet::GetExtranetSiteID();
-			$intranet_site_id = CSite::GetDefSite();
-			$arIntranetUsers = CExtranet::GetIntranetUsers();
-		}
-
-		if (!$arSiteData)
-		{
-			$rsSite = CSite::GetList($by="sort", $order="desc", Array("ACTIVE" => "Y"));
-			while ($arSite = $rsSite->Fetch())
-			{
-				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
-				$arSiteData[$arSite["ID"]] = array(
-					"GROUPS_PATH" => COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]),
-					"SERVER_NAME" => (
-						strlen($serverName) > 0
-							? $serverName
-							: (
-								defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0
-									? SITE_SERVER_NAME
-									: COption::GetOptionString("main", "server_name", "")
-							)
-					)
-				);
-			}
-		}
-
-		$user_site_id = (
-			IsModuleInstalled("extranet") 
-				? (
-					(!in_array($user_id, $arIntranetUsers) && $extranet_site_id) 
-						? $extranet_site_id 
-						: $intranet_site_id
-				)
-				: SITE_ID
-		);
-
-		$server_name = (CMain::IsHTTPS() ? "https" : "http")."://".$arSiteData[$user_site_id]["SERVER_NAME"];
-
-		$arUrl = str_replace(
-			array("#SERVER_NAME#", "#GROUPS_PATH#"),
-			array(
-				$server_name,
-				$arSiteData[$user_site_id]["GROUPS_PATH"]
-			),
-			$arUrl
-		);
-
-		return array(
-			"SERVER_NAME" => $server_name, 
-			"URLS" => $arUrl
-		);
+		return CSocNetLogTools::ProcessPath($arUrl, $user_id);
 	}
 }
 ?>

@@ -29,6 +29,7 @@ $arClasses = array(
 	"CSocServMessage" => "classes/".$DBType."/authmanager.php",
 	"CBitrixOAuthInterface" => "classes/general/bitrix24.php",
 	"CSocServBitrixOAuth" => "classes/general/bitrix24.php",
+	"CBitrixPHPAppTransport" => "classes/general/bitrix24.php",
 	//"CSocServDropbox" => "classes/general/dropbox.php",
 );
 

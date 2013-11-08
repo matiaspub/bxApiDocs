@@ -417,7 +417,7 @@ class CBXVirtualIo
 	 * Gets a directory from the file system
 	 *
 	 * @param string $path - Complete path to the directory
-	 * @return CBXVirtualDirectory
+	 * @return CBXVirtualDirectoryFileSystem
 	 */
 	
 	/**
@@ -457,7 +457,7 @@ class CBXVirtualIo
 	 * Gets a virtual file from the file system
 	 *
 	 * @param string $path - Complete path to the file
-	 * @return CBXVirtualFile
+	 * @return CBXVirtualFileFileSystem
 	 */
 	
 	/**

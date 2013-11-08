@@ -470,7 +470,7 @@ class CSaleOrder extends CAllSaleOrder
 	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__getlist.41061294.php
 	 * @author Bitrix
 	 */
-	public static function GetList($arOrder = Array("ID"=>"DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
+	public static function GetList($arOrder = Array("ID"=>"DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arOptions = array())
 	{
 		global $DB, $USER_FIELD_MANAGER;
 
@@ -911,7 +911,7 @@ class CSaleOrder extends CAllSaleOrder
 		foreach ($arSelectFields as $key => $value)
 			CSaleOrder::PrepareGetListArray($key, $arFields, $arPropIDsTmp);
 
-		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql, $callback);
+		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql, $callback, $arOptions);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 

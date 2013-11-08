@@ -310,7 +310,7 @@ class CSecurityUser
 			$dbc1 = hexdec(substr($sha_hash, $dwOffset * 2, 8 ));
 			$dbc2 = $dbc1 & 0x7fffffff;
 			$hotp = $dbc2 % pow(10, $pDigits);
-			return $hotp;
+			return str_pad($hotp, $pDigits, "0", STR_PAD_LEFT);
 		}
 		else
 		{

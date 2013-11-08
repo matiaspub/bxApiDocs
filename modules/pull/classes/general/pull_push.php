@@ -178,6 +178,8 @@ class CPullPush
 		$arFields = array(
 			"ID" => array("FIELD_NAME" => "R.ID", "FIELD_TYPE" => "int"),
 			"USER_ID" => array("FIELD_NAME" => "R.USER_ID", "FIELD_TYPE" => "int"),
+			"APP_ID" => array("FIELD_NAME" => "R.APP_ID", "FIELD_TYPE" => "string"),
+			"UNIQUE_HASH" => array("FIELD_NAME" => "R.UNIQUE_HASH", "FIELD_TYPE" => "string"),
 			"DEVICE_TYPE" => array("FIELD_NAME" => "R.DEVICE_TYPE", "FIELD_TYPE" => "string"),
 			"DEVICE_ID" => array("FIELD_NAME" => "R.DEVICE_ID", "FIELD_TYPE" => "string"),
 			"DEVICE_NAME" => array("FIELD_NAME" => "R.DEVICE_NAME", "FIELD_TYPE" => "string"),
@@ -192,7 +194,7 @@ class CPullPush
 		(strlen($arSqls["ORDERBY"])<=0 ? "" : " ORDER BY ".$arSqls["ORDERBY"]);
 		if(is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
 			$strSql = $DB->TopSql($strSql, $arNavStartParams["nTopCount"]);
-		//echo "<pre>".$strSql."</pre>";
+//		echo "<pre>".$strSql."</pre>";
 		$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		return $res;
@@ -232,7 +234,7 @@ class CPullPush
 	public static function CheckFields($type = "ADD", &$arFields = Array())
 	{
 		$pm = new CPushManager();
-		$arDeviceTypes = array_keys($pm->GetServices());
+		$arDeviceTypes = array_keys($pm->getServices());
 		$arFields["USER_ID"] = intval($arFields["USER_ID"]);
 		if (!is_array($arFields) || empty($arFields))
 			return false;
@@ -248,6 +250,9 @@ class CPullPush
 			if(!$arFields["DEVICE_NAME"] )
 				$arFields["DEVICE_NAME"] = $arFields["DEVICE_ID"];
 		}
+		if(!$arFields["APP_ID"])
+			$arFields["APP_ID"] = "Bitrix24";
+		$arFields["UNIQUE_HASH"] = self::getUniqueHash($arFields["USER_ID"], $arFields["APP_ID"]);
 
 		return true;
 	}
@@ -265,19 +270,25 @@ class CPullPush
 		return true;
 
 	}
+
+	public static function getUniqueHash($user_id, $app_id)
+	{
+		return md5($user_id.$app_id);
+	}
+
 }
 
 
 class CPushManager
 {
-	public static $arPushServices = false;
+	public static $pushServices = false;
 	private static $remoteProviderUrl = "https://cloud-messaging.bitrix24.com/send/";
 
 	static public function __construct()
 	{
-		if(!is_array(self::$arPushServices))
+		if(!is_array(self::$pushServices))
 		{
-			self::$arPushServices = array();
+			self::$pushServices = array();
 
 			foreach(GetModuleEvents("pull", "OnPushServicesBuildList", true) as $arEvent)
 			{
@@ -287,7 +298,7 @@ class CPushManager
 					if(!is_array($res[0]))
 						$res = array($res);
 					foreach($res as $serv)
-						self::$arPushServices[$serv["ID"]] = $serv;
+						self::$pushServices[$serv["ID"]] = $serv;
 				}
 			}
 
@@ -296,6 +307,9 @@ class CPushManager
 
 	static public function AddQueue($arParams)
 	{
+		if (!CPullOptions::GetPushStatus())
+			return false;
+
 		global $DB;
 
 		if (isset($arParams['USER_ID']) && intval($arParams['USER_ID']) > 0)
@@ -335,11 +349,15 @@ class CPushManager
 				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
 			if (strlen($arFields['PARAMS']) > 0)
 				$arAdd['PARAMS'] = $arFields['PARAMS'];
-			if ($arFields['BADGE'] >= 0)
+			if (intval($arFields['BADGE']) >= 0)
 				$arAdd['BADGE'] = $arFields['BADGE'];
+			if (strlen($arFields['APP_ID']) > 0)
+				$arAdd['APP_ID'] = $arFields['APP_ID'];
+			else
+				$arAdd['APP_ID'] = "Bitrix24";
 
 			$CPushManager = new CPushManager();
-			$CPushManager->SendMessage(Array($arAdd), defined('PULL_PUSH_SANDBOX')? true: false);
+			$CPushManager->SendMessage(Array($arAdd));
 		}
 		else
 		{
@@ -349,12 +367,17 @@ class CPushManager
 				'SUB_TAG' => $arFields['SUB_TAG'],
 				'~DATE_CREATE' => $DB->CurrentTimeFunction()
 			);
+
 			if (strlen($arFields['MESSAGE']) > 0)
 				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
 			if (strlen($arFields['PARAMS']) > 0)
 				$arAdd['PARAMS'] = $arFields['PARAMS'];
-			if ($arFields['BADGE'] >= 0)
+			if (intval($arFields['BADGE']) >= 0)
 				$arAdd['BADGE'] = $arFields['BADGE'];
+			if (strlen($arFields['APP_ID']) > 0)
+				$arAdd['APP_ID'] = $arFields['APP_ID'];
+			else
+				$arAdd['APP_ID'] = "Bitrix24";
 
 			$DB->Add("b_pull_push_queue", $arAdd, Array("PARAMS"));
 
@@ -409,7 +432,7 @@ class CPushManager
 		else if ($dbType == "oracle")
 			$sqlDate = " WHERE DATE_CREATE < SYSDATE-(1/24/60/60*15) ";
 
-		$strSql = $DB->TopSql("SELECT ID, USER_ID, MESSAGE, PARAMS, BADGE FROM b_pull_push_queue".$sqlDate, 280);
+		$strSql = $DB->TopSql("SELECT ID, USER_ID, MESSAGE, PARAMS, BADGE, APP_ID FROM b_pull_push_queue".$sqlDate, 280);
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
 		{
@@ -426,7 +449,7 @@ class CPushManager
 		$CPushManager = new CPushManager();
 		foreach ($arPush as $arStack)
 		{
-			$CPushManager->SendMessage($arStack, defined('PULL_PUSH_SANDBOX')? true: false);
+			$CPushManager->SendMessage($arStack);
 		}
 
 		if ($maxId > 0)
@@ -453,58 +476,73 @@ class CPushManager
 		return false;
 	}
 
-	public function SendMessage($arMessages = Array(), $sandbox = false)
+	public function SendMessage($arMessages = Array())
 	{
 		if(empty($arMessages))
 			return false;
-		$arUsers = Array();
+
+		$uniqueHashes = Array();
 		$arTmpMessages = Array();
 		foreach ($arMessages as $message)
 		{
 			if(!$message["USER_ID"])
 				continue;
-			$arUsers[] = $message["USER_ID"];
+			$uniqueHashes[] = CPullPush::getUniqueHash($message["USER_ID"], $message["APP_ID"]);
+			$uniqueHashes[] = CPullPush::getUniqueHash($message["USER_ID"], $message["APP_ID"]."_bxdev");
 			if(!array_key_exists("USER_".$message["USER_ID"], $arTmpMessages))
 				$arTmpMessages["USER_".$message["USER_ID"]] = Array();
 			$arTmpMessages["USER_".$message["USER_ID"]][] = htmlspecialcharsback($message);
 		}
 
-		$arUsers = array_unique($arUsers);
-		$dbDevices= CPullPush::GetList(Array("DEVICE_TYPE"=>"ASC"),Array("USER_ID"=>$arUsers));
+		$filter = array(
+			"UNIQUE_HASH" => array_unique($uniqueHashes)
+		);
 
+		$dbDevices = CPullPush::GetList(Array("DEVICE_TYPE" => "ASC"), $filter);
 
-		$arServicesIDs = array_keys(self::$arPushServices);
+		$arServicesIDs = array_keys(self::$pushServices);
 		$arPushMessages = Array();
 		while($arDevice = $dbDevices->Fetch())
 		{
+
 			if(in_array($arDevice["DEVICE_TYPE"], $arServicesIDs))
-					$arPushMessages[$arDevice["DEVICE_TYPE"]][$arDevice["DEVICE_TOKEN"]] = $arTmpMessages["USER_".$arDevice["USER_ID"]];
+			{
+				$tmpMessage = $arTmpMessages["USER_" . $arDevice["USER_ID"]];
+				$mode = "PRODUCTION";
+				if(strpos($arDevice["APP_ID"], "_bxdev")>0)
+					$mode = "SANDBOX";
+				$arPushMessages[$arDevice["DEVICE_TYPE"]][$arDevice["DEVICE_TOKEN"]] = Array(
+					"messages"=>$tmpMessage,
+					"mode"=>$mode
+				);
+			}
 		}
 
 		if(empty($arPushMessages))
 			return false;
-
 		$batch = "";
+		/**
+		 * @var CPushService $obPush
+		 */
 		foreach($arServicesIDs as $serviceID)
 		{
 			if($arPushMessages[$serviceID])
 			{
-				if (class_exists(self::$arPushServices[$serviceID]["CLASS"]))
-					$obPush = new self::$arPushServices[$serviceID]["CLASS"];
-				if(method_exists($obPush, "setConnectTimeout"))
-					$obPush->setConnectTimeout(10);
-				if(method_exists($obPush, "GetBatch"))
+				if (class_exists(self::$pushServices[$serviceID]["CLASS"]))
+					$obPush = new self::$pushServices[$serviceID]["CLASS"];
+
+				if(method_exists($obPush, "getBatch"))
 				{
-					$batch.= $obPush->GetBatch($arPushMessages[$serviceID]);
+					$batch.= $obPush->getBatch($arPushMessages[$serviceID]);
 				}
 			}
 		}
-		$this->SendBatch($batch);
+		$this->sendBatch($batch);
 
 		return true;
 	}
 
-	static public function SendBatch($batch)
+	static public function sendBatch($batch)
 	{
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client.php");
 		$key = CUpdateClient::GetLicenseKey();
@@ -518,7 +556,6 @@ class CPushManager
 
 			$postdata = CHTTP::PrepareData($arPostData);
 			$arUrl = $request->ParseURL(self::$remoteProviderUrl."?key=".md5($key), false);
-
 			$request->Query('POST', $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $postdata, $arUrl['proto'], 'N', true);
 
 			return true;
@@ -528,9 +565,9 @@ class CPushManager
 		return false;
 	}
 
-	static public function GetServices()
+	static public function getServices()
 	{
-		return self::$arPushServices;
+		return self::$pushServices;
 	}
 
 	static function _MakeJson($arData, $bWS, $bSkipTilda)

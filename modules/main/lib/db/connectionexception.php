@@ -2,7 +2,7 @@
 namespace Bitrix\Main\DB;
 
 class ConnectionException
-	extends DbException
+	extends Exception
 {
 	static public function __construct($message = "", $databaseMessage = "", \Exception $previous = null)
 	{

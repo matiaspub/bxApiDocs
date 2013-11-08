@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
 IncludeModuleLangFile(__FILE__);
 
 class CAccess
@@ -297,7 +304,12 @@ class CAccess
 	{
 		$arResult = array();
 		foreach(self::$arAuthProviders as $ID=>$provider)
-			$arResult[$ID] = (isset($provider["PROVIDER_NAME"])? $provider["PROVIDER_NAME"] : $ID);
+		{
+			$arResult[$ID] = array(
+				"name" => (isset($provider["PROVIDER_NAME"])? $provider["PROVIDER_NAME"] : $ID),
+				"prefixes" => (isset($provider["PREFIXES"])? $provider["PREFIXES"] : array()),
+			);
+		}
 		return $arResult;
 	}
 
@@ -371,4 +383,3 @@ class CAccess
 }
 
 AddEventHandler("main", "OnAuthProvidersBuildList", array("CAccess", "GetProviders"));
-?>

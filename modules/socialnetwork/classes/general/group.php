@@ -249,9 +249,10 @@ class CAllSocNetGroup
 			$bSuccess = $DB->Query("DELETE FROM b_sonet_log_events WHERE ENTITY_TYPE = 'G' AND ENTITY_ID = ".$ID."", true);
 		if ($bSuccess)
 			$bSuccess = $DB->Query("DELETE FROM b_sonet_group_site WHERE GROUP_ID = ".$ID."", true);
-
 		if ($bSuccess)
 			$bSuccess = $DB->Query("DELETE FROM b_sonet_log_right WHERE GROUP_CODE LIKE 'SG".$ID."\_%' OR GROUP_CODE = 'SG".$ID."'", true);
+		if ($bSuccess)
+			$bSuccess = CSocNetSubscription::DeleteEx(false, "SG".$ID);
 
 		if ($bSuccess)
 		{
@@ -289,9 +290,6 @@ class CAllSocNetGroup
 
 		if ($bSuccess)
 			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_GROUP", $ID);
-		
-//		if ($bSuccess)
-//			$GLOBALS["USER_FIELD_MANAGER"]->Delete("BLOG_BLOG", $ID);
 
 		return $bSuccess;
 	}
@@ -353,7 +351,9 @@ class CAllSocNetGroup
 			array(
 				"NUMBER_OF_MEMBERS" => $num,
 				"NUMBER_OF_MODERATORS" => $num_mods
-			)
+			), 
+			true,
+			false
 		);
 	}
 
@@ -754,6 +754,9 @@ class CAllSocNetGroup
 		$arFields["ACTIVE"] = "Y";
 		$arFields["OWNER_ID"] = $ownerID;
 
+		if (!is_set($arFields, "SPAM_PERMS") || strlen($arFields["SPAM_PERMS"]) <= 0)
+			$arFields["SPAM_PERMS"] = SONET_ROLES_OWNER;
+
 		$groupID = CSocNetGroup::Add($arFields);
 
 		if (!$groupID || IntVal($groupID) <= 0)
@@ -805,6 +808,8 @@ class CAllSocNetGroup
 
 		if ($bAutoSubscribe)
 			CSocNetLogEvents::AutoSubscribe($ownerID, SONET_ENTITY_GROUP, $groupID);
+
+		CSocNetSubscription::Set($ownerID, "SG".$groupID, "Y");
 
 		$DB->Commit();
 

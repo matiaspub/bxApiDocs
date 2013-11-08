@@ -1,11 +1,13 @@
 <?php
 namespace Bitrix\Main;
 
+use Bitrix\Main\Type\ParameterDictionary;
+
 /**
  * Represents server.
  */
 class Server
-	extends \Bitrix\Main\System\ReadonlyDictionary
+	extends ParameterDictionary
 {
 	/**
 	 * Creates server object.
@@ -15,9 +17,17 @@ class Server
 	static public function __construct(array $arServer)
 	{
 		if (isset($arServer["DOCUMENT_ROOT"]))
-			$arServer["DOCUMENT_ROOT"] = rtrim($arServer["DOCUMENT_ROOT"], "\\/");
+			$arServer["DOCUMENT_ROOT"] = rtrim($arServer["DOCUMENT_ROOT"], "/\\");
 
 		parent::__construct($arServer);
+	}
+
+	public function addFilter(Type\IRequestFilter $filter)
+	{
+		$filteredValues = $filter->filter($this->arValues);
+
+		if ($filteredValues != null)
+			$this->setValuesNoDemand($filteredValues);
 	}
 
 	/**

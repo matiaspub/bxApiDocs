@@ -1,8 +1,10 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 abstract class CBitrixCloudWebService
 {
 	private $debug = false;
+	private $timeout = 0;
+	private $server = /*.(CHTTP).*/ null;
 	/**
 	 * Returns URL to update policy
 	 *
@@ -18,16 +20,21 @@ abstract class CBitrixCloudWebService
 	 * @return CDataXML
 	 * @throws CBitrixCloudException
 	 */
-	protected function action($action) /*. throws CBitrixCloudException .*/
+	protected function action($action)
 	{
-		/** @global CMain $APPLICATION */
+		/* @var CMain $APPLICATION */
 		global $APPLICATION;
+
 		$url = $this->getActionURL(array(
 			"action" => $action,
 			"debug" => ($this->debug? "y": "n"),
 		));
-		$server = new CHTTP;
-		$strXML = $server->Get($url);
+
+		$this->server = new CHTTP;
+		if ($this->timeout > 0)
+			$this->server->http_timeout = $this->timeout;
+
+		$strXML = $this->server->Get($url);
 		if ($strXML === false)
 		{
 			$e = $APPLICATION->GetException();
@@ -38,10 +45,10 @@ abstract class CBitrixCloudWebService
 					"#STATUS#" => "-1",
 				)), "");
 		}
-		if ($server->status != 200)
+		if ($this->server->status != 200)
 		{
 			throw new CBitrixCloudException(GetMessage("BCL_CDN_WS_SERVER", array(
-				"#STATUS#" => (string)$server->status,
+				"#STATUS#" => (string)$this->server->status,
 			)), "");
 		}
 		$obXML = new CDataXML;
@@ -84,6 +91,8 @@ abstract class CBitrixCloudWebService
 		return $obXML;
 	}
 	/**
+	 * Sets debug mode for remote service.
+	 * Returns previous mode value.
 	 *
 	 * @param bool $bActive
 	 * @return bool
@@ -91,7 +100,47 @@ abstract class CBitrixCloudWebService
 	 */
 	public function setDebug($bActive)
 	{
-		$this->debug = $bActive === true;
+		$result = $this->debug;
+		$this->debug = ($bActive === true);
+		return $result;
+	}
+	/**
+	 *
+	 * @param int $timeout
+	 * @return int
+	 *
+	 */
+	public function setTimeout($timeout)
+	{
+		$this->timeout = $timeout > 0? intval($timeout): 0;
+		return $this->timeout;
+	}
+	/**
+	 * Returns remote server status.
+	 * Return null if no action was performed.
+	 *
+	 * @return mixed
+	 *
+	 */
+	public function getServerStatus()
+	{
+		if (is_object($this->server))
+			return $this->server->status;
+		else
+			return null;
+	}
+	/**
+	 * Returns remote server response body.
+	 * Return null if no action was performed.
+	 *
+	 * @return mixed
+	 *
+	 */
+	public function getServerResult()
+	{
+		if (is_object($this->server))
+			return $this->server->result;
+		else
+			return null;
 	}
 }
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CBitrixCloudCDNWebService extends CBitrixCloudWebService
@@ -66,4 +66,3 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 		return $this->action("");
 	}
 }
-?>

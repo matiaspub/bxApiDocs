@@ -12,8 +12,19 @@ final class Loader
 
 	private static $arLoadedModules = array("main" => true);
 	private static $arLoadedModulesHolders = array("main" => self::BITRIX_HOLDER);
+	private static $arSharewareModules = array();
+
+	const MODULE_NOT_FOUND = 0;
+	const MODULE_INSTALLED = 1;
+	const MODULE_DEMO = 2;
+	const MODULE_DEMO_EXPIRED = 3;
 
 	private static $arAutoLoadClasses = array();
+
+	private static $isAutoLoadOn = true;
+
+	const ALPHA_LOWER = "qwertyuioplkjhgfdsazxcvbnm";
+	const ALPHA_UPPER = "QWERTYUIOPLKJHGFDSAZXCVBNM";
 
 	public static function includeModule($moduleName)
 	{
@@ -22,28 +33,22 @@ final class Loader
 		if (preg_match("#[^a-zA-Z0-9._]#", $moduleName))
 			throw new LoaderException(sprintf("Module name '%s' is not correct", $moduleName));
 
-		$moduleName = strtolower($moduleName);
+		$moduleName = strtr($moduleName, static::ALPHA_UPPER, static::ALPHA_LOWER);
 
 		if (self::SAFE_MODE)
 		{
 			if (!in_array($moduleName, self::$safeModeModules))
-				return null;
+				return false;
 		}
 
-		if (array_key_exists($moduleName, self::$arLoadedModules))
+		if (isset(self::$arLoadedModules[$moduleName]))
 			return self::$arLoadedModules[$moduleName];
 
 		$arInstalledModules = ModuleManager::getInstalledModules();
-		if (!array_key_exists($moduleName, $arInstalledModules))
-			return self::$arLoadedModules[$moduleName] = null;
+		if (!isset($arInstalledModules[$moduleName]))
+			return self::$arLoadedModules[$moduleName] = false;
 
-		static $documentRoot = null;
-		if ($documentRoot === null)
-		{
-			$documentRoot = Application::getDocumentRoot();
-			while (substr($documentRoot, -1) == "/")
-				$documentRoot = substr($documentRoot, 0, -1);
-		}
+		$documentRoot = static::getDocumentRoot();
 
 		$moduleHolder = self::LOCAL_HOLDER;
 		$pathToModule = $documentRoot."/".$moduleHolder."/modules/".$moduleName;
@@ -60,16 +65,16 @@ final class Loader
 				{
 					$pathToInclude = $pathToModule."/include.php";
 					if (!file_exists($pathToInclude))
-						return self::$arLoadedModules[$moduleName] = null;
+						return self::$arLoadedModules[$moduleName] = false;
 				}
 			}
 		}
 
+		self::$arLoadedModulesHolders[$moduleName] = $moduleHolder;
+
 		$res = self::includeModuleInternal($pathToInclude);
 		if ($res === false)
-			return self::$arLoadedModules[$moduleName] = null;
-
-		self::$arLoadedModulesHolders[$moduleName] = $moduleHolder;
+			return self::$arLoadedModules[$moduleName] = false;
 
 		if (strpos($moduleName, ".") !== false)
 		{
@@ -89,28 +94,113 @@ final class Loader
 
 	private static function includeModuleInternal($path)
 	{
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $DB, $MESS;
 		return include_once($path);
 	}
 
+	public static function includeSharewareModule($moduleName)
+	{
+		if (isset(self::$arSharewareModules[$moduleName]))
+			return self::$arSharewareModules[$moduleName];
+
+		$moduleNameTmp = str_replace(".", "_", $moduleName);
+
+		if (self::includeModule($moduleName))
+		{
+			if (defined($moduleNameTmp."_DEMO") && constant($moduleNameTmp."_DEMO") == "Y")
+				self::$arSharewareModules[$moduleName] = self::MODULE_DEMO;
+			else
+				self::$arSharewareModules[$moduleName] = self::MODULE_INSTALLED;
+
+			return self::$arSharewareModules[$moduleName];
+		}
+
+		if (defined($moduleNameTmp."_DEMO") && constant($moduleNameTmp."_DEMO") == "Y")
+			return self::$arSharewareModules[$moduleName] = self::MODULE_DEMO_EXPIRED;
+
+		return self::$arSharewareModules[$moduleName] = self::MODULE_NOT_FOUND;
+	}
+
+	public static function clearModuleCache($moduleName)
+	{
+		if (!is_string($moduleName) || $moduleName == "")
+			throw new LoaderException("Empty module name");
+
+		unset(static::$arLoadedModules[$moduleName]);
+		unset(static::$arLoadedModulesHolders[$moduleName]);
+		if (isset(static::$arSharewareModules[$moduleName]))
+			unset(static::$arSharewareModules[$moduleName]);
+	}
+
+	public static function getDocumentRoot()
+	{
+		static $documentRoot = null;
+		if ($documentRoot === null)
+			$documentRoot = rtrim($_SERVER["DOCUMENT_ROOT"], "/\\");
+		return $documentRoot;
+	}
+
+	public static function switchAutoLoad($value = true)
+	{
+		static::$isAutoLoadOn = $value;
+	}
+
 	public static function registerAutoLoadClasses($moduleName, array $arClasses)
 	{
-		if (!is_array($arClasses))
-			throw new LoaderException("Classes are not specified");
-
 		if (empty($arClasses))
 			return;
 
-		if (!is_string($moduleName) || $moduleName == "" || preg_match("#[^a-zA-Z0-9._]#", $moduleName))
-			throw new LoaderException(sprintf("Module name '%s' is not correct", $moduleName));
-
-		foreach ($arClasses as $key => $value)
+		if (($moduleName !== null) && empty($moduleName))
 		{
-			self::$arAutoLoadClasses[strtolower($key)] = array(
-				"module" => $moduleName,
-				"file" => $value
-			);
+			throw new LoaderException(sprintf("Module name '%s' is not correct", $moduleName));
 		}
+
+		if (!static::$isAutoLoadOn)
+		{
+			if (!is_null($moduleName) && !isset(static::$arLoadedModulesHolders[$moduleName]))
+				throw new LoaderException(sprintf("Holder of module '%s' is not found", $moduleName));
+
+			$documentRoot = static::getDocumentRoot();
+
+			if (!is_null($moduleName))
+			{
+				foreach ($arClasses as $value)
+				{
+					if (file_exists($documentRoot."/".self::$arLoadedModulesHolders[$moduleName]."/modules/".$moduleName."/".$value))
+						require_once($documentRoot."/".self::$arLoadedModulesHolders[$moduleName]."/modules/".$moduleName."/".$value);
+				}
+			}
+			else
+			{
+				foreach ($arClasses as $value)
+				{
+					if (($includePath = self::getLocal($value, $documentRoot)) !== false)
+						require_once($includePath);
+				}
+			}
+		}
+		else
+		{
+			foreach ($arClasses as $key => $value)
+			{
+				self::$arAutoLoadClasses[strtr($key, static::ALPHA_UPPER, static::ALPHA_LOWER)] = array(
+					"module" => $moduleName,
+					"file" => $value
+				);
+			}
+		}
+	}
+
+	public static function isAutoLoadClassRegistered($className)
+	{
+		$className = trim($className);
+		if ($className == '')
+			return false;
+
+		$className = strtr($className, static::ALPHA_UPPER, static::ALPHA_LOWER);
+
+		return isset(self::$arAutoLoadClasses[$className]);
 	}
 
 	/**
@@ -123,37 +213,21 @@ final class Loader
 	 */
 	public static function autoLoad($className)
 	{
-		if (!is_string($className))
-			return;
-
-		$className = trim($className, '\\/');
-		if (empty($className))
-			return;
-
-		if (preg_match("#[^\\\\/a-zA-Z0-9_]#", $className))
-			return;
-
-		$file = strtolower($className);
-
-		if(substr($file, -5) == "table")
-			$file = substr($file, 0, -5);
+		$file = ltrim($className, "\\");    // fix web env
+		$file = strtr($file, static::ALPHA_UPPER, static::ALPHA_LOWER);
 
 		static $documentRoot = null;
 		if ($documentRoot === null)
-		{
-			$documentRoot = $_SERVER["DOCUMENT_ROOT"];
-			while (substr($documentRoot, -1) == "/")
-				$documentRoot = substr($documentRoot, 0, -1);
-		}
+			$documentRoot = static::getDocumentRoot();
 
-		if (array_key_exists($file, self::$arAutoLoadClasses))
+		if (isset(self::$arAutoLoadClasses[$file]))
 		{
 			$pathInfo = self::$arAutoLoadClasses[$file];
 			if ($pathInfo["module"] != "")
 			{
 				$m = $pathInfo["module"];
-				if (file_exists($documentRoot."/".self::$arLoadedModulesHolders[$m]."/modules/".$m."/" .$pathInfo["file"]))
-					require_once($documentRoot."/".self::$arLoadedModulesHolders[$m]."/modules/".$m."/" .$pathInfo["file"]);
+				$h = isset(self::$arLoadedModulesHolders[$m]) ? self::$arLoadedModulesHolders[$m] : 'bitrix';
+				include_once($documentRoot."/".$h."/modules/".$m."/" .$pathInfo["file"]);
 			}
 			else
 			{
@@ -163,9 +237,14 @@ final class Loader
 			return;
 		}
 
+		if (preg_match("#[^\\\\/a-zA-Z0-9_]#", $file))
+			return;
+
+		if (substr($file, -5) == "table")
+			$file = substr($file, 0, -5);
+
 		$file = str_replace('\\', '/', $file);
 		$arFile = explode("/", $file);
-		$module = "";
 
 		if ($arFile[0] === "bitrix")
 		{
@@ -188,47 +267,26 @@ final class Loader
 			$module = $module1.".".$module2;
 		}
 
-		if (!array_key_exists($module, self::$arLoadedModules) || self::$arLoadedModules[$module] == null)
+		if (!isset(self::$arLoadedModules[$module]))
 			return;
 
 		$filePath = $documentRoot."/".self::$arLoadedModulesHolders[$module]."/modules/".$module."/lib/".implode("/", $arFile).".php";
+
 		if (file_exists($filePath))
 			require_once($filePath);
 	}
-
-	/*private static function AutoLoadRecursive($basePath, $path, $filePath, &$fl)
-	{
-		if (($handle = opendir($basePath.$path)) && $fl)
-		{
-			while ((($dir = readdir($handle)) !== false) && $fl)
-			{
-				if ($dir == "." || $dir == ".." || !is_dir($basePath.$path."/".$dir))
-					continue;
-
-				$path2 = $path.'/'.$dir;
-				if (file_exists($basePath.$path2.$filePath))
-				{
-					$fl = false;
-					require_once($basePath.$path2.$filePath);
-					break;
-				}
-				self::autoLoadRecursive($basePath, $path2, $filePath, $fl);
-			}
-			closedir($handle);
-		}
-	}*/
 
 	/**
 	 * Checks if file exists in /local or /bitrix directories
 	 *
 	 * @param string $path File path relative to /local/ or /bitrix/
-	 * @param string $root Server document root, default \Bitrix\Main\Application::getDocumentRoot()
+	 * @param string $root Server document root, default static::getDocumentRoot()
 	 * @return string|bool Returns combined path or false if the file does not exist in both dirs
 	 */
 	public static function getLocal($path, $root = null)
 	{
 		if ($root === null)
-			$root = Application::getDocumentRoot();
+			$root = static::getDocumentRoot();
 
 		if (file_exists($root."/local/".$path))
 			return $root."/local/".$path;
@@ -240,7 +298,7 @@ final class Loader
 
 	public static function getPersonal($path)
 	{
-		$root = Application::getDocumentRoot();
+		$root = static::getDocumentRoot();
 		$personal = isset($_SERVER["BX_PERSONAL_ROOT"]) ? $_SERVER["BX_PERSONAL_ROOT"] : "";
 
 		if (!empty($personal) && file_exists($root.$personal."/".$path))
@@ -259,4 +317,23 @@ class LoaderException
 	}
 }
 
-\spl_autoload_register('\Bitrix\Main\Loader::autoLoad');
+if (!function_exists("__autoload"))
+{
+	if (function_exists('spl_autoload_register'))
+	{
+		\spl_autoload_register('\Bitrix\Main\Loader::autoLoad');
+	}
+	else
+	{
+		function __autoload($className)
+		{
+			Loader::autoLoad($className);
+		}
+	}
+
+	Loader::switchAutoLoad(true);
+}
+else
+{
+	Loader::switchAutoLoad(false);
+}

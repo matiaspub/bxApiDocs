@@ -1,5 +1,5 @@
 <?
-if(!CModule::IncludeModule('rest'))
+if(!CModule::IncludeModule('rest') || !CModule::IncludeModule('calendar'))
 {
 	return;
 }

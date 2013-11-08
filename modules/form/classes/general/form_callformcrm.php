@@ -6,7 +6,7 @@ abstract class CAllFormCrm
 
 	private static $_ob;
 
-	abstract public function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array());
+	abstract public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array());
 
 	public static function GetByID($ID)
 	{

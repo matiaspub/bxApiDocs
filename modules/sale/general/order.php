@@ -988,7 +988,7 @@ class CAllSaleOrder
 		return array("FIELD" => $key, "NEGATIVE" => $strNegative, "OPERATION" => $strOperation, "OR_NULL" => $strOrNull);
 	}
 
-	public static function PrepareSql(&$arFields, $arOrder, &$arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql = false, $callback = false)
+	public static function PrepareSql(&$arFields, $arOrder, &$arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql = false, $callback = false, $arOptions = array())
 	{
 		global $DB;
 
@@ -1406,6 +1406,7 @@ class CAllSaleOrder
 			}
 		}
 
+		$nullsLast = isset($arOptions['NULLS_LAST']) ? (bool)$arOptions['NULLS_LAST'] : false;
 		$strSqlOrderBy = "";
 		DelDuplicateSort($arSqlOrder);
 		$countSqlOrder = count($arSqlOrder);
@@ -1414,15 +1415,45 @@ class CAllSaleOrder
 			if (strlen($strSqlOrderBy) > 0)
 				$strSqlOrderBy .= ", ";
 
-			if(ToUpper($DB->type)=="ORACLE")
+			$order = (substr($arSqlOrder[$i], -3)=="ASC") ? "ASC" : "DESC";
+			if (!$nullsLast)
 			{
-				if(substr($arSqlOrder[$i], -3)=="ASC")
-					$strSqlOrderBy .= $arSqlOrder[$i]." NULLS FIRST";
+				if(ToUpper($DB->type)=="ORACLE")
+				{
+					if($order === "ASC")
+						$strSqlOrderBy .= $arSqlOrder[$i]." NULLS FIRST";
+					else
+						$strSqlOrderBy .= $arSqlOrder[$i]." NULLS LAST";
+				}
 				else
-					$strSqlOrderBy .= $arSqlOrder[$i]." NULLS LAST";
+					$strSqlOrderBy .= $arSqlOrder[$i];
 			}
 			else
-				$strSqlOrderBy .= $arSqlOrder[$i];
+			{
+				$field = substr($arSqlOrder[$i], 0, -strlen($order)-1);
+				if(ToUpper($DB->type) === "MYSQL")
+				{
+					if($order === 'ASC')
+						$strSqlOrderBy .= '(CASE WHEN ISNULL('.$field.') THEN 1 ELSE 0 END) '.$order.', '.$field." ".$order;
+					else
+						$strSqlOrderBy .= $field." ".$order;
+				}
+				elseif(ToUpper($DB->type) === "MSSQL")
+				{
+					if($order === 'ASC')
+						$strSqlOrderBy .= '(CASE WHEN '.$field.' IS NULL THEN 1 ELSE 0 END) '.$order.', '.$field." ".$order;
+					else
+						$strSqlOrderBy .= $field." ".$order;
+
+				}
+				elseif(ToUpper($DB->type) === "ORACLE")
+				{
+					if($order === 'DESC')
+						$strSqlOrderBy .= $field." ".$order." NULLS LAST";
+					else
+						$strSqlOrderBy .= $field." ".$order;
+				}
+			}
 		}
 		// <-- ORDER BY
 		return array(

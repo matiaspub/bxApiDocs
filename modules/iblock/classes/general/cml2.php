@@ -1966,7 +1966,7 @@ class CIBlockCMLImport
 		return $res2;
 	}
 
-	public function Unserialize($string)
+	public static function Unserialize($string)
 	{
 		if(defined("BX_UTF"))
 		{

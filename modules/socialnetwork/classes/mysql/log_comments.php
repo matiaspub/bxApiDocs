@@ -58,6 +58,39 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 				if (isset($arSource["TEXT_MESSAGE"]) && strlen($arSource["TEXT_MESSAGE"]) > 0)
 					$arFields["TEXT_MESSAGE"] = $arSource["TEXT_MESSAGE"];
+
+				if (isset($arSource["URL"]) && strlen($arSource["URL"]) > 0)
+					$arFields["URL"] = $arSource["URL"];
+
+				if (
+					isset($arSource["UF"]) 
+					&& isset($arSource["UF"]["FILE"])
+				)
+				{
+					if (!is_array($arSource["UF"]["FILE"]))
+						$arSource["UF"]["FILE"] = array($arSource["UF"]["FILE"]);
+
+					$arFields["UF_SONET_COM_FILE"] = $arSource["UF"]["FILE"];
+					$bNeedCheck = true;
+				}
+
+				if (
+					isset($arSource["UF"]) 
+					&& isset($arSource["UF"]["DOC"])
+				)
+				{
+					if (!is_array($arSource["UF"]["DOC"]))
+						$arSource["UF"]["DOC"] = array($arSource["UF"]["DOC"]);
+
+					$arFields["UF_SONET_COM_DOC"] = $arSource["UF"]["DOC"];
+					$bNeedCheck = true;
+				}
+
+				if (
+					$bNeedCheck 
+					&& !CSocNetLogComments::CheckFields("ADD", $arFields)
+				)
+					return false;
 			}
 			else
 				$strMessage =
@@ -72,7 +105,14 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				);
 		}
 
-		if (!$bSetSource || (is_array($arSource) && array_key_exists("SOURCE_ID", $arFields) && intval($arFields["SOURCE_ID"]) > 0))
+		if (
+			!$bSetSource 
+			|| (
+				is_array($arSource) 
+				&& array_key_exists("SOURCE_ID", $arFields) 
+				&& intval($arFields["SOURCE_ID"]) > 0
+			)
+		)
 		{
 			$arInsert = $DB->PrepareInsert("b_sonet_log_comment", $arFields);
 
@@ -151,6 +191,8 @@ class CSocNetLogComments extends CAllSocNetLogComments
 					while ($arEvent = $db_events->Fetch())
 						ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
+					$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields);
+
 					if(defined("BX_COMP_MANAGED_CACHE"))
 						$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$arFields["LOG_ID"]);
 				}
@@ -209,10 +251,12 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				"WHERE ID = ".$ID." ";
 			$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields);
+
 			if(defined("BX_COMP_MANAGED_CACHE"))
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);			
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);
 		}
-		else
+		elseif (!$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields))
 			$ID = False;
 
 		return $ID;
@@ -223,7 +267,13 @@ class CSocNetLogComments extends CAllSocNetLogComments
 	/***************************************/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arParams = array())
 	{
-		global $DB, $arSocNetAllowedEntityTypes, $USER;
+		global $DB, $arSocNetAllowedEntityTypes, $USER, $USER_FIELD_MANAGER;
+
+		$obUserFieldsSql = new CUserTypeSQL;
+		$obUserFieldsSql->SetEntity("SONET_COMMENT", "LC.ID");
+		$obUserFieldsSql->SetSelect($arSelectFields);
+		$obUserFieldsSql->SetFilter($arFilter);
+		$obUserFieldsSql->SetOrder($arOrder);
 
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array(
@@ -326,7 +376,11 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 		$arFields = array_merge($arFields1, $arFields);
 
-		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
+		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql);
+
+		$r = $obUserFieldsSql->GetFilter();
+		if(strlen($r)>0)
+			$strSqlUFFilter = " (".$r.") ";
 
 		$arSqls["RIGHTS"] = "";
 
@@ -417,15 +471,27 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		{
 			$strSql =
 				"SELECT ".$arSqls["SELECT"]." ".
+				$obUserFieldsSql->GetSelect()." ".
 				"FROM b_sonet_log_comment LC ".
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+				$obUserFieldsSql->GetJoin("LC.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
 			else
 				$strSql .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
-			if (strlen($arSqls["RIGHTS"]) > 0)
+
+			if (strlen($strSqlUFFilter) > 0)
 			{
 				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
+					$strSql .= " AND ".$strSqlUFFilter." ";
+				else
+					$strSql .= " WHERE ".$strSqlUFFilter." ";
+			}
+
+			if (strlen($arSqls["RIGHTS"]) > 0)
+			{
+				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
 					$strSql .= " AND ";
 				else
 					$strSql .= " WHERE ";
@@ -440,21 +506,32 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
-				return False;
+				return false;
 		}
 
 		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
+			$obUserFieldsSql->GetSelect()." ".
 			"FROM b_sonet_log_comment LC ".
-			"	".$arSqls["FROM"]." ";
+			"	".$arSqls["FROM"]." ".
+			$obUserFieldsSql->GetJoin("LC.ID")." ";
 
 		if (strlen($arSqls["WHERE"]) > 0)
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
 		else
 			$strSql .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
-		if (strlen($arSqls["RIGHTS"]) > 0)
+
+		if (strlen($strSqlUFFilter) > 0)
 		{
 			if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
+				$strSql .= " AND ".$strSqlUFFilter." ";
+			else
+				$strSql .= " WHERE ".$strSqlUFFilter." ";
+		}
+
+		if (strlen($arSqls["RIGHTS"]) > 0)
+		{
+			if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
 				$strSql .= " AND ";
 			else
 				$strSql .= " WHERE ";
@@ -469,15 +546,27 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		{
 			$strSql_tmp =
 				"SELECT COUNT('x') as CNT ".
+				$obUserFieldsSql->GetSelect()." ".
 				"FROM b_sonet_log_comment LC ".
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+				$obUserFieldsSql->GetJoin("LC.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
 			else
 				$strSql_tmp .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
-			if (strlen($arSqls["RIGHTS"]) > 0)
+				
+			if (strlen($strSqlUFFilter) > 0)
 			{
 				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
+					$strSql_tmp .= " AND ".$strSqlUFFilter." ";
+				else
+					$strSql_tmp .= " WHERE ".$strSqlUFFilter." ";
+			}
+
+			if (strlen($arSqls["RIGHTS"]) > 0)
+			{
+				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
 					$strSql_tmp .= " AND ";
 				else
 					$strSql_tmp .= " WHERE ";
@@ -505,6 +594,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 			//echo "!2.2!=".htmlspecialcharsbx($strSql)."<br>";
 
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("SONET_COMMENT"));
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
@@ -514,6 +604,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("SONET_COMMENT"));
 		}
 
 		return $dbRes;

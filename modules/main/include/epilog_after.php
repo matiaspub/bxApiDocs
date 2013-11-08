@@ -18,8 +18,9 @@ if($canEditPHP)
 
 $bShowTime = isset($_SESSION["SESS_SHOW_TIME_EXEC"]) && ($_SESSION["SESS_SHOW_TIME_EXEC"] == 'Y');
 $bShowStat = ($DB->ShowSqlStat && ($canEditPHP || $_SESSION["SHOW_SQL_STAT"]=="Y"));
+$bShowCacheStat = (\Bitrix\Main\Data\Cache::getShowCacheStat() && ($canEditPHP || $_SESSION["SHOW_CACHE_STAT"]=="Y"));
 
-if($bShowStat && !$USER->IsAuthorized())
+if(($bShowStat || $bShowCacheStat) && !$USER->IsAuthorized())
 {
 	require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/init_admin.php");
 	$GLOBALS["APPLICATION"]->AddHeadString($GLOBALS["adminPage"]->ShowScript());
@@ -27,7 +28,7 @@ if($bShowStat && !$USER->IsAuthorized())
 	$GLOBALS["APPLICATION"]->AddHeadString('<link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/pubstyles.css" />');
 }
 
-if ($bShowStat || $bShowTime)
+if ($bShowStat || $bShowTime || $bShowCacheStat)
 {
 	CUtil::InitJSCore(array('window', 'admin'));
 }
@@ -52,7 +53,7 @@ foreach($arAllEvents as $arEvent)
 
 if(!IsModuleInstalled("compression") && !defined('PUBLIC_AJAX_MODE') && ($_REQUEST["mode"] != 'excel'))
 {
-	if($bShowTime || $bShowStat)
+	if($bShowTime || $bShowStat || $bShowCacheStat)
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/debug_info.php");
 }
 

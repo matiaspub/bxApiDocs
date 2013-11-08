@@ -18,7 +18,7 @@ class IoException
 	 */
 	public function __construct($message = "", $path = "", \Exception $previous = null)
 	{
-		parent::__construct($message, 120, '', '', $previous);
+		parent::__construct($message, 120, '', 0, $previous);
 		$this->path = $path;
 	}
 

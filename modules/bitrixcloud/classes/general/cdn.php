@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 class CBitrixCloudCDN
 {
@@ -13,6 +13,202 @@ class CBitrixCloudCDN
 	private static $domain_changed = false;
 	/**
 	 *
+	 * @return bool
+	 *
+	 */
+	public static function IsActive()
+	{
+		foreach (GetModuleEvents("main", "OnEndBufferContent", true) as $arEvent)
+		{
+			if ($arEvent["TO_MODULE_ID"] === "bitrixcloud" && $arEvent["TO_CLASS"] === "CBitrixCloudCDN")
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 *
+	 * @return void
+	 * @throws CBitrixCloudException
+	 */
+	private static function stop()
+	{
+		$o = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
+		$a = new CBitrixCloudCDNWebService($o->getDomain());
+		$a->actionStop();
+	}
+	/**
+	 *
+	 * @param bool $bActive
+	 * @param bool $force
+	 * @return bool
+	 *
+	 */
+	public static function SetActive($bActive, $force = false)
+	{
+		/* @global CMain $APPLICATION */
+		global $APPLICATION;
+		if ($bActive)
+		{
+			if (!self::IsActive() || $force)
+			{
+				try
+				{
+					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
+					$o->saveToOptions();
+					if (!$o->isActive())
+					{
+						if (
+							$o->getQuota()->getTrafficSize() > $o->getQuota()->getAllowedSize()
+						)
+						{
+							$ex = new CApplicationException(GetMessage("BCL_CDN_ERROR_QUOTA_LIMIT"));
+							$APPLICATION->ThrowException($ex);
+							return false;
+						}
+						elseif (
+						$o->getQuota()->isExpired()
+						)
+						{
+							$ex = new CApplicationException(GetMessage("BCL_CDN_ERROR_QUOTA_EXPIRED"));
+							$APPLICATION->ThrowException($ex);
+							return false;
+						}
+					}
+					RegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
+					self::$domain_changed = false;
+				}
+				catch(CBitrixCloudException $e)
+				{
+					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
+					$APPLICATION->ThrowException($ex);
+					return false;
+				}
+			}
+			elseif (self::$domain_changed)
+			{
+				try
+				{
+					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
+					$o->saveToOptions();
+					self::$domain_changed = false;
+				}
+				catch(CBitrixCloudException $e)
+				{
+					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
+					$APPLICATION->ThrowException($ex);
+					return false;
+				}
+			}
+		}
+		else
+		{
+			if (self::IsActive() || $force)
+			{
+				try
+				{
+					self::stop();
+					UnRegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
+				}
+				catch(CBitrixCloudException $e)
+				{
+					UnRegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
+					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
+					$APPLICATION->ThrowException($ex);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	/**
+	 *
+	 * @return bool
+	 *
+	 */
+	private static function updateConfig()
+	{
+		if (!self::$config->lock())
+			return true;
+
+		$delayExpiration = true;
+		try
+		{
+			try
+			{
+				self::$config = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
+				self::$config->saveToOptions();
+				self::$config->unlock();
+			}
+			catch(CBitrixCloudException $e)
+			{
+				//In case of documented XML error we'll disable CDN
+				if($e->getErrorCode() !== "")
+				{
+					self::SetActive(false);
+					$delayExpiration = false;
+				}
+				throw $e;
+			}
+		}
+		catch (exception $e)
+		{
+			if ($delayExpiration)
+			{
+				self::$config->setExpired(time() + 1800);
+			}
+
+			CAdminNotify::Add(array(
+				"MESSAGE" => GetMessage("BCL_CDN_NOTIFY", array(
+					"#HREF#" => "/bitrix/admin/bitrixcloud_cdn.php?lang=".LANGUAGE_ID,
+				)),
+				"TAG" => "bitrixcloud_off",
+				"MODULE_ID" => "bitrixcloud",
+				"ENABLE_CLOSE" => "Y",
+			));
+			self::$config->unlock();
+			return false;
+		}
+
+		self::$config->unlock();
+
+		//Web service were disabled
+		if (!self::$config->isActive())
+		{
+			//By traffic quota
+			if ( self::$config->getQuota()->getTrafficSize() > self::$config->getQuota()->getAllowedSize() )
+			{
+				self::$config->setExpired(time() + 1800);
+				CAdminNotify::Add(array(
+					"MESSAGE" => GetMessage("BCL_CDN_NOTIFY_QUOTA_LIMIT"),
+					"TAG" => "bitrixcloud_off",
+					"MODULE_ID" => "bitrixcloud",
+					"ENABLE_CLOSE" => "N",
+				));
+				self::$config->unlock();
+				return false;
+			}
+			//Or by license
+			elseif ( self::$config->getQuota()->isExpired() )
+			{
+				self::$config->setExpired(time() + 1800);
+				CAdminNotify::Add(array(
+					"MESSAGE" => GetMessage("BCL_CDN_NOTIFY_QUOTA_EXPIRED"),
+					"TAG" => "bitrixcloud_off",
+					"MODULE_ID" => "bitrixcloud",
+					"ENABLE_CLOSE" => "N",
+				));
+				self::$config->unlock();
+				return false;
+			}
+		}
+
+		CAdminNotify::DeleteByTag("bitrixcloud_off");
+		return true;
+	}
+	/**
+	 *
 	 * @param string &$content
 	 * @return void
 	 *
@@ -24,66 +220,20 @@ class CBitrixCloudCDN
 
 		self::$proto = CMain::IsHTTPS() ? "https" : "http";
 		self::$config = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
-		if (self::$config->isExpired())
+
+		//if (self::$config->isExpired()
 		{
-			if (self::$config->lock())
-			{
-				$delayExpiration = true;
-				try
-				{
-					try
-					{
-						self::$config = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
-						self::$config->saveToOptions();
-						self::$config->unlock();
-					}
-					catch(CBitrixCloudException $e)
-					{
-						//In case of documented XML error we'll disable CDN
-						if($e->getErrorCode() !== "")
-						{
-							self::SetActive(false);
-							$delayExpiration = false;
-						}
-						throw $e;
-					}
-				}
-				catch(exception $e)
-				{
-					if($delayExpiration)
-						self::$config->setExpired(time() + 1800);
-					CAdminNotify::Add(array(
-						"MESSAGE" => GetMessage("BCL_CDN_NOTIFY", array(
-							"#HREF#" => "/bitrix/admin/bitrixcloud_cdn.php?lang=".LANGUAGE_ID,
-						)),
-						"TAG" => "bitrixcloud_off",
-						"MODULE_ID" => "bitrixcloud",
-						"ENABLE_CLOSE" => "Y",
-					));
-					self::$config->unlock();
-					return;
-				}
-			}
+			if(!self::updateConfig())
+				return;
 		}
 
 		if(!self::$config->isActive())
 			return;
 
 		$sites = self::$config->getSites();
-		if (defined("ADMIN_SECTION"))
-		{
-			if (!isset($sites["admin"]))
-				return;
-		}
-		elseif (defined("SITE_ID"))
-		{
-			if (!isset($sites[SITE_ID]))
-				return;
-		}
-		else
-		{
+		$siteId = defined("ADMIN_SECTION")? "admin": (defined("SITE_ID")? SITE_ID: "");
+		if (!isset($sites[$siteId]))
 			return;
-		}
 
 		self::$ajax = preg_match("/<head>/i", substr($content, 0, 512)) === 0;
 
@@ -123,7 +273,6 @@ class CBitrixCloudCDN
 			), $content);
 		}
 	}
-
 	/**
 	 *
 	 * @return void
@@ -170,120 +319,27 @@ class CBitrixCloudCDN
 
 		foreach (self::$config->getLocations() as $location)
 		{
-			/** @var CBitrixCloudCDNLocation $location */
+			/* @var CBitrixCloudCDNLocation $location */
 			if ($location->getProto() === self::$proto)
 			{
 				$server = $location->getServerNameByPrefixAndExtension($prefix, $extension, $link);
 				if ($server !== "")
 				{
+					$filePath = $prefix.$link.$extension;
 					if ($params === '')
-					{
-						if (file_exists($_SERVER["DOCUMENT_ROOT"].$prefix.$link.$extension))
-							$params = "?".filemtime($_SERVER["DOCUMENT_ROOT"].$prefix.$link.$extension).$params;
-					}
+						$filePath = CUtil::GetAdditionalFileURL($filePath);
+
 					//Fix spaces in the link
 					$link = str_replace(" ", "%20", $link);
-					return $attribute.$open_quote.$proto.$server.$prefix.$link.$extension.$params.$close_quote;
+					return $attribute.$open_quote.$proto.$server.$filePath.$params.$close_quote;
 				}
 			}
 		}
 		return $match[0];
 	}
 	/**
-	 *
-	 * @return void
-	 *
-	 */
-	private static function stop() /*. throws CBitrixCloudException .*/
-	{
-		$o = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
-		$a = new CBitrixCloudCDNWebService($o->getDomain());
-		$a->actionStop();
-	}
-	/**
-	 *
-	 * @return bool
-	 *
-	 */
-	public static function IsActive()
-	{
-		$bActive = false;
-		foreach (GetModuleEvents("main", "OnEndBufferContent", true) as $arEvent)
-		{
-			if ($arEvent["TO_MODULE_ID"] === "bitrixcloud" && $arEvent["TO_CLASS"] === "CBitrixCloudCDN")
-			{
-				$bActive = true;
-				break;
-			}
-		}
-		return $bActive;
-	}
-	/**
-	 *
-	 * @param bool $bActive
-	 * @return bool
-	 *
-	 */
-	public static function SetActive($bActive)
-	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-		if ($bActive)
-		{
-			if (!self::IsActive())
-			{
-				try
-				{
-					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
-					$o->saveToOptions();
-					RegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
-					self::$domain_changed = false;
-				}
-				catch(CBitrixCloudException $e)
-				{
-					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
-					$APPLICATION->ThrowException($ex);
-					return false;
-				}
-			}
-			elseif (self::$domain_changed)
-			{
-				try
-				{
-					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
-					$o->saveToOptions();
-					self::$domain_changed = false;
-				}
-				catch(CBitrixCloudException $e)
-				{
-					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
-					$APPLICATION->ThrowException($ex);
-					return false;
-				}
-			}
-		}
-		else
-		{
-			if (self::IsActive())
-			{
-				try
-				{
-					self::stop();
-					UnRegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
-				}
-				catch(CBitrixCloudException $e)
-				{
-					UnRegisterModuleDependences("main", "OnEndBufferContent", "bitrixcloud", "CBitrixCloudCDN", "OnEndBufferContent");
-					$ex = new CApplicationException($e->getMessage()."\n".$e->getDebugInfo());
-					$APPLICATION->ThrowException($ex);
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	/**
 	 * Shows information about CDN free space in Admin's informer popup
+	 *
 	 * @return void
 	 */
 	static public function OnAdminInformerInsertItems()
@@ -296,7 +352,7 @@ class CBitrixCloudCDN
 			"COLOR" => "green",
 		);
 
-		if (CBitrixCloudCDN::IsActive())
+		if (self::IsActive())
 		{
 			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/bitrixcloud_cdn.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_CDN_AI_SETT").'</a>';
 
@@ -358,4 +414,3 @@ class CBitrixCloudCDN
 		CAdminInformer::AddItem($CDNAIParams);
 	}
 }
-?>

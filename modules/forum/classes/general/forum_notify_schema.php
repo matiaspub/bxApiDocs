@@ -9,18 +9,14 @@ class CForumNotifySchema
 
 	public static function OnGetNotifySchema()
 	{
-		return array(
+		return IsModuleInstalled('bitrix24')? array(): array(
 			"forum" => array(
 				"comment" => Array(
 					"NAME" => GetMessage("FORUM_NS_COMMENT"),
-					"MAIL" => true,
-					"XMPP" => false,
 				),
 /*
 				"mention" => Array(
 					"NAME" => GetMessage("FORUM_NS_MENTION"),
-					"MAIL" => true,
-					"XMPP" => false,
 				),
 */
 			),

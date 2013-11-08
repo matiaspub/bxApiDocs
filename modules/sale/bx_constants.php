@@ -117,27 +117,27 @@ define('_TTF_MAC_HEADER', false);
 /**
  * GF_WORDS
  */
-define('GF_WORDS', null);
+define('GF_WORDS', (1 << 0));
 
 /**
  * GF_SCALE
  */
-define('GF_SCALE', null);
+define('GF_SCALE', (1 << 3));
 
 /**
  * GF_MORE
  */
-define('GF_MORE', null);
+define('GF_MORE', (1 << 5));
 
 /**
  * GF_XYSCALE
  */
-define('GF_XYSCALE', null);
+define('GF_XYSCALE', (1 << 6));
 
 /**
  * GF_TWOBYTWO
  */
-define('GF_TWOBYTWO', null);
+define('GF_TWOBYTWO', (1 << 7));
 
 /**
  * SALE_TIME_LOCK_USER

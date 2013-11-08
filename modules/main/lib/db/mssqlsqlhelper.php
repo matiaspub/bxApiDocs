@@ -1,9 +1,27 @@
 <?php
 namespace Bitrix\Main\DB;
 
-class MssqlSqlHelper
-	extends SqlHelper
+class MssqlSqlHelper extends SqlHelper
 {
+
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getLeftQuote()
+	{
+		return '[';
+	}
+
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getRightQuote()
+	{
+		return ']';
+	}
+
 	static public function getQueryDelimiter()
 	{
 		return "\nGO";
@@ -24,9 +42,80 @@ class MssqlSqlHelper
 		return "convert(datetime, cast(year(getdate()) as varchar(4)) + '-' + cast(month(getdate()) as varchar(2)) + '-' + cast(day(getdate()) as varchar(2)), 120)";
 	}
 
+	static public function addSecondsToDateTime($seconds, $from = null)
+	{
+		if ($from === null)
+		{
+			$from = static::getCurrentDateTimeFunction();
+		}
+
+		return 'DATEADD(second, '.$seconds.', '.$from.')';
+	}
+
 	static public function getDatetimeToDateFunction($value)
 	{
 		return 'DATEADD(dd, DATEDIFF(dd, 0, '.$value.'), 0)';
+	}
+
+	public function formatDate($format, $field = null)
+	{
+		if ($field === null)
+		{
+			return '';
+		}
+
+		$result = array();
+
+		foreach (preg_split("#(YYYY|MMMM|MM|MI|M|DD|HH|H|GG|G|SS|TT|T)#", $format, -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $part)
+		{
+			switch ($part)
+			{
+				case "YYYY":
+					$result[] = "\n\tCONVERT(varchar(4),DATEPART(yyyy, $field))";
+					break;
+				case "MMMM":
+					$result[] = "\n\tdatename(mm, $field)";
+					break;
+				case "MM":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(mm, $field)))+CONVERT(varchar(2),DATEPART(mm, $field))";
+					break;
+				case "MI":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(mi, $field)))+CONVERT(varchar(2),DATEPART(mi, $field))";
+					break;
+				case "M":
+					$result[] = "\n\tCONVERT(varchar(3), $field,7)";
+					break;
+				case "DD":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(dd, $field)))+CONVERT(varchar(2),DATEPART(dd, $field))";
+					break;
+				case "HH":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(hh, $field)))+CONVERT(varchar(2),DATEPART(hh, $field))";
+					break;
+				case "H":
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN RIGHT(REPLICATE('0',2) + CAST(datepart(HH, $field) AS VARCHAR(2)),2) ELSE RIGHT(REPLICATE('0',2) + CAST(datepart(HH, dateadd(HH, -12, $field)) AS VARCHAR(2)), 2) END";
+					break;
+				case "GG":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(hh, $field)))+CONVERT(varchar(2),DATEPART(hh, $field))";
+					break;
+				case "G":
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN RIGHT(REPLICATE('0',2) + CAST(datepart(HH, $field) AS VARCHAR(2)),2) ELSE RIGHT(REPLICATE('0',2) + CAST(datepart(HH, dateadd(HH, -12, $field)) AS VARCHAR(2)), 2) END";
+					break;
+				case "SS":
+					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(ss, $field)))+CONVERT(varchar(2),DATEPART(ss, $field))";
+					break;
+				case "TT":
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN 'AM' ELSE 'PM' END";
+					break;
+				case "T":
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN 'AM' ELSE 'PM' END";
+					break;
+				default:
+					$result[] = "'".$this->forSql($part)."'";
+					break;
+			}
+		}
+
+		return join("+", $result);
 	}
 
 	static public function getConcatFunction()
@@ -55,15 +144,15 @@ class MssqlSqlHelper
 
 	static public function getDateTimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
 	{
-		$customOffset = $value->getOffset();
+		$customOffset = $value->getValue()->getOffset();
 
 		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getOffset();
+		$serverOffset = $serverTime->getValue()->getOffset();
 
 		$diff = $customOffset - $serverOffset;
 		$valueTmp = clone $value;
 
-		$valueTmp->sub(new \DateInterval(sprintf("PT%sS", $diff)));
+		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
 
 		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
 		$date = "CONVERT(datetime, '".$valueTmp->format($format)."', 120)";
@@ -105,29 +194,17 @@ class MssqlSqlHelper
 		return array($strInsert1, $strInsert2, array());
 	}
 
-	public function prepareUpdate($tableName, $arFields)
-	{
-		$strUpdate = "";
-
-		$arColumns = $this->dbConnection->getTableFields($tableName);
-		foreach ($arColumns as $columnName => $columnInfo)
-		{
-			if (array_key_exists($columnName, $arFields))
-				$strUpdate .= ", ".$columnName." = ".$this->convertValueToDb($arFields[$columnName], $columnInfo);
-			elseif (array_key_exists("~".$columnName, $arFields))
-				$strUpdate .= ", ".$columnName." = ".$arFields["~".$columnName];
-		}
-
-		if ($strUpdate != "")
-			$strUpdate = " ".substr($strUpdate, 2)." ";
-
-		return array($strUpdate, array());
-	}
-
-	protected function convertValueToDb($value, $columnInfo)
+	protected function convertValueToDb($value, array $columnInfo)
 	{
 		if ($value === null)
+		{
 			return "NULL";
+		}
+
+		if ($value instanceof SqlExpression)
+		{
+			return $value->compile();
+		}
 
 		switch ($columnInfo["TYPE"])
 		{
@@ -162,4 +239,48 @@ class MssqlSqlHelper
 
 		return $result;
 	}
+
+	static public function getTopSql($sql, $limit, $offset = 0)
+	{
+		$offset = intval($offset);
+		$limit = intval($limit);
+
+		if ($offset > 0 && $limit <= 0)
+			throw new \Bitrix\Main\ArgumentException("Limit must be set if offset is set");
+
+		if ($limit > 0)
+		{
+			if ($offset <= 0)
+			{
+				$sql = preg_replace("/^\\s*SELECT/i", "SELECT TOP ".$limit, $sql);
+			}
+			else
+			{
+				if (preg_match("#(\\s+order\\s+by(\\s+[a-z0-9_.]+(\\s+(asc|desc))?\\s*,)*(\\s+[a-z0-9_.]+(\\s+(asc|desc))?)\\s*)$#i", $sql, $matches))
+				{
+					$orderBy = $matches[1];
+					$sqlTmp = substr($sql, 0, -strlen($orderBy));
+				}
+				else
+				{
+					$orderBy = "ORDER BY (SELECT 1)";
+					$sqlTmp = $sql;
+				}
+
+				$sqlTmp = preg_replace(
+					"/^\\s*SELECT/i",
+					"SELECT ROW_NUMBER() OVER (".$orderBy.") AS ROW_NUMBER_ALIAS,",
+					$sqlTmp
+				);
+
+				$sql =
+					"WITH ROW_NUMBER_QUERY_ALIAS AS (".$sqlTmp.") ".
+					"SELECT * ".
+					"FROM ROW_NUMBER_QUERY_ALIAS ".
+					"WHERE ROW_NUMBER_ALIAS BETWEEN ".$offset." AND ".($offset + $limit - 1)."";
+			}
+		}
+		return $sql;
+	}
+
 }

@@ -243,15 +243,8 @@ class CAllSaleUserCards
 
 			if ($type == "E")
 			{
-				if (ToUpper(substr(PHP_OS, 0, 3) == 'WIN'))
-				{
-					srand(((int)((double)microtime()*1000003)));
-					$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($rEncModule), MCRYPT_RAND);
-				}
-				else
-				{
-					$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($rEncModule), MCRYPT_DEV_RANDOM);
-				}
+				$randomSource = preg_match("/^WIN/i", PHP_OS)? MCRYPT_RAND: MCRYPT_DEV_RANDOM;
+				$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($rEncModule), $randomSource);
 			}
 			else
 			{

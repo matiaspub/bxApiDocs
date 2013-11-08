@@ -1,8 +1,7 @@
 <?php
 namespace Bitrix\Main\DB;
 
-class MysqlSqlHelper
-	extends MysqliSqlHelper
+class MysqlSqlHelper extends MysqliSqlHelper
 {
 	public function forSql($value, $maxLength = 0)
 	{

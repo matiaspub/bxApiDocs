@@ -3,7 +3,7 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage main
- * @copyright 2001-2012 Bitrix
+ * @copyright 2001-2013 Bitrix
  */
 
 namespace Bitrix\Main\Entity;
@@ -11,8 +11,7 @@ namespace Bitrix\Main\Entity;
 use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
 
-//Loc::loadMessages(__FILE__);
-IncludeModuleLangFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
 /**
  * Base entity data manager
@@ -110,12 +109,20 @@ abstract class DataManager
 		return static::getByPrimary($id);
 	}
 
+	public static function getRowById($id)
+	{
+		$result = static::getByPrimary($id);
+		$row = $result->fetch();
+
+		return (is_array($row)? $row : null);
+	}
+
 	public static function getRow($parameters)
 	{
 		$result = static::getList($parameters);
 		$row = $result->fetch();
 
-		return is_array($row) ? $row : null;
+		return (is_array($row)? $row : null);
 	}
 
 	public static function getList($parameters = array())
@@ -261,7 +268,7 @@ abstract class DataManager
 		// primary values validation
 		foreach ($primary as $key => $value)
 		{
-			if (!is_scalar($value))
+			if (!is_scalar($value) && !($value instanceof Main\Type\DateTime))
 			{
 				throw new \Exception(sprintf(
 					'Unknown value type "%s" for primary "%s" found when trying to query %s row.',
@@ -275,8 +282,8 @@ abstract class DataManager
 	 * Checks data fields before saving to DB. Result stores in $result object
 	 *
 	 * @param Result $result
+	 * @param mixed $primary
 	 * @param array $data
-	 * @param null $id
 	 * @throws \Exception
 	 */
 	public static function checkFields(Result $result, $primary, array $data)
@@ -287,9 +294,9 @@ abstract class DataManager
 			if ($field instanceof ScalarField && $field->isRequired())
 			{
 				$fieldName = $field->getName();
-				if (($id === null && (!isset($data[$fieldName]) || $data[$fieldName] == '')) || ($id !== null && isset($data[$fieldName]) && $data[$fieldName] == ''))
+				if ((empty($primary) && (!isset($data[$fieldName]) || $data[$fieldName] == '')) || (!empty($primary) && isset($data[$fieldName]) && $data[$fieldName] == ''))
 				{
-					$result->addError(new FieldError($field, /*Loc::*/getMessage("MAIN_ENTITY_FIELD_REQUIRED", array("#FIELD#"=>$field->getTitle())), FieldError::EMPTY_REQUIRED));
+					$result->addError(new FieldError($field, Loc::getMessage("MAIN_ENTITY_FIELD_REQUIRED", array("#FIELD#"=>$field->getTitle())), FieldError::EMPTY_REQUIRED));
 				}
 			}
 		}
@@ -343,15 +350,17 @@ abstract class DataManager
 		// check data
 		static::checkFields($result, $primary, $data);
 
-		if(!$result->isSuccess())
+		if(!$result->isSuccess(true))
+		{
 			return $result;
+		}
 
 		//event on adding
 		$event = new DataManagerEvent($entity, "OnAdd", array("fields"=>$data));
 		$event->send();
 
 		// save data
-		$connection = Main\Application::getDbConnection();
+		$connection = Main\Application::getConnection();
 
 		$tableName = $entity->getDBTableName();
 		$identity = $entity->getAutoIncrement();
@@ -393,15 +402,17 @@ abstract class DataManager
 		// check data
 		static::checkFields($result, $primary, $data);
 
-		if(!$result->isSuccess())
+		if(!$result->isSuccess(true))
+		{
 			return $result;
+		}
 
 		//event on update
 		$event = new DataManagerEvent($entity, "OnUpdate", array("id"=>$primary, "fields"=>$data));
 		$event->send();
 
 		// save data
-		$connection = Main\Application::getDbConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$tableName = $entity->getDBTableName();
@@ -411,12 +422,14 @@ abstract class DataManager
 		$id = array();
 		foreach ($primary as $k => $v)
 		{
-			$id[] = $k." = '".$helper->forSql($v)."'";
+			$id[] = $helper->prepareAssignment($tableName, $k, $v);
 		}
 		$where = implode(' AND ', $id);
 
 		$sql = "UPDATE ".$tableName." SET ".$update[0]." WHERE ".$where;
 		$connection->queryExecute($sql, $update[1]);
+
+		$result->setAffectedRowsCount($connection);
 
 		//TODO: save Userfields
 
@@ -453,7 +466,7 @@ abstract class DataManager
 		$event->send();
 
 		// delete
-		$connection = Main\Application::getDbConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$tableName = $entity->getDBTableName();

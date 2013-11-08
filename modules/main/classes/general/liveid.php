@@ -1275,7 +1275,7 @@ class WindowsLiveLogin
 	* user has granted consent.
 	*/
 	/*public*/
-	public function processConsentToken($token, $context=null)
+	public static function processConsentToken($token, $context=null)
 	{
 		if (!$token) {
 			WindowsLiveLogin::debug('Error: processConsentToken: Null token.');

@@ -16,82 +16,72 @@ class CAjax
 
 	public static function GetComponentID($componentName, $componentTemplate, $additionalID)
 	{
-		if(function_exists("debug_backtrace"))
+		$aTrace = Bitrix\Main\Diag\Helper::getBackTrace(0, DEBUG_BACKTRACE_IGNORE_ARGS);
+
+		$trace_count = count($aTrace);
+		$trace_current = $trace_count-1;
+		for ($i = 0; $i<$trace_count; $i++)
 		{
-			$aTrace = debug_backtrace();
-
-			$trace_count = count($aTrace);
-			$trace_current = $trace_count-1;
-			for ($i = 0; $i<$trace_count; $i++)
+			if (strtolower($aTrace[$i]['function']) == 'includecomponent' && (($c = strtolower($aTrace[$i]['class'])) == 'callmain' || $c == 'cmain'))
 			{
-				if (strtolower($aTrace[$i]['function']) == 'includecomponent' && (($c = strtolower($aTrace[$i]['class'])) == 'callmain' || $c == 'cmain'))
-				{
-					$trace_current = $i;
-					break;
-				}
+				$trace_current = $i;
+				break;
 			}
+		}
 
-			$sSrcFile = strtolower(str_replace("\\", "/", $aTrace[$trace_current]["file"]));
-			$iSrcLine = intval($aTrace[$trace_current]["line"]);
+		$sSrcFile = strtolower(str_replace("\\", "/", $aTrace[$trace_current]["file"]));
+		$iSrcLine = intval($aTrace[$trace_current]["line"]);
 
-			$bSrcFound = false;
+		$bSrcFound = false;
 
-			if($iSrcLine > 0 && $sSrcFile <> "")
+		if($iSrcLine > 0 && $sSrcFile <> "")
+		{
+			// try to covert absolute path to file within DOCUMENT_ROOT
+			$doc_root = rtrim(str_replace(Array("\\\\", "//", "\\"), Array("\\", "/", "/"), realpath($_SERVER["DOCUMENT_ROOT"])), "\\/");
+			$doc_root = strtolower($doc_root);
+
+			if(strpos($sSrcFile, $doc_root."/") === 0)
 			{
-				// try to covert absolute path to file within DOCUMENT_ROOT
-				$doc_root = rtrim(str_replace(Array("\\\\", "//", "\\"), Array("\\", "/", "/"), realpath($_SERVER["DOCUMENT_ROOT"])), "\\/");
-				$doc_root = strtolower($doc_root);
+				//within
+				$sSrcFile = substr($sSrcFile, strlen($doc_root));
+				$bSrcFound = true;
+			}
+			else
+			{
+				//outside
+				$sRealBitrix = strtolower(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"]."/bitrix")));
 
-				if(strpos($sSrcFile, $doc_root) === 0)
+				if(strpos($sSrcFile, substr($sRealBitrix, 0, -6)) === 0)
 				{
-					//within
-					$sSrcFile = substr($sSrcFile, strlen($doc_root));
+					$sSrcFile = substr($sSrcFile, strlen($sRealBitrix) - 7);
 					$bSrcFound = true;
 				}
 				else
 				{
-					//outside
-					$sRealBitrix = strtolower(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"]."/bitrix")));
-
-					if(strpos($sSrcFile, $sRealBitrix) === 0)
+					// special hack
+					$sRealBitrixModules = strtolower(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules")));
+					if(strpos($sSrcFile, $sRealBitrixModules) === 0)
 					{
-						$sSrcFile = "/bitrix".substr($sSrcFile, strlen($sRealBitrix));
+						$sSrcFile = "/bitrix/modules".substr($sSrcFile, strlen($sRealBitrixModules));
 						$bSrcFound = true;
-					}
-					elseif(strpos($sSrcFile, substr($sRealBitrix, 0, -6)) === 0)
-					{
-						$sSrcFile = substr($sSrcFile, strlen($sRealBitrix) - 7);
-						$bSrcFound = true;
-					}
-					else
-					{
-						// special hack
-						$sRealBitrixModules = strtolower(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules")));
-						if(strpos($sSrcFile, $sRealBitrixModules) === 0)
-						{
-							$sSrcFile = "/bitrix/modules".substr($sSrcFile, strlen($sRealBitrixModules));
-							$bSrcFound = true;
-						}
 					}
 				}
 			}
-
-			if (!$bSrcFound)
-				return false;
-
-			$session_string = $sSrcFile.'|'.$iSrcLine.'|'.$componentName;
-
-			if (strlen($componentTemplate) > 0)
-				$session_string .= '|'.$componentTemplate;
-			else
-				$session_string .= '|.default';
-
-			$session_string .= '|'.$additionalID;
-
-			return md5($session_string);
 		}
 
-		return false;
+		if (!$bSrcFound)
+			return false;
+
+		$session_string = $sSrcFile.'|'.$iSrcLine.'|'.$componentName;
+
+		if (strlen($componentTemplate) > 0)
+			$session_string .= '|'.$componentTemplate;
+		else
+			$session_string .= '|.default';
+
+		$session_string .= '|'.$additionalID;
+
+		return md5($session_string);
 	}
 
 	public static function GetSession()

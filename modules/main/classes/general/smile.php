@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
 IncludeModuleLangFile(__FILE__);
 
 class CSmile
@@ -14,6 +21,8 @@ class CSmile
 
 	private static function checkFields(&$arFields, $actionType = self::CHECK_TYPE_ADD)
 	{
+		global $APPLICATION;
+
 		$aMsg = array();
 
 		if(isset($arFields['TYPE']) && (!in_array($arFields['TYPE'], array(self::TYPE_SMILE, self::TYPE_ICON))))
@@ -54,7 +63,7 @@ class CSmile
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -417,13 +426,12 @@ class CSmile
 		if ($setId == CSmileSet::SET_ID_BY_CONFIG)
 			$setId = CSmileSet::getConfigSetId();
 
-		if (strlen($lang) > 0)
-			$arFields["LID"] = htmlspecialcharsbx($lang);
+		if ($lang <> '')
+			$arFilter["LID"] = htmlspecialcharsbx($lang);
 
 		global $CACHE_MANAGER;
-		$cache_id = "b_smile_".$arFilter["TYPE"]."_".$setId."_".$arFields["LID"];
+		$cache_id = "b_smile_".$arFilter["TYPE"]."_".$setId."_".$arFilter["LID"];
 
-		$arResult = Array();
 		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile"))
 		{
 			$arResult = $CACHE_MANAGER->Get($cache_id);
@@ -445,50 +453,10 @@ class CSmile
 		return $arResult;
 	}
 
-	public static function prepareForLHE($smiles)
-	{
-		$arSmiles = Array();
-		foreach($smiles as $smile)
-		{
-			$arSmiles[] = array(
-				'name' => $smile["NAME"],
-				'path' => self::PATH_TO_SMILE.$smile["SET_ID"]."/".$smile["IMAGE"],
-				'code' => array_shift(explode(" ", $smile["TYPING"]))
-			);
-		}
-		return $arSmiles;
-	}
-
-	public static function prepareForParser($smiles)
-	{
-		$arSmiles = Array();
-		foreach($smiles as $smile)
-		{
-			$arTypings = explode(" ", $smile["TYPING"]);
-			foreach ($arTypings as $typing)
-			{
-				$arSmiles[] = array_merge($smile, array(
-					'TYPING' => $typing,
-					'IMAGE'  => self::PATH_TO_SMILE.$smile["SET_ID"]."/".$smile["IMAGE"],
-					'DESCRIPTION' => $smile["NAME"],
-					'DESCRIPTION_DECODE' => 'Y'
-				));
-			}
-		}
-		return $arSmiles;
-	}
-
-	public static function preparePathToCopy($type, $setId, $image)
-	{
-		$path = $_SERVER["DOCUMENT_ROOT"].($type == CSmile::TYPE_SMILE? CSmile::TYPE_SMILE: CSmile::TYPE_ICON).'/'.intval($setId).'/'.$image;
-		if (file_exists($path))
-			return false;
-
-		return $path;
-	}
-
 	public static function import($arParams)
 	{
+		global $APPLICATION;
+
 		// check fields
 		$aMsg = array();
 		$arParams['SET_ID'] = intval($arParams['SET_ID']);
@@ -508,7 +476,7 @@ class CSmile
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 		$sUnpackDir = CTempFile::GetDirectoryName(1);
@@ -522,7 +490,7 @@ class CSmile
 		{
 			$aMsg["UNPACK"] = array("id"=>"UNPACK", "text"=> GetMessage("MAIN_SMILE_IMPORT_UNPACK_ERROR"));
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -530,7 +498,7 @@ class CSmile
 		if (file_exists($sUnpackDir.'install.csv'))
 		{
 			$arLang = Array();
-			$db_res = CLanguage::GetList(($b="sort"), ($o="asc"));
+			$db_res = CLanguage::GetList($b="sort", $o="asc");
 			while ($res = $db_res->Fetch())
 			{
 				if (file_exists($sUnpackDir.'install_lang_'. $res["LID"].'.csv'))
@@ -543,7 +511,7 @@ class CSmile
 					while($smile = $csvFile->Fetch())
 					{
 						if (defined('BX_UTF') && BX_UTF && $res["LID"] == 'ru')
-							$smile[1] = $GLOBALS['APPLICATION']->ConvertCharset($smile[1], 'windows-1251', 'utf-8');
+							$smile[1] = $APPLICATION->ConvertCharset($smile[1], 'windows-1251', 'utf-8');
 
 						$arLang[$smile[0]][$res["LID"]] = $smile[1];
 					}
@@ -677,7 +645,7 @@ class CSmile
 						}
 					}
 
-					$GLOBALS["APPLICATION"]->ResetException();
+					$APPLICATION->ResetException();
 				}
 			}
 		}
@@ -1054,4 +1022,3 @@ class CSmileSet
 	}
 }
 
-?>

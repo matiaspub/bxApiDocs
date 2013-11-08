@@ -22,7 +22,7 @@ class Enum extends Base
 {
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
-		if (in_array($value, $field->getValues(), true))
+		if (in_array($value, $field->getValues(), true) || $value == '')
 		{
 			return true;
 		}

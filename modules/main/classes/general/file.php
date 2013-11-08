@@ -1551,19 +1551,27 @@ class CAllFile
 				$max_file_size = 1000000000;
 
 			$ct = $arFile["CONTENT_TYPE"];
-			if($max_file_size>=$arFile["FILE_SIZE"] && (substr($ct, 0, 6) == "video/" || substr($ct, 0, 6) == "audio/"))
+			$isVideo = (strpos($ct, "video/") === 0);
+			$isAudio = (strpos($ct, "audio/") === 0);
+			if($max_file_size >= $arFile["FILE_SIZE"] && ($isVideo || $isAudio))
+			{
 				$strResult =
-					'<OBJECT ID="WMP64" WIDTH="'.($iMaxW>0?$iMaxW:'250').'" HEIGHT="'.(substr($ct, 0, 6) == "audio/"?'45':($iMaxH>0?$iMaxH:'220')).'" CLASSID="CLSID:22D6f312-B0F6-11D0-94AB-0080C74C7E95" STANDBY="Loading Windows Media Player components..." TYPE="application/x-oleobject"> '.
+					'<OBJECT ID="WMP64" WIDTH="'.($iMaxW > 0? $iMaxW : '250').'" HEIGHT="'.($isAudio? '45' : ($iMaxH > 0? $iMaxH : '220')).'" CLASSID="CLSID:22D6f312-B0F6-11D0-94AB-0080C74C7E95" STANDBY="Loading Windows Media Player components..." TYPE="application/x-oleobject"> '.
 					'<PARAM NAME="AutoStart" VALUE="false"> '.
 					'<PARAM NAME="ShowDisplay" VALUE="false">'.
 					'<PARAM NAME="ShowControls" VALUE="true" >'.
 					'<PARAM NAME="ShowStatusBar" VALUE="0">'.
 					'<PARAM NAME="FileName" VALUE="'.$arFile["SRC"].'"> '.
 					'</OBJECT>';
-			elseif($max_file_size>=$arFile["FILE_SIZE"] && substr($ct, 0, 6) == "image/")
+			}
+			elseif($max_file_size >= $arFile["FILE_SIZE"] && CFile::IsImage($arFile["SRC"], $ct))
+			{
 				$strResult = CFile::ShowImage($arFile, $iMaxW, $iMaxH, $sParams, "", $bPopup, $sPopupTitle, $iSizeWHTTP, $iSizeHHTTP);
+			}
 			else
+			{
 				$strResult = ' [ <a href="'.$arFile["SRC"].'" title="'.GetMessage("FILE_FILE_DOWNLOAD").'">'.GetMessage("FILE_DOWNLOAD").'</a> ] ';
+			}
 		}
 		return $strResult;
 	}
@@ -2455,7 +2463,7 @@ function ImgShw(ID, width, height, alt)
 		if (!is_array($file) || !array_key_exists("FILE_NAME", $file) || strlen($file["FILE_NAME"]) <= 0)
 			return false;
 
-		if ($resizeType != BX_RESIZE_IMAGE_EXACT && $resizeType != BX_RESIZE_IMAGE_PROPORTIONAL_ALT)
+		if ($resizeType !== BX_RESIZE_IMAGE_EXACT && $resizeType !== BX_RESIZE_IMAGE_PROPORTIONAL_ALT)
 			$resizeType = BX_RESIZE_IMAGE_PROPORTIONAL;
 
 		if (!is_array($arSize))
@@ -2911,8 +2919,8 @@ function ImgShw(ID, width, height, alt)
 					default:
 						if ($resizeType == BX_RESIZE_IMAGE_PROPORTIONAL_ALT)
 						{
-							$width = Max($sourceImageWidth, $sourceImageHeight);
-							$height = Min($sourceImageWidth, $sourceImageHeight);
+							$width = max($sourceImageWidth, $sourceImageHeight);
+							$height = min($sourceImageWidth, $sourceImageHeight);
 						}
 						else
 						{
@@ -2922,7 +2930,7 @@ function ImgShw(ID, width, height, alt)
 						$ResizeCoeff["width"] = $arSize["width"] / $width;
 						$ResizeCoeff["height"] = $arSize["height"] / $height;
 
-						$iResizeCoeff = Min($ResizeCoeff["width"], $ResizeCoeff["height"]);
+						$iResizeCoeff = min($ResizeCoeff["width"], $ResizeCoeff["height"]);
 						$iResizeCoeff = ((0 < $iResizeCoeff) && ($iResizeCoeff < 1) ? $iResizeCoeff : 1);
 						$bNeedCreatePicture = ($iResizeCoeff != 1 ? true : false);
 
@@ -3014,7 +3022,7 @@ function ImgShw(ID, width, height, alt)
 
 		$bNeedCreatePicture = false;
 
-		if ($resizeType != BX_RESIZE_IMAGE_EXACT && $resizeType != BX_RESIZE_IMAGE_PROPORTIONAL_ALT)
+		if ($resizeType !== BX_RESIZE_IMAGE_EXACT && $resizeType !== BX_RESIZE_IMAGE_PROPORTIONAL_ALT)
 			$resizeType = BX_RESIZE_IMAGE_PROPORTIONAL;
 
 		if (!is_array($arSize))
@@ -3789,8 +3797,8 @@ function ImgShw(ID, width, height, alt)
 		$arFile["height"] = intval(@imagesy($file_obj));
 
 		$wm_pos = array(
-			"x" => 2, // Left
-			"y" => 2, // Top
+			"x" => 0, // Left
+			"y" => 0, // Top
 			"width" => $arFile["width"],
 			"height" => $arFile["height"]
 		);
@@ -3805,10 +3813,10 @@ function ImgShw(ID, width, height, alt)
 		elseif ($Params["position"]['x'] == 'right')
 			$wm_pos["x"] = intval(($Params["width"] - $wm_pos["width"]));
 
-		if ($wm_pos["y"] < 2)
-			$wm_pos["y"] = 2;
-		if ($wm_pos["x"] < 2)
-			$wm_pos["x"] = 2;
+		if ($wm_pos["y"] < 0)
+			$wm_pos["y"] = 0;
+		if ($wm_pos["x"] < 0)
+			$wm_pos["x"] = 0;
 
 		for ($y = 0; $y < $arFile["height"]; $y++ )
 		{

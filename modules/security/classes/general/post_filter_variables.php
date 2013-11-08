@@ -120,6 +120,7 @@ class CSecurityXSSDetectVariables
 			$needles = $pNeedle;
 		}
 		$needles = array_map(array(__CLASS__,"pregQuote"), $needles);
+		$needles = array_filter($needles);
 
 		$pattern = self::PATTERN_DELIMITER;
 		if($pIsQuotePattern)
@@ -153,7 +154,7 @@ class CSecurityXSSDetectVariables
 	 */
 	protected function parseVariable($pName, $pValue)
 	{
-		if($pValue == "")
+		if(!$pValue)
 			return true;
 
 		if(preg_match("/[^\\\](((\\\)(\\\))*+')+/s"," ".$pValue))

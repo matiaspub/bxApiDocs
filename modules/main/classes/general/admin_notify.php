@@ -297,7 +297,7 @@ class CAdminNotify
 		$html = "";
 		foreach ($arNotify as $value)
 		{
-			$html .= '<div class="adm-warning-block" data-id="'.intval($value['ID']).'"  data-ajax="Y"><span class="adm-warning-text">'.$value['MESSAGE'].'</span>'.($value['ENABLE_CLOSE'] == 'Y' ? '<span onclick="BX.adminPanel ? BX.adminPanel.hideNotify(this.parentNode) : BX.admin.panel.hideNotify(this.parentNode);" class="adm-warning-close"></span>' : '').'</div>';
+			$html .= '<div class="adm-warning-block" data-id="'.intval($value['ID']).'"  data-ajax="Y"><span class="adm-warning-text">'.$value['MESSAGE'].'</span><span class="adm-warning-icon"></span>'.($value['ENABLE_CLOSE'] == 'Y' ? '<span onclick="BX.adminPanel ? BX.adminPanel.hideNotify(this.parentNode) : BX.admin.panel.hideNotify(this.parentNode);" class="adm-warning-close"></span>' : '').'</div>';
 
 			/*$html .= '<div class="bx-panel-notification">'.
 						'<div class="bx-panel-notification-close">'.($value['ENABLE_CLOSE'] == 'Y'? '<a style="cursor: pointer;" onclick="BX.admin.panel.hideNotify(this)" data-id="'.intval($value['ID']).'"  data-ajax="Y"></a>': '').'</div>'.

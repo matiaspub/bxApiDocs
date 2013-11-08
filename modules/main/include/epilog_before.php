@@ -1,12 +1,18 @@
-<?
-/*
-##############################################
-# Bitrix Site Manager                        #
-# Copyright (c) 2002-2007 Bitrix             #
-# http://www.bitrixsoft.com                  #
-# mailto:admin@bitrixsoft.com                #
-##############################################
-*/
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
+/**
+ * Bitrix vars
+ * @global CMain $APPLICATION
+ * @global CUser $USER
+ */
+
+global $USER, $APPLICATION;
 
 // define("START_EXEC_EPILOG_BEFORE_1", microtime());
 $GLOBALS["BX_STATE"] = "EB";
@@ -20,7 +26,7 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 	if(isset($_SERVER["REAL_FILE_PATH"]) && $_SERVER["REAL_FILE_PATH"] != "")
 		$currentFilePath = $_SERVER["REAL_FILE_PATH"];
 	else
-		$currentFilePath = $GLOBALS['APPLICATION']->GetCurPage(true);
+		$currentFilePath = $APPLICATION->GetCurPage(true);
 
 	$encCurrentFilePath = urlencode($currentFilePath);
 	$encUri = urlencode($_SERVER["REQUEST_URI"]);
@@ -31,7 +37,7 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 			"TITLE"=>GetMessage("main_epilog_before_menu_edit"),
 			"ALT"=>GetMessage("main_epilog_before_menu_edit_title"),
 			"ICON"=>"bx-context-toolbar-edit-icon",
-			"URL"=> 'javascript:'.$GLOBALS['APPLICATION']->GetPopupLink(Array(
+			"URL"=> 'javascript:'.$APPLICATION->GetPopupLink(Array(
 				"URL"=> "/bitrix/admin/public_file_edit.php?bxpublic=Y&lang=".LANGUAGE_ID."&path=".$encCurrentFilePath."&site=".SITE_ID."&back_url=".$encUri."&templateID=".$encSiteTemplateId,
 				"PARAMS"=>array("width"=>770, "height"=>470))
 			),
@@ -42,7 +48,7 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 					"TEXT"=>GetMessage("main_epilog_before_menu_edit_html"),
 					"TITLE"=>GetMessage("main_epilog_before_menu_edit_html_title"),
 					"ICON"=>"panel-edit-text",
-					"ACTION"=>'javascript:'.$GLOBALS['APPLICATION']->GetPopupLink(Array(
+					"ACTION"=>'javascript:'.$APPLICATION->GetPopupLink(Array(
 						"URL"=>"/bitrix/admin/public_file_edit.php?bxpublic=Y&lang=".LANGUAGE_ID."&noeditor=Y&path=".$encCurrentFilePath."&site=".SITE_ID."&back_url=".$encUri,
 						"PARAMS"=>array("width"=>770, "height"=>470))
 					),
@@ -67,10 +73,10 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 		),
 	);
 
-	echo $GLOBALS['APPLICATION']->IncludeStringAfter($arIcons, array('TOOLTIP'=>GetMessage("main_epilog_before_menu_title"), 'ICON'=>'edit-icon', "COMPONENT_ID" => "page_edit_control"));
+	echo $APPLICATION->IncludeStringAfter($arIcons, array('TOOLTIP'=>GetMessage("main_epilog_before_menu_title"), 'ICON'=>'edit-icon', "COMPONENT_ID" => "page_edit_control"));
 }
 
-$GLOBALS["APPLICATION"]->ShowSpreadCookieHTML();
+$APPLICATION->ShowSpreadCookieHTML();
 
 /*
 //Prints global url classes and  variables for HotKeys
@@ -96,10 +102,12 @@ if(
 	&& $USER->CanDoOperation('edit_other_settings')
 	&& file_exists($sPreviewFile)
 )
+{
 	include_once($sPreviewFile);
+}
 else
 {
-	if($GLOBALS['APPLICATION']->IsCSSOptimized())
+	if($APPLICATION->IsCSSOptimized())
 	{
 		$arCSS = $APPLICATION->GetCSSArray();
 		$arCSSKeys = array_keys($arCSS);
@@ -108,7 +116,7 @@ else
 		unset($arCSS, $arCSSKeys);
 	}
 
-	if($GLOBALS['APPLICATION']->IsJSOptimized())
+	if($APPLICATION->IsJSOptimized())
 	{
 		$arScripts = array_unique($APPLICATION->arHeadScripts);
 		$arJsKeys = array_keys($arScripts);
@@ -117,6 +125,5 @@ else
 		unset($arCSS, $arCSSKeys);
 	}
 
-	include_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/footer.php");
+	include_once($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/footer.php");
 }
-?>

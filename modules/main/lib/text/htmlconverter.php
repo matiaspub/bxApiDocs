@@ -14,7 +14,7 @@ class HtmlConverter
 		if ($textType == Converter::HTML)
 			return $text;
 
-		return String::htmlspecialchars($text);
+		return String::htmlEncode($text);
 	}
 
 	static public function decode($text, $textType = "")
@@ -27,6 +27,6 @@ class HtmlConverter
 		if ($textType == Converter::HTML)
 			return $text;
 
-		return String::htmlspecialchars_decode($text);
+		return String::htmlDecode($text);
 	}
 }

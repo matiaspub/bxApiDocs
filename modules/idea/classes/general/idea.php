@@ -309,7 +309,7 @@ Class CIdeaManagment
         return CIdeaManagment::getInstance()->Idea()->GetCategoryList();
     }
     //Alias
-    public function SetCategoryListId($ID)
+    static public function SetCategoryListId($ID)
     {
         CIdeaManagment::getInstance()->Idea()->SetCategoryListId($ID);
         return $this;

@@ -58,20 +58,15 @@ class CPullChannel
 			);
 			self::SaveToCache($cache_id, $arChannel);
 
-			$sqlDateFunction = "";
-			$dbType = false;//strtolower($DB->type);
-			if ($dbType== "mysql")
-				$sqlDateFunction = " AND DATE_CREATE < DATE_SUB(NOW(), INTERVAL 12 HOUR)";
-			else if ($dbType == "mssql")
-				$sqlDateFunction = " AND DATE_CREATE < dateadd(HOUR, -12, getdate())";
-			else if ($dbType == "oracle")
-				$sqlDateFunction = " AND DATE_CREATE < SYSDATE-1/12";
-
-			$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId." ".$sqlDateFunction;
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if (isset($arResult['CHANNEL_ID']))
+			{
+				$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$arResult['CHANNEL_ID']."'";
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
 
 			$channelId = self::Add($userId, $arChannel['CHANNEL_ID']);
-			if (isset($arResult['CHANNEL_ID']))
+
+			if (isset($arResult['CHANNEL_ID']) && $channelId != $arResult['CHANNEL_ID'])
 			{
 				$arMessage = Array(
 					'module_id' => 'pull',
@@ -153,6 +148,15 @@ class CPullChannel
 			$arChannel = $res->Fetch();
 			$channelId = $arChannel['CHANNEL_ID'];
 			self::SaveToCache($cache_id, $arChannel);
+			if (CPullOptions::GetNginxStatus())
+			{
+				$arData = Array(
+					'module_id' => 'pull',
+					'command' => 'open_exists',
+					'params' => Array(),
+				);
+				self::Send($channelId, CUtil::PhpToJsObject(Array('MESSAGE' => Array($arData), 'ERROR' => '')));
+			}
 		}
 
 		return $channelId;
@@ -198,20 +202,18 @@ class CPullChannel
 				$channelId = $arRes['CHANNEL_ID'];
 		}
 
-		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId;
+		$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSql($channelId)."'";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$CACHE_MANAGER->Clean("b_pchc_".$userId, "b_pull_channel");
 
-		if (is_null($channelId))
-		{
-			$arMessage = Array(
-				'module_id' => 'pull',
-				'command' => 'channel_die',
-				'params' => Array('from' => 'delete by user')
-			);
-			CPullStack::AddByChannel($channelId, $arMessage);
-		}
+		$arMessage = Array(
+			'module_id' => 'pull',
+			'command' => 'channel_die',
+			'params' => Array('from' => 'delete by user')
+		);
+		CPullStack::AddByChannel($channelId, $arMessage);
+
 		return true;
 	}
 
@@ -304,11 +306,11 @@ class CPullChannel
 		$sqlDateFunction = null;
 		$dbType = strtolower($DB->type);
 		if ($dbType== "mysql")
-			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 12 HOUR)";
+			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 13 HOUR)";
 		else if ($dbType == "mssql")
-			$sqlDateFunction = "dateadd(HOUR, -12, getdate())";
+			$sqlDateFunction = "dateadd(HOUR, -13, getdate())";
 		else if ($dbType == "oracle")
-			$sqlDateFunction = "SYSDATE-1/12";
+			$sqlDateFunction = "SYSDATE-1/13";
 
 		if (!is_null($sqlDateFunction))
 		{
@@ -335,11 +337,11 @@ class CPullChannel
 		$sqlDateFunction = null;
 		$dbType = strtolower($DB->type);
 		if ($dbType == "mysql")
-			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 12 HOUR)";
+			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 13 HOUR)";
 		else if ($dbType == "mssql")
-			$sqlDateFunction = "dateadd(HOUR, -12, getdate())";
+			$sqlDateFunction = "dateadd(HOUR, -13, getdate())";
 		else if ($dbType == "oracle")
-			$sqlDateFunction = "SYSDATE-1/12";
+			$sqlDateFunction = "SYSDATE-1/13";
 
 		if (!is_null($sqlDateFunction))
 		{
@@ -351,50 +353,50 @@ class CPullChannel
 			while ($arRes = $dbRes->Fetch())
 				$arUser[$arRes['USER_ID']] = $arRes['CHANNEL_ID'];
 		}
-
-		if (count($arUser) <= 0)
-			return "CPullChannel::CheckOnlineChannel();";
-
-		$arOnline = Array();
-		$arOffline = Array();
-
-		global $USER;
-		$agentUserId = 0;
-		if (is_object($USER) && $USER->GetId() > 0)
+		if (count($arUser) > 0)
 		{
-			$agentUserId = $USER->GetId();
-			$arOnline[] = $agentUserId;
-		}
+			$arOnline = Array();
+			$arOffline = Array();
 
-		foreach ($arUser as $userId => $channelId)
-		{
-			if ($userId <= 0 || $agentUserId == $userId)
-				continue;
-
-			$result = self::Send($channelId, 'ping', 'GET', 5, false);
-			$result = json_decode($result);
-			if (is_object($result))
+			global $USER;
+			$agentUserId = 0;
+			if (is_object($USER) && $USER->GetId() > 0)
 			{
-				if ($result->subscribers > 0)
-					$arOnline[] = $userId;
-				else
-					$arOffline[] = $userId;
+				$agentUserId = $USER->GetId();
+				$arOnline[$agentUserId] = $agentUserId;
+			}
+
+			foreach ($arUser as $userId => $channelId)
+			{
+				if ($userId <= 0 || $agentUserId == $userId)
+					continue;
+
+				$result = self::Send($channelId, 'ping', 'GET', 5, false);
+				$result = json_decode($result);
+				if (is_object($result))
+				{
+					if ($result->subscribers > 0)
+						$arOnline[$userId] = $userId;
+					else
+						$arOffline[$userId] = $userId;
+				}
+			}
+
+			if (count($arOnline) > 0)
+			{
+				ksort($arOnline);
+				CUser::SetLastActivityDateByArray($arOnline);
 			}
 		}
 
 		$arSend = Array();
-		if (count($arOnline) > 0)
+		$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
+		while ($arUser = $dbUsers->Fetch())
 		{
-			CUser::SetLastActivityDateByArray($arOnline);
-
-			$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
-			while ($arUser = $dbUsers->Fetch())
-			{
-				$arSend[$arUser["ID"]] = Array(
-					'id' => $arUser["ID"],
-					'status' => 'online',
-				);
-			}
+			$arSend[$arUser["ID"]] = Array(
+				'id' => $arUser["ID"],
+				'status' => 'online',
+			);
 		}
 
 		CPullStack::AddShared(Array(
@@ -407,6 +409,7 @@ class CPullChannel
 
 		return "CPullChannel::CheckOnlineChannel();";
 	}
+
 	public static function OnAfterUserAuthorize($arParams)
 	{
 		if (isset($arParams['update']) && $arParams['update'] === false)

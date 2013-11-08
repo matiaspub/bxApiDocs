@@ -19,8 +19,6 @@ class CVoteNotifySchema
 			"vote" => array(
 				"voting" => Array(
 					"NAME" => GetMessage('V_VOTING'),
-					"MAIL" => true,
-					"XMPP" => false
 				)
 			)
 		);

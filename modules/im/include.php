@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 15);
+// define("IM_REVISION", 19);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
@@ -14,6 +14,22 @@ IncludeModuleLangFile(__FILE__);
 // define("IM_STATUS_UNREAD", 0);
 // define("IM_STATUS_NOTIFY", 1);
 // define("IM_STATUS_READ", 2);
+
+// define("IM_CALL_NONE", 0);
+// define("IM_CALL_VIDEO", 1);
+// define("IM_CALL_AUDIO", 2);
+
+// define("IM_CALL_STATUS_NONE", 0);
+// define("IM_CALL_STATUS_WAIT", 1);
+// define("IM_CALL_STATUS_ANSWER", 2);
+// define("IM_CALL_STATUS_DECLINE", 3);
+
+// define("IM_CALL_END_BUSY", 'busy');
+// define("IM_CALL_END_DECLINE", 'decline');
+// define("IM_CALL_END_TIMEOUT", 'waitTimeout');
+// define("IM_CALL_END_ACCESS", 'errorAccess');
+// define("IM_CALL_END_OFFLINE", 'errorOffline');
+
 
 // define("IM_SPEED_NOTIFY", 1);
 // define("IM_SPEED_MESSAGE", 2);
@@ -36,6 +52,7 @@ CModule::AddAutoloadClasses(
 		"CIMMessage" => "classes/general/im_message.php",
 		"CIMHistory" => "classes/general/im_history.php",
 		"CIMEvent" => "classes/general/im_event.php",
+		"CIMCall" => "classes/general/im_call.php",
 		"CIMMail" => "classes/general/im_mail.php",
 		"CIMConvert" => "classes/general/im_convert.php",
 		"CIMTableSchema" => "classes/general/im_table_schema.php",

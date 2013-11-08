@@ -1,5 +1,8 @@
 <?
 $module_id = "socialnetwork";
+
+CJSCore::Init(array("access"));
+
 $SONET_RIGHT = $APPLICATION->GetGroupRight($module_id);
 if ($SONET_RIGHT>="R") :
 
@@ -163,7 +166,10 @@ if (!function_exists('set_valign'))
 }
 
 $arAllOptionsCommon = array(
-	array("follow_default_type", GetMessage("SONET_LOG_FOLLOW_DEFAULT_TYPE"), "Y", Array("checkbox"))
+	array("follow_default_type", GetMessage("SONET_LOG_FOLLOW_DEFAULT_TYPE"), "Y", Array("checkbox")),
+	array("allow_livefeed_toall", GetMessage("SONET_LOG_ALLOW_TOALL"), "Y", Array("checkbox")),
+	array("livefeed_toall_rights", GetMessage("SONET_LOG_TOALL_RIGHTS"), 'a:1:{i:0;s:2:"AU";}', Array("hidden")),
+	array("default_livefeed_toall", GetMessage("SONET_LOG_DEFAULT_TOALL"), "Y", Array("checkbox")),
 );
 
 if (!IsModuleInstalled("intranet"))
@@ -180,9 +186,6 @@ $arAllOptions = array(
 	array("tooltip_show_rating", GetMessage("SONET_TOOLTIP_SHOW_RATING"), "N", Array("checkbox")),
 	array("tooltip_rating_id", GetMessage("SONET_TOOLTIP_RATING_ID"), serialize(Array()), Array("select_rating", true, 3))
 );
-
-
-
 
 $arAllOptionsUsers = array(
 	array("default_user_viewfriends", GetMessage("SONET_USER_OPERATIONS_viewfriends"), SONET_RELATIONS_TYPE_ALL, Array("select_user_perm")),
@@ -229,12 +232,6 @@ $arAllOptionsUsersBlocks["photo"][]	= array("default_photo_operation_view_user",
 
 if ($bIntranet)
 {
-	/*
-	$arAllOptionsUsersBlocks["files"][] = array("default_files_operation_view_user", GetMessage("SONET_FILES_OPERATION_VIEW_USER"), (CSocNetUser::IsFriendsAllowed() ? SONET_RELATIONS_TYPE_FRIENDS : SONET_RELATIONS_TYPE_ALL), Array("select_user"));
-	$arAllOptionsUsersBlocks["files"][] = array("default_files_operation_write_limited_user", GetMessage("SONET_FILES_OPERATION_WRITE_LIMITED_USER"), SONET_RELATIONS_TYPE_NONE, Array("select_user"));
-	$arAllOptionsUsersBlocks["files"][] = array("default_files_operation_write_user", GetMessage("SONET_FILES_OPERATION_WRITE_USER"), SONET_RELATIONS_TYPE_NONE, Array("select_user"));
-	*/
-
 	$arAllOptionsUsersBlocks["tasks"][] = array("default_tasks_operation_view_user", GetMessage("SONET_TASKS_OPERATION_VIEW_USER"), SONET_RELATIONS_TYPE_ALL, Array("select_user"));
 	$arAllOptionsUsersBlocks["tasks"][] = array("default_tasks_operation_view_all_user", GetMessage("SONET_TASKS_OPERATION_VIEW_ALL_USER"), SONET_RELATIONS_TYPE_NONE, Array("select_user"));
 	$arAllOptionsUsersBlocks["tasks"][] = array("default_tasks_operation_create_tasks_user", GetMessage("SONET_TASKS_OPERATION_CREATE_TASKS_USER"), SONET_RELATIONS_TYPE_AUTHORIZED, Array("select_user"));
@@ -354,7 +351,17 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 		$val = ${$name};
 		if ($arAllOptionsCommon[$i][3][0] == "checkbox" && $val != "Y")
 			$val = "N";
-			
+		elseif ($name == "livefeed_toall_rights")
+		{
+			if (
+				is_array($val) 
+				&& count($val) > 0
+			)
+				$val = serialize($val);
+			else
+				$val = serialize(array("G2"));
+		}
+
 		$prev_val = COption::GetOptionString("socialnetwork", $arAllOptionsCommon[$i][0], $arAllOptionsCommon[$i][2], "");
 		if ($val != $prev_val)
 			COption::SetOptionString("socialnetwork", $arAllOptionsCommon[$i][0], $val, $arAllOptionsCommon[$i][1], "");
@@ -725,11 +732,19 @@ $tabControl->Begin();
 ?>
 
 <script>
+	BX.message({
+		SLToAllDel: '<?=CUtil::JSEscape(GetMessage("SONET_LOG_TOALL_DEL"))?>'
+	});
+
 	function SelectSite(id)
 	{
-		<?for($i = 0; $i < $siteCount; $i++):?>
-		document.getElementById('<?= CUtil::JSEscape(htmlspecialcharsbx($siteList[$i]["ID"]));?>_Propery').style.display='none';
-		<?endfor;?>
+		<?
+		for($i = 0; $i < $siteCount; $i++):
+			?>
+			document.getElementById('<?= CUtil::JSEscape(htmlspecialcharsbx($siteList[$i]["ID"]));?>_Propery').style.display='none';
+			<?
+		endfor;
+		?>
 		document.getElementById(id+'_Propery').style.display='';
 	}
 </script>
@@ -745,23 +760,187 @@ $tabControl->BeginNextTab();
 			$Option = $arAllOptionsCommon[$i];
 			$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2]);
 			$type = $Option[3];
-			?><tr>
-				<td <?=set_valign($type[0], $type[1])?> width="50%"><?
-					if ($type[0]=="checkbox")
-						echo "<label for=\"".htmlspecialcharsbx($Option[0])."\">".$Option[1]."</label>";
-					else
-						echo $Option[1];
-				?>:</td>
-				<td width="50%">
-					<?if($type[0]=="checkbox"):?>
-						<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0])?>" id="<?echo htmlspecialcharsbx($Option[0])?>" value="Y"<?if($val=="Y")echo" checked";?>>
-					<?elseif($type[0]=="text"):?>
-						<input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0])?>">
-					<?elseif($type[0]=="textarea"):?>
-						<textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0])?>"><?echo htmlspecialcharsbx($val)?></textarea>
-					<?endif?>
-				</td>
-			</tr><?
+
+			if ($type[0] != "hidden")
+			{
+				?><tr id="<?=htmlspecialcharsbx($Option[0])?>_tr" style="display: <?=($Option[0] != "default_livefeed_toall" || COption::GetOptionString("socialnetwork", "allow_livefeed_toall", "Y") == "Y" ? "table-row" : "none")?>;">
+					<td <?=set_valign($type[0], $type[1])?> width="40%"><?
+
+						if ($type[0] == "checkbox")
+							echo "<label for=\"".htmlspecialcharsbx($Option[0])."\">".$Option[1]."</label>";
+						else
+							echo $Option[1];
+					?>:</td>
+					<td width="60%"><?
+						if($type[0]=="checkbox"):
+							?><input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0])?>" id="<?echo htmlspecialcharsbx($Option[0])?>" value="Y"<?if($val=="Y")echo" checked";?>><?
+						elseif($type[0]=="text"):
+							?><input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0])?>"><?
+						elseif($type[0]=="textarea"):
+							?><textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0])?>"><?echo htmlspecialcharsbx($val)?></textarea><?
+						endif;
+
+						if ($Option[0] == "allow_livefeed_toall")
+						{
+							?><script>
+								var toAllCheckBox = BX('allow_livefeed_toall');
+							</script><?
+						}
+						elseif ($Option[0] == "default_livefeed_toall")
+						{
+							?>
+							<script>
+								var defaultToAllCont = BX('default_livefeed_toall_tr');
+								if (toAllCheckBox && defaultToAllCont)
+								{
+									BX.bind(toAllCheckBox, 'click', BX.delegate(function(e) {
+										defaultToAllCont.style.display = (this.checked ? "" : "none");
+									}, toAllCheckBox));
+								}
+							</script>
+							<?
+						}
+					?></td>
+				</tr><?
+			}
+			elseif ($Option[0] == "livefeed_toall_rights")
+			{
+				$arToAllRights = unserialize($val);
+				if (!$arToAllRights)
+					$arToAllRights = unserialize($Option[2]);
+
+				$access = new CAccess();
+				$arNames = $access->GetNames($arToAllRights);
+
+				?><tr id="RIGHTS_all" style="display: <?=(COption::GetOptionString("socialnetwork", "allow_livefeed_toall", "Y") == "Y" ? "table-row" : "none")?>;"><td>&nbsp;</td><td><?
+				?><script>
+				
+					var rightsCont = BX('RIGHTS_all');
+					if (toAllCheckBox && rightsCont)
+					{
+						BX.bind(toAllCheckBox, 'click', BX.delegate(function(e) {
+							rightsCont.style.display = (this.checked ? "" : "none");
+						}, toAllCheckBox));
+					}
+				
+					function DeleteToAllAccessRow(ob)
+					{
+						var divNode = BX('RIGHTS_div', true);
+						var div = BX.findParent(ob, {tag: 'div', className: 'toall-right'}, divNode);
+						if (div)
+							var right = div.getAttribute('data-bx-right');
+
+						if (div && right)
+						{
+							BX.remove(div);
+							var artoAllRightsNew = [];
+
+							for(var i = 0; i < arToAllRights.length; i++)
+								if (arToAllRights[i] != right)
+									artoAllRightsNew[artoAllRightsNew.length] = arToAllRights[i];
+
+							arToAllRights = BX.clone(artoAllRightsNew);
+
+							var hidden_el = BX('<?=htmlspecialcharsbx($Option[0])?>_' + right);
+							if (hidden_el)
+								BX.remove(hidden_el);
+						}
+						return false;
+					}
+
+					function ShowToAllAccessPopup(val)
+					{
+						val = val || [];
+
+						BX.Access.Init({
+							other: {
+								disabled: false,
+								disabled_g2: true,
+								disabled_cr: true
+							},
+							groups: { disabled: true },
+							socnetgroups: { disabled: true }
+						});
+
+						var startValue = {};
+						for(var i = 0; i < val.length; i++)
+							startValue[val[i]] = true;
+
+						BX.Access.SetSelected(startValue);
+
+						BX.Access.ShowForm({
+							callback: function(arRights)
+							{
+								var divNode = BX('RIGHTS_div', true);
+								var pr = false;
+
+								for(var provider in arRights)
+								{
+									pr = BX.Access.GetProviderName(provider);
+									for(var right in arRights[provider])
+									{
+										divNode.appendChild(BX.create('div', {
+											attrs: {
+												'data-bx-right': right
+											},
+											props: {
+												'className': 'toall-right'
+											},
+											children: [
+												BX.create('span', {
+													html: (pr.length > 0 ? pr + ': ' : '') + arRights[provider][right].name + '&nbsp;'
+												}),
+												BX.create('a', {
+													attrs: { 
+														href: 'javascript:void(0);',
+														title: BX.message('SLToAllDel')
+													},
+													props: {
+														'className': 'access-delete'
+													},
+													events: {
+														click: function() { DeleteToAllAccessRow(this); }
+													}
+												})
+											]
+										}));
+
+										divNode.appendChild(BX.create('input', {
+											attrs: {
+												'type': 'hidden'
+											},
+											props: {
+												'name': '<?=htmlspecialcharsbx($Option[0])?>[]',
+												'id': '<?=htmlspecialcharsbx($Option[0])?>_' + right,
+												'value': right
+											}
+										}));
+
+										arToAllRights[arToAllRights.length] = arRights[provider][right].id;
+									}
+								}
+							}
+						});
+
+						return false;
+					}
+				</script><?
+
+				?><div id="RIGHTS_div"><?
+				foreach($arToAllRights as $right)
+				{
+					?><input type="hidden" name="<?echo htmlspecialcharsbx($Option[0])?>[]" id="<?echo htmlspecialcharsbx($Option[0]."_".$right)?>" value="<?=htmlspecialcharsbx($right)?>"><?
+					?><div data-bx-right="<?=$right?>" class="toall-right"><span><?=(!empty($arNames[$right]["provider"]) ? $arNames[$right]["provider"].": " : "").$arNames[$right]["name"]?>&nbsp;</span><a href="javascript:void(0);" onclick="DeleteToAllAccessRow(this);" class="access-delete" title="<?=GetMessage("SONET_LOG_TOALL_DEL")?>"></a></div><?
+				}
+				?></div><?
+				?><script>
+					var arToAllRights = <?=CUtil::PhpToJSObject($arToAllRights)?>;
+				</script><?
+				
+				?><div style="padding-top: 5px;"><a href="javascript:void(0)" class="bx-action-href" onclick="ShowToAllAccessPopup(arToAllRights);"><?=GetMessage("SONET_LOG_TOALL_RIGHTS_ADD")?></a></div>
+				</td></tr><?
+			}
+
 		endfor;
 		
 		?><tr><td colspan="2">&nbsp;</td></tr><?
@@ -787,13 +966,13 @@ $tabControl->BeginNextTab();
 						$val = array($val);
 				endif;
 				?><tr>
-					<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+					<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 						if ($type[0]=="checkbox")
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 						else
 							echo $Option[1];
 					?>:</td>
-					<td width="50%" align="left">
+					<td width="60%" align="left">
 						<?if($type[0]=="checkbox"):?>
 							<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
 						<?elseif($type[0]=="text"):?>
@@ -832,13 +1011,13 @@ $tabControl->BeginNextTab();
 				$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
 				$type = $Option[3];
 				?><tr>
-					<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+					<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 						if ($type[0]=="checkbox")
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 						else
 							echo $Option[1];
 						?>:</td>
-						<td width="50%" align="left">
+						<td width="60%" align="left">
 							<?if($type[0]=="checkbox"):?>
 								<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
 						<?elseif($type[0]=="text"):?>
@@ -872,13 +1051,13 @@ $tabControl->BeginNextTab();
 							$type = $Option[3];
 							?>
 							<tr>
-								<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+								<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 									if ($type[0]=="checkbox")
 										echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 									else
 										echo $Option[1];
 								?>:</td>
-								<td width="50%">
+								<td width="60%">
 									<?if($type[0]=="checkbox"):?>
 										<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
 									<?elseif($type[0]=="text"):?>
@@ -928,10 +1107,10 @@ $tabControl->BeginNextTab();
 							$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
 							$type = $Option[3];
 							?><tr>
-								<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+								<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 									echo $Option[1];
 								?>:</td>
-								<td width="50%">
+								<td width="60%">
 									<?if($type[0]=="image"):?>
 										<?echo CFile::InputFile(htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"]), 20, $val);?><br>
 										<?echo CFile::ShowImage($val, 200, 200, "border=0", "", true)?>
@@ -955,13 +1134,13 @@ $tabControl->BeginNextTab();
 				$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
 				$type = $Option[3];
 				?><tr>
-					<td <?=set_valign($type[0], $type[1])?> width="50%"><?
+					<td <?=set_valign($type[0], $type[1])?> width="40%"><?
 						if ($type[0]=="checkbox")
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 						else
 							echo $Option[1];
 					?>:</td>
-					<td width="50%">
+					<td width="60%">
 						<?if($type[0]=="checkbox"):?>
 							<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
 						<?elseif($type[0]=="text"):?>
@@ -988,13 +1167,13 @@ $tabControl->BeginNextTab();
 							$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
 							$type = $Option[3];
 							?><tr>
-								<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+								<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 									if ($type[0]=="checkbox")
 										echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 									else
 										echo $Option[1];
 								?>:</td>
-								<td width="50%">
+								<td width="60%">
 									<?if($type[0]=="checkbox"):?>
 										<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
 									<?elseif($type[0]=="hidden"):?>
@@ -1035,13 +1214,13 @@ $tabControl->BeginNextTab();
 				$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
 				$type = $Option[3];
 				?><tr>
-					<td <?=set_valign($type[0], $type[1])?> width="50%" align="right"><?
+					<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 						if ($type[0]=="checkbox")
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
 						else
 							echo $Option[1];
 					?>:</td>
-					<td width="50%" align="left">
+					<td width="60%" align="left">
 						<?if($type[0]=="image"):?>
 							<?echo CFile::InputFile(htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"]), 20, $val);?><br>
 							<?echo CFile::ShowImage($val, 200, 200, "border=0", "", true)?>

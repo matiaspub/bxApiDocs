@@ -9,7 +9,7 @@ class XmlConverter
 		if (is_object($text))
 			return $text;
 
-		return String::htmlspecialchars($text);
+		return String::htmlEncode($text);
 	}
 
 	static public function decode($text, $textType = "")
@@ -17,6 +17,6 @@ class XmlConverter
 		if (is_object($text))
 			return $text;
 
-		return String::htmlspecialchars_decode($text);
+		return String::htmlDecode($text);
 	}
 }

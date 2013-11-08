@@ -27,7 +27,7 @@ class FileExceptionHandlerLog
 		$this->logFileHistory = $this->logFile.".old";
 
 		$this->maxLogSize = static::MAX_LOG_SIZE;
-		if (isset($options["log_size"]) && \Bitrix\Main\Type\Int::isInteger($options["log_size"]) && ($options["log_size"] > 0))
+		if (isset($options["log_size"]) && ($options["log_size"] > 0))
 			$this->maxLogSize = intval($options["log_size"]);
 	}
 
@@ -45,16 +45,13 @@ class FileExceptionHandlerLog
 		$logFile = $this->logFile;
 		$logFileHistory = $this->logFileHistory;
 
-		if (!is_writable($logFile))
-			return;
-
 		$oldAbortStatus = ignore_user_abort(true);
 
 		if ($fp = @fopen($logFile, "ab+"))
 		{
-			if (flock($fp, LOCK_EX))
+			if (@flock($fp, LOCK_EX))
 			{
-				$logSize = filesize($logFile);
+				$logSize = @filesize($logFile);
 				$logSize = intval($logSize);
 
 				if ($logSize > $this->maxLogSize)
@@ -63,10 +60,10 @@ class FileExceptionHandlerLog
 					ftruncate($fp, 0);
 				}
 
-				fwrite($fp, $text);
-				fflush($fp);
-				flock($fp, LOCK_UN);
-				fclose($fp);
+				@fwrite($fp, $text);
+				@fflush($fp);
+				@flock($fp, LOCK_UN);
+				@fclose($fp);
 			}
 		}
 

@@ -1,9 +1,9 @@
 <?php
 namespace Bitrix\Main\Localization;
 
-use \Bitrix\Main;
-use \Bitrix\Main\IO\Path;
-use \Bitrix\Main\Context;
+use Bitrix\Main;
+use Bitrix\Main\IO\Path;
+use Bitrix\Main\Context;
 
 final class Loc
 {
@@ -28,7 +28,7 @@ final class Loc
 			throw new Main\ArgumentNullException("code");
 
 		if($language === null)
-			$language = \Bitrix\Main\Context::getCurrent()->getLanguage();
+			$language = self::getCurrentLang();
 
 		if(!isset(self::$messages[$language][$code]))
 			self::loadLazy($code, $language);
@@ -52,6 +52,14 @@ final class Loc
 		self::$lazyLoadFiles[$file] = $file;
 	}
 
+	private static function getCurrentLang()
+	{
+		$context = Context::getCurrent();
+		if($context !== null)
+			return $context->getLanguage();
+		return 'en';
+	}
+
 	/**
 	 * Loads language messages for specified file
 	 *
@@ -62,7 +70,7 @@ final class Loc
 	public static function loadLanguageFile($file, $language = null)
 	{
 		if($language === null)
-			$language = \Bitrix\Main\Context::getCurrent()->getLanguage();
+			$language = self::getCurrentLang();
 
 		if(!isset(self::$messages[$language]))
 			self::$messages[$language] = array();
@@ -119,13 +127,7 @@ final class Loc
 
 	private static function loadLazy($code, $language)
 	{
-		if (PHP_VERSION_ID < 50306)
-			$trace = debug_backtrace(false);
-		elseif (PHP_VERSION_ID < 50400)
-			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-		else
-			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
-		//$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+		$trace = Main\Diag\Helper::getBackTrace(4, DEBUG_BACKTRACE_IGNORE_ARGS);
 
 		$file = null;
 		for($i = 3; $i >= 1; $i--)
@@ -160,7 +162,7 @@ final class Loc
 	private static function loadCustomMessages($lang)
 	{
 		$customMess = array();
-		$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
+		$documentRoot = Main\Application::getDocumentRoot();
 		if(($fname = Main\Loader::getLocal("php_interface/user_lang/".$lang."/lang.php", $documentRoot)) !== false)
 		{
 			$mess = self::includeFile($fname);
@@ -213,7 +215,7 @@ final class Loc
 	public static function date($date, Context\Culture $culture = null)
 	{
 		if ($culture == null)
-			$culture = \Bitrix\Main\Context::getCurrent()->getCulture();
+			$culture = Context::getCurrent()->getCulture();
 
 		return $date;
 	}
@@ -221,7 +223,7 @@ final class Loc
 	public static function datetime($datetime, Context\Culture $culture = null)
 	{
 		if ($culture == null)
-			$culture = \Bitrix\Main\Context::getCurrent()->getCulture();
+			$culture = Context::getCurrent()->getCulture();
 
 		return $datetime;
 	}
@@ -229,7 +231,7 @@ final class Loc
 	public static function money($money, Context\Culture $culture = null)
 	{
 		if ($culture == null)
-			$culture = \Bitrix\Main\Context::getCurrent()->getCulture();
+			$culture = Context::getCurrent()->getCulture();
 
 		return $money;
 	}

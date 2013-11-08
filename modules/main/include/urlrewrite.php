@@ -1,30 +1,4 @@
 <?
-if(file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/d7.php"))
-{
-	require_once(dirname(__FILE__)."/../bx_root.php");
-
-	include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/lib/loader.php");
-
-	/** @var $application \Bitrix\Main\HttpApplication */
-	$application = \Bitrix\Main\HttpApplication::getInstance();
-	$application->turnOnCompatibleMode();
-	$application->setInputParameters(
-		$_GET, $_POST, $_FILES, $_COOKIE, $_SERVER, $_ENV
-	);
-
-	$application->initialize();
-
-	$page = new \Bitrix\Main\PublicPage();
-	$application->setPage($page);
-
-	$application->start();
-
-	CMain::PrologActions();
-	require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/prolog_after.php");
-
-	return;
-}
-
 error_reporting(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE);
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/charset_converter.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/tools.php");
@@ -92,13 +66,16 @@ if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' ||
 	if(($pos=strpos($url, "?"))!==false)
 	{
 		$params = substr($url, $pos+1);
-		parse_str($params, $vars);
-		unset($vars["SEF_APPLICATION_CUR_PAGE_URL"]);
+		if ($params !== false && $params !== "")
+		{
+			parse_str($params, $vars);
+			unset($vars["SEF_APPLICATION_CUR_PAGE_URL"]);
 
-		$_GET += $vars;
-		$_REQUEST += $vars;
-		//$GLOBALS += $vars;
-		$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
+			$_GET += $vars;
+			$_REQUEST += $vars;
+			//$GLOBALS += $vars;
+			$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
+		}
 	}
 
 	if (isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"])

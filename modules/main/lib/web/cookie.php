@@ -40,7 +40,7 @@ class Cookie
 		$cookiesSettings = \Bitrix\Main\Config\Configuration::getValue("cookies");
 
 		$this->secure = (($cookiesSettings && isset($cookiesSettings["secure"])) ? $cookiesSettings["secure"] : false);
-		$this->httpOnly = (($cookiesSettings && isset($cookiesSettings["http_only"])) ? $cookiesSettings["http_only"] : false);
+		$this->httpOnly = (($cookiesSettings && isset($cookiesSettings["http_only"])) ? $cookiesSettings["http_only"] : true);
 	}
 
 	public function setDomain($domain)
@@ -141,7 +141,7 @@ class Cookie
 
 		if ($cacheTtl === false)
 		{
-			$connection = \Bitrix\Main\Application::getDbConnection();
+			$connection = \Bitrix\Main\Application::getConnection();
 			$sqlHelper = $connection->getSqlHelper();
 
 			$sql = "SELECT DOMAIN ".
@@ -164,7 +164,7 @@ class Cookie
 			{
 				$arLangDomain = array("DOMAIN" => array(), "LID" => array());
 
-				$connection = \Bitrix\Main\Application::getDbConnection();
+				$connection = \Bitrix\Main\Application::getConnection();
 				$sqlHelper = $connection->getSqlHelper();
 
 				$recordset = $connection->query(

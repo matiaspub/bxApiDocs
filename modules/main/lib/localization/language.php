@@ -22,6 +22,14 @@ class LanguageTable extends Entity\DataManager
 				'data_type' => 'string',
 				'primary' => true,
 			),
+			'ID' => array(
+				'data_type' => 'string',
+				'column_name' => 'LID',
+			),
+			'LANGUAGE_ID' => array(
+				'data_type' => 'string',
+				'column_name' => 'LID',
+			),
 			'SORT' => array(
 				'data_type' => 'integer',
 			),

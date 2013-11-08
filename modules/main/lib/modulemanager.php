@@ -16,8 +16,8 @@ final class ModuleManager
 			if (empty(self::$installedModules))
 			{
 				self::$installedModules = array();
-				$con = Application::getDbConnection();
-				$rs = $con->query("SELECT m.* FROM b_module m ORDER BY m.ID");
+				$con = Application::getConnection();
+				$rs = $con->query("SELECT ID FROM b_module ORDER BY ID");
 				while ($ar = $rs->fetch())
 					self::$installedModules[$ar['ID']] = $ar;
 				$cacheManager->set("b_module", self::$installedModules);
@@ -30,15 +30,16 @@ final class ModuleManager
 	public static function isModuleInstalled($moduleName)
 	{
 		$arInstalledModules = self::getInstalledModules();
-		return array_key_exists($moduleName, $arInstalledModules);
+		return isset($arInstalledModules[$moduleName]);
 	}
 
-	public static function remove($moduleName)
+	public static function delete($moduleName)
 	{
-		$con = Application::getDbConnection();
+		$con = Application::getConnection();
 		$con->queryExecute("DELETE FROM b_module WHERE ID = '".$con->getSqlHelper()->forSql($moduleName)."'");
 
 		self::$installedModules = array();
+		Loader::clearModuleCache($moduleName);
 
 		$cacheManager = Application::getInstance()->getManagedCache();
 		$cacheManager->clean("b_module");
@@ -46,12 +47,34 @@ final class ModuleManager
 
 	public static function add($moduleName)
 	{
-		$con = Application::getDbConnection();
+		$con = Application::getConnection();
 		$con->queryExecute("INSERT INTO b_module(ID) VALUES('".$con->getSqlHelper()->forSql($moduleName)."')");
 
 		self::$installedModules = array();
+		Loader::clearModuleCache($moduleName);
 
 		$cacheManager = Application::getInstance()->getManagedCache();
 		$cacheManager->clean("b_module");
+	}
+
+	public static function registerModule($moduleName)
+	{
+		static::add($moduleName);
+
+		$event = new Event("main", "OnAfterRegisterModule", array($moduleName));
+		$event->send();
+	}
+
+	public static function unRegisterModule($moduleName)
+	{
+		$con = Application::getInstance()->getConnection();
+
+		$con->queryExecute("DELETE FROM b_agent WHERE MODULE_ID='".$con->getSqlHelper()->forSql($moduleName)."'");
+		\CMain::DelGroupRight($moduleName);
+
+		static::delete($moduleName);
+
+		$event = new Event("main", "OnAfterUnRegisterModule", array($moduleName));
+		$event->send();
 	}
 }

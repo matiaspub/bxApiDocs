@@ -681,6 +681,9 @@ function ForumAddMessage(
 				$arFields["OWNER_ID"] = $arFieldsG["OWNER_ID"];
 				$arFields["SOCNET_GROUP_ID"] = $arFieldsG["SOCNET_GROUP_ID"];
 
+				if (is_set($arFieldsG, "TOPIC_XML_ID"))
+					$arFields["XML_ID"] = $arFieldsG["TOPIC_XML_ID"];
+
 				$TID = CForumTopic::Add($arFields);
 				if (IntVal($TID)<=0)
 					$aMsg[] = array("id" => "TOPIC_ID", "text" => GetMessage("ADDMESS_ERROR_ADD_TOPIC").".");
@@ -877,7 +880,7 @@ function ForumAddMessage(
 				$F_EVENT3 = CForumNew::PreparePath2Message($arForumSite_tmp[SITE_ID], array("FORUM_ID"=>$FID, "TOPIC_ID"=>$TID, "MESSAGE_ID"=>$MID));
 			}
 		}
-		CStatistic::Set_Event($F_EVENT1, $F_EVENT2, $F_EVENT3);
+		CStatistics::Set_Event($F_EVENT1, $F_EVENT2, $F_EVENT3);
 	}
 
 	if (empty($aMsg))
@@ -2666,7 +2669,7 @@ function InitSortingEx($Path=false, $sByVar="by", $sOrderVar="order")
 function ForumAddDeferredScript($script)
 {
 	$url = CUtil::GetAdditionalFileURL($script);
-	return "<script>BX.loadScript(\"".$url."\");</script>\n";
+	return "<script>BX.ready(function(){BX.loadScript(\"".$url."\");});</script>\n";
 }
 /*
 GetMessage("FORUM_NO_MODULE");

@@ -4449,16 +4449,13 @@ function Rel2Abs($curdir, $relpath)
 	if($relpath == "")
 		return false;
 
-	$relpath = preg_replace("'[\\\/]+'", "/", $relpath);
-
-	if($relpath[0] == "/" || preg_match("#^[a-z]:/#i", $relpath))
+	if(substr($relpath, 0, 1) == "/" || preg_match("#^[a-z]:/#i", $relpath))
 	{
 		$res = $relpath;
 	}
 	else
 	{
-		$curdir = preg_replace("'[\\\/]+'", "/", $curdir);
-		if($curdir[0] != "/" && !preg_match("#^[a-z]:/#i", $curdir))
+		if(substr($curdir, 0, 1) != "/" && !preg_match("#^[a-z]:/#i", $curdir))
 			$curdir = "/".$curdir;
 		if(substr($curdir, -1) != "/")
 			$curdir .= "/";
@@ -4483,7 +4480,11 @@ function _normalizePath($strPath)
 	$strResult = '';
 	if($strPath <> '')
 	{
-		$strPath = str_replace("\\", "/", $strPath);
+		if(strncasecmp(PHP_OS, "WIN", 3) == 0)
+		{
+			//slashes doesn't matter for Windows
+			$strPath = str_replace("\\", "/", $strPath);
+		}
 
 		$arPath = explode('/', $strPath);
 		$nPath = count($arPath);
@@ -4512,7 +4513,7 @@ function removeDocRoot($path)
 	$len = strlen($_SERVER["DOCUMENT_ROOT"]);
 
 	if (substr($path, 0, $len) == $_SERVER["DOCUMENT_ROOT"])
-		return "/".ltrim(substr_replace($path, "", 0, $len), "/");
+		return "/".ltrim(substr($path, $len), "/");
 	else
 		return $path;
 }
@@ -4575,11 +4576,13 @@ function GetMessage($name, $aReplace=false)
 function HasMessage($name)
 {
 	global $MESS;
-	return array_key_exists($name, $MESS);
+	return isset($MESS[$name]);
 }
 
 global $ALL_LANG_FILES;
-$ALL_LANG_FILES = Array();
+$ALL_LANG_FILES = array();
+
+/** @deprecated */
 function GetLangFileName($before, $after, $lang=false)
 {
 	if ($lang===false)
@@ -4691,40 +4694,53 @@ function IncludeTemplateLangFile($filepath, $lang=false)
 {
 	$filepath = rtrim(preg_replace("'[\\\\/]+'", "/", $filepath), "/ ");
 	$module_path = "/bitrix/modules/";
-	$templ_path = BX_PERSONAL_ROOT."/templates/";
-	$module_name = "";
-	if(strpos($filepath, $templ_path)!==false)
+	$module_name = $templ_path = $file_name = $template_name = "";
+
+	$dirs = array(
+		"/local/templates/",
+		BX_PERSONAL_ROOT."/templates/",
+	);
+	foreach($dirs as $dir)
 	{
-		$templ_pos = strlen($filepath) - strpos(strrev($filepath), strrev($templ_path));
-		$rel_path = substr($filepath, $templ_pos);
-		$p = strpos($rel_path, "/");
-		if(!$p)
-			return null;
-		$template_name = substr($rel_path, 0, $p);
-		$file_name = substr($rel_path, $p+1);
-		$p = strpos($file_name, "/");
-		if($p>0)
-			$module_name = substr($file_name, 0, $p);
+		if(strpos($filepath, $dir)!==false)
+		{
+			$templ_path = $dir;
+			$templ_pos = strlen($filepath) - strpos(strrev($filepath), strrev($templ_path));
+			$rel_path = substr($filepath, $templ_pos);
+			$p = strpos($rel_path, "/");
+			if(!$p)
+				return null;
+			$template_name = substr($rel_path, 0, $p);
+			$file_name = substr($rel_path, $p+1);
+			$p = strpos($file_name, "/");
+			if($p>0)
+				$module_name = substr($file_name, 0, $p);
+			break;
+		}
 	}
-	elseif(strpos($filepath, $module_path) !== false)
+	if($templ_path == "")
 	{
-		$templ_pos = strlen($filepath) - strpos(strrev($filepath), strrev($module_path));
-		$rel_path = substr($filepath, $templ_pos);
-		$p = strpos($rel_path, "/");
-		if(!$p)
-			return null;
-		$module_name = substr($rel_path, 0, $p);
-		if(defined("SITE_TEMPLATE_ID"))
-			$template_name = SITE_TEMPLATE_ID;
+		if(strpos($filepath, $module_path) !== false)
+		{
+			$templ_pos = strlen($filepath) - strpos(strrev($filepath), strrev($module_path));
+			$rel_path = substr($filepath, $templ_pos);
+			$p = strpos($rel_path, "/");
+			if(!$p)
+				return null;
+			$module_name = substr($rel_path, 0, $p);
+			if(defined("SITE_TEMPLATE_ID"))
+				$template_name = SITE_TEMPLATE_ID;
+			else
+				$template_name = ".default";
+			$file_name = substr($rel_path, $p + strlen("/install/templates/"));
+		}
 		else
-			$template_name = ".default";
-		$file_name = substr($rel_path, $p + strlen("/install/templates/"));
+		{
+			return false;
+		}
 	}
-	else
-		return false;
 
 	$BX_DOC_ROOT = rtrim(preg_replace("'[\\\\/]+'", "/", $_SERVER["DOCUMENT_ROOT"]), "/ ");
-	$templ_path = $BX_DOC_ROOT.$templ_path;
 	$module_path = $BX_DOC_ROOT.$module_path;
 
 	if($lang === false)
@@ -4734,30 +4750,41 @@ function IncludeTemplateLangFile($filepath, $lang=false)
 
 	if((substr($file_name, -16) == ".description.php") && $module_name!="")
 	{
-		if($lang != "en" && $lang != "ru" && file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$subst_lang."/".$file_name)))
+		if($subst_lang <> $lang && file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$subst_lang."/".$file_name)))
 			__IncludeLang($fname, false, true);
 
 		if(file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$lang."/".$file_name)))
 			__IncludeLang($fname, false, true);
 	}
 
-	if(file_exists(($fname = $templ_path.$template_name."/lang/".$lang."/".$file_name)))
+	if($templ_path <> "")
 	{
-		if($lang != "en" && $lang != "ru")
-			__IncludeLang($templ_path.$template_name."/lang/".$subst_lang."/".$file_name);
-		__IncludeLang($fname, false, true);
+		$templ_path = $BX_DOC_ROOT.$templ_path;
+		$checkDefault = true;
+		if($subst_lang <> $lang && file_exists(($fname = $templ_path.$template_name."/lang/".$subst_lang."/".$file_name)))
+		{
+			__IncludeLang($fname, false, true);
+			$checkDefault = false;
+		}
+		if(file_exists(($fname = $templ_path.$template_name."/lang/".$lang."/".$file_name)))
+		{
+			__IncludeLang($fname, false, true);
+			$checkDefault = false;
+		}
+		if($checkDefault && $template_name != ".default")
+		{
+			if($subst_lang <> $lang && file_exists(($fname = $templ_path.".default/lang/".$subst_lang."/".$file_name)))
+				__IncludeLang($fname, false, true);
+			if(file_exists(($fname = $templ_path.".default/lang/".$lang."/".$file_name)))
+				__IncludeLang($fname, false, true);
+		}
 	}
-	elseif($template_name != ".default" && file_exists(($fname = $templ_path.".default/lang/".$lang."/".$file_name)))
+	elseif($module_name != "")
 	{
-		if($lang != "en" && $lang != "ru")
-			__IncludeLang($templ_path.".default/lang/".$subst_lang."/".$file_name);
-		__IncludeLang($fname, false, true);
-	}
-	elseif($module_name != "" && file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$lang."/".$file_name)))
-	{
-		if($lang != "en" && $lang != "ru")
-			__IncludeLang($module_path.$module_name."/install/templates/lang/".$subst_lang."/".$file_name);
-		__IncludeLang($fname, false, true);
+		if($subst_lang <> $lang && file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$subst_lang."/".$file_name)))
+			__IncludeLang($fname, false, true);
+		if(file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$lang."/".$file_name)))
+			__IncludeLang($fname, false, true);
 	}
 	return null;
 }
@@ -4834,20 +4861,20 @@ function IncludeModuleLangFile($filepath, $lang=false, $bReturnArray=false)
 	if($lang === false)
 		$lang = LANGUAGE_ID;
 
+	$lang_subst = LangSubst($lang);
+
 	$arMess = array();
+	if($lang_subst <> $lang && file_exists(($fname = $module_path."/lang/".$lang_subst."/".$rel_path)))
+	{
+		$arMess = __IncludeLang($fname, $bReturnArray, true);
+	}
 	if(file_exists(($fname = $module_path."/lang/".$lang."/".$rel_path)))
 	{
-		if($lang <> "en" && $lang <> "ru")
-			$arMess = __IncludeLang($module_path."/lang/".LangSubst($lang)."/".$rel_path, $bReturnArray);
-
 		$msg = __IncludeLang($fname, $bReturnArray, true);
 		if(is_array($msg))
 			$arMess = array_merge($arMess, $msg);
 	}
-	elseif(file_exists(($fname = $module_path."/lang/".LangSubst($lang)."/".$rel_path)))
-	{
-		$arMess = __IncludeLang($fname, $bReturnArray, true);
-	}
+
 	if($bReturnArray)
 		return $arMess;
 	return true;
@@ -4855,7 +4882,7 @@ function IncludeModuleLangFile($filepath, $lang=false, $bReturnArray=false)
 
 function LangSubst($lang)
 {
-	static $arSubst = array('ua'=>'ru', 'kz'=>'ru');
+	static $arSubst = array('ua'=>'ru', 'kz'=>'ru', 'ru'=>'ru', 'de'=>'de');
 	if(isset($arSubst[$lang]))
 		return $arSubst[$lang];
 	return 'en';
@@ -5224,43 +5251,41 @@ function AddMessage2Log($sText, $sModule = "", $traceDepth = 6, $bShowArgs = fal
 				if (flock($fp, LOCK_EX))
 				{
 					@fwrite($fp, "Host: ".$_SERVER["HTTP_HOST"]."\nDate: ".date("Y-m-d H:i:s")."\nModule: ".$sModule."\n".$sText."\n");
-					if (function_exists("debug_backtrace"))
+					$arBacktrace = Bitrix\Main\Diag\Helper::getBackTrace($traceDepth, ($bShowArgs? null : DEBUG_BACKTRACE_IGNORE_ARGS));
+					$strFunctionStack = "";
+					$strFilesStack = "";
+					$iterationsCount = min(count($arBacktrace), $traceDepth);
+					for ($i = 1; $i < $iterationsCount; $i++)
 					{
-						$arBacktrace = debug_backtrace();
-						$strFunctionStack = "";
-						$strFilesStack = "";
-						$iterationsCount = min(count($arBacktrace), $traceDepth);
-						for ($i = 1; $i < $iterationsCount; $i++)
-						{
-							if (strlen($strFunctionStack)>0)
-								$strFunctionStack .= " < ";
-
-							if (isset($arBacktrace[$i]["class"]))
-								$strFunctionStack .= $arBacktrace[$i]["class"]."::";
-
-							$strFunctionStack .= $arBacktrace[$i]["function"];
-
-							if(isset($arBacktrace[$i]["file"]))
-								$strFilesStack .= "\t".$arBacktrace[$i]["file"].":".$arBacktrace[$i]["line"]."\n";
-							if($bShowArgs && isset($arBacktrace[$i]["args"]))
-							{
-								$strFilesStack .= "\t\t";
-								if (isset($arBacktrace[$i]["class"]))
-									$strFilesStack .= $arBacktrace[$i]["class"]."::";
-								$strFilesStack .= $arBacktrace[$i]["function"];
-								$strFilesStack .= "(\n";
-								foreach($arBacktrace[$i]["args"] as $value)
-									$strFilesStack .= "\t\t\t".$value."\n";
-								$strFilesStack .= "\t\t)\n";
-
-							}
-						}
-
 						if (strlen($strFunctionStack)>0)
+							$strFunctionStack .= " < ";
+
+						if (isset($arBacktrace[$i]["class"]))
+							$strFunctionStack .= $arBacktrace[$i]["class"]."::";
+
+						$strFunctionStack .= $arBacktrace[$i]["function"];
+
+						if(isset($arBacktrace[$i]["file"]))
+							$strFilesStack .= "\t".$arBacktrace[$i]["file"].":".$arBacktrace[$i]["line"]."\n";
+						if($bShowArgs && isset($arBacktrace[$i]["args"]))
 						{
-							@fwrite($fp, "    ".$strFunctionStack."\n".$strFilesStack);
+							$strFilesStack .= "\t\t";
+							if (isset($arBacktrace[$i]["class"]))
+								$strFilesStack .= $arBacktrace[$i]["class"]."::";
+							$strFilesStack .= $arBacktrace[$i]["function"];
+							$strFilesStack .= "(\n";
+							foreach($arBacktrace[$i]["args"] as $value)
+								$strFilesStack .= "\t\t\t".$value."\n";
+							$strFilesStack .= "\t\t)\n";
+
 						}
 					}
+
+					if (strlen($strFunctionStack)>0)
+					{
+						@fwrite($fp, "    ".$strFunctionStack."\n".$strFilesStack);
+					}
+
 					@fwrite($fp, "----------\n");
 					@fflush($fp);
 					@flock($fp, LOCK_UN);
@@ -7036,10 +7061,7 @@ class CJSCore
 		}
 		else
 		{
-			if($APPLICATION->IsJSOptimized())
-				$APPLICATION->AddHeadScript($js);
-			else
-				$APPLICATION->AddHeadString('<script type="text/javascript" src="'.CUtil::GetAdditionalFileURL($js).'"></script>', true);
+			$APPLICATION->AddHeadScript($js);
 		}
 		return '';
 	}
@@ -7049,17 +7071,31 @@ class CJSCore
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 		$jsMsg = '';
+		$mess_lang_default = Array();
+		$mess_lang = Array();
 
 		if ($lang)
 		{
+			$langSubst = LangSubst(LANGUAGE_ID);
+			if($langSubst <> LANGUAGE_ID)
+			{
+				$lang_filename = $_SERVER['DOCUMENT_ROOT'].str_replace("/lang/".LANGUAGE_ID."/", "/lang/".$langSubst."/", $lang);
+				if (file_exists($lang_filename))
+				{
+					$mess_lang_default = __IncludeLang($lang_filename, true, true);
+				}
+			}
+
 			$lang_filename = $_SERVER['DOCUMENT_ROOT'].$lang;
 			if (file_exists($lang_filename))
 			{
 				$mess_lang = __IncludeLang($lang_filename, true, true);
-				if (!empty($mess_lang))
-				{
-					$jsMsg = '(window.BX||top.BX).message('.CUtil::PhpToJSObject($mess_lang, false).');';
-				}
+			}
+
+			$mess_lang = array_merge($mess_lang_default, $mess_lang);
+			if (!empty($mess_lang))
+			{
+				$jsMsg = '(window.BX||top.BX).message('.CUtil::PhpToJSObject($mess_lang, false).');';
 			}
 		}
 
@@ -7070,11 +7106,13 @@ class CJSCore
 		{
 			$jsMsg = '<script type="text/javascript">'.$jsMsg.'</script>';
 			if ($bReturn)
+			{
 				return $jsMsg."\r\n";
-			elseif($APPLICATION->IsJSOptimized())
-				$APPLICATION->AddLangJS($jsMsg);
+			}
 			else
-				$APPLICATION->AddHeadString($jsMsg, true);
+			{
+				$APPLICATION->AddLangJS($jsMsg);
+			}
 		}
 
 		return $jsMsg;
@@ -7572,8 +7610,9 @@ class CUtil
 
 	public static function GetAdditionalFileURL($file, $bSkipCheck=false)
 	{
-		if($bSkipCheck || file_exists($_SERVER['DOCUMENT_ROOT'].$file))
-			return $file.'?'.filemtime($_SERVER['DOCUMENT_ROOT'].$file);
+		$filePath = $_SERVER['DOCUMENT_ROOT'].$file;
+		if($bSkipCheck || file_exists($filePath))
+			return $file.'?'.filemtime($filePath).filesize($filePath);
 		else
 			return $file;
 	}
@@ -7800,10 +7839,10 @@ class CHTTP
 			else
 				$proto = "http://";
 
-			if(strlen($server_name) > 0)
-				$server_name = preg_replace("/:(443|80)/", "", $server_name);
+			if($server_name <> '')
+				$server_name = preg_replace("/:(443|80)$/", "", $server_name);
 			else
-				$server_name = preg_replace("/:(443|80)/", "", $_SERVER["HTTP_HOST"]);
+				$server_name = preg_replace("/:(443|80)$/", "", $_SERVER["HTTP_HOST"]);
 
 			$uri = $proto.$server_name.$urn;
 		}
@@ -8348,42 +8387,40 @@ class CHTTP
 
 	public static function urlDeleteParams($url, $delete_params, $options = array())
 	{
-		if(count($delete_params))
+		$url_parts = explode("?", $url, 2);
+		if(count($url_parts) == 2 && strlen($url_parts[1]) > 0)
 		{
-			$url_parts = explode("?", $url, 2);
-			if(count($url_parts) == 2 && strlen($url_parts[1]) > 0)
+			if($options["delete_system_params"])
+				$delete_params = array_merge($delete_params, array(
+					"login",
+					"logout",
+					"register",
+					"forgot_password",
+					"change_password",
+					"confirm_registration",
+					"confirm_code",
+					"confirm_user_id",
+					"bitrix_include_areas",
+					"clear_cache",
+					"show_page_exec_time",
+					"show_include_exec_time",
+					"show_sql_stat",
+					"show_cache_stat",
+					"show_link_stat",
+				));
+
+			$params_pairs = explode("&", $url_parts[1]);
+			foreach($params_pairs as $i => $param_pair)
 			{
-				if($options["delete_system_params"])
-					$delete_params = array_merge($delete_params, array(
-						"login",
-						"logout",
-						"register",
-						"forgot_password",
-						"change_password",
-						"confirm_registration",
-						"confirm_code",
-						"confirm_user_id",
-						"bitrix_include_areas",
-						"clear_cache",
-						"show_page_exec_time",
-						"show_include_exec_time",
-						"show_sql_stat",
-						"show_link_stat",
-					));
-
-				$params_pairs = explode("&", $url_parts[1]);
-				foreach($params_pairs as $i => $param_pair)
-				{
-					$name_value_pair = explode("=", $param_pair, 2);
-					if(count($name_value_pair) == 2 && in_array($name_value_pair[0], $delete_params))
-						unset($params_pairs[$i]);
-				}
-
-				if(empty($params_pairs))
-					return $url_parts[0];
-				else
-					return $url_parts[0]."?".implode("&", $params_pairs);
+				$name_value_pair = explode("=", $param_pair, 2);
+				if(count($name_value_pair) == 2 && in_array($name_value_pair[0], $delete_params))
+					unset($params_pairs[$i]);
 			}
+
+			if(empty($params_pairs))
+				return $url_parts[0];
+			else
+				return $url_parts[0]."?".implode("&", $params_pairs);
 		}
 
 		return $url;
@@ -8871,65 +8908,7 @@ function ini_get_bool($param)
  */
 function sortByColumn(array &$array, $columns, $callbacks = '', $defaultValueIfNotSetValue = null, $preserveKeys = false)
 {
-	//by default: sort by ASC
-	if (!is_array($columns))
-	{
-		$columns = array($columns => SORT_ASC);
-	}
-	$params = $preserveDataKeys = array();
-	$alreadyFillPreserveDataKeys = false;
-	foreach ($columns as $column => &$order)
-	{
-		$callback = false;
-		//this is an array of callbacks (callable string)
-		if (is_array($callbacks) && !is_callable($callbacks))
-		{
-			$callback = !empty($callbacks[$column]) && is_callable($callbacks[$column]) ? $callbacks[$column] : false;
-		}
-		//common callback
-		elseif (!empty($callbacks) && is_callable($callbacks))
-		{
-			$callback = $callbacks;
-		}
-
-		//this is similar to the index|slice
-		$valueColumn[$column] = array();
-		foreach ($array as $index => $row)
-		{
-			$value = isset($row[$column]) ? $row[$column] : $defaultValueIfNotSetValue;
-			if ($callback)
-			{
-				$value = $callback($value);
-			}
-			$valueColumn[$column][$index] = $value;
-			if($preserveKeys && !$alreadyFillPreserveDataKeys)
-			{
-				$preserveDataKeys[$index] = $index;
-			}
-		}
-		unset($row, $index);
-		$alreadyFillPreserveDataKeys = $preserveKeys && !empty($preserveDataKeys);
-		//bug in 5.3 call_user_func_array
-		$params[] = &$valueColumn[$column];
-		$order    = (array)$order;
-		foreach ($order as $i => $ord)
-		{
-			$params[] = &$columns[$column][$i];
-		}
-	}
-	unset($order, $column);
-	$params[] = &$array;
-	if($preserveKeys)
-	{
-		$params[] = &$preserveDataKeys;
-	}
-
-	call_user_func_array('array_multisort', $params);
-
-	if($preserveKeys)
-	{
-		$array = array_combine(array_values($preserveDataKeys), array_values($array));
-	}
+	\Bitrix\Main\Type\Collection::sortByColumn($array, $columns, $callbacks, $defaultValueIfNotSetValue, $preserveKeys);
 }
 
 function getLocalPath($path, $baseFolder = "/bitrix")

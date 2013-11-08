@@ -46,10 +46,7 @@ class Uri
 
 		$path = IO\Path::normalize($path);
 
-		if (IO\Path::validate($path))
-			return $path;
-
-		throw new \Bitrix\Main\SystemException("Uri is not valid");
+		return $path;
 	}
 
 	public static function addDirectoryIndex($dir)

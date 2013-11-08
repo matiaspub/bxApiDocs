@@ -115,33 +115,7 @@ class CIMMessenger
 			$arFields['FROM_USER_ID'] = intval($arFields['FROM_USER_ID']);
 			$arFields['TO_USER_ID'] = intval($arFields['TO_USER_ID']);
 
-			$strSql = "
-				SELECT RF.CHAT_ID
-				FROM
-					b_im_relation RF
-					INNER JOIN b_im_relation RT on RF.CHAT_ID = RT.CHAT_ID
-				WHERE
-					RF.USER_ID = ".$arFields['FROM_USER_ID']."
-				and RT.USER_ID = ".$arFields['TO_USER_ID']."
-				and RF.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."'
-			";
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($arRes = $dbRes->Fetch())
-				$chatId = intval($arRes['CHAT_ID']);
-			else
-			{
-				$chatId = IntVal($DB->Add("b_im_chat", Array('AUTHOR_ID' => $arFields['AUTHOR_ID']), Array()));
-				if ($chatId <= 0)
-				{
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MESSAGE_CREATE"), "CHAT_ID");
-					return false;
-				}
-
-				$strSql = "INSERT INTO b_im_relation (CHAT_ID, MESSAGE_TYPE, USER_ID, STATUS) VALUES (".$chatId.",'".IM_MESSAGE_PRIVATE."',".$arFields['FROM_USER_ID'].", ".($bConvert? 2: 0).")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$strSql = "INSERT INTO b_im_relation (CHAT_ID, MESSAGE_TYPE, USER_ID, STATUS) VALUES (".$chatId.",'".IM_MESSAGE_PRIVATE."',".$arFields['TO_USER_ID'].", ".($bConvert? 2: 0).")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
+			$chatId = CIMMessage::GetChatId($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']);
 			if ($chatId > 0)
 			{
 				$arParams = Array();
@@ -166,21 +140,19 @@ class CIMMessenger
 
 				//CUserCounter::Increment($arFields['TO_USER_ID'], 'im_message', '**', false);
 				CIMContactList::SetRecent($arFields['TO_USER_ID'], $messageID, false, $arFields['FROM_USER_ID']);
-				CIMContactList::UpdateRecent($arFields['FROM_USER_ID'], $messageID, false, $arFields['TO_USER_ID']);
+				CIMContactList::SetRecent($arFields['FROM_USER_ID'], $messageID, false, $arFields['TO_USER_ID']);
 
 				if (!$bConvert)
 				{
-					if (!isset($arFields['READED']) || $arFields['READED'] == 'N')
-					{
-						$strSql = "
-							UPDATE b_im_relation
-							SET STATUS = (case when USER_ID = ".$arFields['TO_USER_ID']." then '".IM_STATUS_UNREAD."' else '".IM_STATUS_READ."' end),
-							LAST_ID = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_ID else ".$messageID." end),
-							LAST_SEND_ID = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_SEND_ID else ".$messageID." end),
-							LAST_READ = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_READ else ".$DB->CurrentTimeFunction()." end)
-							WHERE MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."' AND CHAT_ID = ".$chatId;
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					}
+
+					$strSql = "
+						UPDATE b_im_relation
+						SET STATUS = (case when USER_ID = ".$arFields['TO_USER_ID']." then '".IM_STATUS_UNREAD."' else '".IM_STATUS_READ."' end),
+						LAST_ID = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_ID else ".$messageID." end),
+						LAST_SEND_ID = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_SEND_ID else ".$messageID." end),
+						LAST_READ = (case when USER_ID = ".$arFields['TO_USER_ID']." then LAST_READ else ".$DB->CurrentTimeFunction()." end)
+						WHERE CHAT_ID = ".$chatId;
+					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 					if (CModule::IncludeModule("pull"))
 					{
@@ -207,7 +179,6 @@ class CIMMessenger
 								'TO_USER_ID' => $arParams['TO_USER_ID'],
 								'FROM_USER_ID' => $arParams['FROM_USER_ID'],
 								'SYSTEM' => $arFields['SYSTEM'] == 'Y'? 'Y': 'N',
-								'READED' => $arFields['READED'] == 'Y'? 'Y': 'N',
 								'MESSAGE' => $arParams['MESSAGE'],
 								'DATE_CREATE' => time(),
 							)),
@@ -246,7 +217,7 @@ class CIMMessenger
 			$arFields['FROM_USER_ID'] = intval($arFields['FROM_USER_ID']);
 			$chatId = 0;
 			$systemMessage = false;
-			if (isset($arFields['SYSTEM']) && $arFields['SYSTEM'] == 'Y' && $arFields['FROM_USER_ID'] <= 0)
+			if (isset($arFields['SYSTEM']) && $arFields['SYSTEM'] == 'Y')
 			{
 				$strSql = "
 					SELECT C.ID CHAT_ID, C.TITLE CHAT_TITLE, C.AUTHOR_ID CHAT_AUTHOR_ID
@@ -260,7 +231,7 @@ class CIMMessenger
 				$strSql = "
 					SELECT R.CHAT_ID, C.TITLE CHAT_TITLE, C.AUTHOR_ID CHAT_AUTHOR_ID
 					FROM b_im_relation R LEFT JOIN b_im_chat C ON R.CHAT_ID = C.ID
-					WHERE R.USER_ID = ".$arFields['FROM_USER_ID']." AND R.MESSAGE_TYPE = '".IM_MESSAGE_GROUP."' AND R.CHAT_ID = ".intval($arFields['TO_CHAT_ID'])."
+					WHERE R.USER_ID = ".$arFields['FROM_USER_ID']." AND R.CHAT_ID = ".intval($arFields['TO_CHAT_ID'])."
 				";
 			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -280,7 +251,7 @@ class CIMMessenger
 			{
 				$arParams = Array();
 				$arParams['CHAT_ID'] = $chatId;
-				$arParams['AUTHOR_ID'] = intval($arFields['AUTHOR_ID']);
+				$arParams['AUTHOR_ID'] = $systemMessage? 0: intval($arFields['AUTHOR_ID']);
 				$arParams['MESSAGE'] = trim($arFields['MESSAGE']);
 				$arParams['MESSAGE_OUT'] = trim($arFields['MESSAGE_OUT']);
 				$arParams['NOTIFY_MODULE'] = 'im';
@@ -300,20 +271,18 @@ class CIMMessenger
 								WHERE CHAT_ID = ".$chatId." AND USER_ID <> ".$arFields['FROM_USER_ID'];
 				CUserCounter::IncrementWithSelect($sqlCounter, false);
 				*/
-				CIMContactList::SetRecent($chatId, $messageID, true, $arFields['FROM_USER_ID']);
-				CIMContactList::UpdateRecent($chatId, $messageID, true);
+				$arRel = CIMChat::GetRelationById($chatId);
+				foreach ($arRel as $rel)
+					CIMContactList::SetRecent($chatId, $messageID, true, $rel['USER_ID']);
 
-				if (!$systemMessage)
-				{
-					$strSql = "
-						UPDATE b_im_relation
-						SET STATUS = (case when USER_ID = ".$arFields['FROM_USER_ID']." then '".IM_STATUS_READ."' else '".IM_STATUS_UNREAD."' end),
-						LAST_ID = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$messageID." else LAST_ID end),
-						LAST_SEND_ID = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$messageID." else LAST_SEND_ID end),
-						LAST_READ = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$DB->CurrentTimeFunction()." else LAST_READ end)
-						WHERE MESSAGE_TYPE = '".IM_MESSAGE_GROUP."' AND CHAT_ID = ".$chatId;
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				}
+				$strSql = "
+					UPDATE b_im_relation
+					SET STATUS = (case when USER_ID = ".$arFields['FROM_USER_ID']." then '".IM_STATUS_READ."' else '".IM_STATUS_UNREAD."' end),
+					LAST_ID = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$messageID." else LAST_ID end),
+					LAST_SEND_ID = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$messageID." else LAST_SEND_ID end),
+					LAST_READ = (case when USER_ID = ".$arFields['FROM_USER_ID']." then ".$DB->CurrentTimeFunction()." else LAST_READ end)
+					WHERE CHAT_ID = ".$chatId;
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 				if (CModule::IncludeModule("pull"))
 				{
@@ -328,6 +297,7 @@ class CIMMessenger
 							'TO_CHAT_ID' => $arParams['TO_CHAT_ID'],
 							'FROM_USER_ID' => $arParams['FROM_USER_ID'],
 							'MESSAGE' => $arParams['MESSAGE'],
+							'SYSTEM' => $arFields['SYSTEM'] == 'Y'? 'Y': 'N',
 							'DATE_CREATE' => time(),
 						)),
 					);
@@ -337,7 +307,6 @@ class CIMMessenger
 					CPullStack::AddByUser($arParams['FROM_USER_ID'], $arPullFrom);
 					CPushManager::DeleteFromQueueBySubTag($arParams['FROM_USER_ID'], 'IM_MESS');
 
-					$arRel = CIMChat::GetRelationById($chatId);
 					$usersForBadges = Array();
 					foreach ($arRel as $rel)
 					{
@@ -923,7 +892,7 @@ class CIMMessenger
 						'openSettings' : ".(isset($_GET['IM_SETTINGS']) && $_GET['IM_SETTINGS'] == 'Y'? "'true'": 'false').",
 						'currentTab' : '".CUtil::JSEscape($arTemplate['CURRENT_TAB'])."',
 						'userId': ".$USER->GetID().",
-						'userEmail': '".$USER->GetEmail()."',
+						'userEmail': '".CUtil::JSEscape($USER->GetEmail())."',
 						'webrtc': {'turnServer' : '".CUtil::JSEscape($arTemplate['TURN_SERVER'])."', 'turnServerFirefox' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_FIREFOX'])."', 'turnServerLogin' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_LOGIN'])."', 'turnServerPassword' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_PASSWORD'])."'},
 						'path' : {'profile' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE'])."', 'profileTemplate' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE_TEMPLATE'])."', 'mail' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_MAIL'])."'}
 					});
@@ -948,7 +917,7 @@ class CIMMessenger
 						'notify' : {},
 						'users' : {},
 						'userId': ".$USER->GetID().",
-						'userEmail': '".$USER->GetEmail()."',
+						'userEmail': '".CUtil::JSEscape($USER->GetEmail())."',
 
 						'openMessenger' : ".(isset($_GET['IM_DIALOG'])? "'".CUtil::JSEscape(htmlspecialcharsbx($_GET['IM_DIALOG']))."'": 'false').",
 						'openHistory' : ".(isset($_GET['IM_HISTORY'])? "'".CUtil::JSEscape(htmlspecialcharsbx($_GET['IM_HISTORY']))."'": 'false').",
@@ -961,190 +930,6 @@ class CIMMessenger
 		}
 
 		return $sJS;
-	}
-
-	public static function CallCommand($recipientId, $command, $params = Array())
-	{
-		global $USER;
-
-		if ($USER->GetID() <= 0 || intval($recipientId) <= 0)
-			return false;
-
-		if (!CModule::IncludeModule("pull"))
-			return false;
-
-		$arParams = Array(
-			'command' => $command,
-			'senderId' => $USER->GetID()
-		);
-
-		if ($command == 'signaling')
-		{
-			$arParams['peer'] = $params['peer'];
-		}
-		else if ($command == 'invite')
-		{
-			$arParams['video'] = isset($params['video']) && $params['video'] == 'Y'? true: false;
-
-			$arUserData = CIMContactList::GetUserData(Array('ID' => array($USER->GetID(), $recipientId), 'DEPARTMENT' => 'N', 'HR_PHOTO' => 'Y'));
-			$arParams['users'] = $arUserData['users'];
-			$arParams['hrphoto'] = $arUserData['hrphoto'];
-		}
-		else if ($command == 'busy')
-		{
-			$arParams['video'] = isset($params['video']) && $params['video'] == 'Y'? true: false;
-
-			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $USER->GetID()), array('FIELDS' => $arSelect));
-			$arUsers = Array();
-			if ($arUser = $dbUsers->Fetch())
-			{
-				$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
-				$arUsers['GENDER'] = $arUser["PERSONAL_GENDER"] == 'F'? 'F': 'M';
-
-				CIMMessage::Add(Array(
-					"FROM_USER_ID" => intval($recipientId),
-					"TO_USER_ID" => $USER->GetID(),
-					"MESSAGE" => GetMessage("IM_CALL_CHAT_BUSY_".$arUsers['GENDER'], Array('#USER_NAME#' => $arUsers['NAME'])),
-					"PUSH" => 'N',
-					"SYSTEM" => 'Y',
-				));
-			}
-		}
-		else if ($command == 'waitTimeout')
-		{
-			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $recipientId), array('FIELDS' => $arSelect));
-			$arUsers = Array();
-			if ($arUser = $dbUsers->Fetch())
-			{
-				$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
-
-				CIMMessage::Add(Array(
-					"FROM_USER_ID" => $USER->GetID(),
-					"TO_USER_ID" => intval($recipientId),
-					"MESSAGE" => GetMessage("IM_CALL_CHAT_WAIT", Array('#USER_NAME#' => $arUsers['NAME'])),
-					"PUSH" => 'N',
-					"SYSTEM" => 'Y',
-				));
-			}
-		}
-		else if ($command == 'start')
-		{
-			CIMMessage::Add(Array(
-				"FROM_USER_ID" => $USER->GetID(),
-				"TO_USER_ID" =>  intval($recipientId),
-				"MESSAGE" => GetMessage("IM_CALL_CHAT_START"),
-				"SYSTEM" => 'Y',
-				"PUSH" => 'N',
-				"READED" => 'Y',
-			));
-		}
-		else if ($command == 'errorAccess')
-		{
-			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $USER->GetID()), array('FIELDS' => $arSelect));
-			$arUsers = Array();
-			if ($arUser = $dbUsers->Fetch())
-			{
-				$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
-
-				CIMMessage::Add(Array(
-					"FROM_USER_ID" => $USER->GetID(),
-					"TO_USER_ID" => intval($recipientId),
-					"MESSAGE" => GetMessage("IM_CALL_CHAT_ERROR", Array('#USER_NAME#' => $arUsers['NAME'])),
-					"SYSTEM" => 'Y',
-					"PUSH" => 'N',
-					"READED" => 'Y',
-				));
-			}
-		}
-		else if ($command == 'errorOffline')
-		{
-			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => intval($recipientId)), array('FIELDS' => $arSelect));
-			$arUsers = Array();
-			if ($arUser = $dbUsers->Fetch())
-			{
-				$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
-
-				CIMMessage::Add(Array(
-					"FROM_USER_ID" => $USER->GetID(),
-					"TO_USER_ID" =>  intval($recipientId),
-					"MESSAGE" => GetMessage("IM_CALL_CHAT_OFFLINE", Array('#USER_NAME#' => $arUsers['NAME'])),
-					"SYSTEM" => 'Y',
-				));
-			}
-		}
-		else if ($command == 'decline')
-		{
-			if ($params['CONNECTED'] == 'Y')
-			{
-				CIMMessage::Add(Array(
-					"FROM_USER_ID" => $USER->GetID(),
-					"TO_USER_ID" =>  intval($recipientId),
-					"MESSAGE" => GetMessage("IM_CALL_CHAT_END"),
-					"PUSH" => 'N',
-					"SYSTEM" => 'Y',
-					"READED" => 'Y',
-				));
-			}
-			else
-			{
-				$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-				$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $USER->GetID()), array('FIELDS' => $arSelect));
-				$arUsers = Array();
-				if ($arUser = $dbUsers->Fetch())
-				{
-					$arUsers['NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
-					$arUsers['GENDER'] = $arUser["PERSONAL_GENDER"] == 'F'? 'F': 'M';
-
-					CIMMessage::Add(Array(
-						"FROM_USER_ID" => $USER->GetID(),
-						"TO_USER_ID" =>  intval($recipientId),
-						"MESSAGE" => GetMessage("IM_CALL_CHAT_DECLINE_".$arUsers['GENDER'], Array('#USER_NAME#' => $arUsers['NAME'])),
-						"PUSH" => 'N',
-						"SYSTEM" => 'Y',
-						"READED" => $params['ACTIVE'] == 'Y'? 'Y': $params['INITIATOR'] == 'Y'? 'N': 'Y',
-					));
-				}
-			}
-		}
-		else if ($command == 'busy_self')
-		{
-			CIMMessage::Add(Array(
-				"FROM_USER_ID" => $USER->GetID(),
-				"TO_USER_ID" =>  intval($recipientId),
-				"MESSAGE" => GetMessage("IM_CALL_CHAT_END"),
-				"PUSH" => 'N',
-				"SYSTEM" => 'Y',
-				"READED" => 'Y',
-			));
-		}
-		else if ($command == 'wait' || $command == 'accept' || $command == 'ready' || $command == 'decline_self' || $command == 'accept_self' )
-		{
-		}
-		else
-			return false;
-
-
-		CPullStack::AddByUser(intval($recipientId), Array(
-			'module_id' => 'im',
-			'command' => 'call',
-			'params' => $arParams,
-		));
-
-		if ($command == 'accept' || $command == 'decline')
-		{
-			$arParams['command'] = $command.'_self';
-			CPullStack::AddByUser($USER->GetID(), Array(
-				'module_id' => 'im',
-				'command' => 'call',
-				'params' => $arParams,
-			));
-		}
-
-		return true;
 	}
 
 	public static function StartWriting($recipientId)
@@ -1221,13 +1006,6 @@ class CIMMessenger
 		$arPush = Array();
 		if (!is_array($userID))
 			$userID = Array(intval($userID));
-
-		// CHECK удалить перед релизом
-		foreach ($userID as $key => $user)
-		{
-			if (!in_array($user, Array(5, 274)))
-				unset($userID[$key]);
-		}
 
 		global $DB;
 		if (empty($userID))

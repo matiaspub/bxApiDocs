@@ -114,10 +114,11 @@ class CAllBlogComment
 
 		$arResult = CBlogComment::GetByID($ID);
 
-		$db_events = GetModuleEvents("blog", "OnBeforeCommentDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeCommentDelete", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID))===false)
 				return false;
+		}
 
 		if ($arResult)
 		{
@@ -142,8 +143,7 @@ class CAllBlogComment
 
 		unset($GLOBALS["BLOG_COMMENT"]["BLOG_COMMENT_CACHE_".$ID]);
 
-		$events = GetModuleEvents("blog", "OnCommentDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("blog", "OnCommentDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID));
 
 		if (CModule::IncludeModule("search"))
@@ -503,6 +503,9 @@ class CAllBlogComment
 			if($arParams["USE_SOCNET"] == "Y")
 			{
 				$arSearchIndex["PERMISSIONS"] = $arSp;
+				if(!in_array("U".$arComment["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+						$arSearchIndex["PERMISSIONS"][] = "U".$arComment["AUTHOR_ID"];
+
 				if(is_array($arSp))
 				{
 					$sgId = array();

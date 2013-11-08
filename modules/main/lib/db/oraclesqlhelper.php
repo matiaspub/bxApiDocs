@@ -1,9 +1,26 @@
 <?php
 namespace Bitrix\Main\DB;
 
-class OracleSqlHelper
-	extends SqlHelper
+class OracleSqlHelper extends SqlHelper
 {
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getLeftQuote()
+	{
+		return '"';
+	}
+
+	/**
+	 * Identificator escaping - left char
+	 * @return string
+	 */
+	static public function getRightQuote()
+	{
+		return '"';
+	}
+
 	static public function getQueryDelimiter()
 	{
 		return "(?<!\\*)/(?!\\*)";
@@ -49,9 +66,57 @@ class OracleSqlHelper
 		return "TRUNC(SYSDATE)";
 	}
 
+	static public function addSecondsToDateTime($seconds, $from = null)
+	{
+		if ($from === null)
+		{
+			$from = static::getCurrentDateTimeFunction();
+		}
+
+		return '('.$from.'+'.$seconds.'/86400)';
+	}
+
 	static public function getDatetimeToDateFunction($value)
 	{
 		return 'TRUNC('.$value.')';
+	}
+
+	static public function formatDate($format, $field = null)
+	{
+		$format = str_replace("HH", "HH24", $format);
+		$format = str_replace("GG", "HH24", $format);
+
+		if (strpos($format, 'HH24') === false)
+		{
+			$format = str_replace("H", "HH", $format);
+		}
+
+		$format = str_replace("G", "HH", $format);
+
+		$format = str_replace("MI", "II", $format);
+
+		if (strpos($format, 'MMMM') !== false)
+		{
+			$format = str_replace("MMMM", "MONTH", $format);
+		}
+		elseif (strpos($format, 'MM') === false)
+		{
+			$format = str_replace("M", "MON", $format);
+		}
+
+		$format = str_replace("II", "MI", $format);
+
+		$format = str_replace("TT", "AM", $format);
+		$format = str_replace("T", "AM", $format);
+
+		if($field === false)
+		{
+			return $format;
+		}
+		else
+		{
+			return "TO_CHAR(".$field.", '".$format."')";
+		}
 	}
 
 	static public function getConcatFunction()
@@ -80,15 +145,15 @@ class OracleSqlHelper
 
 	static public function getDateTimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
 	{
-		$customOffset = $value->getOffset();
+		$customOffset = $value->getValue()->getOffset();
 
 		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getOffset();
+		$serverOffset = $serverTime->getValue()->getOffset();
 
 		$diff = $customOffset - $serverOffset;
 		$valueTmp = clone $value;
 
-		$valueTmp->sub(new \DateInterval(sprintf("PT%sS", $diff)));
+		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
 
 		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
 		$formatDb = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "YYYY-MM-DD" : "YYYY-MM-DD HH24:MI:SS");
@@ -135,37 +200,36 @@ class OracleSqlHelper
 		return array($strInsert1, $strInsert2, $arBinds);
 	}
 
-	public function prepareUpdate($tableName, $arFields)
+	public function prepareBinds($tableName, $fields)
 	{
-		$arBinds = array();
-		$strUpdate = "";
+		$binds = array();
+		$columns = $this->dbConnection->getTableFields($tableName);
 
-		$arColumns = $this->dbConnection->getTableFields($tableName);
-		foreach ($arColumns as $columnName => $columnInfo)
+		foreach ($columns as $columnName => $columnInfo)
 		{
-			if (array_key_exists($columnName, $arFields))
+			if (array_key_exists($columnName, $fields) && !($fields[$columnName] instanceof SqlExpression))
 			{
-				$val = $arFields[$columnName];
-				$strUpdate .= ", ".$columnName." = ".$this->convertValueToDb($val, $columnInfo);
-				if (($columnInfo["TYPE"] == "CLOB") && ($val != null) && (strlen($val) > 0))
-					$arBinds[] = $columnName;
-			}
-			elseif (array_key_exists("~".$columnName, $arFields))
-			{
-				$strUpdate .= ", ".$columnName." = ".$arFields["~".$columnName];
+				if (($columnInfo["TYPE"] == "CLOB") && ($fields[$columnName] !== null) && (strlen($fields[$columnName]) > 0))
+				{
+					$binds[] = $columnName;
+				}
 			}
 		}
 
-		if ($strUpdate != "")
-			$strUpdate = " ".substr($strUpdate, 2)." ";
-
-		return array($strUpdate, $arBinds);
+		return $binds;
 	}
 
 	protected function convertValueToDb($value, array $columnInfo)
 	{
 		if ($value === null)
+		{
 			return "NULL";
+		}
+
+		if ($value instanceof SqlExpression)
+		{
+			return $value->compile();
+		}
 
 		switch ($columnInfo["TYPE"])
 		{
@@ -194,14 +258,46 @@ class OracleSqlHelper
 				break;
 
 			case "VARCHAR2": case "CHAR":
-				$result = str_replace("'", "''", substr($value, 0, $columnInfo["CHAR_LENGTH"]));
+				$result = "'".str_replace("'", "''", substr($value, 0, $columnInfo["CHAR_LENGTH"]))."'";
 				break;
 
 			default:
-				$result = str_replace("'", "''", $value);
+				$result = "'".str_replace("'", "''", $value)."'";
 				break;
 		}
 
 		return $result;
+	}
+
+	static public function getTopSql($sql, $limit, $offset = 0)
+	{
+		$offset = intval($offset);
+		$limit = intval($limit);
+
+		if ($offset > 0 && $limit <= 0)
+			throw new \Bitrix\Main\ArgumentException("Limit must be set if offset is set");
+
+		if ($limit > 0)
+		{
+			if ($offset <= 0)
+			{
+				$sql =
+					"SELECT * ".
+					"FROM (".$sql.") ".
+					"WHERE ROWNUM <= ".$limit;
+			}
+			else
+			{
+				$sql =
+					"SELECT * ".
+					"FROM (".
+					"   SELECT rownum_query_alias.*, ROWNUM rownum_alias ".
+					"   FROM (".$sql.") rownum_query_alias ".
+					"   WHERE ROWNUM <= ".($offset + $limit - 1)." ".
+					") ".
+					"WHERE rownum_alias >= ".$offset;
+			}
+		}
+		return $sql;
 	}
 }

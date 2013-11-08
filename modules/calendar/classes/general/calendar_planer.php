@@ -5,59 +5,53 @@ class CCalendarPlanner
 	{
 		global $APPLICATION;
 		$id = $Params['id'];
-		$bWideDate = strpos(FORMAT_DATETIME, 'MMMM') !== false;
+		//$bWideDate = strpos(FORMAT_DATETIME, 'MMMM') !== false;
+		$addWidthStyle = IsAmPmMode() ? ' ampm-width' : '';
 ?>
-<div id="bx-planner-popup<?=$id?>" class="bxc-planner bxec-popup<?= ($bWideDate ? ' bxec-d-cont-div-wide-date' : '')?>">
-
-<table class="bxec-edcal-frame">
-	<tr>
-		<td  colSpan="2">
-		<div id="<?=$id?>_plan_cont" class="bxec-plan-cont bxecpl-empty">
+<div id="bx-planner-popup<?=$id?>" class="bxc-planner bxec-popup">
+	<div id="<?=$id?>_plan_cont" class="bxec-plan-cont bxecpl-empty">
 		<div id="<?=$id?>_plan_top_cont"  class="bxec-plan-top-cont">
-			<div style="width: 650px; height: 1px;"></div>
-			<div class="bxec-popup-row bxec-popup-row-from-to">
-				<div class="bxec-field-label">
-					<label class="bxec-from-lbl" for="<?=$id?>planner-from"><?=GetMessage('EC_EDEV_DATE_FROM')?></label>
-					<label class="bxec-from-lbl" for="<?=$id?>planner-to"><?=GetMessage('EC_EDEV_DATE_TO')?></label>
+			<div style="width: 700px; height: 1px;"></div>
 
-					<label for="<?=$id?>_pl_dur"><?=GetMessage('EC_EVENT_DURATION')?></label>
-				</div>
-				<div>
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-calendar"><input id="<?=$id?>planner-from"  type="text"/></span>
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-time"><?CClock::Show(array('inputId' => $id.'planner_from_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_FROM')));?><i class="bxec-time-icon"></i></span>
-				&mdash;
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-calendar"><input id="<?=$id?>planner-to"  type="text"/></span>
-				<span class="bxec-field-val-2 bxec-field-title-inner bxec-field-time"><?CClock::Show(array('inputId' => $id.'planner_to_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_FROM')));?><i class="bxec-time-icon"></i></span>
+			<div class="bxec-plan-from-to">
+				<span class="bxec-date">
+					<label class="bxec-date-label" for="<?=$id?>planner-from"><?=GetMessage('EC_EDEV_FROM_DATE_TIME')?></label>
+					<input id="<?=$id?>planner-from" type="text" class="calendar-inp calendar-inp-cal"/>
+				</span>
+				<span class="bxec-time<?=$addWidthStyle?>"><?CClock::Show(array('inputId' => $id.'planner_from_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_FROM'), 'showIcon' => false));?></span>
+				<span class="bxec-mdash">&mdash;</span>
+				<span class="bxec-date">
+					<label class="bxec-date-label" for="<?=$id?>planner-to"><?=GetMessage('EC_EDEV_TO_DATE_TIME')?></label>
+					<input id="<?=$id?>planner-to" type="text" class="calendar-inp calendar-inp-cal"/>
+				</span>
+				<span class="bxec-time<?=$addWidthStyle?>"><?CClock::Show(array('inputId' => $id.'planner_to_time', 'inputTitle' => GetMessage('EC_EDEV_TIME_TO'), 'showIcon' => false));?></span>
 
-				<span class="bxec-field-duration" title="<?=GetMessage('EC_EVENT_DURATION_TITLE')?>">
-					<span class="bxec-field-val-2 bxec-field-title-inner"><input style="width: 57px;" id="<?=$id?>_pl_dur" type="text" title="<?=GetMessage('EC_EVENT_DURATION_TITLE')?>"/>
-					</span>
-					<span class="bxec-field-val-2 bxec-field-title-inner" style="height: 20px;">
-					<select id="<?=$id?>_pl_dur_type" style="width: 70px;">
+				<div style="display:none;"><?$APPLICATION->IncludeComponent("bitrix:main.calendar",	"",Array("FORM_NAME" => "","INPUT_NAME" => "","INPUT_VALUE" => "","SHOW_TIME" => "N","HIDE_TIMEBAR" => "Y","SHOW_INPUT" => "N"),false, array("HIDE_ICONS" => "Y"));?></div>
+
+				<span class="bxec-val-cnt" style="padding-right: 24px;">
+					<label class="bxec-val-cnt-label" for="<?=$id?>_pl_dur"><?=GetMessage('EC_EVENT_DURATION')?></label>
+					<input class="calendar-inp" style="width: 30px;" id="<?=$id?>_pl_dur" type="text"/>
+					<select id="<?=$id?>_pl_dur_type" style="width: 80px;" class="calendar-select">
 						<option value="min"><?=GetMessage('EC_EDEV_REM_MIN')?></option>
 						<option value="hour" selected="true"><?=GetMessage('EC_EDEV_REM_HOUR')?></option>
 						<option value="day"><?=GetMessage('EC_EDEV_REM_DAY')?></option>
 					</select>
-					</span>
-					<img src="/bitrix/images/1.gif" class="bxecpl-lock-dur" id="<?=$id?>_pl_dur_lock" title="<?=GetMessage('EC_EVENT_DUR_LOCK')?>"/>
+					<i class="bxecpl-lock-dur" id="<?=$id?>_pl_dur_lock" title="<?=GetMessage('EC_EVENT_DUR_LOCK')?>"></i>
 				</span>
-				<div class="bxec-cal-icon-bogus"><?$APPLICATION->IncludeComponent("bitrix:main.calendar", "", Array("FORM_NAME" => "","INPUT_NAME" => "","INPUT_VALUE" => "","SHOW_TIME" => "N","HIDE_TIMEBAR" => "Y","SHOW_INPUT" => "N"),false, array("HIDE_ICONS" => "Y"));?></div>
-				</div>
-			</div>
 
-			<div style="padding: 5px 0 0 0;">
-				<!-- Add users-->
-				<span class="bxc-add-guest-link"  id="<?=$id?>pl_user_control_link"></span>
 				<!-- Location -->
-				<span title="<?=GetMessage('EC_LOCATION_TITLE')?>" class="bxecpl-loc-cont bxec-field-location">
-					<label for="<?=$id?>_planner_location2"><?=GetMessage('EC_LOCATION')?>:</label>
-					<input style="width: 200px;" id="<?=$id?>_planner_location2" type="text"  title="<?=GetMessage('EC_LOCATION_TITLE')?>" value="<?= GetMessage('EC_PL_SEL_MEET_ROOM')?>" class="ec-label" />
+				<span class="bxec-val-cnt" style="width: 230px;">
+					<label class="bxec-val-cnt-label" for="<?=$id?>_planner_location2"><?=GetMessage('EC_LOCATION')?></label>
+					<input class="calendar-inp calendar-inp-time" style="width: 180px;" id="<?=$id?>_planner_location2" type="text" value="<?= GetMessage('EC_PL_SEL_MEET_ROOM')?>" />
 				</span>
+			</div>
+			<div class="bxec-plan-field-dest">
+				<?self::__ShowAttendeesDestinationHtml($Params)?>
 			</div>
 		</div>
 
-
-		<div id="<?=$id?>_plan_grid_cont" class="bxec-plan-grid-cont"><table class="bxec-plan-grid-tbl">
+		<div id="<?=$id?>_plan_grid_cont" class="bxec-plan-grid-cont">
+			<table id="<?=$id?>_plan_grid_tbl" class="bxec-plan-grid-tbl">
 				<tr class="bxec-header">
 					<td class="bxec-scale-cont"><label for="<?=$id?>_plan_scale_sel"><?=GetMessage('EC_SCALE')?>:</label>
 						<select id="<?=$id?>_plan_scale_sel">
@@ -74,7 +68,6 @@ class CCalendarPlanner
 					<td class="bxec-user">
 						<div><?=GetMessage('EC_EDEV_GUESTS')?>
 							<span id="<?=$id?>pl-count"></span>
-							<i class="bxplan-del bxplan-del-all" id="<?=$id?>_planner_del_all" title="<?=GetMessage('EC_DEL_ALL_GUESTS_TITLE')?>"></i>
 						</div>
 					</td>
 				</tr>
@@ -82,41 +75,14 @@ class CCalendarPlanner
 					<td><div class="bxec-user-list-div"><div class="bxec-empty-list"> <?=GetMessage('EC_NO_ATTENDEES')?></div></div></td>
 					<td class="bxec-separator"></td>
 					<td><div class="bxec-grid-cont"><div class="bxec-gacc-cont"></div>
-						<div class="bxecp-selection" id="<?=$id?>_plan_selection"  title="<?=GetMessage('EC_PL_EVENT')?>"><img src="/bitrix/images/1.gif" class="bxecp-sel-left" title="<?=GetMessage('EC_PL_EVENT_MOVE_LEFT')?>" /><img src="/bitrix/images/1.gif" class="bxecp-sel-right" title="<?=GetMessage('EC_PL_EVENT_MOVE_RIGHT')?>" /><img src="/bitrix/images/1.gif" class="bxecp-sel-mover" title="<?=GetMessage('EC_PL_EVENT_MOVE')?>" /></div>
-					</div>
-					<div class="bxec-empty-list2"><?= GetMessage('EC_NO_GUEST_MESS')?></div>
+							<div class="bxecp-selection" id="<?=$id?>_plan_selection"  title="<?=GetMessage('EC_PL_EVENT')?>"><img src="/bitrix/images/1.gif" class="bxecp-sel-left" title="<?=GetMessage('EC_PL_EVENT_MOVE_LEFT')?>" /><img src="/bitrix/images/1.gif" class="bxecp-sel-right" title="<?=GetMessage('EC_PL_EVENT_MOVE_RIGHT')?>" /><img src="/bitrix/images/1.gif" class="bxecp-sel-mover" title="<?=GetMessage('EC_PL_EVENT_MOVE')?>" /></div>
+						</div>
+						<div class="bxec-empty-list2"><?= GetMessage('EC_NO_GUEST_MESS')?></div>
 					</td>
 				</tr>
 			</table>
 		</div>
-		</div>
-		</td>
-	</tr>
-</table>
-<script>
-function BXPlannerAttendeeOnchange(arUsers){BX.onCustomEvent(window, 'onPlannerAttendeeOnChange', [arUsers]);}
-</script>
-<?
-
-$isExtranetGroup = false;
-
-if ($Params["bSocNet"] && $Params["type"] == "group" && intval($Params["ownerId"]) > 0 && CModule::IncludeModule("extranet"))
-	$isExtranetGroup = CExtranet::IsExtranetSocNetGroup($Params["ownerId"]);
-
-$APPLICATION->IncludeComponent(
-	"bitrix:intranet.user.selector.new", "", array(
-			"MULTIPLE" => "Y",
-			"NAME" => "BXPlannerUserSelect",
-			"VALUE" => array(),
-			"POPUP" => "Y",
-			"ON_CHANGE" => "BXPlannerAttendeeOnchange",
-			"SITE_ID" => SITE_ID,
-			"NAME_TEMPLATE" => CCalendar::GetUserNameTemplate(),
-			"SHOW_EXTRANET_USERS" => $isExtranetGroup ? "FROM_EXACT_GROUP" : "NONE",
-			"EX_GROUP" => $isExtranetGroup ? $Params["ownerId"] : ""
-		), null, array("HIDE_ICONS" => "Y")
-	);
-?>
+	</div>
 </div>
 <?
 	}
@@ -172,6 +138,68 @@ var BXPL_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".ad
 			'height' => 500,
 			'scale' => 1
 		));
+	}
+
+	public static function __ShowAttendeesDestinationHtml($Params = array())
+	{
+		$id = $Params['id'];
+		$DESTINATION = CCalendar::GetSocNetDestination(false, $Params['event']['ATTENDEES_CODES']);
+		?>
+		<div id="<?= $id?>_plan_dest_cont" class="event-grid-dest-block">
+			<div class="event-grid-dest-wrap-outer">
+				<div class="event-grid-dest-label"><?=GetMessage("EC_EDEV_GUESTS")?>:</div>
+				<div class="event-grid-dest-wrap" id="event-planner-dest-cont">
+					<span id="event-planner-dest-item"></span>
+					<span class="feed-add-destination-input-box" id="event-planner-dest-input-box">
+						<input type="text" value="" class="feed-add-destination-inp" id="event-planner-dest-input">
+					</span>
+					<a href="#" class="feed-add-destination-link" id="event-planner-dest-add-link"></a>
+					<script>
+						BX.message({
+							'BX_FPD_LINK_1':'<?=GetMessageJS("EC_DESTINATION_1")?>',
+							'BX_FPD_LINK_2':'<?=GetMessageJS("EC_DESTINATION_2")?>'
+						});
+						window.plannerDestFormName = top.plannerDestFormName = 'bx_planner_<?=randString(6)?>';
+						//
+						BX.SocNetLogDestination.init({
+							name : plannerDestFormName,
+							searchInput : BX('event-planner-dest-input'),
+							extranetUser :  false,
+							bindMainPopup : { 'node' : BX('event-planner-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
+							bindSearchPopup : { 'node' : BX('event-planner-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
+							callback : {
+								select : BxPlannerSelectCallback,
+								unSelect : BxPlannerUnSelectCallback,
+								openDialog : BxPlannerOpenDialogCallback,
+								closeDialog : BxPlannerCloseDialogCallback,
+								openSearch : BxPlannerOpenDialogCallback,
+								closeSearch : BxPlannerCloseSearchCallback
+							},
+							items : {
+								users : <?=(empty($DESTINATION['USERS'])? '{}': CUtil::PhpToJSObject($DESTINATION['USERS']))?>,
+								groups : <?=(
+									$DESTINATION["EXTRANET_USER"] == 'Y'
+								|| (array_key_exists("DENY_TOALL", $DESTINATION) && $DESTINATION["DENY_TOALL"])
+									? '{}'
+									: "{'UA' : {'id':'UA','name': '".(!empty($DESTINATION['DEPARTMENT']) ? GetMessageJS("MPF_DESTINATION_3"): GetMessageJS("MPF_DESTINATION_4"))."'}}"
+								)?>,
+								sonetgroups : <?=(empty($DESTINATION['SONETGROUPS'])? '{}': CUtil::PhpToJSObject($DESTINATION['SONETGROUPS']))?>,
+								department : <?=(empty($DESTINATION['DEPARTMENT'])? '{}': CUtil::PhpToJSObject($DESTINATION['DEPARTMENT']))?>,
+								departmentRelation : <?=(empty($DESTINATION['DEPARTMENT_RELATION'])? '{}': CUtil::PhpToJSObject($DESTINATION['DEPARTMENT_RELATION']))?>
+							},
+							itemsLast : {
+								users : <?=(empty($DESTINATION['LAST']['USERS'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['USERS']))?>,
+								sonetgroups : <?=(empty($DESTINATION['LAST']['SONETGROUPS'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['SONETGROUPS']))?>,
+								department : <?=(empty($DESTINATION['LAST']['DEPARTMENT'])? '{}': CUtil::PhpToJSObject($DESTINATION['LAST']['DEPARTMENT']))?>,
+								groups : <?=($DESTINATION["EXTRANET_USER"] == 'Y'? '{}': "{'UA':true}")?>
+							},
+							itemsSelected : <?=(empty($DESTINATION['SELECTED'])? '{}': CUtil::PhpToJSObject($DESTINATION['SELECTED']))?>
+						});
+					</script>
+				</div>
+			</div>
+		</div>
+	<?
 	}
 }
 

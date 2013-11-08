@@ -1239,6 +1239,7 @@ window.'.$this->name.' = new PopupMenu("'.$this->id.'"'.
 						(isset($action["DEFAULT"]) && $action["DEFAULT"] == true? "'DEFAULT':true,":"").
 						($action["TEXT"]<>""? "'TEXT':'".CUtil::JSEscape($action["TEXT"])."',":"").
 						(isset($action["TITLE"]) && $action["TITLE"]<>""? "'TITLE':'".CUtil::JSEscape($action["TITLE"])."',":"").
+						(isset($action["SHOW_TITLE"]) && $action["SHOW_TITLE"] == true ? "'SHOW_TITLE':true'":"").
 						($action["ACTION"]<>""? "'ONCLICK':'".CUtil::JSEscape(htmlspecialcharsback($action["ACTION"]))."',":"").
 						(isset($action["ONMENUPOPUP"]) && $action["ONMENUPOPUP"]<>""? "'ONMENUPOPUP':'".CUtil::JSEscape($action["ONMENUPOPUP"])."',":"").
 						(isset($action["MENU"]) && is_array($action["MENU"])? "'MENU':".CAdminPopup::PhpToJavaScript($action["MENU"]).",":"").
@@ -2514,10 +2515,7 @@ class CAdminTabControl
 		$this->bPublicMode = defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1;
 		$this->bCanExpand = !$this->bPublicMode && (bool)$bCanExpand;
 
-		if(isset($_REQUEST[$this->name."_active_tab"]))
-			$this->selectedTab = $_REQUEST[$this->name."_active_tab"];
-		else
-			$this->selectedTab = $tabs[0]["DIV"];
+		$this->SetSelectedTab();
 
 		if (!$bDenyAutoSave && CAutoSave::Allowed())
 		{
@@ -2566,12 +2564,29 @@ class CAdminTabControl
 			foreach ($arCustomTabs as $value1)
 				$arTabs[] = array_merge($value1, array("CUSTOM" => "Y"));
 
-			if(isset($_REQUEST[$this->name."_active_tab"]))
-				$this->selectedTab = $_REQUEST[$this->name."_active_tab"];
-			else
-				$this->selectedTab = $arTabs[0]["DIV"];
-
 			$this->tabs = $arTabs;
+		}
+	}
+
+	public static function OnAdminTabControlBegin()
+	{
+		foreach(GetModuleEvents("main", "OnAdminTabControlBegin", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$this));
+	}
+
+	public function SetSelectedTab()
+	{
+		$this->selectedTab = $this->tabs[0]["DIV"];
+		if(isset($_REQUEST[$this->name."_active_tab"]))
+		{
+			foreach($this->tabs as $i => $tab)
+			{
+				if($tab["DIV"] == $_REQUEST[$this->name."_active_tab"])
+				{
+					$this->selectedTab = $_REQUEST[$this->name."_active_tab"];
+					break;
+				}
+			}
 		}
 	}
 
@@ -2579,10 +2594,10 @@ class CAdminTabControl
 	{
 		$hkInst = CHotKeys::getInstance();
 
-		foreach(GetModuleEvents("main", "OnAdminTabControlBegin", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array(&$this));
-
+		$this->OnAdminTabControlBegin();
 		$this->tabIndex = 0;
+
+		$this->SetSelectedTab();
 
 		if (!$this->bPublicMode)
 		{
@@ -2597,7 +2612,10 @@ class CAdminTabControl
 		foreach($this->tabs as $key => $tab)
 		{
 			$bSelected = ($tab["DIV"] == $this->selectedTab);
-			$tabs_html .= '<span title="'.$tab["TITLE"].$hkInst->GetTitle("tab-container").'" id="tab_cont_'.$tab["DIV"].'" class="adm-detail-tab'.($bSelected ? ' adm-detail-tab-active':'').($key==$len-1? ' adm-detail-tab-last':'').'" onclick="'.$this->name.'.SelectTab(\''.$tab["DIV"].'\');">'.htmlspecialcharsex($tab["TAB"]).'</span>';
+			$tabs_html .= '<span title="'.$tab["TITLE"].$hkInst->GetTitle("tab-container").'" '.
+				'id="tab_cont_'.$tab["DIV"].'" '.
+				'class="adm-detail-tab'.($bSelected ? ' adm-detail-tab-active':'').($key==$len-1? ' adm-detail-tab-last':'').'" '.
+				'onclick="'.$this->name.'.SelectTab(\''.$tab["DIV"].'\');">'.htmlspecialcharsex($tab["TAB"]).'</span>';
 		}
 
 		$tabs_html .= $this->ShowTabButtons();
@@ -2701,9 +2719,11 @@ echo '
 			|| $this->tabIndex > count($this->tabs)
 			|| $this->tabs[$this->tabIndex-1]["_closed"] === true
 		)
+		{
 			return;
+		}
 
-			echo '
+		echo '
 			</tbody>
 		</table>
 	</div>
@@ -4958,17 +4978,12 @@ class CJSPopup
 
 	}
 
-	public function InitScripts()
+	public static function InitScripts()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
 		CJSCore::Init(array('admin_interface'));
-
-		if (!defined('BX_PUBLIC_MODE') || BX_PUBLIC_MODE == false)
-		{
-			$APPLICATION->AddHeadString('<script type="text/javascript">BX.adminFormTools.modifyFormElements('.$this->jsPopup.'.DIV);</script>');
-		}
 	}
 
 	public function SetAdditionalArgs($additional_args = '')
@@ -5074,6 +5089,12 @@ class CJSPopup
 			{
 ?></div><script type="text/javascript">BX.ready(function() {<?=$this->jsPopup?>.SwapContent(BX('<?echo $this->cont_id?>'))});</script><?
 			}
+
+			if (!defined('BX_PUBLIC_MODE') || BX_PUBLIC_MODE == false)
+			{
+?><script type="text/javascript">BX.adminFormTools.modifyFormElements(<?=$this->jsPopup?>.DIV);</script><?
+			}
+
 			$this->bContentStarted = false;
 		}
 	}
@@ -5201,6 +5222,71 @@ class CJSPopupOnPage extends CJSPopup
 	public static function InitSystem() {} // this SHOULD be empty!
 }
 
+class CAdminFormSettings
+{
+	public static function getTabsArray($formId)
+	{
+		$arCustomTabs = array();
+		$customTabs = CUserOptions::GetOption("form", $formId);
+		if($customTabs && $customTabs["tabs"])
+		{
+			$arTabs = explode("--;--", $customTabs["tabs"]);
+			foreach($arTabs as $customFields)
+			{
+				if ($customFields == "")
+					continue;
+
+				$arCustomFields = explode("--,--", $customFields);
+				$arCustomTabID = "";
+				$arCustomTabName = "";
+				foreach($arCustomFields as $customField)
+				{
+					if($arCustomTabID == "")
+					{
+						list($arCustomTabID, $arCustomTabName) = explode("--#--", $customField);
+						$arCustomTabs[$arCustomTabID] = array(
+							"TAB" => $arCustomTabName,
+							"FIELDS" => array(),
+						);
+					}
+					else
+					{
+						list($arCustomFieldID, $arCustomFieldName) = explode("--#--", $customField);
+						$arCustomFieldName = ltrim($arCustomFieldName, defined("BX_UTF")? "* -\xa0\xc2": "* -\xa0");
+						$arCustomTabs[$arCustomTabID]["FIELDS"][$arCustomFieldID] = $arCustomFieldName;
+					}
+				}
+			}
+		}
+		return $arCustomTabs;
+	}
+
+	public static function setTabsArray($formId, $arCustomTabs, $common = false, $userID = false)
+	{
+		$option = "";
+		if (is_array($arCustomTabs))
+		{
+			foreach($arCustomTabs as $arCustomTabID => $arTab)
+			{
+				if (is_array($arTab) && isset($arTab["TAB"]))
+				{
+					$option .= $arCustomTabID.'--#--'.$arTab["TAB"];
+					if (isset($arTab["FIELDS"]) && is_array($arTab["FIELDS"]))
+					{
+						foreach ($arTab["FIELDS"] as $arCustomFieldID => $arCustomFieldName)
+						{
+							$option .= '--,--'.$arCustomFieldID.'--#--'.$arCustomFieldName;
+						}
+					}
+				}
+				$option .= '--;--';
+			}
+		}
+		$customTabs = CUserOptions::SetOption("form", $formId, array("tabs" => $option), $common, $userID);
+	}
+}
+
+
 class CAdminForm extends CAdminTabControl
 {
 	var $arParams = array();
@@ -5233,22 +5319,11 @@ class CAdminForm extends CAdminTabControl
 
 		//Parse customized labels
 		$this->arCustomLabels = array();
-		$customTabs = CUserOptions::GetOption("form", $this->name);
-		if($customTabs && $customTabs["tabs"])
+		foreach (CAdminFormSettings::getTabsArray($this->name) as $tab_id => $arTab)
 		{
-			$arTabs = explode("--;--", $customTabs["tabs"]);
-			if(count($arTabs) > 0)
+			foreach ($arTab["FIELDS"] as $customID => $customName)
 			{
-				foreach($arTabs as $customFields)
-				{
-					$arCustomFields = explode("--,--", $customFields);
-					//Tab MUST have at least one field
-					foreach($arCustomFields as $customField)
-					{
-						list($customID, $customName) = explode("--#--", $customField);
-						$this->arCustomLabels[$customID] = ltrim($customName, defined("BX_UTF")? "* -\xa0\xc2": "* -\xa0");
-					}
-				}
+				$this->arCustomLabels[$customID] = $customName;
 			}
 		}
 		ob_start();
@@ -5425,90 +5500,59 @@ class CAdminForm extends CAdminTabControl
 		//Save form defined fields
 		$this->arSystemFields = $this->arFields;
 
-		$arCustomTabs = array();
-		$customTabs = CUserOptions::GetOption("form", $this->name);
-		if($customTabs && $customTabs["tabs"])
+		$arCustomTabs = CAdminFormSettings::getTabsArray($this->name);
+		if (!empty($arCustomTabs))
 		{
-			$arTabs = explode("--;--", $customTabs["tabs"]);
-			if(count($arTabs) > 0)
+			$this->bCustomFields = true;
+			$this->tabs = array();
+			foreach($arCustomTabs as $tab_id => $arTab)
 			{
-				foreach($arTabs as $customFields)
+				if(array_key_exists($tab_id, $this->arSystemTabs))
 				{
-					$arCustomFields = explode("--,--", $customFields);
-					//Tab MUST have at least one field
-					if(count($arCustomFields) > 1)
-					{
-						$arCustomTabID = "";
-						$arCustomTabName = "";
-						foreach($arCustomFields as $customField)
-						{
-							if($arCustomTabID == "")
-							{
-								list($arCustomTabID, $arCustomTabName) = explode("--#--", $customField);
-								$arCustomTabs[$arCustomTabID] = array(
-									"TAB" => $arCustomTabName,
-									"FIELDS" => array(),
-								);
-							}
-							else
-							{
-								list($arCustomFieldID, $arCustomFieldName) = explode("--#--", $customField);
-								$arCustomFieldName = ltrim($arCustomFieldName, defined("BX_UTF")? "* -\xa0\xc2": "* -\xa0");
-								$arCustomTabs[$arCustomTabID]["FIELDS"][$arCustomFieldID] = $arCustomFieldName;
-							}
-						}
-					}
+					$arNewTab = $this->arSystemTabs[$tab_id];
+					$arNewTab["TAB"] = $arTab["TAB"];
+					$arNewTab["FIELDS"] = array();
 				}
-				$this->bCustomFields = true;
-				$this->tabs = array();
-				foreach($arCustomTabs as $tab_id => $arTab)
+				else
 				{
-					if(array_key_exists($tab_id, $this->arSystemTabs))
+					$arNewTab = array(
+						"DIV" => $tab_id,
+						"TAB" => $arTab["TAB"],
+						"ICON" => "main_user_edit",
+						"TITLE" => "",
+						"FIELDS" => array(),
+					);
+				}
+
+				foreach($arTab["FIELDS"] as $field_id => $content)
+				{
+					if(array_key_exists($field_id, $this->arSystemFields))
 					{
-						$arNewTab = $this->arSystemTabs[$tab_id];
-						$arNewTab["TAB"] = $arTab["TAB"];
-						$arNewTab["FIELDS"] = array();
+						$arNewField = $this->arSystemFields[$field_id];
+						$arNewField["content"] = $content;
+					}
+					elseif(strlen($content) > 0)
+					{
+						$arNewField = array(
+							"id" => $field_id,
+							"content" => $content,
+							"html" => '<td colspan="2">'.htmlspecialcharsex($content).'</td>',
+							"delimiter" => true,
+						);
 					}
 					else
 					{
-						$arNewTab = array(
-							"DIV" => $tab_id,
-							"TAB" => $arTab["TAB"],
-							"ICON" => "main_user_edit",
-							"TITLE" => "",
-							"FIELDS" => array(),
-						);
+						$arNewField = false;
 					}
-					foreach($arTab["FIELDS"] as $field_id => $content)
+
+					if(is_array($arNewField))
 					{
-
-						if(array_key_exists($field_id, $this->arSystemFields))
-						{
-							$arNewField = $this->arSystemFields[$field_id];
-							$arNewField["content"] = $content;
-						}
-						elseif(strlen($content) > 0)
-						{
-							$arNewField = array(
-								"id" => $field_id,
-								"content" => $content,
-								"html" => '<td colspan="2">'.htmlspecialcharsex($content).'</td>',
-								"delimiter" => true,
-							);
-						}
-						else
-						{
-							$arNewField = false;
-						}
-
-						if(is_array($arNewField))
-						{
-							$this->arFields[$field_id] = $arNewField;
-							$arNewTab["FIELDS"][] = $arNewField;
-						}
+						$this->arFields[$field_id] = $arNewField;
+						$arNewTab["FIELDS"][] = $arNewField;
 					}
-					$this->tabs[] = $arNewTab;
 				}
+
+				$this->tabs[] = $arNewTab;
 			}
 		}
 
@@ -5551,29 +5595,31 @@ class CAdminForm extends CAdminTabControl
 			$action = htmlspecialcharsbx($APPLICATION->GetCurPage());
 		echo '<form method="POST" Action="'.$action.'"  ENCTYPE="multipart/form-data" id="'.$this->name.'_form" name="'.$this->name.'_form"'.($this->arParams["FORM_ATTRIBUTES"] <> ''? ' '.$this->arParams["FORM_ATTRIBUTES"]:'').'>';
 
-		parent::Begin();
-
 		$htmlGroup = "";
 		if($this->group)
 		{
-			foreach($this->tabs as $arTab)
+			if (!empty($arCustomTabs))
 			{
-				if(is_array($arTab["FIELDS"]))
+				foreach($this->tabs as $arTab)
 				{
-					foreach($arTab["FIELDS"] as $arField)
+					if(is_array($arTab["FIELDS"]))
 					{
-						if(
-							(strlen($this->arFields[$arField["id"]]["custom_html"]) > 0)
-							|| (strlen($this->arFields[$arField["id"]]["html"]) > 0)
-						)
+						foreach($arTab["FIELDS"] as $arField)
 						{
-							$p = array_search($arField["id"], $this->arFields[$this->group]["group"]);
-							if($p !== false)
-								unset($this->arFields[$this->group]["group"][$p]);
+							if(
+								(strlen($this->arFields[$arField["id"]]["custom_html"]) > 0)
+								|| (strlen($this->arFields[$arField["id"]]["html"]) > 0)
+							)
+							{
+								$p = array_search($arField["id"], $this->arFields[$this->group]["group"]);
+								if($p !== false)
+									unset($this->arFields[$this->group]["group"][$p]);
+							}
 						}
 					}
 				}
 			}
+
 			if(!empty($this->arFields[$this->group]["group"]))
 			{
 				$htmlGroup .= '<tr class="heading" id="tr_'.$this->arFields[$this->group]["id"].'">'
@@ -5582,10 +5628,12 @@ class CAdminForm extends CAdminTabControl
 			}
 		}
 
+		$this->OnAdminTabControlBegin();
+		$this->tabIndex = 0;
 		while($this->tabIndex < count($this->tabs))
 		{
-			$this->BeginNextTab();
-			$arTab = $this->tabs[$this->tabIndex-1];
+			ob_start();//Start of the tab content
+			$arTab = $this->tabs[$this->tabIndex];
 			if(is_array($arTab["FIELDS"]))
 			{
 				foreach($arTab["FIELDS"] as $arField)
@@ -5629,36 +5677,73 @@ class CAdminForm extends CAdminTabControl
 					unset($arHiddens[$arField["id"]]);
 				}
 			}
+			$tabContent = ob_get_contents();
+			ob_end_clean(); //Dispose tab content
+
+			if ($tabContent == "")
+			{
+				array_splice($this->tabs, $this->tabIndex, 1); // forget about tab
+			}
+			else
+			{
+
+				$this->tabs[$this->tabIndex]["CONTENT"] = $tabContent;
+				$this->tabIndex++;
+			}
 		}
+
+		//sometimes form settings are incorrect but we must show required fields
+		$requiredFields = '';
 		foreach($arHiddens as $arField)
 		{
 			if($arField["required"])
 			{
 				if(strlen($this->arFields[$arField["id"]]["custom_html"]) > 0)
 				{
-					echo $this->arFields[$arField["id"]]["custom_html"];
+					$requiredFields .= $this->arFields[$arField["id"]]["custom_html"];
 				}
 				elseif(strlen($this->arFields[$arField["id"]]["html"]) > 0)
 				{
 					if($this->arFields[$arField["id"]]["delimiter"])
-						echo '<tr class="heading">';
+						$requiredFields .= '<tr class="heading">';
 					else
-						echo '<tr>';
-					echo $this->arFields[$arField["id"]]["html"].'</tr>';
+						$requiredFields .= '<tr>';
+					$requiredFields .= $this->arFields[$arField["id"]]["html"].'</tr>';
 				}
 				unset($arHiddens[$arField["id"]]);
 			}
 		}
+		if($requiredFields <> '')
+		{
+			$this->tabs[] = array(
+				"CONTENT" => $requiredFields,
+				"DIV" => "bx_req",
+				"TAB" => GetMessage("admin_lib_required"),
+				"TITLE" => GetMessage("admin_lib_required"),
+			);
+		}
+
+		parent::Begin();
+
+		while($this->tabIndex < count($this->tabs))
+		{
+			$this->BeginNextTab();
+			echo $this->tabs[$this->tabIndex]["CONTENT"];
+		}
+
 		parent::Buttons($this->arButtonsParams);
 		echo $this->sButtonsContent;
+
 		$this->End();
 		echo $this->sEpilogContent;
+
 		echo '<span class="bx-fields-hidden">';
 		foreach($arHiddens as $arField)
 		{
 			echo $arField["hidden"];
 		}
 		echo '</span>';
+
 		echo '</form>';
 	}
 

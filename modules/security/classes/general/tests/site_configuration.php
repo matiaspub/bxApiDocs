@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecuritySiteConfigurationTest extends CSecurityBaseTest
+/**
+ * Class CSecuritySiteConfigurationTest
+ * @since 12.5.0
+ */
+class CSecuritySiteConfigurationTest
+	extends CSecurityBaseTest
 {
 	protected $internalName = "SiteConfigurationTest";
 
@@ -8,11 +19,31 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 		"securityLevel" => array(
 			"method" => "checkSecurityLevel"
 		),
+		"errorReporting" => array(
+			"method" => "checkErrorReporting",
+			"base_message_key" => "SECURITY_SITE_CHECKER_ERROR_REPORTING",
+			"critical" => CSecurityCriticalLevel::MIDDLE
+		),
+		"exceptionDebug" => array(
+			"method" => "checkExceptionDebug",
+			"base_message_key" => "SECURITY_SITE_CHECKER_EXCEPTION_DEBUG",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
+		"dbDebug" => array(
+			"method" => "checkDbDebug",
+			"base_message_key" => "SECURITY_SITE_CHECKER_DB_DEBUG",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
 		"dbPassword" => array(
 			"method" => "checkDbPassword"
 		),
 		"scriptExtension" => array(
 			"method" => "checkScriptExtension"
+		),
+		"modulesVersion" => array(
+			"method" => "checkModulesVersion",
+			"base_message_key" => "SECURITY_SITE_CHECKER_MODULES_VERSION",
+			"critical" => CSecurityCriticalLevel::HIGHT
 		),
 //		"otp" => array(
 //			"method" => "checkOtp"
@@ -66,8 +97,6 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 
 	protected function checkSecurityLevel()
 	{
-		/** @global CDataBase $DB */
-		global $DB;
 		if(!CSecurityFilter::IsActive())
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_WAF_OFF", CSecurityCriticalLevel::HIGHT);
@@ -76,16 +105,65 @@ class CSecuritySiteConfigurationTest extends CSecurityBaseTest
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL", CSecurityCriticalLevel::HIGHT);
 		}
-		$validErrorReporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE;
-		if(COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting && COption::GetOptionInt("main","error_reporting","") != 0)
-		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ERROR_REPORTING", CSecurityCriticalLevel::MIDDLE);
-		}
-		if($DB->debug)
-		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_DEBUG", CSecurityCriticalLevel::HIGHT);
-		}
+	}
 
+	/**
+	 * Return true if debug = off
+	 *
+	 * @return bool
+	 * @since 14.0.0
+	 */
+	protected function checkDbDebug()
+	{
+		/** @global CDataBase $DB */
+		global $DB;
+
+		return !$DB->debug;
+	}
+
+	/**
+	 * Return true if error_reporting = 0
+	 *
+	 * @return bool
+	 * @since 14.0.0
+	 */
+	protected function checkErrorReporting()
+	{
+		$validErrorReporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE;
+		return !(
+			COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting
+			&& COption::GetOptionInt("main","error_reporting","") != 0);
+	}
+
+	/**
+	 * Return true if exception_handling debug = false
+	 *
+	 * @return bool
+	 * @since 14.0.0
+	 */
+	protected function checkExceptionDebug()
+	{
+		$exceptionConfig = \Bitrix\Main\Config\Configuration::getValue('exception_handling');
+		return !(
+			is_array($exceptionConfig)
+			&& isset($exceptionConfig['debug'])
+			&& $exceptionConfig['debug']
+		);
+	}
+
+	/**
+	 * Return true if module updates available
+	 *
+	 * @return bool
+	 * @since 14.0.2
+	 */
+	protected function checkModulesVersion()
+	{
+		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client.php");
+
+		$modules = array();
+		$errors = '';
+		return !CUpdateClient::IsUpdateAvailable($modules, $errors);
 	}
 
 	protected function checkDbPassword()

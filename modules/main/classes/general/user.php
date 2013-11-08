@@ -1145,9 +1145,9 @@ abstract class CAllUser extends CDBResult
 					$secure = (COption::GetOptionString("main", "use_secure_password_cookies", "N")=="Y" && CMain::IsHTTPS());
 
 					if($bSave)
-						$APPLICATION->set_cookie("UIDH", $hash, time()+60*60*24*30*60, '/', false, $secure, BX_SPREAD_SITES | BX_SPREAD_DOMAIN);
+						$APPLICATION->set_cookie("UIDH", $hash, time()+60*60*24*30*60, '/', false, $secure, BX_SPREAD_SITES | BX_SPREAD_DOMAIN, false, true);
 					else
-						$APPLICATION->set_cookie("UIDH", $hash, 0, '/', false, $secure, BX_SPREAD_SITES);
+						$APPLICATION->set_cookie("UIDH", $hash, 0, '/', false, $secure, BX_SPREAD_SITES, false, true);
 
 					$stored_id = CUser::CheckStoredHash($arUser["ID"], $hash);
 					if($stored_id)
@@ -1180,7 +1180,8 @@ abstract class CAllUser extends CDBResult
 
 			$arParams = array(
 				"user_fields" => $arUser,
-				"save" => $bSave
+				"save" => $bSave,
+				"update" => $bUpdate,
 			);
 
 			foreach (GetModuleEvents("main", "OnAfterUserAuthorize", true) as $arEvent)
@@ -1210,6 +1211,7 @@ abstract class CAllUser extends CDBResult
 		return $_SESSION["SESS_AUTH"]["SESSION_HASH"];
 	}
 
+	/** @deprecated */
 	
 	/**
 	 * <p>Возвращает специальный хеш от пароля пользователя который может быть использован в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">LoginByHash</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">SavePasswordHash</a>.</p>
@@ -1257,7 +1259,6 @@ abstract class CAllUser extends CDBResult
 	 */
 	public static function GetPasswordHash($PASSWORD_HASH)
 	{
-		// deprecated
 		$add = COption::GetOptionString("main", "pwdhashadd", "");
 		if($add == '')
 		{
@@ -2484,7 +2485,7 @@ abstract class CAllUser extends CDBResult
 			else
 				session_regenerate_id(true);
 
-			$APPLICATION->set_cookie("UIDH", "", 0, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y");
+			$APPLICATION->set_cookie("UIDH", "", 0, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y", false, true);
 		}
 
 		$arParams["SUCCESS"] = $bOk;
@@ -3155,7 +3156,7 @@ abstract class CAllUser extends CDBResult
 
 		if(defined("BX_COMP_MANAGED_CACHE"))
 		{
-			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
+			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / TAGGED_user_card_size));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
 
 			static $arNameFields = array("NAME", "LAST_NAME", "SECOND_NAME", "LOGIN", "EMAIL", "PERSONAL_GENDER", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "PERSONAL_BIRTHDAY");
@@ -3440,7 +3441,7 @@ abstract class CAllUser extends CDBResult
 
 		if(defined("BX_COMP_MANAGED_CACHE"))
 		{
-			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
+			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / TAGGED_user_card_size));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
 			$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
 			$CACHE_MANAGER->ClearByTag("USER_NAME");

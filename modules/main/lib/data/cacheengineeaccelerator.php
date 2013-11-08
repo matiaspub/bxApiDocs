@@ -42,7 +42,7 @@ class CacheEngineEAccelerator
 				$initDirVersion = "";
 			}
 
-			eaccelerator_rm($baseDirVersion."|".$initDirVersion."|/".$filename);
+			eaccelerator_rm($baseDirVersion."|".$initDirVersion."|".$filename);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ class CacheEngineEAccelerator
 			$initDirVersion = "";
 		}
 
-		$arAllVars = eaccelerator_get($baseDirVersion."|".$initDirVersion."|/".$filename);
+		$arAllVars = eaccelerator_get($baseDirVersion."|".$initDirVersion."|".$filename);
 
 		if($arAllVars === null)
 		{
@@ -122,7 +122,7 @@ class CacheEngineEAccelerator
 		$arAllVars = serialize($arAllVars);
 		$this->written = strlen($arAllVars);
 
-		eaccelerator_put($baseDirVersion."|".$initDirVersion."|/".$filename, $arAllVars, intval($TTL));
+		eaccelerator_put($baseDirVersion."|".$initDirVersion."|".$filename, $arAllVars, intval($TTL));
 	}
 
 	static public function isCacheExpired($path)

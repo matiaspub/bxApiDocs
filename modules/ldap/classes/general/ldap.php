@@ -9,7 +9,7 @@ class CLDAP
 
 	protected static $PHOTO_ATTRIBS = array("thumbnailPhoto", "jpegPhoto");
 
-	public function Connect($arFields = Array())
+	public static function Connect($arFields = Array())
 	{
 		if(!is_object($this))
 		{

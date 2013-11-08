@@ -361,6 +361,25 @@ class CDatabase extends CAllDatabase
 			return true;
 		$this->bConnected = true;
 
+		if (!$this->bNodeConnection)
+		{
+			$app = \Bitrix\Main\Application::getInstance();
+			if ($app != null)
+			{
+				$con = $app->getConnection();
+				if ($con->isConnected())
+				{
+					$this->db_Conn = $con->getResource();
+
+					$this->cntQuery = 0;
+					$this->timeQuery = 0;
+					$this->arQueryDebug = array();
+
+					return true;
+				}
+			}
+		}
+
 		if (DBPersistent && !$this->bNodeConnection)
 			$this->db_Conn = @mysql_pconnect($this->DBHost, $this->DBLogin, $this->DBPassword);
 		else
@@ -393,6 +412,17 @@ class CDatabase extends CAllDatabase
 		global $DB, $USER, $APPLICATION;
 		if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/after_connect.php"))
 			include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/after_connect.php");
+
+		if (!$this->bNodeConnection)
+		{
+			$app = \Bitrix\Main\Application::getInstance();
+			if ($app != null)
+			{
+				$con = $app->getConnection();
+				if (!$con->isConnected())
+					$con->setConnectionResourceNoDemand($this->db_Conn);
+			}
+		}
 
 		return true;
 	}
@@ -1024,7 +1054,24 @@ class CDatabase extends CAllDatabase
 		if(!DBPersistent && $this->bConnected)
 		{
 			$this->bConnected = false;
-			mysql_close($this->db_Conn);
+
+			if (!$this->bNodeConnection)
+			{
+				$fl = true;
+				$app = \Bitrix\Main\Application::getInstance();
+				if ($app != null)
+				{
+					$con = $app->getConnection();
+					if ($con->isConnected())
+					{
+						$con->disconnect();
+						$fl = false;
+					}
+				}
+
+				if ($fl)
+					mysql_close($this->db_Conn);
+			}
 		}
 
 		foreach(self::$arNodes as $arNode)
@@ -1353,6 +1400,7 @@ class CDatabase extends CAllDatabase
 							$value = DoubleVal($value);
 							break;
 						case "datetime":
+						case "timestamp":
 							if(strlen($value)<=0)
 								$value = "NULL";
 							else
@@ -2513,7 +2561,9 @@ class CDBResult extends CAllDBResult
 		$this->NavPageCount = ($this->NavPageSize>0 ? floor($this->NavRecordCount/$this->NavPageSize) : 0);
 		if($bDescPageNumbering)
 		{
-			$makeweight = ($this->NavRecordCount % $this->NavPageSize);
+			$makeweight = 0;
+			if($this->NavPageSize > 0)
+				$makeweight = ($this->NavRecordCount % $this->NavPageSize);
 			if($this->NavPageCount == 0 && $makeweight > 0)
 				$this->NavPageCount = 1;
 
@@ -2542,7 +2592,7 @@ class CDBResult extends CAllDBResult
 		}
 		else
 		{
-			if($this->NavPageSize && ($this->NavRecordCount % $this->NavPageSize > 0))
+			if($this->NavPageSize > 0 && ($this->NavRecordCount % $this->NavPageSize > 0))
 				$this->NavPageCount++;
 
 			//calculate total pages depend on rows count. start with 1

@@ -23,10 +23,11 @@ class CBlogComment extends CAllBlogComment
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_COMMENT", 0, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforeCommentAdd");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeCommentAdd", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_blog_comment", $arFields);
 
@@ -64,8 +65,7 @@ class CBlogComment extends CAllBlogComment
 		if($arBlog["USE_SOCNET"] == "Y")
 			$arFields["SC_PERM"] = CBlogComment::GetSocNetCommentPerms($arComment["POST_ID"]);
 
-		$db_events = GetModuleEvents("blog", "OnCommentAdd");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnCommentAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
 		
 		if (CModule::IncludeModule("search"))
@@ -133,6 +133,9 @@ class CBlogComment extends CAllBlogComment
 									"entity" => "socnet_group",
 								);
 							}
+
+							if(!in_array("U".$arComment["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+								$arSearchIndex["PERMISSIONS"][] = "U".$arComment["AUTHOR_ID"];
 						}
 					}
 
@@ -147,7 +150,7 @@ class CBlogComment extends CAllBlogComment
 		return $ID;
 	}
 
-	public static function Update($ID, $arFields)
+	public static function Update($ID, $arFields, $bSearchIndex = true)
 	{
 		global $DB;
 
@@ -171,10 +174,11 @@ class CBlogComment extends CAllBlogComment
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_COMMENT", $ID, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforeCommentUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeCommentUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$arFields))===false)
 				return false;
+		}
 
 		$strUpdate = $DB->PrepareUpdate("b_blog_comment", $arFields);
 
@@ -210,11 +214,10 @@ class CBlogComment extends CAllBlogComment
 			if($arBlog["USE_SOCNET"] == "Y")
 				$arFields["SC_PERM"] = CBlogComment::GetSocNetCommentPerms($arComment["POST_ID"]);
 
-			$db_events = GetModuleEvents("blog", "OnCommentUpdate");
-			while ($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("blog", "OnCommentUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
 			
-			if (CModule::IncludeModule("search"))
+			if ($bSearchIndex && CModule::IncludeModule("search"))
 			{
 				$newPostPerms = CBlogUserGroup::GetGroupPerms(1, $arComment["BLOG_ID"], $arComment["POST_ID"], BLOG_PERMS_POST);
 				
@@ -294,6 +297,8 @@ class CBlogComment extends CAllBlogComment
 									"entity" => "socnet_group",
 								);
 							}
+							if(!in_array("U".$arComment["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+								$arSearchIndex["PERMISSIONS"][] = "U".$arComment["AUTHOR_ID"];
 						}
 					}
 
@@ -350,6 +355,7 @@ class CBlogComment extends CAllBlogComment
 				"PATH" => array("FIELD" => "C.PATH", "TYPE" => "string"),
 				"PUBLISH_STATUS" => array("FIELD" => "C.PUBLISH_STATUS", "TYPE" => "string"),
 				"HAS_PROPS" => array("FIELD" => "C.HAS_PROPS", "TYPE" => "string"),
+				"SHARE_DEST" => array("FIELD" => "C.SHARE_DEST", "TYPE" => "string"),
 
 				"USER_LOGIN" => array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "LEFT JOIN b_user U ON (C.AUTHOR_ID = U.ID)"),
 				"USER_NAME" => array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user U ON (C.AUTHOR_ID = U.ID)"),
@@ -455,6 +461,26 @@ class CBlogComment extends CAllBlogComment
 		}
 
 		$arSqls = CBlog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql);
+		if(array_key_exists("FOR_USER", $arFilter))
+		{
+			if(IntVal($arFilter["FOR_USER"]) > 0) //authorized user
+			{
+					$arSqls["FROM"] .=
+								" INNER JOIN b_blog_socnet_rights SR ON (C.POST_ID = SR.POST_ID) " .
+								" LEFT JOIN b_user_access UA ON (UA.ACCESS_CODE = SR.ENTITY AND UA.USER_ID = ".IntVal($arFilter["FOR_USER"]).") ";
+					if(strlen($arSqls["WHERE"]) > 0)
+						$arSqls["WHERE"] .= " AND ";
+					$arSqls["WHERE"] .= " (UA.USER_ID is not NULL OR SR.ENTITY = 'AU') ";
+			}
+			else
+			{
+				$arSqls["FROM"] .=
+							" INNER JOIN b_blog_socnet_rights SR ON (C.POST_ID = SR.POST_ID) ".
+							" INNER JOIN b_user_access UA ON (UA.ACCESS_CODE = SR.ENTITY AND UA.USER_ID = 0)";
+			}
+			$bNeedDistinct = true;
+		}
+
 		if($bNeedDistinct)
 			$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "DISTINCT", $arSqls["SELECT"]);
 		else

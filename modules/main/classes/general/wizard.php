@@ -1439,6 +1439,7 @@ class CWizardAdminTemplate extends CWizardTemplate
 
 		$formName = htmlspecialcharsbx($wizard->GetFormName());
 
+		CUtil::InitJSCore(array("ajax"));
 		$adminScript = CAdminPage::ShowScript();
 
 		$charset = LANG_CHARSET;

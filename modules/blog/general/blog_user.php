@@ -287,16 +287,16 @@ class CAllBlogUser
 				if ($action == BLOG_ADD)
 					$arCurrentGroups = CBlogUser::GetUserGroups($ID, $blogID, "", $selectType);
 
-				for ($i = 0; $i < count($arGroups); $i++)
+				foreach($arGroups as $val)
 				{
-					if ($arGroups[$i] != 1 && $arGroups[$i] != 2)
+					if ($val != 1 && $val != 2)
 					{
 						if ($action == BLOG_CHANGE
-							|| $action == BLOG_ADD && !in_array($arGroups[$i], $arCurrentGroups))
+							|| $action == BLOG_ADD && !in_array($val, $arCurrentGroups))
 						{
 							$DB->Query(
 								"INSERT INTO b_blog_user2user_group (USER_ID, BLOG_ID, USER_GROUP_ID) ".
-								"VALUES (".IntVal($arUser["USER_ID"]).", ".$blogID.", ".IntVal($arGroups[$i]).")"
+								"VALUES (".IntVal($arUser["USER_ID"]).", ".$blogID.", ".IntVal($val).")"
 							);
 						}
 					}
@@ -509,12 +509,12 @@ class CAllBlogUser
 		}
 
 		$strGroups = "";
-		for ($i = 0; $i < count($arGroups); $i++)
+		foreach($arGroups as $val)
 		{
 			if (strlen($strGroups) > 0)
 				$strGroups .= ",";
 
-			$strGroups .= IntVal($arGroups[$i]);
+			$strGroups .= IntVal($val);
 		}
 
 		$varName = "BLOG_USER_PERMS_CACHE_".$blogID."_".$postID."_".$permsType;
@@ -684,7 +684,7 @@ class CAllBlogUser
 			if (intval($arParams["AVATAR_SIZE_COMMENT"]) <= 0)
 				$arParams["AVATAR_SIZE_COMMENT"] = 30;
 
-			$dbUser = CUser::GetList(($sort_by = Array('ID'=>'desc')), ($dummy=''), Array("ID" => $id), Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO")));
+			$dbUser = CUser::GetList(($sort_by = Array('ID'=>'desc')), ($dummy=''), Array("ID" => $id), Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER")));
 			if($arResult["arUser"] = $dbUser->GetNext())
 			{
 				if(IntVal($arResult["arUser"]["PERSONAL_PHOTO"]) > 0)

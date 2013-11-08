@@ -42,7 +42,7 @@ class CacheEngineApc
 				$initDirVersion = "";
 			}
 
-			apc_delete($baseDirVersion."|".$initDirVersion."|/".$filename);
+			apc_delete($baseDirVersion."|".$initDirVersion."|".$filename);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ class CacheEngineApc
 			$initDirVersion = "";
 		}
 
-		$arAllVars = apc_fetch($baseDirVersion."|".$initDirVersion."|/".$filename);
+		$arAllVars = apc_fetch($baseDirVersion."|".$initDirVersion."|".$filename);
 
 		if($arAllVars === false)
 		{
@@ -122,7 +122,7 @@ class CacheEngineApc
 		$arAllVars = serialize($arAllVars);
 		$this->written = strlen($arAllVars);
 
-		apc_store($baseDirVersion."|".$initDirVersion."|/".$filename, $arAllVars, intval($TTL));
+		apc_store($baseDirVersion."|".$initDirVersion."|".$filename, $arAllVars, intval($TTL));
 	}
 
 	static public function isCacheExpired($path)

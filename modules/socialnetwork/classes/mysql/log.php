@@ -91,6 +91,9 @@ class CSocNetLog extends CAllSocNetLog
 						WHERE LID IN ('".implode("', '", $arSiteID)."')
 					", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 			}
+
+			if ($ID > 0)
+				$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_LOG", $ID, $arFields);
 		}
 
 		CSocNetLogTools::SetCacheLastLogID("log", $ID);
@@ -171,10 +174,12 @@ class CSocNetLog extends CAllSocNetLog
 				$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 			}
 
+			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_LOG", $ID, $arFields);
+
 			if(defined("BX_COMP_MANAGED_CACHE"))
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$ID);
 		}
-		else
+		elseif (!$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_LOG", $ID, $arFields))
 			$ID = False;
 
 		return $ID;
@@ -192,7 +197,7 @@ class CSocNetLog extends CAllSocNetLog
 		$DB->Query("DELETE LS FROM b_sonet_log_site LS INNER JOIN (SELECT L.ID FROM b_sonet_log L LEFT JOIN b_sonet_log_favorites LF ON L.ID = LF.LOG_ID WHERE LF.USER_ID IS NULL AND L.LOG_UPDATE < DATE_SUB(NOW(), INTERVAL ".$days." DAY)) L1 ON LS.LOG_ID = L1.ID", true);
 		$DB->Query("DELETE LR FROM b_sonet_log_right LR INNER JOIN (SELECT L.ID FROM b_sonet_log L LEFT JOIN b_sonet_log_favorites LF ON L.ID = LF.LOG_ID WHERE LF.USER_ID IS NULL AND L.LOG_UPDATE < DATE_SUB(NOW(), INTERVAL ".$days." DAY)) L1 ON LR.LOG_ID = L1.ID", true);
 
-		return $DB->Query("DELETE FROM b_sonet_log L LEFT JOIN b_sonet_log_favorites LF ON L.ID = LF.LOG_ID WHERE LF.USER_ID IS NULL AND L.LOG_UPDATE < DATE_SUB(NOW(), INTERVAL ".$days." DAY)", true);
+		return $DB->Query("DELETE FROM b_sonet_log WHERE LOG_UPDATE < DATE_SUB(NOW(), INTERVAL ".$days." DAY)", true);
 	}
 
 	/***************************************/
@@ -200,7 +205,13 @@ class CSocNetLog extends CAllSocNetLog
 	/***************************************/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arParams = array())
 	{
-		global $DB, $arSocNetAllowedEntityTypes, $USER;
+		global $DB, $arSocNetAllowedEntityTypes, $USER, $USER_FIELD_MANAGER;
+
+		$obUserFieldsSql = new CUserTypeSQL;
+		$obUserFieldsSql->SetEntity("SONET_LOG", "L.ID");
+		$obUserFieldsSql->SetSelect($arSelectFields);
+		$obUserFieldsSql->SetFilter($arFilter);
+		$obUserFieldsSql->SetOrder($arOrder);
 
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array(
@@ -269,7 +280,19 @@ class CSocNetLog extends CAllSocNetLog
 		if (isset($USER) && is_object($USER))
 		{
 			$arFields["RATING_USER_VOTE_VALUE"] = Array("FIELD" => $DB->IsNull('RV.VALUE', '0'), "TYPE" => "double", "FROM" => "LEFT JOIN b_rating_vote RV ON L.RATING_TYPE_ID = RV.ENTITY_TYPE_ID AND L.RATING_ENTITY_ID = RV.ENTITY_ID AND RV.USER_ID = ".intval($USER->GetID()));
-			$arFields["FAVORITES_USER_ID"] = Array("FIELD" => $DB->IsNull('SLF.USER_ID', '0'), "TYPE" => "double", "FROM" => "LEFT JOIN b_sonet_log_favorites SLF ON L.ID = SLF.LOG_ID AND SLF.USER_ID = ".intval($USER->GetID()));
+
+			$join_type = "LEFT";
+			$field_value = $DB->IsNull("SLF.USER_ID", "0");
+
+			foreach($arFilter as $key => $value)
+				if (strpos($key, "FAVORITES_USER_ID") !== false)
+				{
+					$join_type = "INNER";
+					$field_value = "SLF.USER_ID";
+					break;
+				}
+
+			$arFields["FAVORITES_USER_ID"] = Array("FIELD" => $field_value, "TYPE" => "double", "FROM" => $join_type." JOIN b_sonet_log_favorites SLF ON L.ID = SLF.LOG_ID AND SLF.USER_ID = ".intval($USER->GetID()));
 		}
 
 		if (
@@ -290,9 +313,9 @@ class CSocNetLog extends CAllSocNetLog
 				WHEN LFW.TYPE = 'Y' 
 					THEN L.LOG_UPDATE 
 				ELSE L.LOG_DATE 
-				END", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
+				END", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
 
-			$arFields["FOLLOW"] = Array("FIELD" => "case when LFW.USER_ID IS NULL then '".$default_follow."' else LFW.TYPE end", "TYPE" => "string", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
+			$arFields["FOLLOW"] = Array("FIELD" => "case when LFW.USER_ID IS NULL then '".$default_follow."' else LFW.TYPE end", "TYPE" => "string", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
 
 			if (!in_array("FOLLOW", $arSelectFields))
 				$arSelectFields[] = "FOLLOW";
@@ -373,7 +396,11 @@ class CSocNetLog extends CAllSocNetLog
 
 		$arFields = array_merge($arFields1, $arFields);
 
-		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
+		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields, $obUserFieldsSql);
+
+		$r = $obUserFieldsSql->GetFilter();
+		if(strlen($r)>0)
+			$strSqlUFFilter = " (".$r.") ";
 
 		$arSqls["RIGHTS"] = "";
 
@@ -484,24 +511,38 @@ class CSocNetLog extends CAllSocNetLog
 		{
 			$strSql =
 				"SELECT ".$arSqls["SELECT"]." ".
+				$obUserFieldsSql->GetSelect()." ".
 				"FROM b_sonet_log L ".
 				$strMinIDJoin.
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+				$obUserFieldsSql->GetJoin("L.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["RIGHTS"]) > 0)
+
+			if (strlen($strSqlUFFilter) > 0)
 			{
 				if (strlen($arSqls["WHERE"]) > 0)
+					$strSql .= " AND ".$strSqlUFFilter." ";
+				else
+					$strSql .= " WHERE ".$strSqlUFFilter." ";
+			}
+
+			if (strlen($arSqls["RIGHTS"]) > 0)
+			{
+				if (strlen($arSqls["WHERE"]) > 0 || strlen($strSqlUFFilter) > 0)
 					$strSql .= " AND ";
 				else
 					$strSql .= " WHERE ";
 				$strSql .= $arSqls["RIGHTS"]." ";
 			}
+
 			if (strlen($arSqls["SUBSCRIBE"]) > 0)
 			{
 				if (
 					strlen($arSqls["WHERE"]) > 0
 					|| strlen($arSqls["RIGHTS"]) > 0
+					|| strlen($strSqlUFFilter) > 0
 				)
 					$strSql .= " AND ";
 				else
@@ -522,14 +563,26 @@ class CSocNetLog extends CAllSocNetLog
 
 		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
+			$obUserFieldsSql->GetSelect()." ".
 			"FROM b_sonet_log L ".
 			$strMinIDJoin.
-			"       ".$arSqls["FROM"]." ";
+			"       ".$arSqls["FROM"]." ".
+			$obUserFieldsSql->GetJoin("L.ID")." ";
+
 		if (strlen($arSqls["WHERE"]) > 0)
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-		if (strlen($arSqls["RIGHTS"]) > 0)
+
+		if (strlen($strSqlUFFilter) > 0)
 		{
 			if (strlen($arSqls["WHERE"]) > 0)
+				$strSql .= " AND ".$strSqlUFFilter." ";
+			else
+				$strSql .= " WHERE ".$strSqlUFFilter." ";
+		}
+
+		if (strlen($arSqls["RIGHTS"]) > 0)
+		{
+			if (strlen($arSqls["WHERE"]) > 0 || strlen($strSqlUFFilter) > 0)
 				$strSql .= " AND ";
 			else
 				$strSql .= " WHERE ";
@@ -540,6 +593,7 @@ class CSocNetLog extends CAllSocNetLog
 			if (
 				strlen($arSqls["WHERE"]) > 0
 				|| strlen($arSqls["RIGHTS"]) > 0
+				|| strlen($strSqlUFFilter) > 0
 			)
 				$strSql .= " AND ";
 			else
@@ -555,14 +609,26 @@ class CSocNetLog extends CAllSocNetLog
 		{
 			$strSql_tmp =
 				"SELECT COUNT('x') as CNT ".
+				$obUserFieldsSql->GetSelect()." ".
 				"FROM b_sonet_log L ".
 				$strMinIDJoin.
-				"	".$arSqls["FROM"]." ";
+				"	".$arSqls["FROM"]." ".
+				$obUserFieldsSql->GetJoin("L.ID")." ";
+
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
-			if (strlen($arSqls["RIGHTS"]) > 0)
+
+			if (strlen($strSqlUFFilter) > 0)
 			{
 				if (strlen($arSqls["WHERE"]) > 0)
+					$strSql_tmp .= " AND ".$strSqlUFFilter." ";
+				else
+					$strSql_tmp .= " WHERE ".$strSqlUFFilter." ";
+			}
+
+			if (strlen($arSqls["RIGHTS"]) > 0)
+			{
+				if (strlen($arSqls["WHERE"]) > 0 || strlen($strSqlUFFilter) > 0)
 					$strSql_tmp .= " AND ";
 				else
 					$strSql_tmp .= " WHERE ";
@@ -573,6 +639,7 @@ class CSocNetLog extends CAllSocNetLog
 				if (
 					strlen($arSqls["WHERE"]) > 0
 					|| strlen($arSqls["RIGHTS"]) > 0
+					|| strlen($strSqlUFFilter) > 0
 				)
 					$strSql_tmp .= " AND ";
 				else
@@ -605,6 +672,7 @@ class CSocNetLog extends CAllSocNetLog
 
 			//echo "!2.2!=".htmlspecialcharsbx($strSql)."<br>";
 
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("SONET_LOG"));
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
@@ -615,6 +683,7 @@ class CSocNetLog extends CAllSocNetLog
 			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes->SetUserFields($USER_FIELD_MANAGER->GetUserFields("SONET_LOG"));
 		}
 
 		return $dbRes;
@@ -653,6 +722,9 @@ class CSocNetLog extends CAllSocNetLog
 		$DB->Query("DELETE FROM b_sonet_log_favorites WHERE LOG_ID = ".$ID, true);
 
 		$bSuccess = $DB->Query("DELETE FROM b_sonet_log WHERE ID = ".$ID, true);
+
+		if ($bSuccess)
+			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_LOG", $ID);
 
 		if(
 			$bSuccess 

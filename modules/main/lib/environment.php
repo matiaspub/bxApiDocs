@@ -1,8 +1,10 @@
 <?php
 namespace Bitrix\Main;
 
+use Bitrix\Main\Type\ParameterDictionary;
+
 class Environment
-	extends \Bitrix\Main\System\ReadonlyDictionary
+	extends ParameterDictionary
 {
 	/**
 	 * Creates env object.

@@ -608,7 +608,8 @@ class CForumEMail
 						if (intVal($AUTHOR_USER_ID) > 0)
 							$arFieldsForSocnet["USER_ID"] = $AUTHOR_USER_ID;
 
-						CSocNetLogComments::Add($arFieldsForSocnet);
+						$comment_id = CSocNetLogComments::Add($arFieldsForSocnet);
+						CSocNetLog::CounterIncrement($comment_id, false, false, "LC");
 					}
 				}
 			}

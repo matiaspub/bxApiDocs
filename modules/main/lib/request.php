@@ -1,11 +1,12 @@
 <?php
 namespace Bitrix\Main;
 
-use \Bitrix\Main\Text;
-use \Bitrix\Main\IO;
+use Bitrix\Main\Type;
+use Bitrix\Main\Text;
+use Bitrix\Main\IO;
 
 abstract class Request
-	extends \Bitrix\Main\System\ReadonlyDictionary
+	extends Type\ParameterDictionary
 {
 	/**
 	 * @var Server
@@ -22,6 +23,14 @@ abstract class Request
 		$this->server = $server;
 	}
 
+	public function addFilter(Type\IRequestFilter $filter)
+	{
+		$filteredValues = $filter->filter($this->arValues);
+
+		if ($filteredValues != null)
+			$this->setValuesNoDemand($filteredValues);
+	}
+
 	public function getPhpSelf()
 	{
 		return $this->server->getPhpSelf();
@@ -34,17 +43,21 @@ abstract class Request
 
 	public function getRequestedPage()
 	{
-		if ($this->requestedFile != null)
+		if ($this->requestedFile !== null)
 			return $this->requestedFile;
 
 		$page = $this->getScriptName();
+		if (empty($page))
+		{
+			return $this->requestedFile = $page;
+		}
 
 		$page = IO\Path::normalize($page);
 
-		if (IO\Path::validate($page))
-			return $this->requestedFile = $page;
+		if (substr($page, 0, 1) !== "/" && !preg_match("#^[a-z]:[/\\\\]#i", $page))
+			$page = "/".$page;
 
-		throw new SystemException("Script name is not valid");
+		return $this->requestedFile = $page;
 	}
 
 	public function getRequestedPageDirectory()
@@ -55,5 +68,15 @@ abstract class Request
 		$requestedFile = $this->getRequestedPage();
 
 		return $this->requestedFileDirectory = IO\Path::getDirectory($requestedFile);
+	}
+
+	public function isAdminSection()
+	{
+		$requestedDir = $this->getRequestedPageDirectory();
+		return (substr($requestedDir, 0, strlen("/bitrix/admin/")) == "/bitrix/admin/"
+			|| substr($requestedDir, 0, strlen("/bitrix/updates/")) == "/bitrix/updates/"
+			|| (defined("ADMIN_SECTION") &&  ADMIN_SECTION == true)
+			|| (defined("BX_PUBLIC_TOOLS") && BX_PUBLIC_TOOLS === true)
+		);
 	}
 }

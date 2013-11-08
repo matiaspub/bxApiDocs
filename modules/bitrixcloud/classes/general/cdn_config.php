@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 class CBitrixCloudCDNConfig
 {
@@ -41,9 +41,9 @@ class CBitrixCloudCDNConfig
 	/**
 	 *
 	 * @return CBitrixCloudCDNConfig
-	 *
+	 * @throws CBitrixCloudException
 	 */
-	public function updateQuota() /*. throws CBitrixCloudException .*/
+	public function updateQuota()
 	{
 		$web_service = new CBitrixCloudCDNWebService($this->domain);
 		$obXML = $web_service->actionQuota();
@@ -62,9 +62,9 @@ class CBitrixCloudCDNConfig
 	 * Loads and parses xml
 	 *
 	 * @return CBitrixCloudCDNConfig
-	 *
+	 * @throws CBitrixCloudException
 	 */
-	public function loadRemoteXML() /*. throws CBitrixCloudException .*/
+	public function loadRemoteXML()
 	{
 		//Get configuration from remote service
 		$this->sites = CBitrixCloudOption::getOption("cdn_config_site")->getArrayValue();
@@ -197,7 +197,7 @@ class CBitrixCloudCDNConfig
 	{
 		//It is true by default
 		if(!isset($this->kernel_rewrite))
-			$this->kernel_rewrite = (CBitrixCloudOption::getOption("cdn_config_rewrite_kernel")->getStringValue() !== "false");
+			$this->kernel_rewrite = (CBitrixCloudOption::getOption("cdn_config_kernel_rewrite")->getStringValue() !== "false");
 		return $this->kernel_rewrite;
 	}
 	/**
@@ -222,7 +222,7 @@ class CBitrixCloudCDNConfig
 	{
 		//It is false by default
 		if(!isset($this->content_rewrite))
-			$this->content_rewrite = (CBitrixCloudOption::getOption("cdn_config_content_rewrite")->getStringValue() === "true");
+			$this->content_rewrite = (CBitrixCloudOption::getOption("cdn_config_content_rewrite")->getStringValue() !== "false");
 		return $this->content_rewrite;
 	}
 	/**
@@ -318,7 +318,7 @@ class CBitrixCloudCDNConfig
 	public function getLocationsPrefixes($bKernel = true, $bContent = false)
 	{
 		$arPrefixes = /*.(array[int]string).*/array();
-		/** @var CBitrixCloudCDNLocation $location */
+		/* @var CBitrixCloudCDNLocation $location */
 		$location = /*.(CBitrixCloudCDNLocation).*/ null;
 		foreach ($this->locations as $location)
 		{
@@ -350,13 +350,13 @@ class CBitrixCloudCDNConfig
 	public function getLocationsExtensions()
 	{
 		$arExtensions = array();
-		/** @var CBitrixCloudCDNLocation $location */
+		/* @var CBitrixCloudCDNLocation $location */
 		$location = /*.(CBitrixCloudCDNLocation).*/ null;
 		foreach ($this->locations as $location)
 		{
 			foreach ($location->getClasses() as $file_class)
 			{
-				/** @var CBitrixCloudCDNClass $file_class */
+				/* @var CBitrixCloudCDNClass $file_class */
 				$arExtensions = array_merge($arExtensions, $file_class->getExtensions());
 			}
 		}
@@ -377,7 +377,7 @@ class CBitrixCloudCDNConfig
 		if ($this->content_rewrite !== null)
 			CBitrixCloudOption::getOption("cdn_config_content_rewrite")->setStringValue($this->content_rewrite? "true": "false");
 		if ($this->kernel_rewrite !== null)
-			CBitrixCloudOption::getOption("cdn_config_rewrite_kernel")->setStringValue($this->kernel_rewrite? "true": "false");
+			CBitrixCloudOption::getOption("cdn_config_kernel_rewrite")->setStringValue($this->kernel_rewrite? "true": "false");
 		$this->quota->saveOption(CBitrixCloudOption::getOption("cdn_config_quota"));
 		$this->classes->saveOption(CBitrixCloudOption::getOption("cdn_class"));
 		$this->server_groups->saveOption(CBitrixCloudOption::getOption("cdn_server_group"));
@@ -429,4 +429,3 @@ class CBitrixCloudCDNConfig
 		$this->debug = $bActive === true;
 	}
 }
-?>

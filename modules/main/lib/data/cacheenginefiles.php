@@ -1,133 +1,165 @@
 <?php
 namespace Bitrix\Main\Data;
 
+use Bitrix\Main;
 use \Bitrix\Main\IO;
-use \Bitrix\Main\Server;
 
 class CacheEngineFiles
-	implements ICacheEngine
+	implements ICacheEngine, ICacheEngineStat
 {
 	private $TTL;
 
 	//cache stats
 	private $written = false;
 	private $read = false;
+	private $path = '';
+
+	public function getReadBytes()
+	{
+		return $this->read;
+	}
+
+	public function getWrittenBytes()
+	{
+		return $this->written;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCachePath()
+	{
+		return $this->path;
+	}
 
 	static public function isAvailable()
 	{
 		return true;
 	}
 
-	static public function clean($baseDir, $initDir = false, $filename = false)
+	private static function unlink($fileName)
 	{
-		if(strlen($filename))
+		//This checks for Zend Server CE in order to suppress warnings
+		if (function_exists('accelerator_reset'))
 		{
-			$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
-			$fn = IO\Path::combine($documentRoot, $baseDir, $initDir, $filename);
-			$file = new IO\File($fn);
-
-			//This checks for Zend Server CE in order to supress warnings
-			if(function_exists('accelerator_reset'))
-			{
-				try
-				{
-					$file->markWritable();
-					if($file->delete())
-					{
-						\Bitrix\Main\Application::resetAccelerator();
-						return true;
-					}
-				}
-				catch (\Exception $ex)
-				{
-
-				}
-			}
-			else
-			{
-				if($file->isExists())
-				{
-					$file->markWritable();
-					if($file->delete())
-					{
-						\Bitrix\Main\Application::resetAccelerator();
-						return true;
-					}
-				}
-			}
-			return false;
+			@chmod($fileName, BX_FILE_PERMISSIONS);
+			if (@unlink($fileName))
+				return true;
 		}
 		else
 		{
-			static $bAgentAdded = false;
-			$bDelayedDelete = false;
-
-			$source = IO\Path::combine($baseDir, $initDir);
-			$sourceDir = new IO\Directory(IO\Path::convertRelativeToAbsolute($source));
-
-			if($sourceDir->isExists())
+			if (file_exists($fileName))
 			{
-				$target = $source.".~";
-				for($i = 0; $i < 9; $i++) //try to get new directory name no more than ten times
-				{
-					$suffix = rand(0, 999999);
-					$targetDir = new IO\Directory(IO\Path::convertRelativeToAbsolute($target.$suffix));
-					if(!$targetDir->isExists())
-					{
-						$con = \Bitrix\Main\Application::getDbConnection();
-						$con->queryExecute(
-							"INSERT INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG)
-							VALUES ('*', '*', '".$con->getSqlHelper()->forSql($target.$suffix)."', '*')");
-						if($sourceDir->rename($targetDir->getPath()))
-							$bDelayedDelete = true;
-						break;
-					}
-				}
+				@chmod($fileName, BX_FILE_PERMISSIONS);
+				if (unlink($fileName))
+					return true;
 			}
+		}
+		return false;
+	}
 
-			if($bDelayedDelete)
+	private static function addAgent()
+	{
+		global $APPLICATION;
+
+		static $bAgentAdded = false;
+		if (!$bAgentAdded)
+		{
+			$bAgentAdded = true;
+			$rsAgents = \CAgent::GetList(array("ID"=>"DESC"), array("NAME" => "\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete(%"));
+			if (!$rsAgents->Fetch())
 			{
-				if(!$bAgentAdded)
-				{
-					$bAgentAdded = true;
+				$res = \CAgent::AddAgent(
+					"\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete();",
+					"main", //module
+					"Y", //period
+					1 //interval
+				);
 
-					/* TODO: Agents */
-					$rsAgents = \CAgent::getList(array("ID"=>"DESC"), array("NAME" => "CacheEngineFiles::delayedDelete(%"));
-					if(!$rsAgents->fetch())
+				if (!$res)
+					$APPLICATION->ResetException();
+			}
+		}
+	}
+
+	private static function randomizeFile($fileName)
+	{
+		for ($i = 0; $i < 99; $i++)
+		{
+			$suffix = rand(0, 999999);
+			if (!file_exists($_SERVER["DOCUMENT_ROOT"].$fileName.$suffix))
+				return $fileName.$suffix;
+		}
+		return "";
+	}
+
+	static public function clean($baseDir, $initDir = false, $filename = false)
+	{
+		$documentRoot = Main\Loader::getDocumentRoot();
+		if (($filename !== false) && ($filename !== ""))
+		{
+			$result = static::unlink($documentRoot.$baseDir.$initDir.$filename);
+			Main\Application::resetAccelerator();
+			return $result;
+		}
+		else
+		{
+			$initDir = trim($initDir, "/");
+			if ($initDir == "")
+			{
+				$sourceDir = $documentRoot."/".trim($baseDir, "/");
+				if (file_exists($sourceDir) && is_dir($sourceDir))
+				{
+					$dh = opendir($sourceDir);
+					if (is_resource($dh))
 					{
-						$res = \CAgent::addAgent(
-							"CacheEngineFiles::delayedDelete();",
-							"main", //module
-							"Y", //period
-							1 //interval
-						);
+						while ($entry = readdir($dh))
+						{
+							if (preg_match("/^(\\.|\\.\\.|.*\\.~\\d+)\$/", $entry))
+								continue;
+
+							if (is_dir($sourceDir."/".$entry))
+								static::clean($baseDir, $entry);
+							elseif (is_file($sourceDir."/".$entry))
+								static::unlink($sourceDir."/".$entry);
+						}
 					}
 				}
 			}
 			else
 			{
-				$sourceDir->delete();
+				$source = "/".trim($baseDir, "/")."/".$initDir;
+				$source = rtrim($source, "/");
+				$bDelayedDelete = false;
+
+				if (!preg_match("/^(\\.|\\.\\.|.*\\.~\\d+)\$/", $source) && file_exists($documentRoot.$source))
+				{
+					$target = static::randomizeFile($source.".~");
+					if ($target != '')
+					{
+						$con = Main\Application::getConnection();
+						$con->queryExecute("INSERT INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG) VALUES ('*', '*', '".$con->getSqlHelper()->forSql($target)."', '*')");
+						if (@rename($documentRoot.$source, $documentRoot.$target))
+							$bDelayedDelete = true;
+					}
+				}
+
+				if ($bDelayedDelete)
+					static::addAgent();
+				else
+					DeleteDirFilesEx($baseDir.$initDir);
+
+				Main\Application::resetAccelerator();
 			}
-
-			\Bitrix\Main\Application::resetAccelerator();
 		}
-	}
-
-	private static function checkZeroDanger()
-	{
-		static $zeroDanger = null;
-		if (is_null($zeroDanger))
-			$zeroDanger = (version_compare(phpversion(), '5.4.0') >= 0) ? (ini_get('zend.multibyte') == '1') : (ini_get('detect_unicode') == '1');
-		return $zeroDanger;
 	}
 
 	public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
-		$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
-		$fn = IO\Path::combine($documentRoot, $baseDir, $initDir, $filename);
-		$file = new IO\File($fn);
+		$documentRoot = Main\Loader::getDocumentRoot();
+		$fn = $documentRoot."/".ltrim($baseDir.$initDir, "/").$filename;
 
-		if(!$file->isExists())
+		if (!file_exists($fn))
 			return false;
 
 		$ser_content = "";
@@ -140,23 +172,17 @@ class CacheEngineFiles
 		{
 			$INCLUDE_FROM_CACHE = 'Y';
 
-			if (!@include(IO\Path::convertLogicalToPhysical($fn)))
+			if (!@include($fn))
 				return false;
-
-			if ($zeroDanger)
-				$ser_content = str_replace("\x01\x01\01", "\x00\x2A\00", $ser_content);
 		}
 		else
 		{
-			if (!($file instanceof IO\IFileStream))
-				return false;
-
-			$handle = $file->open("r");
-			if(!$handle)
+			$handle = fopen($fn, "rb");
+			if (!$handle)
 				return false;
 
 			$datecreate = fread($handle, 2);
-			if($datecreate == "BX")
+			if ($datecreate == "BX")
 			{
 				$datecreate = fread($handle, 12);
 				$dateexpire = fread($handle, 12);
@@ -167,14 +193,14 @@ class CacheEngineFiles
 			}
 		}
 
-		/* We suppress warning here in order not to break
-		the compression under Zend Server */
-		$this->read = $file->getFileSize();
+		/* We suppress warning here in order not to break the compression under Zend Server */
+		$this->read = @filesize($fn);
+		$this->path = $fn;
 
-		if(intval($datecreate) < (mktime() - $TTL))
+		if (intval($datecreate) < (mktime() - $TTL))
 			return false;
 
-		if(is_array($arAllVars))
+		if (is_array($arAllVars))
 		{
 			$arAllVars = unserialize($ser_content);
 		}
@@ -189,87 +215,57 @@ class CacheEngineFiles
 
 	public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
-		$documentRoot = \Bitrix\Main\Application::getDocumentRoot();
-		$fn = IO\Path::combine($documentRoot, $baseDir, $initDir, $filename);
-		$file = new IO\File($fn);
+		$documentRoot = Main\Loader::getDocumentRoot();
+		$folder = $documentRoot."/".ltrim($baseDir.$initDir, "/");
+		$fn = $folder.$filename;
+		$fnTmp = $folder.md5(mt_rand()).".tmp";
 
-		$fnTmp = IO\Path::combine($documentRoot, $baseDir, $initDir, md5(mt_rand()).".tmp");
-		$fileTmp = new IO\File($fnTmp);
+		if (!CheckDirPath($fn))
+			return;
 
-		$dir = $file->getDirectory();
-		if (!$dir->isExists())
-			$dir->create();
-
-		if(is_array($arAllVars))
+		if ($handle = fopen($fnTmp, "wb+"))
 		{
-			$contents = "<?";
-			$contents .= "\nif(\$INCLUDE_FROM_CACHE!='Y')return false;";
-			$contents .= "\n\$datecreate = '".str_pad(mktime(), 12, "0", STR_PAD_LEFT)."';";
-			$contents .= "\n\$dateexpire = '".str_pad(mktime() + IntVal($TTL), 12, "0", STR_PAD_LEFT)."';";
-			$v = serialize($arAllVars);
-			if (static::checkZeroDanger())
+			if (is_array($arAllVars))
 			{
-				$v = str_replace("\x00\x2A\00", "\x01\x01\01", $v);
-				$contents .= "\n\$zeroDanger = true;";
+				$contents = "<?";
+				$contents .= "\nif(\$INCLUDE_FROM_CACHE!='Y')return false;";
+				$contents .= "\n\$datecreate = '".str_pad(mktime(), 12, "0", STR_PAD_LEFT)."';";
+				$contents .= "\n\$dateexpire = '".str_pad(mktime() + intval($TTL), 12, "0", STR_PAD_LEFT)."';";
+				$contents .= "\n\$ser_content = '".str_replace("'", "\'", str_replace("\\", "\\\\", serialize($arAllVars)))."';";
+				$contents .= "\nreturn true;";
+				$contents .= "\n?>";
 			}
-			$contents .= "\n\$ser_content = '".str_replace("'", "\'", str_replace("\\", "\\\\", $v))."';";
-			$contents .= "\nreturn true;";
-			$contents .= "\n?>";
+			else
+			{
+				$contents = "BX".str_pad(mktime(), 12, "0", STR_PAD_LEFT).str_pad(mktime() + intval($this->TTL), 12, "0", STR_PAD_LEFT);
+				$contents .= $arAllVars;
+			}
+
+			$this->written = fwrite($handle, $contents);
+			$this->path = $fn;
+			$len = Main\Text\String::strlenBytes($contents);
+
+			fclose($handle);
+
+			static::unlink($fn);
+
+			if ($this->written === $len)
+				rename($fnTmp, $fn);
+
+			static::unlink($fnTmp);
 		}
-		else
-		{
-			$contents = "BX".str_pad(mktime(), 12, "0", STR_PAD_LEFT).str_pad(mktime() + IntVal($this->TTL), 12, "0", STR_PAD_LEFT);
-			$contents .= $arAllVars;
-		}
-
-		$this->written = $fileTmp->putContents($contents);
-
-		$len = \Bitrix\Main\Text\String::strlenBytes($contents);
-
-		//This checks for Zend Server CE in order to supress warnings
-		if(function_exists('accelerator_reset'))
-		{
-			try
-			{
-				$file->delete();
-			}
-			catch (\Exception $ex)
-			{
-
-			}
-		}
-		elseif($file->isExists())
-			$file->delete();
-
-		if($this->written === $len)
-			$fileTmp->rename($fn);
-
-		//This checks for Zend Server CE in order to supress warnings
-		if(function_exists('accelerator_reset'))
-		{
-			try
-			{
-				IO\File::deleteFile($fnTmp);
-			}
-			catch (\Exception $ex)
-			{
-
-			}
-		}
-		elseif(IO\File::isFileExists($fnTmp))
-			IO\File::deleteFile($fnTmp);
 	}
 
 	static public function isCacheExpired($path)
 	{
-		$file = new IO\File($path);
-		if(!$file->isExists())
+		if(!file_exists($path))
 			return true;
 
-		if (!($file instanceof IO\IFileStream))
-			return true;
+		$dateexpire = 0;
 
-		$dfile = $file->open("r");
+		$INCLUDE_FROM_CACHE='Y';
+
+		$dfile = fopen($path, "rb");
 		$str_tmp = fread($dfile, 150);
 		fclose($dfile);
 
@@ -279,7 +275,7 @@ class CacheEngineFiles
 			|| preg_match("/^(\\d{12})/", $str_tmp, $arTmp)
 		)
 		{
-			if(strlen($arTmp[1]) <= 0 || doubleval($arTmp[1]) < mktime())
+			if (strlen($arTmp[1]) <= 0 || doubleval($arTmp[1]) < mktime())
 				return true;
 		}
 
@@ -290,28 +286,34 @@ class CacheEngineFiles
 	{
 		$bDeleteFromQueue = false;
 
-		$con = \Bitrix\Main\Application::getDbConnection();
-		$rs = $con->query("SELECT * from b_cache_tag WHERE TAG='*'", 0, 1);
-		if($ar = $rs->fetch())
+		$con = Main\Application::getConnection();
+		$rs = $con->query("SELECT SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG from b_cache_tag WHERE TAG='*'", 0, 1);
+		if ($ar = $rs->fetch())
 		{
-			$dirName = IO\Path::convertRelativeToAbsolute($ar["RELATIVE_PATH"]);
-			$dir = new IO\Directory($dirName);
-			if ($dir->isExists())
+			$dirName = Main\Loader::getDocumentRoot().$ar["RELATIVE_PATH"];
+			if ($ar["RELATIVE_PATH"] != '' && file_exists($dirName))
 			{
-				$arChildren = $dir->getChildren();
-				$Counter = 0;
-				foreach ($arChildren as $child)
+				$dh = opendir($dirName);
+				if (is_resource($dh))
 				{
-					$child->delete();
-					$Counter++;
-					if (time() > $etime)
-						break;
-				}
+					$counter = 0;
+					while (($file = readdir($dh)) !== false)
+					{
+						if ($file != "." && $file != "..")
+						{
+							DeleteDirFilesEx($ar["RELATIVE_PATH"]."/".$file);
+							$counter++;
+							if (time() > $etime)
+								break;
+						}
+					}
+					closedir($dh);
 
-				if($Counter == 0)
-				{
-					$dir->delete();
-					$bDeleteFromQueue = true;
+					if ($counter == 0)
+					{
+						rmdir($dirName);
+						$bDeleteFromQueue = true;
+					}
 				}
 			}
 			else
@@ -319,7 +321,7 @@ class CacheEngineFiles
 				$bDeleteFromQueue = true;
 			}
 
-			if($bDeleteFromQueue)
+			if ($bDeleteFromQueue)
 			{
 				$con->queryExecute(
 					"DELETE FROM b_cache_tag
@@ -333,42 +335,59 @@ class CacheEngineFiles
 	public static function delayedDelete($count = 1, $level = 1)
 	{
 		$etime = time()+2;
-		for($i = 0; $i < $count; $i++)
+		for ($i = 0; $i < $count; $i++)
 		{
-			self::deleteOneDir($etime);
-			if(time() > $etime)
+			static::deleteOneDir($etime);
+			if (time() > $etime)
 				break;
 		}
 
-		$con = \Bitrix\Main\Application::getDbConnection();
+		$con = Main\Application::getConnection();
 		//try to adjust cache cleanup speed to cache cleanups
-		$rs = $con->query("SELECT * from b_cache_tag WHERE TAG='**'");
-		if($ar = $rs->fetch())
+		$rs = $con->query("SELECT SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG from b_cache_tag WHERE TAG='**'");
+		if ($ar = $rs->fetch())
+		{
 			$last_count = intval($ar["RELATIVE_PATH"]);
+			if (preg_match("/:(\\d+)$/", $ar["RELATIVE_PATH"], $m))
+				$last_time = intval($m[1]);
+			else
+				$last_time = 0;
+		}
 		else
+		{
 			$last_count = 0;
+			$last_time = 0;
+		}
 		$bWasStatRecFound = is_array($ar);
 
 		$this_count = $con->queryScalar("SELECT count(1) CNT from b_cache_tag WHERE TAG='*'");
 
 		$delta = $this_count - $last_count;
-		if($delta > 0)
-			$count = intval($this_count/3600)+1; //Rest of the queue in an hour
-		elseif($count < 1)
-			$count = 1;
-
-		if($bWasStatRecFound)
+		if ($delta > 0)
 		{
-			if($last_count != $this_count)
-				$con->queryExecute("UPDATE b_cache_tag SET RELATIVE_PATH='".$this_count."' WHERE TAG='**'");
+			if($last_time > 0)
+				$time_step = time() - $last_time;
+			if ($time_step <= 0)
+				$time_step = 1;
+			$count = intval($this_count * $time_step / 3600) + 1; //Rest of the queue in an hour
+		}
+		elseif ($count < 1)
+		{
+			$count = 1;
+		}
+
+		if ($bWasStatRecFound)
+		{
+			if ($last_count != $this_count)
+				$con->queryExecute("UPDATE b_cache_tag SET RELATIVE_PATH='".$this_count.":".time()."' WHERE TAG='**'");
 		}
 		else
 		{
-			$con->queryExecute("INSERT INTO b_cache_tag (TAG, RELATIVE_PATH) VALUES ('**', '".$this_count."')");
+			$con->queryExecute("INSERT INTO b_cache_tag (TAG, RELATIVE_PATH) VALUES ('**', '".$this_count.":".time()."')");
 		}
 
 		if($this_count > 0)
-			return "CacheEngineFiles::delayedDelete(".$count.");";
+			return "\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete(".$count.");";
 		else
 			return "";
 	}

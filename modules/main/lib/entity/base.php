@@ -360,7 +360,7 @@ class Base
 
 	public function getConnection()
 	{
-		return \Bitrix\Main\Application::getInstance()->getDbConnectionPool()->getConnection($this->connectionName);
+		return \Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection($this->connectionName);
 	}
 
 	public function getFilePath()

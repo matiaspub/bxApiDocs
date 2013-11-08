@@ -6,6 +6,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialservices/classes/g
 //manager to operate with services
 class CSocServAuthManager
 {
+	/** @var array  */
 	protected static $arAuthServices = false;
 
 	static public function __construct()
@@ -49,16 +50,9 @@ class CSocServAuthManager
 					$arAuthServices[$serv]["__active"] = ($active == "Y");
 				}
 			}
-			uasort($arAuthServices, array('CSocServAuthManager', 'Cmp'));
+			\Bitrix\Main\Type\Collection::sortByColumn($arAuthServices, "__sort");
 		}
 		return $arAuthServices;
-	}
-
-	static public function Cmp($a, $b)
-	{
-		if($a["__sort"] == $b["__sort"])
-			return 0;
-		return ($a["__sort"] < $b["__sort"])? -1 : 1;
 	}
 
 	static public function GetAuthServices($suffix)
@@ -93,7 +87,7 @@ class CSocServAuthManager
 	static public function GetSettings()
 	{
 		$arOptions = array();
-		foreach(self::$arAuthServices as $key=>$service)
+		foreach(self::$arAuthServices as $service)
 		{
 			if(is_callable(array($service["CLASS"], "GetSettings")))
 			{
@@ -111,7 +105,7 @@ class CSocServAuthManager
 	{
 		if($service_id === 'Bitrix24OAuth')
 		{
-			return CSocServBitrixOAuth::gadgetAuthorize();
+			CSocServBitrixOAuth::gadgetAuthorize();
 		}
 		if(isset(self::$arAuthServices[$service_id]))
 		{
@@ -561,7 +555,7 @@ class CSocServAuthManager
 		{
 			$oldLastId = COption::GetOptionString('socialservices', 'last_twit_id', '1');
 			if((strlen($lastTwitId) > strlen($oldLastId)) && $oldLastId[0] != 9)
-				$lastTwitId[0] = null;
+				$lastTwitId = substr($lastTwitId, 1);
 			COption::SetOptionString('socialservices', 'last_twit_id', $lastTwitId);
 			$counter = 1;
 		}
@@ -703,6 +697,11 @@ class CSocServAuth
 				CFile::SaveForDB($arFields, "PERSONAL_PHOTO", "socialservices");
 			}
 		}
+		$dbCheck = CSocServAuthDB::GetList(array(), array("USER_ID" => $arFields["USER_ID"], "EXTERNAL_AUTH_ID" => $arFields["EXTERNAL_AUTH_ID"]), false, false, array("ID"));
+		if($dbCheck->Fetch())
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -711,7 +710,7 @@ class CSocServAuth
 	{
 		global $DB;
 		$id = intval($id);
-		if($id<=0 || !self::CheckFields('UPDATE', $arFields))
+		if($id <= 0 || !self::CheckFields('UPDATE', $arFields))
 			return false;
 		$strUpdate = $DB->PrepareUpdate("b_socialservices_user", $arFields);
 		$strSql = "UPDATE b_socialservices_user SET ".$strUpdate." WHERE ID = ".$id." ";

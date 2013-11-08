@@ -1450,7 +1450,7 @@ class CVulnScanner
 					foreach ($var_declare->tainted_vars as $taint_var)
 					{
 						$res = $this->traverseVar($taint_var, $var_declare->id);
-						if(strpos($result, $res) === false)
+						if($res && strpos($result, $res) === false)
 							$result .= $res;
 					}
 

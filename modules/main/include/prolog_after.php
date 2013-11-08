@@ -1,4 +1,19 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
+/**
+ * Bitrix vars
+ * @global CUser $USER
+ * @global CMain $APPLICATION
+ * @global $SiteExpireDate
+ */
+global $USER, $APPLICATION;
+
 // define("START_EXEC_PROLOG_AFTER_1", microtime());
 $GLOBALS["BX_STATE"] = "PA";
 
@@ -7,7 +22,7 @@ if(!headers_sent())
 
 if(defined("DEMO") && DEMO=="Y")
 {
-	if(OLDSITEEXPIREDATE != SITEEXPIREDATE)
+	if(defined("OLDSITEEXPIREDATE") && defined("SITEEXPIREDATE") && OLDSITEEXPIREDATE != SITEEXPIREDATE)
 		die(GetMessage("expire_mess2"));
 
 	//wizard customization file
@@ -50,7 +65,7 @@ if(defined("DEMO") && DEMO=="Y")
 	}
 }
 
-if(COption::GetOptionString("main", "site_stopped", "N")=="Y" && !$GLOBALS["USER"]->CanDoOperation('edit_other_settings'))
+if(COption::GetOptionString("main", "site_stopped", "N")=="Y" && !$USER->CanDoOperation('edit_other_settings'))
 {
 	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/site_closed.php"))
 		include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/site_closed.php");
@@ -63,26 +78,28 @@ if(COption::GetOptionString("main", "site_stopped", "N")=="Y" && !$GLOBALS["USER
 
 $sPreviewFile = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/tmp/templates/__bx_preview/header.php";
 if($_GET['bx_template_preview_mode'] == 'Y' && $USER->CanDoOperation('edit_other_settings') && file_exists($sPreviewFile))
+{
 	include_once($sPreviewFile);
+}
 else
 {
-	include_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/header.php");
+	include_once($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/header.php");
 
-	if($GLOBALS['APPLICATION']->IsCSSOptimized())
+	if($APPLICATION->IsCSSOptimized())
 	{
 		$arCSS = $APPLICATION->GetCSSArray();
 		$arCSSKeys = array_keys($arCSS);
 		$cntCSSKeys = count($arCSS);
-		$APPLICATION->SetHeaderLastCss($arCSSKeys[$cntCSSKeys-1]);
+		$APPLICATION->SetHeaderLastCSS($arCSSKeys[$cntCSSKeys-1]);
 		unset($arCSS, $arCSSKeys);
 	}
 
-	if($GLOBALS['APPLICATION']->IsJSOptimized())
+	if($APPLICATION->IsJSOptimized())
 	{
 		$arScripts = array_unique($APPLICATION->arHeadScripts);
 		$arJsKeys = array_keys($arScripts);
 		$cntJsKeys = count($arScripts);
-		$APPLICATION->SetHeaderLastJs($arJsKeys[$cntJsKeys-1]);
+		$APPLICATION->SetHeaderLastJS($arJsKeys[$cntJsKeys-1]);
 		unset($arScripts, $arJsKeys);
 	}
 }
@@ -90,7 +107,8 @@ else
 /* Draw edit menu for whole content */
 global $BX_GLOBAL_AREA_EDIT_ICON;
 $BX_GLOBAL_AREA_EDIT_ICON = false;
-if($GLOBALS['APPLICATION']->GetShowIncludeAreas())
+
+if($APPLICATION->GetShowIncludeAreas())
 {
 	require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/init_admin.php");
 
@@ -101,27 +119,26 @@ if($GLOBALS['APPLICATION']->GetShowIncludeAreas())
 		if(isset($_SERVER["REAL_FILE_PATH"]) && $_SERVER["REAL_FILE_PATH"] != "")
 			$currentFilePath = $_SERVER["REAL_FILE_PATH"];
 		else
-			$currentFilePath = $GLOBALS['APPLICATION']->GetCurPage(true);
+			$currentFilePath = $APPLICATION->GetCurPage(true);
 
 		$bCanEdit = true;
 
-		if(!is_file($documentRoot.$currentFilePath) || !$GLOBALS["USER"]->CanDoFileOperation("fm_edit_existent_file", array(SITE_ID, $currentFilePath)))
+		if(!is_file($documentRoot.$currentFilePath) || !$USER->CanDoFileOperation("fm_edit_existent_file", array(SITE_ID, $currentFilePath)))
 			$bCanEdit = false;
 
 		//need fm_lpa for every .php file, even with no php code inside
-		if($bCanEdit && !$GLOBALS["USER"]->CanDoOperation('edit_php') && in_array(GetFileExtension($currentFilePath), GetScriptFileExt()) && !$GLOBALS["USER"]->CanDoFileOperation('fm_lpa', array(SITE_ID, $currentFilePath)))
+		if($bCanEdit && !$USER->CanDoOperation('edit_php') && in_array(GetFileExtension($currentFilePath), GetScriptFileExt()) && !$USER->CanDoFileOperation('fm_lpa', array(SITE_ID, $currentFilePath)))
 			$bCanEdit = false;
 
-		if($bCanEdit && IsModuleInstalled("fileman") && !($GLOBALS["USER"]->CanDoOperation("fileman_admin_files") && $GLOBALS["USER"]->CanDoOperation("fileman_edit_existent_files")))
+		if($bCanEdit && IsModuleInstalled("fileman") && !($USER->CanDoOperation("fileman_admin_files") && $USER->CanDoOperation("fileman_edit_existent_files")))
 			$bCanEdit = false;
 
 		if($bCanEdit)
 		{
-			echo $GLOBALS['APPLICATION']->IncludeStringBefore();
+			echo $APPLICATION->IncludeStringBefore();
 			$BX_GLOBAL_AREA_EDIT_ICON = true;
 		}
 	}
 }
 // define("START_EXEC_PROLOG_AFTER_2", microtime());
 $GLOBALS["BX_STATE"] = "WA";
-?>

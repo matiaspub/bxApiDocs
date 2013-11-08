@@ -876,12 +876,22 @@ class CReport
 				// show login if names is null
 				global $DB;
 				$nNameElements = count($expression) - 1;
-				$arConcatNameElements = array($DB->IsNull('%s', '\' \''));
-				if (($n = $nNameElements) > 1) while (--$n > 0) $arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
-				$strConcatNameElements = call_user_func_array(array($DB, 'concat'), $arConcatNameElements);
-				$expression[0] = 'CASE WHEN '.$DB->Length('LTRIM(RTRIM('.$strConcatNameElements.'))').'>0 THEN '.$expression[0].' ELSE %s END';
-				if ($nNameElements > 1) for ($i = 1; $i <= $nNameElements; $i++) $expression[] = $expression[$i];
-				$expression[] = (empty($pre) ? '' : $pre.'.').'LOGIN';
+				if ($nNameElements < 1)
+				{
+					$expression = array(
+						$DB->IsNull('%s', '\' \''),
+						(empty($pre) ? '' : $pre.'.').'LOGIN'
+					);
+				}
+				else
+				{
+					$arConcatNameElements = array($DB->IsNull('%s', '\' \''));
+					if (($n = $nNameElements) > 1) while (--$n > 0) $arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
+					$strConcatNameElements = call_user_func_array(array($DB, 'concat'), $arConcatNameElements);
+					$expression[0] = 'CASE WHEN '.$DB->Length('LTRIM(RTRIM('.$strConcatNameElements.'))').'>0 THEN '.$expression[0].' ELSE %s END';
+					if ($nNameElements > 1) for ($i = 1; $i <= $nNameElements; $i++) $expression[] = $expression[$i];
+					$expression[] = (empty($pre) ? '' : $pre.'.').'LOGIN';
+				}
 
 				// modify select
 				unset($select[$k]);

@@ -201,13 +201,14 @@ abstract class CSecurityBaseTest
 
 	/**
 	 * @param string $pBaseMessageKey
+	 * @param array $pPlaceholders
 	 * @return string
 	 */
-	protected static function getDetailText($pBaseMessageKey)
+	protected static function getDetailText($pBaseMessageKey, array $pPlaceholders = array())
 	{
 		if(HasMessage($pBaseMessageKey."_DETAIL"))
 		{
-			$result = GetMessage($pBaseMessageKey."_DETAIL");
+			$result = GetMessage($pBaseMessageKey."_DETAIL", $pPlaceholders);
 		}
 		else
 		{
@@ -218,13 +219,14 @@ abstract class CSecurityBaseTest
 
 	/**
 	 * @param string $pBaseMessageKey
+	 * @param array $pPlaceholders
 	 * @return string
 	 */
-	protected static function getRecommendationText($pBaseMessageKey)
+	protected static function getRecommendationText($pBaseMessageKey, array $pPlaceholders = array())
 	{
 		if(HasMessage($pBaseMessageKey."_RECOMMENDATION"))
 		{
-			$result = GetMessage($pBaseMessageKey."_RECOMMENDATION");
+			$result = GetMessage($pBaseMessageKey."_RECOMMENDATION", $pPlaceholders);
 		}
 		else
 		{
@@ -235,13 +237,14 @@ abstract class CSecurityBaseTest
 
 	/**
 	 * @param string $pBaseMessageKey
+	 * @param array $pPlaceholders
 	 * @return string
 	 */
-	protected static function getTitleText($pBaseMessageKey)
+	protected static function getTitleText($pBaseMessageKey, array $pPlaceholders = array())
 	{
 		if(HasMessage($pBaseMessageKey))
 		{
-			$result = GetMessage($pBaseMessageKey);
+			$result = GetMessage($pBaseMessageKey, $pPlaceholders);
 		}
 		else
 		{
@@ -270,6 +273,7 @@ abstract class CSecurityBaseTest
 
 	/**
 	 * @param array $pDetailError
+	 * @return $this
 	 */
 	private function pushDetailError($pDetailError = array())
 	{
@@ -277,17 +281,21 @@ abstract class CSecurityBaseTest
 		{
 			array_push($this->detailErrors, $pDetailError);
 		}
+		return $this;
 	}
 
 	/**
 	 * Add new unformatted error (call formatDetailError inside)
+	 *
 	 * @param string $pBaseMessageKey
 	 * @param string $pCritical
+	 * @return $this
 	 */
 	protected function addUnformattedDetailError($pBaseMessageKey, $pCritical)
 	{
 		$detailError = self::formatDetailError($pBaseMessageKey, $pCritical);
 		$this->pushDetailError($detailError);
+		return $this;
 	}
 
 	/**

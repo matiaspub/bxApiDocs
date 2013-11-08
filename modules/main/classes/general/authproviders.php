@@ -381,14 +381,17 @@ class COtherAuthProvider implements IProviderInterface
 			"DESC" => GetMessage("authprov_user_curr"),
 		);
 		$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
-		
-		$arItem = array(
-			"ID" => "CR",
-			"AVATAR" => "/bitrix/js/main/core/images/access/avatar-user-author.png",
-			"NAME" => GetMessage("authprov_author"),
-			"DESC" => GetMessage("authprov_author_desc"),
-		);
-		$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
+
+		if(!is_array($arParams["other"]) || $arParams["other"]["disabled_cr"] != "true")
+		{
+			$arItem = array(
+				"ID" => "CR",
+				"AVATAR" => "/bitrix/js/main/core/images/access/avatar-user-author.png",
+				"NAME" => GetMessage("authprov_author"),
+				"DESC" => GetMessage("authprov_author_desc"),
+			);
+			$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
+		}
 		
 		if(!is_array($arParams["other"]) || $arParams["other"]["disabled_g2"] != "true")
 		{

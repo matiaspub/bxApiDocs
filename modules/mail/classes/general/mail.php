@@ -111,30 +111,36 @@ class CAllMailBox
 			$val = $arFilter[$filter_keys[$i]];
 			if (strlen($val)<=0) continue;
 			$key = strtoupper($filter_keys[$i]);
-			switch($key)
+
+			if (substr($key, 0, 1) == '!')
 			{
-			case "ID":
-				$arSqlSearch[] = GetFilterQuery("MB.ID", $val, "N");
-				break;
-			case "PORT":
-				$arSqlSearch[] = GetFilterQuery("MB.".$key, $val, "N");
-				break;
-			case "LID":
-			case "LOGIN":
-			case "SERVER":
-			case "NAME":
-			case "DESCRIPTION":
-			case "DOMAINS":
-			case "SERVER_TYPE":
-				$arSqlSearch[] = GetFilterQuery("MB.".$key, $val);
-				break;
-			case "DELETE_MESSAGES":
-			case "ACTIVE":
-			case "USE_MD5":
-			case "RELAY":
-			case "AUTH_RELAY":
-				$arSqlSearch[] = GetFilterQuery("MB.".$key, $val, "N");
-				break;
+				$key = substr($key, 1);
+				$strNegative = 'Y';
+			}
+
+			switch ($key)
+			{
+				case 'ID':
+				case 'PORT':
+				case 'DELETE_MESSAGES':
+				case 'ACTIVE':
+				case 'USE_MD5':
+				case 'RELAY':
+				case 'AUTH_RELAY':
+					$arSqlSearch[] = GetFilterQuery('MB.'.$key, ($strNegative == 'Y' ? '~' : '').$val, 'N');
+					break;
+				case 'LID':
+				case 'LOGIN':
+				case 'SERVER':
+				case 'NAME':
+				case 'DESCRIPTION':
+				case 'DOMAINS':
+				case 'SERVER_TYPE':
+					$arSqlSearch[] = GetFilterQuery('MB.'.$key, ($strNegative == 'Y' ? '~' : '').$val);
+					break;
+				case 'USER_ID':
+					$arSqlSearch[] = 'MB.' . $key . ($strNegative == 'Y' ? ' != ' : ' = ') . intval($val);
+					break;
 			}
 		}
 
@@ -256,7 +262,8 @@ class CAllMailBox
 				"SELECT MB.ID, MB.PERIOD_CHECK ".
 				"FROM b_mail_mailbox MB ".
 				"WHERE ACTIVE='Y' ".
-				"	AND ID=".$ID;
+				"	AND ID=".$ID.
+				"	AND USER_ID = 0";
 
 		$strReturn = '';
 		$dbr = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -358,8 +365,8 @@ class CAllMailBox
 		if($arFields["USE_TLS"]!="Y")
 			$arFields["USE_TLS"]="N";
 
-		if($arFields["SERVER_TYPE"]!="smtp")
-			$arFields["SERVER_TYPE"]="pop3";
+		if (!in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap")))
+			$arFields["SERVER_TYPE"] = "pop3";
 
 		if(!CMailBox::CheckFields($arFields))
 			return false;
@@ -396,8 +403,8 @@ class CAllMailBox
 		if(is_set($arFields, "USE_TLS") && $arFields["USE_TLS"]!="Y")
 			$arFields["USE_TLS"]="N";
 
-		if(is_set($arFields, "SERVER_TYPE") && $arFields["SERVER_TYPE"]!="smtp")
-			$arFields["SERVER_TYPE"]="pop3";
+		if (is_set($arFields, "SERVER_TYPE") && !in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap")))
+			$arFields["SERVER_TYPE"] = "pop3";
 
 		if(!CMailBox::CheckFields($arFields, $ID))
 			return false;
@@ -467,6 +474,9 @@ class CAllMailBox
 
 	public function SendCommand($command)
 	{
+		//SSRF "filter"
+		$command = preg_replace("/[\\n\\r]/", "", $command);
+
 		fputs($this->pop3_conn, $command."\r\n");
 
 		if($this->mailbox_id>0)
@@ -1896,6 +1906,27 @@ class CAllMailUtil
 			$email = substr($email, 0, $pos);
 		return strtolower($email);
 	}
+
+	public static function CheckImapMailbox($server, $port, $use_tls, $login, $password, &$error, $timeout = 1)
+	{
+		$host = ($use_tls ? 'tls://' : '') . $server;
+
+		$imap = new CMailImap();
+
+		try
+		{
+			$imap->connect($host, $port, $timeout);
+			$imap->authenticate($login, $password);
+			$unseen = $imap->getUnseen();
+		}
+		catch (Exception $e)
+		{
+			$unseen = -1;
+			$error  = $e->getMessage();
+		}
+
+		return $unseen;
+	}
 }
 
 
@@ -2553,7 +2584,7 @@ class CMailFilter
 	{
 		global $DB;
 
-		$arWords = CMailFilter::getWords($message, 1000);
+		$arWords = CMailFilter::getWords($message, 999);
 
 		if (empty($arWords))
 			return 0;

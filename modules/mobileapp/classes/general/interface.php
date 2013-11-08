@@ -252,4 +252,12 @@ class CAdminMobileInterface
 		return $resultHtml;
 	}
 }
+
+class CMobileLazyLoad
+{
+	public static function getBase64Stub()
+	{
+		return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2N88f7jfwAJWAPJBTw90AAAAABJRU5ErkJggg==";
+	}
+}
 ?>

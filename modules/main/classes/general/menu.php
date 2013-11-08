@@ -26,6 +26,11 @@ class CMenu
 		$this->type = $type;
 	}
 
+	public function disableDebug()
+	{
+		$this->debug = false;
+	}
+
 	
 	/**
 	 * <p>Инициализирует (заполняет пунктами) объект класса CMenu. Возвращает "true" если в каталоге сайта найден файл меню <nobr><b>.</b><i>тип меню</i><b>.menu.php</b></nobr> (поиск идет вверх по иерархии начиная с каталога <i>dir</i>), и "false" в противном случае.</p>
@@ -104,7 +109,14 @@ class CMenu
 	public function Init($InitDir, $bMenuExt=false, $template=false, $onlyCurrentDir=false)
 	{
 		global $USER;
-		if($_SESSION["SESS_SHOW_INCLUDE_TIME_EXEC"]=="Y" && ($USER->IsAdmin() || $_SESSION["SHOW_SQL_STAT"]=="Y"))
+		if(
+			$this->debug !== false
+			&& $_SESSION["SESS_SHOW_INCLUDE_TIME_EXEC"] == "Y"
+			&& (
+				$USER->IsAdmin()
+				|| $_SESSION["SHOW_SQL_STAT"]=="Y"
+			)
+		)
 		{
 			$this->debug = new CDebugInfo(false);
 			$this->debug->Start();
@@ -221,26 +233,26 @@ class CMenu
 
 		$this->bMenuCalc = true;
 
-		if(strlen($this->template)>0 && file_exists($GLOBALS["DOCUMENT_ROOT"].$this->template))
+		if(strlen($this->template)>0 && file_exists($_SERVER["DOCUMENT_ROOT"].$this->template))
 		{
-			$this->MenuTemplate = $GLOBALS["DOCUMENT_ROOT"].$this->template;
+			$this->MenuTemplate = $_SERVER["DOCUMENT_ROOT"].$this->template;
 		}
 		else
 		{
-			if(defined("SITE_TEMPLATE_ID") && file_exists($GLOBALS["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/".$this->type.".menu_template.php"))
+			if(defined("SITE_TEMPLATE_PATH") && file_exists($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/".$this->type.".menu_template.php"))
 			{
-				$this->template = BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/".$this->type.".menu_template.php";
-				$this->MenuTemplate = $GLOBALS["DOCUMENT_ROOT"].$this->template;
+				$this->template = SITE_TEMPLATE_PATH."/".$this->type.".menu_template.php";
+				$this->MenuTemplate = $_SERVER["DOCUMENT_ROOT"].$this->template;
 			}
-			elseif(file_exists($GLOBALS["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/".$this->type.".menu_template.php"))
+			elseif(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/".$this->type.".menu_template.php"))
 			{
 				$this->template = BX_PERSONAL_ROOT."/php_interface/".LANG."/".$this->type.".menu_template.php";
-				$this->MenuTemplate = $GLOBALS["DOCUMENT_ROOT"].$this->template;
+				$this->MenuTemplate = $_SERVER["DOCUMENT_ROOT"].$this->template;
 			}
 			else
 			{
 				$this->template = BX_PERSONAL_ROOT."/templates/.default/".$this->type.".menu_template.php";
-				$this->MenuTemplate = $GLOBALS["DOCUMENT_ROOT"].$this->template;
+				$this->MenuTemplate = $_SERVER["DOCUMENT_ROOT"].$this->template;
 			}
 		}
 
@@ -255,7 +267,7 @@ class CMenu
 		$bCacheIsAllowed = CACHED_menu!==false && !$USER->IsAuthorized() && !$this->MenuExtDir;
 		if($bCacheIsAllowed)
 		{
-			$cache_id = $GLOBALS["DOCUMENT_ROOT"].",".$this->MenuDir.",".$this->MenuExtDir.",".$this->type;
+			$cache_id = $_SERVER["DOCUMENT_ROOT"].",".$this->MenuDir.",".$this->MenuExtDir.",".$this->type;
 			if($CACHE_MANAGER->Read(CACHED_menu, $cache_id, "menu"))
 			{
 				$arMenuCache = $CACHE_MANAGER->Get($cache_id);

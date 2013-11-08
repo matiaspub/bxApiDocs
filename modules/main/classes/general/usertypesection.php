@@ -30,7 +30,7 @@ class CUserTypeIBlockSection extends CUserTypeEnum
 
 		return array(
 			"DISPLAY" => $disp,
-			"LIST_HEIGHT" => ($height < 2? 5: $height),
+			"LIST_HEIGHT" => ($height < 1? 1: $height),
 			"IBLOCK_ID" => $iblock_id,
 			"DEFAULT_VALUE" => $section_id,
 			"ACTIVE_FILTER" => $active_filter,

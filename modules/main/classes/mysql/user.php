@@ -217,7 +217,7 @@ class CUser extends CAllUser
 
 		if($ID > 0 && defined("BX_COMP_MANAGED_CACHE"))
 		{
-			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / 100));
+			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / TAGGED_user_card_size));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
 			$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
 			$CACHE_MANAGER->ClearByTag("USER_NAME");			
@@ -742,7 +742,7 @@ class CUser extends CAllUser
 			";
 
 		$strSqlOrder = '';
-		if (count($strSqlOrder) > 0)
+		if (!empty($arSqlOrder))
 			$strSqlOrder = 'ORDER BY '.implode(', ', $arSqlOrder);
 
 		$strSql = "SELECT ".$sSelect.$strFrom.$strSqlOrder;

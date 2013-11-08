@@ -55,9 +55,9 @@ class CSaleMobileOrderUtils
 
 		$arMenuItems = array();
 
-		while ($arReport = $dbRepList->GetNext())
+		while ($arReport = $dbRepList->fetch())
 		{
-			$settings = unserialize($arReport['~SETTINGS']);
+			$settings = unserialize($arReport['SETTINGS']);
 
 			if(isset($settings['mobile'])
 				&& is_array($settings['mobile'])
@@ -70,7 +70,7 @@ class CSaleMobileOrderUtils
 						$template = "admin_mobile_encl";
 
 					$arMenuItems[] = array(
-						"text" => $arReport['TITLE'],
+						"text" => htmlspecialcharsbx($arReport['TITLE']),
 						"data-url" => PATH_TO_MOBILE_REPORTS.'?ID='.$arReport['ID'].'&rep_templ='.$template
 					);
 				}

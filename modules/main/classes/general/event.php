@@ -390,7 +390,7 @@ class CAllEvent
 			return $flag;
 		$strSites = implode(", ", $arSites);
 
-		$strSql = "SELECT CHARSET FROM b_lang WHERE LID IN (".$strSites.") ORDER BY DEF DESC, SORT";
+		$strSql = "SELECT C.CHARSET FROM b_lang L, b_culture C WHERE C.ID=L.CULTURE_ID AND L.LID IN (".$strSites.") ORDER BY L.DEF DESC, L.SORT";
 		$dbCharset = $DB->Query($strSql, false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
 		$arCharset = $dbCharset->Fetch();
 		if(!$arCharset)

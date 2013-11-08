@@ -56,7 +56,7 @@ class SiteTemplateTable extends Entity\DataManager
 		$cacheFlags = Config\Configuration::getValue("cache_flags");
 		$ttl = isset($cacheFlags["site_template"]) ? $cacheFlags["site_template"] : 0;
 
-		$connection = Application::getDbConnection();
+		$connection = Application::getConnection();
 		$sqlHelper = $connection->getSqlHelper();
 		$field = ($connection->getType() === "mysql") ? "`CONDITION`" : "CONDITION";
 

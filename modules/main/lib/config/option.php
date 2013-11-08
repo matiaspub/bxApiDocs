@@ -2,36 +2,39 @@
 namespace Bitrix\Main\Config;
 
 use Bitrix\Main;
-use Bitrix\Main\IO;
 
 class Option
 {
-	static $options = array();
+	protected static $options = array();
+	protected static $cacheTtl = null;
 
-	public static function get($moduleId, $name, $default = "", $siteId = "")
+	public static function get($moduleId, $name, $default = "", $siteId = false)
 	{
 		if (empty($moduleId))
 			throw new Main\ArgumentNullException("moduleId");
 		if (empty($name))
 			throw new Main\ArgumentNullException("name");
 
-		if ($siteId == "")
+		static $defaultSite = null;
+		if ($siteId === false)
 		{
-			/** @var $app \Bitrix\Main\HttpApplication */
-			$app = Main\Application::getInstance();
-			/** @var $page \Bitrix\Main\PublicPage */
-			$page = $app->getPage();
-			if (($page != null) && ($page instanceof Main\PublicPage))
+			if ($defaultSite === null)
 			{
-				$site = $page->getSite();
-				if ($site)
-					$siteId = $site->getId();
+				$context = Main\Application::getInstance()->getContext();
+				if ($context != null)
+					$defaultSite = $context->getSite();
 			}
+			$siteId = $defaultSite;
 		}
 
-		self::load($moduleId, $siteId);
-
 		$siteKey = ($siteId == "") ? "-" : $siteId;
+		if (static::$cacheTtl === null)
+			static::$cacheTtl = self::getCacheTtl();
+		if ((static::$cacheTtl === false) && !isset(self::$options[$siteKey][$moduleId])
+			|| (static::$cacheTtl !== false) && empty(self::$options))
+		{
+			self::load($moduleId, $siteId);
+		}
 
 		if (isset(self::$options[$siteKey][$moduleId][$name]))
 			return self::$options[$siteKey][$moduleId][$name];
@@ -49,16 +52,28 @@ class Option
 		return $default;
 	}
 
-	public static function getRealValue($moduleId, $name, $siteId = "")
+	public static function getRealValue($moduleId, $name, $siteId = false)
 	{
 		if (empty($moduleId))
 			throw new Main\ArgumentNullException("moduleId");
 		if (empty($name))
 			throw new Main\ArgumentNullException("name");
 
-		self::load($moduleId, $siteId);
+		if ($siteId === false)
+		{
+			$context = Main\Application::getInstance()->getContext();
+			if ($context != null)
+				$siteId = $context->getSite();
+		}
 
 		$siteKey = ($siteId == "") ? "-" : $siteId;
+		if (static::$cacheTtl === null)
+			static::$cacheTtl = self::getCacheTtl();
+		if ((static::$cacheTtl === false) && !isset(self::$options[$siteKey][$moduleId])
+			|| (static::$cacheTtl !== false) && empty(self::$options))
+		{
+			self::load($moduleId, $siteId);
+		}
 
 		if (isset(self::$options[$siteKey][$moduleId][$name]))
 			return self::$options[$siteKey][$moduleId][$name];
@@ -72,14 +87,14 @@ class Option
 		if (isset($defaultsCache[$moduleId]))
 			return $defaultsCache[$moduleId];
 
-		if (!IO\Path::validateFilename($moduleId))
+		if (preg_match("#[^a-zA-Z0-9._]#", $moduleId))
 			throw new Main\ArgumentOutOfRangeException("moduleId");
 
-		$path = IO\Path::convertRelativeToAbsolute("/bitrix/modules/".$moduleId."/default_option.php");
-		if (!IO\File::isFileExists($path))
+		$path = Main\Loader::getLocal("modules/".$moduleId."/default_option.php");
+		if ($path === false)
 			return $defaultsCache[$moduleId] = array();
 
-		include(IO\Path::convertLogicalToPhysical($path));
+		include($path);
 
 		$varName = str_replace(".", "_", $moduleId)."_default_option";
 		if (isset(${$varName}) && is_array(${$varName}))
@@ -92,14 +107,16 @@ class Option
 	{
 		$siteKey = ($siteId == "") ? "-" : $siteId;
 
-		$cacheTtl = self::getCacheTtl();
-		if ($cacheTtl === false)
+		if (static::$cacheTtl === null)
+			static::$cacheTtl = self::getCacheTtl();
+
+		if (static::$cacheTtl === false)
 		{
 			if (!isset(self::$options[$siteKey][$moduleId]))
 			{
 				self::$options[$siteKey][$moduleId] = array();
 
-				$con = \Bitrix\Main\Application::getDbConnection();
+				$con = Main\Application::getConnection();
 				$sqlHelper = $con->getSqlHelper();
 
 				$res = $con->query(
@@ -119,15 +136,14 @@ class Option
 		{
 			if (empty(self::$options))
 			{
-				$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
-				if ($cache->read($cacheTtl, "b_option"))
+				$cache = Main\Application::getInstance()->getManagedCache();
+				if ($cache->read(static::$cacheTtl, "b_option"))
 				{
 					self::$options = $cache->get("b_option");
 				}
 				else
 				{
-					$con = \Bitrix\Main\Application::getDbConnection();
-
+					$con = Main\Application::getConnection();
 					$res = $con->query(
 						"SELECT o.SITE_ID, o.MODULE_ID, o.NAME, o.VALUE ".
 						"FROM b_option o "
@@ -137,22 +153,31 @@ class Option
 						$s = ($ar["SITE_ID"] == "") ? "-" : $ar["SITE_ID"];
 						self::$options[$s][$ar["MODULE_ID"]][$ar["NAME"]] = $ar["VALUE"];
 					}
+
 					$cache->set("b_option", self::$options);
 				}
 			}
 		}
 	}
 
-	public static function set($moduleId, $name, $value = "", $siteId = "")
+	public static function set($moduleId, $name, $value = "", $siteId = false)
 	{
-		$cacheTtl = self::getCacheTtl();
-		if ($cacheTtl !== false)
+		if (static::$cacheTtl === null)
+			static::$cacheTtl = self::getCacheTtl();
+		if (static::$cacheTtl !== false)
 		{
-			$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+			$cache = Main\Application::getInstance()->getManagedCache();
 			$cache->clean("b_option");
 		}
 
-		$con = \Bitrix\Main\Application::getDbConnection();
+		if ($siteId === false)
+		{
+			$context = Main\Application::getInstance()->getContext();
+			if ($context != null)
+				$siteId = $context->getSite();
+		}
+
+		$con = Main\Application::getConnection();
 		$sqlHelper = $con->getSqlHelper();
 
 		$strSqlWhere = sprintf(
@@ -213,16 +238,16 @@ class Option
 		if (isset($triggersCache[$moduleId]))
 			return;
 
-		if (!IO\Path::validateFilename($moduleId))
+		if (preg_match("#[^a-zA-Z0-9._]#", $moduleId))
 			throw new Main\ArgumentOutOfRangeException("moduleId");
 
 		$triggersCache[$moduleId] = true;
 
-		$path = IO\Path::convertRelativeToAbsolute("/bitrix/modules/".$moduleId."/option_triggers.php");
-		if (!IO\File::isFileExists($path))
+		$path = Main\Loader::getLocal("modules/".$moduleId."/option_triggers.php");
+		if ($path === false)
 			return;
 
-		include(IO\Path::convertLogicalToPhysical($path));
+		include($path);
 	}
 
 	private static function getCacheTtl()
@@ -233,23 +258,29 @@ class Option
 		return $cacheFlags["config_options"];
 	}
 
-	public static function delete($moduleId, $name = "", $siteId = "")
+	public static function delete($moduleId, $filter = array())
 	{
-		$cacheTtl = self::getCacheTtl();
-		if ($cacheTtl !== false)
+		if (static::$cacheTtl === null)
+			static::$cacheTtl = self::getCacheTtl();
+
+		if (static::$cacheTtl !== false)
 		{
-			$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+			$cache = Main\Application::getInstance()->getManagedCache();
 			$cache->clean("b_option");
 		}
 
-		$con = \Bitrix\Main\Application::getDbConnection();
+		$con = Main\Application::getConnection();
 		$sqlHelper = $con->getSqlHelper();
 
 		$strSqlWhere = "";
-		if ($name != "")
-			$strSqlWhere .= " AND NAME = '".$sqlHelper->forSql($name)."' ";
-		if ($siteId != "")
-			$strSqlWhere .= " AND SITE_ID = '".$sqlHelper->forSql($siteId)."' ";
+		if (isset($filter["name"]))
+		{
+			if (empty($filter["name"]))
+				throw new Main\ArgumentNullException("filter[name]");
+			$strSqlWhere .= " AND NAME = '".$sqlHelper->forSql($filter["name"])."' ";
+		}
+		if (isset($filter["site_id"]))
+			$strSqlWhere .= " AND SITE_ID ".($filter["site_id"] == "") ? "IS NULL" : "= '".$sqlHelper->forSql($filter["site_id"], 2)."'";
 
 		if ($moduleId == "main")
 		{
@@ -257,11 +288,7 @@ class Option
 				"DELETE FROM b_option ".
 				"WHERE MODULE_ID = 'main' ".
 				"   AND NAME NOT LIKE '~%' ".
-				"   AND NAME <> 'crc_code' ".
-				"   AND NAME <> 'admin_passwordh' ".
-				"   AND NAME <> 'server_uniq_id' ".
-				"   AND NAME <> 'PARAM_MAX_SITES' ".
-				"   AND NAME <> 'PARAM_MAX_USERS' ".
+				"	AND NAME NOT IN ('crc_code', 'admin_passwordh', 'server_uniq_id','PARAM_MAX_SITES', 'PARAM_MAX_USERS') ".
 				$strSqlWhere
 			);
 		}
@@ -275,22 +302,23 @@ class Option
 			);
 		}
 
-		if ($siteId != "")
+		if (isset($filter["site_id"]))
 		{
-			if ($name == "")
-				unset(self::$options[$siteId][$moduleId]);
+			$siteKey = $filter["site_id"] == "" ? "-" : $filter["site_id"];
+			if (!isset($filter["name"]))
+				unset(self::$options[$siteKey][$moduleId]);
 			else
-				unset(self::$options[$siteId][$moduleId][$name]);
+				unset(self::$options[$siteKey][$moduleId][$filter["name"]]);
 		}
 		else
 		{
 			$arSites = array_keys(self::$options);
 			foreach ($arSites as $s)
 			{
-				if ($name == "")
+				if (!isset($filter["name"]))
 					unset(self::$options[$s][$moduleId]);
 				else
-					unset(self::$options[$s][$moduleId][$name]);
+					unset(self::$options[$s][$moduleId][$filter["name"]]);
 			}
 		}
 	}

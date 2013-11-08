@@ -143,7 +143,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/increment.php
 	 * @author Bitrix
 	 */
-	public static function Increment($user_id, $code, $site_id = SITE_ID, $sendPull = true)
+	public static function Increment($user_id, $code, $site_id = SITE_ID, $sendPull = true, $increment = 1)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -151,10 +151,12 @@ class CUserCounter extends CAllUserCounter
 		if ($user_id <= 0 || strlen($code) <= 0)
 			return false;
 
+		$increment = intval($increment);
+
 		$strSQL = "
 			INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE)
-			VALUES (".$user_id.", 1, '".$DB->ForSQL($site_id)."', '".$DB->ForSQL($code)."')
-			ON DUPLICATE KEY UPDATE CNT = CNT + 1";
+			VALUES (".$user_id.", ".$increment.", '".$DB->ForSQL($site_id)."', '".$DB->ForSQL($code)."')
+			ON DUPLICATE KEY UPDATE CNT = CNT + ".$increment;
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		if (self::$counters && self::$counters[$user_id])
@@ -164,9 +166,9 @@ class CUserCounter extends CAllUserCounter
 				foreach(self::$counters[$user_id] as $key => $tmp)
 				{
 					if (isset(self::$counters[$user_id][$key][$code]))
-						self::$counters[$user_id][$key][$code]++;
+						self::$counters[$user_id][$key][$code] = self::$counters[$user_id][$key][$code] + $increment;
 					else
-						self::$counters[$user_id][$key][$code] = 1;
+						self::$counters[$user_id][$key][$code] = $increment;
 				}
 			}
 			else
@@ -175,9 +177,9 @@ class CUserCounter extends CAllUserCounter
 					self::$counters[$user_id][$site_id] = array();
 
 				if (isset(self::$counters[$user_id][$site_id][$code]))
-					self::$counters[$user_id][$site_id][$code]++;
+					self::$counters[$user_id][$site_id][$code] = self::$counters[$user_id][$site_id][$code] + $increment;
 				else
-					self::$counters[$user_id][$site_id][$code] = 1;
+					self::$counters[$user_id][$site_id][$code] = $increment;
 			}
 		}
 		$CACHE_MANAGER->Clean("user_counter".$user_id, "user_counter");
@@ -221,7 +223,7 @@ class CUserCounter extends CAllUserCounter
 	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/decremen.php
 	 * @author Bitrix
 	 */
-	public static function Decrement($user_id, $code, $site_id = SITE_ID, $sendPull = true)
+	public static function Decrement($user_id, $code, $site_id = SITE_ID, $sendPull = true, $decrement = 1)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -229,10 +231,12 @@ class CUserCounter extends CAllUserCounter
 		if ($user_id <= 0 || strlen($code) <= 0)
 			return false;
 
+		$decrement = intval($decrement);
+
 		$strSQL = "
 			INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE)
-			VALUES (".$user_id.", -1, '".$DB->ForSQL($site_id)."', '".$DB->ForSQL($code)."')
-			ON DUPLICATE KEY UPDATE CNT = CNT - 1";
+			VALUES (".$user_id.", -".$decrement.", '".$DB->ForSQL($site_id)."', '".$DB->ForSQL($code)."')
+			ON DUPLICATE KEY UPDATE CNT = CNT - ".$decrement;
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		if (self::$counters && self::$counters[$user_id])
@@ -242,9 +246,9 @@ class CUserCounter extends CAllUserCounter
 				foreach(self::$counters[$user_id] as $key => $tmp)
 				{
 					if (isset(self::$counters[$user_id][$key][$code]))
-						self::$counters[$user_id][$key][$code]--;
+						self::$counters[$user_id][$key][$code] = self::$counters[$user_id][$key][$code] - $decrement;
 					else
-						self::$counters[$user_id][$key][$code] = -1;
+						self::$counters[$user_id][$key][$code] = -$decrement;
 				}
 			}
 			else
@@ -253,9 +257,9 @@ class CUserCounter extends CAllUserCounter
 					self::$counters[$user_id][$site_id] = array();
 
 				if (isset(self::$counters[$user_id][$site_id][$code]))
-					self::$counters[$user_id][$site_id][$code]--;
+					self::$counters[$user_id][$site_id][$code] = self::$counters[$user_id][$site_id][$code] - $decrement;
 				else
-					self::$counters[$user_id][$site_id][$code] = -1;
+					self::$counters[$user_id][$site_id][$code] = -$decrement;
 			}
 		}
 
@@ -269,14 +273,14 @@ class CUserCounter extends CAllUserCounter
 
 	public static function IncrementWithSelect($sub_select, $sendPull = true)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER, $APPLICATION;
 
 		if (strlen($sub_select) > 0)
 		{
 			$pullInclude = $sendPull && self::CheckLiveMode();
 			$strSQL = "
 				INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT) (".$sub_select.")
-				ON DUPLICATE KEY UPDATE CNT = CNT + 1, SENT = ".($pullInclude? 0: 1)."
+				ON DUPLICATE KEY UPDATE CNT = CNT + VALUES(CNT), SENT = VALUES(SENT)
 			";
 			$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
@@ -285,76 +289,62 @@ class CUserCounter extends CAllUserCounter
 
 			if ($pullInclude)
 			{
-				$arSites = Array();
-				$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
-				while($row = $res->Fetch())
-					$arSites[] = $row['ID'];
-
-				$strSQL = "
-					SELECT distinct pc.CHANNEL_ID, uc.USER_ID, uc1.SITE_ID, uc1.CODE, uc1.CNT
-					FROM b_user_counter uc
-					INNER JOIN b_user_counter uc1 ON uc1.USER_ID = uc.USER_ID AND uc1.CODE = uc.CODE
-					INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
-					WHERE uc.SENT = 0
-				";
-				$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-
-				$updateId = Array();
-				$pullMessage = Array();
-				while($row = $res->Fetch())
+				$db_lock = $DB->Query("SELECT GET_LOCK('".$APPLICATION->GetServerUniqID()."_pull', 0) as L");
+				$ar_lock = $db_lock->Fetch();
+				if($ar_lock["L"] > 0)
 				{
-					if ($row['SITE_ID'] == '**')
+					$arSites = Array();
+					$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+					while($row = $res->Fetch())
+						$arSites[] = $row['ID'];
+
+					$strSQL = "
+						SELECT distinct pc.CHANNEL_ID, uc1.USER_ID, uc1.SITE_ID, uc1.CODE, uc1.CNT
+						FROM b_user_counter uc
+						INNER JOIN b_user_counter uc1 ON uc1.USER_ID = uc.USER_ID AND uc1.CODE = uc.CODE
+						INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+						WHERE uc.SENT = '0'
+					";
+					$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+					$pullMessage = Array();
+					while($row = $res->Fetch())
 					{
-						foreach($arSites as $siteId)
+						if ($row['SITE_ID'] == '**')
 						{
-							if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
-								$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+							foreach($arSites as $siteId)
+							{
+								if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
+									$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+								else
+									$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+							}
+						}
+						else
+						{
+							if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
+								$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
 							else
-								$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+								$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
 						}
 					}
-					else
+
+					$DB->Query("UPDATE b_user_counter SET SENT = '1' WHERE SENT = '0'");
+					$DB->Query("SELECT RELEASE_LOCK('".$APPLICATION->GetServerUniqID()."_pull')");
+
+					foreach ($pullMessage as $channelId => $arMessage)
 					{
-						if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
-							$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
-						else
-							$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
+						CPullStack::AddByChannel($channelId, Array(
+							'module_id' => 'main',
+							'command' => 'user_counter',
+							'params' => $arMessage,
+						));
 					}
-
-					$updateId[] = Array(
-						'USER_ID' => $row['USER_ID'],
-						'SITE_ID' => $row['SITE_ID'],
-						'CODE' => $row['CODE'],
-					);
-				}
-
-				$strSqlValues = "";
-				$strSqlPrefix = "UPDATE b_user_counter SET SENT = 1 WHERE ";
-				foreach($updateId as $ar)
-				{
-					$strSqlValues .= " OR (USER_ID = '".intval($ar['USER_ID'])."' AND SITE_ID = '".$DB->ForSql($ar['SITE_ID'])."' AND CODE = '".$DB->ForSql($ar['CODE'])."')";
-					if(strlen($strSqlValues) > 2048)
-					{
-						$DB->Query($strSqlPrefix.substr($strSqlValues, 4));
-						$strSqlValues = "";
-					}
-				}
-				if($strSqlValues <> '')
-				{
-					$DB->Query($strSqlPrefix.substr($strSqlValues, 4));
-				}
-
-				foreach ($pullMessage as $channelId => $arMessage)
-				{
-					CPullStack::AddByChannel($channelId, Array(
-						'module_id' => 'main',
-						'command' => 'user_counter',
-						'params' => $arMessage,
-					));
 				}
 			}
 		}
 	}
+
 
 	
 	/**

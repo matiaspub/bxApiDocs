@@ -100,6 +100,7 @@ class CSocNetSearch
 					{
 						if(empty($arPost[$arComment["POST_ID"]]["PERMS_CALC"]))
 						{
+							$arPost[$arComment["POST_ID"]]["PERMS_CALC"] = array();
 							if(is_array($arPost[$arComment["POST_ID"]]["PERMS_FULL"]) && !empty($arPost[$arComment["POST_ID"]]["PERMS_FULL"]))
 							{
 								foreach($arPost[$arComment["POST_ID"]]["PERMS_FULL"] as $e => $v)
@@ -383,9 +384,12 @@ class CSocNetSearch
 			CModule::IncludeModule('tasks')
 		)
 		{
-			$rsTask = CTasks::GetList(array(), array("FORUM_TOPIC_ID" => $arFields['PARAM2']));
-			if ($arTask = $rsTask->Fetch())
-				$arFields['PERMISSIONS'] = CTasks::__GetSearchPermissions($arTask);
+			if (!preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)) // calendar comments live in the same TASK_FORUM_ID :(
+			{
+				$rsTask = CTasks::GetList(array(), array("FORUM_TOPIC_ID" => $arFields['PARAM2']));
+				if ($arTask = $rsTask->Fetch())
+					$arFields['PERMISSIONS'] = CTasks::__GetSearchPermissions($arTask);
+			}
 		}
 		else
 		{
@@ -463,11 +467,14 @@ class CSocNetSearch
 			}
 			elseif($arFields["MODULE_ID"] == "forum" && intval($arFields["PARAM1"]) == intval($this->_params["TASK_FORUM_ID"]))
 			{
-				$arFields = $this->BeforeIndexForum($arFields,
-					"G", $this->_group_id,
-					"tasks", "view",
-					$this->Url($this->_params["PATH_TO_GROUP_TASK_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
-				);
+				if (!preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)) // calendar comments live in the same TASK_FORUM_ID :(
+				{
+					$arFields = $this->BeforeIndexForum($arFields,
+						"G", $this->_group_id,
+						"tasks", "view",
+						$this->Url($this->_params["PATH_TO_GROUP_TASK_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
+					);
+				}
 			}
 			elseif($arFields["MODULE_ID"] == "forum" && intval($arFields["PARAM1"]) == intval($this->_params["PHOTO_FORUM_ID"]))
 			{
@@ -531,10 +538,20 @@ class CSocNetSearch
 			}
 			elseif($arFields["MODULE_ID"] == "forum" && intval($arFields["PARAM1"]) == intval($this->_params["TASK_FORUM_ID"]))
 			{
-				$arFields = $this->BeforeIndexForum($arFields,
-					"U", $this->_user_id,
-					"tasks", "view_all",
-					$this->Url($this->_params["PATH_TO_USER_TASK_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
+				if (!preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)) // calendar comments live in the same TASK_FORUM_ID :(
+				{
+					$arFields = $this->BeforeIndexForum($arFields,
+						"U", $this->_user_id,
+						"tasks", "view_all",
+						$this->Url($this->_params["PATH_TO_USER_TASK_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
+					);
+				}
+			}
+			elseif($arFields["MODULE_ID"] == "forum" && preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)) // don't index calendar comments!
+			{
+				$arFields = array(
+					"TITLE" => "",
+					"BODY" => ""
 				);
 			}
 			elseif($arFields["MODULE_ID"] == "forum" && intval($arFields["PARAM1"]) == intval($this->_params["PHOTO_FORUM_ID"]))

@@ -1269,20 +1269,49 @@ class CAllDatabase
 		else
 		{
 			$trace = array();
-			foreach(debug_backtrace() as $i => $tr)
+			foreach(Bitrix\Main\Diag\Helper::getBackTrace(8) as $i => $tr)
 			{
 				if ($i > 0)
 				{
+					$args = array();
+					if (is_array($tr["args"]))
+					{
+						foreach ($tr["args"] as $k1 => $v1)
+						{
+							if (is_array($v1))
+							{
+								foreach ($v1 as $k2 => $v2)
+								{
+									if (is_scalar($v2))
+										$args[$k1][$k2] = $v2;
+									elseif (is_object($v2))
+										$args[$k1][$k2] = get_class($v2);
+									else
+										$args[$k1][$k2] = gettype($v2);
+								}
+							}
+							else
+							{
+								if (is_scalar($v1))
+									$args[$k1] = $v1;
+								elseif (is_object($v1))
+									$args[$k1] = get_class($v1);
+								else
+									$args[$k1] = gettype($v1);
+							}
+						}
+					}
+
 					$trace[] = array(
 						"file" => $tr["file"],
 						"line" => $tr["line"],
 						"class" => $tr["class"],
 						"type" => $tr["type"],
 						"function" => $tr["function"],
-						"args" => $tr["args"],
+						"args" => $args,
 					);
 				}
-				if ($i > 4)
+				if ($i == 7)
 					break;
 			}
 		}
@@ -1334,9 +1363,11 @@ class CAllDBResult
 	var $nEndPage = 0;
 
 
-	public function CAllDBResult($res=NULL)
+	/** @param CDBResult $res */
+	public function CAllDBResult($res = null)
 	{
-		if(is_object($res) && is_subclass_of($res, "CAllDBResult"))
+		$obj = is_object($res);
+		if($obj && is_subclass_of($res, "CAllDBResult"))
 		{
 			$this->result = $res->result;
 			$this->nSelectedCount = $res->nSelectedCount;
@@ -1361,10 +1392,22 @@ class CAllDBResult
 			$this->SqlTraceIndex = $res->SqlTraceIndex;
 			$this->DB = $res->DB;
 		}
+		elseif($obj && $res instanceof \Bitrix\Main\DB\ArrayResult)
+		{
+			$this->InitFromArray($res->getResource());
+		}
+		elseif($obj && $res instanceof \Bitrix\Main\DB\Result)
+		{
+			$this->result = $res->getResource();
+		}
 		elseif(is_array($res))
+		{
 			$this->arResult = $res;
+		}
 		else
+		{
 			$this->result = $res;
+		}
 	}
 
 	static public function __sleep()
@@ -2608,7 +2651,7 @@ class CAllDBResult
 		return $this->GetPageNavStringEx($dummy, $navigationTitle, $templateName, $showAlways, $parentComponent);
 	}
 
-	public function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
+	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;

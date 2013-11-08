@@ -16,6 +16,7 @@ class CMobile
 	public static $platform = "ios";
 	public static $apiVersion = 1;
 	public static $pgVersion = "2.0.0";
+	public static $isDev = false;
 	private static $remoteScriptPath = "http://dev.1c-bitrix.ru/mobile_scripts/";
 
 	private function __construct()
@@ -27,6 +28,8 @@ class CMobile
 		$this->setScreenCategory($_COOKIE["MOBILE_SCREEN_CATEGORY"]);
 		$this->setPixelratio($_COOKIE["MOBILE_SCALE"]);
 		$this->setPgVersion($_COOKIE["PG_VERSION"]);
+		if(isset($_COOKIE["MOBILE_IS_DEV"]) && $_COOKIE["MOBILE_IS_DEV"] == "Y")
+			self::$isDev = true;
 
 		$this->setDevice($_COOKIE["MOBILE_DEVICE"]);
 
@@ -39,7 +42,6 @@ class CMobile
 				$this->setDeviceheight($_COOKIE["MOBILE_RESOLUTION_HEIGHT"] / 2);
 			}
 		}
-
 
 		//detecting OS
 		if (array_key_exists("MOBILE_DEVICE", $_COOKIE))
@@ -169,6 +171,9 @@ class CMobile
 
 		AddEventHandler("main", "OnBeforeEndBufferContent", Array("CMobile", "initScripts"));
 		self::$isAlreadyInit = true;
+		$db_events = GetModuleEvents("mobileapp", "OnMobileInit");
+		while($arEvent = $db_events->Fetch())
+			ExecuteModuleEventEx($arEvent);
 	}
 
 	/**

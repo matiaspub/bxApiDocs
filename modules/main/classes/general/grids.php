@@ -54,7 +54,9 @@ class CGridOptions
 		elseif(!isset($_SESSION["main.interface.grid"][$this->grid_id]["sort_by"]))
 		{
 			if($this->options["sort_by"] <> '')
+			{
 				$key = $this->options["sort_by"];
+			}
 		}
 		if(isset($_SESSION["main.interface.grid"][$this->grid_id]["sort_by"]))
 			$key = $_SESSION["main.interface.grid"][$this->grid_id]["sort_by"];
@@ -68,7 +70,13 @@ class CGridOptions
 			elseif(!isset($_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]))
 			{
 				if($this->options["sort_order"] <> '')
+				{
 					$arResult["sort"] = array($key => $this->options["sort_order"]);
+				}
+				else
+				{
+					$arResult["sort"] = array($key => reset($arParams["sort"]));
+				}
 			}
 			if(isset($_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]))
 				$arResult["sort"] = array($key => $_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]);

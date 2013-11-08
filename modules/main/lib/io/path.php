@@ -15,22 +15,21 @@ class Path
 	const LOGICAL_TO_PHYSICAL = 1;
 	const PHYSICAL_TO_LOGICAL = 2;
 
-	const INVALID_FILENAME_CHARS = "\\\\/:*?\"\\'<>|~\\0";
+	const INVALID_FILENAME_CHARS = "\\\\/:*?\"\\'<>|~";
 
 	public static function normalize($path)
 	{
 		if (!is_string($path) || ($path == ""))
 			return null;
 
-		$pathTmp = preg_replace("'[\\\\/]+'", "/", $path);
+		//slashes doesn't matter for Windows
+		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0? "'[\\\\/]+'" : "'[/]+'");
+		$pathTmp = preg_replace($pattern, "/", $path);
 
 		if (($p = strpos($pathTmp, "\0")) !== false)
 			$pathTmp = substr($pathTmp, 0, $p);
 		if (($p = strpos($pathTmp, self::PATH_SEPARATOR)) !== false)
 			$pathTmp = substr($pathTmp, 0, $p);
-
-		while (strpos($pathTmp, ".../") !== false)
-			$pathTmp = str_replace(".../", "../", $pathTmp);
 
 		$arPathTmp = explode('/', $pathTmp);
 		$arPathStack = array();
@@ -39,7 +38,7 @@ class Path
 		{
 			if ($arPathTmp[$i] === '.')
 				continue;
-			if (($i !== 0) && ($arPathTmp[$i] === ''))
+			if (($arPathTmp[$i] === '') && ($i !== 0) && ($i !== ($cnt - 1)))
 				continue;
 
 			if ($arPathTmp[$i] === "..")
@@ -55,7 +54,6 @@ class Path
 
 		$pathTmp = implode("/", $arPathStack);
 
-		$pathTmp = preg_replace("'[\\\\/]+'", "/", $pathTmp);
 		$pathTmp = rtrim($pathTmp, "\0.\\/+ ");
 
 		if (substr($path, 0, 1) === "/" && substr($pathTmp, 0, 1) !== "/")
@@ -204,7 +202,7 @@ class Path
 		if (!is_string($relativePath) || $relativePath == "")
 			$site = SITE_ID;
 
-		$basePath = CSite::getSiteDocRoot($site);
+		$basePath = \CSite::getSiteDocRoot($site);
 
 		return self::combine($basePath, $relativePath);
 	}

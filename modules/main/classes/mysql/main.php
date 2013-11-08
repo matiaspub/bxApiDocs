@@ -1,12 +1,10 @@
-<?
-/*
-##############################################
-# Bitrix Site Manager                        #
-# Copyright (c) 2002-2007 Bitrix             #
-# http://www.bitrixsoft.com                  #
-# mailto:admin@bitrixsoft.com                #
-##############################################
-*/
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
 
 require_once(substr(__FILE__, 0, strlen(__FILE__) - strlen("/classes/mysql/main.php"))."/bx_root.php");
 
@@ -25,48 +23,48 @@ class CMain extends CAllMain
 
 	public function GetLang($cur_dir=false, $cur_host=false)
 	{
-		global $DB, $lang, $DOCUMENT_ROOT, $MAIN_LANGS_CACHE, $MAIN_LANGS_ADMIN_CACHE;
+		global $DB, $lang, $MAIN_LANGS_CACHE, $MAIN_LANGS_ADMIN_CACHE;
 
-		if($cur_dir===false)
+		if($cur_dir === false)
 			$cur_dir = $this->GetCurDir();
-		if($cur_host===false)
+		if($cur_host === false)
 			$cur_host = $_SERVER["HTTP_HOST"];
 
-		if(substr($cur_dir, 0, strlen(BX_ROOT."/admin/")) == BX_ROOT."/admin/"
-			|| substr($cur_dir, 0, strlen(BX_ROOT."/updates/")) == BX_ROOT."/updates/"
-			|| (defined("ADMIN_SECTION") &&  ADMIN_SECTION==true)
-			|| (defined("BX_PUBLIC_TOOLS") && BX_PUBLIC_TOOLS===true)
-			) //если раздел администрирования
+		if(
+			strpos($cur_dir, BX_ROOT."/admin/") === 0
+			|| strpos($cur_dir, BX_ROOT."/updates/") === 0
+			|| (defined("ADMIN_SECTION") &&  ADMIN_SECTION === true)
+			|| (defined("BX_PUBLIC_TOOLS") && BX_PUBLIC_TOOLS === true)
+		)
 		{
-			//путь по параметру
+			//if admin section
+
+			//lang by global var
 			if(strlen($lang)<=0)
 				$lang = COption::GetOptionString("main", "admin_lid", "ru");
 
-			$R = CLanguage::GetList($o, $b, Array("LID"=>$lang, "ACTIVE"=>$ACTIVE));
+			$R = CLanguage::GetList($o, $b, array("LID"=>$lang, "ACTIVE"=>"Y"));
 			if($res = $R->Fetch())
 			{
 				$MAIN_LANGS_ADMIN_CACHE[$res["LID"]]=$res;
 				return $res;
 			}
 
-			//если переменная не задана - берем язык по умолчанию
-			$strSql =
-				"SELECT * ".
-				"FROM b_language ".
-				"WHERE ACTIVE='Y' ".
-				"ORDER BY DEF DESC, SORT";
-
-			$R = $DB->Query($strSql);
+			//no lang param - get default
+			$R = CLanguage::GetList($by = "def", $order = "desc", array("ACTIVE"=>"Y"));
 			if($res = $R->Fetch())
 			{
 				$MAIN_LANGS_ADMIN_CACHE[$res["LID"]]=$res;
 				return $res;
 			}
-			//ну если вообще ничего не задано - вернем просто
+
+			//core default
 			return array("en", "MM/DD/YYYY", "MM/DD/YYYY HH24:MI:SS");
 		}
-		else //все остальные папки
+		else
 		{
+			// all other sections
+
 			$arURL = parse_url("http://".$cur_host);
 			if($arURL["scheme"]=="" && strlen($arURL["host"])>0)
 				$CURR_DOMAIN = $arURL["host"];
@@ -75,20 +73,21 @@ class CMain extends CAllMain
 
 			if(strpos($CURR_DOMAIN, ':')>0)
 				$CURR_DOMAIN = substr($CURR_DOMAIN, 0, strpos($CURR_DOMAIN, ':'));
-			$CURR_DOMAIN = Trim($CURR_DOMAIN, "\t\r\n\0 .");
+			$CURR_DOMAIN = trim($CURR_DOMAIN, "\t\r\n\0 .");
 
-			//текущий язык определяем по пути
+			//get site by path
 			if(CACHED_b_lang!==false && CACHED_b_lang_domain!==false)
 			{
 				global $CACHE_MANAGER;
 				$strSql =
-					"SELECT L.*, L.LID as ID, L.LID as SITE_ID ".
-					"FROM b_lang L ".
-					"WHERE L.ACTIVE='Y' ".
+					"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
+					"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
+					"FROM b_lang L, b_culture C ".
+					"WHERE C.ID=L.CULTURE_ID AND L.ACTIVE='Y' ".
 					"ORDER BY ".
 					"	LENGTH(L.DIR) DESC, ".
 					"	L.DOMAIN_LIMITED DESC, ".
-					"	SORT ";
+					"	L.SORT ";
 				if($CACHE_MANAGER->Read(CACHED_b_lang, "b_lang".md5($strSql), "b_lang"))
 				{
 					$arLang = $CACHE_MANAGER->Get("b_lang".md5($strSql));
@@ -98,7 +97,7 @@ class CMain extends CAllMain
 					$arLang = array();
 					$R = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 					while($row = $R->Fetch())
-						$arLang[]=$row;
+						$arLang[] = $row;
 					$CACHE_MANAGER->Set("b_lang".md5($strSql), $arLang);
 				}
 
@@ -129,15 +128,21 @@ class CMain extends CAllMain
 					$bLeft = true;
 					//LEFT JOIN b_lang_domain LD ON L.LID=LD.LID
 					if(array_key_exists($row["LID"], $arLangDomain))
+					{
 						foreach($arLangDomain[$row["LID"]] as $dom)
+						{
 							//AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN)
 							if(strcasecmp(substr($CURR_DOMAIN, -strlen($dom["LD_DOMAIN"])), $dom["LD_DOMAIN"]) == 0)
 							{
 								$arJoin[] = $row+$dom;
 								$bLeft = false;
 							}
+						}
+					}
 					if($bLeft)
+					{
 						$arJoin[] = $row+array("LD_LID"=>"","LD_DOMAIN"=>"");
+					}
 				}
 				$A = array();
 				foreach($arJoin as $row)
@@ -149,7 +154,9 @@ class CMain extends CAllMain
 
 				$res=false;
 				if($res===false)
+				{
 					foreach($A as $row)
+					{
 						if(
 							(strcasecmp(substr($cur_dir, 0, strlen($row["DIR"])), $row["DIR"]) == 0)
 							&& (($row["DOMAIN_LIMITED"]=="Y" && $row["LD_LID"]!="")||$row["DOMAIN_LIMITED"]!="Y")
@@ -158,34 +165,44 @@ class CMain extends CAllMain
 							$res=$row;
 							break;
 						}
+					}
+				}
 				if($res===false)
+				{
 					foreach($A as $row)
-						if(
-							strncasecmp($cur_dir, $row["DIR"], strlen($cur_dir))==0
-						)
+					{
+						if(strncasecmp($cur_dir, $row["DIR"], strlen($cur_dir)) == 0)
 						{
 							$res=$row;
 							break;
 						}
+					}
+				}
 				if($res===false)
+				{
 					foreach($A as $row)
-						if(
-							(($row["DOMAIN_LIMITED"]=="Y" && $row["LD_LID"]!="")||$row["DOMAIN_LIMITED"]!="Y")
-						)
+					{
+						if(($row["DOMAIN_LIMITED"] == "Y" && $row["LD_LID"] != "") || $row["DOMAIN_LIMITED"] != "Y")
 						{
 							$res=$row;
 							break;
 						}
+					}
+				}
 				if($res===false && count($A)>0)
+				{
 					$res=$A[0];
+				}
 			}
 			else
 			{
 				$strSql =
-					"SELECT L.*, L.LID as ID, L.LID as SITE_ID ".
-					"FROM b_lang L ".
+					"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
+					"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
+					"FROM b_lang L, b_culture C ".
 					"	LEFT JOIN b_lang_domain LD ON L.LID=LD.LID AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN) ".
-					"WHERE ('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
+					"WHERE C.ID=L.CULTURE_ID".
+					"	AND ('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
 					"	AND L.ACTIVE='Y' ".
 					"ORDER BY ".
 					"	IF((L.DOMAIN_LIMITED='Y' AND LD.LID IS NOT NULL) OR L.DOMAIN_LIMITED<>'Y', ".
@@ -194,7 +211,7 @@ class CMain extends CAllMain
 					"	) DESC, ".
 					"	LENGTH(L.DIR) DESC, ".
 					"	L.DOMAIN_LIMITED DESC, ".
-					"	SORT, ".
+					"	L.SORT, ".
 					"	LENGTH(LD.DOMAIN) DESC ";
 
 				$R = $DB->Query($strSql, false, "File: ".__FILE__." Line:".__LINE__);
@@ -203,23 +220,24 @@ class CMain extends CAllMain
 
 			if($res)
 			{
-				$MAIN_LANGS_CACHE[$res["LID"]]=$res;
+				$MAIN_LANGS_CACHE[$res["LID"]] = $res;
 				return $res;
 			}
 
-			//если переменная не задана - берем язык по умолчанию
+			//get default site
 			$strSql =
-				"SELECT L.*, L.LID as ID, L.LID as SITE_ID ".
-				"FROM b_lang L ".
-				"WHERE ACTIVE='Y' ".
-				"ORDER BY DEF DESC, SORT";
+				"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
+				"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
+				"FROM b_lang L, b_culture C ".
+				"WHERE C.ID=L.CULTURE_ID AND L.ACTIVE='Y' ".
+				"ORDER BY L.DEF DESC, L.SORT";
 
 			$R = $DB->Query($strSql);
 			while($res = $R->Fetch())
 			{
 				$MAIN_LANGS_CACHE[$res["LID"]]=$res;
 				return $res;
-		   	}
+			}
 		}
 
 		return array("en", "MM/DD/YYYY", "MM/DD/YYYY HH24:MI:SS");
@@ -230,7 +248,9 @@ class CSite extends CAllSite
 {
 	public static function GetCurTemplate()
 	{
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $DB, $APPLICATION, $USER, $CACHE_MANAGER;
+
 		if(CACHED_b_site_template===false)
 		{
 			$strSql = "
@@ -250,7 +270,7 @@ class CSite extends CAllSite
 				$strCondition = trim($ar["CONDITION"]);
 				if(strlen($strCondition)>0 && (!@eval("return ".$strCondition.";")))
 					continue;
-				if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$ar["TEMPLATE"]) && is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$ar["TEMPLATE"]))
+				if(($path = getLocalPath("templates/".$ar["TEMPLATE"], BX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
 					return $ar["TEMPLATE"];
 			}
 		}
@@ -272,6 +292,7 @@ class CSite extends CAllSite
 					ORDER BY
 						SITE_ID, if(length(".CMain::__GetConditionFName().")>0, 1, 2), SORT
 				");
+				$arSiteTemplateBySite = array();
 				while($ar = $dbr->Fetch())
 					$arSiteTemplateBySite[$ar['SITE_ID']][]=$ar;
 				$CACHE_MANAGER->Set("b_site_template", $arSiteTemplateBySite);
@@ -283,7 +304,7 @@ class CSite extends CAllSite
 					$strCondition = trim($ar["CONDITION"]);
 					if(strlen($strCondition)>0 && (!@eval("return ".$strCondition.";")))
 						continue;
-					if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$ar["TEMPLATE"]) && is_dir($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$ar["TEMPLATE"]))
+					if(($path = getLocalPath("templates/".$ar["TEMPLATE"], BX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
 						return $ar["TEMPLATE"];
 				}
 			}
@@ -341,4 +362,3 @@ class CFilterQuery extends CAllFilterQuery
 class CLang extends CSite
 {
 }
-?>

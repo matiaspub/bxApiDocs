@@ -12,6 +12,11 @@ class CTextParser
 	var $serverName = "";
 	var $preg;
 
+	public $smiles = null;
+	protected $smilePatterns = null;
+	protected $smileReplaces = null;
+	protected static $defSmiles = null;
+
 	public function CTextParser()
 	{
 		$this->pathToSmile = '';
@@ -32,11 +37,81 @@ class CTextParser
 		$this->parser_nofollow = "N";
 		$this->link_target = "_blank";
 		$this->MaxAnchorLength = 40;
-		$this->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N", "ALIGN" => "Y");
+		$this->allow = array(
+			"HTML" => "N",
+			"ANCHOR" => "Y",
+			"BIU" => "Y",
+			"IMG" => "Y",
+			"QUOTE" => "Y",
+			"CODE" => "Y",
+			"FONT" => "Y",
+			"LIST" => "Y",
+			"SMILES" => "Y",
+			"NL2BR" => "N",
+			"VIDEO" => "Y",
+			"TABLE" => "Y",
+			"CUT_ANCHOR" => "N",
+			"SHORT_ANCHOR" => "N",
+			"ALIGN" => "Y",
+			"USERFIELDS" => "N",
+		);
 		$this->authorName = '';
+	}
 
-		$this->smiles = CSmile::getByType();
-		$this->smiles = CSmile::prepareForParser($this->smiles);
+	protected function initSmiles()
+	{
+		if(static::$defSmiles === null)
+		{
+			$smiles = CSmile::getByType();
+
+			$arSmiles = array();
+			foreach($smiles as $smile)
+			{
+				$arTypings = explode(" ", $smile["TYPING"]);
+				foreach ($arTypings as $typing)
+				{
+					$arSmiles[] = array_merge($smile, array(
+						'TYPING' => $typing,
+						'IMAGE'  => CSmile::PATH_TO_SMILE.$smile["SET_ID"]."/".$smile["IMAGE"],
+						'DESCRIPTION' => $smile["NAME"],
+						'DESCRIPTION_DECODE' => 'Y',
+					));
+				}
+			}
+			static::$defSmiles = $arSmiles;
+		}
+		$this->smiles = static::$defSmiles;
+	}
+
+	protected function initSmilePatterns()
+	{
+		$this->smilePatterns = array();
+		$this->smileReplaces = array();
+
+		$pre = "[^\\w&]";
+		foreach ($this->smiles as $row)
+		{
+			if(preg_match("/\\w\$/", $row["TYPING"]))
+				$pre .= "|".preg_quote($row["TYPING"], "/");
+		}
+
+		foreach ($this->smiles as $row)
+		{
+			if($row["TYPING"] <> '' && $row["IMAGE"] <> '')
+			{
+				$code = str_replace(array("'", "<", ">"), array("\\'", "&lt;", "&gt;"), $row["TYPING"]);
+				$patt = preg_quote($code, "/");
+				$code = preg_quote(str_replace(array("\x5C"), array("&#092;"), $code));
+				$image = preg_quote(str_replace("'", "\\'", $row["IMAGE"]));
+				$description = preg_quote(htmlspecialcharsbx(str_replace(array("\x5C"), array("&#092;"), $row["DESCRIPTION"]), ENT_QUOTES), "/");
+				$width = intval($row["IMAGE_WIDTH"]);
+				$height = intval($row["IMAGE_HEIGHT"]);
+				$descriptionDecode = $row["DESCRIPTION_DECODE"] == 'Y'? true: false;
+
+				$this->smilePatterns[] = "/(?<=".$pre.")".$patt."(?=.\\W|\\W.|\\W$)/ei".BX_UTF_PCRE_MODIFIER;
+				$this->smileReplaces[] = "\$this->convert_emoticon('".$code."', '".$image."', '".$description."', '".$width."', '".$height."', '".$descriptionDecode."')";
+			}
+		}
 	}
 
 	public function convertText($text)
@@ -189,13 +264,12 @@ class CTextParser
 		}
 		if ($this->allow["ANCHOR"]=="Y")
 		{
-			$word_separator = str_replace(array("\\]", "\\["), "", $this->word_separator);
+			$word_separator = str_replace(array("\\]", "\\[", "?"), "", $this->word_separator);
 			$text = preg_replace(
-				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((http|https|news|ftp|aim|mailto):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
+				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((http|https|news|ftp|aim|mailto|file):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
 				"[url]\\1[/url]", $text
 			);
 		}
-
 		foreach(GetModuleEvents("main", "TextParserBeforeTags", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$text, &$this));
 
@@ -301,12 +375,12 @@ class CTextParser
 					}
 					break;
 				case "FONT":
-					while (preg_match("/\\[size\\s*=\\s*([^\\]]+)\\](.+?)\\[\\/size\\]/is".BX_UTF_PCRE_MODIFIER, $text))
-						$text = preg_replace("/\\[size\\s*=\\s*([^\\]]+)\\](.+?)\\[\\/size\\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('size', '\\1', '\\2')", $text);
+					while (preg_match("/\\[size\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/size\\]/is".BX_UTF_PCRE_MODIFIER, $text))
+						$text = preg_replace("/\\[size\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/size\\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('size', '\\1', '\\2')", $text);
 					while (preg_match("/\\[font\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/font\\]/is".BX_UTF_PCRE_MODIFIER, $text))
 						$text = preg_replace("/\\[font\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/font\\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('font', '\\1', '\\2')", $text);
-					while (preg_match("/\\[color\\s*=\\s*([^\\]]+)\\](.+?)\\[\\/color\\]/is".BX_UTF_PCRE_MODIFIER, $text))
-						$text = preg_replace("/\\[color\\s*=\\s*([^\\]]+)\\](.+?)\\[\\/color\\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('color', '\\1', '\\2')", $text);
+					while (preg_match("/\\[color\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/color\\]/is".BX_UTF_PCRE_MODIFIER, $text))
+						$text = preg_replace("/\\[color\\s*=\\s*([^\\]]+)\\](.*?)\\[\\/color\\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('color', '\\1', '\\2')", $text);
 					break;
 				case "TABLE":
 					while (preg_match("/\\[table\\](.+?)\\[\\/table\\]/is".BX_UTF_PCRE_MODIFIER, $text))
@@ -366,6 +440,50 @@ class CTextParser
 				"\$this->defended_tags('\\1', 'replace')",
 			$text);
 		}
+		if (!empty($this->allow["USERFIELDS"]) && is_array($this->allow["USERFIELDS"]))
+		{
+			foreach($this->allow["USERFIELDS"] as $userField)
+			{
+				if (empty($userField["TAG"]))
+				{
+					switch($userField["USER_TYPE_ID"])
+					{
+						case "webdav_element" :
+							$userField["TAG"] = "DOCUMENT ID";
+							break;
+						case "vote" :
+							$userField["TAG"] = "VOTE ID";
+							break;
+					}
+				}
+				if (!empty($userField["TAG"]) && array_key_exists("VALUE", $userField) && !empty($userField["VALUE"]) &&
+					method_exists($userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML") )
+				{
+					$userField["VALUE"] = (is_array($userField["VALUE"]) ? $userField["VALUE"] : array($userField["VALUE"]));
+					$text = preg_replace_callback(
+						"/\\[".$userField["TAG"]."\\s*=\\s*([0-9]+)([^\\]]*)\\]/is".BX_UTF_PCRE_MODIFIER,
+						function($matches) use ( $userField ) {
+							$id = intval($matches[1]);
+							if ($id > 0 && in_array($id, $userField["VALUE"]))
+							{
+								if (defined("BX_COMP_MANAGED_CACHE"))
+								{
+									global $CACHE_MANAGER;
+									$CACHE_MANAGER->RegisterTag("webdav_element_internal_".$id);
+								}
+
+								return call_user_func_array(
+									array($userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"),
+									array($userField, $id, $matches[2])
+								);
+							}
+							return $matches[0];
+						},
+						$text
+					);
+				}
+			}
+		}
 
 		foreach(GetModuleEvents("main", "TextParserAfterTags", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$text, &$this));
@@ -423,36 +541,24 @@ class CTextParser
 			$text);
 		}
 
-		if ($this->allow["SMILES"]=="Y" && count($this->smiles) > 0)
+		if ($this->allow["SMILES"]=="Y")
 		{
-			$arPattern = array();
-			$arReplace = array();
-
-			$pre = "[^\\w&]";
-			foreach ($this->smiles as $row)
+			if($this->smiles === null)
 			{
-				if(preg_match("/\\w\$/", $row["TYPING"]))
-					$pre .= "|".preg_quote($row["TYPING"], "/");
+				$this->initSmiles();
 			}
-
-			foreach ($this->smiles as $row)
+			if(!empty($this->smiles))
 			{
-				$code = str_replace(array("'", "<", ">"), array("\\'", "&lt;", "&gt;"), $row["TYPING"]);
-				$patt = preg_quote($code, "/");
-				$code = preg_quote(str_replace(array("\x5C"), array("&#092;"), $code));
+				if($this->smilePatterns === null)
+				{
+					$this->initSmilePatterns();
+				}
 
-				$image = preg_quote(str_replace("'", "\\'", $row["IMAGE"]));
-				$description = preg_quote(htmlspecialcharsbx(str_replace(array("\x5C"), array("&#092;"), $row["DESCRIPTION"]), ENT_QUOTES), "/");
-				$width = intval($row["IMAGE_WIDTH"]);
-				$height = intval($row["IMAGE_HEIGHT"]);
-				$descriptionDecode = $row["DESCRIPTION_DECODE"] == 'Y'? true: false;
-
-				$arPattern[] = "/(?<=".$pre.")$patt(?=.\\W|\\W.|\\W$)/ei".BX_UTF_PCRE_MODIFIER;
-				$arReplace[] = "\$this->convert_emoticon('$code', '$image', '$description', '$width', '$height', '$descriptionDecode')";
+				if (!empty($this->smilePatterns))
+				{
+					$text = preg_replace($this->smilePatterns, $this->smileReplaces, ' '.$text.' ');
+				}
 			}
-
-			if (!empty($arPattern))
-				$text = preg_replace($arPattern, $arReplace, ' '.$text.' ');
 		}
 
 		foreach(GetModuleEvents("main", "TextParserBeforePattern", true) as $arEvent)
@@ -514,7 +620,7 @@ class CTextParser
 		$arPattern[] = "/\\[s\\](.+?)\\[\\/s\\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "_\\1_";
 
-		$arPattern[] = "/\\[(\\/?)(color|font|size)([^\\]]*)\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arPattern[] = "/\\[(\\/?)(color|font|size|left|right|center)([^\\]]*)\\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "";
 
 		$arPattern[] = "/\\[url\\](\\S+?)\\[\\/url\\]/is".BX_UTF_PCRE_MODIFIER;
@@ -531,6 +637,13 @@ class CTextParser
 
 		$arPattern[] = "/\\[(\\/?)list\\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "\n";
+
+		$arPattern[] = "/\[user([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "\\2";
+
+		$arPattern[] = "/\[DOCUMENT([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "";
+
 		$text = preg_replace($arPattern, $arReplace, $text);
 
 		$text = str_replace("&shy;", "", $text);
@@ -590,7 +703,7 @@ class CTextParser
 
 	public function convert_emoticon($code = "", $image = "", $description = "", $width = "", $height = "", $descriptionDecode = false)
 	{
-		if (strlen($code)<=0 || strlen($image)<=0)
+		if ($code == '' || $image == '')
 			return '';
 		$code = stripslashes($code);
 		$description = stripslashes($description);
@@ -811,8 +924,13 @@ class CTextParser
 
 	public function convert_anchor_tag($url, $text, $pref="")
 	{
+		$bTextUrl = false;
 		if(strlen(trim($text)) <= 0)
+		{
 			$text = $url;
+		}
+		if($text == $url)
+			$bTextUrl = true;
 
 		$bShortUrl = ($this->allow["SHORT_ANCHOR"] == "Y") ? true : false;
 
@@ -857,6 +975,17 @@ class CTextParser
 			$bShortUrl = false;
 		if ($bShortUrl && !preg_match("/^(http|ftp|https|news):\\/\\//i".BX_UTF_PCRE_MODIFIER, $text))
 			$bShortUrl = false;
+
+		if($bTextUrl)
+		{
+			$lastInd = substr($url, -1);
+			if(in_array($lastInd, array(")", "”", "\"", "'")))
+			{
+				$url = substr($url, 0, -1);
+				$text = substr($text, 0, -1);
+				$end = $lastInd;
+			}
+		}
 
 		if ($bShortUrl)
 		{

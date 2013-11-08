@@ -16,10 +16,6 @@ CModule::AddAutoloadClasses(
 	array(
 		"CSecurityIPRule" => "classes/general/iprule.php",
 		"CSecurityFilter" => "classes/general/filter.php",
-		"CSecurityFilterBaseAuditor" => "classes/general/auditors/base_auditor.php",
-		"CSecurityFilterXssAuditor" => "classes/general/auditors/xss_auditor.php",
-		"CSecurityFilterSqlAuditor" => "classes/general/auditors/sql_auditor.php",
-		"CSecurityFilterPathAuditor" => "classes/general/auditors/path_auditor.php",
 		"CSecurityHtmlEntity" => "classes/general/html_entity.php",
 		"CSecurityFilterMask" => "classes/general/filter_mask.php",
 		"CSecurityXSSDetect" => "classes/general/post_filter.php",
