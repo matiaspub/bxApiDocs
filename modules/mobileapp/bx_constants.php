@@ -44,5 +44,10 @@ define('BX_PULL_SKIP_WEBSOCKET', true);
  */
 define('BX_PULL_SKIP_INIT', true);
 
+/**
+ * BX_PULL_MOBILE
+ */
+define('BX_PULL_MOBILE', true);
+
 
 ?>

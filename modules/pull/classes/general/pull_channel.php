@@ -233,7 +233,7 @@ class CPullChannel
 			{
 				COption::SetOptionString("pull", "nginx_error", "N");
 				CAdminNotify::DeleteByTag("PULL_ERROR_SEND");
-				$nginx_error = false;
+				$nginx_error = "N";
 			}
 			else if ($nginx_error['count'] >= 10)
 			{
@@ -412,6 +412,13 @@ class CPullChannel
 
 	public static function OnAfterUserAuthorize($arParams)
 	{
+		$arAuth = CHTTP::ParseAuthRequest();
+		if(isset($arAuth["basic"]) && $arAuth["basic"]["username"] <> '' && $arAuth["basic"]["password"] <> ''
+			&& strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'bitrix') === false)
+		{
+			return false;
+		}
+
 		if (isset($arParams['update']) && $arParams['update'] === false)
 			return false;
 
@@ -431,7 +438,7 @@ class CPullChannel
 			'module_id' => 'main',
 			'command' => 'user_authorize',
 			'params' => Array(
-				'USER_ID' => intval($arParams['user_fields']['ID'])
+				'USER_ID' => $arParams['user_fields']['ID']
 			),
 		));
 	}
@@ -454,7 +461,7 @@ class CPullChannel
 			'module_id' => 'main',
 			'command' => 'user_logout',
 			'params' => Array(
-				'USER_ID' => intval($arParams['USER_ID'])
+				'USER_ID' => $arParams['USER_ID']
 			),
 		));
 	}

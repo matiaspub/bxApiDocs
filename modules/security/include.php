@@ -44,7 +44,8 @@ CModule::AddAutoloadClasses(
 		"CSecurityPhpConfigurationTest" => "classes/general/tests/php_configuration.php",
 		"CSecuritySiteConfigurationTest" => "classes/general/tests/site_configuration.php",
 		"CSecurityTaintCheckingTest" => "classes/general/tests/taint_checking.php",
-		"CSecurityRequirementsException" => "classes/general/requirements_exception.php"
+		"CSecurityUserTest" => "classes/general/tests/user.php",
+		"CSecurityRequirementsException" => "classes/general/requirements_exception.php",
 	)
 );
 

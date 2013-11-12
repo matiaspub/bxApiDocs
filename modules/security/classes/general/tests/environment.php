@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityEnvironmentTest extends CSecurityBaseTest
+/**
+ * Class CSecurityEnvironmentTest
+ * @since 12.5.0
+ */
+class CSecurityEnvironmentTest
+	extends CSecurityBaseTest
 {
 	const MIN_UID = 100;
 	const MIN_GID = 100;

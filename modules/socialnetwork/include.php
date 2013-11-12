@@ -274,6 +274,14 @@ if (COption::GetOptionString("socialnetwork", "allow_photo_user", "Y") == "Y" ||
 				"METHOD_FORMAT"	=> "FormatEvent_Photo",
 				"HAS_CB" => "Y",
 				"FULL_SET" => array("photo", "photo_photo", "photo_comment"),
+				"COMMENT_EVENT"	=> array(
+					"EVENT_ID" => "photoalbum_comment",
+					"OPERATION" => "view",
+					"OPERATION_ADD"	=> "view",
+					"ADD_CALLBACK" => array("CSocNetPhotoCommentEvent", "AddComment_PhotoAlbum"),
+					"CLASS_FORMAT" => "CSocNetLogTools",
+					"METHOD_FORMAT"	=> "FormatComment_PhotoAlbum"
+				)
 			),
 			"photo_photo" =>  array(
 				"OPERATION" => "view",

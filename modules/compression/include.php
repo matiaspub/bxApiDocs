@@ -10,27 +10,35 @@ class CCompress
 
 	public static function OnAfterEpilog()
 	{
-		$bShowTime = ($_SESSION["SESS_SHOW_TIME_EXEC"] == 'Y');
-		$bShowStat = ($GLOBALS["DB"]->ShowSqlStat && ($GLOBALS["USER"]->IsAdmin() || $_SESSION["SHOW_SQL_STAT"]=="Y"));
+		global $USER;
+
+		$canEditPHP = $USER->CanDoOperation('edit_php');
+		$bShowTime = isset($_SESSION["SESS_SHOW_TIME_EXEC"]) && ($_SESSION["SESS_SHOW_TIME_EXEC"] == 'Y');
+		$bShowStat = ($GLOBALS["DB"]->ShowSqlStat && ($canEditPHP || $_SESSION["SHOW_SQL_STAT"]=="Y"));
+		$bShowCacheStat = (\Bitrix\Main\Data\Cache::getShowCacheStat() && ($canEditPHP || $_SESSION["SHOW_CACHE_STAT"]=="Y"));
+		$bExcel = isset($_REQUEST["mode"]) && $_REQUEST["mode"] === 'excel';
 		$ENCODING = CCompress::CheckCanGzip();
 		if($ENCODING !== 0)
 		{
 			$level = 4;
 
-			if (strtoupper($_GET["compress"])=="Y")
-				$_SESSION["SESS_COMPRESS"] = "Y";
-			elseif (strtoupper($_GET["compress"])=="N")
-				unset($_SESSION["SESS_COMPRESS"]);
-
-			if(!defined("ADMIN_AJAX_MODE") && !defined('PUBLIC_AJAX_MODE'))
+			if (isset($_GET["compress"]))
 			{
-				if($bShowTime || $bShowStat)
+				if ($_GET["compress"] === "Y" || $_GET["compress"] === "y")
+					$_SESSION["SESS_COMPRESS"] = "Y";
+				elseif ($_GET["compress"] === "N" || $_GET["compress"] === "n")
+					unset($_SESSION["SESS_COMPRESS"]);
+			}
+
+			if(!defined("ADMIN_AJAX_MODE") && !defined('PUBLIC_AJAX_MODE') && !$bExcel)
+			{
+				if($bShowTime || $bShowStat || $bShowCacheStat)
 				{
 					$main_exec_time = round((getmicrotime()-START_EXEC_TIME), 4);
 					include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/debug_info.php");
 				}
 
-				if($_SESSION["SESS_COMPRESS"]=="Y")
+				if(isset($_SESSION["SESS_COMPRESS"]) && $_SESSION["SESS_COMPRESS"] == "Y")
 					include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/compression/table.php");
 			}
 
@@ -57,7 +65,7 @@ class CCompress
 		{
 			ob_end_flush();
 			ob_end_flush();
-			if(($bShowTime || $bShowStat) && !defined("ADMIN_AJAX_MODE") && !defined('PUBLIC_AJAX_MODE'))
+			if(($bShowTime || $bShowStat || $bShowCacheStat) && !defined("ADMIN_AJAX_MODE") && !defined('PUBLIC_AJAX_MODE'))
 			{
 				$main_exec_time = round((getmicrotime()-START_EXEC_TIME), 4);
 				include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/debug_info.php");

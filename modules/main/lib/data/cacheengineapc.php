@@ -2,7 +2,7 @@
 namespace Bitrix\Main\Data;
 
 class CacheEngineApc
-	implements ICacheEngine
+	implements ICacheEngine, ICacheEngineStat
 {
 	private $sid = "";
 	//cache stats
@@ -16,6 +16,21 @@ class CacheEngineApc
 			$this->sid = $v["sid"];
 		else
 			$this->sid = "BX";
+	}
+
+	public function getReadBytes()
+	{
+		return $this->read;
+	}
+
+	public function getWrittenBytes()
+	{
+		return $this->written;
+	}
+
+	static public function getCachePath()
+	{
+		return "";
 	}
 
 	static public function isAvailable()

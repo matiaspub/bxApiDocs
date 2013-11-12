@@ -81,16 +81,13 @@ class CClock
 
 		function bxLoadClock_<?=$arParams['inputId']?>(callback)
 		{
-<?
-		if($arParams['view'] != 'inline'):
-?>
+			<?if($arParams['view'] != 'inline'):?>
 			if (!window.JCClock && !window.jsUtils)
 			{
 				return setTimeout(function(){bxLoadClock_<?=$arParams['inputId']?>(callback);}, 50);
 			}
-<?
-		endif;
-?>
+			<?endif;?>
+
 			if (!window.JCClock)
 			{
 				if(!!window.bClockLoading)
@@ -104,9 +101,10 @@ class CClock
 				}
 			}
 
-			delete window.bClockLoading;
+			window.bClockLoading = false;
 
 			var obId = 'bxClock_<?=$arParams['inputId']?>';
+
 			window[obId] = new JCClock({
 				step: <?=$arParams['step']?>,
 				initTime: '<?=$arParams['initTime']?>',
@@ -130,7 +128,8 @@ class CClock
 
 		function bxShowClock_<?=$arParams['inputId']?>(id)
 		{
-			bxLoadClock_<?=$arParams['inputId']?>(function(obClock) {
+			bxLoadClock_<?=$arParams['inputId']?>(function(obClock)
+			{
 				obClock.Show(id);
 			});
 		}

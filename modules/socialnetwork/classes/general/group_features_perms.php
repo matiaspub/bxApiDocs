@@ -194,8 +194,28 @@ class CAllSocNetFeaturesPerms
 		if ($bSuccess)
 		{
 			$bSuccess = $DB->Query("DELETE FROM b_sonet_features2perms WHERE ID = ".$ID."", true);
-			if ($bSuccess && defined("BX_COMP_MANAGED_CACHE"))
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_features2perms_".$ID);
+			if ($bSuccess)
+			{
+				if (defined("BX_COMP_MANAGED_CACHE"))
+				{
+					$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_features2perms_".$ID);
+				}
+				else
+				{
+					$dbGroupFeaturePerm = CSocNetFeaturesPerms::GetList(
+						array(),
+						array("ID" => $ID),
+						false,
+						false,
+						array("FEATURE_ENTITY_TYPE", "FEATURE_ENTITY_ID")
+					);
+					if ($arGroupFeaturePerm = $dbGroupFeaturePerm->Fetch())
+					{
+						$cache = new CPHPCache;
+						$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."_".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
+					}
+				}
+			}
 		}
 
 		return $bSuccess;
@@ -281,7 +301,24 @@ class CAllSocNetFeaturesPerms
 				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 			if (defined("BX_COMP_MANAGED_CACHE"))
+			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_features2perms_".$ID);
+			}
+			else
+			{
+				$dbGroupFeaturePerm = CSocNetFeaturesPerms::GetList(
+					array(),
+					array("ID" => $ID),
+					false,
+					false,
+					array("FEATURE_ENTITY_TYPE", "FEATURE_ENTITY_ID")
+				);
+				if ($arGroupFeaturePerm = $dbGroupFeaturePerm->Fetch())
+				{
+					$cache = new CPHPCache;
+					$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."_".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
+				}
+			}
 		}
 		else
 			$ID = False;

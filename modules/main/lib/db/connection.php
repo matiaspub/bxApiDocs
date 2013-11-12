@@ -53,6 +53,21 @@ abstract class Connection
 			$this->dbOptions = self::PERSISTENT | self::DEFERRED;
 	}
 
+	public function getDbHost()
+	{
+		return $this->dbHost;
+	}
+
+	public function getDbLogin()
+	{
+		return $this->dbLogin;
+	}
+
+	public function getDbName()
+	{
+		return $this->dbName;
+	}
+
 	public function setConnectionResourceNoDemand(&$dbCon)
 	{
 		$this->resource = &$dbCon;
@@ -374,6 +389,9 @@ abstract class Connection
 
 		return isset($tableFields[$columnName]) ? $tableFields[$columnName] : null;
 	}
+
+	abstract public function renameTable($currentName, $newName);
+	abstract public function dropColumn($tableName, $columnName);
 
 	/*********************************************************
 	 * Transaction

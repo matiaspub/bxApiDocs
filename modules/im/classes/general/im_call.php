@@ -11,6 +11,7 @@ class CIMCall
 
 		global $DB, $USER;
 
+		$arConfig['RECIPIENT_ID'] = intval($arParams['RECIPIENT_ID']);
 		$arConfig['USER_ID'] = intval($arParams['USER_ID']) > 0? intval($arParams['USER_ID']): IntVal($USER->GetID());
 		$arConfig['VIDEO'] = isset($arParams['VIDEO']) && $arParams['VIDEO'] == 'N'? 'N': 'Y';
 
@@ -20,6 +21,13 @@ class CIMCall
 
 		$arConfig['CALL_TO_GROUP'] = $arChat['chat'][$arConfig['CHAT_ID']]['type'] == IM_MESSAGE_GROUP;
 		$arConfig['STATUS_TYPE'] = intval($arChat['chat'][$arConfig['CHAT_ID']]['call']);
+
+		if (!$arConfig['CALL_TO_GROUP'] && !IsModuleInstalled('intranet') && CIMSettings::GetPrivacy(CIMSettings::PRIVACY_CALL, $arConfig['RECIPIENT_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT
+			&& CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arConfig['USER_ID'], $arConfig['RECIPIENT_ID']))
+		{
+			$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_CALL_PRIVACY'), "ERROR_FROM_PRIVACY");
+			return false;
+		}
 
 		if ($arConfig['STATUS_TYPE'] != IM_CALL_NONE)
 		{
@@ -362,7 +370,7 @@ class CIMCall
 			}
 			else
 			{
-				self::MessageToPrivate($arConfig['USER_ID'], $arConfig['RECIPIENT_ID'], "IM_CALL_CHAT_OFFLINE", true, false);
+				self::MessageToPrivate($arConfig['RECIPIENT_ID'], $arConfig['USER_ID'], "IM_CALL_CHAT_OFFLINE", true, false);
 			}
 		}
 		else if ($arParams['REASON'] == 'errorAccess')

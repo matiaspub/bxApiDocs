@@ -1,5 +1,15 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
+/**
+ * Class CSecurityCloudMonitorRequest
+ * @since 12.5.0
+ */
 class CSecurityCloudMonitorRequest
 {
 	const BITRIX_CHECKER_URL_PATH = "/bitrix/site_checker.php";
@@ -8,24 +18,25 @@ class CSecurityCloudMonitorRequest
 	const REMOTE_STATUS_FATAL_ERROR = "fatal_error";
 	const CONNECTION_TIMEOUT = 10;
 
-	private static $mValidActions = array("check", "get_results");
+	private static $validActions = array("check", "get_results");
 	protected $response = array();
 	protected $checkingToken = "";
 
-	public function __construct($pAction, $pToken = "")
+	public function __construct($action, $token = "")
 	{
-		if(!in_array($pAction, self::$mValidActions))
+		if(!in_array($action, self::$validActions))
 			return null;
-		$this->checkingToken = $pToken;
-		$this->response = $this->receiveData($pAction);
+
+		$this->checkingToken = $token;
+		$this->response = $this->receiveData($action);
 	}
 
 	/**
-	 * @param string $pCheckingToken
+	 * @param string $checkingToken
 	 */
-	public function setCheckingToken($pCheckingToken)
+	public function setCheckingToken($checkingToken)
 	{
-		$this->checkingToken = $pCheckingToken;
+		$this->checkingToken = $checkingToken;
 	}
 
 	/**
@@ -38,12 +49,12 @@ class CSecurityCloudMonitorRequest
 
 	/**
 	 * Make a request to the Bitrix server and returns the result
-	 * @param array $pAction
+	 * @param array $action
 	 * @return array|bool
 	 */
-	public function receiveData($pAction)
+	public function receiveData($action)
 	{
-		$payload = $this->getPayload($pAction, false);
+		$payload = $this->getPayload($action, false);
 		if(!$payload)
 			return false;
 
@@ -102,14 +113,14 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * @param string $pkey
+	 * @param string $key
 	 * @return string
 	 */
-	public function getValue($pkey)
+	public function getValue($key)
 	{
-		if(isset($this->response[$pkey]))
+		if(isset($this->response[$key]))
 		{
-			return $this->response[$pkey];
+			return $this->response[$key];
 		}
 		else
 		{
@@ -118,48 +129,48 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * @param string $pStatus
+	 * @param string $status
 	 * @return bool
 	 */
-	protected function checkStatus($pStatus)
+	protected function checkStatus($status)
 	{
-		return 	(isset($this->response["status"]) && $this->response["status"] === $pStatus);
+		return 	(isset($this->response["status"]) && $this->response["status"] === $status);
 	}
 
 	/**
 	 * Generate payload for request to Bitrix
-	 * @param string $pAction - "check" or "receive_results"
-	 * @param bool $pCollectSystemInformation
+	 * @param string $action - "check" or "receive_results"
+	 * @param bool $collectSystemInformation
 	 * @return string
 	 */
-	protected function getPayload($pAction = "check", $pCollectSystemInformation = true)
+	protected function getPayload($action = "check", $collectSystemInformation = true)
 	{
-		if(!in_array($pAction, self::$mValidActions))
+		if(!in_array($action, self::$validActions))
 			return false;
 
 		$payload = array(
-				"action" => $pAction,
+				"action" => $action,
 				"host"   => self::getHostName(),
 				"lang"   => LANGUAGE_ID,
 				"license_key" => self::getLicenseKey(),
 				"spd" => CUpdateClient::getSpd(),
 				"testing_token" => $this->checkingToken
 			);
-		if($pCollectSystemInformation || $pAction === "check")
+		if($collectSystemInformation || $action === "check")
 			$payload["system_information"] = base64_encode(serialize(self::getSystemInformation()));
 		return $payload;
 	}
 
 
 	/**
-	 * @param string $pResponse
+	 * @param string $response
 	 * @return array
 	 */
-	protected static function decodeResponse($pResponse)
+	protected static function decodeResponse($response)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
-		$result = json_decode($pResponse, true);
+		$result = json_decode($response, true);
 		if(!defined("BX_UTF"))
 			$result = $APPLICATION->ConvertCharsetArray($result, "UTF-8", LANG_CHARSET);
 		return $result;

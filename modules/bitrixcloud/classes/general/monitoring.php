@@ -71,6 +71,45 @@ class CBitrixCloudMonitoring
 			return $result;
 		}
 	}
+	static public function addDevice($domain, $deviceId)
+	{
+		if ($deviceId != "")
+		{
+			$option = CBitrixCloudOption::getOption('monitoring_devices');
+			$devices = $option->getArrayValue();
+			$devices[] = $domain."|".$deviceId;
+			$option->setArrayValue($devices);
+		}
+	}
+	static public function deleteDevice($domain, $deviceId)
+	{
+		if ($deviceId != "")
+		{
+			$option = CBitrixCloudOption::getOption('monitoring_devices');
+			$devices = $option->getArrayValue();
+			$index = array_search($domain."|".$deviceId, $devices);
+			if ($index !== false)
+			{
+				unset($devices[$index]);
+				$option->setArrayValue($devices);
+			}
+		}
+	}
+	static public function getDevices($domain)
+	{
+		$result = array();
+		$option = CBitrixCloudOption::getOption('monitoring_devices');
+		$devices = $option->getArrayValue();
+		foreach($devices as $domain_device)
+		{
+			if (list ($myDomain, $myDevice) = explode("|", $domain_device, 2))
+			{
+				if ($myDomain === $domain)
+					$result[] = $myDevice;
+			}
+		}
+		return $result;
+	}
 	/*
 	 * Registers new monitoring job with the remote service.
 	 * Returns empty string on success.

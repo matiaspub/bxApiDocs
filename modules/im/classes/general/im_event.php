@@ -30,12 +30,14 @@ class CIMEvent
 				)
 				{
 					$arFIELDS_FORMATTED = call_user_func(array($arEventTmp["CLASS_FORMAT"], $arEventTmp["METHOD_FORMAT"]), $arComment, array());
-					$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), htmlspecialcharsback($arFIELDS_FORMATTED["EVENT_FORMATTED"]["MESSAGE"])), '<br>');
-				}
-				else
-					$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), $arComment["MESSAGE"]), '<br>');
 
-				$arParams['ENTITY_LINK'] = '';
+					$CCTP = new CTextParser();
+					$CCTP->MaxStringLen = 200;
+					$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+					$arComment["MESSAGE"] = $CCTP->convertText($arFIELDS_FORMATTED["EVENT_FORMATTED"]["MESSAGE"]);
+				}
+
+				$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), $arComment["MESSAGE"]));
 
 				$arMessageFields = array(
 					"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,

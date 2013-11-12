@@ -1,6 +1,8 @@
 <?php
 namespace Bitrix\Main\IO;
 
+use Bitrix\Main;
+
 abstract class FileSystemEntry
 {
 	protected $path = null;
@@ -8,14 +10,17 @@ abstract class FileSystemEntry
 	protected $documentRoot = null;
 	protected $pathPhysical = null;
 
-	public function __construct($path)
+	public function __construct($path, $siteId = null)
 	{
 		if (empty($path))
 			throw new InvalidPathException($path);
 
 		$this->originalPath = $path;
 		$this->path = Path::normalize($path);
-		$this->documentRoot = \Bitrix\Main\Application::getDocumentRoot();
+		if ($siteId === null)
+			$this->documentRoot = Main\Application::getDocumentRoot();
+		else
+			$this->documentRoot = Main\SiteTable::getDocumentRoot($siteId);
 
 		if (empty($this->path))
 			throw new InvalidPathException($path);
@@ -23,7 +28,8 @@ abstract class FileSystemEntry
 
 	public function isSystem()
 	{
-		$isSystem = false;
+		if (preg_match("#/\\.#", $this->path))
+			return true;
 
 		if (substr($this->path, 0, strlen($this->documentRoot)) === $this->documentRoot)
 		{
@@ -35,12 +41,16 @@ abstract class FileSystemEntry
 				$s = $relativePath;
 			$s = strtolower(rtrim($s, "."));
 
-			$uploadDirName = \COption::getOptionString("main", "upload_dir", "upload");
-			if (in_array($s, array("bitrix", $uploadDirName)))
-				$isSystem = true;
+			$ar = array(
+				"bitrix" => 1,
+				Main\Config\Option::get("main", "upload_dir", "upload") => 1,
+				"urlrewrite.php" => 1,
+			);
+			if (isset($ar[$s]))
+				return true;
 		}
 
-		return $isSystem;
+		return false;
 	}
 
 	public function getName()

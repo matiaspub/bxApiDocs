@@ -1458,6 +1458,32 @@ class CAllForumMessage
 
 		return $arEvent;
 	}
+
+	/**
+	 * @param $arFilter - array("FORUM_ID" => 241, "TOPIC_ID" => 82383, "APPROVED" => "Y")
+	 * @param $rights - string(1) (A|R|U|W);
+	 */
+	public static function setWebdavRights($arFilter, $rights)
+	{
+		if (IsModuleInstalled("webdav"))
+		{
+			$arFilter = (is_array($arFilter) ? $arFilter : array($arFilter));
+			$arFilter[">UF_FORUM_MESSAGE_DOC"] = 0;
+			$db_res = CForumMessage::GetList(array("ID" => "ASC"), $arFilter, false, 0, array("SELECT" => array("UF_FORUM_MESSAGE_DOC")));
+			$arDocs = array();
+			if ($db_res && ($res = $db_res->Fetch()))
+			{
+				do {
+					if (!empty($res["UF_FORUM_MESSAGE_DOC"]) && is_array($res["UF_FORUM_MESSAGE_DOC"]))
+						$arDocs = array_merge($arDocs, $res["UF_FORUM_MESSAGE_DOC"]);
+				} while ($res = $db_res->Fetch());
+			}
+			if (!empty($arDocs) && CModule::IncludeModule("webdav"))
+			{
+				CWebDavIblock::appendRightsOnElements($arDocs, $rights);
+			}
+		}
+	}
 }
 
 class _CMessageDBResult extends CDBResult
@@ -1466,6 +1492,13 @@ class _CMessageDBResult extends CDBResult
 	public function _CMessageDBResult($res, $params = array())
 	{
 		$this->sNameTemplate = (!empty($params["sNameTemplate"]) ? $params["sNameTemplate"] : '');
+		$this->checkUserFields = false;
+		$this->arUserFields = false;
+		if (array_key_exists("SELECT", $params))
+		{
+			$this->arUserFields = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("FORUM_MESSAGE", 0, LANGUAGE_ID);
+			$this->checkUserFields = (!empty($this->arUserFields));
+		}
 		parent::CDBResult($res);
 	}
 	public function Fetch()
@@ -1608,6 +1641,19 @@ class _CMessageDBResult extends CDBResult
 						}
 						$res[$name] = (!empty($tmp) ? $tmp : $res[$name]);
 						unset($res[$name."_FRMT"]);
+					}
+				}
+			}
+
+			if ($this->checkUserFields)
+			{
+				$arUF = array_intersect_key($res, $this->arUserFields);
+				if (empty($arUF))
+					$this->checkUserFields = false;
+				else {
+					foreach($arUF as $k => $v) {
+						$res[$k] = $this->arUserFields[$k];
+						$res[$k]["VALUE"] = $v;
 					}
 				}
 			}

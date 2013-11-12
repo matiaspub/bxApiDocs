@@ -1133,7 +1133,7 @@ class CSocNetLogTools
 			$parser = (is_object($parser) ? $parser : (is_object($parserLog) ? $parserLog : new logTextParser(false, $arParams["PATH_TO_SMILE"])));
 			if (get_class($parser) == "forumTextParser")
 			{
-				$parser->arUserfields = $arResult["EVENT_FORMATTED"]["UF"];
+				$parser->arUserfields = $arFields["UF"];
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = $parser->convert(
 					$arResult["EVENT_FORMATTED"]["MESSAGE"],
 					array(
@@ -1146,7 +1146,7 @@ class CSocNetLogTools
 						"NL2BR" => "Y", "MULTIPLE_BR" => "N",
 						"VIDEO" => "Y", "LOG_VIDEO" => "N",
 						"SHORT_ANCHOR" => "Y",
-						"USERFIELDS" => $arResult["EVENT_FORMATTED"]["UF"]
+						"USERFIELDS" => $arFields["UF"]
 					),
 					"html",
 					$arResult["EVENT_FORMATTED"]["FILES"]);
@@ -1166,7 +1166,7 @@ class CSocNetLogTools
 						"NL2BR" => "Y", "MULTIPLE_BR" => "N",
 						"VIDEO" => "Y", "LOG_VIDEO" => "N",
 						"SHORT_ANCHOR" => "Y",
-						"USERFIELDS" => $arResult["EVENT_FORMATTED"]["UF"]
+						"USERFIELDS" => $arFields["UF"]
 					)
 				);
 
@@ -1754,6 +1754,78 @@ class CSocNetLogTools
 		return $arResult;
 	}
 
+	public static function FormatComment_PhotoAlbum($arFields, $arParams, $bMail = false, $arLog = array())
+	{
+	
+		$arResult = array(
+			"EVENT_FORMATTED"	=> array(
+				"TITLE" => ($bMail || $arParams["USE_COMMENT"] != "Y" ? GetMessage("SONET_GL_COMMENT_TITLE_PHOTO_ALBUM") : ""),
+				"MESSAGE" => ($bMail ? $arFields["TEXT_MESSAGE"] : $arFields["MESSAGE"])
+			),
+		);
+
+		if ($bMail)
+		{
+		}
+		elseif($arParams["USE_COMMENT"] != "Y")
+			$arResult["ENTITY"] = CSocNetLogTools::FormatEvent_GetEntity($arFields, $arParams, false);
+
+		if ($bMail)
+		{
+
+		}
+		else
+		{
+			static $parserLog = false;
+			if (CModule::IncludeModule("forum"))
+			{
+				$arAllow = array(
+					"HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y",
+					"IMG" => "Y", "LOG_IMG" => "N",
+					"QUOTE" => "Y", "LOG_QUOTE" => "N",
+					"CODE" => "Y", "LOG_CODE" => "N",
+					"FONT" => "Y", "LOG_FONT" => "N",
+					"LIST" => "Y",
+					"SMILES" => "Y",
+					"NL2BR" => "Y",
+					"MULTIPLE_BR" => "N",
+					"VIDEO" => "Y", "LOG_VIDEO" => "N",
+					"USERFIELDS" => $arFields["UF"],
+					"USER" => "Y"
+				);
+
+				if (!$parserLog)
+					$parserLog = new forumTextParser(LANGUAGE_ID);
+
+				$parserLog->arUserfields = $arFields["UF"];
+				
+				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
+			}
+			else
+			{
+				$arAllow = array(
+					"HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y",
+					"IMG" => "Y", "LOG_IMG" => "N",
+					"QUOTE" => "Y", "LOG_QUOTE" => "N",
+					"CODE" => "Y", "LOG_CODE" => "N",
+					"FONT" => "Y", "LOG_FONT" => "N",
+					"LIST" => "Y",
+					"SMILES" => "Y",
+					"NL2BR" => "Y",
+					"MULTIPLE_BR" => "N",
+					"VIDEO" => "Y", "LOG_VIDEO" => "N"
+				);
+
+				if (!$parserLog)
+					$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+
+				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
+			}
+		}
+
+		return $arResult;
+	}
+	
 	public static function FormatEvent_Files($arFields, $arParams, $bMail = false)
 	{
 		if (
@@ -2213,7 +2285,7 @@ class CSocNetLogTools
 			$arResult["EVENT_FORMATTED"] = array(
 				"TITLE" => $title,
 				"TITLE_24" => $title_24,
-				"MESSAGE" => $arFields["MESSAGE"],
+				"MESSAGE" => htmlspecialcharsbx($arFields["MESSAGE"]),
 				"DESCRIPTION" => $message_24_1,
 				"DESCRIPTION_STYLE" => "task"
 			);
@@ -4003,6 +4075,9 @@ class CSocNetLogTools
 								&& sizeof($arRecipientsIDs)
 							)
 							{
+								$parser = new CTextParser();
+								$message_notify = $parser->convert4mail($arFields['TEXT_MESSAGE']);
+
 								$extranetSiteId = false;
 								if (CModule::IncludeModule('extranet')
 									&& method_exists('CExtranet', 'GetExtranetSiteID')
@@ -4107,17 +4182,8 @@ class CSocNetLogTools
 									
 									$messageUrl .= "MID=" . $messageID;
 
-									$MESSAGE_SITE = trim(
-										htmlspecialcharsbx(
-											strip_tags(
-												str_replace(
-													array("\r\n","\n","\r"), 
-													' ', 
-													htmlspecialcharsback($arFields['TEXT_MESSAGE'])
-													)
-												)
-											)
-										);
+									$MESSAGE_SITE = $message_notify;
+
 									$dot = strlen($MESSAGE_SITE)>=100? '...': '';
 									$MESSAGE_SITE = substr($MESSAGE_SITE, 0, 99) . $dot;
 
@@ -4657,6 +4723,7 @@ class CSocNetLogTools
 				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
 				$arSiteData[$arSite["ID"]] = array(
 					"GROUPS_PATH" => COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]),
+					"USER_PATH" => COption::GetOptionString("socialnetwork", "user_page", $arSite["DIR"]."company/personal/", $arSite["ID"]),
 					"SERVER_NAME" => (
 						strlen($serverName) > 0
 							? $serverName
@@ -4683,10 +4750,11 @@ class CSocNetLogTools
 		$server_name = (CMain::IsHTTPS() ? "https" : "http")."://".$arSiteData[$user_site_id]["SERVER_NAME"];
 
 		$arUrl = str_replace(
-			array("#SERVER_NAME#", "#GROUPS_PATH#"),
+			array("#SERVER_NAME#", "#GROUPS_PATH#", "#USER_PATH#"),
 			array(
 				$server_name,
-				$arSiteData[$user_site_id]["GROUPS_PATH"]
+				$arSiteData[$user_site_id]["GROUPS_PATH"],
+				$arSiteData[$user_site_id]["USER_PATH"]
 			),
 			$arUrl
 		);
@@ -4774,6 +4842,25 @@ class CSocNetLogTools
 			case "BITRIX24_NEW_USER_COMMENT":
 				$log_type = "comment";
 				$log_event_id = array("bitrix24_new_user_comment");
+				break;
+			case "VOTING":
+				$log_type = "log";
+				$log_event_id = array("blog_post", "blog_post_important");
+				if (CModule::IncludeModule("blog"))
+				{
+					$rsBlogPost = CBlogPost::GetList(
+						array("ID" => "DESC"), 
+						array("UF_BLOG_POST_VOTE" => $rating_entity_id),
+						false,
+						array("nTopCount" => 1),
+						array("ID")
+					);
+
+					if ($arBlogPost = $rsBlogPost->Fetch())
+					{
+						$rating_entity_id = $arBlogPost["ID"];
+					}
+				}
 				break;
 			case "LOG_ENTRY":
 				$log_type = "log_entry";

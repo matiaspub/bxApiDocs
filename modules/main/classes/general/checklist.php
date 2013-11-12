@@ -668,9 +668,9 @@ class CAutoCheck
 							if (!$arShowHead[0] || count($arShowHead[0]) != 3)
 								$arMessage .= GetMessage("NO_SHOWHEAD", array("#template#" => $dir))."\n";
 						}
-						if (count($arShowTitle) == 0)
+						if (!in_array($dir, array('empty')) && count($arShowTitle) == 0)
 							$arMessage .= GetMessage("NO_SHOWTITLE", array("#template#" => $dir))."\n";
-						if (count($arShowPanel) == 0)
+						if (!in_array($dir, array('mobile_app', 'desktop_app', 'empty')) && count($arShowPanel) == 0)
 							$arMessage .= GetMessage("NO_SHOWPANEL", array("#template#" => $dir))."\n";
 					}
 				}

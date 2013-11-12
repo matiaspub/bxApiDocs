@@ -9,7 +9,6 @@ namespace Bitrix\Main;
 
 use Bitrix\Main\IO;
 use Bitrix\Main\Security;
-use Bitrix\Main\Web\Uri;
 
 /**
  * Http application extends application. Contains http specific methods.
@@ -26,13 +25,12 @@ class HttpApplication extends Application
 
 	/**
 	 * Initializes context of the current request.
+	 *
+	 * @param array $params Request parameters
 	 */
 	protected function initializeContext(array $params)
 	{
 		$context = new HttpContext($this);
-
-		//$context->setLanguage('en');
-		//$context->setSite(SITE_ID);
 
 		$server = new Server($params["server"]);
 

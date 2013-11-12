@@ -131,7 +131,7 @@ class CForumEMail
 		return '';
 	}
 
-	public static function SocnetEMailMessageCheck($arMessageFields, $ACTION_VARS)
+	public static function SocnetEMailMessageCheck(&$arMessageFields, $ACTION_VARS)
 	{
 		//print_r($arMessageFields);
 		$arEmails = CMailUtil::ExtractAllMailAddresses($arMessageFields["FIELD_TO"].",".$arMessageFields["FIELD_CC"].",".$arMessageFields["FIELD_BCC"]);

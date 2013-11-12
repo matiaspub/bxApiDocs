@@ -692,11 +692,11 @@ class CBitrixComponent
 		if ($this->__cachePath === false)
 			$this->__cachePath = $CACHE_MANAGER->getCompCachePath($this->__relativePath);
 
-		$this->__cache = new CPHPCache;
+		$this->__cache = \Bitrix\Main\Data\Cache::createInstance();
 		if ($this->__cache->startDataCache($cacheTime, $this->__cacheID, $this->__cachePath))
 		{
 			$this->__NavNum = $GLOBALS["NavNum"];
-			if (defined("BX_COMP_MANAGED_CACHE"))
+			if (defined("BX_COMP_MANAGED_CACHE") && $this->__cache->isStarted())
 				$CACHE_MANAGER->startTagCache($this->__cachePath);
 
 			return true;
@@ -826,9 +826,10 @@ class CBitrixComponent
 		if (!empty($this->__editButtons))
 			$arCache["templateCachedData"]["__editButtons"] = $this->__editButtons;
 
+		$cacheWasStarted = $this->__cache->isStarted();
 		$this->__cache->endDataCache($arCache);
 
-		if (defined("BX_COMP_MANAGED_CACHE"))
+		if (defined("BX_COMP_MANAGED_CACHE") && $cacheWasStarted)
 			$CACHE_MANAGER->endTagCache();
 
 		$this->__cache = null;
@@ -850,9 +851,10 @@ class CBitrixComponent
 		if (!$this->__cache)
 			return null;
 
+		$cacheWasStarted = $this->__cache->isStarted();
 		$this->__cache->abortDataCache();
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
+		if(defined("BX_COMP_MANAGED_CACHE") && $cacheWasStarted)
 			$CACHE_MANAGER->abortTagCache();
 
 		$this->__cache = null;

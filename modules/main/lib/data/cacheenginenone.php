@@ -2,8 +2,23 @@
 namespace Bitrix\Main\Data;
 
 class CacheEngineNone
-	implements ICacheEngine
+	implements ICacheEngine, ICacheEngineStat
 {
+	static public function getReadBytes()
+	{
+		return 0;
+	}
+
+	static public function getWrittenBytes()
+	{
+		return 0;
+	}
+
+	static public function getCachePath()
+	{
+		return "";
+	}
+
 	static public function isAvailable()
 	{
 		return true;

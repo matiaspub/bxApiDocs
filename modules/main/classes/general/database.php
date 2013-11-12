@@ -1361,7 +1361,8 @@ class CAllDBResult
 	var $is_filtered = false;
 	var $nStartPage = 0;
 	var $nEndPage = 0;
-
+	/** @var \Bitrix\Main\DB\Result */
+	var $resultObject = null;
 
 	/** @param CDBResult $res */
 	public function CAllDBResult($res = null)
@@ -1391,6 +1392,7 @@ class CAllDBResult
 			$this->bDescPageNumbering = $res->bDescPageNumbering;
 			$this->SqlTraceIndex = $res->SqlTraceIndex;
 			$this->DB = $res->DB;
+			$this->arUserMultyFields = $res->arUserMultyFields;
 		}
 		elseif($obj && $res instanceof \Bitrix\Main\DB\ArrayResult)
 		{
@@ -1399,6 +1401,7 @@ class CAllDBResult
 		elseif($obj && $res instanceof \Bitrix\Main\DB\Result)
 		{
 			$this->result = $res->getResource();
+			$this->resultObject = $res;
 		}
 		elseif(is_array($res))
 		{
@@ -1444,6 +1447,7 @@ class CAllDBResult
 	}
 
 	/**
+	 * @abstract
 	 * @return array
 	 */
 	
@@ -1478,6 +1482,15 @@ class CAllDBResult
 	 * @author Bitrix
 	 */
 	public static function Fetch()
+	{
+		return array();
+	}
+
+	/**
+	 * @abstract
+	 * @return array
+	 */
+	protected function FetchInternal()
 	{
 		return array();
 	}

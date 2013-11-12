@@ -594,8 +594,29 @@ class CAllSocNetUserToGroup
 				CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 			}
 		}
-		elseif(strlen(trim($RequestConfirmUrl)) > 0)
+		elseif (
+			strlen(trim($RequestConfirmUrl)) > 0
+			&& CModule::IncludeModule("im")
+		)
 		{
+			static $serverName;
+			if (!$serverName)
+			{
+				$dbSite = CSite::GetByID(SITE_ID);
+				$arSite = $dbSite->Fetch();
+				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
+				if (strlen($serverName) <= 0)
+				{
+					if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
+						$serverName = SITE_SERVER_NAME;
+					else
+						$serverName = COption::GetOptionString("main", "server_name", "");
+					if (strlen($serverName) <=0)
+						$serverName = $_SERVER["SERVER_NAME"];
+				}
+				$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".$serverName;
+			}
+
 			// send sonet system messages to owner and (may be) moderators to accept or refuse request
 			if ($arGroup["INITIATE_PERMS"] == SONET_ROLES_OWNER)
 				$FilterRole = SONET_ROLES_OWNER;
@@ -615,80 +636,56 @@ class CAllSocNetUserToGroup
 			);
 			if ($dbRequests)
 			{
-				$emailTemplate = 'SONET_REQUEST_GROUP';
-
-				$rsUser = CUser::GetByID($userID);
-				$arUser = $rsUser->GetNext();
-				$userName = $arUser["NAME"]." ".$arUser["LAST_NAME"];
-
-				$groupName = $arGroup["NAME"];
-
 				while ($arRequests = $dbRequests->GetNext())
 				{
-					if (CModule::IncludeModule("im"))
-					{
-						$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
-						$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
-						$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
-						$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
-						
-						$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRequests["USER_ID"]);
-						$groupUrl = $arTmp["URLS"]["GROUP_URL"];
+					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+					$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
+					$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
+					$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
+					
+					$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRequests["USER_ID"]);
+					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
-						$arMessageFields = array(
-							"TO_USER_ID" => $arRequests["USER_ID"],
-							"FROM_USER_ID" => $userID,
-							"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
-							"NOTIFY_MODULE" => "socialnetwork",
-							"NOTIFY_EVENT" => "invite_group_btn",
-							"NOTIFY_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID)."|".$arRequests["USER_ID"],
-							"NOTIFY_SUB_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID),
-							"NOTIFY_TITLE" => str_replace(
-								"#GROUP_NAME#", 
-								$groupName,
-								GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+					$arMessageFields = array(
+						"TO_USER_ID" => $arRequests["USER_ID"],
+						"FROM_USER_ID" => $userID,
+						"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
+						"NOTIFY_MODULE" => "socialnetwork",
+						"NOTIFY_EVENT" => "invite_group_btn",
+						"NOTIFY_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID)."|".$arRequests["USER_ID"],
+						"NOTIFY_SUB_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID),
+						"NOTIFY_TITLE" => str_replace(
+							"#GROUP_NAME#", 
+							$arGroup["NAME"],
+							GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+						),
+						"NOTIFY_MESSAGE" => str_replace(
+							array(
+								"#TEXT#", 
+								"#GROUP_NAME#"
+							), 
+							array(
+								$message, 
+								"<a href=\"".$groupUrl."\" class=\"bx-notifier-item-action\">".$arGroup["NAME"]."</a>"
 							),
-							"NOTIFY_MESSAGE" => str_replace(
-								array(
-									"#TEXT#", 
-									"#GROUP_NAME#"
-								), 
-								array(
-									$message, 
-									"<a href=\"".$groupUrl."\" class=\"bx-notifier-item-action\">".$groupName."</a>"
-								),
-								(empty($message)
-									? GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
-									: GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT")
-								)
-							),
-							"NOTIFY_BUTTONS" => Array(
-								Array("TITLE" => GetMessage("SONET_UG_REQUEST_CONFIRM"), "VALUE" => "Y", "TYPE" => "accept"),
-								Array("TITLE" => GetMessage("SONET_UG_REQUEST_REJECT"), "VALUE" => "N", "TYPE" => "cancel"),
-							),
-						);
+							(empty($message)
+								? GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+								: GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT")
+							)
+						),
+						"NOTIFY_BUTTONS" => Array(
+							Array("TITLE" => GetMessage("SONET_UG_REQUEST_CONFIRM"), "VALUE" => "Y", "TYPE" => "accept"),
+							Array("TITLE" => GetMessage("SONET_UG_REQUEST_REJECT"), "VALUE" => "N", "TYPE" => "cancel"),
+						),
+					);
 
-						$dbSite = CSite::GetByID(SITE_ID);
-						$arSite = $dbSite->Fetch();
-						$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
-						if (strlen($serverName) <= 0)
-						{
-							if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
-								$serverName = SITE_SERVER_NAME;
-							else
-								$serverName = COption::GetOptionString("main", "server_name", "");
-							if (strlen($serverName) <=0)
-								$serverName = $_SERVER["SERVER_NAME"];
-						}
-						$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".$serverName;
-						$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
+					$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
 
-						$arMessageFields["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE"];
-						$arMessageFields["NOTIFY_MESSAGE_OUT"] .= "\n\n".GetMessage("SONET_UG_GROUP_LINK").$groupUrl;
-						$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage("SONET_UG_REQUEST_CONFIRM_REJECT").": ".$RequestConfirmUrl;
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE"];
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] .= "\n\n".GetMessage("SONET_UG_GROUP_LINK").$groupUrl;
+					$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage("SONET_UG_REQUEST_CONFIRM_REJECT").": ".$RequestConfirmUrl;
 
-						CIMNotify::Add($arMessageFields);
-					}
+					CIMNotify::Add($arMessageFields);
 				}
 			}
 		}
@@ -986,8 +983,8 @@ class CAllSocNetUserToGroup
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -1497,6 +1494,9 @@ class CAllSocNetUserToGroup
 		$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 		$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
 
+		if (CModule::IncludeModule("im"))
+			$bIMIncluded = true;
+
 		for ($i = 0; $i < $tmp_count; $i++)
 		{
 			$arRelationID[$i] = IntVal($arRelationID[$i]);
@@ -1518,14 +1518,14 @@ class CAllSocNetUserToGroup
 			{
 				$arSuccessRelations[] = $arRelation;
 
-				if (CModule::IncludeModule("im"))
+				if ($bIMIncluded)
 				{
 					$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRelation["USER_ID"]);
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -1683,8 +1683,8 @@ class CAllSocNetUserToGroup
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -2116,8 +2116,8 @@ class CAllSocNetUserToGroup
 			$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 			if (
-				strpos($url, "http://") === 0
-				|| strpos($url, "https://") === 0
+				strpos($groupUrl, "http://") === 0
+				|| strpos($groupUrl, "https://") === 0
 			)
 				$serverName = "";
 			else
@@ -2138,7 +2138,7 @@ class CAllSocNetUserToGroup
 				"NOTIFY_MESSAGE_OUT" => str_replace(
 					"#NAME#",
 					$arGroup["NAME"],
-					GetMessage("SONET_UG_OWNER2MEMBER_MESSAGE")." (".$serverName.$url.")"
+					GetMessage("SONET_UG_OWNER2MEMBER_MESSAGE")." (".$serverName.$groupUrl.")"
 				)
 			);
 
@@ -2152,8 +2152,8 @@ class CAllSocNetUserToGroup
 			$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 			if (
-				strpos($url, "http://") === 0
-				|| strpos($url, "https://") === 0
+				strpos($groupUrl, "http://") === 0
+				|| strpos($groupUrl, "https://") === 0
 			)
 				$serverName = "";
 			else
@@ -2174,7 +2174,7 @@ class CAllSocNetUserToGroup
 				"NOTIFY_MESSAGE_OUT" => str_replace(
 					"#NAME#",
 					$arGroup["NAME"],
-					GetMessage("SONET_UG_MEMBER2OWNER_MESSAGE")." (".$serverName.$url.")"
+					GetMessage("SONET_UG_MEMBER2OWNER_MESSAGE")." (".$serverName.$groupUrl.")"
 				)
 			);
 

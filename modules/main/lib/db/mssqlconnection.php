@@ -37,6 +37,9 @@ class MssqlConnection extends Connection
 		$this->resource = $connection;
 		$this->isConnected = true;
 
+		// hide cautions
+		sqlsrv_configure ("WarningsReturnAsErrors", 0);
+
 		global $DB, $USER, $APPLICATION;
 		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
 			include($fn);
@@ -80,7 +83,7 @@ class MssqlConnection extends Connection
 		$this->lastQueryResult = $result;
 
 		if (!$result)
-			throw new SqlException('MS Sql query error', $this->getErrorMessage());
+			throw new SqlQueryException('MS Sql query error', $this->getErrorMessage(), $sql);
 
 		return $result;
 	}
@@ -188,6 +191,16 @@ class MssqlConnection extends Connection
 			}
 		}
 		return $this->tableColumnsCache[$tableName];
+	}
+
+	public function renameTable($currentName, $newName)
+	{
+		$this->query('EXEC sp_rename '.$this->getSqlHelper()->quote($currentName).', '.$this->getSqlHelper()->quote($newName));
+	}
+
+	public function dropColumn($tableName, $columnName)
+	{
+		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP COLUMN '.$this->getSqlHelper()->quote($columnName));
 	}
 
 	/*********************************************************

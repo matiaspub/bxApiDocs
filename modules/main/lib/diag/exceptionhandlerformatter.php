@@ -15,6 +15,10 @@ class ExceptionHandlerFormatter
 			$result .= static::severityToString($exception->getSeverity());
 
 		$result .= "\n".static::getMessage($exception)."\n";
+
+		if ($exception instanceof Main\DB\SqlQueryException)
+			$result .= $exception->getQuery()."\n";
+
 		$fileLink = static::getFileLink($exception->getFile(), $exception->getLine());
 		$result .= $fileLink.(empty($fileLink) ? "" : "\n");
 

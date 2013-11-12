@@ -252,7 +252,7 @@ class CAllFile
 			if (!array_key_exists("size", $arFile))
 				$arFile["size"] = CUtil::BinStrlen($arFile["content"]);
 		}
-		else
+		elseif(file_exists($arFile["tmp_name"]))
 		{
 			$arFile["size"] = filesize($arFile["tmp_name"]);
 		}

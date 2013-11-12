@@ -221,7 +221,7 @@ class CBitrixCloudCDN
 		self::$proto = CMain::IsHTTPS() ? "https" : "http";
 		self::$config = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
 
-		//if (self::$config->isExpired()
+		if (self::$config->isExpired())
 		{
 			if(!self::updateConfig())
 				return;
@@ -257,6 +257,7 @@ class CBitrixCloudCDN
 					|src=
 					|BX\\.loadCSS\\(
 					|BX\\.loadScript\\(
+					|BX\\.getCDNPath\\(
 					|jsUtils\\.loadJSFile\\(
 					|background\\s*:\\s*url\\(
 				))                                                   #attribute

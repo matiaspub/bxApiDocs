@@ -106,6 +106,8 @@ $arAllOptions = array(
 		Array("translit_original_file_name", GetMessage("MAIN_OPTION_TRANSLIT"), "N", Array("checkbox", "Y")),
 		Array("convert_original_file_name", GetMessage("MAIN_OPTION_FNAME_CONV_AUTO"), "Y", Array("checkbox", "Y")),
 		Array("image_resize_quality", GetMessage("MAIN_OPTIONS_IMG_QUALITY"), "95", Array("text", "10")),
+		Array("bx_fast_download", GetMessage("MAIN_OPT_BX_FAST_DOWNLOAD"), "N", Array("checkbox", "N")),
+		Array("note" => GetMessage("MAIN_OPT_BX_FAST_DOWNLOAD_HINT")),
 
 		GetMessage("MAIN_OPTIMIZE_CSS_SETTINGS"),
 		Array("optimize_css_files", GetMessage("MAIN_OPTIMIZE_CSS"), "N", Array("checkbox", "Y")),
@@ -114,7 +116,7 @@ $arAllOptions = array(
 
 		GetMessage("MAIN_OPTIMIZE_TRANSLATE_SETTINGS"),
 		Array("translate_key_yandex", GetMessage("MAIN_TRANSLATE_KEY_YANDEX"), "", Array("text", 30)),
-		Array("translate_key_yandex_hint", "", BeginNote().GetMessage("MAIN_TRANSLATE_KEY_YANDEX_HINT").EndNote(), Array("statichtml", "")),
+		Array("note" => GetMessage("MAIN_TRANSLATE_KEY_YANDEX_HINT")),
 
 		GetMessage("MAIN_OPT_TIME_ZONES"),
 		array("curr_time", GetMessage("MAIN_OPT_TIME_ZONES_LOCAL"), GetMessage("MAIN_OPT_TIME_ZONES_DIFF")." ".date('O')." (".date('Z').")<br>".GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD")." ".(date('I')? GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD_S") : GetMessage("MAIN_OPT_TIME_ZONES_DIFF_STD_ST"))."<br>".GetMessage("MAIN_OPT_TIME_ZONES_DIFF_DATE")." ".date('r'), array("statichtml")),

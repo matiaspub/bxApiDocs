@@ -43,7 +43,7 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 		$arFilter = array("%NAME" => $search, "ACTIVE"=>"Y");
 		if($arParams["SITE_ID"] <> '')
 			$arFilter["SITE_ID"] = $arParams["SITE_ID"];
-		if(!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"]))
+		if(!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"], ($arParams["SITE_ID"] <> '' ? true : false)))
 			$arFilter["CHECK_PERMISSIONS"] = $USER->GetID();
 		
 		$rsGroups = CSocNetGroup::GetList(array("NAME" => "ASC"), $arFilter);

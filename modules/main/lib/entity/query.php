@@ -1007,6 +1007,10 @@ class Query
 				{
 					$field_type = 'double';
 				}
+				elseif ($field_type == 'enum')
+				{
+					$field_type = 'string';
+				}
 
 				//$is_having = $last->getValue() instanceof ExpressionField && $last->getValue()->isAggregated();
 

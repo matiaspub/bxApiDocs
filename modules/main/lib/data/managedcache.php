@@ -128,7 +128,7 @@ class ManagedCache
 	// Clears all managed_cache
 	public function cleanAll()
 	{
-		$this->cache= array();
+		$this->cache = array();
 		$this->cachePath = array();
 		$this->vars = array();
 		$this->ttl = array();

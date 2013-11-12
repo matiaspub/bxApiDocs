@@ -28,7 +28,7 @@ class CAllIMContactList
 			$ttl = 600;
 
 		$bIntranetEnable = false;
-		if(CModule::IncludeModule('intranet') && CModule::IncludeModule('iblock'))
+		if(IsModuleInstalled('intranet') && CModule::IncludeModule('intranet') && CModule::IncludeModule('iblock'))
 		{
 			$bIntranetEnable = true;
 			if (!(CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()))
@@ -408,6 +408,54 @@ class CAllIMContactList
 		return $arContactList;
 	}
 
+	public static function SearchUsers($searchText)
+	{
+		$searchText = trim($searchText);
+		if (strlen($searchText) <= 3)
+		{
+			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_CL_SEARCH_EMPTY"), "ERROR_SEARCH_EMPTY");
+			return false;
+		}
+
+		$nameTemplate = COption::GetOptionString("im", "user_name_template", "#LAST_NAME# #NAME#", SITE_ID);
+		$nameTemplateSite = CSite::GetNameFormat(false);
+
+		$arFilter = array(
+			"ACTIVE" => "Y",
+			"NAME_SEARCH" => $searchText,
+		);
+
+		$arSettings = CIMSettings::GetDefaultSettings(CIMSettings::SETTINGS);
+		if ($arSettings[CIMSettings::PRIVACY_SEARCH] == CIMSettings::PRIVACY_RESULT_ALL)
+			$arFilter['?UF_IM_SEARCH'] = "~".CIMSettings::PRIVACY_RESULT_CONTACT;
+		else
+			$arFilter['UF_IM_SEARCH'] = CIMSettings::PRIVACY_RESULT_ALL;
+
+		$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "IS_ONLINE"), 'SELECT' => Array('UF_IM_SEARCH'));
+		$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc')), ($dummy=''), $arFilter, $arExtParams);
+		while ($arUser = $dbUsers->GetNext(true, false))
+		{
+			$arFileTmp = CFile::ResizeImageGet(
+				$arUser["PERSONAL_PHOTO"],
+				array('width' => 58, 'height' => 58),
+				BX_RESIZE_IMAGE_EXACT,
+				false
+			);
+
+			$arUsers[$arUser["ID"]] = Array(
+				'id' => $arUser["ID"],
+				'select' => $arUser['UF_IM_SEARCH'],
+				'name' => CUser::FormatName($nameTemplateSite, $arUser, true, false),
+				'nameList' => CUser::FormatName($nameTemplate, $arUser, true, false),
+				'avatar' => empty($arFileTmp['src'])? '/bitrix/js/im/images/blank.gif': $arFileTmp['src'],
+				'status' => $arUser['IS_ONLINE'] == 'Y'? 'online': 'offline',
+				'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false), array("user_id" => $arUser["ID"]))
+			);
+
+		}
+		return Array('users' => $arUsers);
+	}
+
 	public static function AllowToSend($arParams)
 	{
 		$bResult = false;
@@ -577,7 +625,7 @@ class CAllIMContactList
 		$nameTemplateSite = CSite::GetNameFormat(false);
 
 		$bIntranetEnable = false;
-		if(CModule::IncludeModule('intranet'))
+		if(IsModuleInstalled('intranet') && CModule::IncludeModule('intranet'))
 			$bIntranetEnable = true;
 
 		if($useCache)
@@ -913,7 +961,7 @@ class CAllIMContactList
 		$nameTemplate = COption::GetOptionString("im", "user_name_template", "#LAST_NAME# #NAME#", SITE_ID);
 		$nameTemplateSite = CSite::GetNameFormat(false);
 		$nameOfSite = CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false;
-		$bIntranetEnable = CModule::IncludeModule('intranet')? true: false;
+		$bIntranetEnable = IsModuleInstalled('intranet') && CModule::IncludeModule('intranet')? true: false;
 
 		$arRecent = Array();
 		$arUsers = Array();

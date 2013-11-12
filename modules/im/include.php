@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 19);
+// define("IM_REVISION", 21);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");

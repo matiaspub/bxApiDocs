@@ -180,7 +180,11 @@ class CSocNetLogToolsPhoto
 			$logID = CSocNetLog::Add($arSonetFields, false);
 			if (intval($logID) > 0)
 			{
-				CSocNetLog::Update($logID, array("TMP_ID" => $logID));
+				CSocNetLog::Update($logID, array(
+					"TMP_ID" => $logID,
+					"RATING_TYPE_ID" => "IBLOCK_SECTION",
+					"RATING_ENTITY_ID" => $arFields["IBLOCK_SECTION"]
+				));
 				CSocNetLogRights::SetForSonet($logID, $entity_type, $entity_id, "photo", "view", true);
 				CSocNetLog::CounterIncrement($logID);
 			}
@@ -540,6 +544,86 @@ class CSocNetLogToolsPhoto
 
 class CSocNetPhotoCommentEvent
 {
+	public static function AddComment_PhotoAlbum($arFields)
+	{
+		$dbResult = CSocNetLog::GetList(
+			array(),
+			array(
+				"EVENT_ID" => array("photo"),
+				"ID" => $arFields["LOG_ID"]
+			),
+			false,
+			false,
+			array("ID", "SOURCE_ID", "USER_ID", "TITLE", "URL", "PARAMS")
+		);
+
+		$arLog = $dbResult->Fetch();
+		if (!$arLog)
+			$sError = GetMessage("SONET_PHOTO_ADD_COMMENT_SOURCE_ERROR");
+
+		if (
+			!$sError
+			&& intval($arLog["USER_ID"]) > 0
+			&& intval($arLog["SOURCE_ID"]) > 0
+			&& $arLog["USER_ID"] != $GLOBALS["USER"]->GetID()
+			&& CModule::IncludeModule("im")
+			&& CModule::IncludeModule("iblock")
+		)
+		{
+			$rsUnFollower = CSocNetLogFollow::GetList(
+				array(
+					"USER_ID" => $arLog["USER_ID"],
+					"CODE" => "L".$arLog["ID"],
+					"TYPE" => "N"
+				),
+				array("USER_ID")
+			);
+
+			$arUnFollower = $rsUnFollower->Fetch();
+			if (!$arUnFollower)
+			{
+				$rsSection = CIBlockSection::GetByID($arLog["SOURCE_ID"]);
+				if ($arSection = $rsSection->GetNext())
+				{
+					$arMessageFields = array(
+						"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+						"TO_USER_ID" => $arLog["USER_ID"],
+						"FROM_USER_ID" => $GLOBALS["USER"]->GetID(),
+						"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+						"NOTIFY_MODULE" => "photogallery",
+						"NOTIFY_EVENT" => "comment",
+						"LOG_ID" => $arLog["ID"],
+					);
+
+					$arTmp = CSocNetLogTools::ProcessPath(array("SECTION_URL" => $arLog["URL"]), $arLog["USER_ID"]);
+					$serverName = $arTmp["SERVER_NAME"];
+					$arLog["URL"] = $arTmp["URLS"]["SECTION_URL"];
+
+					$arMessageFields["NOTIFY_TAG"] = "PHOTOALBUM|COMMENT|".$arLog["SOURCE_ID"];
+					$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("SONET_PHOTOALBUM_IM_COMMENT", Array(
+						"#album_title#" => "<a href=\"".$arLog["URL"]."\" class=\"bx-notifier-item-action\">".$arSection["NAME"]."</a>"
+					));
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("SONET_PHOTOALBUM_IM_COMMENT", Array(
+						"#album_title#" => $arSection["NAME"]
+					))." (".$serverName.$arLog["URL"].")#BR##BR#".$arFields["TEXT_MESSAGE"];
+
+					$ID = CIMNotify::Add($arMessageFields);
+
+					if(!empty($arFields["MENTION_ID"]))
+					{
+						//
+					}
+				}
+			}
+		}
+
+		return array(
+			"NO_SOURCE" => "Y",
+			"ERROR" => $sError,
+			"NOTES" => ""
+		);
+	}
+
 	public static function AddComment_Photo($arFields)
 	{
 		$dbResult = CSocNetLog::GetList(
@@ -999,7 +1083,7 @@ class CSocNetPhotoCommentEvent
 						"CALLBACK_FUNC" => false,
 						"SOURCE_ID" => $arElement["ID"],
 						"PARAMS" => serialize($arLogParams),
-						"RATING_TYPE_ID" 	=> "IBLOCK_ELEMENT",
+						"RATING_TYPE_ID" => "IBLOCK_ELEMENT",
 						"RATING_ENTITY_ID"=> $arElement["ID"],
 					);
 

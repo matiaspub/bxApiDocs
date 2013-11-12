@@ -242,8 +242,8 @@ class CSocNetLogRights
 //			(CSocNetUser::IsUserModuleAdmin($userID, $siteID) ? " OR SLR.GROUP_CODE = 'SA'" : "").
 			(intval($userID) > 0 ? " OR (SLR.GROUP_CODE = 'AU')" : "").
 			" OR (SLR.GROUP_CODE = 'G2')".
-			(intval($userID) > 0 ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".$userID.")" : "")."
-			WHERE SLR.LOG_ID = ".$logID;
+			(intval($userID) > 0 ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).")" : "")."
+			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
@@ -256,7 +256,7 @@ class CSocNetLogRights
 	{
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
 			INNER JOIN b_user_access UA ON 0=1 OR (SLR.GROUP_CODE = 'AU') OR (SLR.GROUP_CODE = 'G2') 
-			WHERE SLR.LOG_ID = ".$logID;
+			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
@@ -274,7 +274,7 @@ class CSocNetLogRights
 			return false;
 
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
-			INNER JOIN b_user_access UA ON 0=1 OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".$userID.") 
+			INNER JOIN b_user_access UA ON 0=1 OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).") 
 			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);

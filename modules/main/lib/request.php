@@ -5,6 +5,10 @@ use Bitrix\Main\Type;
 use Bitrix\Main\Text;
 use Bitrix\Main\IO;
 
+/**
+ * Class Request contains current request
+ * @package Bitrix\Main
+ */
 abstract class Request
 	extends Type\ParameterDictionary
 {

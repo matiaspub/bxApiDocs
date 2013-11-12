@@ -305,6 +305,11 @@ class CForumMessage extends CAllForumMessage
 		$strSqlOrder = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
 		$arAddParams = (is_array($arAddParams) ? $arAddParams : array());
+		$obUserFieldsSql = new CUserTypeSQL;
+		$obUserFieldsSql->SetEntity("FORUM_MESSAGE", "FM.ID");
+		$obUserFieldsSql->SetSelect($arAddParams["SELECT"]);
+		$obUserFieldsSql->SetFilter($arFilter);
+		$obUserFieldsSql->SetOrder($arOrder);
 
 		foreach ($arFilter as $key => $val)
 		{
@@ -398,11 +403,18 @@ class CForumMessage extends CAllForumMessage
 					break;
 			}
 		}
-		if (count($arSqlSearch) > 0)
+		$r = $obUserFieldsSql->GetFilter();
+		if (!empty($r))
+			$arSqlSearch[] = $r;
+		if (!empty($arSqlSearch))
 			$strSqlSearch = " AND (".implode(") AND (", $arSqlSearch).") ";
 
 		if ($bCount || (is_array($arAddParams) && is_set($arAddParams, "bDescPageNumbering") && (intVal($arAddParams["nTopCount"])<=0)))
 		{
+			$strFrom = "FROM b_forum_message FM\n".$obUserFieldsSql->GetJoin("FM.ID")."\nWHERE 1 = 1 ".$strSqlSearch;
+			if($obUserFieldsSql->GetDistinct())
+				$strFrom = "FROM b_forum_message FM\n\tINNER JOIN (SELECT DISTINCT FM.ID ".$strFrom.") FM2 ON (FM2.ID=FM.ID)";
+
 			// This code was changed because of http://bugs.mysql.com/bug.php?id=64002
 			if ($bCount === "cnt_not_approved")
 			{
@@ -412,8 +424,7 @@ class CForumMessage extends CAllForumMessage
 						"MIN(CASE WHEN FM.NEW_TOPIC='Y' THEN FM.ID ELSE NULL END) AS FIRST_MESSAGE_ID, \n\t".
 						"SUM(CASE WHEN FM.APPROVED!='Y' THEN 1 ELSE 0 END) as CNT_NOT_APPROVED,\n\t".
 						"MAX(CASE WHEN FM.APPROVED='Y' THEN FM.ID ELSE 0 END) AS LAST_MESSAGE_ID \n".
-					"FROM b_forum_message FM\n".
-					"WHERE 1 = 1 ".$strSqlSearch;
+					$strFrom;
 
 				if (array_intersect_key($arFilter, array("FORUM_ID" => null)) ==  $arFilter && $arFilter["FORUM_ID"] > 0) { // High-usage
 					$db_res = $DB->Query($strSql . "\nGROUP BY FM.FORUM_ID", false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -422,7 +433,7 @@ class CForumMessage extends CAllForumMessage
 					$db_res = $DB->Query($strSql . "\nGROUP BY FM.TOPIC_ID", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					$ar_res = $db_res->Fetch();
 				} else {
-					$strSql = "SELECT COUNT(FM.ID) as CNT \nFROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+					$strSql = "SELECT COUNT(FM.ID) as CNT ".$strFrom;
 					$db_res = $DB->Query($strSql , false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					if ($db_res && $ar_res = $db_res->Fetch()) {
 						$strSql =
@@ -430,8 +441,7 @@ class CForumMessage extends CAllForumMessage
 							"MIN(CASE WHEN FM.NEW_TOPIC='Y' THEN FM.ID ELSE NULL END) AS FIRST_MESSAGE_ID, \n\t".
 							"SUM(CASE WHEN FM.APPROVED!='Y' THEN 1 ELSE 0 END) as CNT_NOT_APPROVED,\n\t".
 							"MAX(CASE WHEN FM.APPROVED='Y' THEN FM.ID ELSE 0 END) AS LAST_MESSAGE_ID \n".
-							"FROM b_forum_message FM\n".
-							"WHERE 1 = 1 ".$strSqlSearch;
+							$strFrom;
 						$db_res = $DB->Query($strSql , false, "File: ".__FILE__."<br>Line: ".__LINE__);
 						if ($db_res && $ar_res1 = $db_res->Fetch()) {
 							$ar_res = array_merge($ar_res1, $ar_res);
@@ -446,18 +456,17 @@ class CForumMessage extends CAllForumMessage
 				$ar_res = array();
 				if (array_intersect_key($arFilter, array("AUTHOR_ID" => null, "APPROVED" => null)) == $arFilter && $arFilter["AUTHOR_ID"] > 0) // High-usage
 				{
-					$strSql = "SELECT COUNT(FM.ID) as CNT, MAX(FM.ID) as LAST_MESSAGE_ID \n FROM b_forum_message FM ".
-						"\nWHERE 1 = 1 ".$strSqlSearch." \nGROUP BY FM.AUTHOR_ID"; // explain the same as without "GROUP BY"
+					$strSql = "SELECT COUNT(FM.ID) as CNT, MAX(FM.ID) as LAST_MESSAGE_ID \n ".$strFrom." \nGROUP BY FM.AUTHOR_ID"; // explain the same as without "GROUP BY"
 					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					if ($db_res)
 						$ar_res = $db_res->Fetch();
 				}
 				else
 				{
-					$strSql = "SELECT COUNT(FM.ID) as CNT \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+					$strSql = "SELECT COUNT(FM.ID) as CNT \n ".$strFrom;
 					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					if ($db_res && $ar_res = $db_res->Fetch()) {
-						$strSql = "SELECT MAX(FM.ID) as LAST_MESSAGE_ID \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+						$strSql = "SELECT MAX(FM.ID) as LAST_MESSAGE_ID \n ".$strFrom;
 						$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 						if ($db_res && $ar_res1 = $db_res->Fetch()) {
 							$ar_res["LAST_MESSAGE_ID"] = $ar_res1["LAST_MESSAGE_ID"];
@@ -468,7 +477,7 @@ class CForumMessage extends CAllForumMessage
 			}
 			else
 			{
-				$strSql = "SELECT COUNT(FM.ID) as CNT \n FROM b_forum_message FM \nWHERE 1 = 1 ".$strSqlSearch;
+				$strSql = "SELECT COUNT(FM.ID) as CNT \n ".$strFrom;
 				$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$iCnt = 0;
 				if ($db_res && $ar_res = $db_res->Fetch())
@@ -492,14 +501,37 @@ class CForumMessage extends CAllForumMessage
 			elseif ($by == "APPROVED") $arSqlOrder[] = " FM.APPROVED ".$order." ";
 			else
 			{
-				$arSqlOrder[] = " FM.ID ".$order." ";
-				$by = "ID";
+				$r = $obUserFieldsSql->GetOrder($by);
+				if (!!$r) {
+					$arSqlOrder[] = " ".$r." ".$order." ";
+				} else {
+					$arSqlOrder[] = " FM.ID ".$order." ";
+					$by = "ID";
+				}
 			}
 		}
 		$arSqlOrder = array_unique($arSqlOrder);
 		DelDuplicateSort($arSqlOrder);
-		if(count($arSqlOrder) > 0)
+		if(!empty($arSqlOrder))
 			$strSqlOrder = " ORDER BY ".implode(", ", $arSqlOrder);
+
+		$strSqlUserFieldJoin = $obUserFieldsSql->GetJoin("FM.ID");
+		if ($obUserFieldsSql->GetDistinct())
+		{
+			$obUserFieldsSqlSelect = new CUserTypeSQL;
+			$obUserFieldsSqlSelect->SetEntity("FORUM_MESSAGE", "FM.ID");
+			$obUserFieldsSqlSelect->SetSelect($arAddParams["SELECT"]);
+			$obUserFieldsSqlSelect->SetOrder($arOrder);
+
+			$strSqlUserFieldJoin =
+				$obUserFieldsSqlSelect->GetJoin("FM.ID")."
+				INNER JOIN (
+					SELECT DISTINCT FM.ID
+						FROM b_forum_message FM\n".
+						$obUserFieldsSql->GetJoin("FM.ID")."\n".
+				"WHERE 1 = 1 ".$strSqlSearch.") FM2 ON (FM2.ID = FM.ID) ";
+			$strSqlSearch = "";
+		}
 
 		$strSql =
 			"SELECT FM.ID,
@@ -511,6 +543,7 @@ class CForumMessage extends CAllForumMessage
 				FM.EDITOR_ID, FM.EDITOR_NAME, FM.EDITOR_EMAIL, FM.EDIT_REASON,
 				FU.SHOW_NAME, U.LOGIN, U.NAME, U.SECOND_NAME, U.LAST_NAME,
 				".$DB->DateToCharFunction("FM.EDIT_DATE", "FULL")." as EDIT_DATE, FM.PARAM1, FM.PARAM2, FM.HTML, FM.MAIL_HEADER".
+				$obUserFieldsSql->GetSelect().
 				(!empty($arAddParams["sNameTemplate"]) ?
 					",\n\t".CForumUser::GetFormattedNameFieldsForSelect(array_merge(
 						$arAddParams, array(
@@ -519,9 +552,9 @@ class CForumMessage extends CAllForumMessage
 						"sFieldName" => "AUTHOR_NAME_FRMT")), false) : "")."
 			FROM b_forum_message FM
 				LEFT JOIN b_forum_user FU ON (FM.AUTHOR_ID = FU.USER_ID)
-				LEFT JOIN b_user U ON (FM.AUTHOR_ID = U.ID)
-			WHERE 1 = 1
-			".$strSqlSearch."
+				LEFT JOIN b_user U ON (FM.AUTHOR_ID = U.ID)".
+				$strSqlUserFieldJoin."
+			WHERE 1 = 1 ".$strSqlSearch."
 			".$strSqlOrder;
 
 		$iNum = intVal($iNum);
@@ -530,16 +563,18 @@ class CForumMessage extends CAllForumMessage
 			$iNum = ($iNum > 0) ? $iNum : intVal($arAddParams["nTopCount"]);
 			$strSql .= " LIMIT 0,".$iNum;
 		}
+
 		if (!$iNum && is_array($arAddParams) && is_set($arAddParams, "bDescPageNumbering") && (intVal($arAddParams["nTopCount"])<=0))
 		{
 			$db_res =  new CDBResult();
+			$db_res->SetUserFields($GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("FORUM_MESSAGE"));
 			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
 		}
 		else
 		{
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$db_res->SetUserFields($GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("FORUM_MESSAGE"));
 		}
-
 		return new _CMessageDBResult($db_res, $arAddParams);
 	}
 
@@ -707,7 +742,7 @@ class CForumMessage extends CAllForumMessage
 					if(intVal($val) > 0)
 					{
 						$arSqlFrom["FUT"] = "
-							LEFT JOIN b_forum_user_topic FUT ON (FT.ID = FUT.TOPIC_ID AND FUT.USER_ID=".intVal($val).")";
+							LEFT JOIN b_forum_user_topic FUT ON (FM.TOPIC_ID = FUT.TOPIC_ID AND FUT.USER_ID=".intVal($val).")";
 					}
 					break;
 				case "NEW_MESSAGE":
@@ -1040,7 +1075,7 @@ class CForumFiles extends CAllForumFiles
 				case "FILE_ID":
 				case "MESSAGE_ID":
 				case "USER_ID":
-					if (($strOperation!="IN") && (intVal($val) > 0 || $val === 0) )
+					if (($strOperation!="IN") && (intVal($val) > 0 || $val === 0))
 					{
 						$arSqlSearch[] = ($strNegative=="Y"?" FF.".$key." IS NULL OR NOT ":"")."(FF.".$key." ".$strOperation." ".intVal($val)." )";
 						break;

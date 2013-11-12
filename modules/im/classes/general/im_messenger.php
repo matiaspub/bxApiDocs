@@ -115,6 +115,20 @@ class CIMMessenger
 			$arFields['FROM_USER_ID'] = intval($arFields['FROM_USER_ID']);
 			$arFields['TO_USER_ID'] = intval($arFields['TO_USER_ID']);
 
+			if (!IsModuleInstalled('intranet'))
+			{
+				if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE) == CIMSettings::PRIVACY_RESULT_CONTACT)
+				{
+					$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY_SELF'), "ERROR_FROM_PRIVACY_SELF");
+					return false;
+				}
+				else if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE, $arFields['TO_USER_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+				{
+					$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY'), "ERROR_FROM_PRIVACY");
+					return false;
+				}
+			}
+
 			$chatId = CIMMessage::GetChatId($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']);
 			if ($chatId > 0)
 			{
@@ -188,6 +202,7 @@ class CIMMessenger
 						$arPullTo['push_params'] = 'IM_MESS_'.$arParams['FROM_USER_ID'];
 						$arPullTo['push_tag'] = 'IM_MESS_'.$arParams['FROM_USER_ID'];
 						$arPullTo['push_sub_tag'] = 'IM_MESS';
+						$arPullTo['push_app_id'] = 'Bitrix24';
 						$arPullTo['push_text'] = preg_replace("/\[s\].*?\[\/s\]/i", "", $pushText);
 						$arPullTo['push_text'] = preg_replace("/\[[bui]\](.*?)\[\/[bui]\]/i", "$1", $arPullTo['push_text']);
 						$arPullTo['push_text'] = preg_replace("/------------------------------------------------------(.*)------------------------------------------------------/mi", " [".GetMessage('IM_QUOTE')."] ", str_replace(array("#BR#"), Array(" "), $arPullTo['push_text']));
@@ -304,8 +319,14 @@ class CIMMessenger
 					$arPullFrom = $arPullTo;
 					unset($arPullFrom['push_text']);
 
-					CPullStack::AddByUser($arParams['FROM_USER_ID'], $arPullFrom);
-					CPushManager::DeleteFromQueueBySubTag($arParams['FROM_USER_ID'], 'IM_MESS');
+					foreach ($arRel as $rel)
+					{
+						if ($rel['USER_ID'] == $arParams['FROM_USER_ID'])
+						{
+							CPullStack::AddByUser($arParams['FROM_USER_ID'], $arPullFrom);
+							CPushManager::DeleteFromQueueBySubTag($arParams['FROM_USER_ID'], 'IM_MESS');
+						}
+					}
 
 					$usersForBadges = Array();
 					foreach ($arRel as $rel)

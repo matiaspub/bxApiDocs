@@ -1,5 +1,15 @@
-<?php
+<?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
+/**
+ * Class CSecurityTestsPackage
+ * @since 12.5.0
+ */
 class CSecurityTestsPackage
 {
 	const SLOW_LOCAL_TESTS = "slow_local";
@@ -16,6 +26,7 @@ class CSecurityTestsPackage
 	protected static $slowLocalTests = array(
 		"CSecurityFilePermissionsTest",
 		"CSecurityTaintCheckingTest",
+		"CSecurityUserTest"
 	);
 
 	protected static $remoteTests = array(

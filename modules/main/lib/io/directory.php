@@ -4,9 +4,9 @@ namespace Bitrix\Main\IO;
 class Directory
 	extends DirectoryEntry
 {
-	static public function __construct($path)
+	static public function __construct($path, $siteId = null)
 	{
-		parent::__construct($path);
+		parent::__construct($path, $siteId);
 	}
 
 	public function isExists()

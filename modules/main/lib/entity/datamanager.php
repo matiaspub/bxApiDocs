@@ -343,9 +343,10 @@ abstract class DataManager
 		$result = new AddResult();
 
 		//event before adding
-		$event = new DataManagerEvent($entity, "OnBeforeAdd", array("fields"=>$data));
+		$event = new Event($entity, "OnBeforeAdd", array("fields"=>$data));
 		$event->send();
 		$event->getErrors($result);
+		$data = $event->mergeFields($data);
 
 		// check data
 		static::checkFields($result, $primary, $data);
@@ -356,7 +357,7 @@ abstract class DataManager
 		}
 
 		//event on adding
-		$event = new DataManagerEvent($entity, "OnAdd", array("fields"=>$data));
+		$event = new Event($entity, "OnAdd", array("fields"=>$data));
 		$event->send();
 
 		// save data
@@ -372,7 +373,7 @@ abstract class DataManager
 		//TODO: save Userfields
 
 		//event after adding
-		$event = new DataManagerEvent($entity, "OnAfterAdd", array("id"=>$id, "fields"=>$data));
+		$event = new Event($entity, "OnAfterAdd", array("id"=>$id, "fields"=>$data));
 		$event->send();
 
 		return $result;
@@ -395,9 +396,10 @@ abstract class DataManager
 		$result = new UpdateResult();
 
 		//event before update
-		$event = new DataManagerEvent($entity, "OnBeforeUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, "OnBeforeUpdate", array("id"=>$primary, "fields"=>$data));
 		$event->send();
 		$event->getErrors($result);
+		$data = $event->mergeFields($data);
 
 		// check data
 		static::checkFields($result, $primary, $data);
@@ -408,7 +410,7 @@ abstract class DataManager
 		}
 
 		//event on update
-		$event = new DataManagerEvent($entity, "OnUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, "OnUpdate", array("id"=>$primary, "fields"=>$data));
 		$event->send();
 
 		// save data
@@ -434,7 +436,7 @@ abstract class DataManager
 		//TODO: save Userfields
 
 		//event after update
-		$event = new DataManagerEvent($entity, "OnAfterUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, "OnAfterUpdate", array("id"=>$primary, "fields"=>$data));
 		$event->send();
 
 		return $result;
@@ -456,13 +458,13 @@ abstract class DataManager
 		$result = new DeleteResult();
 
 		//event before delete
-		$event = new DataManagerEvent($entity, "OnBeforeDelete", array("id"=>$primary));
+		$event = new Event($entity, "OnBeforeDelete", array("id"=>$primary));
 		$event->send();
 		if($event->getErrors($result))
 			return $result;
 
 		//event on delete
-		$event = new DataManagerEvent($entity, "OnDelete", array("id"=>$primary));
+		$event = new Event($entity, "OnDelete", array("id"=>$primary));
 		$event->send();
 
 		// delete
@@ -482,7 +484,7 @@ abstract class DataManager
 		$connection->queryExecute($sql);
 
 		//event after delete
-		$event = new DataManagerEvent($entity, "OnAfterDelete", array("id"=>$primary));
+		$event = new Event($entity, "OnAfterDelete", array("id"=>$primary));
 		$event->send();
 
 		// event POST

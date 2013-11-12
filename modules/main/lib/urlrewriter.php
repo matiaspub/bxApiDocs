@@ -2,6 +2,7 @@
 namespace Bitrix\Main;
 
 use \Bitrix\Main\Component;
+use Bitrix\Main\Config;
 use \Bitrix\Main\IO;
 
 class UrlRewriter
@@ -409,7 +410,7 @@ class UrlRewriter
 		if (!UrlRewriter::checkPath($pathAbs))
 			return 0;
 
-		$file = new \Bitrix\Main\IO\File($pathAbs);
+		$file = new IO\File($pathAbs);
 		if ($maxFileSize > 0 && $file->getFileSize() > $maxFileSize * 1024)
 			return 0;
 
@@ -465,15 +466,15 @@ class UrlRewriter
 			$arExc = array();
 			$arInc = array();
 
-			$inc = \COption::getOptionString("main", "urlrewrite_include_mask", "*.php");
-			$inc = str_replace("'", "\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\.", str_replace("\\", "/", $inc)))));
+			$inc = Config\Option::get("main", "urlrewrite_include_mask", "*.php");
+			$inc = str_replace("'", "\\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\\.", str_replace("\\", "/", $inc)))));
 			$arIncTmp = explode(";", $inc);
 			foreach ($arIncTmp as $preg_mask)
 				if (strlen(trim($preg_mask)) > 0)
 					$arInc[] = "'^".trim($preg_mask)."$'";
 
-			$exc = \COption::getOptionString("main", "urlrewrite_exclude_mask", "/bitrix/*;");
-			$exc = str_replace("'", "\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\.", str_replace("\\", "/", $exc)))));
+			$exc = Config\Option::get("main", "urlrewrite_exclude_mask", "/bitrix/*;");
+			$exc = str_replace("'", "\\'", str_replace("*", ".*?", str_replace("?", ".", str_replace(".", "\\.", str_replace("\\", "/", $exc)))));
 			$arExcTmp = explode(";", $exc);
 			foreach ($arExcTmp as $preg_mask)
 				if (strlen(trim($preg_mask)) > 0)
@@ -482,7 +483,7 @@ class UrlRewriter
 			$searchMasksCache = array("exc" => $arExc, "inc" => $arInc);
 		}
 
-		$file = \Bitrix\Main\IO\Path::getName($path);
+		$file = IO\Path::getName($path);
 		if (substr($file, 0, 1) === ".")
 			return 0;
 

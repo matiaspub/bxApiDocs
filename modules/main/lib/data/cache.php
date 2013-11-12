@@ -85,6 +85,10 @@ class Cache
 					if (extension_loaded('apc'))
 						$cacheEngine = new CacheEngineApc();
 					break;
+				case "xcache":
+					if (extension_loaded('xcache'))
+						$cacheEngine = new CacheEngineXCache();
+					break;
 				case "files":
 					$cacheEngine = new CacheEngineFiles();
 					break;
@@ -293,6 +297,9 @@ class Cache
 		if ($TTL <= 0)
 			return true;
 
+		if ($this->shouldClearCache())
+			return true;
+
 		ob_start();
 		$this->vars = $vars;
 		$this->isStarted = true;
@@ -350,6 +357,11 @@ class Cache
 	public function isCacheExpired($path)
 	{
 		return $this->cacheEngine->isCacheExpired($path);
+	}
+
+	public function isStarted()
+	{
+		return $this->isStarted;
 	}
 
 	public static function clearCache($full = false, $initDir = "")

@@ -84,6 +84,11 @@ abstract class Application
 		return static::$instance;
 	}
 
+	/**
+	 * Does minimally possible kernel initialization
+	 *
+	 * @throws SystemException
+	 */
 	public function initializeBasicKernel()
 	{
 		if ($this->isBasicKernelInitialized)
@@ -95,6 +100,12 @@ abstract class Application
 		$this->createDatabaseConnection();
 	}
 
+	/**
+	 * Does full kernel initialization. Should be called somewhere after initializeBasicKernel()
+	 *
+	 * @param array $params Parameters of the current request (depends on application type)
+	 * @throws SystemException
+	 */
 	public function initializeExtendedKernel(array $params)
 	{
 		if ($this->isExtendedKernelInitialized)
@@ -263,12 +274,14 @@ abstract class Application
 			Data\Cache::setClearCache($_GET["clear_cache"] === 'Y');
 	}
 
+	/*
 	final private function initializeDispatcher()
 	{
 		$dispatcher = new Dispatcher();
 		$dispatcher->initialize();
 		$this->dispatcher = $dispatcher;
 	}
+	*/
 
 	/**
 	 * @return \Bitrix\Main\Diag\ExceptionHandler
@@ -384,6 +397,11 @@ abstract class Application
 		return Loader::getDocumentRoot();
 	}
 
+	/**
+	 * Returns personal root directory (relative to document root)
+	 *
+	 * @return null|string
+	 */
 	public static function getPersonalRoot()
 	{
 		static $personalRoot = null;
@@ -406,6 +424,9 @@ abstract class Application
 	 */
 	public static function resetAccelerator()
 	{
+		if (defined("BX_NO_ACCELERATOR_RESET"))
+			return;
+
 		$fl = Config\Configuration::getValue("no_accelerator_reset");
 		if ($fl)
 			return;

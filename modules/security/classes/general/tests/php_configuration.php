@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityPhpConfigurationTest extends CSecurityBaseTest
+/**
+ * Class CSecurityPhpConfigurationTest
+ * @since 12.5.0
+ */
+class CSecurityPhpConfigurationTest
+	extends CSecurityBaseTest
 {
 	protected $internalName = "PhpConfigurationTest";
 

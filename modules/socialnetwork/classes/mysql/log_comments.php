@@ -39,9 +39,16 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		if ($bSetSource)
 		{
 			$arSource = CSocNetLogComments::SetSource($arFields);
-			if (intval($arSource["SOURCE_ID"]) > 0)
+			if (
+				$arSource["NO_SOURCE"] == "Y"
+				|| intval($arSource["SOURCE_ID"]) > 0
+			)
 			{
-				$arFields["SOURCE_ID"] = $arSource["SOURCE_ID"];
+				if ($arSource["NO_SOURCE"] == "Y")
+					$bSetSource = false;
+				else
+					$arFields["SOURCE_ID"] = $arSource["SOURCE_ID"];
+
 				if (
 					array_key_exists("RATING_ENTITY_ID", $arSource)
 					&& array_key_exists("RATING_TYPE_ID", $arSource)

@@ -109,7 +109,7 @@ class OracleConnection extends Connection
 			if ($trackerQuery != null)
 				$trackerQuery->finishQuery();
 
-			throw new SqlException("", $this->getErrorMessage());
+			throw new SqlQueryException("", $this->getErrorMessage(), $sql);
 		}
 
 		$executionMode = $this->transaction;
@@ -129,7 +129,7 @@ class OracleConnection extends Connection
 			if ($trackerQuery != null)
 				$trackerQuery->finishQuery();
 
-			throw new SqlException("", $this->getErrorMessage());
+			throw new SqlQueryException("", $this->getErrorMessage(), $sql);
 		}
 
 		if (!empty($arBinds))
@@ -300,6 +300,15 @@ class OracleConnection extends Connection
 		return $this->tableColumnsCache[$tableName];
 	}
 
+	public function renameTable($currentName, $newName)
+	{
+		$this->query('RENAME TABLE '.$this->getSqlHelper()->quote($currentName).' TO '.$this->getSqlHelper()->quote($newName));
+	}
+
+	public function dropColumn($tableName, $columnName)
+	{
+		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP '.$this->getSqlHelper()->quote($columnName));
+	}
 
 	/*********************************************************
 	 * Transaction

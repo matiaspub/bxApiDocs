@@ -7,8 +7,6 @@ class CSecurityFilter
 {
 	const DEFAULT_REQUEST_ORDER = "GP";
 	private $doBlock = false;
-	private $isUserBlocked = false;
-	private $action = "filter";
 	/** @var \Bitrix\Security\Filter\Request $requestFilter */
 	private $requestFilter = null;
 	/** @var \Bitrix\Security\Filter\Server $serverFilter */
@@ -19,22 +17,13 @@ class CSecurityFilter
 
 	public function __construct($customOptions = array(), $char = "")
 	{
-		if(isset($customOptions["action"]))
-		{
-			$this->action = $customOptions["action"];
-		}
-		else
-		{
-			$this->action = \COption::getOptionString("security", "filter_action");
-		}
-
 		if(isset($customOptions["stop"]))
 		{
 			$this->doBlock = $customOptions["stop"];
 		}
 		else
 		{
-			$this->doBlock = \COption::getOptionString("security", "filter_stop");
+			$this->doBlock = (\COption::getOptionString("security", "filter_stop") === 'Y');
 		}
 
 		$this->requestFilter = new Filter\Request($customOptions);
@@ -244,16 +233,25 @@ class CSecurityFilter
 		$this->getHttpRequest()->addFilter($this->requestFilter);
 		$this->context->getServer()->addFilter($this->serverFilter);
 
-		if ($this->isSomethingChanged())
+		if ($this->isAuditorsTriggered())
 		{
-			$this->overrideSuperGlobals();
-			$this->doPostProccessActions();
+			if ($this->isSomethingChanged())
+			{
+				$this->overrideSuperGlobals();
+
+				if ($this->currentUserHaveRightsForSkip())
+				{
+					$this->showForm();
+				}
+			}
+
+			$this->doPostProcessActions();
 		}
 	}
 
 	protected function overrideSuperGlobals()
 	{
-		global $HTTP_GET_VARS, $HTTP_POST_VARS, $HTTP_COOKIE_VARS, $HTTP_REQUEST_VARS;
+		global $HTTP_GET_VARS, $HTTP_POST_VARS, $HTTP_COOKIE_VARS, $HTTP_REQUEST_VARS, $HTTP_SERVER_VARS;
 
 		self::cleanGlobals();
 
@@ -261,6 +259,7 @@ class CSecurityFilter
 		$_GET = $httpRequest->getQueryList()->toArray();
 		$_POST = $httpRequest->getPostList()->toArray();
 		$_COOKIE = $httpRequest->getCookieRawList()->toArray();
+		$_SERVER = $this->context->getServer()->toArray();
 
 		self::reconstructRequest();
 		self::restoreGlobals();
@@ -269,6 +268,19 @@ class CSecurityFilter
 		$HTTP_POST_VARS = $_POST;
 		$HTTP_COOKIE_VARS = $_COOKIE;
 		$HTTP_REQUEST_VARS = $_REQUEST;
+		$HTTP_SERVER_VARS = $_SERVER;
+	}
+
+	/**
+	 * @since 14.0.3
+	 * @return bool
+	 */
+	protected function isAuditorsTriggered()
+	{
+		return (
+			$this->requestFilter->isAuditorsTriggered()
+			|| $this->serverFilter->isAuditorsTriggered()
+		);
 	}
 
 	/**
@@ -276,7 +288,10 @@ class CSecurityFilter
 	 */
 	protected function isSomethingChanged()
 	{
-		return count($this->requestFilter->getChangedVars()) > 0;
+		return (
+			count($this->requestFilter->getChangedVars()) > 0
+			|| count($this->serverFilter->getChangedVars()) > 0
+		);
 	}
 
 	/**
@@ -306,19 +321,6 @@ class CSecurityFilter
 	/**
 	 * @return bool
 	 */
-	protected function isNeedShowForm()
-	{
-		if ($this->action === "none")
-			return false;
-
-		return
-			count($this->requestFilter->getChangedVars()) > 0
-			|| count($this->serverFilter->getChangedVars()) > 0;
-	}
-
-	/**
-	 * @return bool
-	 */
 	protected static function currentUserHaveRightsForSkip()
 	{
 		/** @global CUser $USER */
@@ -331,44 +333,33 @@ class CSecurityFilter
 
 
 	/**
-	 * @param string $pIP
+	 * @param string $ip
+	 * @return bool
 	 */
-	protected function blockCurrentUser($pIP = "")
+	protected function blockCurrentUser($ip = "")
 	{
-		static $blocked = array();
-
 		if(self::currentUserHaveRightsForSkip())
-			return;
+			return false;
 
-		if(is_string($pIP) && $pIP != "")
-		{
-			$ip = $pIP;
-		}
-		else
-		{
+		if(!is_string($ip) || $ip === "")
 			$ip = $_SERVER["REMOTE_ADDR"];
-		}
 
-		if(!array_key_exists($ip, $blocked))
-		{
-			$rule = new CSecurityIPRule;
+		$rule = new CSecurityIPRule;
 
-			CTimeZone::Disable();
-			$rule->Add(array(
-				"RULE_TYPE" => "A",
-				"ACTIVE" => "Y",
-				"ADMIN_SECTION" => "Y",
-				"NAME" => getMessage("SECURITY_FILTER_IP_RULE", array("#IP#" => $ip)),
-				"ACTIVE_FROM" => ConvertTimeStamp(false, "FULL"),
-				"ACTIVE_TO" => ConvertTimeStamp(time()+COption::getOptionInt("security", "filter_duration")*60, "FULL"),
-				"INCL_IPS" => array($ip),
-				"INCL_MASKS" => array("*"),
-			));
-			CTimeZone::Enable();
+		CTimeZone::Disable();
+		$added = $rule->Add(array(
+			"RULE_TYPE" => "A",
+			"ACTIVE" => "Y",
+			"ADMIN_SECTION" => "Y",
+			"NAME" => getMessage("SECURITY_FILTER_IP_RULE", array("#IP#" => $ip)),
+			"ACTIVE_FROM" => ConvertTimeStamp(false, "FULL"),
+			"ACTIVE_TO" => ConvertTimeStamp(time()+COption::getOptionInt("security", "filter_duration")*60, "FULL"),
+			"INCL_IPS" => array($ip),
+			"INCL_MASKS" => array("*"),
+		));
+		CTimeZone::Enable();
 
-			$blocked[$ip] = true;
-			$this->isUserBlocked = true;
-		}
+		return ($added > 0);
 	}
 
 	/**
@@ -406,14 +397,12 @@ class CSecurityFilter
 		return $safetyVars;
 	}
 
-	/**
-	 *
-	 */
 	protected static function cleanGlobals()
 	{
+		$safetyGlobals = self::getSafetyGlobals();
 		foreach($_REQUEST as $key => $value)
 		{
-			if($value === $GLOBALS[$key] && !array_key_exists($key, self::getSafetyGlobals()))
+			if(!isset($safetyGlobals[$key]) && $value === $GLOBALS[$key])
 			{
 				unset($GLOBALS[$key]);
 			}
@@ -466,17 +455,15 @@ class CSecurityFilter
 		}
 	}
 
-	/**
-	 *
-	 */
 	protected static function restoreGlobals()
 	{
+		$safetyGlobals = self::getSafetyGlobals();
 		foreach($_REQUEST as $key => $value)
 		{
-			if(!array_key_exists($key, self::getSafetyGlobals())
+			if(!isset($safetyGlobals[$key])
 				&& !(
-				isset($GLOBALS[$key])
-				|| array_key_exists($key, $GLOBALS)
+					isset($GLOBALS[$key])
+					|| array_key_exists($key, $GLOBALS)
 				)
 			)
 			{
@@ -485,26 +472,19 @@ class CSecurityFilter
 		}
 	}
 
-	protected function doPostProccessActions()
+	protected function doPostProcessActions()
 	{
-		if($this->currentUserHaveRightsForSkip() && $this->isNeedShowForm())
-		{
-			$postVars = $this->getHttpRequest()->getPostList()->toArrayRaw();
-			if (!$postVars)
-				$postVars = array();
-			$this->showForm($postVars);
-		}
-		elseif($this->isUserBlocked && CSecurityIPRule::IsActive())
+		if (
+			$this->isBlockNeeded()
+			&& $this->blockCurrentUser()
+			&& CSecurityIPRule::IsActive()
+		)
 		{
 			CSecurityIPRule::OnPageStart(true);
 		}
 	}
 
-
-	/**
-	 * @param array $originalPostVars
-	 */
-	protected function showForm($originalPostVars = array())
+	protected function showForm()
 	{
 		if(!isset($_POST['____SECFILTER_CONVERT_JS']) || empty($_POST['____SECFILTER_CONVERT_JS']))
 		{
@@ -542,6 +522,10 @@ class CSecurityFilter
 			}
 			else
 			{
+				$originalPostVars = $this->getHttpRequest()->getPostList()->toArrayRaw();
+				if (!$originalPostVars)
+					$originalPostVars = array();
+
 				$this->showHtmlForm($originalPostVars);
 			}
 
@@ -575,6 +559,7 @@ class CSecurityFilter
 	<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=<?echo LANG_CHARSET?>" />
+		<meta name="robots" content="none" />
 		<title><?echo getMessage("SECURITY_FILTER_FORM_TITLE")?></title>
 		<link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 		<link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />

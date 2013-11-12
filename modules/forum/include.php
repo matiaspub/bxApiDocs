@@ -129,10 +129,12 @@ $forumCache = new CForumCacheManager();
 $forumEventManager = new ForumEventManager();
 
 
-function ForumCurrUserPermissions($FID)
+function ForumCurrUserPermissions($FID, $arAddParams = array())
 {
 	static $arCache = array();
-	if (! isset($arCache[$FID]))
+	$arAddParams = (is_array($arAddParams) ? $arAddParams : array());
+	$arAddParams["PERMISSION"] = (!!$arAddParams["PERMISSION"] ? $arAddParams["PERMISSION"] : '');
+	if (! isset($arCache[$FID.$arAddParams["PERMISSION"]]))
 	{
 		if ($GLOBALS["USER"]->IsAdmin() || $GLOBALS["APPLICATION"]->GetGroupRight("forum") >= "W")
 		{
@@ -140,7 +142,7 @@ function ForumCurrUserPermissions($FID)
 		}
 		else
 		{
-			$strPerms = CForumNew::GetUserPermission($FID, $GLOBALS["USER"]->GetUserGroupArray());
+			$strPerms = (!!$arAddParams["PERMISSION"] ? $arAddParams["PERMISSION"] : CForumNew::GetUserPermission($FID, $GLOBALS["USER"]->GetUserGroupArray()));
 			if ($strPerms <= "E")
 			{
 				$result = $strPerms;
@@ -155,10 +157,10 @@ function ForumCurrUserPermissions($FID)
 				$result = $strPerms;
 			}
 		}
-		$arCache[$FID] = $result;
+		$arCache[$FID.$arAddParams["PERMISSION"]] = $result;
 	}
 
-	return $arCache[$FID];
+	return $arCache[$FID.$arAddParams["PERMISSION"]];
 }
 
 function ForumSubscribeNewMessagesEx($FID, $TID, $NEW_TOPIC_ONLY, &$strErrorMessage, &$strOKMessage, $strSite = false, $SOCNET_GROUP_ID = false)
@@ -500,7 +502,7 @@ function ForumAddMessage(
 		$bUpdateTopic = True;
 	}
 ?><?
-	if ($MESSAGE_TYPE =="EDIT" && (ForumCurrUserPermissions($FID) > "Q" && $arFieldsG["EDIT_ADD_REASON"] == "N"))
+	if ($MESSAGE_TYPE =="EDIT" && (ForumCurrUserPermissions($FID, $arParams) > "Q" && $arFieldsG["EDIT_ADD_REASON"] == "N"))
 		$bAddEditNote = false;
 	//*************************!CAPTCHA********************************************************************************
 	if (!$USER->IsAuthorized() && $arForum["USE_CAPTCHA"]=="Y")
@@ -660,7 +662,7 @@ function ForumAddMessage(
 		else
 		{
 			$arFieldsG["APPROVED"] = ($arForum["MODERATION"]=="Y") ? "N" : "Y";
-			if (ForumCurrUserPermissions($FID)>="Q")
+			if (ForumCurrUserPermissions($FID, $arParams)>="Q")
 				$arFieldsG["APPROVED"] = "Y";
 		}
 
@@ -966,7 +968,7 @@ function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage
 		{
 			while ($arMessage = $db_res->Fetch())
 			{
-				if (!(ForumCurrUserPermissions($arMessage["FORUM_ID"]) >= "Q" ||
+				if (!(ForumCurrUserPermissions($arMessage["FORUM_ID"], $arAddParams) >= "Q" ||
 					CForumMessage::CanUserUpdateMessage($arMessage["ID"], $USER->GetUserGroupArray(), $USER->GetID(), $arAddParams["PERMISSION"])))
 					$arError[] = GetMessage("MODMESS_NO_PERMS")." (MID=".$arMessage["ID"]."). \n";
 				else

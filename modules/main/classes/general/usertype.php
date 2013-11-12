@@ -2825,7 +2825,7 @@ class CAllSQLWhere
 									{
 										//kinda optimization for digits only
 										if(preg_match("/[^0-9]/", $FIELD_VALUE))
-											$result[] = $this->_Upper($FIELD_NAME)." like '".$FIELD_VALUE."'";
+											$result[] = $this->_Upper($FIELD_NAME)." like upper('".$FIELD_VALUE."')";
 										else
 											$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
 									}

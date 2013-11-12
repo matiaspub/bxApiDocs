@@ -4,6 +4,11 @@ namespace Bitrix\Main;
 use Bitrix\Main\Config;
 use Bitrix\Main\Type;
 
+/**
+ * Class HttpRequest extends Request. Contains http specific request data.
+ *
+ * @package Bitrix\Main
+ */
 class HttpRequest
 	extends Request
 {
@@ -32,6 +37,15 @@ class HttpRequest
 	 */
 	protected $cookiesRaw;
 
+	/**
+	 * Creates new HttpRequest object
+	 *
+	 * @param Server $server
+	 * @param array $queryString _GET
+	 * @param array $postData _POST
+	 * @param array $files _FILES
+	 * @param array $cookies _COOKIE
+	 */
 	public function __construct(Server $server, array $queryString, array $postData, array $files, array $cookies)
 	{
 		$request = array_merge($queryString, $postData);
@@ -44,6 +58,11 @@ class HttpRequest
 		$this->cookies = new Type\ParameterDictionary($this->prepareCookie($cookies));
 	}
 
+	/**
+	 * Applies filter to the http request data. Preserve original values.
+	 *
+	 * @param Type\IRequestFilter $filter Filter object
+	 */
 	public function addFilter(Type\IRequestFilter $filter)
 	{
 		$filteredValues = $filter->filter(array(
@@ -69,16 +88,33 @@ class HttpRequest
 			$this->arValues = array_merge($this->queryString->arValues, $this->postData->arValues);
 	}
 
+	/**
+	 * Returns _GET parameter of the current request.
+	 *
+	 * @param string $name Parameter name
+	 * @return null|string
+	 */
 	public function getQuery($name)
 	{
 		return $this->queryString->get($name);
 	}
 
+	/**
+	 * Return list of _GET parameters of current request.
+	 *
+	 * @return Type\ParameterDictionary
+	 */
 	public function getQueryList()
 	{
 		return $this->queryString;
 	}
 
+	/**
+	 * 
+	 *
+	 * @param $name
+	 * @return null|string
+	 */
 	public function getPost($name)
 	{
 		return $this->postData->get($name);

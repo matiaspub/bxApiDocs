@@ -44,7 +44,7 @@ class CMailImap
 		$prompt = $this->readLine();
 		if (strpos($prompt, '+') !== 0)
 		{
-			if (strpos($prompt, $tag.' NO') === 0)
+			if (strpos($prompt, $tag.' NO') === 0 || strpos($prompt, $tag.' BAD') === 0)
 				throw new Exception(GetMessage('MAIL_IMAP_ERR_AUTH_MECH'));
 			else
 				throw new Exception(GetMessage('MAIL_IMAP_ERR_AUTH').': '.GetMessage('MAIL_IMAP_ERR_BAD_SERVER'));

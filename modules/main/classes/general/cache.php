@@ -15,108 +15,6 @@ interface ICacheBackend
 	public static function IsCacheExpired($path);
 }
 
-class CCacheDebug
-{
-	static $arCacheDebug = array();
-	static $ShowCacheStat = false;
-	static $skipUntil = array(
-		"ccachedebug->add" => true,
-		"cphpcache->initcache" => true,
-		"cphpcache->startdatacache" => true,
-		"cphpcache->enddatacache" => true,
-		"cphpcache->clean" => true,
-		"cphpcache->cleandir" => true,
-		"cpagecache->initcache" => true,
-		"cpagecache->startdatacache" => true,
-		"cpagecache->enddatacache" => true,
-		"cpagecache->clean" => true,
-		"cpagecache->cleandir" => true,
-		"ccachemanager->read" => true,
-		"ccachemanager->setimmediate" => true,
-		"ccachemanager->clean" => true,
-		"ccachemanager->cleandir" => true,
-		"ccachemanager->cleanall" => true,
-		"cbitrixcomponent->startresultcache" => true,
-	);
-	public static function add($size, $path, $basedir, $initdir, $filename, $operation)
-	{
-		$prev = array();
-		$found = -1;
-		foreach(Bitrix\Main\Diag\Helper::getBackTrace(8) as $i => $tr)
-		{
-			$func = $tr["class"].$tr["type"].$tr["function"];
-
-			if ($found < 0 && !isset(self::$skipUntil[strtolower($func)]))
-			{
-				$found = count(self::$arCacheDebug);
-				self::$arCacheDebug[$found] = array(
-					"TRACE" => array(),
-					"path" => $path,
-					"basedir" => $basedir,
-					"initdir" => $initdir,
-					"filename" => $filename,
-					"cache_size" => $size,
-					"callee_func" => $prev["class"].$prev["type"].$prev["function"],
-					"operation" => $operation,
-				);
-				self::$arCacheDebug[$found]["TRACE"][] = array(
-					"func" => $prev["class"].$prev["type"].$prev["function"],
-					"args" => array(),
-					"file" => $prev["file"],
-					"line" => $prev["line"],
-				);
-			}
-
-			if ($found > -1)
-			{
-				if (count(self::$arCacheDebug[$found]["TRACE"]) < 8)
-				{
-					$args = array();
-					if (is_array($tr["args"]))
-					{
-						foreach ($tr["args"] as $k1 => $v1)
-						{
-							if (is_array($v1))
-							{
-								foreach ($v1 as $k2 => $v2)
-								{
-									if (is_scalar($v2))
-										$args[$k1][$k2] = $v2;
-									elseif (is_object($v2))
-										$args[$k1][$k2] = get_class($v2);
-									else
-										$args[$k1][$k2] = gettype($v2);
-								}
-							}
-							else
-							{
-								if (is_scalar($v1))
-									$args[$k1] = $v1;
-								elseif (is_object($v1))
-									$args[$k1] = get_class($v1);
-								else
-									$args[$k1] = gettype($v1);
-							}
-						}
-					}
-
-					self::$arCacheDebug[$found]["TRACE"][] = array(
-						"func" => $func,
-						"args" => $args,
-						"file" => $tr["file"],
-						"line" => $tr["line"],
-					);
-				}
-				else
-				{
-					break;
-				}
-			}
-			$prev = $tr;
-		}
-	}
-}
-
 class CPHPCache
 {
 	/**
@@ -1290,18 +1188,6 @@ global $CACHE_MANAGER;
 $CACHE_MANAGER = new CCacheManager;
 
 $GLOBALS["CACHE_STAT_BYTES"] = 0;
-//magic parameters: show cache usage statistics
-$show_cache_stat = "";
-if(array_key_exists("show_cache_stat", $_GET))
-{
-	$show_cache_stat = (strtoupper($_GET["show_cache_stat"]) == "Y"? "Y":"");
-	setcookie("show_cache_stat", $show_cache_stat, false, "/");
-}
-elseif(array_key_exists("show_cache_stat", $_COOKIE))
-{
-	$show_cache_stat = $_COOKIE["show_cache_stat"];
-}
-CCacheDebug::$ShowCacheStat = ($show_cache_stat === "Y");
 
 /*****************************************************************************************************/
 /************************  CStackCacheManager  *******************************************************/

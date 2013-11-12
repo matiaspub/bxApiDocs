@@ -367,7 +367,12 @@ class CDatabase extends CAllDatabase
 			if ($app != null)
 			{
 				$con = $app->getConnection();
-				if ($con->isConnected())
+				if ($con->isConnected()
+					&& ($con instanceof Bitrix\Main\DB\Connection)
+					&& ($this->DBHost == $con->getDbHost())
+					&& ($this->DBLogin == $con->getDbLogin())
+					&& ($this->DBName == $con->getDbName())
+				)
 				{
 					$this->db_Conn = $con->getResource();
 
@@ -419,8 +424,15 @@ class CDatabase extends CAllDatabase
 			if ($app != null)
 			{
 				$con = $app->getConnection();
-				if (!$con->isConnected())
+				if (!$con->isConnected()
+					&& ($con instanceof Bitrix\Main\DB\Connection)
+					&& ($this->DBHost == $con->getDbHost())
+					&& ($this->DBLogin == $con->getDbLogin())
+					&& ($this->DBName == $con->getDbName())
+				)
+				{
 					$con->setConnectionResourceNoDemand($this->db_Conn);
+				}
 			}
 		}
 
@@ -2198,52 +2210,49 @@ class CDBResult extends CAllDBResult
 			elseif($res = current($this->arResult))
 				next($this->arResult);
 		}
-		elseif($this->SqlTraceIndex)
+		else
 		{
-			$start_time = microtime(true);
-
-			if(!$this->arUserMultyFields)
+			if($this->SqlTraceIndex)
 			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-			}
-			else
-			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-				if($res)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
+				$start_time = microtime(true);
 			}
 
-			if ($res && $this->arReplacedAliases)
-			{
-				foreach($this->arReplacedAliases as $tech => $human)
-				{
-					$res[$human] = $res[$tech];
-					unset($res[$tech]);
-				}
-			}
+			$res = $this->FetchInternal();
 
-			$exec_time = round(microtime(true) - $start_time, 10);
-			$DB->addDebugTime($this->SqlTraceIndex, $exec_time);
-			$DB->timeQuery += $exec_time;
+			if($this->SqlTraceIndex)
+			{
+				/** @noinspection PhpUndefinedVariableInspection */
+				$exec_time = round(microtime(true) - $start_time, 10);
+				$DB->addDebugTime($this->SqlTraceIndex, $exec_time);
+				$DB->timeQuery += $exec_time;
+			}
+		}
+
+		return $res;
+	}
+
+	protected function FetchInternal()
+	{
+		if($this->resultObject !== null)
+		{
+			$res = $this->resultObject->fetch();
 		}
 		else
 		{
-			if(!$this->arUserMultyFields)
+			$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
+			if(!$res)
 			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-			}
-			else
-			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-				if($res)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
+				return false;
 			}
 
-			if ($res && $this->arReplacedAliases)
+			if($this->arUserMultyFields)
+			{
+				foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
+					if($res[$FIELD_NAME])
+						$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
+			}
+
+			if ($this->arReplacedAliases)
 			{
 				foreach($this->arReplacedAliases as $tech => $human)
 				{
@@ -2252,7 +2261,6 @@ class CDBResult extends CAllDBResult
 				}
 			}
 		}
-
 		return $res;
 	}
 
@@ -2498,25 +2506,12 @@ class CDBResult extends CAllDBResult
 			$start_time = microtime(true);
 
 		mysql_data_seek($this->result, $NavFirstRecordShow);
+
 		$temp_arrray = array();
 		for($i=$NavFirstRecordShow; $i<$NavLastRecordShow; $i++)
 		{
-			if(($res = mysql_fetch_array($this->result, MYSQL_ASSOC)))
+			if(($res = $this->FetchInternal()))
 			{
-				if($this->arUserMultyFields)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
-
-				if ($this->arReplacedAliases)
-				{
-					foreach($this->arReplacedAliases as $tech => $human)
-					{
-						$res[$human] = $res[$tech];
-						unset($res[$tech]);
-					}
-				}
-
 				$temp_arrray[] = $res;
 			}
 			else
@@ -2626,6 +2621,9 @@ class CDBResult extends CAllDBResult
 		if ($bIgnoreErrors && ($res_tmp === false))
 			return false;
 
+		$this->result = $res_tmp->result;
+		$this->DB = $res_tmp->DB;
+
 		if($this->SqlTraceIndex)
 			$start_time = microtime(true);
 
@@ -2633,23 +2631,9 @@ class CDBResult extends CAllDBResult
 		$temp_arrray_add = array();
 		$tmp_cnt = 0;
 
-		while($ar = mysql_fetch_array($res_tmp->result, MYSQL_ASSOC))
+		while($ar = $this->FetchInternal())
 		{
 			$tmp_cnt++;
-			if($this->arUserMultyFields)
-				foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-					if($ar[$FIELD_NAME])
-						$ar[$FIELD_NAME] = unserialize($ar[$FIELD_NAME]);
-
-			if ($this->arReplacedAliases)
-			{
-				foreach($this->arReplacedAliases as $tech => $human)
-				{
-					$ar[$human] = $ar[$tech];
-					unset($ar[$tech]);
-				}
-			}
-
 			if (intval($NavLastRecordShow - $NavFirstRecordShow) > 0 && $tmp_cnt > ($NavLastRecordShow - $NavFirstRecordShow))
 				$temp_arrray_add[] = $ar;
 			else
@@ -2664,13 +2648,11 @@ class CDBResult extends CAllDBResult
 			$DB->timeQuery += $exec_time;
 		}
 
-		$this->result = $res_tmp->result; // added for FieldsCount and other compatibility
-		$this->arResult = (count($temp_arrray)? $temp_arrray : false);
-		$this->arResultAdd = (count($temp_arrray_add)? $temp_arrray_add : false);
+		$this->arResult = (!empty($temp_arrray)? $temp_arrray : false);
+		$this->arResultAdd = (!empty($temp_arrray_add)? $temp_arrray_add : false);
 		$this->nSelectedCount = $cnt;
 		$this->bDescPageNumbering = $bDescPageNumbering;
 		$this->bFromLimited = true;
-		$this->DB = $res_tmp->DB;
 
 		return null;
 	}

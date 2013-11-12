@@ -264,6 +264,23 @@ class CTextParser
 		}
 		if ($this->allow["ANCHOR"]=="Y")
 		{
+			$text = preg_replace(
+				array(
+						"/\\[url\\](.*?)\\[\\/url\\]/ie".BX_UTF_PCRE_MODIFIER,
+						"/\\[url\\s*=\\s*(
+							(?:
+								[^\\[\\]]++
+								|\\[ (?: (?>[^\\[\\]]+) | (?:\\1) )* \\]
+							)+
+							)\\s*\\](.*?)\\[\\/url\\]/iexs".BX_UTF_PCRE_MODIFIER,
+					),
+				array(
+					"\$this->pre_convert_anchor_tag('\\1')",
+					"\$this->pre_convert_anchor_tag('\\1', '\\2')"
+				),
+				$text
+			);
+
 			$word_separator = str_replace(array("\\]", "\\[", "?"), "", $this->word_separator);
 			$text = preg_replace(
 				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((http|https|news|ftp|aim|mailto|file):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
@@ -924,11 +941,13 @@ class CTextParser
 
 	public function convert_anchor_tag($url, $text, $pref="")
 	{
+		$url = str_replace(array("[nomodify]", "[/nomodify]"), "", $url);
 		$bTextUrl = false;
 		if(strlen(trim($text)) <= 0)
-		{
 			$text = $url;
-		}
+		else
+			$text = str_replace(array("[nomodify]", "[/nomodify]"), "", $text);
+
 		if($text == $url)
 			$bTextUrl = true;
 
@@ -1002,6 +1021,21 @@ class CTextParser
 		$url = htmlspecialcharsbx(htmlspecialcharsback($url));
 
 		return $pref.($this->parser_nofollow == "Y" ? '<noindex>' : '').'<a href="'.$url.'" target="'.$this->link_target.'"'.($this->parser_nofollow == "Y" ? ' rel="nofollow"' : '').'>'.$text.'</a>'.($this->parser_nofollow == "Y" ? '</noindex>' : '').$end;
+	}
+
+	public function pre_convert_anchor_tag($url, $text = "")
+	{
+		if(strlen($text) > 0)
+		{
+			$word_separator = str_replace(array("\\]", "\\[", "?"), "", $this->word_separator);
+			$text = preg_replace(
+				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((http|https|news|ftp|aim|mailto|file):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
+				"[nomodify]\\1[/nomodify]", $text
+			);
+			return "[url=".$url."]".$text."[/url]";
+		}
+		
+		return "[url][nomodify]".$url."[/nomodify][/url]";
 	}
 
 	public static function TextParserConvertVideo($arParams)

@@ -1,8 +1,10 @@
 <?php
 namespace Bitrix\Main\Data;
 
+use Bitrix\Main\Config;
+
 class CacheEngineMemcache
-	implements ICacheEngine
+	implements ICacheEngine, ICacheEngineStat
 {
 	private static $obMemcache = null;
 	private static $isConnected = false;
@@ -20,7 +22,8 @@ class CacheEngineMemcache
 		{
 			self::$obMemcache = new \Memcache;
 
-			$v = \Bitrix\Main\Config\Configuration::getValue("cache_memcache");
+			$cacheConfig = Config\Configuration::getValue("cache");
+			$v = (isset($cacheConfig["memcache"])) ? $cacheConfig["memcache"] : null;
 
 			if ($v != null && isset($v["host"]) && $v["host"] != "")
 			{
@@ -32,12 +35,12 @@ class CacheEngineMemcache
 				if (self::$obMemcache->connect($v["host"], $port))
 				{
 					self::$isConnected = true;
-					register_shutdown_function(array("CacheEngineMemcache", "close"));
+					register_shutdown_function(array("\\Bitrix\\Main\\Data\\CacheEngineMemcache", "close"));
 				}
 			}
 		}
 
-		$v = \Bitrix\Main\Config\Configuration::getValue("cache");
+		$v = Config\Configuration::getValue("cache");
 		if ($v != null && isset($v["sid"]) && ($v["sid"] != ""))
 			$this->sid = $v["sid"];
 		else
@@ -51,6 +54,21 @@ class CacheEngineMemcache
 			self::$obMemcache->close();
 			self::$obMemcache = null;
 		}
+	}
+
+	public function getReadBytes()
+	{
+		return $this->read;
+	}
+
+	public function getWrittenBytes()
+	{
+		return $this->written;
+	}
+
+	static public function getCachePath()
+	{
+		return "";
 	}
 
 	public static function isAvailable()

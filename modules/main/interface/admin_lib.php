@@ -456,10 +456,10 @@ class CAdminMenu
 				$module = _normalizePath($module);
 
 				//trying to include file menu.php in the /admin/ folder of the current module
-				$fname = $_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$module."/admin/menu.php";
-				if(file_exists($fname))
+				$fname = getLocalPath("modules/".$module."/admin/menu.php");
+				if($fname !== false)
 				{
-					$menu = CAdminMenu::_IncludeMenu($fname);
+					$menu = CAdminMenu::_IncludeMenu($_SERVER["DOCUMENT_ROOT"].$fname);
 					if(is_array($menu) && !empty($menu))
 					{
 						if(isset($menu["parent_menu"]) && $menu["parent_menu"] <> "")
@@ -1239,7 +1239,7 @@ window.'.$this->name.' = new PopupMenu("'.$this->id.'"'.
 						(isset($action["DEFAULT"]) && $action["DEFAULT"] == true? "'DEFAULT':true,":"").
 						($action["TEXT"]<>""? "'TEXT':'".CUtil::JSEscape($action["TEXT"])."',":"").
 						(isset($action["TITLE"]) && $action["TITLE"]<>""? "'TITLE':'".CUtil::JSEscape($action["TITLE"])."',":"").
-						(isset($action["SHOW_TITLE"]) && $action["SHOW_TITLE"] == true ? "'SHOW_TITLE':true'":"").
+						(isset($action["SHOW_TITLE"]) && $action["SHOW_TITLE"] == true ? "'SHOW_TITLE':true,":"").
 						($action["ACTION"]<>""? "'ONCLICK':'".CUtil::JSEscape(htmlspecialcharsback($action["ACTION"]))."',":"").
 						(isset($action["ONMENUPOPUP"]) && $action["ONMENUPOPUP"]<>""? "'ONMENUPOPUP':'".CUtil::JSEscape($action["ONMENUPOPUP"])."',":"").
 						(isset($action["MENU"]) && is_array($action["MENU"])? "'MENU':".CAdminPopup::PhpToJavaScript($action["MENU"]).",":"").
@@ -4318,7 +4318,7 @@ class CAdminMessage
 
 	public function Show()
 	{
-		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
+		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1 && $this->message["TYPE"] != "PROGRESS")
 		{
 			ob_end_clean();
 			echo '<script>top.BX.WindowManager.Get().ShowError(\''.CUtil::JSEscape(str_replace(array('<br>', '<br />', '<BR>', '<BR />'), "\r\n", htmlspecialcharsback($this->message['DETAILS']? $this->message['DETAILS'] : $this->message['MESSAGE']))).'\');</script>';
@@ -5647,8 +5647,9 @@ class CAdminForm extends CAdminTabControl
 							{
 								if($this->arFields[$p]["custom_html"])
 									echo preg_replace("/^\\s*<tr/is", "<tr class=\"bx-in-group\"", $this->arFields[$p]["custom_html"]);
-								elseif($this->arFields[$p]["html"])
+								elseif($this->arFields[$p]["html"] && !$this->arFields[$p]["delimiter"])
 									echo '<tr class="bx-in-group" '.($this->arFields[$p]["valign"] <> ''? ' valign="'.$this->arFields[$p]["valign"].'"':'').' id="tr_'.$p.'">', $this->arFields[$p]["html"], "</tr>\n";
+								$this->arFields[$p] = array();
 								unset($arHiddens[$this->arFields[$p]["id"]]);
 							}
 						}

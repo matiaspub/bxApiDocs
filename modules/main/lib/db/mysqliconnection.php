@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Main\DB;
 
-class MysqliConnection extends Connection
+class MysqliConnection extends MysqlCommonConnection
 {
 	/**********************************************************
 	 * SqlHelper
@@ -121,7 +121,7 @@ class MysqliConnection extends Connection
 		$this->lastQueryResult = $result;
 
 		if (!$result)
-			throw new SqlException('Mysql query error', $this->getErrorMessage());
+			throw new SqlQueryException('Mysql query error', $this->getErrorMessage(), $sql);
 
 		return $result;
 	}
@@ -156,62 +156,6 @@ class MysqliConnection extends Connection
 	 * DDL
 	 *********************************************************/
 
-	public function isTableExists($tableName)
-	{
-		$tableName = preg_replace("/[^a-z0-9%_]+/i", "", $tableName);
-		$tableName = trim($tableName);
-
-		if (strlen($tableName) <= 0)
-			return false;
-
-		$dbResult = $this->query("SHOW TABLES LIKE '".$this->getSqlHelper()->forSql($tableName)."'");
-		if ($arResult = $dbResult->fetch())
-			return true;
-		else
-			return false;
-	}
-
-	public function isIndexExists($tableName, array $arColumns)
-	{
-		return $this->getIndexName($tableName, $arColumns) !== null;
-	}
-
-	public function getIndexName($tableName, array $arColumns, $strict = false)
-	{
-		if (!is_array($arColumns) || empty($arColumns))
-			return null;
-
-		$tableName = preg_replace("/[^a-z0-9_]+/i", "", $tableName);
-		$tableName = trim($tableName);
-
-		$rs = $this->query("SHOW INDEX FROM `".$this->getSqlHelper()->forSql($tableName)."`");
-		if (!$rs)
-			return null;
-
-		$arIndexes = array();
-		while ($ar = $rs->fetch())
-			$arIndexes[$ar["Key_name"]][$ar["Seq_in_index"] - 1] = $ar["Column_name"];
-
-		$strColumns = implode(",", $arColumns);
-		foreach ($arIndexes as $Key_name => $arKeyColumns)
-		{
-			ksort($arKeyColumns);
-			$strKeyColumns = implode(",", $arKeyColumns);
-			if ($strict)
-			{
-				if ($strKeyColumns === $strColumns)
-					return $Key_name;
-			}
-			else
-			{
-				if (substr($strKeyColumns, 0, strlen($strColumns)) === $strColumns)
-					return $Key_name;
-			}
-		}
-
-		return null;
-	}
-
 	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
@@ -230,26 +174,6 @@ class MysqliConnection extends Connection
 			}
 		}
 		return $this->tableColumnsCache[$tableName];
-	}
-
-
-	/*********************************************************
-	 * Transaction
-	 *********************************************************/
-
-	public function startTransaction()
-	{
-		$this->query("START TRANSACTION");
-	}
-
-	public function commitTransaction()
-	{
-		$this->query("COMMIT");
-	}
-
-	public function rollbackTransaction()
-	{
-		$this->query("ROLLBACK");
 	}
 
 

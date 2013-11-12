@@ -144,7 +144,7 @@ class AppCacheManifest
 		$manifestText = "CACHE MANIFEST\n\n";
 		$manifestText .= $this->getManifestDescription();
 		$manifestText .= "#files" . "\n\n";
-		$manifestText .= implode("\n", $this->files["files"]) . "\n\n";
+		$manifestText .= implode("\n", $this->files) . "\n\n";
 		$manifestText .= "NETWORK:\n";
 		$manifestText .= implode("\n", $this->network) . "\n\n";
 		$manifestText .= "FALLBACK:\n\n";
@@ -172,7 +172,7 @@ class AppCacheManifest
 	 */
 	static function getFilesFromContent($content)
 	{
-		$arFileData = Array("files" => Array());
+		$files = Array();
 		$arFilesByType = Array();
 		$arExtensions = Array("js", "css");
 		$extension_regex = "(?:" . implode("|", $arExtensions) . ")";
@@ -199,8 +199,7 @@ class AppCacheManifest
 		$linkCount = count($link);
 		for ($i = 0; $i < $linkCount; $i++)
 		{
-			$arFileData["files"][] = $arFilesByType[$extension[$i]][] = $link[$i] . $extension[$i] . $params[$i];
-			$arFileData["mdate"][$link[$i] . $extension[$i]] = str_replace("?", "", $params[$i]);
+			$files[] = $arFilesByType[$extension[$i]][] = $link[$i] . $extension[$i] . $params[$i];
 			$arFilesByType[$extension[$i]][] = $link[$i] . $extension[$i];
 
 		}
@@ -218,14 +217,14 @@ class AppCacheManifest
 				for ($k = 0; $k < $matchCount; $k++)
 				{
 					$file = self::replaceUrlCSS($match[3][$k], addslashes($cssPath));
-					if (!in_array($file, $arFileData["files"]))
-						$arFileData["files"][] = $arFilesByType["img"][] = $file;
+					if (!in_array($file, $files["files"]))
+						$files[] = $arFilesByType["img"][] = $file;
 				}
 			}
 
 		}
 
-		return $arFileData;
+		return $files;
 	}
 
 	/**
@@ -303,7 +302,10 @@ class AppCacheManifest
 
 	public function setFiles($arFiles)
 	{
-		$this->files = $arFiles;
+		if(count($this->files)>0)
+			$this->files = array_merge($this->files, $arFiles);
+		else
+			$this->files = $arFiles;
 	}
 
 	public function addFile($filePath)
@@ -368,6 +370,7 @@ class AppCacheManifest
 
 		$desc = "#Date: " . date("r") . "\n";
 		$desc .= "#Page: " . $this->pageURI . "\n";
+		$desc .= "#Count: " . count($this->files) . "\n";
 		$desc .= "#Params: \n" . $manifestParams . "\n\n";
 
 		return $desc;

@@ -44,10 +44,7 @@ class CSecuritySiteConfigurationTest
 			"method" => "checkModulesVersion",
 			"base_message_key" => "SECURITY_SITE_CHECKER_MODULES_VERSION",
 			"critical" => CSecurityCriticalLevel::HIGHT
-		),
-//		"otp" => array(
-//			"method" => "checkOtp"
-//		),
+		)
 	);
 
 	protected static $actualScriptExtensions = "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp";
@@ -69,29 +66,6 @@ class CSecuritySiteConfigurationTest
 		if(!empty($missingExtensions))
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_SCRIPT_EXTENSIONS", CSecurityCriticalLevel::HIGHT);
-		}
-	}
-
-	protected function checkOtp()
-	{
-		if(IsModuleInstalled('intranet')) //OTP not used in Bitrix Intranet Portal
-			return;
-
-		if(CSecurityUser::isActive())
-		{
-			$dbUser = CUser::GetList($by = 'ID', $order = 'ASC', array("GROUPS_ID" => 1, "ACTIVE" => "Y"), array("FIELDS" => "ID"));
-			while($user = $dbUser->fetch())
-			{
-				$userInfo = CSecurityUser::getSecurityUserInfo($user["ID"]);
-				if(!$userInfo)
-				{
-					$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
-				}
-			}
-		}
-		else
-		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
 		}
 	}
 

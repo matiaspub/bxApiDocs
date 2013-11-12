@@ -2,7 +2,7 @@
 namespace Bitrix\Main\DB;
 
 class MysqlConnection
-	extends Connection
+	extends MysqlCommonConnection
 {
 	/**********************************************************
 	 * SqlHelper
@@ -86,7 +86,7 @@ class MysqlConnection
 		$this->lastQueryResult = $result;
 
 		if (!$result)
-			throw new SqlException('Mysql query error', mysql_error($this->resource));
+			throw new SqlQueryException('Mysql query error', mysql_error($this->resource), $sql);
 
 		return $result;
 	}
@@ -116,59 +116,6 @@ class MysqlConnection
 	 * DDL
 	 *********************************************************/
 
-	public function isTableExists($tableName)
-	{
-		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
-		$tableName = trim($tableName);
-
-		if (strlen($tableName) <= 0)
-			return false;
-
-		$dbResult = $this->query("SHOW TABLES LIKE '".$this->getSqlHelper()->forSql($tableName)."'");
-		if ($arResult = $dbResult->fetch())
-			return true;
-		else
-			return false;
-	}
-
-	public function isIndexExists($tableName, array $arColumns)
-	{
-		return $this->getIndexName($tableName, $arColumns) !== null;
-	}
-
-	public function getIndexName($tableName, array $arColumns, $strict = false)
-	{
-		if (!is_array($arColumns) || count($arColumns) <= 0)
-			return null;
-
-		$rs = $this->query("SHOW INDEX FROM `".$this->getSqlHelper()->forSql($tableName)."`");
-		if (!$rs)
-			return null;
-
-		$arIndexes = array();
-		while ($ar = $rs->fetch())
-			$arIndexes[$ar["Key_name"]][$ar["Seq_in_index"] - 1] = $ar["Column_name"];
-
-		$strColumns = implode(",", $arColumns);
-		foreach ($arIndexes as $Key_name => $arKeyColumns)
-		{
-			ksort($arKeyColumns);
-			$strKeyColumns = implode(",", $arKeyColumns);
-			if ($strict)
-			{
-				if ($strKeyColumns === $strColumns)
-					return $Key_name;
-			}
-			else
-			{
-				if (substr($strKeyColumns, 0, strlen($strColumns)) === $strColumns)
-					return $Key_name;
-			}
-		}
-
-		return null;
-	}
-
 	public function getTableFields($tableName)
 	{
 		if (!array_key_exists($tableName, $this->tableColumnsCache))
@@ -191,26 +138,6 @@ class MysqlConnection
 			}
 		}
 		return $this->tableColumnsCache[$tableName];
-	}
-
-
-	/*********************************************************
-	 * Transaction
-	 *********************************************************/
-
-	public function startTransaction()
-	{
-		$this->query("START TRANSACTION");
-	}
-
-	public function commitTransaction()
-	{
-		$this->query("COMMIT");
-	}
-
-	public function rollbackTransaction()
-	{
-		$this->query("ROLLBACK");
 	}
 
 

@@ -4757,6 +4757,7 @@ function IncludeTemplateLangFile($filepath, $lang=false)
 			__IncludeLang($fname, false, true);
 	}
 
+	$checkModule = true;
 	if($templ_path <> "")
 	{
 		$templ_path = $BX_DOC_ROOT.$templ_path;
@@ -4764,22 +4765,28 @@ function IncludeTemplateLangFile($filepath, $lang=false)
 		if($subst_lang <> $lang && file_exists(($fname = $templ_path.$template_name."/lang/".$subst_lang."/".$file_name)))
 		{
 			__IncludeLang($fname, false, true);
-			$checkDefault = false;
+			$checkDefault = $checkModule = false;
 		}
 		if(file_exists(($fname = $templ_path.$template_name."/lang/".$lang."/".$file_name)))
 		{
 			__IncludeLang($fname, false, true);
-			$checkDefault = false;
+			$checkDefault = $checkModule = false;
 		}
 		if($checkDefault && $template_name != ".default")
 		{
 			if($subst_lang <> $lang && file_exists(($fname = $templ_path.".default/lang/".$subst_lang."/".$file_name)))
+			{
 				__IncludeLang($fname, false, true);
+				$checkModule = false;
+			}
 			if(file_exists(($fname = $templ_path.".default/lang/".$lang."/".$file_name)))
+			{
 				__IncludeLang($fname, false, true);
+				$checkModule = false;
+			}
 		}
 	}
-	elseif($module_name != "")
+	if($module_name != "" && $checkModule)
 	{
 		if($subst_lang <> $lang && file_exists(($fname = $module_path.$module_name."/install/templates/lang/".$subst_lang."/".$file_name)))
 			__IncludeLang($fname, false, true);
@@ -7181,10 +7188,10 @@ class CUtil
 
 	public static function JSEscape($s)
 	{
-		static $aSearch = array("\xe2\x80\xa9", "\\", "'", "\"", "\r\n", "\r", "\n", "\xe2\x80\xa8", "*/");
-		static $aReplace = array(" ", "\\\\", "\\'", '\\"', "\n", "\n", "\\n'+\n'", "\\n'+\n'", "*'+'/");
+		static $aSearch = array("\xe2\x80\xa9", "\\", "'", "\"", "\r\n", "\r", "\n", "\xe2\x80\xa8", "*/", "</");
+		static $aReplace = array(" ", "\\\\", "\\'", '\\"', "\n", "\n", "\\n", "\\n", "*\\/", "<\\/");
 		$val = str_replace($aSearch, $aReplace, $s);
-		return preg_replace("'</script'i", "</s'+'cript", $val);
+		return $val;
 	}
 
 	public static function JSUrlEscape($s)
@@ -7194,9 +7201,11 @@ class CUtil
 		return str_replace($aSearch, $aReplace, $s);
 	}
 
-	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false)
+	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
 	{
 		static $aSearch = array("\r", "\n");
+
+		$bExtType = !!$bExtType;
 
 		if(is_array($arData))
 		{
@@ -7216,6 +7225,7 @@ class CUtil
 			{
 				foreach($arData as $key => $value)
 				{
+
 					if(is_string($value))
 					{
 						if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
@@ -7232,7 +7242,11 @@ class CUtil
 					}
 					elseif(is_array($value))
 					{
-						$arData[$key] = CUtil::PhpToJSObject($value, $bWS, $bSkipTilda);
+						$arData[$key] = CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
+					}
+					elseif ($bExtType && (is_int($value) || is_float($value)))
+					{
+						$arData[$key] = $value;
 					}
 					else
 					{
@@ -7279,7 +7293,11 @@ class CUtil
 				}
 				elseif(is_array($value))
 				{
-					$res .= CUtil::PhpToJSObject($value, $bWS, $bSkipTilda);
+					$res .= CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
+				}
+				elseif ($bExtType && (is_int($value) || is_float($value)))
+				{
+					$res .= $value;
 				}
 				else
 				{
@@ -7299,6 +7317,10 @@ class CUtil
 				return 'true';
 			else
 				return 'false';
+		}
+		elseif ($bExtType && (is_int($arData) || is_float($arData)))
+		{
+			return $arData;
 		}
 		else
 		{

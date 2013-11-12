@@ -169,6 +169,7 @@ class forumTextParser extends CTextParser
 
 	public function convert($text, $allow = array(), $type = "html", $arFiles = false)	//, "KEEP_AMP" => "N"
 	{
+		$text = str_replace(array("\013", "\014"), "", $text);
 		if (!isset($this->image_params['width'])) $this->image_params['width'] = 300;
 		if (!isset($this->image_params['height'])) $this->image_params['height'] = 300;
 		if (!isset($this->image_params['template'])) $this->image_params['template'] = 'popup_image';
@@ -189,7 +190,8 @@ class forumTextParser extends CTextParser
 			$this->arFiles = is_array($arFiles) ? $arFiles : array($arFiles);
 		$this->arFilesIDParsed = array();
 
-		return $this->convertText($text);
+		$text = str_replace(array("\013", "\014"), array(chr(34), chr(39)), $this->convertText($text));
+		return $text;
 	}
 
 	public function convert4mail($text, $arFiles = false)

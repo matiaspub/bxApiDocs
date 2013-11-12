@@ -97,9 +97,6 @@ class CIMNotify
 			$arGetUsers = Array();
 			while ($arRes = $dbRes->Fetch())
 			{
-				if ($arRes['NOTIFY_READ'] == 'N')
-					continue;
-
 				if ($this->bHideLink)
 					$arRes['HIDE_LINK'] = 'Y';
 
@@ -467,8 +464,8 @@ class CIMNotify
 
 		$strSql = "
 		UPDATE b_im_relation SET
-			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then '".intval($lastSendId)."' else LAST_SEND_ID end),
-			STATUS = '".IM_STATUS_NOTIFY."'
+			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then ".intval($lastSendId)." else LAST_SEND_ID end),
+			STATUS = ".IM_STATUS_NOTIFY."
 		WHERE CHAT_ID = ".intval($chatId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
