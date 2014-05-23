@@ -36,7 +36,7 @@ class CIBlockFindTools
 		{
 			$arFilter["=CODE"] = $section_code;
 
-			$rsSection = CIBlockSection::GetList(array(), $arFilter);
+			$rsSection = CIBlockSection::GetList(array(), $arFilter, false, array("ID"));
 			if($arSection = $rsSection->Fetch())
 				return intval($arSection["ID"]);
 		}
@@ -62,7 +62,7 @@ class CIBlockFindTools
 			if (defined("BX_COMP_MANAGED_CACHE"))
 			{
 				$CACHE_MANAGER->StartTagCache("iblock_find");
-				$CACHE_MANAGER->RegisterTag("iblock_id_".$iblock_id);
+				CIBlock::registerWithTagCache($iblock_id);
 			}
 
 			foreach ($pageCandidates as $pageID => $arVariablesTmp)
@@ -181,6 +181,7 @@ class CIBlockFindTools
 		$strFrom = "";
 		$joinField = "";
 		$strWhere = "";
+		$strRoot = "";
 		foreach (array_reverse($sectionPath) as $i => $SECTION_CODE)
 		{
 			if ($i == 0)
@@ -192,6 +193,7 @@ class CIBlockFindTools
 				$strWhere .= "
 					AND BS.CODE = '".$DB->ForSql($SECTION_CODE)."'
 				";
+				$strRoot = "AND BS.IBLOCK_SECTION_ID IS NULL";
 			}
 			else
 			{
@@ -202,6 +204,7 @@ class CIBlockFindTools
 				$strWhere .= "
 					AND BS".$i.".CODE = '".$DB->ForSql($SECTION_CODE)."'
 				";
+				$strRoot = "AND BS".$i.".IBLOCK_SECTION_ID IS NULL";
 			}
 		}
 
@@ -210,6 +213,7 @@ class CIBlockFindTools
 			from ".$strFrom."
 			WHERE BS.IBLOCK_ID = ".$iblock_id."
 			".$strWhere."
+			".$strRoot."
 		";
 		$rs = $DB->Query($strSql);
 		if ($ar = $rs->Fetch())

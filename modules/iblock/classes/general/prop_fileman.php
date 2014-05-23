@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CIBlockPropertyFileMan
 {
-	public static function GetUserTypeDescription()
+	function GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" =>"S",
@@ -16,7 +16,7 @@ class CIBlockPropertyFileMan
 		);
 	}
 
-	static public function GetPropertyFieldHtmlMulty($arProperty, $arValues, $strHTMLControlName)
+	public function GetPropertyFieldHtmlMulty($arProperty, $arValues, $strHTMLControlName)
 	{
 		if($strHTMLControlName["MODE"]=="FORM_FILL" && CModule::IncludeModule('fileman'))
 		{
@@ -75,7 +75,7 @@ class CIBlockPropertyFileMan
 		}
 	}
 
-	public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
+	function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
 	{
 		global $APPLICATION;
 
@@ -125,7 +125,7 @@ class CIBlockPropertyFileMan
 		}
 	}
 
-	public static function ConvertToDB($arProperty, $value)
+	function ConvertToDB($arProperty, $value)
 	{
 		$result = array();
 		$return = array();
@@ -144,7 +144,7 @@ class CIBlockPropertyFileMan
 		return $return;
 	}
 
-	public static function ConvertFromDB($arProperty, $value)
+	function ConvertFromDB($arProperty, $value)
 	{
 		$return = array();
 		if (strLen(trim($value["VALUE"])) > 0)
@@ -154,7 +154,7 @@ class CIBlockPropertyFileMan
 		return $return;
 	}
 
-	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
 			"HIDE" => array("MULTIPLE_CNT"),

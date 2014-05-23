@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CIBlockPropertyHTML
 {
-	public static function GetPublicViewHTML($arProperty, $value, $strHTMLControlName)
+	function GetPublicViewHTML($arProperty, $value, $strHTMLControlName)
 	{
 		if(!is_array($value["VALUE"]))
 			$value = CIBlockPropertyHTML::ConvertFromDB($arProperty, $value);
@@ -14,7 +14,7 @@ class CIBlockPropertyHTML
 			return "";
 	}
 
-	public static function GetAdminListViewHTML($arProperty, $value, $strHTMLControlName)
+	function GetAdminListViewHTML($arProperty, $value, $strHTMLControlName)
 	{
 		if(!is_array($value["VALUE"]))
 			$value = CIBlockPropertyHTML::ConvertFromDB($arProperty, $value);
@@ -30,7 +30,7 @@ class CIBlockPropertyHTML
 			return "&nbsp;";
 	}
 
-	public static function GetPublicEditHTML($arProperty, $value, $strHTMLControlName)
+	function GetPublicEditHTML($arProperty, $value, $strHTMLControlName)
 	{
 		if (!CModule::IncludeModule("fileman"))
 			return GetMessage("IBLOCK_PROP_HTML_NOFILEMAN_ERROR");
@@ -69,7 +69,7 @@ class CIBlockPropertyHTML
 		return  $s;
 	}
 
-	public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
+	function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
 	{
 		global $APPLICATION;
 
@@ -125,7 +125,7 @@ class CIBlockPropertyHTML
 		return  $return;
 	}
 
-	public static function ConvertToDB($arProperty, $value)
+	function ConvertToDB($arProperty, $value)
 	{
 		global $DB;
 		$return = false;
@@ -158,7 +158,7 @@ class CIBlockPropertyHTML
 		return $return;
 	}
 
-	public static function ConvertFromDB($arProperty, $value)
+	function ConvertFromDB($arProperty, $value)
 	{
 		$return = false;
 		if(!is_array($value["VALUE"]))
@@ -172,7 +172,7 @@ class CIBlockPropertyHTML
 		return $return;
 	}
 
-	public static function CheckArray($arFields = false)
+	function CheckArray($arFields = false)
 	{
 		$return = false;
 		if (!is_array($arFields))
@@ -200,7 +200,7 @@ class CIBlockPropertyHTML
 		return $return;
 	}
 
-	public static function GetLength($arProperty, $value)
+	function GetLength($arProperty, $value)
 	{
 		if(is_array($value) && array_key_exists("VALUE", $value))
 			return strLen(trim($value["VALUE"]["TEXT"]));
@@ -208,7 +208,7 @@ class CIBlockPropertyHTML
 			return 0;
 	}
 
-	public static function PrepareSettings($arProperty)
+	function PrepareSettings($arProperty)
 	{
 		$height = 0;
 		if(is_array($arProperty["USER_TYPE_SETTINGS"]))
@@ -221,7 +221,7 @@ class CIBlockPropertyHTML
 		);
 	}
 
-	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
 			"HIDE" => array("ROW_COUNT", "COL_COUNT"),

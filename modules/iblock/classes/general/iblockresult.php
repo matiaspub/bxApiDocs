@@ -1,17 +1,4 @@
 <?
-
-/**
- * <b>CIBlockResult</b> - вспомогательный класс для работы с объектами результатов выборок, наследуется от класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> и содержит все его параметры и методы. Объекты данного класса возвращают функции: <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getbyid.php">GetByID</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php">GetIBlockElementList</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">GetIBlockElementListEx</a>. Использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php
- * @author Bitrix
- */
 class CIBlockResult extends CDBResult
 {
 	var $arIBlockMultProps=false;
@@ -26,17 +13,18 @@ class CIBlockResult extends CDBResult
 	var $strSectionUrl = false;
 	var $strListUrl = false;
 	var $arSectionContext = false;
+	var $bIBlockSection = false;
 	var $nameTemplate = "";
 
 	var $_LAST_IBLOCK_ID = "";
 	var $_FILTER_IBLOCK_ID = array();
 
-	public static function CIBlockResult($res)
+	function CIBlockResult($res)
 	{
 		parent::CDBResult($res);
 	}
 
-	
+
 	/**
 	 * <p>Устанавливает шаблоны путей для элементов, разделов и списка элементов вместо тех которые указаны в настройках информационного блока. Шаблоны будут использованы функцией  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. </p> <p><b>Примечание</b>: Используется в компонентах для корректного формирования путей, если соответствующие параметры указаны.</p>
 	 *
@@ -61,14 +49,14 @@ class CIBlockResult extends CDBResult
 	 * @return void <p>Ничего.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a></li> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/setsectioncontext.php">CIBlockResult::SetSectionContext</a></li>
@@ -78,14 +66,14 @@ class CIBlockResult extends CDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/seturltemplates.php
 	 * @author Bitrix
 	 */
-	public function SetUrlTemplates($DetailUrl = "", $SectionUrl = "", $ListUrl = "")
+	function SetUrlTemplates($DetailUrl = "", $SectionUrl = "", $ListUrl = "")
 	{
 		$this->strDetailUrl = $DetailUrl;
 		$this->strSectionUrl = $SectionUrl;
 		$this->strListUrl = $ListUrl;
 	}
 
-	
+
 	/**
 	 * <p>Функция устанавливает поля раздела в качестве родителя элемента для подстановки в шаблоны путей функцией <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. Если родительский раздел не определен с помощью вызова этого метода, то для подстановки шаблона будут использованы поля из раздела с минимальным ID к которому привязан элемент. <br></p> <p><b>Примечание</b>: Используется в компонентах для сохранения текущего просматриваемого пользователем раздела в случае множественной привязки элементов.</p>
 	 *
@@ -100,14 +88,14 @@ class CIBlockResult extends CDBResult
 	 * @return void <p>Функция ничего не возвращает.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$rsElements-&gt;SetSectionContext($arSection);<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>
 	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::</a><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/seturltemplates.php">SetUrlTemplates</a> </li>
@@ -117,7 +105,7 @@ class CIBlockResult extends CDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/setsectioncontext.php
 	 * @author Bitrix
 	 */
-	public function SetSectionContext($arSection)
+	function SetSectionContext($arSection)
 	{
 		if(is_array($arSection) && array_key_exists("ID", $arSection))
 		{
@@ -133,7 +121,7 @@ class CIBlockResult extends CDBResult
 		}
 	}
 
-	public function SetIBlockTag($iblock_id)
+	function SetIBlockTag($iblock_id)
 	{
 		if(is_array($iblock_id))
 		{
@@ -155,12 +143,12 @@ class CIBlockResult extends CDBResult
 		}
 	}
 
-	public function SetNameTemplate($nameTemplate)
+	function SetNameTemplate($nameTemplate)
 	{
 		$this->nameTemplate = $nameTemplate;
 	}
 
-	public static function Fetch()
+	function Fetch()
 	{
 		/** @global CCacheManager $CACHE_MANAGER */
 		global $CACHE_MANAGER;
@@ -192,7 +180,7 @@ class CIBlockResult extends CDBResult
 				&& $res["IBLOCK_ID"] != $this->_LAST_IBLOCK_ID
 			)
 			{
-				$CACHE_MANAGER->RegisterTag("iblock_id_".$res["IBLOCK_ID"]);
+				CIBlock::registerWithTagCache($res["IBLOCK_ID"]);
 				$this->_LAST_IBLOCK_ID = $res["IBLOCK_ID"];
 			}
 
@@ -206,14 +194,31 @@ class CIBlockResult extends CDBResult
 							$res[$field_name]=$res[$field_name]->load();
 
 						if(preg_match("/(_VALUE)$/", $field_name))
+						{
 							$descr_name = preg_replace("/(_VALUE)$/", "_DESCRIPTION", $field_name);
+							$value_id_name = preg_replace("/(_VALUE)$/", "_PROPERTY_VALUE_ID", $field_name);;
+						}
 						else
+						{
 							$descr_name = preg_replace("/^(PROPERTY_)/", "DESCRIPTION_", $field_name);
+							$value_id_name = preg_replace("/^(PROPERTY_)/", "PROPERTY_VALUE_ID_", $field_name);
+						}
 
-						if(strlen($res[$field_name]) <= 0)
+						$update = false;
+						if (strlen($res[$field_name]) <= 0)
+						{
+							$update = true;
+						}
+						else
+						{
+							$tmp = unserialize($res[$field_name]);
+							if (!isset($tmp['ID']))
+								$update = true;
+						}
+						if ($update)
 						{
 							$strSql = "
-								SELECT VALUE,DESCRIPTION
+								SELECT ID, VALUE, DESCRIPTION
 								FROM b_iblock_element_prop_m".$db_prop["IBLOCK_ID"]."
 								WHERE
 									IBLOCK_ELEMENT_ID = ".intval($res["ID"])."
@@ -223,18 +228,20 @@ class CIBlockResult extends CDBResult
 							$rs = $DB->Query($strSql);
 							$res[$field_name] = array();
 							$res[$descr_name] = array();
+							$res[$value_id_name] = array();
 							while($ar=$rs->Fetch())
 							{
 								$res[$field_name][]=$ar["VALUE"];
 								$res[$descr_name][]=$ar["DESCRIPTION"];
+								$res[$value_id_name][] = $ar['ID'];
 							}
-							$arUpdate["b_iblock_element_prop_s".$db_prop["IBLOCK_ID"]]["PROPERTY_".$db_prop["ORIG_ID"]] = serialize(array("VALUE"=>$res[$field_name],"DESCRIPTION"=>$res[$descr_name]));
+							$arUpdate["b_iblock_element_prop_s".$db_prop["IBLOCK_ID"]]["PROPERTY_".$db_prop["ORIG_ID"]] = serialize(array("VALUE"=>$res[$field_name],"DESCRIPTION"=>$res[$descr_name],"ID"=>$res[$value_id_name]));
 						}
 						else
 						{
-							$tmp = unserialize($res[$field_name]);
 							$res[$field_name] = $tmp["VALUE"];
 							$res[$descr_name] = $tmp["DESCRIPTION"];
+							$res[$value_id_name] = $tmp["ID"];
 						}
 
 						if(is_array($res[$field_name]) && $db_prop["PROPERTY_TYPE"]=="L")
@@ -313,24 +320,24 @@ class CIBlockResult extends CDBResult
 		)
 		{
 			foreach($this->_FILTER_IBLOCK_ID as $iblock_id => $t)
-				$CACHE_MANAGER->RegisterTag("iblock_id_".$iblock_id);
+				CIBlock::registerWithTagCache($iblock_id);
 		}
 
 		return $res;
 	}
 
-	
+
 	/**
 	 * <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. <br></p> <p>Если выборка была из инфоблока свойства которого хранятся отдельно (<a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2723" >Режим хранения свойств в отдельных таблицах</a>), то для правильной обработки значений множественных свойств требуется наличие полей ID и IBLOCK_ID. <br></p>
 	 *
 	 *
 	 *
 	 *
-	 * @param bool $text_html = true 
+	 * @param bool $text_html = true
 	 *
 	 *
 	 *
-	 * @param bool $original = true 
+	 * @param bool $original = true
 	 *
 	 *
 	 *
@@ -338,14 +345,14 @@ class CIBlockResult extends CDBResult
 	 * информационного блока</a><br>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($ar_res = $res-&gt;GetNext())<br>  echo '&lt;a href="'.$ar_res['DETAIL_PAGE_URL'].'"&gt;'.$ar_res['NAME'].'&lt;/a&gt;';<br>else<br>  echo 'Элемент не найден.';<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement()</a> </li> <li>
@@ -359,7 +366,7 @@ class CIBlockResult extends CDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php
 	 * @author Bitrix
 	 */
-	public function GetNext($bTextHtmlAuto=true, $use_tilda=true)
+	function GetNext($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		static $arSectionPathCache = array();
 
@@ -485,7 +492,7 @@ class CIBlockResult extends CDBResult
 		return $res;
 	}
 
-	
+
 	/**
 	 * <p>Метод возвращает из выборки объект <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a>.</p>
 	 *
@@ -495,7 +502,7 @@ class CIBlockResult extends CDBResult
 	 * @return _CIBElement <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a><br>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $res = CIBlockElement::GetByID($_GET["PID"]);
@@ -509,7 +516,7 @@ class CIBlockResult extends CDBResult
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">GetNext()</a> </li> <li> <a
@@ -521,7 +528,7 @@ class CIBlockResult extends CDBResult
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php
 	 * @author Bitrix
 	 */
-	public function GetNextElement($bTextHtmlAuto=true, $use_tilda=true)
+	function GetNextElement($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		if(!($r = $this->GetNext($bTextHtmlAuto, $use_tilda)))
 			return $r;
@@ -533,12 +540,12 @@ class CIBlockResult extends CDBResult
 		return $res;
 	}
 
-	public function SetTableID($table_id)
+	function SetTableID($table_id)
 	{
 		$this->table_id = $table_id;
 	}
 
-	public function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
+	function NavStart($nPageSize=20, $bShowAll=true, $iNumPage=false)
 	{
 		if($this->table_id)
 		{
@@ -560,7 +567,7 @@ class CIBlockResult extends CDBResult
 		parent::NavStart($nPageSize, $bShowAll, $iNumPage);
 	}
 
-	public function GetNavPrint($title, $show_allways=true, $StyleText="", $template_path=false, $arDeleteParam=false)
+	function GetNavPrint($title, $show_allways=true, $StyleText="", $template_path=false, $arDeleteParam=false)
 	{
 		if($this->table_id && ($template_path === false))
 			$template_path = $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/interface/navigation.php";

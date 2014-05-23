@@ -1,20 +1,7 @@
 <?
-
-/**
- * <b>CIBlockProperty</b> - класс для работы со свойствами информационных разделов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php
- * @author Bitrix
- */
 class CIBlockProperty extends CAllIBlockProperty
 {
-	public function _Update($ID, $arFields)
+	function _Update($ID, $arFields)
 	{
 		global $DB;
 		$ID=intval($ID);
@@ -187,12 +174,12 @@ class CIBlockProperty extends CAllIBlockProperty
 		return true;
 	}
 
-	public static function DropColumnSQL($strTable, $arColumns)
+	function DropColumnSQL($strTable, $arColumns)
 	{
 		return array("ALTER TABLE ".$strTable." DROP ".implode(", DROP ", $arColumns));
 	}
 
-	public static function _Add($ID, $arFields)
+	function _Add($ID, $arFields)
 	{
 		global $DB;
 		$ID = IntVal($ID);

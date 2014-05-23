@@ -3,13 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 class CEventIBlock
 {
-	public static function MakeIBlockObject()
+	function MakeIBlockObject()
 	{
 		$obj = new CEventIBlock;
 		return $obj;
 	}
 
-	public static function GetFilter()
+	function GetFilter()
 	{
 		$arFilter = array();
 		$res = CIBlock::GetList(
@@ -40,7 +40,7 @@ class CEventIBlock
 
 		return  $arFilter;
 	}
-	public static function GetAuditTypes()
+	function GetAuditTypes()
 	{
 		AddEventHandler("main", "GetAuditTypesIblock", array("CAllIBlock", "GetAuditTypes"));
 		$db_events = GetModuleEvents("main", "GetAuditTypesIblock");
@@ -51,7 +51,7 @@ class CEventIBlock
 		return $AuditTypes;
 	}
 
-	public static function GetEventInfo($row, $arParams, $arUser, $arResult)
+	function GetEventInfo($row, $arParams, $arUser, $arResult)
 	{
 		$DESCRIPTION = unserialize($row['DESCRIPTION']);
 
@@ -147,7 +147,7 @@ class CEventIBlock
 		);
 	}
 
-	public static function GetFilterSQL($var)
+	function GetFilterSQL($var)
 	{
 		if (is_array($var))
 			foreach($var as $key => $val)

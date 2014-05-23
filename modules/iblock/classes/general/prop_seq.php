@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CIBlockPropertySequence
 {
-	public static function AddFilterFields($arProperty, $strHTMLControlName, &$arFilter, &$filtered)
+	function AddFilterFields($arProperty, $strHTMLControlName, &$arFilter, &$filtered)
 	{
 		$from_name = $strHTMLControlName["VALUE"].'_from';
 		$from = isset($_REQUEST[$from_name])? $_REQUEST[$from_name]: "";
@@ -22,7 +22,7 @@ class CIBlockPropertySequence
 		}
 	}
 
-	public static function GetPublicFilterHTML($arProperty, $strHTMLControlName)
+	function GetPublicFilterHTML($arProperty, $strHTMLControlName)
 	{
 		$from_name = $strHTMLControlName["VALUE"].'_from';
 		$to_name = $strHTMLControlName["VALUE"].'_to';
@@ -35,7 +35,7 @@ class CIBlockPropertySequence
 		';
 	}
 
-	public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
+	function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
 	{
 		if($value["VALUE"] > 0 && !$strHTMLControlName["COPY"])
 		{
@@ -54,7 +54,7 @@ class CIBlockPropertySequence
 				'<input type="hidden" size="5" name="'.$strHTMLControlName["VALUE"].'" value="'.$current_value.'">';
 	}
 
-	public static function PrepareSettings($arProperty)
+	function PrepareSettings($arProperty)
 	{
 		//This method not for storing sequence value in the database
 		//but it just sets starting value for it
@@ -78,7 +78,7 @@ class CIBlockPropertySequence
 		);
 	}
 
-	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
 			"HIDE" => array("SEARCHABLE", "WITH_DESCRIPTION", "ROW_COUNT", "COL_COUNT", "DEFAULT_VALUE"),

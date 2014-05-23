@@ -9,10 +9,10 @@ This class is used to parse and load an xml file into database table.
  *
  *
  *
- * @return mixed 
+ * @return mixed
  *
  *
- * <h4>Example</h4> 
+ * <h4>Example</h4>
  * <pre>
  * &lt;?<br><span> </span>$obXMLFile = new CIBlockXMLFile;<br><span> </span>// Удаляем результат предыдущей загрузки<br><span> </span>$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/droptemporarytables.php">DropTemporaryTables</a>();<br><span> </span>// Подготавливаем БД<br><span> </span>if(!$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php">CreateTemporaryTables</a>())<br><span> </span>	return "Ошибка создания БД.";<br><span> </span><br><span> </span>if($fp = fopen($FILE_NAME, "rb"))<br><span> </span>{<br><span> </span>	// Чтение содержимого файла за один шаг<br><span> </span>	$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/readxmltodatabase.php">ReadXMLToDatabase</a>($fp, $NS, 0);<br><span> </span>	fclose($fp);<br><span> </span>}<br><span> </span>else<br><span> </span>{<br><span> </span>	// Файл открыть не удалось<br><span> </span>	return "Ошибка открытия файла";<br><span> </span>}<br><span> </span><br><span> </span>// Индексируем загруженные данные для ускорения доступа<br><span> </span>if(!CIBlockXMLFile::<a href="/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php">IndexTemporaryTables</a>())<br><span> </span>	return "Ошибка созния индексов БД.";<br><span> </span><br><span> </span>?&gt;
  * </pre>
@@ -38,7 +38,7 @@ class CIBlockXMLFile
 
 	private $_get_xml_chunk_function = "_get_xml_chunk";
 
-	public function __construct($table_name = "b_xml_tree")
+	function __construct($table_name = "b_xml_tree")
 	{
 		$this->_table_name = strtolower($table_name);
 		if (defined("BX_UTF"))
@@ -54,7 +54,7 @@ class CIBlockXMLFile
 		}
 	}
 
-	public function StartSession($sess_id)
+	function StartSession($sess_id)
 	{
 		global $DB;
 
@@ -88,7 +88,7 @@ class CIBlockXMLFile
 		return $res;
 	}
 
-	public function GetSessionRoot()
+	function GetSessionRoot()
 	{
 		global $DB;
 		$rs = $DB->Query("SELECT ID MID from ".$this->_table_name." WHERE SESS_ID = '".$DB->ForSQL($this->_sessid)."' AND PARENT_ID = 0");
@@ -96,7 +96,7 @@ class CIBlockXMLFile
 		return $ar["MID"];
 	}
 
-	public function EndSession()
+	function EndSession()
 	{
 		global $DB;
 
@@ -120,7 +120,7 @@ class CIBlockXMLFile
 	return : result of the CDatabase::Query method
 	We use drop due to mysql innodb slow truncate bug.
 	*/
-	
+
 	/**
 	 * <p>Удаляет таблицы содержащие ранее загруженный файл. Необходимо вызывать функцию перед началом загрузки XML. <br></p>
 	 *
@@ -130,16 +130,15 @@ class CIBlockXMLFile
 	 * @return bool <p>В случае возникновения ошибки функция возвращает false.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
 	 * </ul>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/droptemporarytables.php
 	 * @author Bitrix
 	 */
-	public static function DropTemporaryTables()
+	function DropTemporaryTables()
 	{
 		if(!isset($this) || !is_object($this) || strlen($this->_table_name) <= 0)
 		{
@@ -156,7 +155,7 @@ class CIBlockXMLFile
 		}
 	}
 
-	
+
 	/**
 	 * <p>Создает таблицы для загрузки XML.</p> <p><b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа. <br></p>
 	 *
@@ -167,7 +166,7 @@ class CIBlockXMLFile
 	 * false.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
 	 * </ul><br>
 	 *
@@ -176,7 +175,7 @@ class CIBlockXMLFile
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php
 	 * @author Bitrix
 	 */
-	public static function CreateTemporaryTables($with_sess_id = false)
+	function CreateTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)
 		{
@@ -204,6 +203,10 @@ class CIBlockXMLFile
 					PRIMARY KEY (ID)
 				)
 			");
+
+			if ($res && defined("BX_XML_CREATE_INDEXES_IMMEDIATELY"))
+				$res = $this->IndexTemporaryTables($with_sess_id);
+
 			return $res;
 		}
 	}
@@ -216,7 +219,7 @@ class CIBlockXMLFile
 
 	return : result of the CDatabase::Query method
 	*/
-	
+
 	/**
 	 * <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. <br></p>
 	 *
@@ -227,7 +230,7 @@ class CIBlockXMLFile
 	 * вернет false.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
 	 * </ul><br>
 	 *
@@ -236,7 +239,7 @@ class CIBlockXMLFile
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php
 	 * @author Bitrix
 	 */
-	public static function IndexTemporaryTables($with_sess_id = false)
+	function IndexTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)
 		{
@@ -267,7 +270,7 @@ class CIBlockXMLFile
 		}
 	}
 
-	public function Add($arFields)
+	function Add($arFields)
 	{
 		global $DB;
 
@@ -299,7 +302,7 @@ class CIBlockXMLFile
 		return $DB->LastID();
 	}
 
-	public function GetFilePosition()
+	function GetFilePosition()
 	{
 		return $this->file_position;
 	}
@@ -317,7 +320,7 @@ class CIBlockXMLFile
 	NS have to be preserved between steps.
 	They automatically extracted from xml file and should not be modified!
 	*/
-	
+
 	/**
 	 * <p>Функция загружает данные из файла в таблицы БД. Когда весь файл прочитан она возвращает true. Если функции не удалось уложиться в time_limit секунд она вернет false и в параметре NS данные необходимые для продолжения работы на следующем шаге. <br></p> <p><b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</p>
 	 *
@@ -349,7 +352,7 @@ class CIBlockXMLFile
 	 * противном случае.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
 	 * </ul><br>
 	 *
@@ -428,7 +431,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	public function _get_xml_chunk($fp)
+	function _get_xml_chunk($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -494,7 +497,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	public function _get_xml_chunk_mb_orig($fp)
+	function _get_xml_chunk_mb_orig($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -560,7 +563,7 @@ class CIBlockXMLFile
 	Internal function.
 	Used to read an xml by chunks started with "<" and endex with "<"
 	*/
-	public function _get_xml_chunk_mb($fp)
+	function _get_xml_chunk_mb($fp)
 	{
 		if($this->buf_position >= $this->buf_len)
 		{
@@ -626,7 +629,7 @@ class CIBlockXMLFile
 	Internal function.
 	Stores an element into xml database tree.
 	*/
-	public function _start_element($xmlChunk)
+	function _start_element($xmlChunk)
 	{
 		global $DB;
 		static $search = array(
@@ -724,7 +727,7 @@ class CIBlockXMLFile
 	Internal function.
 	Winds tree stack back. Modifies (if neccessary) internal tree structure.
 	*/
-	public function _end_element($xmlChunk)
+	function _end_element($xmlChunk)
 	{
 		global $DB;
 
@@ -750,7 +753,7 @@ class CIBlockXMLFile
 			),
 		);
 	*/
-	public function GetAllChildrenArray($arParent)
+	function GetAllChildrenArray($arParent)
 	{
 		global $DB;
 
@@ -810,7 +813,7 @@ class CIBlockXMLFile
 		return $arResult;
 	}
 
-	public function GetList($arOrder = array(), $arFilter = array(), $arSelect = array())
+	function GetList($arOrder = array(), $arFilter = array(), $arSelect = array())
 	{
 		global $DB;
 
@@ -865,13 +868,13 @@ class CIBlockXMLFile
 		return $DB->Query($strSql);
 	}
 
-	public function Delete($ID)
+	function Delete($ID)
 	{
 		global $DB;
 		return $DB->Query("delete from ".$this->_table_name." where ID = ".intval($ID));
 	}
 
-	public static function UnZip($file_name, $last_zip_entry = "", $start_time = 0, $interval = 0)
+	function UnZip($file_name, $last_zip_entry = "", $start_time = 0, $interval = 0)
 	{
 		global $APPLICATION;
 		$io = CBXVirtualIo::GetInstance();

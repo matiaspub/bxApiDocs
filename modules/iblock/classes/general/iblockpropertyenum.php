@@ -1,7 +1,7 @@
 <?
 class CIBlockPropertyEnumResult extends CDBResult
 {
-	public static function Fetch()
+	function Fetch()
 	{
 		$a = parent::Fetch();
 		if($a && defined("BX_COMP_MANAGED_CACHE"))
@@ -18,7 +18,7 @@ class CIBlockPropertyEnumResult extends CDBResult
  *
  *
  *
- * @return mixed 
+ * @return mixed
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/index.php
@@ -26,7 +26,7 @@ class CIBlockPropertyEnumResult extends CDBResult
  */
 class CIBlockPropertyEnum
 {
-	
+
 	/**
 	 * <p>Возвращает список вариантов значений свойств типа "список" по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>.</p>
 	 *
@@ -63,14 +63,14 @@ class CIBlockPropertyEnum
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$property_enums = CIBlockPropertyEnum::GetList(Array("DEF"=&gt;"DESC", "SORT"=&gt;"ASC"), Array("IBLOCK_ID"=&gt;$IBLOCK_ID, "CODE"=&gt;"COLORS"));<br>while($enum_fields = $property_enums-&gt;GetNext())<br>{<br>  echo $enum_fields["ID"]." - ".$enum_fields["VALUE"]."&lt;br&gt;";<br>}<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля варианта значений
 	 * свойства типа "список"</a> </li> </ul><a name="examples"></a>
@@ -122,6 +122,9 @@ class CIBlockPropertyEnum
 					$arSqlSearch[] = CIBlock::FilterCreate("P.ID", $val, "number", $bInvert);
 				else
 					$arSqlSearch[] = CIBlock::FilterCreate("P.CODE", $val, "string", $bInvert);
+				break;
+			case "PROPERTY_ACTIVE":
+				$arSqlSearch[] = CIBlock::FilterCreate("P.ACTIVE", $val, "string_equal", $bInvert);
 				break;
 			case "ID":
 			case "SORT":
@@ -186,7 +189,7 @@ class CIBlockPropertyEnum
 		return new CIBlockPropertyEnumResult($rs);
 	}
 
-	
+
 	/**
 	 * <p>Функция добавляет новый вариант значения свойства типа "список". </p>
 	 *
@@ -203,7 +206,7 @@ class CIBlockPropertyEnum
 	 * прошло успешно, при возникновении ошибки функция вернет false.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $ibpenum = new CIBlockPropertyEnum;
@@ -214,7 +217,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php">CIBlockPropertyEnum::Update</a>
 	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
@@ -255,7 +258,7 @@ class CIBlockPropertyEnum
 		return $ID;
 	}
 
-	
+
 	/**
 	 * <p>Функция изменяет параметры варианта свойства с кодом <i>ID</i>.</p>
 	 *
@@ -276,7 +279,7 @@ class CIBlockPropertyEnum
 	 * возникновении ошибки метод вернет false.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $ibpenum = new CIBlockPropertyEnum;
@@ -286,7 +289,7 @@ class CIBlockPropertyEnum
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php">CIBlockPropertyEnum::Add</a> </li>
 	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля свойства</a> </li>
@@ -341,7 +344,7 @@ class CIBlockPropertyEnum
 		);
 	}
 
-	
+
 	/**
 	 * <p>Функция удаляет вариант значения свойства типа "список".</p>
 	 *
@@ -354,11 +357,10 @@ class CIBlockPropertyEnum
 	 *
 	 * @return bool <p>В случае успешного удаления возвращается true, иначе - false.</p>
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/delete.php
 	 * @author Bitrix
 	 */
-	public static function Delete($ID)
+	function Delete($ID)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -374,7 +376,7 @@ class CIBlockPropertyEnum
 		return true;
 	}
 
-	
+
 	/**
 	 * <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта значения свойства типа "список".Или false если такой вариант отсутствует. <br></p>
 	 *
@@ -388,7 +390,7 @@ class CIBlockPropertyEnum
 	 * @return array <p>Массив если такой вариант есть и false если вариант отсутствует.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
 	 * значения свойств типа "список" </a> </li> </ul><br>
 	 *

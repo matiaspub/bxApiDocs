@@ -1,4 +1,4 @@
-<?php
+<?
 IncludeModuleLangFile(__FILE__);
 
 
@@ -8,7 +8,7 @@ IncludeModuleLangFile(__FILE__);
  *
  *
  *
- * @return mixed 
+ * @return mixed
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php
@@ -17,7 +17,7 @@ IncludeModuleLangFile(__FILE__);
 class CAllIBlock
 {
 	public $LAST_ERROR = "";
-	
+    protected static $disabledCacheTag = array();
 	/**
 	 * <p>Добавляет в административную панель кнопки для быстрого перехода к редактированию объектов модуля информационных блоков, с учётом прав доступа. Также состав кнопок различен для разных режимов панели. <br></p>
 	 *
@@ -78,17 +78,17 @@ class CAllIBlock
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 * @return mixed
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$IBLOCK_TYPE = 'catalog';<br>if(CModule::IncludeModule('iblock')):<br>	if($arIBlockElement = GetIBlockElement($_GET['ID'], $IBLOCK_TYPE)):<br>		CIBlock::ShowPanel($arIBlockElement['IBLOCK_ID'], $_GET['ID'], 0, $IBLOCK_TYPE);<br>		$APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>		$APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], $arIBlockElement['LIST_PAGE_URL']);<br>		?&gt;<br>		&lt;?=$arIBlockElement['NAME']?&gt;&lt;br&gt;<br>		&lt;?=$arIBlockElement['DETAIL_TEXT']?&gt;<br>		&lt;?<br>	endif;<br>endif;<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php">CMain</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">ShowPanel</a> </li> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php">CMain::GetPublicShowMode</a></li>
@@ -129,9 +129,9 @@ class CAllIBlock
 		return null;
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 *
 	 *
 	 *
@@ -139,14 +139,14 @@ class CAllIBlock
 	 * @return mixed <p></p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * <br><br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
@@ -275,9 +275,9 @@ class CAllIBlock
 		return $arResult;
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 *
 	 *
 	 *
@@ -285,14 +285,14 @@ class CAllIBlock
 	 * @return mixed <p></p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * <br><br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
@@ -703,7 +703,7 @@ class CAllIBlock
 	 * @param int $iblock_id
 	 * @return CDBResult
 	 */
-	
+
 	/**
 	 * <p>Функция возвращает список сайтов к которым привязан инфоблок. <br></p>
 	 *
@@ -718,14 +718,14 @@ class CAllIBlock
 	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a></p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$SITES = '';<br>$rsSites = CIBlock::GetSite($IBLOCK_ID);<br>while($arSite = $rsSites-&gt;Fetch())<br>	$SITES .= ($SITES!=""?" / ":"").htmlspecialchars($arSite["SITE_ID"]);<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a></li> </ul><a
 	 * name="examples"></a>
@@ -747,7 +747,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// Block by ID
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Возвращает информационный блок по его коду <i>ID</i>.</p>
 	 *
@@ -761,7 +761,7 @@ class CAllIBlock
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $res = CIBlock::GetByID($_GET["BID"]);
@@ -772,7 +772,7 @@ class CAllIBlock
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля результата</a> </li> </ul><a
 	 * name="examples"></a>
@@ -792,7 +792,7 @@ class CAllIBlock
 	 * @param string $FIELD
 	 * @return mixed
 	 */
-	
+
 	/**
 	 * <p>Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей</a> информационного блока.</p> <p><b>Примечание</b>: если инфоблока с таким ID не существует, то функция вернет false.</p>
 	 *
@@ -811,14 +811,14 @@ class CAllIBlock
 	 * @return array <p>Массив полей инфоблока.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>echo CIBlock::GetArrayByID($IBLOCK_ID, "NAME");<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля инфоблока</a></li>
 	 * </ul><a name="examples"></a>
 	 *
@@ -910,7 +910,7 @@ class CAllIBlock
 			return $arResult;
 	}
 
-	public static function CleanCache($ID)
+	function CleanCache($ID)
 	{
 		/** @global CCacheManager $CACHE_MANAGER */
 		global $CACHE_MANAGER;
@@ -931,7 +931,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// New block
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Метод добавляет новый информационный блок. Модифицировать поля, а также отменить создание инфоблока можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a>.</p>
 	 *
@@ -956,17 +956,17 @@ class CAllIBlock
 	 *
 	 *
 	 *
-	 * @return int 
+	 * @return int
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a> </li> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационного
 	 * блока</a></li> <li><a
@@ -1113,6 +1113,12 @@ class CAllIBlock
 					$this->SetPermission($ID, $arFields["GROUP_ID"]);
 			}
 
+			if (array_key_exists("IPROPERTY_TEMPLATES", $arFields))
+			{
+				$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\IblockTemplates($ID);
+				$ipropTemplates->set($arFields["IPROPERTY_TEMPLATES"]);
+			}
+
 			if(!empty($arLID))
 			{
 				$DB->Query("
@@ -1165,7 +1171,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// Update
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Функция изменяет параметры информационного блока с кодом <i>ID</i>. Модифицировать поля, а также отменить изменение параметров можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>.</p>
 	 *
@@ -1191,17 +1197,17 @@ class CAllIBlock
 	 *
 	 *
 	 *
-	 * @return bool 
+	 * @return bool
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационного блока</a>
 	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
@@ -1364,6 +1370,12 @@ class CAllIBlock
 					CIBlock::SetPermission($ID, $arFields["GROUP_ID"]);
 			}
 
+			if (array_key_exists("IPROPERTY_TEMPLATES", $arFields))
+			{
+				$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\IblockTemplates($ID);
+				$ipropTemplates->set($arFields["IPROPERTY_TEMPLATES"]);
+			}
+
 			if(!empty($arLID))
 			{
 				$strSql = "DELETE FROM b_iblock_site WHERE IBLOCK_ID=".$ID;
@@ -1406,7 +1418,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// Function deletes iblock by ID
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Функция удаляет информационный блок.</p>
 	 *
@@ -1421,7 +1433,7 @@ class CAllIBlock
 	 * name="examples"></a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>if($USER-&gt;IsAdmin())<br>{<br>	$DB-&gt;StartTransaction();<br>	if(!CIBlock::Delete($iblock_id))<br>	{<br>		$strWarning .= GetMessage("IBLOCK_DELETE_ERROR");<br>		$DB-&gt;Rollback();<br>	}<br>	else<br>		$DB-&gt;Commit();<br>}<br>?&gt;<br>
 	 * </pre>
@@ -1500,6 +1512,9 @@ class CAllIBlock
 		$obIBlockRights = new CIBlockRights($ID);
 		$obIBlockRights->DeleteAllRights();
 
+		$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\IblockTemplates($ID);
+		$ipropTemplates->delete();
+
 		CIBlockSectionPropertyLink::DeleteByIBlock($ID);
 
 		$DB->Query("delete from b_iblock_offers_tmp where PRODUCT_IBLOCK_ID=".$ID, false, $err_mess.__LINE__);
@@ -1538,7 +1553,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// Check function called from Add and Update
 	///////////////////////////////////////////////////////////////////
-	public function CheckFields(&$arFields, $ID=false)
+	function CheckFields(&$arFields, $ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -1664,7 +1679,7 @@ class CAllIBlock
 		return true;
 	}
 
-	
+
 	/**
 	 * <p>Функция устанавливает права доступа <span class="syntax"><i>arPERMISSIONS</i> для информационного блока <i>IBLOCK_ID</i></span>. Перед этим все права установленные ранее снимаются. <br></p>
 	 *
@@ -1682,17 +1697,17 @@ class CAllIBlock
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 * @return mixed
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>CIBlock::SetPermission($IBLOCK_ID, Array("1"=&gt;"X", "2"=&gt;"R", "3"=&gt;"W"));<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpermission.php">GetPermission()</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
@@ -1700,16 +1715,15 @@ class CAllIBlock
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php
 	 * @author Bitrix
 	 */
-	public static function SetPermission($IBLOCK_ID, $arGROUP_ID)
+    function SetPermission($IBLOCK_ID, $arGROUP_ID)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
 		$IBLOCK_ID = intval($IBLOCK_ID);
-		static $letters = "RUWX";
+		static $letters = "RSTUWX";
 
 		$arToDelete = array();
 		$arToInsert = array();
@@ -1780,7 +1794,7 @@ class CAllIBlock
 		}
 	}
 
-	
+
 	/**
 	 * <p>Функция устанавливает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update.</a></p> <p><b>Примечание</b>: Значения полей не указанных в параметре arFields сохраняются.</p>
 	 *
@@ -1798,16 +1812,15 @@ class CAllIBlock
 	 * @return mixed <p>Эта функция ничего не возвращает.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
 	 * поля</a> </li> </ul><br>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetMessages.php
 	 * @author Bitrix
 	 */
-	public static function SetMessages($ID, $arFields)
+    function SetMessages($ID, $arFields)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -1857,7 +1870,7 @@ class CAllIBlock
 		}
 	}
 
-	
+
 	/**
 	 * <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока.</p>
 	 *
@@ -1873,7 +1886,7 @@ class CAllIBlock
 	 * инфоблока.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetMessages.php">CIBlock::SetMessages</a></li>
 	 * <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
 	 * поля</a></li> </ul><br><br>
@@ -1940,7 +1953,7 @@ class CAllIBlock
 		return $arMessages;
 	}
 
-	public static function GetFieldsDefaults()
+	function GetFieldsDefaults()
 	{
 /*************
 REQ
@@ -2122,11 +2135,17 @@ REQ
 				"IS_REQUIRED" => false,
 				"DEFAULT_VALUE" => false,
 			),
+			"XML_IMPORT_START_TIME" => array(
+				"NAME" => "XML_IMPORT_START_TIME",
+				"IS_REQUIRED" => false,
+				"DEFAULT_VALUE" => false,
+				"VISIBLE" => "N",
+			),
 		);
 		return $res;
 	}
 
-	
+
 	/**
 	 * <p>Функция изменяет описание полей элементов инфоблоков. С ее помощью можно отметить поля как обязательные для заполнения, а также установить значение по умолчанию для новых элементов. <br></p> <p><b>Примечание</b>: обязательность полей будет проверена в функциях <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>, а значение по умолчанию будет установлено только в форме редактирования элемента в административной части сайта. <br></p>
 	 *
@@ -2147,7 +2166,7 @@ REQ
 	 * @return mixed <p>Функция ничего не возвращает.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * //Как сделать поле "Символьный код" обязательным
 	 * if (CModule::IncludeModule('iblock'))
@@ -2160,7 +2179,7 @@ REQ
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockfields">Поля элемента</a> </li>
 	 * </ul><br>
 	 *
@@ -2458,7 +2477,7 @@ REQ
 		}
 	}
 
-	
+
 	/**
 	 * <p>Функция возвращает описание полей элементов инфоблоков. Структура массива описана в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields.</a></p>
 	 *
@@ -2472,7 +2491,7 @@ REQ
 	 * @return array <p>Массив.</p>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
 	 * </ul><br>
 	 *
@@ -2537,7 +2556,7 @@ REQ
 		return $arDefFields;
 	}
 
-	
+
 	/**
 	 * Возвращает свойства информационного блока <span class="syntax"><i>iblock_id</i></span> с возможностью сортировки и дополнительной фильтрации. <br>
 	 *
@@ -2565,14 +2584,14 @@ REQ
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$res = CIBlock::GetProperties($IBLOCK_ID, Array(), Array("CODE"=&gt;"SRC"));<br>if($res_arr = $res-&gt;Fetch())<br>	$SrcPropID = $res_arr["ID"];<br>else<br>{<br>	$arFields = Array(<br>		"NAME" 			=&gt; "Источник импорта",<br>		"ACTIVE" 		=&gt; "Y",<br>		"SORT" 			=&gt; "1000",<br>		"DEFAULT_VALUE" =&gt; "",<br>		"CODE" 			=&gt; "SRC",<br>		"ROW_COUNT" 	=&gt; "1",<br>		"COL_COUNT" 	=&gt; "10",<br>		"MULTIPLE"	 	=&gt; "N",<br>		"MULTIPLE_CNT" 	=&gt; "",<br>		"PROPERTY_TYPE"	=&gt; "S",<br>		"LIST_TYPE" 	=&gt; "L",<br>		"IBLOCK_ID" 	=&gt; $IBLOCK_ID<br>		);<br>	$ibp = new CIBlockProperty;<br>	$SrcPropID = $ibp-&gt;Add($arFields);<br>	if(IntVal($SrcPropID)&lt;=0)<br>		$strWarning .= $ibp-&gt;LAST_ERROR."&lt;br&gt;";<br>}<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойств</a> </li> <li>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/getlist.php">GetList()</a> </li> </ul><a
@@ -2590,7 +2609,7 @@ REQ
 		return $props->GetList($arOrder, $arFilter);
 	}
 
-	
+
 	/**
 	 * <p>Возвращает права доступа к информационному блоку ID для всех групп пользователей.</p>
 	 *
@@ -2601,10 +2620,10 @@ REQ
 	 *
 	 *
 	 *
-	 * @return array 
+	 * @return array
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * // выбор списка пользователей, имеющих право доступа на чтение инфоблока $IBLOCK_ID<br>$gr_res = CIBlock::GetGroupPermissions($IBLOCK_ID);<br>$res = Array(1);<br>foreach($gr_res as $group_id=&gt;$perm)<br>if($perm&gt;"R")<br>   $res[] = $group_id;<br>$res = CUser::GetList($by="NAME", $order="ASC", Array("GROUP_MULTI"=&gt;$res));<br>?&gt;
@@ -2612,7 +2631,7 @@ REQ
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpermission.php">GetPermission</a>
 	 * </li></ul><a name="examples"></a>
 	 *
@@ -2638,7 +2657,7 @@ REQ
 		return $arRes;
 	}
 
-	
+
 	/**
 	 * <p>Возвращает право доступа к информационному блоку <span class="syntax"><i>IBLOCK_ID</i></span> для текущего пользователя.</p>
 	 *
@@ -2654,14 +2673,14 @@ REQ
 	 * + право изменять права доступа).</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$iblock_permission = CIBlock::GetPermission($id);<br>if($iblock_permission&lt;"X")<br>		return false;<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getgrouppermissions.php">CIBlock::GetGroupPermissions</a></li>
 	 * <li><a
@@ -2673,7 +2692,7 @@ REQ
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpermission.php
 	 * @author Bitrix
 	 */
-	public static function GetPermission($IBLOCK_ID, $FOR_USER_ID = false)
+	function GetPermission($IBLOCK_ID, $FOR_USER_ID = false)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -2732,7 +2751,7 @@ REQ
 		return $CACHE[$CACHE_KEY];
 	}
 
-	public static function OnBeforeLangDelete($lang)
+	function OnBeforeLangDelete($lang)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -2759,12 +2778,12 @@ REQ
 		}
 	}
 
-	public static function OnLangDelete($lang)
+	function OnLangDelete($lang)
 	{
 		return true;
 	}
 
-	public static function OnGroupDelete($group_id)
+	function OnGroupDelete($group_id)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -2772,7 +2791,7 @@ REQ
 		return $DB->Query("DELETE FROM b_iblock_group WHERE GROUP_ID=".IntVal($group_id), true);
 	}
 
-	function MkOperationFilter($key)
+	public static function MkOperationFilter($key)
 	{
 		static $triple_char = array(
 			"!><"=>"NB", //not between
@@ -2807,7 +2826,7 @@ REQ
 		return CIBlock::FilterCreateEx($field_name, $values, $type, $bFullJoin, $cOperationType, $bSkipEmpty);
 	}
 
-	public static function ForLIKE($str)
+	function ForLIKE($str)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -2815,7 +2834,7 @@ REQ
 		return str_replace("%", "\\%", str_replace("_", "\\_", $DB->ForSQL($str)));
 	}
 
-	public static function FilterCreateEx($fname, $vals, $type, &$bFullJoin, $cOperationType=false, $bSkipEmpty = true)
+	function FilterCreateEx($fname, $vals, $type, &$bFullJoin, $cOperationType=false, $bSkipEmpty = true)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -3044,7 +3063,7 @@ REQ
 		return array();
 	}
 
-	public static function OnSearchGetURL($arFields)
+	function OnSearchGetURL($arFields)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -3092,7 +3111,7 @@ REQ
 		return CIBlock::ReplaceDetailUrl($url, $arr, $server_name, $arrType);
 	}
 
-	public static function _GetProductUrl($OF_ELEMENT_ID, $OF_IBLOCK_ID, $server_name = false, $arrType = false)
+	function _GetProductUrl($OF_ELEMENT_ID, $OF_IBLOCK_ID, $server_name = false, $arrType = false)
 	{
 		static $arIBlockCache = array();
 		static $arElementCache = array();
@@ -3331,7 +3350,7 @@ REQ
 	}
 
 
-	public static function OnSearchReindex($NS=Array(), $oCallback=NULL, $callback_method="")
+	function OnSearchReindex($NS=Array(), $oCallback=NULL, $callback_method="")
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $USER_FIELD_MANAGER;
@@ -3364,7 +3383,8 @@ REQ
 		}
 		$strSql = "
 			SELECT B.ID, B.IBLOCK_TYPE_ID, B.INDEX_ELEMENT, B.INDEX_SECTION, B.RIGHTS_MODE,
-				B.IBLOCK_TYPE_ID, B.CODE as IBLOCK_CODE, B.XML_ID as IBLOCK_EXTERNAL_ID
+				B.IBLOCK_TYPE_ID, B.CODE as IBLOCK_CODE, B.XML_ID as IBLOCK_EXTERNAL_ID,
+				B.SOCNET_GROUP_ID
 			FROM b_iblock B
 			".$strNSJoin1."
 			WHERE B.ACTIVE = 'Y'
@@ -3534,6 +3554,11 @@ REQ
 						"URL" => $DETAIL_URL
 					);
 
+					if ($arIBlock["SOCNET_GROUP_ID"] > 0)
+						$Result["PARAMS"] = array(
+							"socnet_group" => $arIBlock["SOCNET_GROUP_ID"],
+						);
+
 					if($oCallback)
 					{
 						$res = call_user_func(array($oCallback, $callback_method), $Result);
@@ -3606,6 +3631,11 @@ REQ
 						"URL" => $DETAIL_URL,
 						);
 
+					if ($arIBlock["SOCNET_GROUP_ID"] > 0)
+						$Result["PARAMS"] = array(
+							"socnet_group" => $arIBlock["SOCNET_GROUP_ID"],
+						);
+
 					if($oCallback)
 					{
 						$res = call_user_func(array($oCallback, $callback_method), $Result);
@@ -3628,7 +3658,7 @@ REQ
 		return $arResult;
 	}
 
-	
+
 	/**
 	 * <p>Функция возвращает количество элементов информационного блока.</p> <p><b>Примечание</b>: активность элементов и права доступа не учитываются.</p>
 	 *
@@ -3645,7 +3675,7 @@ REQ
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetElementCount.php
 	 * @author Bitrix
 	 */
-	public static function GetElementCount($iblock_id)
+    function GetElementCount($iblock_id)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -3663,7 +3693,7 @@ REQ
 		return intval($ar["C"]);
 	}
 
-	
+
 	/**
 	 * <p>Функция выполняет масштабирование файла.</p> <p><b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан. <br></p>
 	 *
@@ -3697,14 +3727,14 @@ REQ
 	 * @return array <p>Массив описывающий файл или строка с сообщением об ошибке.</p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("MyHandlers", "ResizeElementProperty"));<br>AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", Array("MyHandlers", "ResizeElementProperty"));<br><br>class MyHandlers<br>{<br>	function ResizeElementProperty(&amp;$arFields)<br>	{<br>		global $APPLICATION;<br>		//Код инфоблока свойство каторого нуждается в масштабировании<br>		$IBLOCK_ID = 1;<br>		//Идентификатор свойства<br>		$PROPERTY_ID = 15;<br>		//Наш инфоблок и значения свойства в наличии<br>		if(<br>			$arFields["IBLOCK_ID"] == $IBLOCK_ID<br>			&amp;&amp; is_array($arFields["PROPERTY_VALUES"])<br>			&amp;&amp; array_key_exists(15, $arFields["PROPERTY_VALUES"])<br>		)<br>		{<br>			foreach($arFields["PROPERTY_VALUES"][$PROPERTY_ID] as $key =&gt; $arFile)<br>			{<br>				//Изменяем размеры картинки<br>				$arNewFile = CIBlock::ResizePicture($arFile, array(<br>					"WIDTH" =&gt; 100,<br>					"HEIGHT" =&gt; 100,<br>					"METHOD" =&gt; "resample",<br>				));<br>				if(is_array($arNewFile))<br>					$arFields["PROPERTY_VALUES"][$PROPERTY_ID][$key] = $arNewFile;<br>				else<br>				{<br>					//Можно вернуть ошибку<br>					$APPLICATION-&gt;throwException("Ошибка масштабирования изображения в свойстве \"Файлы\":".$arNewFile);<br>					return false;<br>				}<br>			}<br>		}<br>	}<br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a></li>
 	 * <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li> </ul><a
 	 * name="examples"></a>
@@ -3850,6 +3880,11 @@ REQ
 		if(!is_array($arFileSize))
 			return false;
 
+		if ($arFilter["type"] === "text" && strlen($arFilter["text"]) > 1 && $arFilter["coefficient"] > 0)
+		{
+			$arFilter["text_width"] = ($arFileSize[0]-5) * $arFilter["coefficient"] / 100;
+		}
+
 		switch ($arFileSize[2])
 		{
 		case IMAGETYPE_GIF:
@@ -3916,7 +3951,7 @@ REQ
 		}
 	}
 
-	public static function _Order($by, $order, $default_order, $nullable = true)
+	function _Order($by, $order, $default_order, $nullable = true)
 	{
 		static $arOrder = array(
 			"nulls,asc"  => array(true,  "asc" ),
@@ -3945,6 +3980,27 @@ REQ
 		}
 
 		return $o;
+	}
+
+	public static function GetAdminIBlockEditLink($IBLOCK_ID, $arParams = array(), $strAdd = "")
+	{
+		if (
+			(defined("CATALOG_PRODUCT") || $arParams["force_catalog"] || array_key_exists('catalog', $arParams))
+			&& !array_key_exists("menu", $arParams)
+		)
+			$url = "cat_catalog_edit.php";
+		else
+			$url = "iblock_edit.php";
+
+		$url.= "?ID=".intval($IBLOCK_ID);
+		$url.= "&type=".urlencode(CIBlock::GetArrayByID($IBLOCK_ID, "IBLOCK_TYPE_ID"));
+		$url.= "&admin=Y";
+		$url.= "&lang=".urlencode(LANGUAGE_ID);
+		foreach ($arParams as $name => $value)
+			if (isset($value))
+				$url.= "&".urlencode($name)."=".urlencode($value);
+
+		return $url.$strAdd;
 	}
 
 	public static function GetAdminSectionEditLink($IBLOCK_ID, $SECTION_ID, $arParams = array(), $strAdd = "")
@@ -3994,11 +4050,19 @@ REQ
 	public static function GetAdminElementListLink($IBLOCK_ID, $arParams = array(), $strAdd = "")
 	{
 		if (defined("CATALOG_PRODUCT") && !array_key_exists("menu", $arParams))
-			$url = "cat_product_admin.php";
-		elseif (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
-			$url = "iblock_list_admin.php";
+		{
+			if (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
+				$url = "cat_product_list.php";
+			else
+				$url = "cat_product_admin.php";
+		}
 		else
-			$url = "iblock_element_admin.php";
+		{
+			if (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
+				$url = "iblock_list_admin.php";
+			else
+				$url = "iblock_element_admin.php";
+		}
 
 		$url.= "?IBLOCK_ID=".intval($IBLOCK_ID);
 		$url.= "&type=".urlencode(CIBlock::GetArrayByID($IBLOCK_ID, "IBLOCK_TYPE_ID"));
@@ -4013,11 +4077,19 @@ REQ
 	public static function GetAdminSectionListLink($IBLOCK_ID, $arParams = array(), $strAdd = "")
 	{
 		if ((defined("CATALOG_PRODUCT") || array_key_exists('catalog', $arParams)) && !array_key_exists("menu", $arParams))
-			$url = "cat_section_admin.php";
-		elseif (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
-			$url = "iblock_list_admin.php";
+		{
+			if (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
+				$url = "cat_product_list.php";
+			else
+				$url = "cat_section_admin.php";
+		}
 		else
-			$url = "iblock_section_admin.php";
+		{
+			if (CIBlock::GetAdminListMode($IBLOCK_ID) == 'C')
+				$url = "iblock_list_admin.php";
+			else
+				$url = "iblock_section_admin.php";
+		}
 
 		$url.= "?IBLOCK_ID=".intval($IBLOCK_ID);
 		$url.= "&type=".urlencode(CIBlock::GetArrayByID($IBLOCK_ID, "IBLOCK_TYPE_ID"));
@@ -4041,7 +4113,7 @@ REQ
 			return 'S';
 	}
 
-	public static function CheckForIndexes($IBLOCK_ID)
+	function CheckForIndexes($IBLOCK_ID)
 	{
 		global $DB;
 		$arIBlock = CIBlock::GetArrayByID($IBLOCK_ID);
@@ -4064,7 +4136,7 @@ REQ
 	}
 
 
-	public static function GetAuditTypes()
+	function GetAuditTypes()
 	{
 		return array(
 			"IBLOCK_SECTION_ADD" => "[IBLOCK_SECTION_ADD] ".GetMessage("IBLOCK_SECTION_ADD"),
@@ -4095,7 +4167,7 @@ REQ
 		return $result;
 	}
 
-	public static function _transaction_lock($IBLOCK_ID)
+	function _transaction_lock($IBLOCK_ID)
 	{
 		/** @global CDatabase $DB */
 		global $DB;
@@ -4103,7 +4175,7 @@ REQ
 		$DB->Query("UPDATE b_iblock set TMP_ID = '".md5(mt_rand())."' WHERE ID = ".$IBLOCK_ID);
 	}
 
-	public static function isShortDate($strDate)
+	function isShortDate($strDate)
 	{
 		$arDate = ParseDateTime($strDate, FORMAT_DATETIME);
 		unset($arDate["DD"]);
@@ -4114,17 +4186,17 @@ REQ
 		return array_sum($arDate) == 0;
 	}
 
-	public static function _Upper($str)
+	function _Upper($str)
 	{
 		return $str;
 	}
 
-	static function _Add($ID)
+	function _Add($ID)
 	{
 		return false;
 	}
 
-	public static function _NotEmpty($column)
+	function _NotEmpty($column)
 	{
 		return "";
 	}
@@ -4225,13 +4297,13 @@ REQ
 		else
 		{
 			$io = CBXVirtualIo::GetInstance();
-			$normPath = $io->CombinePath("/", $io->GetPhysicalName($file_path));
-			$pathWithinRoot = $_SERVER["DOCUMENT_ROOT"].$normPath;
-			if ($io->ValidatePathString($pathWithinRoot) && $io->FileExists($pathWithinRoot))
+			$normPath = $io->CombinePath("/", $file_path);
+			$absPath = $io->CombinePath($_SERVER["DOCUMENT_ROOT"], $normPath);
+			if ($io->ValidatePathString($absPath) && $io->FileExists($absPath))
 			{
 				$perm = $APPLICATION->GetFileAccessPermission($normPath);
 				if ($perm >= "W")
-					$result = CFile::MakeFileArray($pathWithinRoot);
+					$result = CFile::MakeFileArray($io->GetPhysicalName($absPath));
 			}
 		}
 
@@ -4272,5 +4344,21 @@ REQ
 		}
 
 		return $result;
+	}
+
+	public static function disableTagCache($iblock_id)
+	{
+		$iblock_id = intval($iblock_id);
+		self::$disabledCacheTag[$iblock_id] = $iblock_id;
+	}
+
+	public  static function registerWithTagCache($iblock_id)
+	{
+		global $CACHE_MANAGER;
+		$iblock_id = intval($iblock_id);
+		if (!isset(self::$disabledCacheTag[$iblock_id]))
+		{
+			$CACHE_MANAGER->RegisterTag("iblock_id_".$iblock_id);
+		}
 	}
 }

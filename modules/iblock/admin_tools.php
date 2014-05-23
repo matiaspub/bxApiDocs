@@ -138,7 +138,7 @@ function _ShowElementPropertyField($name, $property_fields, $values, $bVarsFromF
 		$ar_res = $db_res->GetNext();
 		echo '<tr><td>'.
 		'<input name="'.$name.'['.$key.']" id="'.$name.'['.$key.']" value="'.htmlspecialcharsex($val).'" size="5" type="text">'.
-		'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANG.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;k='.$key.'\', 600, 500);">'.
+		'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANGUAGE_ID.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;k='.$key.'\', 600, 500);">'.
 		'&nbsp;<span id="sp_'.md5($name).'_'.$key.'" >'.$ar_res['NAME'].'</span>'.
 		'</td></tr>';
 
@@ -161,7 +161,7 @@ function _ShowElementPropertyField($name, $property_fields, $values, $bVarsFromF
 
 			echo '<tr><td>'.
 			'<input name="'.$name.'['.$key.']" id="'.$name.'['.$key.']" value="'.htmlspecialcharsex($val).'" size="5" type="text">'.
-			'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANG.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;k='.$key.'\', 600, 500);">'.
+			'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANGUAGE_ID.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;k='.$key.'\', 600, 500);">'.
 			'&nbsp;<span id="sp_'.md5($name).'_'.$key.'"></span>'.
 			'</td></tr>';
 		}
@@ -170,7 +170,7 @@ function _ShowElementPropertyField($name, $property_fields, $values, $bVarsFromF
 	if($property_fields["MULTIPLE"]=="Y")
 	{
 		echo '<tr><td>'.
-			'<input type="button" value="'.GetMessage("IBLOCK_AT_PROP_ADD").'..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANG.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;m=y&amp;k='.$key.'\', 600, 500);">'.
+			'<input type="button" value="'.GetMessage("IBLOCK_AT_PROP_ADD").'..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANGUAGE_ID.'&amp;IBLOCK_ID='.$property_fields["LINK_IBLOCK_ID"].'&amp;n='.$name.'&amp;m=y&amp;k='.$key.'\', 600, 500);">'.
 			'<span id="sp_'.md5($name).'_'.$key.'" ></span>'.
 			'</td></tr>';
 	}
@@ -185,7 +185,7 @@ function _ShowElementPropertyField($name, $property_fields, $values, $bVarsFromF
 	echo "	oCell.innerHTML=".
 		"'<input name=\"".$name."[n'+MV_".md5($name)."+']\" value=\"'+id+'\" size=\"5\" type=\"text\">'+\r\n".
 		"'<input type=\"button\" value=\"...\" '+\r\n".
-		"'onClick=\"jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang=".LANG."&amp;IBLOCK_ID=".$property_fields["LINK_IBLOCK_ID"]."&amp;n=".$name."&amp;k='+MV_".md5($name)."+'\', '+\r\n".
+		"'onClick=\"jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang=".LANGUAGE_ID."&amp;IBLOCK_ID=".$property_fields["LINK_IBLOCK_ID"]."&amp;n=".$name."&amp;k='+MV_".md5($name)."+'\', '+\r\n".
 		"' 600, 500);\">'+".
 		"'&nbsp;<span id=\"sp_".md5($name)."_'+MV_".md5($name)."+'\" >'+name+'</span>".
 		"';";
@@ -499,7 +499,12 @@ function _ShowUserPropertyField($name, $property_fields, $values, $bInitDef = fa
 		}
 		$max_val += $cnt;
 	}
-	if($property_fields["MULTIPLE"]=="Y" && $arUserType["USER_TYPE"] !== "HTML" && !$bMultiple)
+	if(
+		$property_fields["MULTIPLE"]=="Y"
+		&& $arUserType["USER_TYPE"] !== "HTML"
+		&& $arUserType["USER_TYPE"] !== "employee"
+		&& !$bMultiple
+	)
 	{
 		$html .= '<tr><td><input type="button" value="'.GetMessage("IBLOCK_AT_PROP_ADD").'" onClick="addNewRow(\'tb'.md5($name).'\')"></td></tr>';
 	}
@@ -550,7 +555,7 @@ class _CIBlockError
 {
 	var $err_type, $err_text, $err_level;
 
-	public function _CIBlockError($err_level = false, $err_type = "", $err_text = "")
+	function _CIBlockError($err_level = false, $err_type = "", $err_text = "")
 	{
 		$this->err_type = $err_type;
 		$this->err_text = preg_replace("#<br>$#i", "", $err_text);
@@ -825,5 +830,65 @@ function IBlockGetWatermarkPositions()
 		array("reference_id" => "br", "reference" => GetMessage("IBLOCK_WATERMARK_POSITION_BR")),
 	));
 	return $rs;
+}
+
+function IBlockInheritedPropertyInput($iblock_id, $id, $data, $type, $checkboxLabel = "")
+{
+	$inherited = ($data[$id]["INHERITED"] !== "N") && ($checkboxLabel !== "");
+	$inputId = "IPROPERTY_TEMPLATES_".$id;
+	$inputName = "IPROPERTY_TEMPLATES[".$id."][TEMPLATE]";
+	$menuId = "mnu_IPROPERTY_TEMPLATES_".$id;
+	$resultId = "result_IPROPERTY_TEMPLATES_".$id;
+	$checkboxId = "ck_IPROPERTY_TEMPLATES_".$id;
+
+	if ($type === "S")
+		$menuItems = CIBlockParameters::GetInheritedPropertyTemplateSectionMenuItems($iblock_id, "InheritedPropertiesTemplates.insertIntoInheritedPropertiesTemplate", $menuId, $inputId);
+	else
+		$menuItems= CIBlockParameters::GetInheritedPropertyTemplateElementMenuItems($iblock_id, "InheritedPropertiesTemplates.insertIntoInheritedPropertiesTemplate", $menuId, $inputId);
+
+	$u = new CAdminPopupEx($menuId, $menuItems, array("zIndex" => 2000));
+	$result = $u->Show(true)
+		.'<script>
+			window.ipropTemplates[window.ipropTemplates.length] = {
+			"ID": "'.$id.'",
+			"INPUT_ID": "'.$inputId.'",
+			"RESULT_ID": "'.$resultId.'",
+			"TEMPLATE": ""
+			};
+		</script>'
+		.'<input type="hidden" name="'.$inputName.'" value="'.htmlspecialcharsbx($data[$id]["TEMPLATE"]).'" />'
+		.'<textarea onclick="InheritedPropertiesTemplates.enableTextArea(\''.$inputId.'\')" name="'.$inputName.'" id="'.$inputId.'" '.($inherited? 'readonly="readonly"': '').' cols="55" rows="1" style="width:90%">'
+		.htmlspecialcharsbx($data[$id]["TEMPLATE"])
+		.'</textarea>'
+		.'<input style="float:right" type="button" id="'.$menuId.'" '.($inherited? 'disabled="disabled"': '').' value="...">'
+		.'<br>'
+	;
+	if ($checkboxLabel != "")
+	{
+		$result .= '<input type="hidden" name="IPROPERTY_TEMPLATES['.$id.'][INHERITED]" value="Y">'
+			.'<input type="checkbox" name="IPROPERTY_TEMPLATES['.$id.'][INHERITED]" id="'.$checkboxId.'" value="N" '
+			.'onclick="InheritedPropertiesTemplates.updateInheritedPropertiesTemplates()" '.(!$inherited? 'checked="checked"': '').'>'
+			.'<label for="'.$checkboxId.'">'.$checkboxLabel.'</label><br>'
+		;
+	}
+	if (preg_match("/_FILE_NAME\$/", $id))
+	{
+		$result .= '<input type="hidden" name="IPROPERTY_TEMPLATES['.$id.'][LOWER]" value="N">'
+			.'<input type="checkbox" name="IPROPERTY_TEMPLATES['.$id.'][LOWER]" id="lower_'.$id.'" value="Y" '
+			.'onclick="InheritedPropertiesTemplates.enableTextArea(\''.$inputId.'\');InheritedPropertiesTemplates.updateInheritedPropertiesValues(false, true)" '.($data[$id]["LOWER"] !== "Y"? '': 'checked="checked"').'>'
+			.'<label for="lower_'.$id.'">'.GetMessage("IBLOCK_AT_FILE_NAME_LOWER").'</label><br>'
+		;
+		$result .= '<input type="hidden" name="IPROPERTY_TEMPLATES['.$id.'][TRANSLIT]" value="N">'
+			.'<input type="checkbox" name="IPROPERTY_TEMPLATES['.$id.'][TRANSLIT]" id="translit_'.$id.'" value="Y" '
+			.'onclick="InheritedPropertiesTemplates.enableTextArea(\''.$inputId.'\');InheritedPropertiesTemplates.updateInheritedPropertiesValues(false, true)" '.($data[$id]["TRANSLIT"] !== "Y"? '': 'checked="checked"').'>'
+			.'<label for="translit_'.$id.'">'.GetMessage("IBLOCK_AT_FILE_NAME_TRANSLIT").'</label><br>'
+		;
+		$result .= '<input size="2" maxlength="1" type="text" name="IPROPERTY_TEMPLATES['.$id.'][SPACE]" id="space_'.$id.'" value="'.htmlspecialcharsbx($data[$id]["SPACE"]).'" '
+			.'onchange="InheritedPropertiesTemplates.updateInheritedPropertiesValues(false, true)">'.GetMessage("IBLOCK_AT_FILE_NAME_SPACE").'<br>'
+		;
+	}
+	$result .= '<b><div id="'.$resultId.'"></div></b>';
+
+	return $result;
 }
 ?>

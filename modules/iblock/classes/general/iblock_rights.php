@@ -16,33 +16,33 @@ class CIBlockRights
 	protected static $arLetterToTask = null;
 	protected static $arLetterToOperations = null;
 
-	public function __construct($IBLOCK_ID)
+	function __construct($IBLOCK_ID)
 	{
 		$this->IBLOCK_ID = intval($IBLOCK_ID);
 		$this->id = $this->IBLOCK_ID;
 	}
 
-	public function GetIBlockID()
+	function GetIBlockID()
 	{
 		return $this->IBLOCK_ID;
 	}
 
-	public function GetID()
+	function GetID()
 	{
 		return $this->id;
 	}
 
-	public static function _entity_type()
+	function _entity_type()
 	{
 		return "iblock";
 	}
 
-	public function _self_check()
+	function _self_check()
 	{
 		return $this->IBLOCK_ID == $this->id;
 	}
 
-	public static function Post2Array($ar)
+	function Post2Array($ar)
 	{
 		$arRights = array();
 		$RIGHT_ID = "";
@@ -163,7 +163,7 @@ class CIBlockRights
 			return array();
 	}
 
-	public function ConvertGroups($arGroups)
+	function ConvertGroups($arGroups)
 	{
 		$i = 0;
 		$arRights = array();
@@ -183,7 +183,7 @@ class CIBlockRights
 		return $arRights;
 	}
 
-	public static function GetRightsList($bTitle = true)
+	function GetRightsList($bTitle = true)
 	{
 		global $DB;
 		$arResult = array();
@@ -201,7 +201,7 @@ class CIBlockRights
 		return $arResult;
 	}
 
-	public function GetGroups($arOperations = false, $opMode = false)
+	function GetGroups($arOperations = false, $opMode = false)
 	{
 		$arResult = array();
 
@@ -212,7 +212,7 @@ class CIBlockRights
 		return $arResult;
 	}
 
-	public static function GetList($arFilter)
+	function GetList($arFilter)
 	{
 		global $DB;
 
@@ -253,7 +253,7 @@ class CIBlockRights
 		");
 	}
 
-	public function GetRights($arOptions = array())
+	function GetRights($arOptions = array())
 	{
 		global $DB;
 		$arResult = array();
@@ -348,45 +348,21 @@ class CIBlockRights
 		return $arResult;
 	}
 
-	public function DeleteAllRights()
+	function DeleteAllRights()
 	{
 		$stor = $this->_storage_object();
 		$stor->CleanUp(/*$bFull=*/true);
 	}
 
-	public function Recalculate()
+	function Recalculate()
 	{
 		$stor = $this->_storage_object();
 		$stor->Recalculate();
 	}
 
-	public function ChangeParents($arOldParents, $arNewParents)
+	function ChangeParents($arOldParents, $arNewParents)
 	{
 		$obStorage = $this->_storage_object();
-
-		foreach($arOldParents as $i => $oid)
-		{
-			foreach($arNewParents as $j => $nid)
-			{
-				if($oid == $nid)
-				{
-					unset($arOldParents[$i]);
-					unset($arNewParents[$j]);
-				}
-			}
-		}
-
-		foreach($arNewParents as $j => $nid)
-		{
-			foreach($arOldParents as $i => $oid)
-			{
-				if($oid == $nid)
-				{
-					unset($arOldParents[$i]);
-					unset($arNewParents[$j]);
-				}
-			}
-		}
 
 		foreach($arOldParents as $id)
 		{
@@ -432,7 +408,7 @@ class CIBlockRights
 		}
 	}
 
-	public function _get_parent_object($id)
+	function _get_parent_object($id)
 	{
 		if($id <= 0)
 			return new CIBlockRights($this->IBLOCK_ID, $id);
@@ -440,7 +416,7 @@ class CIBlockRights
 			return new CIBlockSectionRights($this->IBLOCK_ID, $id);
 	}
 
-	public function SetRights($arRights)
+	function SetRights($arRights)
 	{
 		global $DB;
 
@@ -474,6 +450,7 @@ class CIBlockRights
 				$arRights[$RIGHT_ID]["TASK_ID"] = $arDBRights[$RIGHT_ID]["TASK_ID"];
 		}
 
+		$bCleanUp = false;
 		$obStorage = $this->_storage_object();
 		foreach($arRights as $RIGHT_ID => $arRightSet)
 		{
@@ -494,7 +471,7 @@ class CIBlockRights
 			)
 			{
 				$obStorage->DeleteChildrenSet($GROUP_CODE, CIBlockRights::GROUP_CODE);
-				$obStorage->CleanUp();
+				$bCleanUp = true;
 			}
 
 			if(substr($RIGHT_ID, 0, 1) == "n")
@@ -553,13 +530,16 @@ class CIBlockRights
 			}
 		}
 
+		if ($bCleanUp)
+			$obStorage->CleanUp();
+
 		if(defined("BX_COMP_MANAGED_CACHE"))
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("iblock_id_".$this->IBLOCK_ID);
 
 		return true;
 	}
 
-	public function _add($GROUP_CODE, $bInherit, $TASK_ID, $XML_ID)
+	function _add($GROUP_CODE, $bInherit, $TASK_ID, $XML_ID)
 	{
 		global $DB;
 		$arOperations = CTask::GetOperations($TASK_ID, /*$return_names=*/true);
@@ -579,7 +559,7 @@ class CIBlockRights
 		return $NEW_RIGHT_ID;
 	}
 
-	public static function _update($RIGHT_ID, $GROUP_CODE, $bInherit, $TASK_ID)
+	function _update($RIGHT_ID, $GROUP_CODE, $bInherit, $TASK_ID)
 	{
 		global $DB;
 		$RIGHT_ID = intval($RIGHT_ID);
@@ -595,14 +575,14 @@ class CIBlockRights
 		$DB->Query("UPDATE b_iblock_right SET ".$strUpdate." WHERE ID = ".$RIGHT_ID);
 	}
 
-	public static function _delete($RIGHT_ID)
+	function _delete($RIGHT_ID)
 	{
 		global $DB;
 		$RIGHT_ID = intval($RIGHT_ID);
 		$DB->Query("DELETE FROM b_iblock_right WHERE ID = ".$RIGHT_ID);
 	}
 
-	public function _storage_object()
+	function _storage_object()
 	{
 		return new CIBlockRightsStorage($this->IBLOCK_ID, 0, 0);
 	}
@@ -748,13 +728,13 @@ class CIBlockRights
 
 class CIBlockSectionRights extends CIBlockRights
 {
-	public function __construct($IBLOCK_ID, $SECTION_ID)
+	function __construct($IBLOCK_ID, $SECTION_ID)
 	{
 		parent::__construct($IBLOCK_ID);
 		$this->id = intval($SECTION_ID);
 	}
 
-	public function _self_check()
+	function _self_check()
 	{
 		global $DB;
 		$rs = $DB->Query("
@@ -766,17 +746,17 @@ class CIBlockSectionRights extends CIBlockRights
 		return is_array($rs->Fetch());
 	}
 
-	public static function _entity_type()
+	function _entity_type()
 	{
 		return "section";
 	}
 
-	public function _storage_object()
+	function _storage_object()
 	{
 		return new CIBlockRightsStorage($this->IBLOCK_ID, $this->id, 0);
 	}
 
-	public static function GetList($arFilter)
+	function GetList($arFilter)
 	{
 		global $DB;
 
@@ -818,7 +798,7 @@ class CIBlockSectionRights extends CIBlockRights
 		");
 	}
 
-	public function GetRights($arOptions = array())
+	function GetRights($arOptions = array())
 	{
 		global $DB;
 		$arResult = array();
@@ -940,7 +920,7 @@ class CIBlockSectionRights extends CIBlockRights
 		return $arResult;
 	}
 
-	public function DeleteAllRights()
+	function DeleteAllRights()
 	{
 		$stor = $this->_storage_object();
 		$stor->DeleteRights();
@@ -1020,13 +1000,13 @@ class CIBlockSectionRights extends CIBlockRights
 
 class CIBlockElementRights extends CIBlockRights
 {
-	public function __construct($IBLOCK_ID, $ELEMENT_ID)
+	function __construct($IBLOCK_ID, $ELEMENT_ID)
 	{
 		parent::__construct($IBLOCK_ID);
 		$this->id = intval($ELEMENT_ID);
 	}
 
-	public function _self_check()
+	function _self_check()
 	{
 		global $DB;
 		$rs = $DB->Query("
@@ -1038,17 +1018,17 @@ class CIBlockElementRights extends CIBlockRights
 		return is_array($rs->Fetch());
 	}
 
-	public static function _entity_type()
+	function _entity_type()
 	{
 		return "element";
 	}
 
-	public function _storage_object()
+	function _storage_object()
 	{
 		return new CIBlockRightsStorage($this->IBLOCK_ID, 0, $this->id);
 	}
 
-	public static function GetList($arFilter)
+	function GetList($arFilter)
 	{
 		global $DB;
 
@@ -1090,7 +1070,7 @@ class CIBlockElementRights extends CIBlockRights
 		");
 	}
 
-	public function GetRights($arOptions = array())
+	function GetRights($arOptions = array())
 	{
 		global $DB;
 		$arResult = array();
@@ -1212,7 +1192,7 @@ class CIBlockElementRights extends CIBlockRights
 		return $arResult;
 	}
 
-	public function DeleteAllRights()
+	function DeleteAllRights()
 	{
 		$stor = $this->_storage_object();
 		$stor->DeleteRights();
@@ -1248,7 +1228,7 @@ class CIBlockElementRights extends CIBlockRights
 		if ($USER_ID > 0)
 		{
 			$acc = new CAccess;
-			$acc->UpdateCodes();
+			$acc->UpdateCodes(array('USER_ID' => $USER_ID));
 		}
 
 		if(!is_array($arID))
@@ -1293,20 +1273,20 @@ class CIBlockRightsStorage
 	protected $SECTION_ID = 0;
 	protected $ELEMENT_ID = 0;
 	protected $arSection = null;
-	public function __construct($IBLOCK_ID, $SECTION_ID, $ELEMENT_ID)
+	function __construct($IBLOCK_ID, $SECTION_ID, $ELEMENT_ID)
 	{
 		$this->IBLOCK_ID = intval($IBLOCK_ID);
 		$this->SECTION_ID = intval($SECTION_ID);
 		$this->ELEMENT_ID = intval($ELEMENT_ID);
 	}
 
-	public function _set_section($SECTION_ID)
+	function _set_section($SECTION_ID)
 	{
 		$this->SECTION_ID = intval($SECTION_ID);
 		$this->arSection = null;
 	}
 
-	public function _get_section()
+	function _get_section()
 	{
 		if(!isset($this->arSection))
 		{
@@ -1346,7 +1326,7 @@ class CIBlockRightsStorage
 		return $this->arSection;
 	}
 
-	public function CountOverWrited($GROUP_CODE)
+	function CountOverWrited($GROUP_CODE)
 	{
 		global $DB;
 		$arResult = array(0,0);
@@ -1434,7 +1414,7 @@ class CIBlockRightsStorage
 		return $arResult;
 	}
 
-	public function DeleteSelfSet($ID, $TYPE)
+	function DeleteSelfSet($ID, $TYPE)
 	{
 		global $DB;
 
@@ -1470,7 +1450,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function DeleteChildrenSet($ID, $TYPE)
+	function DeleteChildrenSet($ID, $TYPE)
 	{
 		global $DB;
 
@@ -1568,7 +1548,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function AddSelfSet($RIGHT_ID, $bInherited = false)
+	function AddSelfSet($RIGHT_ID, $bInherited = false)
 	{
 		global $DB;
 
@@ -1603,7 +1583,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function AddChildrenSet($RIGHT_ID, $GROUP_CODE, $bInherited)
+	function AddChildrenSet($RIGHT_ID, $GROUP_CODE, $bInherited)
 	{
 		global $DB;
 
@@ -1722,7 +1702,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function FindParentWithInherit($GROUP_CODE)
+	function FindParentWithInherit($GROUP_CODE)
 	{
 		global $DB;
 		$arResult = array();
@@ -1782,7 +1762,7 @@ class CIBlockRightsStorage
 		return $arResult;
 	}
 
-	public function DeleteRights()
+	function DeleteRights()
 	{
 		global $DB;
 
@@ -1799,7 +1779,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function CleanUp($bFull = false)
+	function CleanUp($bFull = false)
 	{
 		global $DB;
 
@@ -1829,7 +1809,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public function Recalculate()
+	function Recalculate()
 	{
 		global $DB;
 
@@ -1845,6 +1825,15 @@ class CIBlockRightsStorage
 			WHERE
 				BR.IBLOCK_ID = ".$this->IBLOCK_ID."
 				AND BR.ENTITY_TYPE = 'element'
+				AND BE.ID NOT IN (
+					SELECT ER0.ELEMENT_ID
+					FROM
+						b_iblock_right BR0
+						INNER JOIN b_iblock_element_right ER0 ON ER0.RIGHT_ID = BR0.ID
+					WHERE
+						BR0.IBLOCK_ID = ".$this->IBLOCK_ID."
+						AND BR0.ENTITY_TYPE = 'element'
+				)
 		");
 		//Sections
 		$rs = $DB->Query("
@@ -1880,7 +1869,7 @@ class CIBlockRightsStorage
 		}
 	}
 
-	public static function OnTaskOperationsChanged($TASK_ID, $arOld, $arNew)
+	function OnTaskOperationsChanged($TASK_ID, $arOld, $arNew)
 	{
 		global $DB;
 		$TASK_ID = intval($TASK_ID);
@@ -1896,7 +1885,7 @@ class CIBlockRightsStorage
 			$DB->Query("UPDATE b_iblock_right SET OP_SREAD = 'N' WHERE TASK_ID = ".$TASK_ID);
 	}
 
-	public static function OnGroupDelete($GROUP_ID)
+	function OnGroupDelete($GROUP_ID)
 	{
 		global $DB;
 		$GROUP_ID = intval($GROUP_ID);
@@ -1916,7 +1905,7 @@ class CIBlockRightsStorage
 		");
 	}
 
-	public static function OnUserDelete($USER_ID)
+	function OnUserDelete($USER_ID)
 	{
 		global $DB;
 		$USER_ID = intval($USER_ID);

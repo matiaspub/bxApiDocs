@@ -3,12 +3,12 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * 
  *
  *
  *
  *
- * @return mixed 
+ *
+ * @return mixed
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockformatproperties/index.php
@@ -16,9 +16,9 @@ IncludeModuleLangFile(__FILE__);
  */
 class CIBlockFormatProperties
 {
-	
+
 	/**
-	 * 
+	 *
 	 *
 	 *
 	 *
@@ -26,14 +26,14 @@ class CIBlockFormatProperties
 	 * @return mixed <p></p>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * <br><br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <p></p><a name="examples"></a>
 	 *
 	 *
@@ -43,11 +43,16 @@ class CIBlockFormatProperties
 	 */
 	public static function GetDisplayValue($arItem, $arProperty, $event1)
 	{
+		static $installedStatictic = null;
+		if (null === $installedStatictic)
+		{
+			$installedStatictic = \Bitrix\Main\ModuleManager::isModuleInstalled('statistic');
+		}
 		$arUserTypeFormat = false;
-		if(strlen($arProperty["USER_TYPE"])>0)
+		if(isset($arProperty["USER_TYPE"]) && !empty($arProperty["USER_TYPE"]))
 		{
 			$arUserType = CIBlockProperty::GetUserType($arProperty["USER_TYPE"]);
-			if(array_key_exists("GetPublicViewHTML", $arUserType))
+			if(isset($arUserType["GetPublicViewHTML"]))
 				$arUserTypeFormat = $arUserType["GetPublicViewHTML"];
 		}
 
@@ -68,6 +73,8 @@ class CIBlockFormatProperties
 		}
 		$arDisplayValue = array();
 		$arFiles = array();
+		$arLinkElements = array();
+		$arLinkSections = array();
 		foreach($arValues as $val)
 		{
 			if($arUserTypeFormat)
@@ -83,7 +90,7 @@ class CIBlockFormatProperties
 			{
 				if(intval($val) > 0)
 				{
-					if(!array_key_exists($val, $CACHE["E"]))
+					if(!isset($CACHE["E"][$val]))
 					{
 						//USED TO GET "LINKED" ELEMENTS
 						$arLinkFilter = array (
@@ -92,28 +99,45 @@ class CIBlockFormatProperties
 							"ACTIVE_DATE" => "Y",
 							"CHECK_PERMISSIONS" => "Y",
 						);
-						$rsLink = CIBlockElement::GetList(array(), $arLinkFilter, false, false, array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL"));
+						$rsLink = CIBlockElement::GetList(
+							array(),
+							$arLinkFilter,
+							false,
+							false,
+							array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL", "PREVIEW_PICTURE", "DETAIL_PUCTURE")
+						);
 						$CACHE["E"][$val] = $rsLink->GetNext();
 					}
 					if(is_array($CACHE["E"][$val]))
+					{
 						$arDisplayValue[]='<a href="'.$CACHE["E"][$val]["DETAIL_PAGE_URL"].'">'.$CACHE["E"][$val]["NAME"].'</a>';
+						$arLinkElements[$val] = $CACHE["E"][$val];
+					}
 				}
 			}
 			elseif($arProperty["PROPERTY_TYPE"] == "G")
 			{
 				if(intval($val) > 0)
 				{
-					if(!array_key_exists($val, $CACHE["G"]))
+					if(!isset($CACHE["G"][$val]))
 					{
 						//USED TO GET SECTIONS NAMES
 						$arSectionFilter = array (
 							"ID" => $val,
 						);
-						$rsSection = CIBlockSection::GetList(Array(), $arSectionFilter, false, array("NAME", "SECTION_PAGE_URL"));
+						$rsSection = CIBlockSection::GetList(
+							array(),
+							$arSectionFilter,
+							false,
+							array("ID", "IBLOCK_ID", "NAME", "SECTION_PAGE_URL", "PICTURE", "DETAIL_PICTURE")
+						);
 						$CACHE["G"][$val] = $rsSection->GetNext();
 					}
 					if(is_array($CACHE["G"][$val]))
+					{
 						$arDisplayValue[]='<a href="'.$CACHE["G"][$val]["SECTION_PAGE_URL"].'">'.$CACHE["G"][$val]["NAME"].'</a>';
+						$arLinkSections[$val] = $CACHE["G"][$val];
+					}
 				}
 			}
 			elseif($arProperty["PROPERTY_TYPE"]=="L")
@@ -125,7 +149,7 @@ class CIBlockFormatProperties
 				if($arFile = CFile::GetFileArray($val))
 				{
 					$arFiles[] = $arFile;
-					if(IsModuleInstalled("statistic"))
+					if($installedStatictic)
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("/bitrix/redirect.php?event1=".urlencode($event1)."&event2=".urlencode($arFile["SRC"])."&event3=".urlencode($arFile["ORIGINAL_NAME"])."&goto=".urlencode($arFile["SRC"])).'">'.GetMessage('IBLOCK_DOWNLOAD').'</a>';
 					else
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx($arFile["SRC"]).'">'.GetMessage('IBLOCK_DOWNLOAD').'</a>';
@@ -136,14 +160,14 @@ class CIBlockFormatProperties
 				$trimmed = trim($val);
 				if(strpos($trimmed, "http")===0)
 				{
-					if(IsModuleInstalled("statistic"))
+					if($installedStatictic)
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("/bitrix/redirect.php?event1=".urlencode($event1)."&event2=".urlencode($trimmed)."&event3=".urlencode($arItem["NAME"])."&goto=".urlencode($trimmed)).'">'.$trimmed.'</a>';
 					else
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx($trimmed).'">'.$trimmed.'</a>';
 				}
 				elseif(strpos($trimmed, "www")===0)
 				{
-					if(IsModuleInstalled("statistic"))
+					if($installedStatictic)
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("/bitrix/redirect.php?event1=".urlencode($event1)."&event2=".urlencode("http://".$trimmed)."&event3=".urlencode($arItem["NAME"])."&goto=".urlencode("http://".$trimmed)).'">'.$trimmed.'</a>';
 					else
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("http://".$val).'">'.$val.'</a>';
@@ -160,7 +184,7 @@ class CIBlockFormatProperties
 		else
 			$arProperty["DISPLAY_VALUE"] = false;
 
-		if($arProperty["PROPERTY_TYPE"]=="F")
+		if ($arProperty["PROPERTY_TYPE"]=="F")
 		{
 			if(count($arFiles)==1)
 				$arProperty["FILE_VALUE"] = $arFiles[0];
@@ -168,6 +192,14 @@ class CIBlockFormatProperties
 				$arProperty["FILE_VALUE"] = $arFiles;
 			else
 				$arProperty["FILE_VALUE"] = false;
+		}
+		elseif ($arProperty['PROPERTY_TYPE'] == 'E')
+		{
+			$arProperty['LINK_ELEMENT_VALUE'] = (!empty($arLinkElements) ? $arLinkElements : false);
+		}
+		elseif ($arProperty['PROPERTY_TYPE'] == 'G')
+		{
+			$arProperty['LINK_SECTION_VALUE'] = (!empty($arLinkSections) ? $arLinkSections : false);
 		}
 
 		return $arProperty;
@@ -178,24 +210,24 @@ class CIBlockFormatProperties
 	 * @param int $timestamp
 	 * @return string
 	 */
-	
+
 	/**
-	 * 
 	 *
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 *
+	 * @return mixed
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * <br><br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <a name="examples"></a>
 	 *
 	 *

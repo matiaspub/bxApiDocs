@@ -1,20 +1,7 @@
 <?
-
-/**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами <br>
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php
- * @author Bitrix
- */
 class CIBlockRSS extends CAllIBlockRSS
 {
-	public static function GetCache($cacheKey)
+	function GetCache($cacheKey)
 	{
 		global $DB;
 
@@ -25,7 +12,7 @@ class CIBlockRSS extends CAllIBlockRSS
 		return $db_res->Fetch();
 	}
 
-	public static function Add($IBLOCK_ID, $NODE, $NODE_VALUE)
+	function Add($IBLOCK_ID, $NODE, $NODE_VALUE)
 	{
 		global $DB;
 		$IBLOCK_ID = IntVal($IBLOCK_ID);
@@ -34,7 +21,7 @@ class CIBlockRSS extends CAllIBlockRSS
 			"VALUES(".$IBLOCK_ID.", '".$DB->ForSql($NODE, 50)."', '".$DB->ForSql($NODE_VALUE, 255)."')");
 	}
 
-	public static function UpdateCache($cacheKey, $CACHE, $HOURS_CACHE, $bCACHED)
+	function UpdateCache($cacheKey, $CACHE, $HOURS_CACHE, $bCACHED)
 	{
 		global $DB;
 
@@ -60,7 +47,7 @@ class CIBlockRSS extends CAllIBlockRSS
 		$db_res = $DB->Query("DELETE from b_iblock_cache WHERE CACHE_DATE < NOW()");
 	}
 
-	public static function GetRSSText($arIBLOCK, $LIMIT_NUM = false, $LIMIT_DAY = false, $yandex = false)
+	function GetRSSText($arIBLOCK, $LIMIT_NUM = false, $LIMIT_DAY = false, $yandex = false)
 	{
 		global $DB;
 
@@ -247,14 +234,15 @@ class CIBlockRSS extends CAllIBlockRSS
 	}
 
 	// Agent
-	public static function PreGenerateRSS($IBLOCK_ID, $yandex = true)
+	function PreGenerateRSS($IBLOCK_ID, $yandex = true)
 	{
 		global $DB;
 
 		$strSql =
-			"SELECT DISTINCT B.*, S.CHARSET, S.SERVER_NAME, ".$DB->DateToCharFunction("B.TIMESTAMP_X")." as TIMESTAMP_X ".
+			"SELECT DISTINCT B.*, C.CHARSET, S.SERVER_NAME, ".$DB->DateToCharFunction("B.TIMESTAMP_X")." as TIMESTAMP_X ".
 			"FROM b_iblock B LEFT JOIN b_iblock_group IBG ON IBG.IBLOCK_ID=B.ID ".
 			"	LEFT JOIN b_lang S ON S.LID=B.LID ".
+			"	LEFT JOIN b_culture C ON C.ID=S.CULTURE_ID ".
 			"WHERE B.ID = ".IntVal($IBLOCK_ID).
 			"	AND IBG.GROUP_ID IN (2) ".
 			"	AND IBG.PERMISSION>='R'".
