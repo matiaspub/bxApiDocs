@@ -43,6 +43,7 @@ $arClasses = array(
 	"CIBlockPropertySequence" => "classes/general/prop_seq.php",
 	"CIBlockPropertyElementAutoComplete" => "classes/general/prop_element_auto.php",
 	"CIBlockPropertySKU" => "classes/general/prop_element_sku.php",
+	"CIBlockPropertySectionAutoComplete" => "classes/general/prop_section_auto.php",
 	"CAllIBlockOffersTmp" => "classes/general/iblockoffers.php",
 	"CIBlockOffersTmp" => "classes/".$DBType."/iblockoffers.php",
 	"CEventIblock" => "classes/general/iblock_event_list.php",
@@ -57,6 +58,10 @@ $arClasses = array(
 	"Bitrix\\Iblock\\SectionTable" => "lib/section.php",
 	"Bitrix\\Iblock\\SiteTable" => "lib/site.php",
 	"CIBlockSectionPropertyLink" => "classes/general/section_property.php",
+	"Bitrix\\Iblock\\Template\\NodeRoot" => "lib/template/engine.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyEnum" => "lib/template/entity/elementproperty.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyElement" => "lib/template/entity/elementproperty.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertySection" => "lib/template/entity/elementproperty.php",
 );
 if(IsModuleInstalled('bizproc'))
 {
@@ -203,14 +208,14 @@ function GetIBlockListLang($lang, $type, $arTypesInc = array(), $arTypesExc = ar
  * блока</a><code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><h4>Примечание</h4>
  *
  *
- * <h4>Example</h4> 
+ * <h4>Example</h4>
  * <pre>
  * &lt;?<br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");<br><br>$APPLICATION-&gt;SetTitle("Продукты");<br><br>// проверим установлен ли модуль и получим блок с кодом $BID и типом catalog<br>if(CModule::IncludeModule("iblock") &amp;&amp; ($arIBlock = GetIBlock($_GET["BID"], "catalog")))<br>{<br>   // сделаем заголовок страницы таким же как название инф. блока<br>   $APPLICATION-&gt;SetTitle($arIBlock["NAME"]);<br>   //добавим название в навигационную цепочку<br>   $APPLICATION-&gt;AddChainItem($arIBlock["NAME"], $arIBlock["LIST_PAGE_URL"]);<br><br>   //работаем дальше с информационным блоком<br>   // ....<br>}<br>else<br>   ShowError("Информационный блок не найден.");<br><br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
  *
  *
  *
- * <h4>See Also</h4> 
+ * <h4>See Also</h4>
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационных
  * блоков</a></li> </ul><a name="examples"></a>
  *
@@ -564,7 +569,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. </p>
  *
  *
- * <h4>Example</h4> 
+ * <h4>Example</h4>
  * <pre>
  * &lt;?
  * if(CModule::IncludeModule("iblock"))
@@ -584,7 +589,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  *
  *
  *
- * <h4>See Also</h4> 
+ * <h4>See Also</h4>
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов
  * информационного блока</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">Функция
@@ -665,14 +670,14 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>.</p>
  *
  *
- * <h4>Example</h4> 
+ * <h4>Example</h4>
  * <pre>
  * &lt;?<br>require($_SERVER['DOCUMENT_ROOT'].'/bitrix/header.php');<br><br>$APPLICATION-&gt;SetTitle('Карточка товара');<br><br>// подключим модуль и выберем элемент ID типа product<br>$arIBlockElement = false;<br>if(CModule::IncludeModule('iblock') &amp;&amp; ($arIBlockElement = GetIBlockElement($ID, 'product')))<br>{<br>   // В заголовок страницы вставим название элемента<br>   $APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>   // В навигационную цепочку вставим название и ссылку на текущий информационный блок<br>   $APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], 'products.php?ID='.$arIBlockElement['IBLOCK_ID']);<br><br>   // выведем детальную картинку<br>   echo ShowImage($arIBlockElement['DETAIL_PICTURE'], 150, 150, 'border="0"', '', true);<br>   // выведем детальное описание<br>   echo $arIBlockElement['DETAIL_TEXT'].'&lt;br&gt;';<br>   // выведем значение свойства с кодом PRICE<br>   echo $arIBlockElement['PROPERTIES']['PRICE']['VALUE'].'&lt;br&gt;';<br><br>   // вывeдем оставшиеся свойсва<br>   $arProps = $arIBlockElement['PROPERTIES'];<br>   foreach($arProps as $property_code=&gt;$arValue)<br>   {<br>      // если это свойство с кодом PRICE или значение свойства не введено - пропустим<br>      if($property_code=='PRICE' <br>			|| (!is_array($arValue['VALUE']) &amp;&amp; strlen($arValue['VALUE'])&lt;=0) <br>			|| (is_array($arValue['VALUE']) &amp;&amp; count($arValue['VALUE'])&lt;=0)<br>			)<br>         continue;<br><br>      // выведем пару "Название: значение"<br>      if(!is_array($arValue['VALUE']))<br>         echo $arValue['NAME'].": ".$arValue['VALUE'];<br>      else<br>      {<br>         echo $arValue['NAME'].': ';<br>         foreach($arValue['VALUE'] as $val)<br>         {<br>            echo $val.'&lt;br&gt;';<br>         }<br>      }<br>   }<br>}<br>else<br>   echo ShowError('Новость не найдена');<br><br>require($_SERVER["DOCUMENT_ROOT"].'/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
  *
  *
  *
- * <h4>See Also</h4> 
+ * <h4>See Also</h4>
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля информационного
  * элемента</a></li> </ul><a name="examples"></a>
  *
@@ -801,13 +806,13 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * раздела</a><i>IBLOCK_NAME</i><br><h4>Примечание</h4>
  *
  *
- * <h4>Example</h4> 
+ * <h4>Example</h4>
  * <pre>
  * &lt;?
  * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
- * 
+ *
  * $APPLICATION-&gt;SetTitle("Просмотр раздела");
- * 
+ *
  * // подключим модуль и выберем раздел ID типа product
  * if(CModule::IncludeModule("iblock") &amp;&amp; ($arIBlockSection = GetIBlockSection($_GET['ID'], 'product')))
  * {
@@ -822,14 +827,14 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * }
  * else
  *    echo ShowError("Раздел не найден");
- * 
+ *
  * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");
  * ?&gt;
  * </pre>
  *
  *
  *
- * <h4>See Also</h4> 
+ * <h4>See Also</h4>
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
  * информационного блока</a></li> </ul><a name="examples"></a>
  *
@@ -1231,7 +1236,8 @@ function ImportXMLFile($file_name, $iblock_type="-", $site_id='', $section_actio
 	$SECTION_MAP = false;
 	$PRICES_MAP = false;
 	$obCatalog->ReadCatalogData($SECTION_MAP, $PRICES_MAP);
-	$result = $obCatalog->ImportElements(time(), 0);
+	$obCatalog->ImportElements(time(), 0);
+	$obCatalog->ImportProductSets();
 
 	$obCatalog->DeactivateElement($element_action, time(), 0);
 	if($sync)

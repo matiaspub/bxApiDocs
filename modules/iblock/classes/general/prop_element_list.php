@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CIBlockPropertyElementList
 {
-	public static function PrepareSettings($arProperty)
+	function PrepareSettings($arProperty)
 	{
 		$size = 0;
 		if(is_array($arProperty["USER_TYPE_SETTINGS"]))
@@ -35,7 +35,7 @@ class CIBlockPropertyElementList
 		);
 	}
 
-	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
 		$settings = CIBlockPropertyElementList::PrepareSettings($arProperty);
 
@@ -69,7 +69,7 @@ class CIBlockPropertyElementList
 	//strHTMLControlName - array("VALUE","DESCRIPTION")
 	//return:
 	//safe html
-	public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
+	function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
 	{
 		$settings = CIBlockPropertyElementList::PrepareSettings($arProperty);
 		if($settings["size"] > 1)
@@ -93,7 +93,7 @@ class CIBlockPropertyElementList
 		return  $html;
 	}
 
-	public static function GetPropertyFieldHtmlMulty($arProperty, $value, $strHTMLControlName)
+	function GetPropertyFieldHtmlMulty($arProperty, $value, $strHTMLControlName)
 	{
 		$max_n = 0;
 		$values = array();
@@ -162,7 +162,7 @@ class CIBlockPropertyElementList
 		return  $html;
 	}
 
-	public static function GetAdminFilterHTML($arProperty, $strHTMLControlName)
+	function GetAdminFilterHTML($arProperty, $strHTMLControlName)
 	{
 		$lAdmin = new CAdminList($strHTMLControlName["TABLE_ID"]);
 		$lAdmin->InitFilter(array($strHTMLControlName["VALUE"]));
@@ -194,7 +194,7 @@ class CIBlockPropertyElementList
 		return  $html;
 	}
 
-	static public function GetPublicViewHTML($arProperty, $arValue, $strHTMLControlName)
+	public function GetPublicViewHTML($arProperty, $arValue, $strHTMLControlName)
 	{
 		static $cache = array();
 
@@ -202,7 +202,7 @@ class CIBlockPropertyElementList
 		$arValue['VALUE'] = intval($arValue['VALUE']);
 		if (0 < $arValue['VALUE'])
 		{
-			if (!array_key_exists($arValue['VALUE'],$cache))
+			if (!isset($cache[$arValue['VALUE']]))
 			{
 				$arFilter = array();
 				$intIBlockID = intval($arProperty['LINK_IBLOCK_ID']);
@@ -220,16 +220,20 @@ class CIBlockPropertyElementList
 				{
 					$strResult = $cache[$arValue['VALUE']]['ID'];
 				}
+				elseif (isset($strHTMLControlName['MODE']) && ('SIMPLE_TEXT' == $strHTMLControlName['MODE'] || 'ELEMENT_TEMPLATE' == $strHTMLControlName['MODE']))
+				{
+					$strResult = $cache[$arValue['VALUE']]["NAME"];
+				}
 				else
 				{
-					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.$cache[$arValue['VALUE']]["NAME"].'</a>';;
+					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.htmlspecialcharsEx($cache[$arValue['VALUE']]["NAME"]).'</a>';;
 				}
 			}
 		}
 		return $strResult;
 	}
 
-	public static function GetOptionsHtml($arProperty, $values, &$bWasSelect)
+	function GetOptionsHtml($arProperty, $values, &$bWasSelect)
 	{
 		$options = "";
 		$settings = CIBlockPropertyElementList::PrepareSettings($arProperty);

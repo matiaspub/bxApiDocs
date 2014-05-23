@@ -1,7 +1,7 @@
 <?
 class CAllIBlockOffersTmp
 {
-	public static function Add($intProductIBlockID,$intOffersIBlockID)
+	function Add($intProductIBlockID,$intOffersIBlockID)
 	{
 		global $DB;
 
@@ -16,7 +16,7 @@ class CAllIBlockOffersTmp
 		return $DB->Add("b_iblock_offers_tmp", $arFields);
 	}
 
-	public static function Delete($ID)
+	function Delete($ID)
 	{
 		global $DB;
 
@@ -28,12 +28,12 @@ class CAllIBlockOffersTmp
 		return true;
 	}
 
-	public static function GetOldID($intProductIBlockID,$intOffersIBlockID)
+	function GetOldID($intProductIBlockID,$intOffersIBlockID)
 	{
 		return false;
 	}
 
-	public static function DeleteOldID($intProductIBlockID,$intOffersIBlockID,$intInterval = 86400)
+	function DeleteOldID($intProductIBlockID,$intOffersIBlockID,$intInterval = 86400)
 	{
 		return true;
 	}

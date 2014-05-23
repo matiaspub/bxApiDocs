@@ -1,7 +1,7 @@
 <?php
 IncludeModuleLangFile(__FILE__);
 /**
- * Class CIBlockType
+ * CIBlockType - класс для работы с типами информационных блоков.
  *
  * Fields:
  * <ul>
@@ -12,17 +12,8 @@ IncludeModuleLangFile(__FILE__);
  * <li> IN_RSS bool optional default 'N'
  * <li> SORT int optional default 500
  * </ul>
- */
-
-/**
- * CIBlockType - класс для работы с типами информационных блоков.
  *
  *
- *
- *
- * @return mixed 
- *
- * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php
  * @author Bitrix
  */
@@ -60,7 +51,7 @@ class CIBlockType
 	 * 	values with zero string length are ignored.
 	 * @return CDBResult
 	 */
-	
+
 	/**
 	 * <p>Возвращает список типов информационных блоков по фильтру <i>arFilter</i> с сортировкой <i>arOrder</i>.</p>
 	 *
@@ -86,14 +77,14 @@ class CIBlockType
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$db_iblock_type = CIBlockType::GetList();<br>while($ar_iblock_type = $db_iblock_type-&gt;Fetch())<br>{<br>   if($arIBType = CIBlockType::GetByIDLang($ar_iblock_type["ID"], LANG))<br>   {<br>      echo htmlspecialcharsEx($arIBType["NAME"])."&lt;br&gt;";<br>   }   <br>}<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> </ul><a
 	 * name="examples"></a>
@@ -264,7 +255,7 @@ class CIBlockType
 	 * @param string $ID iblock type ID
 	 * @return CDBResult
 	 */
-	
+
 	/**
 	 * <p>Возвращает тип информационных блоков по его коду <i>ID</i>.</p>
 	 *
@@ -278,7 +269,7 @@ class CIBlockType
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a></li> </ul>
 	 *
@@ -337,7 +328,7 @@ class CIBlockType
 	 * @param bool $bFindAny Forces strict search
 	 * @return array|bool
 	 */
-	
+
 	/**
 	 * <p>Метод возвращает языковые настройки типа информационных блоков по его коду <i>ID</i>, для языка <i>LANGUAGE_ID</i>. Если <span class="syntax">для языка <i>LANGUAGE_ID</i> нет настроек и параметр <i>bFindAny</i> установлен в true, функция вернет настройки типа для языка по умолчанию. </span></p>
 	 *
@@ -361,14 +352,14 @@ class CIBlockType
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">параметров</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$db_iblock_type = CIBlockType::GetList();<br>while($ar_iblock_type = $db_iblock_type-&gt;Fetch())<br>{<br>   if($arIBType = CIBlockType::GetByIDLang($ar_iblock_type["ID"], LANG))<br>   {<br>      echo htmlspecialcharsex($arIBType["NAME"])."&lt;br&gt;";<br>   }   <br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля CIBlockType</a> </li> <li>
 	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">Языкозависимые поля
 	 * CIBlockType</a> </li> </ul><a name="examples"></a>
@@ -433,7 +424,7 @@ class CIBlockType
 	 * @param string $ID iblock type ID.
 	 * @return bool|CDBResult
 	 */
-	
+
 	/**
 	 * <p>Функция удаляет тип информационных блоков по его коду <i>ID</i>. Также удаляются все информационные блоки указанного типа. <br></p>
 	 *
@@ -444,17 +435,17 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * @return bool 
+	 * @return bool
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$DB-&gt;StartTransaction();<br>if(!CIBlockType::Delete('catalog'))<br>{<br>    $DB-&gt;Rollback();<br>    echo 'Delete error!';<br>}<br>$DB-&gt;Commit();<br>?&gt;<br>
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/delete.php">CIBlock::Delete</a></li> </ul><a
 	 * name="examples"></a>
 	 *
@@ -565,7 +556,7 @@ class CIBlockType
 	 * @param array $arFields
 	 * @return bool
 	 */
-	
+
 	/**
 	 * <p> Метод добавляет новый тип информационных блоков. Этот метод не может быть использован как статическая функция. В случае ошибки в свойстве объекта LAST_ERROR будет содержаться текст ошибки. </p>
 	 *
@@ -581,17 +572,17 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * @return bool 
+	 * @return bool
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$arFields = Array(<br>	'ID'=&gt;'catalog',<br>	'SECTIONS'=&gt;'Y',<br>	'IN_RSS'=&gt;'N',<br>	'SORT'=&gt;100,<br>	'LANG'=&gt;Array(<br>		'en'=&gt;Array(<br>			'NAME'=&gt;'Catalog',<br>			'SECTION_NAME'=&gt;'Sections',<br>			'ELEMENT_NAME'=&gt;'Products'<br>			)<br>		)<br>	);<br><br>$obBlocktype = new CIBlockType;<br>$DB-&gt;StartTransaction();<br>$res = $obBlocktype-&gt;Add($arFields);<br>if(!$res)<br>{<br>   $DB-&gt;Rollback();<br>   echo 'Error: '.$obBlocktype-&gt;LAST_ERROR.'&lt;br&gt;';<br>}<br>else<br>   $DB-&gt;Commit();<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/update.php">Update()</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля типа информационных
@@ -639,7 +630,7 @@ class CIBlockType
 	 * @param array $arFields
 	 * @return bool
 	 */
-	
+
 	/**
 	 * <p>Функция изменяет параметры типа информационных блоков с кодом <i>ID</i>.</p>
 	 *
@@ -659,10 +650,10 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * @return bool 
+	 * @return bool
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$arFields = Array(<br>	'SECTIONS'=&gt;'Y',<br>	'IN_RSS'=&gt;'N',<br>	'SORT'=&gt;100,<br>	'LANG'=&gt;Array(<br>		'en'=&gt;Array(<br>			'NAME'=&gt;'Catalog',<br>			'SECTION_NAME'=&gt;'Sections',<br>			'ELEMENT_NAME'=&gt;'Products'<br>			)<br>		)<br>	);<br>
 	 * $obBlocktype = new CIBlockType;<br>$DB-&gt;StartTransaction();<br>$res = $obBlocktype-&gt;Update('catalog', $arFields);<br>if(!$res)<br>{<br>   $DB-&gt;Rollback();<br>   echo 'Error: '.$obBlocktype-&gt;LAST_ERROR.'&lt;br&gt;';<br>}<br>else<br>   $DB-&gt;Commit();<br>?&gt;<br>
@@ -670,7 +661,7 @@ class CIBlockType
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/index.php">CIBlockType</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocktype/add.php">Add()</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">Поля типа информационных

@@ -6,7 +6,7 @@
  *
  *
  *
- * @return mixed 
+ * @return mixed
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php
@@ -17,7 +17,7 @@ class _CIBElement
 	var $fields;
 	var $props=false;
 
-	
+
 	/**
 	 * <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. </p>
 	 *
@@ -28,7 +28,7 @@ class _CIBElement
 	 * информационного блока</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $res = CIBlockElement::GetByID($_GET["PID"]);
@@ -42,7 +42,7 @@ class _CIBElement
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">GetNext()</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элемента
@@ -60,7 +60,7 @@ class _CIBElement
 		return $this->fields;
 	}
 
-	
+
 	/**
 	 * <p>Метод возвращает значения свойств текущего элемента информационного блока.</p>
 	 *
@@ -340,7 +340,7 @@ class _CIBElement
 							$arProp["VALUE_ENUM_ID"] = array($arProp["VALUE_ENUM_ID"]);
 							$arProp["VALUE_ENUM"] = array($arProp["VALUE_ENUM"]);
 							$arProp["VALUE_XML_ID"] = array($arProp["VALUE_XML_ID"]);
-							$arTemp["VALUE_SORT"] = array($arProp["VALUE_SORT"]);
+							$arProp["VALUE_SORT"] = array($arProp["VALUE_SORT"]);
 						}
 					}
 					else
@@ -355,7 +355,7 @@ class _CIBElement
 							$arProp["VALUE_ENUM_ID"] = false;
 							$arProp["VALUE_ENUM"] = false;
 							$arProp["VALUE_XML_ID"] = false;
-							$arTemp["VALUE_SORT"] = false;
+							$arProp["VALUE_SORT"] = false;
 						}
 					}
 					$arAllProps[$PIND] = $arProp;
@@ -376,7 +376,7 @@ class _CIBElement
 		return $arAllProps;
 	}
 
-	
+
 	/**
 	 * <p>Метод возвращает параметры свойства <i>ID</i> и его значения для текущего элемента информационного блока.</p>
 	 *
@@ -391,7 +391,7 @@ class _CIBElement
 	 * свойства</a><br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?
 	 * $res = CIBlockElement::GetByID($_GET["PID"]);
@@ -411,54 +411,54 @@ class _CIBElement
 	 *     [NAME] =&gt; Photos with description
 	 *     [ACTIVE] =&gt; Y
 	 *     [SORT] =&gt; 500
-	 *     [CODE] =&gt; 
-	 *     [DEFAULT_VALUE] =&gt; 
+	 *     [CODE] =&gt;
+	 *     [DEFAULT_VALUE] =&gt;
 	 *     [PROPERTY_TYPE] =&gt; F
 	 *     [ROW_COUNT] =&gt; 1
 	 *     [COL_COUNT] =&gt; 30
 	 *     [LIST_TYPE] =&gt; L
 	 *     [MULTIPLE] =&gt; Y
-	 *     [XML_ID] =&gt; 
-	 *     [FILE_TYPE] =&gt; 
+	 *     [XML_ID] =&gt;
+	 *     [FILE_TYPE] =&gt;
 	 *     [MULTIPLE_CNT] =&gt; 5
-	 *     [TMP_ID] =&gt; 
+	 *     [TMP_ID] =&gt;
 	 *     [WITH_DESCRIPTION] =&gt; Y
 	 *     [LINK_IBLOCK_ID] =&gt; 0
 	 *     [VALUE_TYPE] =&gt; text
-	 *     [VALUE_ENUM] =&gt; 
+	 *     [VALUE_ENUM] =&gt;
 	 *     [VALUE] =&gt; Array
 	 *         (
 	 *             [0] =&gt; 2311
 	 *         )
-	 * 
+	 *
 	 *     [~VALUE] =&gt; Array
 	 *         (
 	 *             [0] =&gt; 2311
 	 *         )
-	 * 
+	 *
 	 *     [DESCRIPTION] =&gt; Array
 	 *         (
 	 *             [0] =&gt; Descr
 	 *         )
-	 * 
+	 *
 	 *     [~DESCRIPTION] =&gt; Array
 	 *         (
 	 *             [0] =&gt; Descr
 	 *         )
-	 * 
+	 *
 	 *     [PROPERTY_VALUE_ID] =&gt; Array
 	 *         (
 	 *             [0] =&gt; 53865
 	 *         )
-	 * 
+	 *
 	 *     [~NAME] =&gt; Photos with description
-	 *     [~DEFAULT_VALUE] =&gt; 
+	 *     [~DEFAULT_VALUE] =&gt;
 	 * )
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getproperty.php">GetProperty()</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a>::<a
@@ -476,7 +476,7 @@ class _CIBElement
 		return $res;
 	}
 
-	
+
 	/**
 	 * <p>Возвращает группы, которым принадлежит текущий элемент и значения свойств типа "привязка к разделам" заданные для данного элемента. <br></p>
 	 *
@@ -486,14 +486,14 @@ class _CIBElement
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($obRes = $res-&gt;GetNextElement())<br>{<br>  $ar_res = $obRes-&gt;GetGroups();<br>  print_r($ar_res);<br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getelementgroups.php">CIBlockElement::GetElementGroups</a>
 	 * </li> </ul><a name="examples"></a>

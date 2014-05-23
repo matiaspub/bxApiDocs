@@ -6,7 +6,7 @@
  *
  *
  *
- * @return mixed 
+ * @return mixed
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php
@@ -17,7 +17,7 @@ class CIBlock extends CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	// List of blocks
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Возвращает список информационных блоков по фильтру <i>arFilter</i> отсортированный в порядке <i>arOrder</i>.</p>
 	 *
@@ -68,24 +68,23 @@ class CIBlock extends CAllIBlock
 	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a>
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>// выберем все активные информационные блоки для текущего сайта типа catalog<br>// у которых мнемонический код не my_products, со счетчиком активных элементов.<br>$res = CIBlock::GetList(<br>	Array(), <br>	Array(<br>		'TYPE'=&gt;'catalog', <br>		'SITE_ID'=&gt;SITE_ID, <br>		'ACTIVE'=&gt;'Y', <br>		"CNT_ACTIVE"=&gt;"Y", <br>		"!CODE"=&gt;'my_products'<br>	), true<br>);<br>while($ar_res = $res-&gt;Fetch())<br>{<br>	echo $ar_res['NAME'].': '.$ar_res['ELEMENT_CNT'];<br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля CIBlock</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php
 	 * @author Bitrix
 	 */
-	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $bIncCnt = false)
+	function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $bIncCnt = false)
 	{
 		global $DB, $USER;
 
@@ -165,6 +164,8 @@ class CIBlock extends CAllIBlock
 			if($min_permission >= "X")
 				$operation = "'iblock_edit'";
 			elseif($min_permission >= "U")
+				$operation = "'element_edit'";
+			elseif($min_permission >= "S")
 				$operation = "'iblock_admin_display'";
 			else
 				$operation = "'section_read', 'element_read', 'section_element_bind', 'section_section_bind'";
@@ -291,12 +292,12 @@ class CIBlock extends CAllIBlock
 		return $res;
 	}
 
-	public static function _Upper($str)
+	function _Upper($str)
 	{
 		return $str;
 	}
 
-	public static function _Add($ID)
+	function _Add($ID)
 	{
 		global $DB;
 		$err_mess = "FILE: ".__FILE__."<br>LINE: ";
@@ -333,7 +334,7 @@ class CIBlock extends CAllIBlock
 		return $rs;
 	}
 
-	public static function _Order($by, $order, $default_order, $nullable = true)
+	function _Order($by, $order, $default_order, $nullable = true)
 	{
 		$o = parent::_Order($by, $order, $default_order, $nullable);
 		//$o[0] - bNullsFirst
@@ -354,7 +355,7 @@ class CIBlock extends CAllIBlock
 		}
 	}
 
-	public static function _NotEmpty($column)
+	function _NotEmpty($column)
 	{
 		return "if(".$column." is null, 0, 1)";
 	}

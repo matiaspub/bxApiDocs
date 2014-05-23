@@ -1,23 +1,10 @@
 <?
-
-/**
- * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php
- * @author Bitrix
- */
 class CIBlockElement extends CAllIBlockElement
 {
 	///////////////////////////////////////////////////////////////////
 	// Function returns lock status of element (red, yellow, green)
 	///////////////////////////////////////////////////////////////////
-	public static function WF_GetLockStatus($ID, &$locked_by, &$date_lock)
+	function WF_GetLockStatus($ID, &$locked_by, &$date_lock)
 	{
 		global $DB, $USER;
 		$err_mess = "FILE: ".__FILE__."<br> LINE:";
@@ -44,7 +31,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// Locking element
 	///////////////////////////////////////////////////////////////////
-	public static function WF_Lock($LAST_ID, $bWorkFlow=true)
+	function WF_Lock($LAST_ID, $bWorkFlow=true)
 	{
 		global $DB, $USER;
 		$LAST_ID = intval($LAST_ID);
@@ -91,7 +78,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// Unlock element
 	///////////////////////////////////////////////////////////////////
-	public static function WF_UnLock($LAST_ID, $bWorkFlow=true)
+	function WF_UnLock($LAST_ID, $bWorkFlow=true)
 	{
 		global $DB, $USER;
 		$LAST_ID = intval($LAST_ID);
@@ -146,7 +133,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// List the history items
 	///////////////////////////////////////////////////////////////////
-	public static function WF_GetHistoryList($ELEMENT_ID, &$by, &$order, $arFilter=Array(), &$is_filtered)
+	function WF_GetHistoryList($ELEMENT_ID, &$by, &$order, $arFilter=Array(), &$is_filtered)
 	{
 		$err_mess = "FILE: ".__FILE__."<br>LINE: ";
 		global $DB;
@@ -241,7 +228,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// List of elements
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Возвращает список элементов по фильтру <i>arFilter</i>.</p> <p><b>Примечания</b>:</p> <ol> <li>Внутренние ограничения Oracle и MSSQL не позволяют использовать DISTINCT при фильтрации по полям типа blob, поэтому фильтрация по нескольким значениям множественного свойства может дать дублирование.   </li> <li>Поля перечисленные для сортировки будут автоматически добавлены в параметр arSelectFields или в arGroupBy, если указана группировка записей. <br> </li> </ol>
 	 *
@@ -539,7 +526,7 @@ class CIBlockElement extends CAllIBlockElement
 	 * @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
 	 *
 	 *
@@ -547,7 +534,7 @@ class CIBlockElement extends CAllIBlockElement
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php
 	 * @author Bitrix
 	 */
-	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $arGroupBy=false, $arNavStartParams=false, $arSelectFields=Array())
+	function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $arGroupBy=false, $arNavStartParams=false, $arSelectFields=Array())
 	{
 		/*
 		Filter combinations:
@@ -1061,7 +1048,7 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	// Update element function
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * <p>Метод изменяет параметры элемента с кодом <i>ID</i>. Перед изменением элемента вызываются обработчики события  <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/OnStartIBlockElementUpdate.php">OnStartIBlockElementUpdate</a> из которых можно изменить значения полей или отменить изменение элемента вернув сообщение об ошибке. После изменения элемента вызывается само событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a>. </p> <p>Если изменяется свойство типа <b>файл</b>, то необходимо сформировать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">массив</a>. </p>
 	 *
@@ -1118,17 +1105,17 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @return bool 
+	 * @return bool
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$el = new CIBlockElement;<br><br>$PROP = array();<br>$PROP[12] = "Белый";  // свойству с кодом 12 присваиваем значение "Белый"<br>$PROP[3] = 38;        // свойству с кодом 3 присваиваем значение 38<br><br>$arLoadProductArray = Array(<br>  "MODIFIED_BY"    =&gt; $USER-&gt;GetID(), // элемент изменен текущим пользователем<br>  "IBLOCK_SECTION" =&gt; false,          // элемент лежит в корне раздела<br>  "PROPERTY_VALUES"=&gt; $PROP,<br>  "NAME"           =&gt; "Элемент",<br>  "ACTIVE"         =&gt; "Y",            // активен<br>  "PREVIEW_TEXT"   =&gt; "текст для списка элементов",<br>  "DETAIL_TEXT"    =&gt; "текст для детального просмотра",<br>  "DETAIL_PICTURE" =&gt; CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/image.gif")<br>  );<br><br>$PRODUCT_ID = 2;  // изменяем элемент с кодом (ID) 2<br>$res = $el-&gt;Update($PRODUCT_ID, $arLoadProductArray);<br>?&gt;Менять параметр IBLOCK_ID нельзя.
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a></li>
 	 * <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementupdate.php">OnBeforeIBlockElementUpdate</a></li>
@@ -1140,7 +1127,7 @@ class CIBlockElement extends CAllIBlockElement
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php
 	 * @author Bitrix
 	 */
-	public function Update($ID, $arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false, $bCheckDiskQuota=true)
+	function Update($ID, $arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false, $bCheckDiskQuota=true)
 	{
 		global $DB, $USER;
 		$ID = intval($ID);
@@ -1535,6 +1522,7 @@ class CIBlockElement extends CAllIBlockElement
 			}
 		}
 
+		$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\ElementTemplates($ar_element["IBLOCK_ID"], $ar_element["ID"]);
 		if(array_key_exists("PREVIEW_PICTURE", $arFields) && is_array($arFields["PREVIEW_PICTURE"]))
 		{
 			if(
@@ -1549,6 +1537,12 @@ class CIBlockElement extends CAllIBlockElement
 			{
 				$arFields["PREVIEW_PICTURE"]["MODULE_ID"] = "iblock";
 				$arFields["PREVIEW_PICTURE"]["old_file"] = $ar_wf_element["PREVIEW_PICTURE"];
+				$arFields["PREVIEW_PICTURE"]["name"] = \Bitrix\Iblock\Template\Helper::makeFileName(
+					$ipropTemplates
+					,"ELEMENT_PREVIEW_PICTURE_FILE_NAME"
+					,array_merge($ar_element, $arFields)
+					,$arFields["PREVIEW_PICTURE"]
+				);
 			}
 		}
 
@@ -1566,6 +1560,12 @@ class CIBlockElement extends CAllIBlockElement
 			{
 				$arFields["DETAIL_PICTURE"]["MODULE_ID"] = "iblock";
 				$arFields["DETAIL_PICTURE"]["old_file"] = $ar_wf_element["DETAIL_PICTURE"];
+				$arFields["DETAIL_PICTURE"]["name"] = \Bitrix\Iblock\Template\Helper::makeFileName(
+					$ipropTemplates
+					,"ELEMENT_DETAIL_PICTURE_FILE_NAME"
+					,array_merge($ar_element, $arFields)
+					,$arFields["DETAIL_PICTURE"]
+				);
 			}
 		}
 
@@ -1851,11 +1851,21 @@ class CIBlockElement extends CAllIBlockElement
 					$obElementRights->SetRights($arFields["RIGHTS"]);
 			}
 
+			if (array_key_exists("IPROPERTY_TEMPLATES", $arFields))
+			{
+				$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\ElementTemplates($arIBlock["ID"], $ID);
+				$ipropTemplates->set($arFields["IPROPERTY_TEMPLATES"]);
+			}
+
 			if($bUpdateSearch)
+			{
 				CIBlockElement::UpdateSearch($ID, true);
+			}
 
 			if($bWorkFlow)
+			{
 				CIBlockElement::WF_CleanUpHistoryCopies($ID);
+			}
 
 			//Restore saved values
 			if($SAVED_PREVIEW_PICTURE !== false)
@@ -1948,7 +1958,7 @@ class CIBlockElement extends CAllIBlockElement
 		return $Result;
 	}
 
-	
+
 	/**
 	 * <p>Функция сохраняет значения всех свойств элемента информационного блока.</p>
 	 *
@@ -1985,28 +1995,27 @@ class CIBlockElement extends CAllIBlockElement
 	 *
 	 *
 	 *
-	 * @return mixed 
+	 * @return mixed
 	 *
 	 *
-	 * <h4>Example</h4> 
+	 * <h4>Example</h4>
 	 * <pre>
 	 * &lt;?<br>$ELEMENT_ID = 18;  // код элемента<br>$PROPERTY_CODE = "PROP1";  // код свойства<br>$PROPERTY_VALUE = "Синий";  // значение свойства<br><br>// Установим новое значение для данного свойства данного элемента<br>$dbr = CIBlockElement::GetList(array(), array("=ID"=&gt;$ELEMENT_ID), false, false, array("ID", "IBLOCK_ID"));<br>if ($dbr_arr = $dbr-&gt;Fetch())<br>{<br>  $IBLOCK_ID = $dbr_arr["IBLOCK_ID"];<br>  CIBlockElement::SetPropertyValues($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUE, $PROPERTY_CODE);<br>}<br>?&gt;
 	 * </pre>
 	 *
 	 *
 	 *
-	 * <h4>See Also</h4> 
+	 * <h4>See Also</h4>
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
 	 * </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">CIBlockElement::SetPropertyValueCode</a>
 	 * </li> </ul><a name="examples"></a>
 	 *
 	 *
-	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php
 	 * @author Bitrix
 	 */
-	public static function SetPropertyValues($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUES, $PROPERTY_CODE = false)
+	function SetPropertyValues($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUES, $PROPERTY_CODE = false)
 	{
 		global $DB;
 		$ELEMENT_ID = intVal($ELEMENT_ID);
@@ -2270,13 +2279,16 @@ class CIBlockElement extends CAllIBlockElement
 						$arV[] = $res;
 				}
 				elseif(is_set($cacheValues, $prop["ID"]))
+				{
 					$arV = $cacheValues[$prop["ID"]];
+				}
 
+				$arFilesToDelete = array();
 				$arWas = Array();
 				foreach($arV as $res)
 				{
 					$val = $PROP[$res["ID"]];
-					if(is_array($val) && !is_set($val, "tmp_name")&& !is_set($val, "del"))
+					if(is_array($val) && !is_set($val, "tmp_name") && !is_set($val, "del"))
 					{
 						$val_desc = $val["DESCRIPTION"];
 						$val = $val["VALUE"];
@@ -2387,7 +2399,11 @@ class CIBlockElement extends CAllIBlockElement
 
 						if($val=="NULL")
 						{
-							CIBLockElement::DeleteFile($res["VALUE"], $ELEMENT_ID, "PROPERTY", -1, $prop["IBLOCK_ID"]);
+							$arFilesToDelete[] = array(
+								"FILE_ID" => $res["VALUE"],
+								"ELEMENT_ID" => $ELEMENT_ID,
+								"IBLOCK_ID" => $prop["IBLOCK_ID"],
+							);
 
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
 							{
@@ -2416,7 +2432,13 @@ class CIBlockElement extends CAllIBlockElement
 						elseif(IntVal($val)>0)
 						{
 							if(intval($val) != $res["VALUE"])
-								CIBLockElement::DeleteFile($res["VALUE"], $ELEMENT_ID, "PROPERTY", -1, $prop["IBLOCK_ID"]);
+							{
+								$arFilesToDelete[] = array(
+									"FILE_ID" => $res["VALUE"],
+									"ELEMENT_ID" => $ELEMENT_ID,
+									"IBLOCK_ID" => $prop["IBLOCK_ID"],
+								);
+							}
 
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
 							{
@@ -2534,7 +2556,13 @@ class CIBlockElement extends CAllIBlockElement
 							}
 							$pfres = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							while($pfar = $pfres->Fetch())
-								CIBLockElement::DeleteFile($pfar["VALUE"], $ELEMENT_ID, "PROPERTY", -1, $prop["IBLOCK_ID"]);
+							{
+								$arFilesToDelete[] = array(
+									"FILE_ID" => $pfar["VALUE"],
+									"ELEMENT_ID" => $ELEMENT_ID,
+									"IBLOCK_ID" => $prop["IBLOCK_ID"],
+								);
+							}
 
 							$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
@@ -2596,6 +2624,16 @@ class CIBlockElement extends CAllIBlockElement
 					}
 					$ids .= ",".$prop["ID"];
 				} //foreach($PROP as $key=>$value)
+
+				foreach ($arFilesToDelete as $deleteTask)
+				{
+					CIBLockElement::DeleteFile(
+						$deleteTask["FILE_ID"],
+						$deleteTask["ELEMENT_ID"],
+						"PROPERTY", -1,
+						$deleteTask["IBLOCK_ID"]
+					);
+				}
 			} //if($prop["PROPERTY_TYPE"]=="L")
 		}
 
@@ -2605,14 +2643,17 @@ class CIBlockElement extends CAllIBlockElement
 		/****************************** QUOTA ******************************/
 			$_SESSION["SESS_RECOUNT_DB"] = "Y";
 		/****************************** QUOTA ******************************/
+
+		foreach (GetModuleEvents("iblock", "OnAfterIBlockElementSetPropertyValues", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUES, $PROPERTY_CODE));
 	}
 
-	public static function GetRandFunction()
+	function GetRandFunction()
 	{
 		return " RAND(".rand(0, 1000000).") ";
 	}
 
-	public static function GetShowedFunction()
+	function GetShowedFunction()
 	{
 		return " IfNULL(BE.SHOW_COUNTER/((UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(BE.SHOW_COUNTER_START)+0.1)/60/60),0) ";
 	}

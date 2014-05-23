@@ -1,7 +1,7 @@
 <?
 class CIBlockOffersTmp extends CAllIBlockOffersTmp
 {
-	public static function GetOldID($intProductIBlockID, $intOffersIBlockID, $intInterval = 1800)
+	function GetOldID($intProductIBlockID, $intOffersIBlockID, $intInterval = 1800)
 	{
 		global $DB;
 
@@ -29,7 +29,7 @@ class CIBlockOffersTmp extends CAllIBlockOffersTmp
 		return $DB->Query($strQuery);
 	}
 
-	public static function DeleteOldID($intProductIBlockID, $intOffersIBlockID = 0, $intInterval = 86400)
+	function DeleteOldID($intProductIBlockID, $intOffersIBlockID = 0, $intInterval = 86400)
 	{
 		global $DB;
 

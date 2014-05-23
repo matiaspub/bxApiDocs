@@ -12,6 +12,7 @@ class CIBlockParameters
 			"TYPE" => "LIST",
 			"MULTIPLE" => "Y",
 			"ADDITIONAL_VALUES" => "Y",
+			"SIZE" => 8,
 			"VALUES" => array(
 				"ID" => GetMessage("IBLOCK_FIELD_ID"),
 				"CODE" => GetMessage("IBLOCK_FIELD_CODE"),
@@ -59,6 +60,7 @@ class CIBlockParameters
 			"TYPE" => "LIST",
 			"MULTIPLE" => "Y",
 			"ADDITIONAL_VALUES" => "Y",
+			"SIZE" => 8,
 			"VALUES" => array(
 				"ID" => GetMessage("IBLOCK_FIELD_ID"),
 				"CODE" => GetMessage("IBLOCK_FIELD_CODE"),
@@ -90,6 +92,7 @@ class CIBlockParameters
 			"PARENT" => $parent,
 			"NAME" => $name,
 			"TYPE" => "LIST",
+			"SIZE" => 8,
 			"VALUES" => array(
 				"d-m-Y" => CIBlockFormatProperties::DateFormat("d-m-Y", $timestamp),//"22-02-2007",
 				"m-d-Y" => CIBlockFormatProperties::DateFormat("m-d-Y", $timestamp),//"02-22-2007",
@@ -296,6 +299,329 @@ class CIBlockParameters
 		}
 	}
 
+	public static function GetInheritedPropertyTemplateSectionMenuItems($iblock_id, $action_function, $menuID, $inputID = "")
+	{
+		global $USER_FIELD_MANAGER;
+		$result = array();
+		$result["this"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_NAME"),
+					"ONCLICK" => "$action_function('{=this.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_LOWER_NAME"),
+					"ONCLICK" => "$action_function('{=lower this.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"ONCLICK" => "$action_function('{=this.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_PREVIEW_TEXT"),
+					"ONCLICK" => "$action_function('{=this.PreviewText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		if ($iblock_id > 0)
+		{
+			$result["properties"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PROPERTIES"),
+				"MENU" => array(
+				),
+			);
+			$arProperty = $USER_FIELD_MANAGER->GetUserFields("IBLOCK_".$iblock_id."_SECTION");
+			foreach($arProperty as $property)
+			{
+				if ($property["PROPERTY_TYPE"] != "F")
+				{
+					$result["properties"]["MENU"][] = array(
+						"TEXT" => $property["FIELD_NAME"],
+						"ONCLICK" => "$action_function('{=this.property.".strtolower(substr($property["FIELD_NAME"], 3))."}', '$menuID', '$inputID')",
+					);
+				}
+			}
+		}
+		$result["parent"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
+					"ONCLICK" => "$action_function('{=parent.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
+					"ONCLICK" => "$action_function('{=parent.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
+					"ONCLICK" => "$action_function('{=parent.PreviewText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		$result["iblock"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
+					"ONCLICK" => "$action_function('{=iblock.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"ONCLICK" => "$action_function('{=iblock.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
+					"ONCLICK" => "$action_function('{=iblock.PreviewText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		{
+			$result["store"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE"),
+				"MENU" => array(),
+			);
+			$rsStore = CCatalogStore::GetList();
+			while ($store = $rsStore->Fetch())
+			{
+				$result["store"]["MENU"][] = array(
+					"TEXT" => $store["TITLE"],
+					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
+				);
+			}
+		}
+		$result["misc"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_MISC"),
+			"MENU" => array(),
+		);
+		$result["misc"]["MENU"][] =  array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
+			"ONCLICK" => "$action_function('{=concat this.sections.name this.name \" / \"}', '$menuID', '$inputID')",
+		);
+		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		{
+			$result["misc"]["MENU"][] =  array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
+			);
+		}
+		$r = array();
+		foreach($result as $category)
+		{
+			if (!empty($category) && !empty($category["MENU"]))
+			{
+				$r[] = $category;
+			}
+		}
+		return $r;
+	}
+
+	public static function GetInheritedPropertyTemplateElementMenuItems($iblock_id, $action_function, $menuID, $inputID = "")
+	{
+		$result = array();
+		$result["this"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_NAME"),
+					"ONCLICK" => "$action_function('{=this.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_LOWER_NAME"),
+					"ONCLICK" => "$action_function('{=lower this.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
+					"ONCLICK" => "$action_function('{=this.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_PREVIEW_TEXT"),
+					"ONCLICK" => "$action_function('{=this.PreviewText}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_DETAIL_TEXT"),
+					"ONCLICK" => "$action_function('{=this.DetailText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		if ($iblock_id > 0)
+		{
+			$result["properties"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PROPERTIES"),
+				"MENU" => array(
+				),
+			);
+			$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $iblock_id));
+			while($property = $rsProperty->fetch())
+			{
+				if ($property["PROPERTY_TYPE"] != "F")
+				{
+					$result["properties"]["MENU"][] = array(
+						"TEXT" => $property["NAME"],
+						"ONCLICK" => "$action_function('{=this.property.".($property["CODE"]!=""? $property["CODE"]: $property["ID"])."}', '$menuID', '$inputID')",
+					);
+				}
+			}
+		}
+		$result["parent"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
+					"ONCLICK" => "$action_function('{=parent.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
+					"ONCLICK" => "$action_function('{=parent.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
+					"ONCLICK" => "$action_function('{=parent.PreviewText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		$result["iblock"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK"),
+			"MENU" => array(
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
+					"ONCLICK" => "$action_function('{=iblock.Name}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"ONCLICK" => "$action_function('{=iblock.Code}', '$menuID', '$inputID')",
+				),
+				array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
+					"ONCLICK" => "$action_function('{=iblock.PreviewText}', '$menuID', '$inputID')",
+				),
+			),
+		);
+		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		{
+			$arCatalog = \CCatalogSKU::GetInfoByProductIBlock($iblock_id);
+			if (is_array($arCatalog))
+			{
+				$result["sku_properties"] = array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
+					"MENU" => array(
+					),
+				);
+				$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $arCatalog["IBLOCK_ID"]));
+				while($property = $rsProperty->fetch())
+				{
+					if ($property["PROPERTY_TYPE"] != "F")
+					{
+						$result["sku_properties"]["MENU"][] = array(
+							"TEXT" => $property["NAME"],
+							"ONCLICK" => "$action_function('{=concat {=distinct this.catalog.sku.property.".($property["CODE"]!=""? $property["CODE"]: $property["ID"])." \", \"}}', '$menuID', '$inputID')",
+						);
+					}
+				}
+				$result["sku_price"] = array(
+					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SKU_PRICE"),
+					"MENU" => array(),
+				);
+				$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
+				while ($price = $rsPrice->Fetch())
+				{
+					if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
+					{
+						$result["sku_price"]["MENU"][] = array(
+							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+						);
+						$result["sku_price"]["MENU"][] = array(
+							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+						);
+					}
+					else
+					{
+						$result["sku_price"]["MENU"][] = array(
+							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
+						);
+						$result["sku_price"]["MENU"][] = array(
+							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
+						);
+					}
+				}
+			}
+
+			$result["catalog"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG"),
+				"MENU" => array(
+					array(
+						"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG_WEIGHT"),
+						"ONCLICK" => "$action_function('{=this.catalog.weight}', '$menuID', '$inputID')",
+					),
+					array(
+						"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG_MEASURE"),
+						"ONCLICK" => "$action_function('{=this.catalog.measure}', '$menuID', '$inputID')",
+					),
+				),
+			);
+			$result["price"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PRICE"),
+				"MENU" => array(),
+			);
+			$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
+			while ($price = $rsPrice->Fetch())
+			{
+				if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
+					$result["price"]["MENU"][] = array(
+						"TEXT" => $price["NAME"],
+						"ONCLICK" => "$action_function('{=this.catalog.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+					);
+				else
+					$result["price"]["MENU"][] = array(
+						"TEXT" => $price["NAME"],
+						"ONCLICK" => "$action_function('{=this.catalog.price.".$price["ID"]."}', '$menuID', '$inputID')",
+					);
+			}
+			$result["store"] = array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE"),
+				"MENU" => array(),
+			);
+			$rsStore = CCatalogStore::GetList();
+			while ($store = $rsStore->Fetch())
+			{
+				$result["store"]["MENU"][] = array(
+					"TEXT" => $store["TITLE"],
+					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
+				);
+			}
+		}
+		$result["misc"] = array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_MISC"),
+			"MENU" => array(),
+		);
+		$result["misc"]["MENU"][] =  array(
+			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
+			"ONCLICK" => "$action_function('{=concat this.sections.name \" / \"}', '$menuID', '$inputID')",
+		);
+		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		{
+			$result["misc"]["MENU"][] =  array(
+				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
+			);
+		}
+		$r = array();
+		foreach($result as $category)
+		{
+			if (!empty($category) && !empty($category["MENU"]))
+			{
+				$r[] = $category;
+			}
+		}
+		return $r;
+	}
+
 	public static function GetPathTemplateParam($menuType, $ID, $parameterName, $defaultValue = "", $parentID = "URL_TEMPLATES")
 	{
 		return array(
@@ -315,9 +641,73 @@ class CIBlockParameters
 
 	public static function AddPagerSettings(&$arComponentParameters, $pager_title, $bDescNumbering=true, $bShowAllParam=false)
 	{
+		$arHiddenTemplates = array(
+			'js' => true
+		);
+		if (!isset($arComponentParameters['GROUPS']))
+			$arComponentParameters['GROUPS'] = array();
 		$arComponentParameters["GROUPS"]["PAGER_SETTINGS"] = array(
 			"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_SETTINGS"),
 		);
+
+		$arTemplateInfo = CComponentUtil::GetTemplatesList('bitrix:system.pagenavigation');
+		if (empty($arTemplateInfo))
+		{
+			$arComponentParameters["PARAMETERS"]["PAGER_TEMPLATE"] = Array(
+				"PARENT" => "PAGER_SETTINGS",
+				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE"),
+				"TYPE" => "STRING",
+				"DEFAULT" => "",
+			);
+		}
+		else
+		{
+			sortByColumn($arTemplateInfo, array('TEMPLATE' => SORT_ASC, 'NAME' => SORT_ASC));
+			$arTemplateList = array();
+			$arSiteTemplateList = array(
+				'.default' => GetMessage('T_IBLOCK_DESC_PAGER_TEMPLATE_SITE_DEFAULT')
+			);
+			$arTemplateID = array();
+			foreach ($arTemplateInfo as &$template)
+			{
+				if ('' != $template["TEMPLATE"] && '.default' != $template["TEMPLATE"])
+					$arTemplateID[] = $template["TEMPLATE"];
+				if (!isset($template['TITLE']))
+					$template['TITLE'] = $template['NAME'];
+			}
+			unset($template);
+
+			if (!empty($arTemplateID))
+			{
+				$rsSiteTemplates = CSiteTemplate::GetList(
+					array(),
+					array("ID"=>$arTemplateID),
+					array()
+				);
+				while ($arSitetemplate = $rsSiteTemplates->Fetch())
+				{
+					$arSiteTemplateList[$arSitetemplate['ID']] = $arSitetemplate['NAME'];
+				}
+			}
+
+			foreach ($arTemplateInfo as &$template)
+			{
+				if (isset($arHiddenTemplates[$template['NAME']]))
+					continue;
+				$strDescr = $template["TITLE"].' ('.('' != $template["TEMPLATE"] && '' != $arSiteTemplateList[$template["TEMPLATE"]] ? $arSiteTemplateList[$template["TEMPLATE"]] : GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_SYSTEM")).')';
+				$arTemplateList[$template['NAME']] = $strDescr;
+			}
+			unset($template);
+			$arComponentParameters["PARAMETERS"]["PAGER_TEMPLATE"] = array(
+				"PARENT" => "PAGER_SETTINGS",
+				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_EXT"),
+				"TYPE" => "LIST",
+				"VALUES" => $arTemplateList,
+				"DEFAULT" => ".default",
+				"ADDITIONAL_VALUES" => "Y"
+			);
+		}
+
 		$arComponentParameters["PARAMETERS"]["DISPLAY_TOP_PAGER"] = Array(
 			"PARENT" => "PAGER_SETTINGS",
 			"NAME" => GetMessage("T_IBLOCK_DESC_TOP_PAGER"),
@@ -342,12 +732,6 @@ class CIBlockParameters
 			"TYPE" => "CHECKBOX",
 			"DEFAULT" => "Y",
 		);
-		$arComponentParameters["PARAMETERS"]["PAGER_TEMPLATE"] = Array(
-			"PARENT" => "PAGER_SETTINGS",
-			"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE"),
-			"TYPE" => "STRING",
-			"DEFAULT" => "",
-		);
 
 		if($bDescNumbering)
 		{
@@ -371,7 +755,7 @@ class CIBlockParameters
 				"PARENT" => "PAGER_SETTINGS",
 				"NAME" => GetMessage("T_IBLOCK_DESC_SHOW_ALL"),
 				"TYPE" => "CHECKBOX",
-				"DEFAULT" => "Y",
+				"DEFAULT" => "Y"
 			);
 		}
 	}
