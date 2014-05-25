@@ -7549,7 +7549,11 @@ public static 	public static function JSUrlEscape($s)
 		return str_replace($aSearch, $aReplace, $s);
 	}
 
+<<<<<<< HEAD
 public static 	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
+=======
+	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
+>>>>>>> FETCH_HEAD
 	{
 		static $aSearch = array("\r", "\n");
 

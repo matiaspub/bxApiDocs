@@ -510,9 +510,13 @@ class CForumMessage extends CAllForumMessage
 				{
 					$db_res = $DB->Query($strSql . "\nGROUP BY FM.TOPIC_ID", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					$ar_res = $db_res->Fetch();
+<<<<<<< HEAD
 				}
 				else
 				{
+=======
+				} else {
+>>>>>>> FETCH_HEAD
 					$strSql = "SELECT COUNT(FM.ID) as CNT ".$strFrom;
 					$db_res = $DB->Query($strSql , false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					if ($db_res && $ar_res = $db_res->Fetch())
@@ -547,8 +551,12 @@ class CForumMessage extends CAllForumMessage
 				{
 					$strSql = "SELECT COUNT(FM.ID) as CNT \n ".$strFrom;
 					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+<<<<<<< HEAD
 					if ($db_res && $ar_res = $db_res->Fetch())
 					{
+=======
+					if ($db_res && $ar_res = $db_res->Fetch()) {
+>>>>>>> FETCH_HEAD
 						$strSql = "SELECT MAX(FM.ID) as LAST_MESSAGE_ID \n ".$strFrom;
 						$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 						if ($db_res && $ar_res1 = $db_res->Fetch())
@@ -586,12 +594,18 @@ class CForumMessage extends CAllForumMessage
 			else
 			{
 				$r = $obUserFieldsSql->GetOrder($by);
+<<<<<<< HEAD
 				if (!!$r)
 				{
 					$arSqlOrder[] = " ".$r." ".$order." ";
 				}
 				else
 				{
+=======
+				if (!!$r) {
+					$arSqlOrder[] = " ".$r." ".$order." ";
+				} else {
+>>>>>>> FETCH_HEAD
 					$arSqlOrder[] = " FM.ID ".$order." ";
 					$by = "ID";
 				}
@@ -650,6 +664,7 @@ class CForumMessage extends CAllForumMessage
 			$iNum = ($iNum > 0) ? $iNum : intVal($arAddParams["nTopCount"]);
 			$strSql .= " LIMIT 0,".$iNum;
 		}
+
 		if (!$iNum && is_array($arAddParams) && is_set($arAddParams, "bDescPageNumbering") && (intVal($arAddParams["nTopCount"])<=0))
 		{
 			$db_res =  new CDBResult();

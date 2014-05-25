@@ -131,6 +131,7 @@ public static 	function SocnetPrepareVars()
 		return '';
 	}
 
+<<<<<<< HEAD
 public static 	public static function SocnetLogMessageAdd($arParams, $arMessageFields, $action = "")
 	{
 		static $parser = null;
@@ -232,6 +233,9 @@ public static 	public static function SocnetLogMessageAdd($arParams, $arMessageF
 	}
 
 public static 	function SocnetEMailMessageCheck(&$arMessageFields, $ACTION_VARS)
+=======
+	public static function SocnetEMailMessageCheck(&$arMessageFields, $ACTION_VARS)
+>>>>>>> FETCH_HEAD
 	{
 		$arEmails = CMailUtil::ExtractAllMailAddresses($arMessageFields["FIELD_TO"].",".$arMessageFields["FIELD_CC"].",".$arMessageFields["FIELD_BCC"]);
 		$dbMbx = CMailBox::GetById($arMessageFields["MAIL_FILTER"]["MAILBOX_ID"]);

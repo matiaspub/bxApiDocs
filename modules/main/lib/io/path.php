@@ -13,7 +13,16 @@ class Path
 	const DIRECTORY_SEPARATOR_ALT = '\\';
 	const PATH_SEPARATOR = PATH_SEPARATOR;
 
+<<<<<<< HEAD
 	const INVALID_FILENAME_CHARS = "\\/:*?\"'<>|~#";
+
+	protected static $physicalEncoding = "";
+	protected static $logicalEncoding = "";
+
+	protected static $directoryIndex = null;
+=======
+	const INVALID_FILENAME_CHARS = "\\\\/:*?\"\\'<>|~";
+>>>>>>> FETCH_HEAD
 
 	protected static $physicalEncoding = "";
 	protected static $logicalEncoding = "";
@@ -284,6 +293,22 @@ class Path
 	public static function randomizeInvalidFilename($filename)
 	{
 		return preg_replace("#([\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."])#e", "chr(rand(97, 122))", $filename);
+	}
+
+	public static function isAbsolute($path)
+	{
+		return (substr($path, 0, 1) === "/") || preg_match("#^[a-z]:/#i", $path);
+	}
+
+	protected static function getDirectoryIndexArray()
+	{
+		static $directoryIndexDefault = array("index.php" => 1, "index.html" => 1, "index.htm" => 1, "index.phtml" => 1, "default.html" => 1, "index.php3" => 1);
+
+		$directoryIndex = Main\Config\Configuration::getValue("directory_index");
+		if ($directoryIndex !== null)
+			return $directoryIndex;
+
+		return $directoryIndexDefault;
 	}
 
 	public static function isAbsolute($path)

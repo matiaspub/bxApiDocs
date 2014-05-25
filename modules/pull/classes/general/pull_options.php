@@ -65,12 +65,15 @@ class CPullOptions
 		return $arModule;
 	}
 
+<<<<<<< HEAD
 	public static function GetExcludeSites()
 	{
 		$result = COption::GetOptionString("pull", "exclude_sites", "a:0:{}");
 		return unserialize($result);
 	}
 
+=======
+>>>>>>> FETCH_HEAD
 	public static function SetExcludeSites($sites)
 	{
 		if (!is_array($sites))
@@ -81,6 +84,7 @@ class CPullOptions
 		return true;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * @deprecated No longer used by internal code and not recommended. Use CPullOptions::GetQueueServerStatus()
 	 */
@@ -97,6 +101,8 @@ class CPullOptions
 	/*
 	 * @deprecated No longer used by internal code and not recommended. Use CPullOptions::SetQueueServerStatus()
 	 */
+=======
+>>>>>>> FETCH_HEAD
 	public static function SetNginxStatus($flag = "N")
 	{
 		return self::SetQueueServerStatus($flag);
@@ -154,6 +160,7 @@ class CPullOptions
 		return true;
 	}
 
+<<<<<<< HEAD
 	public static function GetListenUrl($channelId = "", $mobile = false)
 	{
 		if (!is_array($channelId) && strlen($channelId) > 0)
@@ -176,6 +183,29 @@ class CPullOptions
 		}
 
 		COption::SetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener", $path);
+=======
+	public static function SetListenUrl($path = "", $mobile = false)
+	{
+		if (strlen($path)<=0)
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $mobile? $pull_default_option["path_to_mobile_listener"]: $pull_default_option["path_to_listener"];
+		}
+
+		COption::SetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener", $path);
+		return true;
+	}
+
+	public static function SetListenSecureUrl($path = "", $mobile = false)
+	{
+		if (strlen($path)<=0)
+		{
+			include_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
+			$path = $mobile? $pull_default_option["path_to_mobile_listener_secure"]: $pull_default_option["path_to_listener_secure"];
+		}
+
+		COption::SetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener_secure", $path);
+>>>>>>> FETCH_HEAD
 		return true;
 	}
 
@@ -214,7 +244,17 @@ class CPullOptions
 		return intval(COption::GetOptionInt("pull", "nginx_version"));
 	}
 
+<<<<<<< HEAD
 	public static function SetQueueServerVersion($version)
+=======
+	public static function GetExcludeSites()
+	{
+		$result = COption::GetOptionString("pull", "exclude_sites", "a:0:{}");
+		return unserialize($result);
+	}
+
+	public static function GetNginxStatus()
+>>>>>>> FETCH_HEAD
 	{
 		COption::SetOptionInt("pull", "nginx_version", intval($version));
 
@@ -226,21 +266,38 @@ class CPullOptions
 		return intval(COption::GetOptionInt("pull", "nginx_command_per_hit"));
 	}
 
+<<<<<<< HEAD
 	public static function SetCommandPerHit($count)
+=======
+	public static function GetListenUrl($channelId = "", $mobile = false)
+>>>>>>> FETCH_HEAD
 	{
 		COption::SetOptionInt("pull", "nginx_command_per_hit", intval($count));
 
+<<<<<<< HEAD
 		return true;
 	}
 
 	public static function GetWebSocketStatus()
+=======
+		$url = COption::GetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		return $url;
+	}
+
+	public static function GetListenSecureUrl($channelId = "", $mobile = false)
+>>>>>>> FETCH_HEAD
 	{
 		return self::GetWebSocket() && self::GetQueueServerVersion()>1? true: false;
 	}
 
+<<<<<<< HEAD
 	public static function GetWebSocket()
 	{
 		return COption::GetOptionString("pull", "websocket") == 'Y'? true: false;
+=======
+		$url = COption::GetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener_secure").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		return $url;
+>>>>>>> FETCH_HEAD
 	}
 
 	public static function SetWebSocket($flag = "N")

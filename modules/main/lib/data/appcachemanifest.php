@@ -220,8 +220,12 @@ class AppCacheManifest
 		);
 		for ($i = 0; $i < $linkCount; $i++)
 		{
+<<<<<<< HEAD
 			$fileData["FULL_FILE_LIST"][] = $files[] = $link[$i] . $extension[$i] . $params[$i];
 			$fileData["FILE_TIMESTAMPS"][$link[$i] . $extension[$i]] = $params[$i];
+=======
+			$files[] = $arFilesByType[$extension[$i]][] = $link[$i] . $extension[$i] . $params[$i];
+>>>>>>> FETCH_HEAD
 			$arFilesByType[$extension[$i]][] = $link[$i] . $extension[$i];
 		}
 
@@ -234,6 +238,7 @@ class AppCacheManifest
 				$cssFilePath = $arFilesByType["css"][$j];
 				if ($manifestCache["FILE_DATA"]["FILE_TIMESTAMPS"][$cssFilePath] != $fileData["FILE_TIMESTAMPS"][$cssFilePath])
 				{
+<<<<<<< HEAD
 
 					$fileContent = false;
 					$fileUrl = parse_url($cssFilePath);
@@ -275,13 +280,22 @@ class AppCacheManifest
 					{
 						$fileData["FULL_FILE_LIST"] = array_merge($fileData["FULL_FILE_LIST"], $manifestCache["FILE_DATA"]["CSS_FILE_IMAGES"][$cssFilePath]);
 					}
+=======
+					$file = self::replaceUrlCSS($match[3][$k], addslashes($cssPath));
+					if (!in_array($file, $files["files"]))
+						$files[] = $arFilesByType["img"][] = $file;
+>>>>>>> FETCH_HEAD
 				}
 
 			}
 		}
 
+<<<<<<< HEAD
 
 		return $fileData;
+=======
+		return $files;
+>>>>>>> FETCH_HEAD
 	}
 
 	/**
@@ -363,6 +377,7 @@ class AppCacheManifest
 
 	public function setFiles($arFiles)
 	{
+<<<<<<< HEAD
 		if (count($this->files) > 0)
 		{
 			$this->files = array_merge($this->files, $arFiles);
@@ -371,6 +386,12 @@ class AppCacheManifest
 		{
 			$this->files = $arFiles;
 		}
+=======
+		if(count($this->files)>0)
+			$this->files = array_merge($this->files, $arFiles);
+		else
+			$this->files = $arFiles;
+>>>>>>> FETCH_HEAD
 	}
 
 	public function addFile($filePath)

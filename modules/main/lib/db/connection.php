@@ -391,11 +391,15 @@ abstract class Connection
 	}
 
 	abstract public function renameTable($currentName, $newName);
+<<<<<<< HEAD
 
 	public function dropColumn($tableName, $columnName)
 	{
 		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP COLUMN '.$this->getSqlHelper()->quote($columnName));
 	}
+=======
+	abstract public function dropColumn($tableName, $columnName);
+>>>>>>> FETCH_HEAD
 
 	/*********************************************************
 	 * Transaction

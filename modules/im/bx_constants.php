@@ -2,7 +2,11 @@
 /**
  * IM_REVISION
  */
+<<<<<<< HEAD
 define('IM_REVISION', 30);
+=======
+define('IM_REVISION', 21);
+>>>>>>> FETCH_HEAD
 
 /**
  * IM_MESSAGE_SYSTEM

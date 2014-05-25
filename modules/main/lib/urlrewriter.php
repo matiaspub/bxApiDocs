@@ -1,9 +1,15 @@
 <?php
 namespace Bitrix\Main;
 
+<<<<<<< HEAD
 use Bitrix\Main\Component;
 use Bitrix\Main\Config;
 use Bitrix\Main\IO;
+=======
+use \Bitrix\Main\Component;
+use Bitrix\Main\Config;
+use \Bitrix\Main\IO;
+>>>>>>> FETCH_HEAD
 
 class UrlRewriter
 {

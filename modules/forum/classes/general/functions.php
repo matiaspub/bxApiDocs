@@ -172,6 +172,7 @@ class forumTextParser extends CTextParser
 		return $result;
 	}
 
+<<<<<<< HEAD
 	
 	/**
 	* <p>Функция форматирования текста.</p>
@@ -224,6 +225,14 @@ class forumTextParser extends CTextParser
 		$this->imageWidth = ($this->image_params["width"] > 0 ? $this->image_params["width"] : ($this->imageWidth > 0 ? $this->imageWidth : 300));
 		$this->imageHeight = ($this->image_params["height"] > 0 ? $this->image_params["height"] : ($this->imageHeight > 0 ? $this->imageHeight : 300));
 		$this->userPath = (empty($this->userPath) && !empty($this->pathToUser) ? $this->pathToUser : $this->userPath);
+=======
+	public function convert($text, $allow = array(), $type = "html", $arFiles = false)	//, "KEEP_AMP" => "N"
+	{
+		$text = str_replace(array("\013", "\014"), "", $text);
+		if (!isset($this->image_params['width'])) $this->image_params['width'] = 300;
+		if (!isset($this->image_params['height'])) $this->image_params['height'] = 300;
+		if (!isset($this->image_params['template'])) $this->image_params['template'] = 'popup_image';
+>>>>>>> FETCH_HEAD
 
 		$this->type = $type;
 		$allow = (is_array($allow) ? $allow : array());

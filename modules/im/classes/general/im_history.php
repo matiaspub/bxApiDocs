@@ -379,7 +379,11 @@ class CIMHistory
 					'senderId' => $arRes['AUTHOR_ID'],
 					'recipientId' => $arRes['CHAT_ID'],
 					'date' => $arRes['DATE_CREATE'],
+<<<<<<< HEAD
 					'system' => $arRes['AUTHOR_ID'] > 0? 'N': 'Y',
+=======
+					'system' => $arRes['NOTIFY_EVENT'] == 'private'? 'N': 'Y',
+>>>>>>> FETCH_HEAD
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 

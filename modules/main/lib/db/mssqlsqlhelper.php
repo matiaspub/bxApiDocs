@@ -239,6 +239,12 @@ class MssqlSqlHelper extends SqlHelper
 					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
 				}
 				break;
+			case "date":
+				if (empty($value))
+					$result = "NULL";
+				else
+					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME);
+				break;
 			case "int":
 			case "tinyint":
 			case "smallint":

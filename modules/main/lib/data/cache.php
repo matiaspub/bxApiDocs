@@ -324,6 +324,9 @@ class Cache
 		if ($TTL <= 0)
 			return true;
 
+		if ($this->shouldClearCache())
+			return true;
+
 		ob_start();
 		$this->vars = $vars;
 		$this->isStarted = true;

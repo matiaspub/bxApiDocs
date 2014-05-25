@@ -514,7 +514,11 @@ class CAdminMobileEdit
 								<a'.
 									' id="'.$id.'_b1'.'"'.
 									' href="javascript:void(0);"'.
+<<<<<<< HEAD
 									($value == 'Y' ? ' class="current"' : '').
+=======
+									(!isset($arField['VALUE']) || $arField['VALUE'] == 'Y' ? ' class="current"' : '').
+>>>>>>> FETCH_HEAD
 									self::getCustomAttribs($arField["BUTT_Y"]).
 								'>'.
 									$arField["BUTT_Y"]["TITLE"].
@@ -522,7 +526,11 @@ class CAdminMobileEdit
 								<a'.
 									' id="'.$id.'_b2'.'"'.
 									' href="javascript:void(0);"'
+<<<<<<< HEAD
 									.($value != 'Y' ? ' class="current"' : '').
+=======
+									.($arField['VALUE'] != 'Y' ? ' class="current"' : '').
+>>>>>>> FETCH_HEAD
 								'>'
 									.$arField["BUTT_N"]["TITLE"].
 									self::getCustomAttribs($arField["BUTT_N"]).

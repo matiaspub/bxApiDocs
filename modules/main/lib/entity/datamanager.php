@@ -429,6 +429,7 @@ abstract class DataManager
 		$result = new AddResult();
 
 		//event before adding
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields"=>$data));
 		$event->send();
 		$event->getErrors($result);
@@ -442,6 +443,12 @@ abstract class DataManager
 				$data[$field->getName()] = $field->getDefaultValue();
 			}
 		}
+=======
+		$event = new Event($entity, "OnBeforeAdd", array("fields"=>$data));
+		$event->send();
+		$event->getErrors($result);
+		$data = $event->mergeFields($data);
+>>>>>>> FETCH_HEAD
 
 		// check data
 		static::checkFields($result, null, $data);
@@ -452,7 +459,11 @@ abstract class DataManager
 		}
 
 		//event on adding
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_ADD, array("fields"=>$data));
+=======
+		$event = new Event($entity, "OnAdd", array("fields"=>$data));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		// save data
@@ -469,7 +480,11 @@ abstract class DataManager
 		//TODO: save Userfields
 
 		//event after adding
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id"=>$id, "fields"=>$data));
+=======
+		$event = new Event($entity, "OnAfterAdd", array("id"=>$id, "fields"=>$data));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		return $result;
@@ -492,7 +507,11 @@ abstract class DataManager
 		$result = new UpdateResult();
 
 		//event before update
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id"=>$primary, "fields"=>$data));
+=======
+		$event = new Event($entity, "OnBeforeUpdate", array("id"=>$primary, "fields"=>$data));
+>>>>>>> FETCH_HEAD
 		$event->send();
 		$event->getErrors($result);
 		$data = $event->mergeFields($data);
@@ -506,7 +525,11 @@ abstract class DataManager
 		}
 
 		//event on update
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_UPDATE, array("id"=>$primary, "fields"=>$data));
+=======
+		$event = new Event($entity, "OnUpdate", array("id"=>$primary, "fields"=>$data));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		// save data
@@ -533,7 +556,11 @@ abstract class DataManager
 		//TODO: save Userfields
 
 		//event after update
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id"=>$primary, "fields"=>$data));
+=======
+		$event = new Event($entity, "OnAfterUpdate", array("id"=>$primary, "fields"=>$data));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		return $result;
@@ -555,13 +582,21 @@ abstract class DataManager
 		$result = new DeleteResult();
 
 		//event before delete
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id"=>$primary));
+=======
+		$event = new Event($entity, "OnBeforeDelete", array("id"=>$primary));
+>>>>>>> FETCH_HEAD
 		$event->send();
 		if($event->getErrors($result))
 			return $result;
 
 		//event on delete
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_DELETE, array("id"=>$primary));
+=======
+		$event = new Event($entity, "OnDelete", array("id"=>$primary));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		// delete
@@ -581,7 +616,11 @@ abstract class DataManager
 		$connection->queryExecute($sql);
 
 		//event after delete
+<<<<<<< HEAD
 		$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id"=>$primary));
+=======
+		$event = new Event($entity, "OnAfterDelete", array("id"=>$primary));
+>>>>>>> FETCH_HEAD
 		$event->send();
 
 		return $result;

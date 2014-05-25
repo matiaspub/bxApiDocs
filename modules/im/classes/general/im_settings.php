@@ -54,7 +54,11 @@ class CIMSettings
 		$arDefault = self::GetDefaultSettings($type);
 		foreach ($value as $key => $val)
 		{
+<<<<<<< HEAD
 			if (isset($arDefault[$key]) && $arDefault[$key] == $val)
+=======
+			if ($arDefault[$key] == $val)
+>>>>>>> FETCH_HEAD
 			{
 				if ($key == self::PRIVACY_SEARCH)
 					$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => ''));
@@ -84,6 +88,16 @@ class CIMSettings
 		$arSettings = CUserOptions::GetOption('IM', $type, Array(), $userId);
 		foreach ($value as $key => $val)
 			$arSettings[$key] = $val;
+<<<<<<< HEAD
+=======
+
+		$arDefault = self::GetDefaultSettings($type);
+		foreach ($arSettings as $key => $val)
+		{
+			if ($arDefault[$key] == $val)
+				unset($arSettings[$key]);
+		}
+>>>>>>> FETCH_HEAD
 
 		$arDefault = self::GetDefaultSettings($type);
 		foreach ($arSettings as $key => $val)
@@ -152,7 +166,10 @@ class CIMSettings
 				'status' => 'online',
 				'bxdNotify' => true,
 				'sshNotify' => true,
+<<<<<<< HEAD
 				'nativeNotify' => true,
+=======
+>>>>>>> FETCH_HEAD
 				'viewOffline' => COption::GetOptionString("im", "view_offline"),
 				'viewGroup' => COption::GetOptionString("im", "view_group"),
 				'enableSound' => true,

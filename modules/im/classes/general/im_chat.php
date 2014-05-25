@@ -302,6 +302,7 @@ class CIMChat
 					'id' => $arRes["CHAT_ID"],
 					'name' => $arRes["CHAT_TITLE"],
 					'owner' => $arRes["CHAT_OWNER_ID"],
+<<<<<<< HEAD
 					'avatar' => $avatar,
 					'call' => trim($arRes["CHAT_CALL_TYPE"]),
 					'call_number' => trim($arRes["CHAT_CALL_NUMBER"]),
@@ -309,6 +310,10 @@ class CIMChat
 					'call_entity_id' => trim($arRes["ENTITY_ID"]),
 					'type' => trim($arRes["CHAT_TYPE"]),
 					'style' => strlen($arRes["ENTITY_TYPE"])>0? 'call': (trim($arRes["CHAT_TYPE"]) == IM_MESSAGE_PRIVATE? 'private': 'group'),
+=======
+					'call' => trim($arRes["CHAT_CALL_TYPE"]),
+					'type' => trim($arRes["CHAT_TYPE"]),
+>>>>>>> FETCH_HEAD
 				);
 			}
 			$arUserInChat[$arRes["CHAT_ID"]][] = $arRes["RELATION_USER_ID"];
@@ -649,6 +654,7 @@ class CIMChat
 
 		if (!$skipUserAdd)
 		{
+<<<<<<< HEAD
 			if (count($arUserId) <= 2)
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER"), "MIN_USER");
@@ -686,6 +692,43 @@ class CIMChat
 					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER_BY_PRIVACY"), "MIN_USER_BY_PRIVACY");
 					return false;
 				}
+			}
+=======
+			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER"), "MIN_USER");
+			return false;
+		}
+
+		if (count($arUserId) > 100)
+		{
+			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MAX_USER", Array('#COUNT#' => 100)), "MAX_USER");
+			return false;
+>>>>>>> FETCH_HEAD
+		}
+
+		if (!IsModuleInstalled('intranet') && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
+		{
+			global $USER;
+
+			$arFriendUsers = Array();
+			$dbFriends = CSocNetUserRelations::GetList(array(),array("USER_ID" => $USER->GetID(), "RELATION" => SONET_RELATIONS_FRIEND), false, false, array("ID", "FIRST_USER_ID", "SECOND_USER_ID", "DATE_CREATE", "DATE_UPDATE", "INITIATED_BY"));
+			while ($arFriends = $dbFriends->Fetch())
+			{
+				$friendId = $USER->GetID() == $arFriends["FIRST_USER_ID"]? $arFriends["SECOND_USER_ID"]: $arFriends["FIRST_USER_ID"];
+				$arFriendUsers[$friendId] = $friendId;
+			}
+			foreach ($arUserId as $id => $userId)
+			{
+				if ($userId == $USER->GetID())
+					continue;
+
+				if (!isset($arFriendUsers[$userId]) && CIMSettings::GetPrivacy(CIMSettings::PRIVACY_CHAT, $userId) == CIMSettings::PRIVACY_RESULT_CONTACT)
+					unset($arUserId[$id]);
+			}
+
+			if (count($arUserId) <= 2)
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER_BY_PRIVACY"), "MIN_USER_BY_PRIVACY");
+				return false;
 			}
 		}
 

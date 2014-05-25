@@ -261,12 +261,17 @@ class CSocNetLogRights
 	public static function CheckForUserAll($logID)
 	{
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
+<<<<<<< HEAD
 			WHERE 
 			SLR.LOG_ID = ".intval($logID)." 
 			AND (
 				(SLR.GROUP_CODE = 'AU') 
 				OR (SLR.GROUP_CODE = 'G2')
 			)";
+=======
+			INNER JOIN b_user_access UA ON 0=1 OR (SLR.GROUP_CODE = 'AU') OR (SLR.GROUP_CODE = 'G2') 
+			WHERE SLR.LOG_ID = ".intval($logID);
+>>>>>>> FETCH_HEAD
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())

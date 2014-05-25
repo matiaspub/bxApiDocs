@@ -49,5 +49,10 @@ define('CALL_AJAX_INIT', true);
  */
 define('PULL_REVISION', 8);
 
+/**
+ * BX_PULL_SKIP_INIT
+ */
+define('BX_PULL_SKIP_INIT', true);
+
 
 ?>

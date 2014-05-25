@@ -343,6 +343,7 @@ final class Frame
 	static public function onEndBufferContent(&$content)
 	{
 		global $APPLICATION;
+		global $USER;
 
 		$dividedData = self::getInstance()->getDividedPageData($content);
 		$htmlCacheChanged = false;
@@ -405,6 +406,7 @@ final class Frame
 			\Bitrix\Main\Data\AppCacheManifest::checkObsoleteManifest();
 		}
 
+<<<<<<< HEAD
 		if (self::isAjaxRequest()) //Is it a check request?
 		{
 			header("Content-Type: application/x-javascript; charset=".SITE_CHARSET);
@@ -414,6 +416,28 @@ final class Frame
 				"lang"              => \CJSCore::GetCoreMessages(),
 				"css"               => $APPLICATION->GetCSSArray(),
 				"htmlCacheChanged"  => $htmlCacheChanged,
+=======
+			header("Content-Type: application/x-javascript");
+			$autoTimeZone = "N";
+			if (is_object($GLOBALS["USER"]))
+				$autoTimeZone = trim($USER->GetParam("AUTO_TIME_ZONE"));
+			$content = array(
+				"js"=> $APPLICATION->arHeadScripts,
+				"additional_js"=> $APPLICATION->arAdditionalJS,
+				"lang"=>  array(
+						'LANGUAGE_ID' => LANGUAGE_ID,
+						'FORMAT_DATE' => FORMAT_DATE,
+						'FORMAT_DATETIME' => FORMAT_DATETIME,
+						'COOKIE_PREFIX' => \COption::GetOptionString("main", "cookie_name", "BITRIX_SM"),
+						'USER_ID' => $USER->GetID(),
+						'SERVER_TIME' => time(),
+						'SERVER_TZ_OFFSET' => date("Z"),
+						'USER_TZ_OFFSET' => \CTimeZone::GetOffset(),
+						'USER_TZ_AUTO' => $autoTimeZone == 'N' ? 'N' : 'Y',
+						'bitrix_sessid' => bitrix_sessid(),
+					),
+				"css"=> $APPLICATION->GetCSSArray(),
+>>>>>>> FETCH_HEAD
 				"isManifestUpdated" => \Bitrix\Main\Data\AppCacheManifest::getInstance()->getIsModified(),
 				"dynamicBlocks"     => $dividedData["dynamic"],
 				"spread"            => array_map(array("CUtil", "JSEscape"), $APPLICATION->GetSpreadCookieUrls()),

@@ -675,7 +675,11 @@ class CAutoCheck
 						}
 						if (!in_array($dir, array('empty')) && count($arShowTitle) == 0)
 							$arMessage .= GetMessage("NO_SHOWTITLE", array("#template#" => $dir))."\n";
+<<<<<<< HEAD
 						if (!in_array($dir, array('mobile_app', 'desktop_app', 'empty', 'learning_10_0_0')) && count($arShowPanel) == 0)
+=======
+						if (!in_array($dir, array('mobile_app', 'desktop_app', 'empty')) && count($arShowPanel) == 0)
+>>>>>>> FETCH_HEAD
 							$arMessage .= GetMessage("NO_SHOWPANEL", array("#template#" => $dir))."\n";
 					}
 				}

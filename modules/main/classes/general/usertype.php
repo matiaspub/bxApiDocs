@@ -2629,6 +2629,7 @@ public static 	function GetQuery($arFilter)
 
 					switch($FIELD_TYPE)
 					{
+<<<<<<< HEAD
 					case "file":
 					case "enum":
 					case "int":
@@ -2655,6 +2656,448 @@ public static 	function GetQuery($arFilter)
 						if (strlen($res))
 							$result[] = $res;
 						break;
+=======
+						case "file":
+						case "enum":
+						case "int":
+							if(is_array($value))
+							{
+								$FIELD_VALUE = array();
+								foreach($value as $val)
+									$FIELD_VALUE[] = intval($val);
+							}
+							elseif (is_object($value))
+							{
+								$FIELD_VALUE = $value;
+							}
+							else
+								$FIELD_VALUE = intval($value);
+							switch($operation)
+							{
+								case "I":
+								case "E":
+								case "S":
+								case "M":
+									if(is_array($FIELD_VALUE))
+									{
+										if(count($FIELD_VALUE))
+										{
+											$_result = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
+
+											if (in_array(0, $FIELD_VALUE, true))
+											{
+												$_result = '('.$_result.' OR '.$FIELD_NAME.' IS NULL)';
+											}
+
+											$result[] = $_result;
+										}
+										else
+											$result[] = "1=0";
+
+										if($this->fields[$key]["MULTIPLE"] === "Y")
+											$this->bDistinctReqired = true;
+									}
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $FIELD_NAME." = ".$FIELD_VALUE->compile();
+									elseif($FIELD_VALUE==0)
+										$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
+									else
+										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+									break;
+								case "NI":
+								case "N":
+								case "NS":
+								case "NM":
+									if(is_array($FIELD_VALUE))
+									{
+										if(count($FIELD_VALUE))
+											$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
+										else
+											$result[] = "1=1";
+									}
+									elseif($FIELD_VALUE==0)
+										$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
+									else
+										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "G":
+								case "L":
+								case "GE":
+								case "LE":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
+									else
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "B":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NB":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+							}
+							break;
+						case "double":
+							if(is_array($value))
+							{
+								$FIELD_VALUE = array();
+								foreach($value as $val)
+									$FIELD_VALUE[] = doubleval($val);
+							}
+							else
+							{
+								$FIELD_VALUE = doubleval($value);
+							}
+
+							switch($operation)
+							{
+								case "I":
+								case "E":
+								case "S":
+								case "M":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
+									elseif($FIELD_VALUE==0)
+										$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
+									else
+										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NI":
+								case "N":
+								case "NS":
+								case "NM":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
+									elseif($FIELD_VALUE==0)
+										$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
+									else
+										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "G":
+								case "L":
+								case "GE":
+								case "LE":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
+									else
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "B":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NB":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+							}
+							break;
+						case "string":
+							if(is_array($value))
+							{
+								$FIELD_VALUE = array();
+								if($operation=="S" || $operation=="NS")
+								{
+									foreach($value as $val)
+										$FIELD_VALUE[] = $this->ForLIKE(toupper($val));
+								}
+								else
+								{
+									foreach($value as $val)
+										$FIELD_VALUE[] = $DB->ForSQL($val);
+								}
+							}
+							elseif (is_object($value))
+							{
+								$FIELD_VALUE = $value;
+							}
+							else
+							{
+								if($operation=="S" || $operation=="NS")
+									$FIELD_VALUE = $this->ForLIKE(toupper($value));
+								else
+									$FIELD_VALUE = $DB->ForSQL($value);
+							}
+
+							switch($operation)
+							{
+								case "I":
+									if(is_array($FIELD_VALUE))
+									{
+										$result[] = $this->_StringIN($FIELD_NAME, $FIELD_VALUE);
+										if($this->fields[$key]["MULTIPLE"] === "Y")
+											$this->bDistinctReqired = true;
+									}
+									elseif (is_object($FIELD_VALUE))
+									{
+										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+									}
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_Empty($FIELD_NAME);
+									else
+										$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+									break;
+								case "E":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$this->_Upper($FIELD_NAME)." like '".implode("' OR ".$this->_Upper($FIELD_NAME)." like '", $FIELD_VALUE)."')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_Empty($FIELD_NAME);
+									else
+									{
+										//kinda optimization for digits only
+										if(preg_match("/[^0-9]/", $FIELD_VALUE))
+											$result[] = $this->_Upper($FIELD_NAME)." like upper('".$FIELD_VALUE."')";
+										else
+											$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+									}
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "S":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$this->_Upper($FIELD_NAME)." like '%".implode("%' ESCAPE '!' OR ".$this->_Upper($FIELD_NAME)." like '%", $FIELD_VALUE)."%' ESCAPE '!')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_Upper($FIELD_NAME)." like ".$FIELD_VALUE->compile()." ESCAPE '!'";
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_Empty($FIELD_NAME);
+									else
+										$result[] = $this->_Upper($FIELD_NAME)." like '%".$FIELD_VALUE."%' ESCAPE '!'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "M":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$FIELD_NAME." like '".implode("' OR ".$FIELD_NAME." like '", $FIELD_VALUE)."')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_Empty($FIELD_NAME);
+									else
+									{
+										//kinda optimization for digits only
+										if(preg_match("/[^0-9]/", $FIELD_VALUE))
+											$result[] = $FIELD_NAME." like '".$FIELD_VALUE."'";
+										else
+											$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+									}
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NI":
+									if(is_array($FIELD_VALUE))
+										$result[] = $this->_StringNotIN($FIELD_NAME, $FIELD_VALUE);
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_ExprNotEQ($FIELD_NAME, $FIELD_VALUE);
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_NotEmpty($FIELD_NAME);
+									else
+										$result[] = $this->_StringNotEQ($FIELD_NAME, $FIELD_VALUE);
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "N":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$this->_Upper($FIELD_NAME)." not like '".implode("' AND ".$this->_Upper($FIELD_NAME)." not like '", $FIELD_VALUE)."')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_NotEmpty($FIELD_NAME);
+									else
+										$result[] = $this->_Upper($FIELD_NAME)." not like '".$FIELD_VALUE."'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NS":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$this->_Upper($FIELD_NAME)." not like '%".implode("%' ESCAPE '!' AND ".$this->_Upper($FIELD_NAME)." not like '%", $FIELD_VALUE)."%' ESCAPE '!')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_NotEmpty($FIELD_NAME);
+									else
+										$result[] = $this->_Upper($FIELD_NAME)." not like '%".$FIELD_VALUE."%' ESCAPE '!'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NM":
+									if(is_array($FIELD_VALUE))
+										$result[] = "(".$FIELD_NAME." not like '".implode("' AND ".$FIELD_NAME." not like '", $FIELD_VALUE)."')";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $FIELD_NAME." not like ".$FIELD_VALUE->compile();
+									elseif(strlen($FIELD_VALUE)<=0)
+										$result[] = $this->_NotEmpty($FIELD_NAME);
+									else
+										$result[] = $FIELD_NAME." not like '".$FIELD_VALUE."'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "G":
+								case "L":
+								case "GE":
+								case "LE":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME.$FIELD_OPERATION."'".$FIELD_VALUE[0]."'";
+									elseif (is_object($FIELD_VALUE))
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE->compile();
+									else
+										$result[] = $FIELD_NAME.$FIELD_OPERATION."'".$FIELD_VALUE."'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "B":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NB":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." not between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "?":
+									if(is_scalar($FIELD_VALUE) && strlen($FIELD_VALUE))
+									{
+										$q = GetFilterQuery($FIELD_NAME, $FIELD_VALUE);
+										// Check if error ("0" was returned)
+										if($q !== '0')
+											$result[] = $q;
+									}
+									break;
+							}
+							break;
+						case "date":
+						case "datetime":
+							if($FIELD_TYPE=="date")
+								$format = "SHORT";
+							else
+								$format = "FULL";
+							if(is_array($value))
+							{
+								$FIELD_VALUE = array();
+								foreach($value as $val)
+									$FIELD_VALUE[] = $DB->CharToDateFunction($val, $format);
+							}
+							elseif (strlen($value))
+							{
+								$FIELD_VALUE = $DB->CharToDateFunction($value, $format);
+							}
+							else
+							{
+								$FIELD_VALUE = '';
+							}
+
+							switch($operation)
+							{
+								case "I":
+								case "E":
+								case "S":
+								case "M":
+									if(is_array($FIELD_VALUE))
+									{
+										$result[] = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
+										if($this->fields[$key]["MULTIPLE"] === "Y")
+											$this->bDistinctReqired = true;
+									}
+									elseif(strlen($value)<=0)
+										$result[] = "(".$FIELD_NAME." IS NULL)";
+									else
+										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+									break;
+								case "NI":
+								case "N":
+								case "NS":
+								case "NM":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
+									elseif(strlen($value)<=0)
+										$result[] = "(".$FIELD_NAME." IS NOT NULL)";
+									else
+										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "G":
+								case "L":
+								case "GE":
+								case "LE":
+									if(is_array($FIELD_VALUE))
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
+									else
+										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "B":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+								case "NB":
+									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+									if($this->fields[$key]["MULTIPLE"] === "Y")
+										$this->bDistinctReqired = true;
+									break;
+							}
+							break;
+						case "callback":
+							$res = call_user_func_array($this->fields[$key]["CALLBACK"], array(
+								$FIELD_NAME,
+								$operation,
+								$value,
+							));
+							if(strlen($res))
+								$result[] = $res;
+							break;
+>>>>>>> FETCH_HEAD
 					}
 				}
 			}

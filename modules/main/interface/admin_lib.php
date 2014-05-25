@@ -5648,6 +5648,7 @@ class CAdminForm extends CAdminTabControl
 									echo preg_replace("/^\\s*<tr/is", "<tr class=\"bx-in-group\"", $this->arFields[$p]["custom_html"]);
 								elseif($this->arFields[$p]["html"] && !$this->arFields[$p]["delimiter"])
 									echo '<tr class="bx-in-group" '.($this->arFields[$p]["valign"] <> ''? ' valign="'.$this->arFields[$p]["valign"].'"':'').' id="tr_'.$p.'">', $this->arFields[$p]["html"], "</tr>\n";
+								$this->arFields[$p] = array();
 								unset($arHiddens[$this->arFields[$p]["id"]]);
 								$this->arFields[$p] = array();
 							}

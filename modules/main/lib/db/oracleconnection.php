@@ -318,7 +318,16 @@ class OracleConnection extends Connection
 
 	public function renameTable($currentName, $newName)
 	{
+<<<<<<< HEAD
 		$this->query('RENAME '.$this->getSqlHelper()->quote($currentName).' TO '.$this->getSqlHelper()->quote($newName));
+=======
+		$this->query('RENAME TABLE '.$this->getSqlHelper()->quote($currentName).' TO '.$this->getSqlHelper()->quote($newName));
+	}
+
+	public function dropColumn($tableName, $columnName)
+	{
+		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP '.$this->getSqlHelper()->quote($columnName));
+>>>>>>> FETCH_HEAD
 	}
 
 	/*********************************************************

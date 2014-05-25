@@ -2703,7 +2703,12 @@ abstract class CAllMain
 				$tmp_str = '';
 				foreach($arFile as $key => $filename)
 				{
+<<<<<<< HEAD
 					$tmp_content = file_get_contents($_SERVER['DOCUMENT_ROOT'].$filename);
+=======
+					$filename = $_SERVER['DOCUMENT_ROOT'].$filename;
+					$tmp_content = file_get_contents($filename);
+>>>>>>> FETCH_HEAD
 					if(empty($tmp_content))
 					{
 						unset($arFile[$key], $arSrcFile[$key]);
@@ -2756,6 +2761,7 @@ abstract class CAllMain
 
 					if($writeResult = self::__WriteCssJsCache($optimFName, $contents))
 					{
+<<<<<<< HEAD
 
 						$cacheInfo = '<? $arFilesInfo = array( \'FILES\' => array(';
 
@@ -2765,6 +2771,19 @@ abstract class CAllMain
 						$cacheInfo .= "), 'CUR_SEL_CNT' => '".$arFilesInfo['CUR_SEL_CNT']."', 'CUR_IE_CNT' => '".$arFilesInfo['CUR_IE_CNT']."'); ?>";
 						self::__WriteCssJsCache($infoFile, $cacheInfo, false);
 
+=======
+						if($unique)
+						{
+							$cacheInfo = '<? $arFilesInfo = array( \'FILES\' => array(';
+
+							foreach($arFilesInfo['FILES'] as $key => $time)
+								$cacheInfo .= '"'.EscapePHPString($key).'" => "'.$time.'",';
+
+							$cacheInfo .= "), 'CUR_SEL_CNT' => '".$arFilesInfo['CUR_SEL_CNT']."', 'CUR_IE_CNT' => '".$arFilesInfo['CUR_IE_CNT']."'); ?>";
+							self::__WriteCssJsCache($infoFile, $cacheInfo, false);
+						}
+
+>>>>>>> FETCH_HEAD
 						if($type == 'css')
 						{
 							foreach($arIEContent as $key => $ieContent)
@@ -3542,17 +3561,31 @@ abstract class CAllMain
 		if($firstExec)
 		{
 			$additionalJS = array_unique($this->arHeadAdditionalScripts);
+<<<<<<< HEAD
 
 			$arBxFile = array('main' => array());
 			$arSrcBxFile = array('main' => array());
 			$arSrcBxNoKernel = array();
+=======
 
-			$arBxBodyFile = array();
-			$arSrcBxBodyFile = array();
+			if($optimJS)
+			{
+				CJSCore::Init();
+				$arBxFile = array('main' => array());
+				$arSrcBxFile = array('main' => array());
+				$arSrcBxNoKernel = array();
 
-			$arTemplateFile = array();
-			$arSrcTemplateFile = array();
+				$arBxBodyFile = array();
+				$arSrcBxBodyFile = array();
+>>>>>>> FETCH_HEAD
 
+				$arTemplateFile = array();
+				$arSrcTemplateFile = array();
+
+				$arPageFile = array();
+				$arSrcPageFile = array();
+
+<<<<<<< HEAD
 			$arPageFile = array();
 			$arSrcPageFile = array();
 
@@ -3579,11 +3612,28 @@ abstract class CAllMain
 				$arScripts = array_unique(array_merge($this->arHeadScripts, $additionalJS));
 			}
 
+=======
+				$arScripts = array_unique($this->arHeadScripts);
+				foreach($additionalJS as $jsKey => $jsSrc)
+				{
+					if(!self::IsExternalLink($jsSrc) && !file_exists($_SERVER['DOCUMENT_ROOT'].$jsSrc))
+					{
+						unset($additionalJS[$jsKey]);
+					}
+				}
+			}
+			else
+			{
+				$arScripts = array_unique(array_merge($this->arHeadScripts, $additionalJS));
+			}
+
+>>>>>>> FETCH_HEAD
 			foreach($arScripts as $jsKey => $src)
 			{
 				$bExternalLink = self::IsExternalLink($src);
 				if($bExternalLink)
 				{
+<<<<<<< HEAD
 					$arJS['KERNEL'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
 					continue;
 				}
@@ -3597,6 +3647,21 @@ abstract class CAllMain
 					{
 						continue;
 					}
+=======
+					if(file_exists($_SERVER['DOCUMENT_ROOT'].$src))
+					{
+						$src = CUtil::GetAdditionalFileURL($src, true);
+					}
+					else
+					{
+						continue;
+					}
+				}
+				else
+				{
+					$arJS['KERNEL'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
+					continue;
+>>>>>>> FETCH_HEAD
 				}
 
 				if($optimJS)
@@ -3634,12 +3699,15 @@ abstract class CAllMain
 						{
 							if($moduleInfo['MODULE_ID'] != '')
 							{
+<<<<<<< HEAD
 								if(!array_key_exists($moduleInfo['MODULE_ID'], $arBxFile))
 								{
 									$arBxFile[$moduleInfo['MODULE_ID']] = array();
 									$arSrcBxFile[$moduleInfo['MODULE_ID']] = array();
 								}
 
+=======
+>>>>>>> FETCH_HEAD
 								$arSrcBxNoKernel[$moduleInfo['MODULE_ID']] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
 							}
 							else
@@ -3683,11 +3751,15 @@ abstract class CAllMain
 				$site_template = defined("SITE_TEMPLATE_ID") ? SITE_TEMPLATE_ID : '.default';
 				foreach($arBxFile as $moduleID => $arJsFiles)
 				{
+<<<<<<< HEAD
 					if(!empty($arJsFiles))
 					{
 						$arJS['KERNEL'] .= $this->__OptimizeCssJs($arJsFiles, $arSrcBxFile[$moduleID], $site_template, true, 'kernel_'.$moduleID, 'js');
 					}
 
+=======
+					$arJS['KERNEL'] .= $this->__OptimizeCssJs($arJsFiles, $arSrcBxFile[$moduleID], $site_template, true, 'kernel_'.$moduleID, 'js');
+>>>>>>> FETCH_HEAD
 					if(array_key_exists($moduleID, $arSrcBxNoKernel))
 					{
 						$arJS['KERNEL'] .= $arSrcBxNoKernel[$moduleID];
@@ -3749,7 +3821,11 @@ abstract class CAllMain
 		switch ($type)
 		{
 			case 1:
+<<<<<<< HEAD
 				$res = $arJS['LANG']."\n".$arJS['KERNEL'];
+=======
+				return $arJS['LANG']."\n".$arJS['KERNEL']."\n";
+>>>>>>> FETCH_HEAD
 				break;
 			case 2:
 				$res = $arJS['TEMPLATE']."\n".$arJS['PAGE'];
