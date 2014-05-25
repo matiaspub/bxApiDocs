@@ -16,7 +16,7 @@ class CCloudUtil
 			if((intval($i) % 2) == 1)
 				$strEncodedURL .= (string)$part_of_url;
 			else
-				$strEncodedURL .= urlencode($APPLICATION->ConvertCharset((string)$part_of_url, LANG_CHARSET, $charset));
+				$strEncodedURL .= urlencode($APPLICATION->ConvertCharset(urldecode($part_of_url), LANG_CHARSET, $charset));
 		}
 		return $strEncodedURL;
 	}

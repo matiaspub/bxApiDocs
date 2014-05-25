@@ -145,6 +145,56 @@ define('GF_TWOBYTWO', (1 << 7));
 define('SALE_TIME_LOCK_USER', 600);
 
 /**
+ * SALE_DEBUG
+ */
+define('SALE_DEBUG', false);
+
+/**
+ * SALE_PROC_REC_NUM
+ */
+define('SALE_PROC_REC_NUM', 3);
+
+/**
+ * SALE_PROC_REC_ATTEMPTS
+ */
+define('SALE_PROC_REC_ATTEMPTS', 3);
+
+/**
+ * SALE_PROC_REC_TIME
+ */
+define('SALE_PROC_REC_TIME', 43200);
+
+/**
+ * SALE_PROC_REC_FREQUENCY
+ */
+define('SALE_PROC_REC_FREQUENCY', 7200);
+
+/**
+ * SALE_REPORT_OWNER_ID
+ */
+define('SALE_REPORT_OWNER_ID', 'sale');
+
+/**
+ * CACHED_b_sale_order
+ */
+define('CACHED_b_sale_order', 3600*24);
+
+/**
+ * SALE_VALUE_PRECISION
+ */
+define('SALE_VALUE_PRECISION', 2);
+
+/**
+ * SALE_WEIGHT_PRECISION
+ */
+define('SALE_WEIGHT_PRECISION', 3);
+
+/**
+ * BX_SALE_MENU_CATALOG_CLEAR
+ */
+define('BX_SALE_MENU_CATALOG_CLEAR', 'Y');
+
+/**
  * NO_KEEP_STATISTIC
  */
 define('NO_KEEP_STATISTIC', true);
@@ -295,6 +345,16 @@ define('DELIVERY_EMS_PRICE_TARIFF', 0.01);
 define('DELIVERY_EMS_WRITE_LOG', 0); // flag 'write to log'. use CDeliveryEMS::__WriteToLog();
 
 /**
+ * DELIVERY_RP_CSV_PATH
+ */
+define('DELIVERY_RP_CSV_PATH', $_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/sale/ru/delivery/rus_post');
+
+/**
+ * DELIVERY_RPF_CSV_PATH
+ */
+define('DELIVERY_RPF_CSV_PATH', $_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/sale/ru/delivery/rus_post_first');
+
+/**
  * DELIVERY_RUSSIANPOST_WRITE_LOG
  */
 define('DELIVERY_RUSSIANPOST_WRITE_LOG', 0); // flag 'write to log'. use CDeliveryRUSSIANPOST::__WriteToLog();
@@ -398,6 +458,21 @@ define('DELIVERY_RUSSIANPOST_VALUE_CHECK_STRING', '<span id="TarifValue">');
  * DELIVERY_RUSSIANPOST_VALUE_CAPTHA_STRING
  */
 define('DELIVERY_RUSSIANPOST_VALUE_CAPTHA_STRING', '<input id="key"');
+
+/**
+ * NO_AGENT_CHECK
+ */
+define('NO_AGENT_CHECK', true);
+
+/**
+ * NO_AGENT_STATISTIC
+ */
+define('NO_AGENT_STATISTIC', true);
+
+/**
+ * DisableEventsCheck
+ */
+define('DisableEventsCheck', true);
 
 
 ?>

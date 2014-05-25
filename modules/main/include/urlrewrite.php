@@ -73,7 +73,9 @@ if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' ||
 
 			$_GET += $vars;
 			$_REQUEST += $vars;
-			//$GLOBALS += $vars;
+			if (ini_get_bool("register_globals"))
+				$GLOBALS += $vars;
+
 			$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
 		}
 	}
@@ -93,7 +95,7 @@ if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' ||
 
 	$HTTP_GET_VARS = $_GET;
 	$sUrlPath = GetPagePath();
-	$strNavQueryString = DeleteParam(array("SEF_APPLICATION_CUR_PAGE_URL"));
+	$strNavQueryString = DeleteParam(array("bxrand", "bxref", "SEF_APPLICATION_CUR_PAGE_URL"));
 	if($strNavQueryString != "")
 		$sUrlPath = $sUrlPath."?".$strNavQueryString;
 	// define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/bitrix/urlrewrite.php?SEF_APPLICATION_CUR_PAGE_URL=".urlencode($sUrlPath)));
@@ -133,8 +135,10 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 
 			$urlTmp = strtolower(ltrim($url, "/\\"));
 			$urlTmp = str_replace(".", "", $urlTmp);
+			$bxUrlTmp = substr($urlTmp, 0, 16);
 			$urlTmp = substr($urlTmp, 0, 7);
-			if (($urlTmp == "bitrix/") || ($urlTmp == "upload/"))
+
+			if (($urlTmp == "upload/" || ($urlTmp == "bitrix/" && $bxUrlTmp != "bitrix/services/")))
 				continue;
 
 			$ext = strtolower(GetFileExtension($url));

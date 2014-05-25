@@ -1,14 +1,13 @@
-<?
-/*
-##############################################
-# Bitrix Site Manager                        #
-# Copyright (c) 2002-2007 Bitrix             #
-# http://www.bitrixsoft.com                  #
-# mailto:admin@bitrixsoft.com                #
-##############################################
-*/
-// ***** CUndo *****
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
+
 IncludeModuleLangFile(__FILE__);
+
 class CUndo
 {
 	public static function Add($params = array())
@@ -33,7 +32,7 @@ class CUndo
 		return $ID;
 	}
 
-	public static function Escape($ID, $params = array())
+	public static function Escape($ID)
 	{
 		global $USER;
 		if(!isset($USER) || !is_object($USER) || !$USER->IsAuthorized())
@@ -74,7 +73,7 @@ class CUndo
 
 	public static function GetList($Params = array())
 	{
-		global $DB, $USER;
+		global $DB;
 
 		$arFilter = $Params['arFilter'];
 		$arOrder = isset($Params['arOrder']) ? $Params['arOrder'] : Array('ID' => 'asc');
@@ -150,7 +149,7 @@ class CUndo
 		return "CUndo::CleanUpOld();";
 	}
 
-	public static function ShowUndoMessage($ID, $params = array())
+	public static function ShowUndoMessage($ID)
 	{
 		$_SESSION['BX_UNDO_ID'] = $ID;
 	}
@@ -216,38 +215,39 @@ class CAutoSave
 
 	public function __construct()
 	{
-		global $APPLICATION;
+		global $USER;
 
-		if (!$GLOBALS['USER']->IsAuthorized())
-			return false;
-
-		if (isset($_REQUEST['autosave_id']) && strlen($_REQUEST['autosave_id']) == 33)
+		if ($USER->IsAuthorized())
 		{
-			$this->bSkipRestore = true;
-			$this->autosaveId = preg_replace("/[^a-z0-9_]/i", "", $_REQUEST['autosave_id']);
-		}
-		else
-			$this->formId = self::_GetFormID();
+			if (isset($_REQUEST['autosave_id']) && strlen($_REQUEST['autosave_id']) == 33)
+			{
+				$this->bSkipRestore = true;
+				$this->autosaveId = preg_replace("/[^a-z0-9_]/i", "", $_REQUEST['autosave_id']);
+			}
+			else
+				$this->formId = self::_GetFormID();
 
-		addEventHandler('main', 'OnBeforeLocalRedirect', array($this, 'Reset'));
+			addEventHandler('main', 'OnBeforeLocalRedirect', array($this, 'Reset'));
 
-		if (!defined('BX_PUBLIC_MODE'))
-			CJSCore::Init(array('autosave'));
+			if (!defined('BX_PUBLIC_MODE'))
+				CJSCore::Init(array('autosave'));
 
-		if (!$this->bSkipRestore)
-		{
-			addEventHandler('main', 'onEpilog', array($this, 'checkRestore'));
+			if (!$this->bSkipRestore)
+			{
+				addEventHandler('main', 'onEpilog', array($this, 'checkRestore'));
+			}
 		}
 	}
 
 	public function Init($admin = true)
 	{
-		if (!$GLOBALS['USER']->IsAuthorized())
+		global $USER;
+
+		if (!$USER->IsAuthorized())
 			return false;
 
 		if (!$this->bInited)
 		{
-			$bSkipRestore = false;
 			$DISABLE_STANDARD_NOTIFY = ($admin ? 'false' : 'true');
 
 			if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
@@ -263,6 +263,7 @@ class CAutoSave
 <?
 			$this->bInited = true;
 		}
+		return true;
 	}
 
 	public function checkRestore()
@@ -286,7 +287,7 @@ class CAutoSave
 
 	public function Set($data)
 	{
-		global $USER, $DB;
+		global $USER;
 
 		if ($this->Reset() !== false)
 		{
@@ -321,9 +322,11 @@ class CAutoSave
 
 	public function GetID()
 	{
+		global $USER;
+
 		if (!$this->autosaveId)
 		{
-			$this->autosaveId = '2'.md5($this->formId.'|'.$GLOBALS['USER']->GetID());
+			$this->autosaveId = '2'.md5($this->formId.'|'.$USER->GetID());
 		}
 
 		return $this->autosaveId;
@@ -367,16 +370,17 @@ class CAutoSave
 
 	public static function Allowed()
 	{
-		if (!$GLOBALS['USER']->IsAuthorized())
+		global $USER, $APPLICATION;
+
+		if (!$USER->IsAuthorized())
 			return false;
 
 		if (self::$bAllowed == null)
 		{
 			$arOpt = CUserOptions::GetOption('global', 'settings');
-			self::$bAllowed = $arOpt['autosave'] != 'N' && $GLOBALS['APPLICATION']->GetCurPage() != '/bitrix/admin/update_system.php';
+			self::$bAllowed = $arOpt['autosave'] != 'N' && $APPLICATION->GetCurPage() != '/bitrix/admin/update_system.php';
 		}
 
 		return self::$bAllowed;
 	}
 }
-?>

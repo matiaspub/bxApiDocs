@@ -314,6 +314,7 @@ class CFileMan
 		$strMenuLinks .= "\n);";
 		$APPLICATION->SaveFileContent($DOC_ROOT.$path, "<"."?\n".$strMenuLinks."\n?".">");
 		$GLOBALS["CACHE_MANAGER"]->CleanDir("menu");
+		CBitrixComponent::clearComponentCache("bitrix:menu");
 	}
 
 	public static function GetMenuArray($abs_path)
@@ -450,13 +451,13 @@ class CFileMan
 			if(CModule::IncludeModule("search"))
 				CSearch::DeleteIndex("main", $site."|".$path);
 
-		//************************** Quota **************************//
+			//************************** Quota **************************//
 			if(COption::GetOptionInt("main", "disk_space") > 0)
 			{
 				$quota = new CDiskQuota();
 				$quota->updateDiskQuota("file", $file_size, "delete");
 			}
-		//************************** Quota **************************//
+			//************************** Quota **************************//
 		}
 	}
 
@@ -941,7 +942,7 @@ class CFileMan
 
 		if (isset($Params['public']) && $Params['public'] == 'Y')
 		{
-		?>
+			?>
 			<script type="text/javascript">
 				window.location = '<?= CUtil::JSEscape(CHTTP::URN2URI(GetDirPath($Params['path'])))?>';
 			</script>
@@ -1031,6 +1032,7 @@ class CFileMan
 
 	public static function ShowTypeSelector($params)
 	{
+		$useEditor3 = COption::GetOptionString('fileman', "use_editor_3", "N") == "Y";
 		$name = $params['name'];
 		$key = isset($params['key']) ? $params['key'] : '';
 		$showTextType = isset($params['strTextTypeFieldName']) && $params['strTextTypeFieldName'];
@@ -1042,31 +1044,111 @@ class CFileMan
 		{
 			$curType = CUserOptions::GetOption('fileman', "type_selector_".$name.$key, false);
 			if ($curType && in_array($curType, array('html', 'editor')))
+			{
 				$textType = $curType;
+			}
 		}
 
 		$ch = "checked=\"checked\"";
 		?>
-		<script>
-			top.onChangeInputType = window.onChangeInputType = function(editorName)
-			{
-				if (window['changeType_' + editorName] && typeof window['changeType_' + editorName] == 'function')
-					window['changeType_' + editorName]();
-				else
-					return setTimeout(function(){onChangeInputType(editorName);}, 100);
-			}
-		</script>
 		<div class="bx-ed-type-selector">
 			<?if ($showTextType):?>
-			<span class="bx-ed-type-selector-item"><input <? if ($textType == 'text') {echo $ch;}?> onclick="onChangeInputType('<?= $name?>');" type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_text" value="text" /><label for="<?= $bxid?>_text"><?= GetMessage('FILEMAN_FILEMAN_TYPE_TEXT')?></label></span>
+				<span class="bx-ed-type-selector-item"><input <? if ($textType == 'text') {echo $ch;}?>  type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_text" value="text" /><label for="<?= $bxid?>_text"><?= GetMessage('FILEMAN_FILEMAN_TYPE_TEXT')?></label></span>
 
-			<span class="bx-ed-type-selector-item"><input <? if ($textType == 'html') {echo $ch;}?> onclick="onChangeInputType('<?= $name?>');"  type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_html" value="html" /><label for="<?= $bxid?>_html">HTML</label></span>
+				<span class="bx-ed-type-selector-item"><input <? if ($textType == 'html') {echo $ch;}?>  type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_html" value="html" /><label for="<?= $bxid?>_html">HTML</label></span>
 
-			<span class="bx-ed-type-selector-item"><input <? if ($textType == 'editor') {echo $ch;}?> onclick="onChangeInputType('<?= $name?>');" type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_editor" value="html" /><label for="<?= $bxid?>_editor"><?= GetMessage('FILEMAN_FILEMAN_TYPE_HTML_EDITOR')?></label></span>
+				<span class="bx-ed-type-selector-item"><input <? if ($textType == 'editor') {echo $ch;}?>  type="radio" name="<?= $strTextTypeFieldName?>" id="<?= $bxid?>_editor" value="html" /><label for="<?= $bxid?>_editor"><?= GetMessage('FILEMAN_FILEMAN_TYPE_HTML_EDITOR')?></label></span>
 			<? else:?>
-			<span class="bx-ed-type-selector-item"><input type="checkbox" id="<?= $bxid?>_editor" name="<?= $strTextTypeFieldName?>" onclick="onChangeInputType('<?= $name?>');" value="Y" <? if ($textType == 'editor') {echo $ch;}?> /><label for="<?= $bxid?>_editor"><?= GetMessage("FILEMAN_FILEMAN_USE_HTML_EDITOR");?></span>
+				<span class="bx-ed-type-selector-item"><input type="checkbox" id="<?= $bxid?>_editor" name="<?= $strTextTypeFieldName?>" value="Y" <? if ($textType == 'editor') {echo $ch;}?> /><label for="<?= $bxid?>_editor"><?= GetMessage("FILEMAN_FILEMAN_USE_HTML_EDITOR");?></span>
 			<? endif;?>
 		</div>
+		<script>
+			function onChangeInputType(editorName)
+			{
+				if (window['changeType_' + editorName] && typeof window['changeType_' + editorName] == 'function')
+				{
+					window['changeType_' + editorName]();
+				}
+				else
+				{
+					return setTimeout(function(){onChangeInputType(editorName);}, 100);
+				}
+			}
+			BX.ready(function()
+			{
+				var
+					pOptText = BX("<?= $bxid?>_text"),
+					pOptHtml = BX("<?= $bxid?>_html"),
+					pOptEditor = BX("<?= $bxid?>_editor");
+				if (pOptText)
+				{
+					BX.bind(pOptText, 'click', function(){onChangeInputType('<?= $name?>');});
+				}
+				if (pOptHtml)
+				{
+					BX.bind(BX("<?= $bxid?>_html"), 'click', function(){onChangeInputType('<?= $name?>');});
+				}
+				if (pOptEditor)
+				{
+					BX.bind(BX("<?= $bxid?>_editor"), 'click', function(){onChangeInputType('<?= $name?>');});
+				}
+			});
+		</script>
+		<?if ($useEditor3):?>
+		<script>
+			BX.ready(function()
+			{
+				top.changeType_<?= $name?> = window.changeType_<?= $name?> = function(bSave)
+				{
+					var
+						pOptHtml = BX("<?= $bxid?>_html"),
+						pOptEditor = BX("<?= $bxid?>_editor");
+
+					var curType = pOptEditor.checked ? 'editor' : 'text';
+					if (pOptHtml && pOptHtml.checked)
+					{
+						curType = 'html';
+					}
+
+					<?if (isset($params['externalFuncName']) && $params['externalFuncName']):?>
+					var func = window['<?= $params['externalFuncName']?>'];
+					if (func && typeof func == 'function')
+					{
+						func(curType);
+					}
+					<?else:?>
+					// Editor
+					var
+						editorName = '<?= $name?>',
+						textarea = BX("bxed_<?= $name?>"),
+						show = pOptEditor.checked && textarea.style.display != "none",
+						editor = window.BXHtmlEditor.Get('<?= $name?>');
+
+					if (editor && editor.Check())
+					{
+						if(show)
+						{
+							editor.Show();
+							editor.SetContent(textarea.value, true);
+							textarea.style.display = "none";
+						}
+						else
+						{
+							editor.Hide();
+							textarea.style.display = "";
+							editor.SaveContent();
+						}
+					}
+					else if(show)
+					{
+						window.BXHtmlEditor.Show(false, editorName);
+						textarea.style.display = "none";
+					}
+					<?endif;?>
+				}
+			});
+		</script>
+	<?else: /* if ($useEditor3) */ ?>
 		<script>
 			BX.ready(
 				function()
@@ -1074,18 +1156,21 @@ class CFileMan
 					window.changeType_<?= $name?> = function(bSave)
 					{
 						var
-							pOptText = BX("<?= $bxid?>_text"),
 							pOptHtml = BX("<?= $bxid?>_html"),
 							pOptEditor = BX("<?= $bxid?>_editor");
 
 						var curType = pOptEditor.checked ? 'editor' : 'text';
 						if (pOptHtml && pOptHtml.checked)
+						{
 							curType = 'html';
+						}
 
 						<?if (isset($params['externalFuncName']) && $params['externalFuncName']):?>
 						var func = window['<?= $params['externalFuncName']?>'];
 						if (func && typeof func == 'function')
+						{
 							func(curType);
+						}
 
 						<?else:?>
 						// Editor
@@ -1147,26 +1232,25 @@ class CFileMan
 				}
 			);
 		</script>
-		<?
-
+	<?endif;/* if ($useEditor3) */
 		return $textType;
 	}
 
 	public static function AddHTMLEditorFrame(
-				$strTextFieldName,
-				$strTextValue,
-				$strTextTypeFieldName,
-				$strTextTypeValue,
-				$arSize = Array("height"=>350),
-				$CONVERT_FOR_WORKFLOW="N",
-				$WORKFLOW_DOCUMENT_ID=0,
-				$NEW_DOCUMENT_PATH="",
-				$textarea_field="",
-				$site = false,
-				$bWithoutPHP = true,
-				$arTaskbars = false,
-				$arAdditionalParams = Array()
-			)
+		$strTextFieldName,
+		$strTextValue,
+		$strTextTypeFieldName,
+		$strTextTypeValue,
+		$arSize = Array("height"=>350),
+		$CONVERT_FOR_WORKFLOW="N",
+		$WORKFLOW_DOCUMENT_ID=0,
+		$NEW_DOCUMENT_PATH="",
+		$textarea_field="",
+		$site = false,
+		$bWithoutPHP = true,
+		$arTaskbars = false,
+		$arAdditionalParams = Array()
+	)
 	{
 		// We have to avoid of showing HTML-editor with probably unsecure content when loosing the session [mantis:#0007986]
 		if ($_SERVER["REQUEST_METHOD"] == "POST" && !check_bitrix_sessid())
@@ -1210,6 +1294,9 @@ class CFileMan
 			"height" => $iHeight < 450 ? 450 : $iHeight
 		);
 
+		if (isset($arAdditionalParams['use_editor_3']))
+			$arParams['use_editor_3'] = $arAdditionalParams['use_editor_3'];
+
 		$arParams['site'] = (strlen($site)<=0?LANG:$site);
 		if(isset($arSize["width"]))
 			$arParams["width"] = $arSize["width"];
@@ -1228,9 +1315,12 @@ class CFileMan
 
 	public static function ShowHTMLEditControl($name, $content, $arParams = Array())
 	{
+		global $USER;
 		// We have to avoid of showing HTML-editor with probably unsecure content when loosing the session [mantis:#0007986]
 		if ($_SERVER["REQUEST_METHOD"] == "POST" && !check_bitrix_sessid())
+		{
 			return;
+		}
 
 		CUtil::InitJSCore(array('window', 'ajax'));
 		$relPath = (isset($arParams["path"])) ? $arParams["path"] : "/";
@@ -1274,6 +1364,33 @@ class CFileMan
 					$template = $arSiteRes['TEMPLATE'];
 			}
 		}
+
+		if (isset($arParams['use_editor_3']))
+		{
+			$useEditor3 = $arParams['use_editor_3'] == "Y";
+		}
+		else
+		{
+			$useEditor3 = COption::GetOptionString('fileman', "use_editor_3", "N") == "Y";
+		}
+
+		if ($useEditor3)
+		{
+			$Editor = new CHTMLEditor;
+			$Editor->Show(array(
+				'name' => $name,
+				'id' => $name,
+				'siteId' => $arParams["site"],
+				'width' => $arParams["width"],
+				'height' => $arParams["height"],
+				'content' => $content,
+				'bAllowPhp' => !$arParams["bWithoutPHP"] && $USER->CanDoOperation('edit_php'),
+				"limitPhpAccess" => $arParams["light_mode"],
+				"display" => $arParams['bDisplay']
+			));
+			return;
+		}
+
 		//Taskbars
 		$arTaskbars = (isset($arParams["arTaskbars"])) ? $arParams["arTaskbars"] : Array();
 		//Toolbars
@@ -1312,22 +1429,22 @@ class CFileMan
 
 		?>
 		<script>
-		var relPath = "<?= CUtil::JSEscape($relPath);?>";
-		var <? echo 'ar_'.$name.'_taskbars';?> = {};
-		<?
-		for ($k = 0; $k < count($arTaskbars); $k++)
-			echo 'ar_'.$name.'_taskbars["'.$arTaskbars[$k].'"] = true;';
-		if ($arToolbars !== false)
-		{
-			echo 'var  ar_'.$name.'_toolbars = {};';
-			for ($k = 0; $k < count($arToolbars); $k++)
-				echo 'ar_'.$name.'_toolbars["'.$arToolbars[$k].'"] = true;';
-		}
-		else
-			echo 'var  ar_'.$name.'_toolbars = false;';
-		?>
+			var relPath = "<?= CUtil::JSEscape($relPath);?>";
+			var <? echo 'ar_'.$name.'_taskbars';?> = {};
+			<?
+			for ($k = 0; $k < count($arTaskbars); $k++)
+				echo 'ar_'.$name.'_taskbars["'.$arTaskbars[$k].'"] = true;';
+			if ($arToolbars !== false)
+			{
+				echo 'var  ar_'.$name.'_toolbars = {};';
+				for ($k = 0; $k < count($arToolbars); $k++)
+					echo 'ar_'.$name.'_toolbars["'.$arToolbars[$k].'"] = true;';
+			}
+			else
+				echo 'var  ar_'.$name.'_toolbars = false;';
+			?>
 
-		window.ar_<?= $name?>_config = <?= CUtil::PhpToJSObject($arParams)?>; // editor-config
+			window.ar_<?= $name?>_config = <?= CUtil::PhpToJSObject($arParams)?>; // editor-config
 		</script>
 		<?
 		$str_taskbars = "";
@@ -1354,101 +1471,103 @@ class CFileMan
 					spellcheck_js_v = "<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/spellcheck.js')?>",
 					BX_PERSONAL_ROOT = "<?=BX_PERSONAL_ROOT?>";
 
-                window.limit_php_access = top.limit_php_access = limit_php_access;
-                window.lightMode = top.lightMode = lightMode;
-                window.lca = top.lca = lca;
-                window.BXLang = top.BXLang = BXLang;
-                window.BXSite = top.BXSite = BXSite;
-                window.BX_PERSONAL_ROOT = top.BX_PERSONAL_ROOT = BX_PERSONAL_ROOT;
+				window.limit_php_access = top.limit_php_access = limit_php_access;
+				window.lightMode = top.lightMode = lightMode;
+				window.lca = top.lca = lca;
+				window.BXLang = top.BXLang = BXLang;
+				window.BXSite = top.BXSite = BXSite;
+				window.BX_PERSONAL_ROOT = top.BX_PERSONAL_ROOT = BX_PERSONAL_ROOT;
 			</script>
 			<?
 
-		$arJS = Array();
-		$arCSS = Array();
-		$events = GetModuleEvents("fileman", "OnBeforeHTMLEditorScriptsGet");
-		while($arEvent = $events->Fetch())
-		{
-			$tmp = ExecuteModuleEventEx($arEvent, array($name, $arParams));
-			if (!is_array($tmp))
-				continue;
+			$arJS = Array();
+			$arCSS = Array();
+			$events = GetModuleEvents("fileman", "OnBeforeHTMLEditorScriptsGet");
+			while($arEvent = $events->Fetch())
+			{
+				$tmp = ExecuteModuleEventEx($arEvent, array($name, $arParams));
+				if (!is_array($tmp))
+					continue;
 
-			if (is_array($tmp['JS']))
-				$arJS = array_merge($arJS, $tmp['JS']);
-			if (is_array($tmp['CSS']))
-				$arCSS = array_merge($arCSS, $tmp['CSS']);
-		}
-		$arr = Array();
-		// Additional JS files from event OnBeforeHtmlEditorScriptGet
-		for($i = 0, $c = count($arJS); $i < $c; $i++)
-		{
-			$arJS[$i] = preg_replace("/[^a-zA-Z0-9_:\.]/is", "", $arJS[$i]);
-			if(file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arJS[$i]))
-				$arr[] = $arJS[$i];
-		}
-		?>
-<script type="text/javascript" src="/bitrix/admin/fileman_js.php?lang=<?=LANGUAGE_ID?>&v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/fileman/lang/'.LANGUAGE_ID.'/admin/fileman_js.php')?>"></script>
-<script type="text/javascript" src="/bitrix/admin/fileman_common_js.php?s=<?=$str_taskbars?>"></script>
-		<?
-		for($i = 0; $i < count($arr); $i++)
-		{
-			$script_filename = $arr[$i];
-			?><script type="text/javascript" src="/bitrix/admin/htmleditor2/<?=$script_filename?>?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$script_filename)?>"></script><?
-		}
-		?>
-		<script type="text/javascript" src="/bitrix/js/main/popup_menu.js?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/js/main/popup_menu.js')?>"></script>
-		<?
-		for($i=0; $i< count($arCSS); $i++) // Additional CSS files from event OnBeforeHtmlEditorScriptGet
-		{
-			$arCSS[$i] = preg_replace("/[^a-zA-Z0-9_:\.]/is", "", $arCSS[$i]);
-			if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arCSS[$i]))
-				continue;
-			?><link rel="stylesheet" type="text/css" href="/bitrix/admin/htmleditor2/<?=$arCSS[$i]?>?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arCSS[$i])?>"/><?
-		}
+				if (is_array($tmp['JS']))
+					$arJS = array_merge($arJS, $tmp['JS']);
+				if (is_array($tmp['CSS']))
+					$arCSS = array_merge($arCSS, $tmp['CSS']);
+			}
+			$arr = Array();
+			// Additional JS files from event OnBeforeHtmlEditorScriptGet
+			for($i = 0, $c = count($arJS); $i < $c; $i++)
+			{
+				$arJS[$i] = preg_replace("/[^a-zA-Z0-9_:\.]/is", "", $arJS[$i]);
+				if(file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arJS[$i]))
+					$arr[] = $arJS[$i];
+			}
+			?>
+			<script type="text/javascript" src="/bitrix/admin/fileman_js.php?lang=<?=LANGUAGE_ID?>&v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/fileman/lang/'.LANGUAGE_ID.'/admin/fileman_js.php')?>"></script>
+			<script type="text/javascript" src="/bitrix/admin/fileman_common_js.php?s=<?=$str_taskbars?>"></script>
+			<?
+			for($i = 0; $i < count($arr); $i++)
+			{
+				$script_filename = $arr[$i];
+				?><script type="text/javascript" src="/bitrix/admin/htmleditor2/<?=$script_filename?>?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$script_filename)?>"></script><?
+			}
+			?>
+			<script type="text/javascript" src="/bitrix/js/main/popup_menu.js?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/js/main/popup_menu.js')?>"></script>
+			<?
+			for($i=0; $i< count($arCSS); $i++) // Additional CSS files from event OnBeforeHtmlEditorScriptGet
+			{
+				$arCSS[$i] = preg_replace("/[^a-zA-Z0-9_:\.]/is", "", $arCSS[$i]);
+				if(!file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arCSS[$i]))
+					continue;
+				?><link rel="stylesheet" type="text/css" href="/bitrix/admin/htmleditor2/<?=$arCSS[$i]?>?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/'.$arCSS[$i])?>"/><?
+			}
 
-		$db_events = GetModuleEvents("fileman", "OnIncludeHTMLEditorScript");
-		while($arEvent = $db_events->Fetch())
-			ExecuteModuleEventEx($arEvent);
-		$bFirstUsed = true;
+			$db_events = GetModuleEvents("fileman", "OnIncludeHTMLEditorScript");
+			while($arEvent = $db_events->Fetch())
+			{
+				ExecuteModuleEventEx($arEvent);
+			}
+			$bFirstUsed = true;
 		}
 		?>
-			<div class="bxedmain-cont" id="<?= $name.'_object';?>"><table id="<?= $name?>_pFrame" class="bxedmainframe dim100x100" style="display:none;">
-					<tr style="height: 1%;"><td id="<?= $name?>_toolBarSet0" colspan="2" style="width: 100%; display: none; border-bottom: 1px solid #808080 !important;"></td></tr>
-					<tr>
-						<td id="<?= $name?>_toolBarSet1" style="width:0%; display: none; border-right: 1px solid #808080 !important;"></td>
-						<td vAlign="top" style="width: 4000px; padding: 0!important;">
-							<table class="dim100x100">
-								<tr>
-									<td class="bx-ceditor" id="<?= $name?>_cEditor"></td>
-									<td id="<?= $name?>_taskBarSet2" class="bxedtaskbarset" style="width:0%; display: none;">
+		<div class="bxedmain-cont" id="<?= $name.'_object';?>"><table id="<?= $name?>_pFrame" class="bxedmainframe dim100x100" style="display:none;">
+				<tr style="height: 1%;"><td id="<?= $name?>_toolBarSet0" colspan="2" style="width: 100%; display: none; border-bottom: 1px solid #808080 !important;"></td></tr>
+				<tr>
+					<td id="<?= $name?>_toolBarSet1" style="width:0%; display: none; border-right: 1px solid #808080 !important;"></td>
+					<td vAlign="top" style="width: 4000px; padding: 0!important;">
+						<table class="dim100x100">
+							<tr>
+								<td class="bx-ceditor" id="<?= $name?>_cEditor"></td>
+								<td id="<?= $name?>_taskBarSet2" class="bxedtaskbarset" style="width:0%; display: none;">
 									<table>
 										<tr><td class="bx-move-col-v" rowSpan="3"><img src="/bitrix/images/1.gif" /></td><td style="height:26px;"></td></tr>
 										<tr><td style="vertical-align: top;"></td></tr>
 										<tr><td class="bx-taskbar-tabs"></td></tr>
 									</table>
-									</td>
-								</tr>
-								<tr style="height:0%; display: none;">
-									<td id="<?= $name?>_taskBarSet3" colspan="2">
-										<table>
-											<tr><td class="bx-move-col-h"><img src="/bitrix/images/1.gif" /></td></tr>
-											<tr><td style="height:26px;"></td></tr>
-											<tr><td style="vertical-align: top; background: #F4F4F4 none !important;"></td></tr>
-											<tr><td class="bx-taskbar-tabs"></td></tr>
-										</table>
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr id="bx-css-tt"><td id="<?= $name?>_taskBarTabs" colspan="2" class="tasktabcell"></td></tr>
-				</table>
-			</div>
-<script>
-	BX.loadCSS('/bitrix/admin/htmleditor2/editor.css');
-	var bEd = BX("bxed_<?= $name?>_editor");
-	if (bEd && !bEd.checked)
-		BX("<?= $name?>_object").style.display = "none";
-</script>
+								</td>
+							</tr>
+							<tr style="height:0%; display: none;">
+								<td id="<?= $name?>_taskBarSet3" colspan="2">
+									<table>
+										<tr><td class="bx-move-col-h"><img src="/bitrix/images/1.gif" /></td></tr>
+										<tr><td style="height:26px;"></td></tr>
+										<tr><td style="vertical-align: top; background: #F4F4F4 none !important;"></td></tr>
+										<tr><td class="bx-taskbar-tabs"></td></tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr id="bx-css-tt"><td id="<?= $name?>_taskBarTabs" colspan="2" class="tasktabcell"></td></tr>
+			</table>
+		</div>
+		<script>
+			BX.loadCSS('/bitrix/admin/htmleditor2/editor.css');
+			var bEd = BX("bxed_<?= $name?>_editor");
+			if (bEd && !bEd.checked)
+				BX("<?= $name?>_object").style.display = "none";
+		</script>
 		<?
 		if(!$arParams["bFromTextarea"])
 			echo '<input type="hidden" name="'.$name.'" id="bxed_'.$name.'" value="'.htmlspecialcharsbx($content).'">';
@@ -1458,12 +1577,12 @@ class CFileMan
 			setEditorEventHandlers($name);
 			?>
 			<script>
-			BX.ready(function(){
-				BX.showWait();
-				BX("bxed_<?= $name;?>").pMainObj  = new BXHTMLEditor("<?= $name;?>");
-			});
+				BX.ready(function(){
+					BX.showWait();
+					BX("bxed_<?= $name;?>").pMainObj  = new BXHTMLEditor("<?= $name;?>");
+				});
 			</script>
-			<?
+		<?
 		}
 	}
 
@@ -1555,7 +1674,7 @@ class CFileMan
 			$arResult = Array(
 				"ID" => $ar_templ["ID"],
 				"NAME" => $ar_templ["NAME"]
-				);
+			);
 
 			if(is_set($ar_templ, "STYLES"))
 			{
@@ -1693,24 +1812,24 @@ class CFileMan
 
 	public static function GetHTMLEditorSettings($edname, $lightMode, $arTaskbars, &$loadParams)
 	{
-?>
-<script>
-//Array of settings
-if (!window.SETTINGS)
-	SETTINGS = {};
+		?>
+		<script>
+			//Array of settings
+			if (!window.SETTINGS)
+				SETTINGS = {};
 
-SETTINGS['<?= $edname?>'] = {};
-<?
-		$loadParams = '';
-		if (!$lightMode)
-		{
-			//Get toolbar settings
-			$toolbar_settings = stripslashes(CUserOptions::GetOption("fileman", "toolbar_settings_".$edname));
-			$rs_tlbrs = stripslashes(CUserOptions::GetOption("fileman", "rs_toolbar_".$edname, 'Y'));
+			SETTINGS['<?= $edname?>'] = {};
+			<?
+					$loadParams = '';
+					if (!$lightMode)
+					{
+						//Get toolbar settings
+						$toolbar_settings = stripslashes(CUserOptions::GetOption("fileman", "toolbar_settings_".$edname));
+						$rs_tlbrs = stripslashes(CUserOptions::GetOption("fileman", "rs_toolbar_".$edname, 'Y'));
 
-			if ($toolbar_settings)
-			{
-				?>SETTINGS['<?= $edname?>'].arToolbarSettings = [];<?
+						if ($toolbar_settings)
+						{
+							?>SETTINGS['<?= $edname?>'].arToolbarSettings = [];<?
 				$res = explode("||", $toolbar_settings);
 				for ($i = 0, $len = count($res); $i < $len; $i++)
 				{
@@ -1721,33 +1840,33 @@ SETTINGS['<?= $edname?>'] = {};
 					$docked = $tmp2[1];
 					$arPos = explode(";", substr($tmp2[2], 1, -1));
 ?>
-var _ar = [];
-_ar.show = <?echo($show == 'true' ? 'true' : 'false');?>;
-_ar.docked = <?echo($docked=='true' ? 'true' : 'false');?>;
-<?if ($docked=='true'):?>
-	_ar.position = [<?echo$arPos[0];?>,<?echo$arPos[1];?>,<?echo$arPos[2];?>];
-<?else:?>
-	_ar.position = {
-		x : '<?echo(substr($arPos[0],-2)=="px" ? substr($arPos[0],0,-2) : $arPos[0]);?>',
-		y : '<?echo(substr($arPos[1],-2)=="px" ? substr($arPos[1],0,-2) : $arPos[1]);?>'
-	};
-<?endif;?>
+			var _ar = [];
+			_ar.show = <?echo($show == 'true' ? 'true' : 'false');?>;
+			_ar.docked = <?echo($docked=='true' ? 'true' : 'false');?>;
+			<?if ($docked=='true'):?>
+			_ar.position = [<?echo$arPos[0];?>,<?echo$arPos[1];?>,<?echo$arPos[2];?>];
+			<?else:?>
+			_ar.position = {
+				x : '<?echo(substr($arPos[0],-2)=="px" ? substr($arPos[0],0,-2) : $arPos[0]);?>',
+				y : '<?echo(substr($arPos[1],-2)=="px" ? substr($arPos[1],0,-2) : $arPos[1]);?>'
+			};
+			<?endif;?>
 
-SETTINGS['<?= $edname?>'].arToolbarSettings["<?=$tlbrname?>"] = _ar;
-<?
-				}
-			}
-			$loadParams = 'em'; // extended mode
-		}
+			SETTINGS['<?= $edname?>'].arToolbarSettings["<?=$tlbrname?>"] = _ar;
+			<?
+							}
+						}
+						$loadParams = 'em'; // extended mode
+					}
 
-		//Get taskbar settings
-		$taskbars = CUserOptions::GetOption("fileman", "taskbar_settings_".$edname, false);
-		if ($taskbars !== false)
-			$taskbars = unserialize($taskbars);
+					//Get taskbar settings
+					$taskbars = CUserOptions::GetOption("fileman", "taskbar_settings_".$edname, false);
+					if ($taskbars !== false)
+						$taskbars = unserialize($taskbars);
 
-		if (is_array($taskbars))
-		{
-			?>SETTINGS['<?= $edname?>'].arTaskbarSettings = {};<?
+					if (is_array($taskbars))
+					{
+						?>SETTINGS['<?= $edname?>'].arTaskbarSettings = {};<?
 			foreach($taskbars as $tname => $tskbr)
 			{
 				// Display settings
@@ -1788,21 +1907,21 @@ SETTINGS['<?= $edname?>'].arToolbarSettings["<?=$tlbrname?>"] = _ar;
 				if ($iNum != 2)
 					$iNum = 3;
 				?>SETTINGS['<?= $edname?>'].arTBSetsSettings["<?= intVal($iNum)?>"] = {show: <?= $tskbrset['show'] ? 'true' : 'false'?>, size: <?= intVal($tskbrset['size'])?>};
-				<?
-			}
+			<?
 		}
+	}
 
-		$show_tooltips = CUserOptions::GetOption("fileman", "show_tooltips".$edname, "Y");
-		$visualEffects = CUserOptions::GetOption("fileman", "visual_effects".$edname, "Y");
-		$arC2DS = CUtil::GetPopupSize("bx_edc2_".$edname, array("width" => 650, "height" => 450));
-		?>
+	$show_tooltips = CUserOptions::GetOption("fileman", "show_tooltips".$edname, "Y");
+	$visualEffects = CUserOptions::GetOption("fileman", "visual_effects".$edname, "Y");
+	$arC2DS = CUtil::GetPopupSize("bx_edc2_".$edname, array("width" => 650, "height" => 450));
+	?>
 
-	SETTINGS['<?= $edname?>'].showTooltips4Components = <?echo $show_tooltips == "N" ? "false" : "true";?>;
-	SETTINGS['<?= $edname?>'].visualEffects = <?echo $visualEffects == "N" ? "false" : "true";?>;
+			SETTINGS['<?= $edname?>'].showTooltips4Components = <?echo $show_tooltips == "N" ? "false" : "true";?>;
+			SETTINGS['<?= $edname?>'].visualEffects = <?echo $visualEffects == "N" ? "false" : "true";?>;
 
-	window.comp2_dialog_size = {width: '<?= $arC2DS['width']?>', height: '<?= $arC2DS['height']?>'};
-</script>
-<?
+			window.comp2_dialog_size = {width: '<?= $arC2DS['width']?>', height: '<?= $arC2DS['height']?>'};
+		</script>
+		<?
 		//return $str_res;
 	}
 
@@ -1964,21 +2083,21 @@ function setEditorEventHandlers($name)
 {
 	?>
 	<script>
-	function onContextMenu_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnContextMenu(e);}
-	function onClick_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnClick(e);}
-	function onDblClick_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnDblClick(e);}
-	function onMouseUp_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnMouseUp(e);}
-	function onDragDrop_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnDragDrop(e);}
-	function onKeyPress_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnKeyPress(e);}
-	function onKeyDown_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnKeyDown(e);}
-	function onPaste_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnPaste(e);}
+		function onContextMenu_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnContextMenu(e);}
+		function onClick_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnClick(e);}
+		function onDblClick_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnDblClick(e);}
+		function onMouseUp_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnMouseUp(e);}
+		function onDragDrop_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnDragDrop(e);}
+		function onKeyPress_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnKeyPress(e);}
+		function onKeyDown_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnKeyDown(e);}
+		function onPaste_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].OnPaste(e);}
 
-	function OnSubmit_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].onSubmit(e);}
+		function OnSubmit_<?= $name;?>(e){GLOBAL_pMainObj['<?= $name;?>'].onSubmit(e);}
 
-	function OnDispatcherEvent_pDocument_<?= $name;?>(e){pBXEventDispatcher.OnEvent(GLOBAL_pMainObj['<?= $name;?>'].pDocument, e);}
-	function OnDispatcherEvent_pEditorDocument_<?= $name;?>(e){pBXEventDispatcher.OnEvent(GLOBAL_pMainObj['<?= $name;?>'].pEditorDocument, e);}
+		function OnDispatcherEvent_pDocument_<?= $name;?>(e){pBXEventDispatcher.OnEvent(GLOBAL_pMainObj['<?= $name;?>'].pDocument, e);}
+		function OnDispatcherEvent_pEditorDocument_<?= $name;?>(e){pBXEventDispatcher.OnEvent(GLOBAL_pMainObj['<?= $name;?>'].pEditorDocument, e);}
 	</script>
-	<?
+<?
 }
 
 function _replace_br_($str)

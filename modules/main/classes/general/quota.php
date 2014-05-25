@@ -339,8 +339,8 @@ class CAllDiskQuota
 				else
 					$size = strlen(serialize($params));
 
-				if ($size !== false && ((double)$quota - $size) > 0)
-					return true;
+				if ($size !== false)
+					return ((double)$quota - $size) > 0;
 			}
 			if (!is_array($params) && doubleVal($params) > 0 && ((double)$quota - $params) > 0)
 				return true;

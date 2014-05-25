@@ -561,7 +561,7 @@ class CSMTPConnection
 	}
 
 	//обработчик команд
-	public function __ProcessCommand($command, $arg = '')
+public 	function __ProcessCommand($command, $arg = '')
 	{
 		switch(strtoupper($command))
 		{
@@ -732,7 +732,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	public function Authorize($login, $password)
+public 	function Authorize($login, $password)
 	{
 		$authResult = $GLOBALS["USER"]->Login($login, $password, "N");
 
@@ -750,7 +750,7 @@ class CSMTPConnection
 		return false;
 	}
 
-	public function __AuthLoginHandler()
+public 	function __AuthLoginHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -780,7 +780,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	public function __AuthPlainHandler()
+public 	function __AuthPlainHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -804,7 +804,7 @@ class CSMTPConnection
 		return true;
 	}
 
-	public function __DataHandler()
+public 	function __DataHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n.\r\n")===false)
 			return false;

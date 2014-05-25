@@ -23,6 +23,7 @@ CModule::AddAutoloadClasses(
 		"CUserTypeInteger" => "classes/general/usertypeint.php",
 		"CUserTypeDouble" => "classes/general/usertypedbl.php",
 		"CUserTypeDateTime" => "classes/general/usertypetime.php",
+		"CUserTypeDate" => "classes/general/usertypedate.php",
 		"CUserTypeBoolean" => "classes/general/usertypebool.php",
 		"CUserTypeFile" => "classes/general/usertypefile.php",
 		"CUserTypeEnum" => "classes/general/usertypeenum.php",
@@ -109,12 +110,12 @@ create table b_user_field_lang (
 class CAllUserTypeEntity extends CDBResult
 {
 	//must be extended
-	public static function CreatePropertyTables($entity_id)
+public static 	function CreatePropertyTables($entity_id)
 	{
 		return true;
 	}
 	//must be extended
-	public static function DropColumnSQL($strTable, $arColumns)
+public static 	function DropColumnSQL($strTable, $arColumns)
 	{
 		return array();
 	}
@@ -127,38 +128,42 @@ class CAllUserTypeEntity extends CDBResult
 	 * @return array Если свойство не найдено, то возвращается false
 	 * @static
 	 */
-	
+
 	/**
-	 * <p>Возвращает массив параметров пользовательского поля с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  ID пользовательского поля
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает массив параметров пользовательского поля. Или false
-	 * если поле не найдено.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ar_res = CUserTypeEntity::GetByID( $id );
-	 * echo $ar_res["NAME"];                // вывод названия
-	 * echo "&lt;pre&gt;"; print_r($ar_res); echo "&lt;/pre&gt;";       // вывод всего массива   
-	 * ?&gt;Чтобы получить список возможных значений пользовательского свойства пользователя типа "список":$rsEnum = CUserFieldEnum::GetList(array(), array("ID" =&gt;$arUser["UF_LEGAL"]));
-	 * $arEnum = $rsEnum-&gt;GetNext();
-	 * echo $arEnum["VALUE"];$arUser["UF_LEGAL"] - в данном случае значение пользовательского типа "список".
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusertypeentity/getbyid.php
-	 * @author Bitrix
-	 */
-	function GetByID($ID)
+	* <p>Возвращает массив параметров пользовательского поля с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  ID пользовательского поля
+	*
+	*
+	*
+	* @return mixed <p>Возвращает массив параметров пользовательского поля. Или false
+	* если поле не найдено.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ar_res = CUserTypeEntity::GetByID( $id );
+	* echo $ar_res["NAME"];                // вывод названия
+	* echo "&lt;pre&gt;"; print_r($ar_res); echo "&lt;/pre&gt;";       // вывод всего массива   
+	* ?&gt;
+	* 
+	* Чтобы получить список возможных значений пользовательского свойства пользователя типа "список":
+	* 
+	* $rsEnum = CUserFieldEnum::GetList(array(), array("ID" =&gt;$arUser["UF_LEGAL"]));
+	* $arEnum = $rsEnum-&gt;GetNext();
+	* echo $arEnum["VALUE"];$arUser["UF_LEGAL"] - в данном случае значение пользовательского типа "список".
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusertypeentity/getbyid.php
+	* @author Bitrix
+	*/
+	public static 	function GetByID($ID)
 	{
 		global $DB;
 		static $arLabels = array("EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL", "ERROR_MESSAGE", "HELP_MESSAGE");
@@ -194,61 +199,61 @@ class CAllUserTypeEntity extends CDBResult
 	 * @return CDBResult
 	 * @static
 	 */
-	
+
 	/**
-	 * <p>Функция возвращает список пользовательских полей по фильтру <b>$arFilter</b> с сортировкой <b>$arOrder</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $aSort = array() Массив полей для сортировки, содержащий пары <b>поле сортировки</b>
-	 * =&gt; <b>направление сортировки</b>. Поля сортировки: <ul> <li> <b>ID</b> - ID
-	 * пользовательского поля</li> <li> <b>ENTITY_ID</b> - название объекта,
-	 * которому принадлежит пользовательское поле.</li> <li> <b>FIELD_NAME</b> -
-	 * название поля;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>SORT</b> - значение
-	 * сортировки;</li> </ul> Направление сортировки: <ul> <li> <b>ASC</b> - по
-	 * возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $aFilter = array() Массив вида <i>array("фильтруемое поле" =&gt; "значение" [, ...])</i>. Может
-	 * принимать значения: <ul> <li> <b>ID</b> - ID пользовательского поля;</li> <li>
-	 * <b>ENTITY_ID</b> - название объекта, которому принадлежит
-	 * пользовательское поле. <br>Напр: <code>"ENTITY_ID" =&gt; "IBLOCK_".$iblock_id."_SECTION";</code>
-	 * </li> <li> <b>FIELD_NAME</b> - Название поля;</li> <li> <b>SORT</b> - Значение
-	 * сортировки;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>MULTIPLE</b> -
-	 * Множественность свойства;</li> <li><b>MANDATORY</b></li> <li><b>SHOW_FILTER</b></li>
-	 * <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> <li> <b>LANG</b> - ID
-	 * языка</li> </ul> Необязательное. По умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращается объект CDBResult.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsData = CUserTypeEntity::GetList( array($by=&gt;$order), array() );
-	 * while($arRes = $rsData-&gt;Fetch())
-	 * {
-	 * echo $arRes["FIELD_NAME"]."<br>"; // вывод названия пользовательского поля
-	 * echo "&lt;pre&gt;"; print_r($arRes); echo "&lt;/pre&gt;"; // вывод массива значений
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusertypeentity/getlist.php
-	 * @author Bitrix
-	 */
-	public static function GetList($aSort=array(), $aFilter=array())
+	* <p>Функция возвращает список пользовательских полей по фильтру <b>$arFilter</b> с сортировкой <b>$arOrder</b>.</p>
+	*
+	*
+	*
+	*
+	* @param array $Sort = array() Массив полей для сортировки, содержащий пары <b>поле сортировки</b>
+	* =&gt; <b>направление сортировки</b>. Поля сортировки: <ul> <li> <b>ID</b> - ID
+	* пользовательского поля</li> <li> <b>ENTITY_ID</b> - название объекта,
+	* которому принадлежит пользовательское поле.</li> <li> <b>FIELD_NAME</b> -
+	* название поля;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>SORT</b> - значение
+	* сортировки;</li> </ul> Направление сортировки: <ul> <li> <b>ASC</b> - по
+	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul>
+	*
+	*
+	*
+	* @param array $Filter = array() Массив вида <i>array("фильтруемое поле" =&gt; "значение" [, ...])</i>. Может
+	* принимать значения: <ul> <li> <b>ID</b> - ID пользовательского поля;</li> <li>
+	* <b>ENTITY_ID</b> - название объекта, которому принадлежит
+	* пользовательское поле. <br>Напр: <code>"ENTITY_ID" =&gt; "IBLOCK_".$iblock_id."_SECTION";</code>
+	* </li> <li> <b>FIELD_NAME</b> - Название поля;</li> <li> <b>SORT</b> - Значение
+	* сортировки;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>MULTIPLE</b> -
+	* Множественность свойства;</li> <li><b>MANDATORY</b></li> <li><b>SHOW_FILTER</b></li>
+	* <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> <li> <b>LANG</b> - ID
+	* языка</li> </ul> Необязательное. По умолчанию записи не фильтруются.
+	*
+	*
+	*
+	* @return mixed <p>Возвращается объект CDBResult.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsData = CUserTypeEntity::GetList( array($by=&gt;$order), array() );
+	* while($arRes = $rsData-&gt;Fetch())
+	* {
+	* echo $arRes["FIELD_NAME"]."<br>"; // вывод названия пользовательского поля
+	* echo "&lt;pre&gt;"; print_r($arRes); echo "&lt;/pre&gt;"; // вывод массива значений
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <p></p><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusertypeentity/getlist.php
+	* @author Bitrix
+	*/
+	public static 	function GetList($aSort=array(), $aFilter=array())
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -398,7 +403,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param bool $bCheckUserType
 	 * @return boolean false - если хоть одна проверка не прошла.
 	 */
-	public function CheckFields($ID, $arFields, $bCheckUserType = true)
+public 	function CheckFields($ID, $arFields, $bCheckUserType = true)
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $APPLICATION, $USER_FIELD_MANAGER;
@@ -487,7 +492,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param bool $bCheckUserType
 	 * @return integer - иднтификатор добавленного свойства, false - если свойство не было добавлено.
 	 */
-	public function Add($arFields, $bCheckUserType = true)
+public 	function Add($arFields, $bCheckUserType = true)
 	{
 		global $DB, $APPLICATION, $USER_FIELD_MANAGER, $CACHE_MANAGER;
 		if(!$this->CheckFields(0, $arFields, $bCheckUserType))
@@ -564,9 +569,37 @@ class CAllUserTypeEntity extends CDBResult
 		if(!$this->CreatePropertyTables($arFields["ENTITY_ID"]))
 			return false;
 
+		if($arFields["MULTIPLE"]=="N")
+			$strType = $USER_FIELD_MANAGER->GetDBColumnType($arFields);
+		elseif(strtolower($DB->type)=="oracle")
+			$strType = "clob";
+		else
+			$strType = "text";
+
+		if(!$strType)
+		{
+			$aMsg = array();
+			$aMsg[] = array(
+				"id"=>"FIELD_NAME",
+				"text"=>GetMessage("USER_TYPE_ADD_ERROR", array(
+						"#FIELD_NAME#"=>htmlspecialcharsbx($arFields["FIELD_NAME"]),
+						"#ENTITY_ID#"=>htmlspecialcharsbx($arFields["ENTITY_ID"]),
+				)),
+			);
+			$e = new CAdminException($aMsg);
+			$APPLICATION->ThrowException($e);
+			return false;
+		}
+
+		$DB->DDL("
+			ALTER TABLE b_uts_".strtolower($arFields["ENTITY_ID"])."
+			ADD ".$arFields["FIELD_NAME"]." ".$strType."
+		", true, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+
 		if($ID = $DB->Add("b_user_field", $arFields, array("SETTINGS")))
 		{
-			if(CACHED_b_user_field!==false) $CACHE_MANAGER->CleanDir("b_user_field");
+			if(CACHED_b_user_field!==false)
+				$CACHE_MANAGER->CleanDir("b_user_field");
 
 			$arLabels = array("EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL", "ERROR_MESSAGE", "HELP_MESSAGE");
 			$arLangs = array();
@@ -580,37 +613,12 @@ class CAllUserTypeEntity extends CDBResult
 					}
 				}
 			}
+
 			foreach($arLangs as $lang=>$arLangFields)
 			{
 				$arLangFields["USER_FIELD_ID"] = $ID;
 				$arLangFields["LANGUAGE_ID"] = $lang;
 				$DB->Add("b_user_field_lang", $arLangFields);
-			}
-
-			if($arFields["MULTIPLE"]=="N")
-				$strType = $USER_FIELD_MANAGER->GetDBColumnType($arFields);
-			elseif(strtolower($DB->type)=="oracle")
-				$strType = "clob";
-			else
-				$strType = "text";
-
-			$rs = $DB->DDL("
-				ALTER TABLE b_uts_".strtolower($arFields["ENTITY_ID"])."
-				ADD ".$arFields["FIELD_NAME"]." ".$strType."
-			", false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-			if(!$rs)
-			{
-				$aMsg = array();
-				$aMsg[] = array(
-					"id"=>"FIELD_NAME",
-					"text"=>GetMessage("USER_TYPE_ADD_ERROR", array(
-							"#FIELD_NAME#"=>htmlspecialcharsbx($arFields["FIELD_NAME"]),
-							"#ENTITY_ID#"=>htmlspecialcharsbx($arFields["ENTITY_ID"]),
-					)),
-				);
-				$e = new CAdminException($aMsg);
-				$APPLICATION->ThrowException($e);
-				return false;
 			}
 		}
 		return $ID;
@@ -643,7 +651,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param array $arFields новые метаданные свойства
 	 * @return boolean - true в случае успешного обновления, false - в противном случае.
 	 */
-	public function Update($ID, $arFields)
+public 	function Update($ID, $arFields)
 	{
 		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER, $APPLICATION;
 		$ID = intval($ID);
@@ -760,7 +768,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * @param array $ID идентификатор свойства
 	 * @return CDBResult - результат выполнения последнего запроса функции.
 	 */
-	public function Delete($ID)
+public 	function Delete($ID)
 	{
 		global $DB, $CACHE_MANAGER, $USER_FIELD_MANAGER, $APPLICATION;
 		$ID = intval($ID);
@@ -850,10 +858,10 @@ class CAllUserTypeEntity extends CDBResult
 	 * <p>Сначала удаляются метаданные свойств.</p>
 	 * <p>Можно вызвать при удалении инфоблока например.</p>
 	 * <p>Затем таблички вида <b>b_utm_[ENTITY_ID]</b> и <b>b_uts_[ENTITY_ID]</b> дропаются.</p>
-	 * @param array $entity_id идентификатор сущности
+	 * @param string $entity_id идентификатор сущности
 	 * @return CDBResult - результат выполнения последнего запроса функции.
 	 */
-	public function DropEntity($entity_id)
+public 	function DropEntity($entity_id)
 	{
 		global $DB, $CACHE_MANAGER, $USER_FIELD_MANAGER;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
@@ -901,7 +909,7 @@ class CAllUserTypeEntity extends CDBResult
 	 * <p>Десериализует поле SETTINGS.</p>
 	 * @return array возвращает false в случае последней записи выборки.
 	 */
-	public static function Fetch()
+public 	function Fetch()
 	{
 		$res = parent::Fetch();
 		if($res && strlen($res["SETTINGS"])>0)
@@ -921,7 +929,7 @@ class CAllUserTypeEntity extends CDBResult
 class CAllUserTypeManager
 {
 	//must be extended
-	public static function DateTimeToChar($FIELD_NAME)
+public 	function DateTimeToChar($FIELD_NAME)
 	{
 		return "";
 	}
@@ -936,7 +944,7 @@ class CAllUserTypeManager
 	var $arFieldsCache = array();
 	var $arRightsCache = array();
 
-	public function CleanCache()
+public 	function CleanCache()
 	{
 		$this->arFieldsCache = array();
 	}
@@ -951,7 +959,7 @@ class CAllUserTypeManager
 	 * @param string|bool $user_type_id необязательный. идентификатор типа свойства.
 	 * @return array|boolean
 	 */
-	public function GetUserType($user_type_id = false)
+public 	function GetUserType($user_type_id = false)
 	{
 		if(!is_array($this->arUserTypes))
 		{
@@ -973,7 +981,7 @@ class CAllUserTypeManager
 			return $this->arUserTypes;
 	}
 
-	public function GetDBColumnType($arUserField)
+public static 	function GetDBColumnType($arUserField)
 	{
 		if($arType = $this->GetUserType($arUserField["USER_TYPE_ID"]))
 		{
@@ -983,7 +991,7 @@ class CAllUserTypeManager
 		return "";
 	}
 
-	public function PrepareSettings($ID, $arUserField, $bCheckUserType = true)
+public 	function PrepareSettings($ID, $arUserField, $bCheckUserType = true)
 	{
 		$user_type_id = $arUserField["USER_TYPE_ID"];
 		if($ID > 0)
@@ -1020,7 +1028,7 @@ class CAllUserTypeManager
 		return null;
 	}
 
-	public static function OnEntityDelete($entity_id)
+	fupublic nction OnEntityDelete($entity_id)
 	{
 		$obUserField  = new CUserTypeEntity;
 		return $obUserField->DropEntity($entity_id);
@@ -1032,15 +1040,16 @@ class CAllUserTypeManager
 	 * <p>Важно! В $arUserField добалено поле ENTITY_VALUE_ID - это идентификатор экземпляра сущности
 	 * позволяющий отделить новые записи от старых и соответсвенно использовать значения по умолчанию.</p>
 	*/
-	public function GetUserFields($entity_id, $value_id=0, $LANG=false)
+public 	function GetUserFields($entity_id, $value_id = 0, $LANG = false, $user_id = false)
 	{
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
 		$value_id = intval($value_id);
+		$cacheId = $entity_id . "." . $LANG . '.' . (int) $user_id;
 
 		global $DB;
 
 		$result = array();
-		if(!array_key_exists($entity_id.".".$LANG, $this->arFieldsCache))
+		if(!array_key_exists($cacheId, $this->arFieldsCache))
 		{
 			$arFilter = array("ENTITY_ID"=>$entity_id);
 			if($LANG)
@@ -1050,9 +1059,12 @@ class CAllUserTypeManager
 			{
 				if($arType = $this->GetUserType($arUserField["USER_TYPE_ID"]))
 				{
-					if(is_callable(array($arType["CLASS_NAME"], "checkpermission")))
+					if(
+						$user_id !== 0
+						&& is_callable(array($arType["CLASS_NAME"], "checkpermission"))
+					)
 					{
-						if(!call_user_func_array(array($arType["CLASS_NAME"], "checkpermission"), array($arUserField)))
+						if(!call_user_func_array(array($arType["CLASS_NAME"], "checkpermission"), array($arUserField, $user_id)))
 							continue;
 					}
 					$arUserField["USER_TYPE"] = $arType;
@@ -1062,10 +1074,10 @@ class CAllUserTypeManager
 					$result[$arUserField["FIELD_NAME"]] = $arUserField;
 				}
 			}
-			$this->arFieldsCache[$entity_id.".".$LANG] = $result;
+			$this->arFieldsCache[$cacheId] = $result;
 		}
 		else
-			$result = $this->arFieldsCache[$entity_id.".".$LANG];
+			$result = $this->arFieldsCache[$cacheId];
 
 		if(count($result)>0 && $value_id>0)
 		{
@@ -1099,7 +1111,7 @@ class CAllUserTypeManager
 		return $result;
 	}
 
-	public function GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
+public static 	function GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
 	{
 		global $DB;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
@@ -1145,7 +1157,7 @@ class CAllUserTypeManager
 		return $result;
 	}
 
-	public static function OnAfterFetch($arUserField, $result)
+public static 	function OnAfterFetch($arUserField, $result)
 	{
 		if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onafterfetch")))
 		{
@@ -1183,7 +1195,7 @@ class CAllUserTypeManager
 		return $result;
 	}
 
-	public static function EditFormTab($entity_id)
+public static 	function EditFormTab($entity_id)
 	{
 		return array(
 			"DIV" => "user_fields_tab",
@@ -1193,7 +1205,7 @@ class CAllUserTypeManager
 		);
 	}
 
-	public function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
+	function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
 	{
 		global $APPLICATION;
 
@@ -1316,7 +1328,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public function AdminListAddFilterFields($entity_id, &$arFilterFields)
+	functionpublic static  AdminListAddFilterFields($entity_id, &$arFilterFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1324,7 +1336,7 @@ class CAllUserTypeManager
 				$arFilterFields[]="find_".$FIELD_NAME;
 	}
 
-	public static function IsNotEmpty($value)
+public 	function IsNotEmpty($value)
 	{
 		if(is_array($value))
 		{
@@ -1345,7 +1357,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public function AdminListAddFilter($entity_id, &$arFilter)
+public static 	function AdminListAddFilter($entity_id, &$arFilter)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1367,7 +1379,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public function AdminListPrepareFields($entity_id, &$arFields)
+public static 	function AdminListPrepareFields($entity_id, &$arFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1375,7 +1387,7 @@ class CAllUserTypeManager
 				unset($arFields[$FIELD_NAME]);
 	}
 
-	public function AdminListAddHeaders($entity_id, &$arHeaders)
+public 	function AdminListAddHeaders($entity_id, &$arHeaders)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1391,7 +1403,7 @@ class CAllUserTypeManager
 		}
 	}
 
-	public function AddUserFields($entity_id, $arRes, &$row)
+public static 	function AddUserFields($entity_id, $arRes, &$row)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1399,28 +1411,41 @@ class CAllUserTypeManager
 				$this->AddUserField($arUserField, $arRes[$FIELD_NAME], $row);
 	}
 
-	public function AddFindFields($entity_id, &$arFindFields)
+public static 	function AddFindFields($entity_id, &$arFindFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
+		{
 			if($arUserField["SHOW_FILTER"]!="N" && $arUserField["USER_TYPE"]["BASE_TYPE"]!="file")
 			{
-				if($arUserField["LIST_FILTER_LABEL"])
-					$arFindFields[$FIELD_NAME]=$arUserField["LIST_FILTER_LABEL"];
-				else
-					$arFindFields[$FIELD_NAME]=$arUserField["FIELD_NAME"];
+				if($arUserField["USER_TYPE"] && is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "getfilterhtml")))
+				{
+					if($arUserField["LIST_FILTER_LABEL"])
+					{
+						$arFindFields[$FIELD_NAME] = $arUserField["LIST_FILTER_LABEL"];
+					}
+					else
+					{
+						$arFindFields[$FIELD_NAME] = $arUserField["FIELD_NAME"];
+					}
+				}
 			}
+		}
 	}
 
-	public function AdminListShowFilter($entity_id)
+public static 	function AdminListShowFilter($entity_id)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
+		{
 			if($arUserField["SHOW_FILTER"]!="N" && $arUserField["USER_TYPE"]["BASE_TYPE"]!="file")
+			{
 				echo $this->GetFilterHTML($arUserField, "find_".$FIELD_NAME, $GLOBALS["find_".$FIELD_NAME]);
+			}
+		}
 	}
 
-	function ShowScript()
+public static 	function ShowScript()
 	{
 		static $first=true;
 		if($first)
@@ -1831,7 +1856,7 @@ class CAllUserTypeManager
 		{
 			$EDIT_FORM_LABEL = strLen($arUserField["EDIT_FORM_LABEL"]) > 0 ? $arUserField["EDIT_FORM_LABEL"] : $arUserField["FIELD_NAME"];
 			//common Check for all fields
-			if($arUserField["MANDATORY"]=="Y" && ($ID<=0 || isset($arFields[$FIELD_NAME])))
+			if($arUserField["MANDATORY"]=="Y" && ((isset($ID) && $ID <= 0) || isset($arFields[$FIELD_NAME])))
 			{
 				if($arUserField["USER_TYPE"]["BASE_TYPE"] == "file")
 				{
@@ -1840,6 +1865,8 @@ class CAllUserTypeManager
 						$arDBFiles = array_flip($arUserField["VALUE"]);
 					elseif($arUserField["VALUE"] > 0)
 						$arDBFiles = array($arUserField["VALUE"] => 0);
+					elseif (is_numeric($arFields[$FIELD_NAME]))
+						$arDBFiles = array($arFields[$FIELD_NAME] => 0);
 					else
 						$arDBFiles = array();
 
@@ -1953,7 +1980,7 @@ class CAllUserTypeManager
 		return true;
 	}
 
-	function Update($entity_id, $ID, $arFields)
+	function Update($entity_id, $ID, $arFields, $user_id = false)
 	{
 		$result = false;
 
@@ -1965,7 +1992,7 @@ class CAllUserTypeManager
 		$arInsert = array();
 		$arInsertType = array();
 		$arDelete = array();
-		$arUserFields = $this->GetUserFields($entity_id, $ID);
+		$arUserFields = $this->GetUserFields($entity_id, $ID, false, $user_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
 		{
 			if(array_key_exists($FIELD_NAME, $arFields))
@@ -2097,7 +2124,7 @@ class CAllUserTypeManager
 	function Delete($entity_id, $ID)
 	{
 		global $DB;
-		if($arUserFields = $this->GetUserFields($entity_id, $ID))
+		if($arUserFields = $this->GetUserFields($entity_id, $ID, false, 0))
 		{
 			foreach($arUserFields as $arUserField)
 			{
@@ -2120,7 +2147,7 @@ class CAllUserTypeManager
 	function OnSearchIndex($entity_id, $ID)
 	{
 		$result = "";
-		if($arUserFields = $this->GetUserFields($entity_id, $ID))
+		if($arUserFields = $this->GetUserFields($entity_id, $ID, false, 0))
 		{
 			foreach($arUserFields as $arUserField)
 			{
@@ -2196,7 +2223,7 @@ class CUserTypeSQL
 	/** @var CSQLWhere */
 	var $obWhere = false;
 
-	public function SetEntity($entity_id, $ID)
+public 	function SetEntity($entity_id, $ID)
 	{
 		global $USER_FIELD_MANAGER;
 
@@ -2267,7 +2294,7 @@ class CUserTypeSQL
 		$this->obWhere->SetFields($arFields);
 	}
 
-	public function SetSelect($arSelect)
+public 	function SetSelect($arSelect)
 	{
 		$this->obWhere->bDistinctReqired = false;
 		$this->select = array();
@@ -2293,7 +2320,7 @@ class CUserTypeSQL
 		}
 	}
 
-	public function GetDistinct()
+	public static function GetDistinct()
 	{
 		return $this->obWhere->bDistinctReqired;
 	}
@@ -2312,15 +2339,16 @@ class CUserTypeSQL
 		return $result;
 	}
 
-	public function GetJoin($ID)
+public static 	function GetJoin($ID)
 	{
 		$result = $this->obWhere->GetJoins();
-		if((count($this->select)>0 || count($this->order)>0) && strpos($result, "b_uts_")===false)
-			$result .= "\nLEFT JOIN b_uts_".$this->entity_id." ".$this->table_alias." ON ".$this->table_alias.".VALUE_ID = ".$ID;
+		$table = " b_uts_".$this->entity_id." ".$this->table_alias." ";
+		if((count($this->select)>0 || count($this->order)>0) && strpos($result, $table)===false)
+			$result .= "\nLEFT JOIN".$table."ON ".$this->table_alias.".VALUE_ID = ".$ID;
 		return $result;
 	}
 
-	public function SetOrder($arOrder)
+static 	function SetOrder($arOrder)
 	{
 		if(is_array($arOrder))
 		{
@@ -2333,7 +2361,7 @@ class CUserTypeSQL
 		}
 	}
 
-	public function GetOrder($field)
+public 	function GetOrder($field)
 	{
 		$field = strtoupper($field);
 		if(isset($this->order[$field]))
@@ -2343,13 +2371,13 @@ class CUserTypeSQL
 		return $result;
 	}
 
-	public function SetFilter($arFilter)
+public 	function SetFilter($arFilter)
 	{
 		if(is_array($arFilter))
 			$this->filter = $arFilter;
 	}
 
-	public function GetFilter()
+public static 	function GetFilter()
 	{
 		return $this->obWhere->GetQuery($this->filter);
 	}
@@ -2368,50 +2396,55 @@ class CAllSQLWhere
 	var $l_joins = array();
 	var $bDistinctReqired = false;
 
-	//must be extended
-	public static function _StringIN($field, $sql_values)
+public static 	function _Upper($field)
 	{
-		return "";
+		return "UPPER(".$field.")";
 	}
-	//must be extended
-	public static function _ExprEQ($field, CSQLWhereExpression $val)
+public 	function _Empty($field)
 	{
-		return "";
+		return "(".$field." IS NULL)";
 	}
-	//must be extended
-	public static function _Empty($field)
-	{
-		return "";
-	}
-	//must be extended
-	public static function _StringEQ($field, $sql_value)
-	{
-		return "";
-	}
-	//must be extended
-	public static function _Upper($field)
-	{
-		return "";
-	}
-	//must be extended
-	public static function _StringNotIN($field, $sql_values)
-	{
-		return "";
-	}
-	//must be extended
-	public static function _ExprNotEQ($field, CSQLWhereExpression $val)
-	{
-		return "";
-	}
-	//must be extended
 	public static function _NotEmpty($field)
 	{
-		return "";
+		return "(".$field." IS NOT NULL)";
 	}
-	//must be extended
-	public static function _StringNotEQ($field, $sql_value)
+public static 	function _StringEQ($field, $sql_value)
 	{
-		return "";
+		return $field." = '".$sql_value."'";
+	}
+public static 	function _StringNotEQ($field, $sql_value)
+	{
+		return "(".$field." IS NULL OR ".$field." <> '".$sql_value."')";
+	}
+public static 	function _StringIN($field, $sql_values)
+	{
+		return $field." in ('".implode("', '", $sql_values)."')";
+	}
+public 	function _StringNotIN($field, $sql_values)
+	{
+		return "(".$field." IS NULL OR ".$field." not in ('".implode("', '", $sql_values)."'))";
+	}
+public 	function _ExprEQ($field, CSQLWhereExpression $val)
+	{
+		return $field." = ".$val->compile();
+	}
+public 	function _ExprNotEQ($field, CSQLWhereExpression $val)
+	{
+		return "(".$field." IS NULL OR ".$field." <> ".$val->compile().")";
+	}
+public static 	function _NumberIN($field, $sql_values)
+	{
+		$result = $field." in (".implode(", ", $sql_values).")";
+		if (in_array(0, $sql_values, true))
+			$result .= " or ".$field." IS NULL";
+		return $result;
+	}
+	public function _NumberNotIN($field, $sql_values)
+	{
+		$result = $field." not in (".implode(", ", $sql_values).")";
+		if (in_array(0, $sql_values, true))
+			$result .= " and ".$field." IS NOT NULL";
+		return $result;
 	}
 
 	static $triple_char = array(
@@ -2439,7 +2472,7 @@ class CAllSQLWhere
 		"!"=>"N", // not field LIKE val
 	);
 
-	public function AddFields($arFields)
+public 	function AddFields($arFields)
 	{
 		if(is_array($arFields))
 		{
@@ -2470,7 +2503,7 @@ class CAllSQLWhere
 		$this->AddFields($arFields);
 	}
 
-	public static function MakeOperation($key)
+public 	function MakeOperation($key)
 	{
 		if(isset(self::$triple_char[$op = substr($key,0,3)]))
 			return Array("FIELD"=>substr($key,3), "OPERATION"=>self::$triple_char[$op]);
@@ -2482,14 +2515,14 @@ class CAllSQLWhere
 			return Array("FIELD"=>$key, "OPERATION"=>"E"); // field LIKE val
 	}
 
-	public static function getOperationByCode($code)
+public 	function getOperationByCode($code)
 	{
 		$all_operations = array_flip(self::$single_char + self::$double_char + self::$triple_char);
 
 		return $all_operations[$code];
 	}
 
-	public function GetQuery($arFilter)
+public static 	function GetQuery($arFilter)
 	{
 		$this->l_joins = array();
 		$this->c_joins = array();
@@ -2503,8 +2536,6 @@ class CAllSQLWhere
 
 	public function GetQueryEx($arFilter, &$arJoins, $level=0)
 	{
-		global $DB;
-
 		if(!is_array($arFilter))
 			return "";
 
@@ -2526,6 +2557,7 @@ class CAllSQLWhere
 				$value = $this->GetQueryEx($value, $arRecursiveJoins, $level+1);
 				if(strlen($value)>0)
 					$result[] = "(".$value."\n".str_repeat("\t", $level).")";
+
 				foreach($arRecursiveJoins as $TABLE_ALIAS=>$bLeftJoin)
 				{
 					if($bLeftJoin)
@@ -2554,15 +2586,6 @@ class CAllSQLWhere
 				{
 					$FIELD_NAME = $this->fields[$key]["FIELD_NAME"];
 					$FIELD_TYPE = $this->fields[$key]["FIELD_TYPE"];
-					$FIELD_OPERATION = "";
-					if($operation=="G")
-						$FIELD_OPERATION = " > ";
-					elseif($operation=="L")
-						$FIELD_OPERATION = " < ";
-					elseif($operation=="GE")
-						$FIELD_OPERATION = " >= ";
-					elseif($operation=="LE")
-						$FIELD_OPERATION = " <= ";
 					//Handle joins logic
 					$this->c_joins[$key]++;
 					if(
@@ -2577,7 +2600,8 @@ class CAllSQLWhere
 								)
 							)
 						)
-						|| (
+						||
+						(
 							($operation=="NI" || $operation=="N" || $operation=="NS" || $operation=="NB" || $operation=="NM")
 							&& (
 								is_array($value)
@@ -2605,446 +2629,32 @@ class CAllSQLWhere
 
 					switch($FIELD_TYPE)
 					{
-						case "file":
-						case "enum":
-						case "int":
-							if(is_array($value))
-							{
-								$FIELD_VALUE = array();
-								foreach($value as $val)
-									$FIELD_VALUE[] = intval($val);
-							}
-							elseif (is_object($value))
-							{
-								$FIELD_VALUE = $value;
-							}
-							else
-								$FIELD_VALUE = intval($value);
-							switch($operation)
-							{
-								case "I":
-								case "E":
-								case "S":
-								case "M":
-									if(is_array($FIELD_VALUE))
-									{
-										if(count($FIELD_VALUE))
-										{
-											$_result = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
-
-											if (in_array(0, $FIELD_VALUE, true))
-											{
-												$_result = '('.$_result.' OR '.$FIELD_NAME.' IS NULL)';
-											}
-
-											$result[] = $_result;
-										}
-										else
-											$result[] = "1=0";
-
-										if($this->fields[$key]["MULTIPLE"] === "Y")
-											$this->bDistinctReqired = true;
-									}
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $FIELD_NAME." = ".$FIELD_VALUE->compile();
-									elseif($FIELD_VALUE==0)
-										$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
-									else
-										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
-									break;
-								case "NI":
-								case "N":
-								case "NS":
-								case "NM":
-									if(is_array($FIELD_VALUE))
-									{
-										if(count($FIELD_VALUE))
-											$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
-										else
-											$result[] = "1=1";
-									}
-									elseif($FIELD_VALUE==0)
-										$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
-									else
-										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "G":
-								case "L":
-								case "GE":
-								case "LE":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
-									else
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "B":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NB":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-							}
-							break;
-						case "double":
-							if(is_array($value))
-							{
-								$FIELD_VALUE = array();
-								foreach($value as $val)
-									$FIELD_VALUE[] = doubleval($val);
-							}
-							else
-							{
-								$FIELD_VALUE = doubleval($value);
-							}
-
-							switch($operation)
-							{
-								case "I":
-								case "E":
-								case "S":
-								case "M":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
-									elseif($FIELD_VALUE==0)
-										$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
-									else
-										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NI":
-								case "N":
-								case "NS":
-								case "NM":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
-									elseif($FIELD_VALUE==0)
-										$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
-									else
-										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "G":
-								case "L":
-								case "GE":
-								case "LE":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
-									else
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "B":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NB":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-							}
-							break;
-						case "string":
-							if(is_array($value))
-							{
-								$FIELD_VALUE = array();
-								if($operation=="S" || $operation=="NS")
-								{
-									foreach($value as $val)
-										$FIELD_VALUE[] = $this->ForLIKE(toupper($val));
-								}
-								else
-								{
-									foreach($value as $val)
-										$FIELD_VALUE[] = $DB->ForSQL($val);
-								}
-							}
-							elseif (is_object($value))
-							{
-								$FIELD_VALUE = $value;
-							}
-							else
-							{
-								if($operation=="S" || $operation=="NS")
-									$FIELD_VALUE = $this->ForLIKE(toupper($value));
-								else
-									$FIELD_VALUE = $DB->ForSQL($value);
-							}
-
-							switch($operation)
-							{
-								case "I":
-									if(is_array($FIELD_VALUE))
-									{
-										$result[] = $this->_StringIN($FIELD_NAME, $FIELD_VALUE);
-										if($this->fields[$key]["MULTIPLE"] === "Y")
-											$this->bDistinctReqired = true;
-									}
-									elseif (is_object($FIELD_VALUE))
-									{
-										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
-									}
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_Empty($FIELD_NAME);
-									else
-										$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
-									break;
-								case "E":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$this->_Upper($FIELD_NAME)." like '".implode("' OR ".$this->_Upper($FIELD_NAME)." like '", $FIELD_VALUE)."')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_Empty($FIELD_NAME);
-									else
-									{
-										//kinda optimization for digits only
-										if(preg_match("/[^0-9]/", $FIELD_VALUE))
-											$result[] = $this->_Upper($FIELD_NAME)." like '".$FIELD_VALUE."'";
-										else
-											$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
-									}
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "S":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$this->_Upper($FIELD_NAME)." like '%".implode("%' ESCAPE '!' OR ".$this->_Upper($FIELD_NAME)." like '%", $FIELD_VALUE)."%' ESCAPE '!')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_Upper($FIELD_NAME)." like ".$FIELD_VALUE->compile()." ESCAPE '!'";
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_Empty($FIELD_NAME);
-									else
-										$result[] = $this->_Upper($FIELD_NAME)." like '%".$FIELD_VALUE."%' ESCAPE '!'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "M":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$FIELD_NAME." like '".implode("' OR ".$FIELD_NAME." like '", $FIELD_VALUE)."')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_Empty($FIELD_NAME);
-									else
-									{
-										//kinda optimization for digits only
-										if(preg_match("/[^0-9]/", $FIELD_VALUE))
-											$result[] = $FIELD_NAME." like '".$FIELD_VALUE."'";
-										else
-											$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
-									}
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NI":
-									if(is_array($FIELD_VALUE))
-										$result[] = $this->_StringNotIN($FIELD_NAME, $FIELD_VALUE);
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_ExprNotEQ($FIELD_NAME, $FIELD_VALUE);
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_NotEmpty($FIELD_NAME);
-									else
-										$result[] = $this->_StringNotEQ($FIELD_NAME, $FIELD_VALUE);
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "N":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$this->_Upper($FIELD_NAME)." not like '".implode("' AND ".$this->_Upper($FIELD_NAME)." not like '", $FIELD_VALUE)."')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_NotEmpty($FIELD_NAME);
-									else
-										$result[] = $this->_Upper($FIELD_NAME)." not like '".$FIELD_VALUE."'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NS":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$this->_Upper($FIELD_NAME)." not like '%".implode("%' ESCAPE '!' AND ".$this->_Upper($FIELD_NAME)." not like '%", $FIELD_VALUE)."%' ESCAPE '!')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_NotEmpty($FIELD_NAME);
-									else
-										$result[] = $this->_Upper($FIELD_NAME)." not like '%".$FIELD_VALUE."%' ESCAPE '!'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NM":
-									if(is_array($FIELD_VALUE))
-										$result[] = "(".$FIELD_NAME." not like '".implode("' AND ".$FIELD_NAME." not like '", $FIELD_VALUE)."')";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $FIELD_NAME." not like ".$FIELD_VALUE->compile();
-									elseif(strlen($FIELD_VALUE)<=0)
-										$result[] = $this->_NotEmpty($FIELD_NAME);
-									else
-										$result[] = $FIELD_NAME." not like '".$FIELD_VALUE."'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "G":
-								case "L":
-								case "GE":
-								case "LE":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME.$FIELD_OPERATION."'".$FIELD_VALUE[0]."'";
-									elseif (is_object($FIELD_VALUE))
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE->compile();
-									else
-										$result[] = $FIELD_NAME.$FIELD_OPERATION."'".$FIELD_VALUE."'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "B":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NB":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." not between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "?":
-									if(is_scalar($FIELD_VALUE) && strlen($FIELD_VALUE))
-									{
-										$q = GetFilterQuery($FIELD_NAME, $FIELD_VALUE);
-										// Check if error ("0" was returned)
-										if($q !== '0')
-											$result[] = $q;
-									}
-									break;
-							}
-							break;
-						case "date":
-						case "datetime":
-							if($FIELD_TYPE=="date")
-								$format = "SHORT";
-							else
-								$format = "FULL";
-							if(is_array($value))
-							{
-								$FIELD_VALUE = array();
-								foreach($value as $val)
-									$FIELD_VALUE[] = $DB->CharToDateFunction($val, $format);
-							}
-							elseif (strlen($value))
-							{
-								$FIELD_VALUE = $DB->CharToDateFunction($value, $format);
-							}
-							else
-							{
-								$FIELD_VALUE = '';
-							}
-
-							switch($operation)
-							{
-								case "I":
-								case "E":
-								case "S":
-								case "M":
-									if(is_array($FIELD_VALUE))
-									{
-										$result[] = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
-										if($this->fields[$key]["MULTIPLE"] === "Y")
-											$this->bDistinctReqired = true;
-									}
-									elseif(strlen($value)<=0)
-										$result[] = "(".$FIELD_NAME." IS NULL)";
-									else
-										$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
-									break;
-								case "NI":
-								case "N":
-								case "NS":
-								case "NM":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
-									elseif(strlen($value)<=0)
-										$result[] = "(".$FIELD_NAME." IS NOT NULL)";
-									else
-										$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "G":
-								case "L":
-								case "GE":
-								case "LE":
-									if(is_array($FIELD_VALUE))
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE[0];
-									else
-										$result[] = $FIELD_NAME.$FIELD_OPERATION.$FIELD_VALUE;
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "B":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-								case "NB":
-									if(is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
-										$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
-
-									if($this->fields[$key]["MULTIPLE"] === "Y")
-										$this->bDistinctReqired = true;
-									break;
-							}
-							break;
-						case "callback":
-							$res = call_user_func_array($this->fields[$key]["CALLBACK"], array(
-								$FIELD_NAME,
-								$operation,
-								$value,
-							));
-							if(strlen($res))
-								$result[] = $res;
-							break;
+					case "file":
+					case "enum":
+					case "int":
+						$this->addIntFilter($result, $this->fields[$key]["MULTIPLE"] === "Y", $FIELD_NAME, $operation, $value);
+						break;
+					case "double":
+						$this->addFloatFilter($result, $this->fields[$key]["MULTIPLE"] === "Y", $FIELD_NAME, $operation, $value);
+						break;
+					case "string":
+						$this->addStringFilter($result, $this->fields[$key]["MULTIPLE"] === "Y", $FIELD_NAME, $operation, $value);
+						break;
+					case "date":
+						$this->addDateFilter($result, $this->fields[$key]["MULTIPLE"] === "Y", $FIELD_NAME, $operation, $value, "SHORT");
+						break;
+					case "datetime":
+						$this->addDateFilter($result, $this->fields[$key]["MULTIPLE"] === "Y", $FIELD_NAME, $operation, $value, "FULL");
+						break;
+					case "callback":
+						$res = call_user_func_array($this->fields[$key]["CALLBACK"], array(
+							$FIELD_NAME,
+							$operation,
+							$value,
+						));
+						if (strlen($res))
+							$result[] = $res;
+						break;
 					}
 				}
 			}
@@ -3056,7 +2666,7 @@ class CAllSQLWhere
 			return "";
 	}
 
-	public function GetJoins()
+public 	function GetJoins()
 	{
 		$result = array();
 
@@ -3074,12 +2684,544 @@ class CAllSQLWhere
 		return implode("\n", $result);
 	}
 
-	function ForLIKE($str)
+public 	function ForLIKE($str)
 	{
 		global $DB;
 		static $search  = array( "!",  "_",  "%");
 		static $replace = array("!!", "!_", "!%");
 		return str_replace($search, $replace, $DB->ForSQL($str));
+	}
+
+public 	function addIntFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value)
+	{
+		if (is_array($value))
+			$FIELD_VALUE = array_map("intval", $value);
+		elseif (is_object($value))
+			$FIELD_VALUE = $value;
+		else
+			$FIELD_VALUE = intval($value);
+
+		switch ($operation)
+		{
+		case "I":
+		case "E":
+		case "S":
+		case "M":
+			if (is_array($FIELD_VALUE))
+			{
+				if (!empty($FIELD_VALUE))
+					$result[] = "(".$this->_NumberIN($FIELD_NAME, $FIELD_VALUE).")";
+				else
+					$result[] = "1=0";
+
+				if ($isMultiple)
+					$this->bDistinctReqired = true;
+			}
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." = ".$FIELD_VALUE->compile();
+			elseif ($FIELD_VALUE == 0)
+				$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
+			else
+				$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+			break;
+		case "NI":
+		case "N":
+		case "NS":
+		case "NM":
+			if (is_array($FIELD_VALUE))
+			{
+				if (!empty($FIELD_VALUE))
+					$result[] = "(".$this->_NumberNotIN($FIELD_NAME, $FIELD_VALUE).")";
+				else
+					$result[] = "1=1";
+			}
+			elseif ($FIELD_VALUE == 0)
+				$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
+			else
+				$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "G":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "L":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "GE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "LE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "B":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NB":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		}
+	}
+
+public 	function addFloatFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value)
+	{
+		if (is_array($value))
+			$FIELD_VALUE = array_map("doubleval", $value);
+		elseif (is_object($value))
+			$FIELD_VALUE = $value;
+		else
+			$FIELD_VALUE = intval($value);
+
+		switch ($operation)
+		{
+		case "I":
+		case "E":
+		case "S":
+		case "M":
+			if (is_array($FIELD_VALUE))
+			{
+				if (!empty($FIELD_VALUE))
+					$result[] = "(".$this->_NumberIN($FIELD_NAME, $FIELD_VALUE).")";
+				else
+					$result[] = "1=0";
+
+				if ($isMultiple)
+					$this->bDistinctReqired = true;
+			}
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." = ".$FIELD_VALUE->compile();
+			elseif ($FIELD_VALUE == 0)
+				$result[] = "(".$FIELD_NAME." IS NULL OR ".$FIELD_NAME." = 0)";
+			else
+				$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+			break;
+		case "NI":
+		case "N":
+		case "NS":
+		case "NM":
+			if (is_array($FIELD_VALUE))
+			{
+				if (!empty($FIELD_VALUE))
+					$result[] = "(".$this->_NumberNotIN($FIELD_NAME, $FIELD_VALUE).")";
+				else
+					$result[] = "1=1";
+			}
+			elseif ($FIELD_VALUE == 0)
+				$result[] = "(".$FIELD_NAME." IS NOT NULL AND ".$FIELD_NAME." <> 0)";
+			else
+				$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "G":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "L":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "GE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "LE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "B":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+				$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NB":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE)>1)
+				$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		}
+	}
+
+public 	function addStringFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value)
+	{
+		global $DB;
+
+		if (is_array($value))
+		{
+			$FIELD_VALUE = array();
+			if ($operation=="S" || $operation=="NS")
+			{
+				foreach ($value as $val)
+					$FIELD_VALUE[] = $this->ForLIKE(toupper($val));
+			}
+			else
+			{
+				foreach ($value as $val)
+					$FIELD_VALUE[] = $DB->ForSQL($val);
+			}
+		}
+		elseif (is_object($value))
+		{
+			$FIELD_VALUE = $value;
+		}
+		else
+		{
+			if ($operation=="S" || $operation=="NS")
+				$FIELD_VALUE = $this->ForLIKE(toupper($value));
+			else
+				$FIELD_VALUE = $DB->ForSQL($value);
+		}
+
+		switch ($operation)
+		{
+		case "I":
+			if (is_array($FIELD_VALUE))
+			{
+				$result[] = $this->_StringIN($FIELD_NAME, $FIELD_VALUE);
+				if ($isMultiple)
+					$this->bDistinctReqired = true;
+			}
+			elseif (is_object($FIELD_VALUE))
+			{
+				$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+			}
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_Empty($FIELD_NAME);
+			else
+				$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+			break;
+		case "E":
+			if (is_array($FIELD_VALUE))
+				$result[] = "(".$this->_Upper($FIELD_NAME)." like '".implode("' OR ".$this->_Upper($FIELD_NAME)." like '", $FIELD_VALUE)."')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+			elseif(strlen($FIELD_VALUE)<=0)
+				$result[] = $this->_Empty($FIELD_NAME);
+			else
+			{
+				//kinda optimization for digits only
+				if (preg_match("/[^0-9]/", $FIELD_VALUE))
+					$result[] = $this->_Upper($FIELD_NAME)." like upper('".$FIELD_VALUE."')";
+				else
+					$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+			}
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "S":
+			if (is_array($FIELD_VALUE))
+				$result[] = "(".$this->_Upper($FIELD_NAME)." like '%".implode("%' ESCAPE '!' OR ".$this->_Upper($FIELD_NAME)." like '%", $FIELD_VALUE)."%' ESCAPE '!')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_Upper($FIELD_NAME)." like ".$FIELD_VALUE->compile()." ESCAPE '!'";
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_Empty($FIELD_NAME);
+			else
+				$result[] = $this->_Upper($FIELD_NAME)." like '%".$FIELD_VALUE."%' ESCAPE '!'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "M":
+			if (is_array($FIELD_VALUE))
+				$result[] = "(".$FIELD_NAME." like '".implode("' OR ".$FIELD_NAME." like '", $FIELD_VALUE)."')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_Empty($FIELD_NAME);
+			else
+			{
+				//kinda optimization for digits only
+				if (preg_match("/[^0-9]/", $FIELD_VALUE))
+					$result[] = $FIELD_NAME." like '".$FIELD_VALUE."'";
+				else
+					$result[] = $this->_StringEQ($FIELD_NAME, $FIELD_VALUE);
+			}
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NI":
+			if (is_array($FIELD_VALUE))
+				$result[] = $this->_StringNotIN($FIELD_NAME, $FIELD_VALUE);
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_ExprNotEQ($FIELD_NAME, $FIELD_VALUE);
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_NotEmpty($FIELD_NAME);
+			else
+				$result[] = $this->_StringNotEQ($FIELD_NAME, $FIELD_VALUE);
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "N":
+			if (is_array($FIELD_VALUE))
+				$result[] = "(".$this->_Upper($FIELD_NAME)." not like '".implode("' AND ".$this->_Upper($FIELD_NAME)." not like '", $FIELD_VALUE)."')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_NotEmpty($FIELD_NAME);
+			else
+				$result[] = $this->_Upper($FIELD_NAME)." not like '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NS":
+			if (is_array($FIELD_VALUE))
+				$result[] = "(".$this->_Upper($FIELD_NAME)." not like '%".implode("%' ESCAPE '!' AND ".$this->_Upper($FIELD_NAME)." not like '%", $FIELD_VALUE)."%' ESCAPE '!')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $this->_Upper($FIELD_NAME)." not like ".$FIELD_VALUE->compile();
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_NotEmpty($FIELD_NAME);
+			else
+				$result[] = $this->_Upper($FIELD_NAME)." not like '%".$FIELD_VALUE."%' ESCAPE '!'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NM":
+			if(is_array($FIELD_VALUE))
+				$result[] = "(".$FIELD_NAME." not like '".implode("' AND ".$FIELD_NAME." not like '", $FIELD_VALUE)."')";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." not like ".$FIELD_VALUE->compile();
+			elseif (strlen($FIELD_VALUE) <= 0)
+				$result[] = $this->_NotEmpty($FIELD_NAME);
+			else
+				$result[] = $FIELD_NAME." not like '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "G":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." > '".$FIELD_VALUE[0]."'";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE->compile();
+			else
+				$result[] = $FIELD_NAME." > '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "L":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." < '".$FIELD_VALUE[0]."'";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE->compile();
+			else
+				$result[] = $FIELD_NAME." < '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "GE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." >= '".$FIELD_VALUE[0]."'";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE->compile();
+			else
+				$result[] = $FIELD_NAME." >= '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "LE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." <= '".$FIELD_VALUE[0]."'";
+			elseif (is_object($FIELD_VALUE))
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE->compile();
+			else
+				$result[] = $FIELD_NAME." <= '".$FIELD_VALUE."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "B":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NB":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." not between '".$FIELD_VALUE[0]."' AND '".$FIELD_VALUE[1]."'";
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "?":
+			if (is_scalar($FIELD_VALUE) && strlen($FIELD_VALUE))
+			{
+				$q = GetFilterQuery($FIELD_NAME, $FIELD_VALUE);
+				// Check if error ("0" was returned)
+				if ($q !== '0')
+					$result[] = $q;
+			}
+			break;
+		}
+	}
+
+public static 	function addDateFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value, $format)
+	{
+		global $DB;
+
+		if (is_array($value))
+		{
+			$FIELD_VALUE = array();
+			foreach ($value as $val)
+				$FIELD_VALUE[] = $DB->CharToDateFunction($val, $format);
+		}
+		elseif (strlen($value))
+		{
+			$FIELD_VALUE = $DB->CharToDateFunction($value, $format);
+		}
+		else
+		{
+			$FIELD_VALUE = '';
+		}
+
+		switch($operation)
+		{
+		case "I":
+		case "E":
+		case "S":
+		case "M":
+			if (is_array($FIELD_VALUE))
+			{
+				$result[] = $FIELD_NAME." in (".implode(", ", $FIELD_VALUE).")";
+				if ($isMultiple)
+					$this->bDistinctReqired = true;
+			}
+			elseif (strlen($value) <= 0)
+				$result[] = "(".$FIELD_NAME." IS NULL)";
+			else
+				$result[] = $FIELD_NAME." = ".$FIELD_VALUE;
+			break;
+		case "NI":
+		case "N":
+		case "NS":
+		case "NM":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." not in (".implode(", ", $FIELD_VALUE).")";
+			elseif (strlen($value) <= 0)
+				$result[] = "(".$FIELD_NAME." IS NOT NULL)";
+			else
+				$result[] = $FIELD_NAME." <> ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "G":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." > ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "L":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." < ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "GE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." >= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "LE":
+			if (is_array($FIELD_VALUE))
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE[0];
+			else
+				$result[] = $FIELD_NAME." <= ".$FIELD_VALUE;
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "B":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		case "NB":
+			if (is_array($FIELD_VALUE) && count($FIELD_VALUE) > 1)
+				$result[] = $FIELD_NAME." not between ".$FIELD_VALUE[0]." AND ".$FIELD_VALUE[1];
+
+			if ($isMultiple)
+				$this->bDistinctReqired = true;
+			break;
+		}
 	}
 }
 
@@ -3108,7 +3250,7 @@ class CSQLWhereExpression
 		$this->DB = $DB;
 	}
 
-	public function compile()
+public static 	public function compile()
 	{
 		$this->i = -1;
 
@@ -3119,7 +3261,7 @@ class CSQLWhereExpression
 		return $value;
 	}
 
-	protected function execPlaceholders($matches)
+	public protected function execPlaceholders($matches)
 	{
 		$this->i++;
 
@@ -3135,8 +3277,10 @@ class CSQLWhereExpression
 			}
 			elseif ($id == '?#')
 			{
-				$value = str_replace('.', $this->DB->escR.'.'.$this->DB->escL, $value);
-				return $this->DB->escL . $value . $this->DB->escR;
+				$connection = \Bitrix\Main\Application::getConnection();
+				$helper = $connection->getSqlHelper();
+
+				return $helper->quote($value);
 			}
 			elseif ($id == '?i')
 			{
@@ -3170,50 +3314,51 @@ class CSQLWhereExpression
 
 class CUserFieldEnum
 {
-	
+
 	/**
-	 * <p>Изменение значений списка пользовательского поля. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $FIELD_ID  Идентификатор пользовательского поля. <br>
-	 *
-	 *
-	 *
-	 * @param array $values  Массив устанавливаемых значений. Ключами массива служат
-	 * идентификаторы значений списка, а значения ключей определяют
-	 * новое содержимое списка. <br><br> Если ключ начинается с символа "n",
-	 * то это будет новое значение списка. <br><br> Значение ключа в с вою
-	 * очередь представляет собой массив. Ключи данного массива: <br><ul> <li>
-	 * <b>VALUE</b> - значение для отображения, если задана пустая строка, то
-	 * значение будет удалено из списка; </li> <li> <b>DEF</b> - флаг умолчания (Y|N);
-	 * </li> <li> <b>SORT</b> - сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника,
-	 * если не задан, то будет вычислен как md5 от VALUE.</li> <li> <b>DEL</b> - если
-	 * равен Y, то данное значение будет удалено из списка.</li> </ul>
-	 * Значения ключей задают точное соответствие для фильтрации. <br>
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Добавим значение выпадающего списка: "не знаю"<br><br>	$obEnum = new CUserFieldEnum;<br>	$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>		"n0" =&gt; array(<br>			"VALUE" =&gt; "не знаю",<br>		),<br>	));<br><br>	//2. Изменим "не знаю" на "не помню"<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не знаю",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"VALUE" =&gt; "не помню",<br>			),<br>		));<br>	}<br><br>	//3. удалим значение "не помню" из списка<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не помню",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"DEL" =&gt; "Y",<br>			),<br>		));<br>	}<br><br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
-	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/setenumvalues.php
-	 * @author Bitrix
-	 */
-	public function SetEnumValues($FIELD_ID, $values)
+	* <p>Изменение значений списка пользовательского поля. </p>
+	*
+	*
+	*
+	*
+	* @param int $FIELD_ID  Идентификатор пользовательского поля. <br>
+	*
+	*
+	*
+	* @param array $values  Массив устанавливаемых значений. Ключами массива служат
+	* идентификаторы значений списка, а значения ключей определяют
+	* новое содержимое списка. <br><br> Если ключ начинается с символа "n",
+	* то это будет новое значение списка. <br><br> Значение ключа в с вою
+	* очередь представляет собой массив. Ключи данного массива: <br><ul> <li>
+	* <b>VALUE</b> - значение для отображения, если задана пустая строка, то
+	* значение будет удалено из списка; </li> <li> <b>DEF</b> - флаг умолчания (Y|N);
+	* </li> <li> <b>SORT</b> - сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника,
+	* если не задан, то будет вычислен как md5 от VALUE.</li> <li> <b>DEL</b> - если
+	* равен Y, то данное значение будет удалено из списка.</li> </ul>
+	* Значения ключей задают точное соответствие для фильтрации. <br>
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Добавим значение выпадающего списка: "не знаю"<br><br>	$obEnum = new CUserFieldEnum;<br>	$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>		"n0" =&gt; array(<br>			"VALUE" =&gt; "не знаю",<br>		),<br>	));<br><br>	//2. Изменим "не знаю" на "не помню"<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не знаю",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"VALUE" =&gt; "не помню",<br>			),<br>		));<br>	}<br><br>	//3. удалим значение "не помню" из списка<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не помню",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"DEL" =&gt; "Y",<br>			),<br>		));<br>	}<br><br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
+	* CUserFieldEnum</a></li> </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/setenumvalues.php
+	* @author Bitrix
+	*/
+	public static 	function SetEnumValues($FIELD_ID, $values)
 	{
 		global $DB, $CACHE_MANAGER, $APPLICATION;
 		$aMsg = array();
@@ -3346,52 +3491,52 @@ class CUserFieldEnum
 		return true;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayaSort = array() Массив для сортировки значений. В массиве допустимы следующие
-	 * ключи: <ul> <li> <b>ID</b> - ID значения списка; </li> <li> <b>USER_FIELD_ID</b> -
-	 * идентификатор пользовательского поля; </li> <li> <b>VALUE</b> - значение
-	 * для отображения; </li> <li> <b>DEF</b> - флаг умолчания; </li> <li> <b>SORT</b> -
-	 * сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника. <br> </li> </ul>
-	 * Значения ключей могут принимать значения: <br><ul> <li> <b>ASC</b> - по
-	 * возрастанию </li> <li> <b>DESC</b> - по убыванию </li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arrayaFilter = array() Массив для фильтрации значений. В массиве допустимы следующие
-	 * ключи: <br><ul> <li> <b>ID</b> - ID значения списка; </li> <li> <b>USER_FIELD_ID</b> -
-	 * идентификатор пользовательского поля; </li> <li> <b>VALUE</b> - значение
-	 * для отображения; </li> <li> <b>DEF</b> - флаг умолчания; </li> <li> <b>SORT</b> -
-	 * сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника.</li> </ul> Значения
-	 * ключей задают точное соответствие для фильтрации. <br>
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. Выведем отображаемое значение для<br>// текущего пользователя.<br><br>//Сначала получим значение пользовательского поля:<br>global $USER;<br>if(is_object($USER))<br>{<br>	$rsUser = CUser::GetList($by, $order,<br>		array(<br>			"ID" =&gt; $USER-&gt;GetID(),<br>		),<br>		array(<br>			"SELECT" =&gt; array(<br>				"UF_GENDER",<br>			),<br>		)<br>	);<br>	if($arUser = $rsUser-&gt;Fetch())<br>	{<br>		$rsGender = <strong>CUserFieldEnum::GetList</strong>(array(), array(<br>			"ID" =&gt; $arUser["UF_GENDER"],<br>		));<br>		if($arGender = $rsGender-&gt;GetNext())<br>			echo $arGender["VALUE"];<br>	}<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
-	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/getlist.php
-	 * @author Bitrix
-	 */
-	public static function GetList($aSort=array(), $aFilter=array())
+	* <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayaSort = array() Массив для сортировки значений. В массиве допустимы следующие
+	* ключи: <ul> <li> <b>ID</b> - ID значения списка; </li> <li> <b>USER_FIELD_ID</b> -
+	* идентификатор пользовательского поля; </li> <li> <b>VALUE</b> - значение
+	* для отображения; </li> <li> <b>DEF</b> - флаг умолчания; </li> <li> <b>SORT</b> -
+	* сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника. <br> </li> </ul>
+	* Значения ключей могут принимать значения: <br><ul> <li> <b>ASC</b> - по
+	* возрастанию </li> <li> <b>DESC</b> - по убыванию </li> </ul>
+	*
+	*
+	*
+	* @param array $arrayaFilter = array() Массив для фильтрации значений. В массиве допустимы следующие
+	* ключи: <br><ul> <li> <b>ID</b> - ID значения списка; </li> <li> <b>USER_FIELD_ID</b> -
+	* идентификатор пользовательского поля; </li> <li> <b>VALUE</b> - значение
+	* для отображения; </li> <li> <b>DEF</b> - флаг умолчания; </li> <li> <b>SORT</b> -
+	* сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника.</li> </ul> Значения
+	* ключей задают точное соответствие для фильтрации. <br>
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. Выведем отображаемое значение для<br>// текущего пользователя.<br><br>//Сначала получим значение пользовательского поля:<br>global $USER;<br>if(is_object($USER))<br>{<br>	$rsUser = CUser::GetList($by, $order,<br>		array(<br>			"ID" =&gt; $USER-&gt;GetID(),<br>		),<br>		array(<br>			"SELECT" =&gt; array(<br>				"UF_GENDER",<br>			),<br>		)<br>	);<br>	if($arUser = $rsUser-&gt;Fetch())<br>	{<br>		$rsGender = <strong>CUserFieldEnum::GetList</strong>(array(), array(<br>			"ID" =&gt; $arUser["UF_GENDER"],<br>		));<br>		if($arGender = $rsGender-&gt;GetNext())<br>			echo $arGender["VALUE"];<br>	}<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
+	* CUserFieldEnum</a></li> </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/getlist.php
+	* @author Bitrix
+	*/
+	public static 	function GetList($aSort=array(), $aFilter=array())
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -3510,37 +3655,37 @@ class CUserFieldEnum
 		return  $res;
 	}
 
-	
+
 	/**
-	 * <p>Удаление ВСЕХ значений списка пользовательского поля. Фактически это удаление справочника.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $FIELD_ID  Идентификатор пользовательского поля.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Очистим выпадающий список<br><strong>CUserFieldEnum::DeleteFieldEnum</strong>($FIELD_ID);<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
-	 * CUserFieldEnum</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/deletefieldenum.php
-	 * @author Bitrix
-	 */
-	public static function DeleteFieldEnum($FIELD_ID)
+	* <p>Удаление ВСЕХ значений списка пользовательского поля. Фактически это удаление справочника.</p>
+	*
+	*
+	*
+	*
+	* @param int $FIELD_ID  Идентификатор пользовательского поля.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Очистим выпадающий список<br><strong>CUserFieldEnum::DeleteFieldEnum</strong>($FIELD_ID);<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/index.php">Поля
+	* CUserFieldEnum</a></li> </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/deletefieldenum.php
+	* @author Bitrix
+	*/
+	public static 	function DeleteFieldEnum($FIELD_ID)
 	{
 		global $DB, $CACHE_MANAGER;
 		$DB->Query("DELETE FROM b_user_field_enum WHERE USER_FIELD_ID = ".intval($FIELD_ID), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);

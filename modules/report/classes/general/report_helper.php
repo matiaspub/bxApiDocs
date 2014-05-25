@@ -12,6 +12,11 @@ abstract class CReportHelper
 
 	abstract public static function getDefaultColumns();
 
+	public static function getCustomColumnTypes()
+	{
+		return array();
+	}
+
 	public static function getGrcColumns()
 	{
 		return array();
@@ -107,7 +112,16 @@ abstract class CReportHelper
 			$fieldDefinition = $treeElem['fieldName'];
 			$branch = $treeElem['branch'];
 
-			$fieldType = $treeElem['field'] ? $treeElem['field']->GetDataType() : null;
+			$fieldType = null;
+			$customColumnTypes = static::getCustomColumnTypes();
+			if (array_key_exists($fieldDefinition, $customColumnTypes))
+			{
+				$fieldType = $customColumnTypes[$fieldDefinition];
+			}
+			else
+			{
+				$fieldType = $treeElem['field'] ? $treeElem['field']->GetDataType() : null;
+			}
 
 			if (empty($branch))
 			{

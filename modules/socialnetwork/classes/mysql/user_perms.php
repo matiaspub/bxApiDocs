@@ -21,22 +21,23 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	 * <p>Метод добавляет новую запись в таблицу прав на доступ к профайлу пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров записи с ключами<br> USER_ID - код пользователя,<br>
-	 * OPERATION_ID - операция,<br> RELATION_TYPE - тип отношений между пользователями.
-	 *
-	 *
-	 *
-	 * @return int <p>Код добавленной записи или false в случае ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новую запись в таблицу прав на доступ к профайлу пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров записи с ключами<br><b>USER_ID</b> - код
+	* пользователя,<br><b>OPERATION_ID</b> - операция,<br><b>RELATION_TYPE</b> - тип отношений
+	* между пользователями.
+	*
+	*
+	*
+	* @return int <p>Код добавленной записи или false в случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/Add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -86,56 +87,57 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает список прав в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает список прав в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;

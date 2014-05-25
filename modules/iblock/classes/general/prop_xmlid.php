@@ -6,13 +6,13 @@ class CIBlockPropertyXmlID
 	public static function GetPublicViewHTML($arProperty, $value, $strHTMLControlName)
 	{
 		static $cache = array();
-		if($strHTMLControlName["MODE"] == "CSV_EXPORT")
+		if(isset($strHTMLControlName['MODE']) && $strHTMLControlName["MODE"] == "CSV_EXPORT")
 		{
 			return $value["VALUE"];
 		}
 		elseif(strlen($value["VALUE"])>0)
 		{
-			if(!array_key_exists($value["VALUE"], $cache))
+			if(!isset($cache[$value["VALUE"]]))
 			{
 				$db_res = CIBlockElement::GetList(
 					array(),
@@ -23,11 +23,25 @@ class CIBlockPropertyXmlID
 				);
 				$ar_res = $db_res->GetNext();
 				if($ar_res)
-					$cache[$value["VALUE"]] = '<a href="'.$ar_res["DETAIL_PAGE_URL"].'">'.$ar_res["NAME"].'</a>';
+					$cache[$value["VALUE"]] = $ar_res;
 				else
-					$cache[$value["VALUE"]] = htmlspecialcharsbx($value["VALUE"]);
+					$cache[$value["VALUE"]] = $value["VALUE"];
 			}
-			return $cache[$value["VALUE"]];
+
+			if (isset($strHTMLControlName['MODE']) && ($strHTMLControlName["MODE"] == "SIMPLE_TEXT" || $strHTMLControlName["MODE"] == 'ELEMENT_TEMPLATE'))
+			{
+				if (is_array($cache[$value["VALUE"]]))
+					return $cache[$value["VALUE"]]["~NAME"];
+				else
+					return $cache[$value["VALUE"]];
+			}
+			else
+			{
+				if (is_array($cache[$value["VALUE"]]))
+					return '<a href="'.$cache[$value["VALUE"]]["DETAIL_PAGE_URL"].'">'.$cache[$value["VALUE"]]["NAME"].'</a>';
+				else
+					return htmlspecialcharsex($cache[$value["VALUE"]]);
+			}
 		}
 		else
 		{

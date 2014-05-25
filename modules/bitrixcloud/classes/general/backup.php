@@ -35,7 +35,8 @@ class CBitrixCloudBackup
 			return true;
 		$this->init = true;
 
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudBackupWebService();
 			$web_service->setTimeout(10);
 			$this->infoXML = $web_service->actionGetInformation();
@@ -255,9 +256,9 @@ class CBitrixCloudBackup
 				&& $last_request_time_option->getIntegerValue() <= 0
 			)
 			{
-				$last_request_time_option->setStringValue((string)time());
 				$backup->_getInformation(true);
 				$backup->saveToOptions();
+				$last_request_time_option->setStringValue((string)time());
 			}
 		}
 		catch (CBitrixCloudException $e)
@@ -345,7 +346,8 @@ class CBitrixCloudBackup
 	 */
 	static public function addBackupJob($secret_key, $url, $time = 0, $weekdays = array())
 	{
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudBackupWebService();
 			$web_service->actionAddBackupJob($secret_key, $url, $time, $weekdays);
 			return "";
@@ -364,7 +366,8 @@ class CBitrixCloudBackup
 	 */
 	static public function deleteBackupJob()
 	{
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudBackupWebService();
 			$web_service->actionDeleteBackupJob();
 			return "";
@@ -377,7 +380,8 @@ class CBitrixCloudBackup
 
 	static public function getBackupJob()
 	{
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudBackupWebService();
 			$infoXML = $web_service->actionGetBackupJob();
 		}

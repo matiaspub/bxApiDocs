@@ -25,14 +25,14 @@ define('MOBILE_APP_BUILD_MENU_EVENT_NAME', "OnBeforeAdminMobileMenuBuild");
 define('BX_SKIP_SESSION_EXPAND', true);
 
 /**
+ * BX_PULL_MOBILE
+ */
+define('BX_PULL_MOBILE', true);
+
+/**
  * BX_PULL_SKIP_LS
  */
 define('BX_PULL_SKIP_LS', true);
-
-/**
- * BX_SKIP_PULL_INIT
- */
-define('BX_SKIP_PULL_INIT', true);
 
 /**
  * BX_PULL_SKIP_WEBSOCKET

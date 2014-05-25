@@ -212,6 +212,9 @@ class CPullPush
 				"VALUES(".$arInsert[1].", ".$DB->CurrentTimeFunction().", ".$DB->CurrentTimeFunction().")";
 		// echo $strSql ;
 		$ID = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+		CAgent::AddAgent("CPullPush::cleanTokens();", "pull", "N", 43200, "", "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset() + 30, "FULL"));
+
 		return $ID;
 	}
 
@@ -223,6 +226,7 @@ class CPullPush
 		if (!self::CheckFields("UPDATE", $arFields) || $ID<=0)
 			return false;
 
+		$arFields["DATE_AUTH"] = ConvertTimeStamp(getmicrotime(), "FULL");
 		$strUpdate = $DB->PrepareUpdate("b_pull_push", $arFields);
 		$strSql = "UPDATE b_pull_push SET ".$strUpdate." WHERE ID=".$ID;
 
@@ -250,6 +254,12 @@ class CPullPush
 			if(!$arFields["DEVICE_NAME"] )
 				$arFields["DEVICE_NAME"] = $arFields["DEVICE_ID"];
 		}
+
+		if ($arFields["DATE_AUTH"])
+		{
+			unset($arFields["DATE_AUTH"]);
+		}
+
 		if(!$arFields["APP_ID"])
 			$arFields["APP_ID"] = "Bitrix24";
 		$arFields["UNIQUE_HASH"] = self::getUniqueHash($arFields["USER_ID"], $arFields["APP_ID"]);
@@ -276,6 +286,19 @@ class CPullPush
 		return md5($user_id.$app_id);
 	}
 
+	public static function cleanTokens()
+	{
+		global $DB;
+		/**
+		 * @var $DB CAllDatabase
+		 */
+		$killTime = ConvertTimeStamp(getmicrotime() - 24 * 3600 * 14, "FULL");
+		$sqlString = "DELETE FROM b_pull_push WHERE DATE_AUTH < ". $DB->CharToDateFunction($killTime);
+
+		$DB->Query($sqlString, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
+
+		return "CPullPush::cleanTokens();";
+	}
 }
 
 
@@ -446,29 +469,31 @@ class CPushManager
 			$maxId = $maxId < $arRes['ID']? $arRes['ID']: $maxId;
 		}
 
-		$CPushManager = new CPushManager();
-		foreach ($arPush as $arStack)
-		{
-			$CPushManager->SendMessage($arStack);
-		}
-
 		if ($maxId > 0)
 		{
 			$strSql = "DELETE FROM b_pull_push_queue WHERE ID <= ".$maxId;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
+		$CPushManager = new CPushManager();
+		foreach ($arPush as $arStack)
+		{
+			$CPushManager->SendMessage($arStack);
+		}
+
 		$strSql = "SELECT COUNT(ID) CNT FROM b_pull_push_queue";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
 		{
+			global $pPERIOD;
 			if ($arRes['CNT'] > 280)
 			{
-				CAgent::RemoveAgent("CPushManager::SendAgent();", "pull");
-				CAgent::AddAgent("CPushManager::SendAgent();", "pull", "N", 15, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+15, "FULL"));
+				$pPERIOD = 10;
+				return "CPushManager::SendAgent();";
 			}
 			else if ($arRes['CNT'] > 0)
 			{
+				$pPERIOD = 30;
 				return "CPushManager::SendAgent();";
 			}
 		}

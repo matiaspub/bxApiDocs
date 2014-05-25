@@ -608,13 +608,16 @@ class CAutoCheck
 		if ($bBitrixCloud)
 		{
 			$backup = CBitrixCloudBackup::getInstance();
-			try {
+			try
+			{
 				foreach($backup->listFiles() as $ar)
 				{
 					if (strpos($ar['FILE_NAME'], ".enc.gz") || strpos($ar['FILE_NAME'], ".tar.gz") || strpos($ar['FILE_NAME'], ".tar") || strpos($ar['FILE_NAME'], ".enc"))
 						$arCount++;
 				}
-			} catch (Exception $e) {
+			}
+			catch (Exception $e)
+			{
 			}
 		}
 		if ($arCount>0)
@@ -623,7 +626,9 @@ class CAutoCheck
 			$arResult["MESSAGE"]["PREVIEW"] = GetMessage("CL_FOUND_BACKUP", array("#count#" => $arCount));
 		}
 		else
+		{
 			$arResult["MESSAGE"]["PREVIEW"] = GetMessage("CL_NOT_FOUND_BACKUP");
+		}
 		return $arResult;
 	}
 
@@ -668,9 +673,9 @@ class CAutoCheck
 							if (!$arShowHead[0] || count($arShowHead[0]) != 3)
 								$arMessage .= GetMessage("NO_SHOWHEAD", array("#template#" => $dir))."\n";
 						}
-						if (count($arShowTitle) == 0)
+						if (!in_array($dir, array('empty')) && count($arShowTitle) == 0)
 							$arMessage .= GetMessage("NO_SHOWTITLE", array("#template#" => $dir))."\n";
-						if (count($arShowPanel) == 0)
+						if (!in_array($dir, array('mobile_app', 'desktop_app', 'empty', 'learning_10_0_0')) && count($arShowPanel) == 0)
 							$arMessage .= GetMessage("NO_SHOWPANEL", array("#template#" => $dir))."\n";
 					}
 				}
@@ -754,9 +759,16 @@ class CAutoCheck
 			if(count($NS["FILE_LIST"]) == 0)
 			{
 				$sHost = COption::GetOptionString("main", "update_site", "www.bitrixsoft.com");
-				$sUrl = "/bitrix/updates/checksum.php";
-				$sVars = "check_sum=Y&module_id=".$module_id."&ver=".$ver."&dbtype=".$dbtype."&mode=2";
-				$data = QueryGetData($sHost, 80, $sUrl, $sVars, $errno, $errstr);
+				$proxyAddr = COption::GetOptionString("main", "update_site_proxy_addr", "");
+				$proxyPort = COption::GetOptionString("main", "update_site_proxy_port", "");
+				$proxyUserName = COption::GetOptionString("main", "update_site_proxy_user", "");
+				$proxyPassword = COption::GetOptionString("main", "update_site_proxy_pass", "");
+
+				$http = new \Bitrix\Main\Web\HttpClient();
+				$http->setProxy($proxyAddr, $proxyPort, $proxyUserName, $proxyPassword);
+
+				$data = $http->get("http://".$sHost."/bitrix/updates/checksum.php?check_sum=Y&module_id=".$module_id."&ver=".$ver."&dbtype=".$dbtype."&mode=2");
+
 				$NS["FILE_LIST"] = $result = unserialize(gzinflate($data));
 				$NS["MODULE_FILES_COUNT"] = count($NS["FILE_LIST"]);
 			}

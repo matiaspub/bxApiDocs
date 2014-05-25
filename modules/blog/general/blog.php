@@ -258,14 +258,16 @@ class CAllBlog
 		$ID = IntVal($ID);
 		$bSuccess = True;
 
-		$db_events = GetModuleEvents("blog", "OnBeforeBlogDelete");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeBlogDelete", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID))===false)
 				return false;
+		}
 
-		$events = GetModuleEvents("blog", "OnBlogDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBlogDelete", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent, Array($ID));
+		}
 
 		$arBlog = CBlog::GetByID($ID);
 
@@ -336,8 +338,6 @@ class CAllBlog
 		$arBlog = CBlog::GetByID($ID);
 		if ($arBlog)
 		{
-			$DB->StartTransaction();
-
 			foreach ($arPerms as $key => $value)
 			{
 				$dbGroupPerms = CBlogUserGroupPerms::GetList(
@@ -373,8 +373,6 @@ class CAllBlog
 					);
 				}
 			}
-
-			$DB->Commit();
 		}
 	}
 
@@ -535,42 +533,39 @@ class CAllBlog
 				|| count($arSelectFields)<=0
 				|| in_array("*", $arSelectFields))
 			{
-				for ($i = 0; $i < count($arFieldsKeys); $i++)
+				foreach($arFieldsKeys as $fkey)
 				{
-					if (isset($arFields[$arFieldsKeys[$i]]["WHERE_ONLY"])
-						&& $arFields[$arFieldsKeys[$i]]["WHERE_ONLY"] == "Y")
-					{
+					if (isset($arFields[$fkey]["WHERE_ONLY"]) && $arFields[$fkey]["WHERE_ONLY"] == "Y")
 						continue;
-					}
 
 					if (strlen($strSqlSelect) > 0)
 						$strSqlSelect .= ", ";
 
-					if ($arFields[$arFieldsKeys[$i]]["TYPE"] == "datetime")
+					if ($arFields[$fkey]["TYPE"] == "datetime")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
-							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
+						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($fkey, $arOrder)))
+							$strSqlSelect .= $arFields[$fkey]["FIELD"]." as ".$fkey."_X1, ";
 
-						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "FULL")." as ".$arFieldsKeys[$i];
+						$strSqlSelect .= $DB->DateToCharFunction($arFields[$fkey]["FIELD"], "FULL")." as ".$fkey;
 					}
-					elseif ($arFields[$arFieldsKeys[$i]]["TYPE"] == "date")
+					elseif ($arFields[$fkey]["TYPE"] == "date")
 					{
-						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($arFieldsKeys[$i], $arOrder)))
-							$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i]."_X1, ";
+						if ((strtoupper($DB->type)=="ORACLE" || strtoupper($DB->type)=="MSSQL") && (array_key_exists($fkey, $arOrder)))
+							$strSqlSelect .= $arFields[$fkey]["FIELD"]." as ".$fkey."_X1, ";
 
-						$strSqlSelect .= $DB->DateToCharFunction($arFields[$arFieldsKeys[$i]]["FIELD"], "SHORT")." as ".$arFieldsKeys[$i];
+						$strSqlSelect .= $DB->DateToCharFunction($arFields[$fkey]["FIELD"], "SHORT")." as ".$fkey;
 					}
 					else
-						$strSqlSelect .= $arFields[$arFieldsKeys[$i]]["FIELD"]." as ".$arFieldsKeys[$i];
+						$strSqlSelect .= $arFields[$fkey]["FIELD"]." as ".$fkey;
 
-					if (isset($arFields[$arFieldsKeys[$i]]["FROM"])
-						&& strlen($arFields[$arFieldsKeys[$i]]["FROM"]) > 0
-						&& !in_array($arFields[$arFieldsKeys[$i]]["FROM"], $arAlreadyJoined))
+					if (isset($arFields[$fkey]["FROM"])
+						&& strlen($arFields[$fkey]["FROM"]) > 0
+						&& !in_array($arFields[$fkey]["FROM"], $arAlreadyJoined))
 					{
 						if (strlen($strSqlFrom) > 0)
 							$strSqlFrom .= " ";
-						$strSqlFrom .= $arFields[$arFieldsKeys[$i]]["FROM"];
-						$arAlreadyJoined[] = $arFields[$arFieldsKeys[$i]]["FROM"];
+						$strSqlFrom .= $arFields[$fkey]["FROM"];
+						$arAlreadyJoined[] = $arFields[$fkey]["FROM"];
 					}
 				}
 			}
@@ -641,13 +636,13 @@ class CAllBlog
 		else
 			$filter_keys = array_keys($arFilter);
 
-		for ($i = 0; $i < count($filter_keys); $i++)
+		foreach($filter_keys as $fkey)
 		{
-			$vals = $arFilter[$filter_keys[$i]];
+			$vals = $arFilter[$fkey];
 			if (!is_array($vals))
 				$vals = array($vals);
 
-			$key = $filter_keys[$i];
+			$key = $fkey;
 			$key_res = CBlog::GetFilterOperation($key);
 			$key = $key_res["FIELD"];
 			$strNegative = $key_res["NEGATIVE"];
@@ -804,11 +799,11 @@ class CAllBlog
 				}
 
 				$strSqlSearch_tmp = "";
-				for ($j = 0; $j < count($arSqlSearch_tmp); $j++)
+				foreach($arSqlSearch_tmp as $arSqlS)
 				{
-					if ($j > 0)
+					if (strlen($strSqlSearch_tmp) > 0)
 						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
-					$strSqlSearch_tmp .= "(".$arSqlSearch_tmp[$j].")";
+					$strSqlSearch_tmp .= "(".$arSqlS.")";
 				}
 				if ($strOrNull == "Y")
 				{
@@ -829,11 +824,11 @@ class CAllBlog
 			}
 		}
 
-		for ($i = 0; $i < count($arSqlSearch); $i++)
+		foreach($arSqlSearch as $sqlS)
 		{
 			if (strlen($strSqlWhere) > 0)
 				$strSqlWhere .= " AND ";
-			$strSqlWhere .= "(".$arSqlSearch[$i].")";
+			$strSqlWhere .= "(".$sqlS.")";
 		}
 		// <-- WHERE
 
@@ -871,20 +866,20 @@ class CAllBlog
 
 		$strSqlOrderBy = "";
 		DelDuplicateSort($arSqlOrder); 
-		for ($i=0; $i<count($arSqlOrder); $i++)
+		foreach($arSqlOrder as $sqlO)
 		{
 			if (strlen($strSqlOrderBy) > 0)
 				$strSqlOrderBy .= ", ";
 
 			if(strtoupper($DB->type)=="ORACLE")
 			{
-				if(substr($arSqlOrder[$i], -3)=="ASC")
-					$strSqlOrderBy .= $arSqlOrder[$i]." NULLS FIRST";
+				if(substr($sqlO, -3)=="ASC")
+					$strSqlOrderBy .= $sqlO." NULLS FIRST";
 				else
-					$strSqlOrderBy .= $arSqlOrder[$i]." NULLS LAST";
+					$strSqlOrderBy .= $sqlO." NULLS LAST";
 			}
 			else
-				$strSqlOrderBy .= $arSqlOrder[$i];
+				$strSqlOrderBy .= $sqlO;
 		}
 		// <-- ORDER BY
 
@@ -1809,11 +1804,7 @@ class CAllBlog
 							$out .= $query;
 							
 							fwrite($fp, $out);
-							//$response = '';
-							//while(!feof($fp)) $response.=fgets($fp, 128);
 							fclose($fp);
-							//print_r($response);
-							//die();
 						}
 					}
 				}

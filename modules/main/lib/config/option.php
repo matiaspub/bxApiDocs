@@ -280,7 +280,7 @@ class Option
 			$strSqlWhere .= " AND NAME = '".$sqlHelper->forSql($filter["name"])."' ";
 		}
 		if (isset($filter["site_id"]))
-			$strSqlWhere .= " AND SITE_ID ".($filter["site_id"] == "") ? "IS NULL" : "= '".$sqlHelper->forSql($filter["site_id"], 2)."'";
+			$strSqlWhere .= " AND SITE_ID ".(($filter["site_id"] == "") ? "IS NULL" : "= '".$sqlHelper->forSql($filter["site_id"], 2)."'");
 
 		if ($moduleId == "main")
 		{

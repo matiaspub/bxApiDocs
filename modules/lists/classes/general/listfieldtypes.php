@@ -70,10 +70,17 @@ class CListFieldTypeList
 			self::$types["G"] = new CListFieldType("G", GetMessage("LISTS_LIST_FIELD_G"), CListFieldType::NOT_FIELD, CListFieldType::NOT_READONLY);
 			self::$types["E"] = new CListFieldType("E", GetMessage("LISTS_LIST_FIELD_E"), CListFieldType::NOT_FIELD, CListFieldType::NOT_READONLY);
 			//User types
-			foreach(CIBlockProperty::GetUserType() as  $ar)
+			$type = CIBlockProperty::GetUserType();
+			if ($type)
 			{
-				if(array_key_exists("GetPublicEditHTML", $ar))
-					self::$types[$ar["PROPERTY_TYPE"].":".$ar["USER_TYPE"]] = new CListFieldType($ar["PROPERTY_TYPE"].":".$ar["USER_TYPE"], $ar["DESCRIPTION"], CListFieldType::NOT_FIELD, CListFieldType::NOT_READONLY);
+				foreach($type as  $ar)
+				{
+					if(array_key_exists("GetPublicEditHTML", $ar))
+					{
+						$typeId = $ar["PROPERTY_TYPE"].":".$ar["USER_TYPE"];
+						self::$types[$typeId] = new CListFieldType($typeId, $ar["DESCRIPTION"], CListFieldType::NOT_FIELD, CListFieldType::NOT_READONLY);
+					}
+				}
 			}
 		}
 	}

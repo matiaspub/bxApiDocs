@@ -48,8 +48,14 @@ class HsphpReadConnection extends NosqlConnection implements \Bitrix\Main\Entity
 
 	protected function connectInternal()
 	{
+		if ($this->isConnected)
+		{
+			return;
+		}
+
 		$this->resource = new \HSPHP\ReadSocket();
-		$this->isConnected = $this->resource->connect($this->host, $this->port);
+		$this->resource->connect($this->host, $this->port);
+		$this->isConnected = true;
 	}
 
 	protected function disconnectInternal()

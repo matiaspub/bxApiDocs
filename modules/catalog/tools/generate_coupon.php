@@ -15,7 +15,7 @@ $arResult = array(
 $boolFlag = true;
 
 IncludeModuleLangFile(__FILE__);
-if (true == $boolFlag)
+if ($boolFlag)
 {
 	if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
 	{
@@ -31,7 +31,7 @@ if (true == $boolFlag)
 	}
 }
 
-if (true == $boolFlag)
+if ($boolFlag)
 {
 	if (!check_bitrix_sessid())
 	{
@@ -40,7 +40,7 @@ if (true == $boolFlag)
 		$boolFlag = false;
 	}
 }
-if (true == $boolFlag)
+if ($boolFlag)
 {
 	if (!$USER->CanDoOperation('catalog_discount'))
 	{
@@ -50,22 +50,14 @@ if (true == $boolFlag)
 	}
 }
 
-if (true == $boolFlag)
+if ($boolFlag)
 {
 	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/include.php");
-	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/prolog.php");
 
 	do
 	{
-		$boolCheck = true;
-		$strCoupon = CatalogGenerateCoupon();
-		$arFilter = array("COUPON" => substr($strCoupon, 0, 32));
-		$rsCoupons = CCatalogDiscountCoupon::GetList(array(),$arFilter, false, array('nTopCount' => 1),array('ID', 'COUPON'));
-
-		if ($arCoupon = $rsCoupons->Fetch())
-		{
-			$boolCheck = false;
-		}
+		$strCoupon = substr(CatalogGenerateCoupon(), 0, 32);
+		$boolCheck = !CCatalogDiscountCoupon::IsExistCoupon($strCoupon);
 	}
 	while (!$boolCheck);
 

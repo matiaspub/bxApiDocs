@@ -17,25 +17,25 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция возвращает языконезависимые параметры страны с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код страны.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * страны.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название страны.</td>
-	 * </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название страны.</td>
-	 * </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrybyid.bc803b85.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает языконезависимые параметры страны с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код страны.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* страны.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название страны.</td>
+	* </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название страны.</td>
+	* </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrybyid.bc803b85.php
+	* @author Bitrix
+	*/
 	public static function GetCountryByID($ID)
 	{
 		global $DB;
@@ -56,30 +56,30 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция возвращает языкозависимые параметры страны по ее коду ID и языку strLang</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код страны.
-	 *
-	 *
-	 *
-	 * @param string $strLang = LANGUAGE_ID Язык.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * записи.</td> </tr> <tr> <td>COUNTRY_ID</td> <td>Код страны.</td> </tr> <tr> <td>LID</td>
-	 * <td>Язык.</td> </tr> <tr> <td>NAME</td> <td>Языкозависимое название страны.</td> </tr>
-	 * <tr> <td>SHORT_NAME</td> <td>Языкозависимое короткое название страны.</td> </tr>
-	 * </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrylangbyid.aef8761b.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает языкозависимые параметры страны по ее коду ID и языку strLang</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код страны.
+	*
+	*
+	*
+	* @param string $strLang = LANGUAGE_ID Язык. По умолчанию берется текущий язык.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* записи.</td> </tr> <tr> <td>COUNTRY_ID</td> <td>Код страны.</td> </tr> <tr> <td>LID</td>
+	* <td>Язык.</td> </tr> <tr> <td>NAME</td> <td>Языкозависимое название страны.</td> </tr>
+	* <tr> <td>SHORT_NAME</td> <td>Языкозависимое короткое название страны.</td> </tr>
+	* </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcountrylangbyid.aef8761b.php
+	* @author Bitrix
+	*/
 	public static function GetCountryLangByID($ID, $strLang = LANGUAGE_ID)
 	{
 		global $DB;
@@ -103,25 +103,25 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция возвращает языконезависимые параметры города с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код города.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * города.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название города.</td>
-	 * </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название города.</td>
-	 * </tr> <tr> <td>REGION_ID</td> <td>Код региона.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitybyid.fb724f2b.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает языконезависимые параметры города с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код города.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* города.</td> </tr> <tr> <td>NAME</td> <td>Языконезависимое название города.</td>
+	* </tr> <tr> <td>SHORT_NAME</td> <td>Языконезависимое короткое название города.</td>
+	* </tr> <tr> <td>REGION_ID</td> <td>Код региона.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitybyid.fb724f2b.php
+	* @author Bitrix
+	*/
 	public static function GetCityByID($ID)
 	{
 		global $DB;
@@ -142,30 +142,30 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция возвращает языкозависимые параметры города по его коду ID и языку strLang </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код города.
-	 *
-	 *
-	 *
-	 * @param string $strLang = LANGUAGE_ID Язык. По умолчанию равен текущему языку.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * записи.</td> </tr> <tr> <td>CITY_ID</td> <td>Код города.</td> </tr> <tr> <td>LID</td> <td>Язык.</td>
-	 * </tr> <tr> <td>NAME</td> <td>Языкозависимое название города.</td> </tr> <tr>
-	 * <td>SHORT_NAME</td> <td>Языкозависимое короткое название города.</td> </tr>
-	 * </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitylangbyid.f2bc091a.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает языкозависимые параметры города по его коду ID и языку strLang </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код города.
+	*
+	*
+	*
+	* @param string $strLang = LANGUAGE_ID Язык. По умолчанию равен текущему языку.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* записи.</td> </tr> <tr> <td>CITY_ID</td> <td>Код города.</td> </tr> <tr> <td>LID</td> <td>Язык.</td>
+	* </tr> <tr> <td>NAME</td> <td>Языкозависимое название города.</td> </tr> <tr>
+	* <td>SHORT_NAME</td> <td>Языкозависимое короткое название города.</td> </tr> </table>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__getcitylangbyid.f2bc091a.php
+	* @author Bitrix
+	*/
 	public static function GetCityLangByID($ID, $strLang = LANGUAGE_ID)
 	{
 		global $DB;
@@ -259,34 +259,34 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция изменяет параметры страны с кодом ID на новые параметры из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код страны.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив с параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> -
-	 * название страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
-	 * сокращенное название страны - абревиатура (не зависящее от
-	 * языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
-	 * значением ассоциативный массив вида <pre class="syntax">array("LID" =&gt; "код
-	 * языка", "NAME" =&gt; "название страны на этом языке", "SHORT_NAME" =&gt;
-	 * "сокращенное название страны (аббревиатура) на этом языке")</pre> Эта
-	 * пара ключ-значение должна присутствовать для каждого языка
-	 * системы.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененной страны или <i>false</i> у случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecountry.d8fa5b90.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры страны с кодом ID на новые параметры из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код страны.
+	*
+	*
+	*
+	* @param array $arFields  Массив с параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> -
+	* название страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
+	* сокращенное название страны - абревиатура (не зависящее от
+	* языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
+	* значением ассоциативный массив вида <pre class="syntax">array("LID" =&gt; "код
+	* языка", "NAME" =&gt; "название страны на этом языке", "SHORT_NAME" =&gt;
+	* "сокращенное название страны (аббревиатура) на этом языке")</pre> Эта
+	* пара ключ-значение должна присутствовать для каждого языка
+	* системы.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененной страны или <i>false</i> у случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecountry.d8fa5b90.php
+	* @author Bitrix
+	*/
 	public static function UpdateCountry($ID, $arFields)
 	{
 		global $DB;
@@ -330,31 +330,31 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция удаляет страну с кодом ID. Связаные с этой страной местоположения не изменяются. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код страны.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
-	 * местоположения и <i>false</i> - в противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (!CSaleLocation::DeleteCountry(12))
-	 *    echo "Ошибка удаления страны";<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deletecountry.e37a14ed.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет страну с кодом ID. Связаные с этой страной местоположения не изменяются. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код страны.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
+	* местоположения и <i>false</i> - в противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (!CSaleLocation::DeleteCountry(12))
+	*    echo "Ошибка удаления страны";<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deletecountry.e37a14ed.php
+	* @author Bitrix
+	*/
 	public static function DeleteCountry($ID)
 	{
 		global $DB;
@@ -401,34 +401,34 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция изменяет параметры города с кодом ID на значения из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код города.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив с параметрами города должен содержать ключи: <ul> <li> <b>NAME</b> -
-	 * название города (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
-	 * сокращенное название города - абревиатура (не зависящее от
-	 * языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
-	 * значением ассоциативный массив вида <pre class="syntax"> array("LID" =&gt; "код
-	 * языка", "NAME" =&gt; "название города на этом языке", "SHORT_NAME" =&gt;
-	 * "сокращенное название города (аббревиатура) на этом языке")</pre> Эта
-	 * пара ключ-значение должна присутствовать для каждого языка
-	 * системы.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененного города или <i>false</i> у случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecity.3fe4165d.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры города с кодом ID на значения из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код города.
+	*
+	*
+	*
+	* @param array $arFields  Массив с параметрами города должен содержать ключи: <ul> <li> <b>NAME</b> -
+	* название города (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
+	* сокращенное название города - абревиатура (не зависящее от
+	* языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
+	* значением ассоциативный массив вида <pre class="syntax"> array("LID" =&gt; "код
+	* языка", "NAME" =&gt; "название города на этом языке", "SHORT_NAME" =&gt;
+	* "сокращенное название города (аббревиатура) на этом языке")</pre> Эта
+	* пара ключ-значение должна присутствовать для каждого языка
+	* системы.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененного города или <i>false</i> у случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatecity.3fe4165d.php
+	* @author Bitrix
+	*/
 	public static function UpdateCity($ID, $arFields)
 	{
 		global $DB;
@@ -547,31 +547,33 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция удаляет город с кодом ID. Местоположение, с которым связан этот город, не изменяется.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код города.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
-	 * местоположения и <i>false</i> - в противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (!CSaleLocation::DeleteCity(12))
-	 *    echo "Ошибка удаления города";<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deletecity.339c5a43.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет город с кодом ID. Местоположение, с которым связан этот город, не изменяется.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код города.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
+	* местоположения и <i>false</i> - в противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (!CSaleLocation::DeleteCity(12))
+	*    echo "Ошибка удаления города";<br>?&gt;
+	* 
+	* </htm
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deletecity.339c5a43.php
+	* @author Bitrix
+	*/
 	public static function DeleteCity($ID)
 	{
 		global $DB;
@@ -604,30 +606,30 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код местоположения.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
-	 * <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны;</li> <li>
-	 * <b>REGION_ID</b> - код региона;</li> <li> <b>CITY_ID</b> - код города (если такой город
-	 * уже есть, иначе код должен быть нулем, и должен быть заполнен ключ
-	 * CITY).</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененного местоположения или <i>false</i> в
-	 * случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatelocation.3c5a6205.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код местоположения. </h
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
+	* <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны;</li> <li>
+	* <b>REGION_ID</b> - код региона;</li> <li> <b>CITY_ID</b> - код города (если такой город
+	* уже есть, иначе код должен быть нулем, и должен быть заполнен ключ
+	* CITY).</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененного местоположения или <i>false</i> в
+	* случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__updatelocation.3c5a6205.php
+	* @author Bitrix
+	*/
 	public static function UpdateLocation($ID, $arFields)
 	{
 		global $DB;
@@ -674,100 +676,100 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция добавляет новое местоположение включая страну и город местоположения, если нужно.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
-	 * <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны (если такая
-	 * страна уже есть, иначе код должен быть нулем, и должен быть
-	 * заполнен ключ COUNTRY);</li> <li> <b>COUNTRY</b> - массив с параметрами страны
-	 * (если страна уже есть и установлен ключ COUNTRY_ID, то этот ключ
-	 * заполнять не нужно); </li> <li> <b>WITHOUT_CITY</b> - флаг (Y/N), означающий, что
-	 * это местоположение без города (только страна) (если значением с
-	 * этим ключом является N, то необходимо заполнить ключ CITY);</li> <li>
-	 * <b>CITY</b> - массив с параметрами города (если установлен флаг WITHOUT_CITY
-	 * в значение Y, то этот ключ заполнять не нужно);</li> <li> <b>REGION_NAME</b> -
-	 * название региона;</li> <li> <b>REGION_ID</b> - ID региона;</li> </ul> Массив с
-	 * параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> - название
-	 * страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> - сокращенное
-	 * название страны - абревиатура (не зависящее от языка);</li> <li>
-	 * <b>&lt;код языка&gt;</b> - ключом является код языка, а значением
-	 * ассоциативный массив вида: <pre class="syntax">array("LID" =&gt; "код языка", "NAME"
-	 * =&gt; "название страны на этом языке", "SHORT_NAME" =&gt; "сокращенное
-	 * название страны (аббревиатура) на этом языке")</pre> Эта пара
-	 * ключ-значение должна присутствовать для каждого языка системы.
-	 * </li> </ul> Массив с параметрами города должен содержать ключи: <ul> <li>
-	 * <b>NAME</b> - название города (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
-	 * сокращенное название города - абревиатура (не зависящее от
-	 * языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
-	 * значением ассоциативный массив вида: <pre class="syntax">array("LID" =&gt; "код
-	 * языка", "NAME" =&gt; "название города на этом языке", "SHORT_NAME" =&gt;
-	 * "сокращенное название города (аббревиатура) на этом языке")</pre> Эта
-	 * пара ключ-значение должна присутствовать для каждого языка
-	 * системы. </li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленного местоположения или <i>false</i> у
-	 * случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array(
-	 *    "SORT" =&gt; 100,
-	 *    "COUNTRY_ID" =&gt; 0,
-	 *    "WITHOUT_CITY" =&gt; "N"
-	 * );
-	 * 
-	 * $arCountry = array(
-	 *    "NAME" =&gt; "Russian Federation",
-	 *    "SHORT_NAME" =&gt; "Russia",
-	 *    "ru" =&gt; array(
-	 *       "LID" =&gt; "ru",
-	 *       "NAME" =&gt; "Российская федерация",
-	 *       "SHORT_NAME" =&gt; "Россия"
-	 *       ),
-	 *    "en" =&gt; array(
-	 *       "LID" =&gt; "en",
-	 *       "NAME" =&gt; "Russian Federation",
-	 *       "SHORT_NAME" =&gt; "Russia"
-	 *       )
-	 * );
-	 * 
-	 * $arFields["COUNTRY"] = $arCountry;
-	 * 
-	 * $arCity = array(
-	 *    "NAME" =&gt; "Kaliningrad",
-	 *    "SHORT_NAME" =&gt; "Kaliningrad",
-	 *    "ru" =&gt; array(
-	 *       "LID" =&gt; "ru",
-	 *       "NAME" =&gt; "Калининград",
-	 *       "SHORT_NAME" =&gt; "Калининград"
-	 *       ),
-	 *    "en" =&gt; array(
-	 *       "LID" =&gt; "en",
-	 *       "NAME" =&gt; "Kaliningrad",
-	 *       "SHORT_NAME" =&gt; "Kaliningrad"
-	 *       )
-	 * );
-	 * 
-	 * $arFields["CITY"] = $arCity;
-	 * 
-	 * $ID = CSaleLocation::Add($arFields);
-	 * if (IntVal($ID)&lt;=0)
-	 *    echo "Ошибка добавления местоположения";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__add.92483b06.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новое местоположение включая страну и город местоположения, если нужно.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
+	* <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны (если такая
+	* страна уже есть, иначе код должен быть нулем, и должен быть
+	* заполнен ключ COUNTRY);</li> <li> <b>COUNTRY</b> - массив с параметрами страны
+	* (если страна уже есть и установлен ключ COUNTRY_ID, то этот ключ
+	* заполнять не нужно); </li> <li> <b>WITHOUT_CITY</b> - флаг (Y/N), означающий, что
+	* это местоположение без города (только страна) (если значением с
+	* этим ключом является N, то необходимо заполнить ключ CITY);</li> <li>
+	* <b>CITY</b> - массив с параметрами города (если установлен флаг WITHOUT_CITY
+	* в значение Y, то этот ключ заполнять не нужно);</li> <li> <b>REGION_NAME</b> -
+	* название региона;</li> <li> <b>REGION_ID</b> - ID региона;</li> </ul> Массив с
+	* параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> - название
+	* страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> - сокращенное
+	* название страны - абревиатура (не зависящее от языка);</li> <li>
+	* <b>&lt;код языка&gt;</b> - ключом является код языка, а значением
+	* ассоциативный массив вида: <pre class="syntax">array("LID" =&gt; "код языка", "NAME"
+	* =&gt; "название страны на этом языке", "SHORT_NAME" =&gt; "сокращенное
+	* название страны (аббревиатура) на этом языке")</pre> Эта пара
+	* ключ-значение должна присутствовать для каждого языка системы.
+	* </li> </ul> Массив с параметрами города должен содержать ключи: <ul> <li>
+	* <b>NAME</b> - название города (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
+	* сокращенное название города - абревиатура (не зависящее от
+	* языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
+	* значением ассоциативный массив вида: <pre class="syntax">array("LID" =&gt; "код
+	* языка", "NAME" =&gt; "название города на этом языке", "SHORT_NAME" =&gt;
+	* "сокращенное название города (аббревиатура) на этом языке")</pre> Эта
+	* пара ключ-значение должна присутствовать для каждого языка
+	* системы. </li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленного местоположения или <i>false</i> у
+	* случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array(
+	*    "SORT" =&gt; 100,
+	*    "COUNTRY_ID" =&gt; 0,
+	*    "WITHOUT_CITY" =&gt; "N"
+	* );
+	* 
+	* $arCountry = array(
+	*    "NAME" =&gt; "Russian Federation",
+	*    "SHORT_NAME" =&gt; "Russia",
+	*    "ru" =&gt; array(
+	*       "LID" =&gt; "ru",
+	*       "NAME" =&gt; "Российская федерация",
+	*       "SHORT_NAME" =&gt; "Россия"
+	*       ),
+	*    "en" =&gt; array(
+	*       "LID" =&gt; "en",
+	*       "NAME" =&gt; "Russian Federation",
+	*       "SHORT_NAME" =&gt; "Russia"
+	*       )
+	* );
+	* 
+	* $arFields["COUNTRY"] = $arCountry;
+	* 
+	* $arCity = array(
+	*    "NAME" =&gt; "Kaliningrad",
+	*    "SHORT_NAME" =&gt; "Kaliningrad",
+	*    "ru" =&gt; array(
+	*       "LID" =&gt; "ru",
+	*       "NAME" =&gt; "Калининград",
+	*       "SHORT_NAME" =&gt; "Калининград"
+	*       ),
+	*    "en" =&gt; array(
+	*       "LID" =&gt; "en",
+	*       "NAME" =&gt; "Kaliningrad",
+	*       "SHORT_NAME" =&gt; "Kaliningrad"
+	*       )
+	* );
+	* 
+	* $arFields["CITY"] = $arCity;
+	* 
+	* $ID = CSaleLocation::Add($arFields);
+	* if (IntVal($ID)&lt;=0)
+	*    echo "Ошибка добавления местоположения";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__add.92483b06.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -823,88 +825,88 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields. Обновляются так же страна и город этого местоположения. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код местоположения.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
-	 * <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны (если такая
-	 * страна уже есть, иначе код должен быть нулем, и должен быть
-	 * заполнен ключ COUNTRY);</li> <li> <b>COUNTRY</b> - массив с параметрами страны
-	 * (должен быть заполнен, если не установлен ключ COUNTRY_ID или если ключ
-	 * CHANGE_COUNTRY установлен в значение Y); </li> <li> <b>CHANGE_COUNTRY</b> - флаг (Y/N),
-	 * изменять ли параметры страны (долны быть установлены ключи COUNTRY_ID
-	 * и COUNTRY); </li> <li> <b>WITHOUT_CITY</b> - флаг (Y/N), означающий, что это
-	 * местоположение без города (только страна) (если значением с этим
-	 * ключем является N, то необходимо заполнить ключ CITY);</li> <li> <b>CITY_ID</b> -
-	 * код города (если такой город уже есть, иначе код должен быть нулем,
-	 * и должен быть заполнен ключ CITY);</li> <li> <b>CITY</b> - массив с параметрами
-	 * города (если установлен флаг WITHOUT_CITY в значение Y, то этот ключ
-	 * заполнять не нужно);</li> </ul> Массив с параметрами страны должен
-	 * содержать ключи: <ul> <li> <b>NAME</b> - название страны (не зависящее от
-	 * языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название страны - абревиатура
-	 * (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является
-	 * код языка, а значением ассоциативный массив вида <pre class="syntax">
-	 * array("LID" =&gt; "код языка", "NAME" =&gt; "название страны на этом языке",
-	 * "SHORT_NAME" =&gt; "сокращенное название страны (аббревиатура) на этом
-	 * языке")</pre> Эта пара ключ-значение должна присутствовать для
-	 * каждого языка системы. </li> </ul> Массив с параметрами города должен
-	 * содержать ключи: <ul> <li> <b>NAME</b> - название города (не зависящее от
-	 * языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название города - абревиатура
-	 * (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является
-	 * код языка, а значением ассоциативный массив вида <pre class="syntax">
-	 * array("LID" =&gt; "код языка", "NAME" =&gt; "название города на этом языке",
-	 * "SHORT_NAME" =&gt; "сокращенное название города (аббревиатура) на этом
-	 * языке")</pre> Эта пара ключ-значение должна присутствовать для
-	 * каждого языка системы.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененного местоположения или <i>false</i> у
-	 * случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array(
-	 *    "SORT" =&gt; 100,
-	 *    "COUNTRY_ID" =&gt; 8,
-	 *    "WITHOUT_CITY" =&gt; "N"
-	 * );
-	 * 
-	 * $arCity = array(
-	 *    "NAME" =&gt; "Kaliningrad",
-	 *    "SHORT_NAME" =&gt; "Kaliningrad",
-	 *    "ru" =&gt; array(
-	 *       "LID" =&gt; "ru",
-	 *       "NAME" =&gt; "Калининград",
-	 *       "SHORT_NAME" =&gt; "Калининград"
-	 *       ),
-	 *    "en" =&gt; array(
-	 *       "LID" =&gt; "en",
-	 *       "NAME" =&gt; "Kaliningrad",
-	 *       "SHORT_NAME" =&gt; "Kaliningrad"
-	 *       )
-	 * );
-	 * 
-	 * $arFields["CITY"] = $arCity;
-	 * 
-	 * if (!CSaleLocation::Update(6, $arFields))
-	 *    echo "Ошибка изменения местоположения";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__update.a6601f1c.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields. Обновляются так же страна и город этого местоположения. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код местоположения. </h
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
+	* <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны (если такая
+	* страна уже есть, иначе код должен быть нулем, и должен быть
+	* заполнен ключ COUNTRY);</li> <li> <b>COUNTRY</b> - массив с параметрами страны
+	* (должен быть заполнен, если не установлен ключ COUNTRY_ID или если ключ
+	* CHANGE_COUNTRY установлен в значение Y); </li> <li> <b>CHANGE_COUNTRY</b> - флаг (Y/N),
+	* изменять ли параметры страны (долны быть установлены ключи COUNTRY_ID
+	* и COUNTRY); </li> <li> <b>WITHOUT_CITY</b> - флаг (Y/N), означающий, что это
+	* местоположение без города (только страна) (если значением с этим
+	* ключем является N, то необходимо заполнить ключ CITY);</li> <li> <b>CITY_ID</b> -
+	* код города (если такой город уже есть, иначе код должен быть нулем,
+	* и должен быть заполнен ключ CITY);</li> <li> <b>CITY</b> - массив с параметрами
+	* города (если установлен флаг WITHOUT_CITY в значение Y, то этот ключ
+	* заполнять не нужно);</li> </ul> Массив с параметрами страны должен
+	* содержать ключи: <ul> <li> <b>NAME</b> - название страны (не зависящее от
+	* языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название страны - абревиатура
+	* (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является
+	* код языка, а значением ассоциативный массив вида <pre class="syntax">
+	* array("LID" =&gt; "код языка", "NAME" =&gt; "название страны на этом языке",
+	* "SHORT_NAME" =&gt; "сокращенное название страны (аббревиатура) на этом
+	* языке")</pre> Эта пара ключ-значение должна присутствовать для
+	* каждого языка системы. </li> </ul> Массив с параметрами города должен
+	* содержать ключи: <ul> <li> <b>NAME</b> - название города (не зависящее от
+	* языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название города - абревиатура
+	* (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является
+	* код языка, а значением ассоциативный массив вида <pre class="syntax">
+	* array("LID" =&gt; "код языка", "NAME" =&gt; "название города на этом языке",
+	* "SHORT_NAME" =&gt; "сокращенное название города (аббревиатура) на этом
+	* языке")</pre> Эта пара ключ-значение должна присутствовать для
+	* каждого языка системы.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененного местоположения или <i>false</i> у
+	* случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array(
+	*    "SORT" =&gt; 100,
+	*    "COUNTRY_ID" =&gt; 8,
+	*    "WITHOUT_CITY" =&gt; "N"
+	* );
+	* 
+	* $arCity = array(
+	*    "NAME" =&gt; "Kaliningrad",
+	*    "SHORT_NAME" =&gt; "Kaliningrad",
+	*    "ru" =&gt; array(
+	*       "LID" =&gt; "ru",
+	*       "NAME" =&gt; "Калининград",
+	*       "SHORT_NAME" =&gt; "Калининград"
+	*       ),
+	*    "en" =&gt; array(
+	*       "LID" =&gt; "en",
+	*       "NAME" =&gt; "Kaliningrad",
+	*       "SHORT_NAME" =&gt; "Kaliningrad"
+	*       )
+	* );
+	* 
+	* $arFields["CITY"] = $arCity;
+	* 
+	* if (!CSaleLocation::Update(6, $arFields))
+	*    echo "Ошибка изменения местоположения";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__update.a6601f1c.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -986,31 +988,31 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция удаляет местоположение с кодом ID. Функция так же удаляет город этого местоположения, страну этого местоположения (если она не входит больше ни в одно другое местоположение), а так же связи этого местоположения с группами местоположений и службами доставки. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код местоположения.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
-	 * местоположения и <i>false</i> - в противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (!CSaleLocation::Delete(12))
-	 *    echo "Ошибка удаления местоположения";<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__delete.008e0aa2.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет местоположение с кодом ID. Функция так же удаляет город этого местоположения, страну этого местоположения (если она не входит больше ни в одно другое местоположение), а так же связи этого местоположения с группами местоположений и службами доставки. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код местоположения. </h
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает <i>true</i> в случае успешного удаления
+	* местоположения и <i>false</i> - в противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (!CSaleLocation::Delete(12))
+	*    echo "Ошибка удаления местоположения";<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__delete.008e0aa2.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -1071,17 +1073,17 @@ class CAllSaleLocation
 
 	
 	/**
-	 * <p>Функция удаляет все местоположения из базы.</p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deleteall.1cda6559.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет все местоположения из базы.</p> <br><br>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/csalelocation__deleteall.1cda6559.php
+	* @author Bitrix
+	*/
 	public static function DeleteAll()
 	{
 		global $DB;
@@ -1252,6 +1254,92 @@ WHERE ".$strWhere;
 			return $arCity;
 		else
 			return false;
+	}
+
+	public static function GetRegionsIdsByNames($arRegNames, $countryId = false)
+	{
+		global $DB;
+		$arResult = array();
+		$arWhere = array();
+		$arQueryFields = array('RL.NAME', 'RL.SHORT_NAME');
+
+
+		if(is_array($arRegNames))
+		{
+			foreach ($arRegNames as $regName)
+			{
+				$regName = $DB->ForSql($regName);
+				foreach ($arQueryFields as $field)
+					$arWhere[] = $field." LIKE '".$regName."'";
+			}
+
+			if (count($arWhere) > 0)
+			{
+				$strWhere = implode(' OR ', $arWhere);
+
+				$query = "	SELECT RL.REGION_ID, RL.NAME, RL.SHORT_NAME
+							FROM b_sale_location_region_lang RL ";
+
+				if ($countryId)
+				{
+					$strWhere = 'L.COUNTRY_ID=\''.intval($countryId).'\' AND ('.$strWhere.')';
+					$query .= "LEFT JOIN b_sale_location L ON L.REGION_ID=RL.REGION_ID ";
+				}
+
+				$query .= "WHERE ".$strWhere;
+				$query .= " GROUP BY RL.REGION_ID";
+				$query .= " ORDER BY RL.NAME, RL.SHORT_NAME";
+
+				$dbList = $DB->Query($query);
+
+				$arRegionsLang = array();
+
+				while($arRegion = $dbList->Fetch())
+				{
+					if(strlen($arRegion["NAME"]) > 0)
+						$idx = $arRegion["NAME"];
+					else
+						$idx = $arRegion["SHORT_NAME"];
+
+					$arResult[$idx] = $arRegion["REGION_ID"];
+				}
+			}
+		}
+
+		return $arResult;
+	}
+
+	public static function GetRegionsNamesByIds($arIds, $lang = LANGUAGE_ID)
+	{
+		global $DB;
+		$arResult = array();
+		$arWhere = array();
+
+		if ('' == $lang)
+			$lang = LANGUAGE_ID;
+
+		if(!empty($arIds) && is_array($arIds))
+		{
+			foreach ($arIds as $id)
+			{
+				if(intval($id) > 0)
+					$arWhere[] = intval($id);
+			}
+
+			if (!empty($arWhere))
+			{
+				$query = "select RL.REGION_ID, RL.NAME, RL.SHORT_NAME from b_sale_location_region_lang RL";
+				$query .= " where REGION_ID IN(".implode(',', $arWhere).") and RL.LID='".$DB->ForSql($lang, 2)."'";
+				$query .= " order by RL.NAME, RL.SHORT_NAME";
+
+				$dbList = $DB->Query($query);
+
+				while($arRegion = $dbList->Fetch())
+					$arResult[$arRegion["REGION_ID"]] = strlen($arRegion["NAME"]) > 0 ? $arRegion["NAME"] : $arRegion["SHORT_NAME"];
+			}
+		}
+
+		return $arResult;
 	}
 }
 ?>

@@ -29,7 +29,13 @@ function Error($error)
  */
 class forumTextParser extends CTextParser
 {
-	var $image_params = array();
+	/* @deprecated */ var $image_params = array();
+	/* @deprecated */ var $pathToUser = "";
+	var $imageWidth = 300;
+	var $imageHeight = 300;
+	var $imageHtmlWidth = 0;
+	var $imageHtmlHeight = 0;
+	var $imageTemplate = "popup_image";
 	var $preg_smiles = array();
 	var $component = null;
 
@@ -45,7 +51,8 @@ class forumTextParser extends CTextParser
 		$pathToSmiles = (!empty($pathToSmiles) ? $pathToSmiles : "/bitrix/images/forum/smile/");
 		$this->arUserfields = array();
 		$this->ajaxPage = $GLOBALS["APPLICATION"]->GetCurPageParam("", array("bxajaxid", "logout"));
-		$this->pathToUser = "";
+		$this->userPath = "";
+		$this->userNameTemplate = str_replace(array("#NOBR#","#/NOBR#"), "", CSite::GetDefaultNameFormat());
 
 		if ($mode == 'full')
 		{
@@ -83,7 +90,6 @@ class forumTextParser extends CTextParser
 
 			AddEventHandler("main", "TextParserBeforeTags", Array(&$this, "ParserSpoiler"));
 			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserFile"));
-			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserUserfields"));
 			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserUser"));
 		}
 	}
@@ -140,7 +146,6 @@ class forumTextParser extends CTextParser
 			"ALLOW_SMILES" => array('SmileList'),
 			//"ALLOW_UPLOAD" => array('UploadFile'),
 			//"ALLOW_NL2BR" => array(''),
-			"ALLOW_MENTION" => array("MentionUser")
 		);
 		$result = array();
 
@@ -160,23 +165,72 @@ class forumTextParser extends CTextParser
 			}
 		}
 
-		$result = array_merge($result, array('UploadFile', 'RemoveFormat', 'Source'));
+		$result = array_merge($result, array('MentionUser', 'UploadFile', 'RemoveFormat', 'Source'));
 		if (LANGUAGE_ID == 'ru')
 			$result[] = 'Translit';
 
 		return $result;
 	}
 
-	public function convert($text, $allow = array(), $type = "html", $arFiles = false)	//, "KEEP_AMP" => "N"
+	
+	/**
+	* <p>Функция форматирования текста.</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Исходное сообщение. </htm
+	*
+	*
+	*
+	* @param array $arAllow = array() Массив параметров для форматирования сообщения, со значениями
+	* <i>Y</i> или <i>N</i>: <ul> <li> <code>HTML</code> - в тексте могут содержаться любые
+	* HTML теги, </li> <li> <code>ANCHOR</code> - разрешен тег &lt;a&gt;, </li> <li> <code>BIU</code> -
+	* разрешены теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <code>IMG</code> - разрешен тег
+	* &lt;img&gt;, </li> <li> <code>QUOTE</code> - разрешен тег цитирования &lt;quote&gt;, </li> <li>
+	* <code>CODE</code> - разрешен тег показа кода &lt;code&gt;, </li> <li> <code>FONT</code> -
+	* разрешен тег &lt;font&gt;, </li> <li> <code>LIST</code> - разрешены теги &lt;ul&gt;, &lt;li&gt;,
+	* </li> <li> <code>SMILES</code> - показ смайликов в виде картинок, </li> <li>
+	* <code>NL2BR</code> - заменять переводы каретки на тег &lt;br&gt; при разрешении
+	* принимать любые HTML теги, </li> <li> <code>VIDEO</code> - разрешена вставка
+	* видео, </li> <li> <code>UPLOAD</code> - разрешена загрузка файлов, </li> <li>
+	* <code>TABLE</code> - разрешены таблицы, </li> <li> <code>ALIGN</code> - разрешено
+	* выравнивание текста.</li> </ul>
+	*
+	*
+	*
+	* @param typ $e = "html" Тип текста. Необязательный. По умолчанию html.
+	*
+	*
+	*
+	* @param arFile $s = false массив файлов, которые надо распарсить в тексте. Должно быть либо
+	* в виде массива ID файлов <code>array(fileID10, fileID12, fileID14)</code>, либо в виде
+	* массива <code>array(fileID10 =&gt; array about file, ....)</code> для преобразования
+	* bb-кодов типа [FILE ID=fileID10] в соответствующее представление файлов, в
+	* зависимости от типа текста и файла.
+	*
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/forumtextparser/convert.php
+	* @author Bitrix
+	*/
+	public function convert($text, $allow = array(), $type = "html", $arFiles = false)
 	{
-		if (!isset($this->image_params['width'])) $this->image_params['width'] = 300;
-		if (!isset($this->image_params['height'])) $this->image_params['height'] = 300;
-		if (!isset($this->image_params['template'])) $this->image_params['template'] = 'popup_image';
+		$text = str_replace(array("\013", "\014"), "", $text);
 
-		$this->imageWidth = $this->image_params["width"];
-		$this->imageHeight = $this->image_params["height"];
+		$this->imageWidth = ($this->image_params["width"] > 0 ? $this->image_params["width"] : ($this->imageWidth > 0 ? $this->imageWidth : 300));
+		$this->imageHeight = ($this->image_params["height"] > 0 ? $this->image_params["height"] : ($this->imageHeight > 0 ? $this->imageHeight : 300));
+		$this->userPath = (empty($this->userPath) && !empty($this->pathToUser) ? $this->pathToUser : $this->userPath);
+
 		$this->type = $type;
-		if (is_array($allow) && sizeof($allow)>0)
+		$allow = (is_array($allow) ? $allow : array());
+		if (!empty($this->arUserfields))
+			$allow["USERFIELDS"] = $this->arUserfields;
+
+		if (sizeof($allow)>0)
 		{
 			if (!isset($allow['TABLE']))
 				$allow['TABLE']=$allow['BIU'];
@@ -189,7 +243,8 @@ class forumTextParser extends CTextParser
 			$this->arFiles = is_array($arFiles) ? $arFiles : array($arFiles);
 		$this->arFilesIDParsed = array();
 
-		return $this->convertText($text);
+		$text = str_replace(array("\013", "\014"), array(chr(34), chr(39)), $this->convertText($text));
+		return $text;
 	}
 
 	public function convert4mail($text, $arFiles = false)
@@ -236,40 +291,6 @@ class forumTextParser extends CTextParser
 			$text = preg_replace("/(\[file([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\])/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_attachment('\\3', '\\4', \$type, '\\1')", $text);
 	}
 
-	public static function ParserUserfields(&$text, &$obj, $type="html")
-	{
-		if (is_object($obj) && get_class($obj) == "forumTextParser" && !empty($obj->arUserfields))
-		{
-			foreach($obj->arUserfields as $userField)
-			{
-				if (empty($userField["TAG"]))
-				{
-					switch($userField["USER_TYPE_ID"])
-					{
-						case "webdav_element" :
-							$userField["TAG"] = "DOCUMENT ID";
-							break;
-						case "vote" :
-							$userField["TAG"] = "VOTE ID";
-							break;
-					}
-				}
-
-				if (!empty($userField["TAG"]) && method_exists($userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"))
-				{
-					$obj->userField = $userField;
-					$obj->type = $type;
-					$text = preg_replace_callback(
-						"/\[".$userField["TAG"]."\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
-						array( &$obj, 'convert_userfields'),
-						$text
-					);
-				}
-			}
-		}
-		return $text;
-	}
-
 	public static function ParserUser(&$text, &$obj)
 	{
 		if($obj->allow["USER"] != "N" && is_callable(array($obj, 'convert_user')))
@@ -283,22 +304,15 @@ class forumTextParser extends CTextParser
 		{
 			$anchor_id = RandString(8);
 			return
-				'<a class="blog-p-user-name" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.
-				(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
+				'<a class="blog-p-user-name" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->userPath,
+					array(
+						"user_id" => $userId,
+						"USER_ID" => $userId,
+						"uid" => $userId,
+						"UID" => $userId)).'">'.$name.'</a>'.
+				(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">if(!!BX[\'tooltip\']){BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");}</script>' : '');
 		}
 		return;
-	}
-
-	public function convert_userfields($matches)
-	{
-		if (is_array($this->userField["VALUE"]) && !empty($this->userField["VALUE"])) {
-			$id = intval($matches[1]);
-			if ($id > 0 && in_array($id, $this->userField["VALUE"]))
-			{
-				return call_user_func_array(array($this->userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"), array($this->userField, $id, $matches[2]));
-			}
-		}
-		return $matches[0];
 	}
 
 	public static function convert_spoiler_tag($text, $title="")
@@ -353,9 +367,8 @@ class forumTextParser extends CTextParser
 		$type = (strtolower($this->type) == "rss" ? "rss" : "html");
 		$extension = "";
 		$urlforcheck = (strpos($url, "?") !== false ? substr($url, 0, strpos($url, "?")) : $url);
-		if (preg_match("/^.*\.(\S+)$/".BX_UTF_PCRE_MODIFIER, $urlforcheck, $matches)) {
+		if (preg_match("/^.*\.(\S+)$/".BX_UTF_PCRE_MODIFIER, $urlforcheck, $matches))
 			$extension = preg_quote(strtolower($matches[1]), "/");
-		}
 
 		$bErrorIMG = (!$extension);
 		if (!$bErrorIMG && !preg_match("/$extension(\||\$)/".BX_UTF_PCRE_MODIFIER, $this->AllowImgExt))
@@ -374,11 +387,11 @@ class forumTextParser extends CTextParser
 
 		$result = $GLOBALS["APPLICATION"]->IncludeComponent(
 			"bitrix:forum.interface",
-			$this->image_params["template"],
+			$this->imageTemplate,
 			Array(
 				"URL" => $url,
-				"WIDTH"=> $this->image_params["width"],
-				"HEIGHT"=> $this->image_params["height"],
+				"MAX_SIZE" => array("width" => $this->imageWidth, "height" => $this->imageHeight),
+				"HTML_SIZE"=> array("width" => $this->imageHtmlWidth, "height" => $this->imageHtmlHeight),
 				"CONVERT" => "N",
 				"FAMILY" => "FORUM",
 				"RETURN" => "Y"
@@ -416,23 +429,22 @@ class forumTextParser extends CTextParser
 			$arFile = $this->arFiles[$fileID];
 			if ($type == "html" || $type == "rss")
 			{
-				$width = $this->image_params["width"]; $height = $this->image_params["height"];
+				$width = 0; $height = 0;
 				if (preg_match_all("/width\=(?P<width>\d+)|height\=(?P<height>\d+)/is".BX_UTF_PCRE_MODIFIER, $p, $matches)):
 					$width = intVal(!empty($matches["width"][0]) ? $matches["width"][0] : $matches["width"][1]);
-					$width = ($width > 0 ? min($width, $this->image_params["width"]) : $this->image_params["width"]);
 					$height = intVal(!empty($matches["height"][0]) ? $matches["height"][0] : $matches["height"][1]);
-					$height = ($height > 0 ? min($height, $this->image_params["height"]) : $this->image_params["height"]);
 				endif;
-
 				$arFile[$type] = $GLOBALS["APPLICATION"]->IncludeComponent(
 						"bitrix:forum.interface",
 						"show_file",
 						Array(
 							"FILE" => $arFile,
 							"SHOW_MODE" => ($type == "html" ? "THUMB" : "RSS"),
-							"WIDTH" => $width,
-							"HEIGHT" => $height,
+							"SIZE" => array("width" => $width, "height" => $height),
+							"MAX_SIZE" => array("width" => $this->imageWidth, "height" => $this->imageHeight),
+							"HTML_SIZE"=> array("width" => $this->imageHtmlWidth, "height" => $this->imageHtmlHeight),
 							"CONVERT" => "N",
+							"NAME_TEMPLATE" => $this->userNameTemplate,
 							"FAMILY" => "FORUM",
 							"SINGLE" => "Y",
 							"RETURN" => "Y"),
@@ -634,7 +646,143 @@ class textParser // deprecated
 		$this->path_to_smile = $pathToSmile;
 	}
 
-	public function convert($text, $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")	//, "KEEP_AMP" => "N"
+	
+	/**
+	* <p>Функция форматирования текста.</p> <p></p>
+	*
+	*
+	*
+	*
+	* @param string $text  Форматируемое сообщение.
+	*
+	*
+	*
+	* @param array $arAllow = array("HTML" Массив параметров форматирования сообщения. Имеет структуру,
+	* идентичную массиву ALLOW - переменной класса <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/index.php">CForum</a>. Содержит
+	* следующие параметры, которые могут принимать значения <i>Y</i> и
+	* <i>N</i>: <ul> <li> <code>HTML</code> - в тексте могут содержаться любые HTML теги,
+	* </li> <li> <code>ANCHOR</code> - разрешен тег &lt;a&gt;, </li> <li> <code>BIU</code> - разрешены
+	* теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <code>IMG</code> - разрешен тег &lt;img&gt;, </li> <li>
+	* <code>QUOTE</code> - разрешен тег цитирования &lt;quote&gt;, </li> <li> <code>CODE</code> -
+	* разрешен тег показа кода &lt;code&gt;, </li> <li> <code>FONT</code> - разрешен тег
+	* &lt;font&gt;, </li> <li> <code>LIST</code> - разрешены теги &lt;ul&gt;, &lt;li&gt;, </li> <li>
+	* <code>SMILES</code> - показ смайликов в виде картинок, </li> <li> <code>NL2BR</code> -
+	* заменять переводы каретки на тег &lt;br&gt; при разрешении принимать
+	* любые HTML теги. </li> <li> <code>VIDEO</code> - показ видео </li> </ul>
+	*
+	*
+	*
+	* @param  $N  Тип текста. Необязательный. По умолчанию html.
+	*
+	*
+	*
+	* @param ANCHO $R  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param BI $U  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param IM $G  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param QUOT $E  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param COD $E  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param FON $T  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param LIS $T  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param SMILE $S  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param NL2B $R  
+	*
+	*
+	*
+	* @param  $N  
+	*
+	*
+	*
+	* @param VIDE $O  
+	*
+	*
+	*
+	* @param  $Y  
+	*
+	*
+	*
+	* @param typ $e = "html" 
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $parser = new textParser();  // создаем экземпляр класса textParser
+	* $arAllow = $Forum-&gt;ALLOW;    // заполняем массив параметров форматирования
+	*                              // из массива переменной-члена класса CForum, 
+	*                              // эти два массива имеют идентичную структуру
+	* $arAllow["SMILES"] = "N";    // переопределяем (запрещаем) показ смайликов 
+	*                              // в виде картинок
+	* echo $parser-&gt;convert($strMessage, $arAllow);  // форматируем и выводим сообщение
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/textparser/convert.php
+	* @author Bitrix
+	*/
+	public function convert($text, $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")
 	{
 		global $DB;
 
@@ -697,7 +845,7 @@ class textParser // deprecated
 			if ($allow["IMG"]=="Y")
 			{
 				$text = preg_replace(
-					"#<img[^>]+src\s*=[\s\013\014]*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?\s]+)+)[\s\013\014]*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
+					"#<img[^>]+src\s*=[\s\013\014]*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?\s%]+)+)[\s\013\014]*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
 					"[img]\\1[/img]", $text);
 			}
 			if ($allow["QUOTE"]=="Y")
@@ -954,7 +1102,8 @@ class textParser // deprecated
 
 	public function defended_tags($text, $tag = 'replace')
 	{
-		switch ($tag) {
+		switch ($tag)
+		{
 			case "replace":
 				$this->preg["pattern"][] = "/\<\017\#".$this->preg["counter"]."\>/is".BX_UTF_PCRE_MODIFIER;
 				$this->preg["replace"][] = str_replace("$", "\\$", $text);
@@ -1025,6 +1174,12 @@ class textParser // deprecated
 
 		$arPattern[] = "/\[(\/?)list[^\]]*\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "\n";
+
+		$arPattern[] = "/\\[user([^\\]]*)\\](.+?)\\[\\/user\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "\\2";
+
+		$arPattern[] = "/\\[DOCUMENT([^\\]]*)\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "";
 
 		$arPattern[] = "/\[\*\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "- ";
@@ -1476,7 +1631,8 @@ class textParser // deprecated
 	}
 }
 
-class CForumSimpleHTMLParser {
+class CForumSimpleHTMLParser
+{
 	var $data;
 	var $parse_search_needle = '/([^\[]*)(?:\[(.*)\])*/i';
 	var $parse_tag = '/((\<\s*(\/)?\s*([a-z]+).*?(?:(\/)\>|\>))[^<]*)/ism';
@@ -1638,11 +1794,17 @@ class CForumSimpleHTMLParser {
 						return $this->setError('E_PARSE_INVALID_DOM_2');
 					}
 				}
-			} elseif (isset($matches[5]) && $matches[5] == '/') { // self close tag
+			}
+			elseif (isset($matches[5]) && $matches[5] == '/') // self close tag
+			{
 				// do nothing
-			} elseif ($tag_name == 'LI' && end($arStack) == 'LI') { // oh
+			}
+			elseif ($tag_name == 'LI' && end($arStack) == 'LI') // oh
+			{
 				// do nothing
-			} else { // open tag
+			}
+			else // open tag
+			{
 				$arStack[] = $tag_name;
 			}
 			if (sizeof($arStack) > 300)
@@ -1776,7 +1938,9 @@ class CForumCacheManager
 		{
 			foreach ($tags as $tag)
 				$CACHE_MANAGER->RegisterTag($tag);
-		} else {
+		}
+		else
+		{
 			$CACHE_MANAGER->RegisterTag($tags);
 		}
 		$CACHE_MANAGER->EndTagCache();
@@ -1820,16 +1984,25 @@ class CForumCacheManager
 		return true;
 	}
 
-	public function OnMessageAdd(&$ID, &$arFields)
+	public function OnMessageAdd($ID, $arFields)
 	{
 		$this->ClearTag("T", isset($arFields["FORUM_TOPIC_ID"]) ? $arFields["FORUM_TOPIC_ID"] : $arFields["TOPIC_ID"]);
 		$this->ClearTag("forum_msg_count".$arFields["FORUM_ID"]);
 	}
 
-	public function OnMessageUpdate(&$ID, &$arFields)
+	public function OnMessageUpdate($ID, $arFields, $arMessage = array())
 	{
-		$this->ClearTag("T", isset($arFields["FORUM_TOPIC_ID"]) ? $arFields["FORUM_TOPIC_ID"] : $arFields["TOPIC_ID"]);
-		$this->ClearTag("forum_msg_count".$arFields["FORUM_ID"]);
+		$arMessage = (is_array($arMessage) ? $arMessage : array());
+		$topic_id = (isset($arFields["FORUM_TOPIC_ID"]) ? $arFields["FORUM_TOPIC_ID"] : $arFields["TOPIC_ID"]);
+		if (isset($arFields["APPROVED"]) && $topic_id <= 0)
+			$topic_id = $arMessage["TOPIC_ID"];
+		if ($topic_id > 0)
+			$this->ClearTag("T", $topic_id);
+		$forum_id = (isset($arFields["FORUM_ID"]) ? $arFields["FORUM_ID"] : 0);
+		if (isset($arFields["APPROVED"]) && $forum_id <= 0)
+			$forum_id = $arMessage["FORUM_ID"];
+		if ($forum_id > 0)
+			$this->ClearTag("forum_msg_count".$forum_id);
 	}
 
 	public function OnMessageDelete($ID, $arMessage)
@@ -1908,10 +2081,14 @@ class CForumAutosave
 		ob_start();
 ?>
 		<script>
-		BX.loadScript("/bitrix/js/forum/autosave.js", function() {
-			ForumFormAutosave(<?=$jsParams?>);
-			window.autosave_<?=$id?>.Prepare();
-		});
+		window.autosave_<?=$id?>_func = function() { ForumFormAutosave(<?=$jsParams?>); window.autosave_<?=$id?>.Prepare(); };
+		if (!!window["ForumFormAutosave"])
+			window.autosave_<?=$id?>_func();
+		else
+		{
+			BX.addCustomEvent(window, 'onScriptForumAutosaveLoaded', window.autosave_<?=$id?>_func);
+			BX.loadScript("<?=CUtil::GetAdditionalFileURL("/bitrix/js/forum/autosave.js")?>");
+		}
 		</script>
 <?
 		ob_end_flush();

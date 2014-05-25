@@ -15,16 +15,25 @@ Loc::loadMessages(__FILE__);
 
 /**
  * Base entity data manager
- * @package bitrix
- * @subpackage main
  */
 abstract class DataManager
 {
-	/** @var Base */
+	const EVENT_ON_BEFORE_ADD = "OnBeforeAdd";
+	const EVENT_ON_ADD = "OnAdd";
+	const EVENT_ON_AFTER_ADD = "OnAfterAdd";
+	const EVENT_ON_BEFORE_UPDATE = "OnBeforeUpdate";
+	const EVENT_ON_UPDATE = "OnUpdate";
+	const EVENT_ON_AFTER_UPDATE = "OnAfterUpdate";
+	const EVENT_ON_BEFORE_DELETE = "OnBeforeDelete";
+	const EVENT_ON_DELETE = "OnDelete";
+	const EVENT_ON_AFTER_DELETE = "OnAfterDelete";
+
+	/** @var Base[] */
 	protected static $entity;
 
 	/**
-	 * @static
+	 * Returns entity object
+	 *
 	 * @return Base
 	 */
 	public static function getEntity()
@@ -45,24 +54,42 @@ abstract class DataManager
 	public static function getFilePath()
 	{
 		throw new Main\NotImplementedException("Method getFilePath() must be implemented by successor.");
+
+		/** @noinspection PhpUnreachableStatementInspection */
+		return null;
 	}
 
+	/**
+	 * Returns DB table name for entity
+	 *
+	 * @return string
+	 */
 	public static function getTableName()
 	{
 		return null;
 	}
 
+	/**
+	 * Returns connection name for entity
+	 *
+	 * @return string
+	 */
 	public static function getConnectionName()
 	{
 		return 'default';
 	}
 
 	/**
+	 * Returns entity map definition. Must be emplemented by successor
+	 *
 	 * @abstract
 	 */
 	public static function getMap()
 	{
 		throw new Main\NotImplementedException("Method getMap() must be implemented by successor.");
+
+		/** @noinspection PhpUnreachableStatementInspection */
+		return null;
 	}
 
 	public static function getUfId()
@@ -80,7 +107,14 @@ abstract class DataManager
 		return false;
 	}
 
-	public static function getByPrimary($primary, $parameters = array())
+	/**
+	 * Returns selection by entity's primary key and optional parameters for getList()
+	 *
+	 * @param mixed $primary Primary key of the entity
+	 * @param array $parameters Additional parameters for getList()
+	 * @return Main\DB\Result
+	 */
+	public static function getByPrimary($primary, array $parameters = array())
 	{
 		static::normalizePrimary($primary);
 		static::validatePrimary($primary);
@@ -104,11 +138,23 @@ abstract class DataManager
 		return static::getList($parameters);
 	}
 
+	/**
+	 * Returns selection by entity's primary key
+
+	 * @param mixed $id Primary key of the entity
+	 * @return Main\DB\Result
+	 */
 	public static function getById($id)
 	{
 		return static::getByPrimary($id);
 	}
 
+	/**
+	 * Returns one row (or null) by entity's primary key
+	 *
+	 * @param mixed $id Primary key of the entity
+	 * @return array|null
+	 */
 	public static function getRowById($id)
 	{
 		$result = static::getByPrimary($id);
@@ -117,7 +163,13 @@ abstract class DataManager
 		return (is_array($row)? $row : null);
 	}
 
-	public static function getRow($parameters)
+	/**
+	 * Returns one row (or null) by parameters for getList()
+	 *
+	 * @param array $parameters Primary key of the entity
+	 * @return array|null
+	 */
+	public static function getRow(array $parameters)
 	{
 		$result = static::getList($parameters);
 		$row = $result->fetch();
@@ -125,9 +177,23 @@ abstract class DataManager
 		return (is_array($row)? $row : null);
 	}
 
-	public static function getList($parameters = array())
+	/**
+	 * Executes the query and returns selection by parameters of the query. This function is an alias to the Query object functions
+	 *
+	 * @param array $parameters Array of query parameters, available keys are:
+	 * 		"select" => array of fields in the SELECT part of the query, aliases are possible in the form of "alias"=>"field"
+	 * 		"filter" => array of filters in the WHERE part of the query in the form of "(condition)field"=>"value"
+	 * 		"group" => array of fields in the GROUP BY part of the query
+	 * 		"order" => array of fields in the ORDER BY part of the query in the form of "field"=>"asc|desc"
+	 * 		"limit" => integer indicating maximum number of rows in the selection (like LIMIT n in MySql)
+	 * 		"offset" => integer indicating first row number in the selection (like LIMIT n, 100 in MySql)
+	 *		"runtime" => array of entity fields created dynamically
+	 * @return Main\DB\Result
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getList(array $parameters = array())
 	{
-		$query = new Query(static::getEntity());
+		$query = static::query();
 
 		if(!isset($parameters['select']))
 		{
@@ -182,9 +248,15 @@ abstract class DataManager
 		return $query->exec();
 	}
 
+	/**
+	 * Performs COUNT query on entity and returns the result
+	 *
+	 * @return int
+	 */
 	public static function getCount()
 	{
-		$query = new Query(static::getEntity());
+		$query = static::query();
+
 		$query->setSelect(array(
 			'CNT' => array('expression' => array('COUNT(*)'), 'data_type'=>'integer')
 		));
@@ -193,6 +265,11 @@ abstract class DataManager
 		return $result['CNT'];
 	}
 
+	/**
+	 * Creates and returns the Query object for the entity
+	 *
+	 * @return Query
+	 */
 	public static function query()
 	{
 		return new Query(static::getEntity());
@@ -219,7 +296,7 @@ abstract class DataManager
 
 				if (!isset($data[$key]))
 				{
-					throw new \Exception(sprintf(
+					throw new Main\ArgumentException(sprintf(
 						'Primary `%s` was not found when trying to query %s row.', $key, static::getEntity()->getName()
 					));
 				}
@@ -231,7 +308,7 @@ abstract class DataManager
 		{
 			if (count($entity_primary) > 1)
 			{
-				throw new \Exception(sprintf(
+				throw new Main\ArgumentException(sprintf(
 					'Require multi primary {`%s`}, but one scalar value "%s" found when trying to query %s row.',
 					join('`, `', $entity_primary), $primary, static::getEntity()->getName()
 				));
@@ -245,13 +322,20 @@ abstract class DataManager
 	{
 		if (is_array($primary))
 		{
+			if(empty($primary))
+			{
+				throw new Main\ArgumentException(sprintf(
+					'Empty primary found when trying to query %s row.', static::getEntity()->getName()
+				));
+			}
+
 			$entity_primary = static::getEntity()->getPrimaryArray();
 
 			foreach (array_keys($primary) as $key)
 			{
 				if (!in_array($key, $entity_primary, true))
 				{
-					throw new \Exception(sprintf(
+					throw new Main\ArgumentException(sprintf(
 						'Unknown primary `%s` found when trying to query %s row.',
 						$key, static::getEntity()->getName()
 					));
@@ -260,7 +344,7 @@ abstract class DataManager
 		}
 		else
 		{
-			throw new \Exception(sprintf(
+			throw new Main\ArgumentException(sprintf(
 				'Unknown type of primary "%s" found when trying to query %s row.', gettype($primary), static::getEntity()->getName()
 			));
 		}
@@ -268,9 +352,9 @@ abstract class DataManager
 		// primary values validation
 		foreach ($primary as $key => $value)
 		{
-			if (!is_scalar($value) && !($value instanceof Main\Type\DateTime))
+			if (!is_scalar($value) && !($value instanceof Main\Type\Date))
 			{
-				throw new \Exception(sprintf(
+				throw new Main\ArgumentException(sprintf(
 					'Unknown value type "%s" for primary "%s" found when trying to query %s row.',
 					gettype($value), $key, static::getEntity()->getName()
 				));
@@ -279,12 +363,12 @@ abstract class DataManager
 	}
 
 	/**
-	 * Checks data fields before saving to DB. Result stores in $result object
+	 * Checks the data fields before saving to DB. Result stores in the $result object
 	 *
 	 * @param Result $result
 	 * @param mixed $primary
 	 * @param array $data
-	 * @throws \Exception
+	 * @throws Main\ArgumentException
 	 */
 	public static function checkFields(Result $result, $primary, array $data)
 	{
@@ -294,9 +378,16 @@ abstract class DataManager
 			if ($field instanceof ScalarField && $field->isRequired())
 			{
 				$fieldName = $field->getName();
-				if ((empty($primary) && (!isset($data[$fieldName]) || $data[$fieldName] == '')) || (!empty($primary) && isset($data[$fieldName]) && $data[$fieldName] == ''))
+				if (
+					(empty($primary) && (!isset($data[$fieldName]) || $field->isValueEmpty($data[$fieldName])))
+					|| (!empty($primary) && isset($data[$fieldName]) && $field->isValueEmpty($data[$fieldName]))
+				)
 				{
-					$result->addError(new FieldError($field, Loc::getMessage("MAIN_ENTITY_FIELD_REQUIRED", array("#FIELD#"=>$field->getTitle())), FieldError::EMPTY_REQUIRED));
+					$result->addError(new FieldError(
+						$field,
+						Loc::getMessage("MAIN_ENTITY_FIELD_REQUIRED", array("#FIELD#"=>$field->getTitle())),
+						FieldError::EMPTY_REQUIRED
+					));
 				}
 			}
 		}
@@ -316,7 +407,7 @@ abstract class DataManager
 			}
 			else
 			{
-				throw new \Exception(sprintf(
+				throw new Main\ArgumentException(sprintf(
 					'Field `%s` not found in entity when trying to query %s row.',
 					$k, static::getEntity()->getName()
 				));
@@ -334,21 +425,26 @@ abstract class DataManager
 	 */
 	public static function add(array $data)
 	{
-		// check primary
-		$primary = null;
-		static::normalizePrimary($primary, $data);
-		static::validatePrimary($primary);
-
 		$entity = static::getEntity();
 		$result = new AddResult();
 
 		//event before adding
-		$event = new DataManagerEvent($entity, "OnBeforeAdd", array("fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields"=>$data));
 		$event->send();
 		$event->getErrors($result);
+		$data = $event->mergeFields($data);
+
+		// set fields with default values
+		foreach (static::getEntity()->getFields() as $field)
+		{
+			if ($field instanceof ScalarField &&  !array_key_exists($field->getName(), $data) && $field->getDefaultValue() !== null)
+			{
+				$data[$field->getName()] = $field->getDefaultValue();
+			}
+		}
 
 		// check data
-		static::checkFields($result, $primary, $data);
+		static::checkFields($result, null, $data);
 
 		if(!$result->isSuccess(true))
 		{
@@ -356,7 +452,7 @@ abstract class DataManager
 		}
 
 		//event on adding
-		$event = new DataManagerEvent($entity, "OnAdd", array("fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_ADD, array("fields"=>$data));
 		$event->send();
 
 		// save data
@@ -368,11 +464,12 @@ abstract class DataManager
 		$id = $connection->add($tableName, $data, $identity);
 
 		$result->setId($id);
+		$result->setData($data);
 
 		//TODO: save Userfields
 
 		//event after adding
-		$event = new DataManagerEvent($entity, "OnAfterAdd", array("id"=>$id, "fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id"=>$id, "fields"=>$data));
 		$event->send();
 
 		return $result;
@@ -381,7 +478,7 @@ abstract class DataManager
 	/**
 	 * Updates row in entity table by primary key
 	 *
-	 * @param string|array $primary
+	 * @param mixed $primary
 	 * @param array $data
 	 * @return UpdateResult
 	 */
@@ -395,9 +492,10 @@ abstract class DataManager
 		$result = new UpdateResult();
 
 		//event before update
-		$event = new DataManagerEvent($entity, "OnBeforeUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id"=>$primary, "fields"=>$data));
 		$event->send();
 		$event->getErrors($result);
+		$data = $event->mergeFields($data);
 
 		// check data
 		static::checkFields($result, $primary, $data);
@@ -408,7 +506,7 @@ abstract class DataManager
 		}
 
 		//event on update
-		$event = new DataManagerEvent($entity, "OnUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_UPDATE, array("id"=>$primary, "fields"=>$data));
 		$event->send();
 
 		// save data
@@ -430,11 +528,12 @@ abstract class DataManager
 		$connection->queryExecute($sql, $update[1]);
 
 		$result->setAffectedRowsCount($connection);
+		$result->setData($data);
 
 		//TODO: save Userfields
 
 		//event after update
-		$event = new DataManagerEvent($entity, "OnAfterUpdate", array("id"=>$primary, "fields"=>$data));
+		$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id"=>$primary, "fields"=>$data));
 		$event->send();
 
 		return $result;
@@ -443,7 +542,7 @@ abstract class DataManager
 	/**
 	 * Deletes row in entity table by primary key
 	 *
-	 * @param string|array $primary
+	 * @param mixed $primary
 	 * @return DeleteResult
 	 */
 	public static function delete($primary)
@@ -456,13 +555,13 @@ abstract class DataManager
 		$result = new DeleteResult();
 
 		//event before delete
-		$event = new DataManagerEvent($entity, "OnBeforeDelete", array("id"=>$primary));
+		$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id"=>$primary));
 		$event->send();
 		if($event->getErrors($result))
 			return $result;
 
 		//event on delete
-		$event = new DataManagerEvent($entity, "OnDelete", array("id"=>$primary));
+		$event = new Event($entity, self::EVENT_ON_DELETE, array("id"=>$primary));
 		$event->send();
 
 		// delete
@@ -482,10 +581,24 @@ abstract class DataManager
 		$connection->queryExecute($sql);
 
 		//event after delete
-		$event = new DataManagerEvent($entity, "OnAfterDelete", array("id"=>$primary));
+		$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id"=>$primary));
 		$event->send();
 
-		// event POST
 		return $result;
 	}
+
+	/*
+	An inheritor class can define the event handlers for own events.
+	Why? To prevent from rewriting the add/update/delete functions.
+	These handlers are triggered in the Bitrix\Main\Entity\Event::send() function
+	*/
+	public static function onBeforeAdd(Event $event){}
+	public static function onAdd(Event $event){}
+	public static function onAfterAdd(Event $event){}
+	public static function onBeforeUpdate(Event $event){}
+	public static function onUpdate(Event $event){}
+	public static function onAfterUpdate(Event $event){}
+	public static function onBeforeDelete(Event $event){}
+	public static function onDelete(Event $event){}
+	public static function onAfterDelete(Event $event){}
 }

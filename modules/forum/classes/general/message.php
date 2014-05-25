@@ -25,56 +25,62 @@ class CAllForumMessage
 	//---------------> Message add, update, delete
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новое сообщение в тему <i>TID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $TID  Код темы, в которую пользователь хочет добавить сообщение.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CForumMessage::CanUserAddMessage($TID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	 * {
-	 * 	echo "You can add message!";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новое сообщение в тему <i>TID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $TID  Код темы, в которую пользователь хочет добавить сообщение.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
+	* проверяются права самого форума, а идет доверие только этому
+	* параметру. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CForumMessage::CanUserAddMessage($TID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
+	* {
+	* 	echo "You can add message!";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php
+	* @author Bitrix
+	*/
 	public static function CanUserAddMessage($TID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$TID = intVal($TID);
-		$arTopic = CForumTopic::GetByID($TID);
+		$arTopic = ($TID > 0 ? CForumTopic::GetByID($TID) : false);
 		if ($arTopic)
 		{
 			if (!CForumUser::IsLocked($iUserID)):
@@ -96,52 +102,58 @@ class CAllForumMessage
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить сообщение с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения, которое пользователь хочет изменить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CForumMessage::CanUserUpdateMessage($ID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	 * {
-	 * 	echo "You can modify this message!";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить сообщение с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $MID  Код сообщения, которое пользователь хочет изменить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
+	* проверяются права самого форума, а идет доверие только этому
+	* параметру. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CForumMessage::CanUserUpdateMessage($MID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
+	* {
+	* 	echo "You can modify this message!";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php
+	* @author Bitrix
+	*/
 	public static function CanUserUpdateMessage($MID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$MID = intVal($MID);
@@ -177,52 +189,58 @@ class CAllForumMessage
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить сообщение с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения, которое пользователь хочет удалить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CForumMessage::CanUserDeleteMessage($ID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	 * {
-	 * 	CForumMessage::Delete($ID);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить сообщение с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $MID  Код сообщения, которое пользователь хочет удалить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
+	* проверяются права самого форума, а идет доверие только этому
+	* параметру. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CForumMessage::CanUserDeleteMessage($MID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
+	* {
+	* 	CForumMessage::Delete($MID);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php
+	* @author Bitrix
+	*/
 	public static function CanUserDeleteMessage($MID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$MID = intVal($MID);
@@ -371,15 +389,15 @@ class CAllForumMessage
 			$e = new CAdminException(array_reverse($aMsg));
 			$GLOBALS["APPLICATION"]->ThrowException($e);
 			return false;
-		} else if(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("FORUM_MESSAGE", $ID, $arFields)) {
-			return false;
 		}
+		else if(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("FORUM_MESSAGE", $ID, $arFields))
+			return false;
 
-		if (is_set($arFields, "AUTHOR_ID") || $ACTION=="ADD") {$arFields["AUTHOR_ID"] = intVal($arFields["AUTHOR_ID"]) <= 0 ? false : $arFields["AUTHOR_ID"];}
-		if (is_set($arFields, "USE_SMILES") || $ACTION=="ADD") {$arFields["USE_SMILES"] = ($arFields["USE_SMILES"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "NEW_TOPIC") || $ACTION=="ADD") {$arFields["NEW_TOPIC"] = ($arFields["NEW_TOPIC"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "APPROVED") || $ACTION=="ADD") {$arFields["APPROVED"] = ($arFields["APPROVED"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "SOURCE_ID") || $ACTION=="ADD") {$arFields["SOURCE_ID"] = ($arFields["SOURCE_ID"] == "EMAIL" ? "EMAIL" : "WEB");}
+		if (is_set($arFields, "AUTHOR_ID") || $ACTION=="ADD") $arFields["AUTHOR_ID"] = intVal($arFields["AUTHOR_ID"]) <= 0 ? false : $arFields["AUTHOR_ID"];
+		if (is_set($arFields, "USE_SMILES") || $ACTION=="ADD") $arFields["USE_SMILES"] = ($arFields["USE_SMILES"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "NEW_TOPIC") || $ACTION=="ADD") $arFields["NEW_TOPIC"] = ($arFields["NEW_TOPIC"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "APPROVED") || $ACTION=="ADD") $arFields["APPROVED"] = ($arFields["APPROVED"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "SOURCE_ID") || $ACTION=="ADD") $arFields["SOURCE_ID"] = ($arFields["SOURCE_ID"] == "EMAIL" ? "EMAIL" : "WEB");
 
 // ********************************* QUOTA ********************************* //
 //		if ((!empty($arFields["POST_MESSAGE"])) && (COption::GetOptionInt("main", "disk_space") > 0))
@@ -395,53 +413,73 @@ class CAllForumMessage
 
 	
 	/**
-	 * <p>Изменяет параметры существующего сообщения с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого сообщения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения, параметры которого необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
-	 * полей сообщения</a>.
-	 *
-	 *
-	 *
-	 * @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
-	 * сообщения не будут автоматически обсчитаны статистические
-	 * данные. Это ускоряет работу функции, но создает логические ошибки
-	 * в данных. Необязательный. По умолчанию равен False.
-	 *
-	 *
-	 *
-	 * @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
-	 * главного каталога для загрузки. Необязательный. По умолчанию
-	 * равен "forum".
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращает код измененного сообщения. В случае ошибки
-	 * изменения возвращает False.</p><h4>Примечания</h4><p>Перед изменением
-	 * сообщения следует проверить возможность изменения методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p><p>Для
-	 * добавления и изменения сообщения и темы рекомендуется
-	 * пользоваться высокоуровневой функцией <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующего сообщения с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого сообщения.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения, параметры которого необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
+	* полей сообщения</a>.
+	*
+	*
+	*
+	* @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
+	* сообщения не будут автоматически обсчитаны статистические
+	* данные. Это ускоряет работу функции, но создает логические ошибки
+	* в данных. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
+	* главного каталога для загрузки. Необязательный. По умолчанию
+	* равен "forum".
+	*
+	*
+	*
+	* @return int <p>Возвращает код измененного сообщения. В случае ошибки
+	* изменения возвращает False.</p> <h4>Примечания</h4><p>Перед изменением
+	* сообщения следует проверить возможность изменения методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p>
+	* <p>Для добавления и изменения сообщения и темы рекомендуется
+	* пользоваться высокоуровневой функцией <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // Добавление информации о редактировании на форумах, где есть только логины: 
+	* // 1. Не стоит использовать время PHP (время PHP и БД довольно часто различается, а сейчас в форуме, практически, везде используется время БД);
+	* // 2. Нельзя показывать логин пользователя без его разрешения.
+	* 
+	* &lt;?
+	* $arUser = CForumUser::GetByUSER_ID($USER-&gt;GetID());
+	* $arFields = array( 
+	*    "POST_MESSAGE" =&gt; $_POST["POST_MESSAGE"], 
+	*    "EDIT_DATE" =&gt; "", 
+	*    "EDITOR_ID" =&gt; $USER-&gt;GetID(), 
+	*    "EDITOR_NAME" =&gt; trim($arUser["SHOW_NAME"] == "Y" ? $USER-&gt;GetFullName() : $USER-&gt;GetLogin()));
+	* $arFields["EDITOR_NAME"] = (empty($arFields["EDITOR_NAME"]) ? $USER-&gt;GetLogin() : $arFields["EDITOR_NAME"]);
+	* CForumMessage::Update($MID, $arFields);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	* </li></ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $skip_counts = false, $strUploadDir = false)
 	{
 		global $DB;
@@ -498,8 +536,7 @@ class CAllForumMessage
 			}
 		}
 /***************** Event onBeforeMessageUpdate *********************/
-		$events = GetModuleEvents("forum", "onBeforeMessageUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onBeforeMessageUpdate", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields, &$strUploadDir)) === false)
 				return false;
@@ -564,9 +601,8 @@ class CAllForumMessage
 
 		$GLOBALS["USER_FIELD_MANAGER"]->Update("FORUM_MESSAGE", $ID, $arFields);
 /***************** Event onAfterMessageUpdate **********************/
-		$events = GetModuleEvents("forum", "onAfterMessageUpdate");
-		while ($arEvent = $events->Fetch())
-			ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields));
+		foreach (GetModuleEvents("forum", "onAfterMessageUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields, $arMessage_prev));
 /***************** /Event ******************************************/
 		unset($GLOBALS["FORUM_CACHE"]["MESSAGE"][$ID]);
 		unset($GLOBALS["FORUM_CACHE"]["MESSAGE_FILTER"][$ID]);
@@ -632,12 +668,11 @@ class CAllForumMessage
 
 	public static function Reindex($ID, &$arMessage)
 	{
-		if (!CModule::IncludeModule("search")) return;
-		if (!is_set($arMessage, "FORUM_INFO") || !is_set($arMessage, "TOPIC_INFO"))
-			$arMessage = CForumMessage::GetByIDEx($arMessage['ID'], array("GET_TOPIC_INFO" => "Y", "GET_FORUM_INFO" => "Y", "FILTER" => "Y"));
+		if (!($ID > 0) || !CModule::IncludeModule("search"))
+			return array("FORUM_ID", "TOPIC_ID", "TITLE_SEO", "MESSAGE_ID", "SOCNET_GROUP_ID", "OWNER_ID", "PARAM1", "PARAM2");
+		if (!is_array($arMessage) || !array_key_exists("FORUM_INFO", $arMessage) || !array_key_exists("TOPIC_INFO", $arMessage))
+			$arMessage = CForumMessage::GetByIDEx($ID, array("GET_TOPIC_INFO" => "Y", "GET_FORUM_INFO" => "Y", "FILTER" => "Y"));
 
-		$arForum = $arMessage["FORUM_INFO"];
-		$arTopic = $arMessage["TOPIC_INFO"];
 		$arMessage["POST_MESSAGE"] = (COption::GetOptionString("forum", "FILTER", "Y") == "Y" ?
 			$arMessage["POST_MESSAGE_FILTER"] : $arMessage["POST_MESSAGE"]);
 
@@ -663,7 +698,8 @@ class CAllForumMessage
 			"PARAM1" => $arMessage["FORUM_ID"],
 			"PARAM2" => $arMessage["TOPIC_ID"],
 			"PERMISSIONS" => $arParams["PERMISSION"],
-			"TITLE" => $arMessage["TOPIC_INFO"]["TITLE"],
+			"TITLE" => $arMessage["TOPIC_INFO"]["TITLE"].($arMessage["NEW_TOPIC"] == "Y" && !empty($arMessage["TOPIC_INFO"]["DESCRIPTION"]) ?
+					", ".$arMessage["TOPIC_INFO"]["DESCRIPTION"] : ""),
 			"TAGS" => (($arMessage["NEW_TOPIC"] == "Y") ? $arMessage["TOPIC_INFO"]["TAGS"] : ""),
 			"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(textParser::killAllTags($arMessage["POST_MESSAGE"])),
 			"ENTITY_TYPE_ID"  => $arMessage["NEW_TOPIC"] == "Y"? "FORUM_TOPIC": "FORUM_POST",
@@ -673,39 +709,36 @@ class CAllForumMessage
 			"INDEX_TITLE" => $arMessage["NEW_TOPIC"] == "Y",
 		);
 
+		$urlPatterns = array(
+			"FORUM_ID" => $arMessage["FORUM_ID"],
+			"TOPIC_ID" => $arMessage["TOPIC_ID"],
+			"TITLE_SEO" => $arMessage["TOPIC_INFO"]["TITLE_SEO"],
+			"MESSAGE_ID" => $arMessage["ID"],
+			"SOCNET_GROUP_ID" => $arMessage["TOPIC_INFO"]["SOCNET_GROUP_ID"],
+			"OWNER_ID" => $arMessage["TOPIC_INFO"]["OWNER_ID"],
+			"PARAM1" => $arMessage["PARAM1"],
+			"PARAM2" => $arMessage["PARAM2"]);
 		foreach ($arParams["SITE"] as $key => $val)
 		{
-			$arSearchInd["LID"][$key] =
-				CForumNew::PreparePath2Message(
-					$val,
-					array(
-						"FORUM_ID" => $arMessage["FORUM_ID"],
-						"TOPIC_ID" => $arMessage["TOPIC_ID"],
-						"MESSAGE_ID" => $arMessage["ID"],
-						"SOCNET_GROUP_ID" => $arMessage["TOPIC_INFO"]["SOCNET_GROUP_ID"],
-						"OWNER_ID" => $arMessage["TOPIC_INFO"]["OWNER_ID"],
-						"PARAM1" => $arMessage["PARAM1"],
-						"PARAM2" => $arMessage["PARAM2"]));
+			$arSearchInd["LID"][$key] = CForumNew::PreparePath2Message($val, $urlPatterns);
 			if (empty($arSearchInd["URL"]) && !empty($arSearchInd["LID"][$key]))
 				$arSearchInd["URL"] = $arSearchInd["LID"][$key];
 		}
 
 		if (empty($arSearchInd["URL"]))
 		{
-			foreach ($arParams["SITE"] as $key => $val) {
+			foreach ($arParams["SITE"] as $key => $val)
+			{
 				$db_lang = CLang::GetByID($key);
-				if ($db_lang && $ar_lang = $db_lang->Fetch()){
+				if ($db_lang && $ar_lang = $db_lang->Fetch())
+				{
 					$arParams["DEFAULT_URL"] = $ar_lang["DIR"];
 					break;
 				}
 			}
 			$arParams["DEFAULT_URL"] .= COption::GetOptionString("forum", "REL_FPATH", "").
 				"forum/read.php?FID=#FID#&TID=#TID#&MID=#MID##message#MID#";
-
-			$arSearchInd["URL"] = CForumNew::PreparePath2Message($arParams["DEFAULT_URL"],
-				array("FORUM_ID" => $arMessage["FORUM_ID"], "TOPIC_ID" => $arMessage["TOPIC_ID"], "MESSAGE_ID" => $arMessage["ID"],
-				"SOCNET_GROUP_ID" => $arMessage["TOPIC_INFO"]["SOCNET_GROUP_ID"], "OWNER_ID" => $arMessage["TOPIC_INFO"]["OWNER_ID"],
-				"PARAM1" => $arMessage["PARAM1"], "PARAM2" => $arMessage["PARAM2"]));
+			$arSearchInd["URL"] = CForumNew::PreparePath2Message($arParams["DEFAULT_URL"], $urlPatterns);
 		}
 		CSearch::DeleteIndex("forum", $ID);
 		CSearch::Index("forum", $ID, $arSearchInd, true);
@@ -713,29 +746,33 @@ class CAllForumMessage
 
 	
 	/**
-	 * <p>Удаляет сообщение с кодом <i>ID</i>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения, которое необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li>Перед удалением сообщения следует проверить возможность
-	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет сообщение с кодом <i>ID</i>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения, которое необходимо удалить.
+	*
+	*
+	*
+	* @return bool <p>Перед удалением вызывает событие onBeforeMessageDelete с параметрами $ID и
+	* $arMessage, возвращение false из обработчика отменяет удаление
+	* сообщения.</p> <p>После удаления вызывает событие onAfterMessageDelete с теми
+	* же параметрами структура массива $arMessage соответствует результату
+	* работы функции CForumMessage::GetByID($ID). </p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li>Перед удалением сообщения следует проверить возможность
+	* удаления методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
+	* </li></ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -746,8 +783,7 @@ class CAllForumMessage
 		if (empty($arMessage))
 			return false;
 /***************** Event onBeforeMessageAdd ************************/
-		$events = GetModuleEvents("forum", "onBeforeMessageDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onBeforeMessageDelete", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, $arMessage)) === false)
 				return false;
@@ -774,9 +810,8 @@ class CAllForumMessage
 			CForumTopic::Delete($TOPIC_ID);
 		else:
 			// if deleted message was first
-			if ($arMessage["NEW_TOPIC"] == "Y"):
-				$DB->Query("UPDATE b_forum_message SET NEW_TOPIC='Y' WHERE ID=".$res["ID"]);
-			endif;
+			if ($arMessage["NEW_TOPIC"] == "Y")
+				$DB->Update('b_forum_message', array('NEW_TOPIC' => '"Y"'), "WHERE ID=".$res["ID"]);
 			CForumTopic::SetStat($TOPIC_ID);
 		endif;
 		$DB->Commit();
@@ -788,13 +823,14 @@ class CAllForumMessage
 		endif;
 		CForumNew::SetStat($FORUM_ID);
 /***************** Event onBeforeMessageAdd ************************/
-		$events = GetModuleEvents("forum", "onAfterMessageDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onAfterMessageDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arMessage));
 /***************** /Event ******************************************/
 		if (CModule::IncludeModule("search"))
 		{
 			CSearch::DeleteIndex("forum", $ID);
+			if (is_array($res) && !empty($res))
+				CForumMessage::Reindex($res["ID"], $res);
 		}
 		return true;
 	}
@@ -802,41 +838,45 @@ class CAllForumMessage
 	//---------------> Message list
 	
 	/**
-	 * <p>Возвращает массив параметров сообщения по его коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arMessage = CForumMessage::GetByID($MID);
-	 * if ($arMessage)
-	 * {
-	 *   $TID = IntVal($arMessage["TOPIC_ID"]);
-	 *   $FID = IntVal($arMessage["FORUM_ID"]);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров сообщения по его коду <b>ID</b>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения.
+	*
+	*
+	*
+	* @param array $arAddParams = Array() Массив добавления параметров.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arMessage = CForumMessage::GetByID($MID);
+	* if ($arMessage)
+	* {
+	*   $TID = IntVal($arMessage["TOPIC_ID"]);
+	*   $FID = IntVal($arMessage["FORUM_ID"]);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	* </li></ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -871,52 +911,55 @@ class CAllForumMessage
 		$res = ($arAddParams["FILTER"] == "Y" ? $GLOBALS["FORUM_CACHE"]["MESSAGE_FILTER"][$ID] :
 			$GLOBALS["FORUM_CACHE"]["MESSAGE"][$ID]);
 
-		if ($arAddParams["getFiles"] == "Y" && !empty($res)) {
+		if ($arAddParams["getFiles"] == "Y" && !empty($res))
 			$res["FILES"] = CForumFiles::getByMessageID($ID);
-		}
 
 		return $res;
 	}
 
 	
 	/**
-	 * <p>Возвращает массив параметров сообщения, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Распечатаем на экран все возвращаемые параметры сообщения
-	 * $arMessage = CForumMessage::GetByIDEx($MID);
-	 * if ($arMessage)
-	 * {
-	 *   echo "&lt;pre&gt;";
-	 *   print_r($arMessage);
-	 *   echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyidex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров сообщения, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения.
+	*
+	*
+	*
+	* @param array $arAddParams = Array() Массив добавления параметров.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Распечатаем на экран все возвращаемые параметры сообщения
+	* $arMessage = CForumMessage::GetByIDEx($MID);
+	* if ($arMessage)
+	* {
+	*   echo "&lt;pre&gt;";
+	*   print_r($arMessage);
+	*   echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	* </li></ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -1020,9 +1063,8 @@ class CAllForumMessage
 					$GLOBALS["FORUM_CACHE"]["FORUM"][intVal($res["FORUM_INFO"]["ID"])] = $res["FORUM_INFO"];
 				endif;
 			endif;
-			if ($arAddParams["getFiles"] == "Y" && !empty($res)) {
+			if ($arAddParams["getFiles"] == "Y" && !empty($res))
 				$res["FILES"] = CForumFiles::getByMessageID($ID);
-			}
 			return $res;
 		endif;
 		return false;
@@ -1031,50 +1073,58 @@ class CAllForumMessage
 	//---------------> Message utils
 	
 	/**
-	 * <p>Возвращает страницу, на которой будет находиться сообщение с кодом <i>ID</i> для пользователя, входящего в группы <i>arUserGroups</i>, при постраничном показе с <i>mess_per_page</i> сообщениями на странице.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код сообщения.
-	 *
-	 *
-	 *
-	 * @param int $mess_per_page  Количество сообщений на страницу. Обычно равно переменной
-	 * $FORUM_MESSAGES_PER_PAGE, которая определяется модулем форума. Эта
-	 * переменная инициализируется из настроек модуля форума.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray().
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($MID&gt;0)
-	 *   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE, true, CForumMessage::GetMessagePage($MID, $FORUM_MESSAGES_PER_PAGE, $USER-&gt;GetUserGroupArray()));
-	 * else
-	 *   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getmessagepage.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает страницу, на которой будет находиться сообщение с кодом <i>ID</i> для пользователя, входящего в группы <i>arUserGroups</i>, при постраничном показе с <i>mess_per_page</i> сообщениями на странице.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения.
+	*
+	*
+	*
+	* @param int $mess_per_page  Количество сообщений на страницу. Обычно равно переменной
+	* $FORUM_MESSAGES_PER_PAGE, которая определяется модулем форума. Эта
+	* переменная инициализируется из настроек модуля форума.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray().
+	*
+	*
+	*
+	* @param bool $TID = false Код темы форума. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @param array $arAddParams  Массив параметров. </h
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($MID&gt;0)
+	*   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE, true, CForumMessage::GetMessagePage($MID, $FORUM_MESSAGES_PER_PAGE, $USER-&gt;GetUserGroupArray()));
+	* else
+	*   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getmessagepage.php
+	* @author Bitrix
+	*/
 	public static function GetMessagePage($ID, $mess_per_page, $arUserGroups, $TID = false, $arAddParams = array())
 	{
 		$ID = intVal($ID);
@@ -1207,7 +1257,7 @@ class CAllForumMessage
 					if($arMailParams["USE_SUBJECT"] == "Y")
 						$arFields["=Subject"] = $arFields["TOPIC_TITLE"];
 
-					$arFields["PATH2FORUM"] = CComponentEngine::MakePathFromTemplate($arMailParams["URL_TEMPLATES_MESSAGE"], array("FID" => $arMessage["FORUM_ID"], "TID" => $arMessage["TOPIC_ID"], "MID" => $arMessage["ID"]));
+					$arFields["PATH2FORUM"] = CComponentEngine::MakePathFromTemplate($arMailParams["URL_TEMPLATES_MESSAGE"], array("FID" => $arMessage["FORUM_ID"], "TID" => $arMessage["TOPIC_ID"], "TITLE_SEO" => $arMessage["TOPIC_INFO"]["TITLE_SEO"], "MID" => $arMessage["ID"]));
 				}
 				else
 					return false;
@@ -1220,7 +1270,7 @@ class CAllForumMessage
 			$arForumSites = CForumNew::GetSites($FID);
 			foreach ($arForumSites as $site_id => $path):
 				$arForumSites[$site_id] = trim(CForumNew::PreparePath2Message($arForumSites[$site_id],
-						array("FORUM_ID" => $arMessage["FORUM_ID"], "TOPIC_ID" => $arMessage["TOPIC_ID"], "MESSAGE_ID" => $arMessage["ID"],
+						array("FORUM_ID" => $arMessage["FORUM_ID"], "TOPIC_ID" => $arMessage["TOPIC_ID"], "TITLE_SEO" => $arMessage["TOPIC_INFO"]["TITLE_SEO"], "MESSAGE_ID" => $arMessage["ID"],
 							"SOCNET_GROUP_ID" => $arTopic["SOCNET_GROUP_ID"], "OWNER_ID" => $arTopic["OWNER_ID"],
 							"PARAM1" => $arMessage["PARAM1"], "PARAM2" => $arMessage["PARAM2"])));
 				if (empty($arForumSites[$site_id])):
@@ -1458,6 +1508,32 @@ class CAllForumMessage
 
 		return $arEvent;
 	}
+
+	/**
+	 * @param $arFilter - array("FORUM_ID" => 241, "TOPIC_ID" => 82383, "APPROVED" => "Y")
+	 * @param $rights - string(1) (A|R|U|W);
+	 */
+	public static function setWebdavRights($arFilter, $rights)
+	{
+		if (IsModuleInstalled("webdav"))
+		{
+			$arFilter = (is_array($arFilter) ? $arFilter : array($arFilter));
+			$arFilter[">UF_FORUM_MESSAGE_DOC"] = 0;
+			$db_res = CForumMessage::GetList(array("ID" => "ASC"), $arFilter, false, 0, array("SELECT" => array("UF_FORUM_MESSAGE_DOC")));
+			$arDocs = array();
+			if ($db_res && ($res = $db_res->Fetch()))
+			{
+				do {
+					if (!empty($res["UF_FORUM_MESSAGE_DOC"]) && is_array($res["UF_FORUM_MESSAGE_DOC"]))
+						$arDocs = array_merge($arDocs, $res["UF_FORUM_MESSAGE_DOC"]);
+				} while ($res = $db_res->Fetch());
+			}
+			if (!empty($arDocs) && CModule::IncludeModule("webdav"))
+			{
+				CWebDavIblock::appendRightsOnElements($arDocs, $rights);
+			}
+		}
+	}
 }
 
 class _CMessageDBResult extends CDBResult
@@ -1466,6 +1542,13 @@ class _CMessageDBResult extends CDBResult
 	public function _CMessageDBResult($res, $params = array())
 	{
 		$this->sNameTemplate = (!empty($params["sNameTemplate"]) ? $params["sNameTemplate"] : '');
+		$this->checkUserFields = false;
+		$this->arUserFields = false;
+		if (array_key_exists("SELECT", $params))
+		{
+			$this->arUserFields = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("FORUM_MESSAGE", 0, LANGUAGE_ID);
+			$this->checkUserFields = (!empty($this->arUserFields));
+		}
 		parent::CDBResult($res);
 	}
 	public function Fetch()
@@ -1611,6 +1694,21 @@ class _CMessageDBResult extends CDBResult
 					}
 				}
 			}
+
+			if ($this->checkUserFields)
+			{
+				$arUF = array_intersect_key($res, $this->arUserFields);
+				if (empty($arUF))
+					$this->checkUserFields = false;
+				else
+				{
+					foreach($arUF as $k => $v)
+					{
+						$res[$k] = $this->arUserFields[$k];
+						$res[$k]["VALUE"] = $v;
+					}
+				}
+			}
 		}
 		return $res;
 	}
@@ -1627,10 +1725,12 @@ class CALLForumFiles
 			if (!is_array($GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"]))
 				$GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"] = array();
 
-			if (!array_key_exists($ID, $GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"])) {
+			if (!array_key_exists($ID, $GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"]))
+			{
 				$GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"][$ID] = array();
 				$db_files = CForumFiles::GetList(array("MESSAGE_ID" => "ASC"), array("MESSAGE_ID" => $ID));
-				if ($db_files && ($res_file = $db_files->Fetch())) {
+				if ($db_files && ($res_file = $db_files->Fetch()))
+				{
 					do {
 						$GLOBALS["FORUM_CACHE"]["MESSAGE_FILES"][$ID][$res_file["FILE_ID"]] = $res_file;
 					} while ($res_file = $db_files->Fetch());

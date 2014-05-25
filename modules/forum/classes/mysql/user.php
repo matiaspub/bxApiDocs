@@ -18,49 +18,53 @@ class CForumUser extends CAllForumUser
 {
 	
 	/**
-	 * <p>Возвращает список профайлов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID профайла;<br>     <i>USER_ID</i> - ID пользователя;<br>
-	 *     <i>SHOW_NAME</i> - показывать имя вместо логина;<br>     <i>NUM_POSTS</i> -
-	 * количество сообщений;<br>     <i>LAST_POST</i> - ID последнего сообщения;<br>
-	 *     <i>NAME</i> - имя пользователя;<br>     <i>LAST_NAME</i> - фамилия
-	 * пользователя;<br>     <i>LOGIN</i> - логин;<br>     <i>LAST_VISIT</i> - дата
-	 * последнего посещения;<br><br><i>order</i> - порядок сортировки, может
-	 * принимать значения<br>     <i>ASC</i> - по возрастанию;<br>     <i>DESC</i> - по
-	 * убыванию;<br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения<br>     <i>ID</i> - ID
-	 * профайла;<br>     <i>USER_ID</i> - ID пользователя;<br>     <i>RANK_ID</i> - ID звания
-	 * пользователя;<br>     <i>SHOW_NAME</i> - показывать имя вместо логина;<br>
-	 *     <i>NUM_POSTS</i> - количество сообщений;<br>     <i>ALLOW_POST</i> - разрешено
-	 * писать сообщения (т.е. не забанен);<br><br> фильтруемое поле может
-	 * иметь содержать перед названием тип проверки фильтра<br> "!" - не
-	 * равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
-	 * "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
-	 * не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список профайлов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <b>ID</b> - ID профайла;<br>     <b>USER_ID</b> - ID пользователя;<br>
+	*     <b>SHOW_NAME</b> - показывать имя вместо логина;<br>     <b>NUM_POSTS</b> -
+	* количество сообщений;<br>     <b>LAST_POST</b> - ID последнего сообщения;<br>
+	*     <b>NAME</b> - имя пользователя;<br>     <b>LAST_NAME</b> - фамилия
+	* пользователя;<br>     <b>LOGIN</b> - логин;<br>     <b>LAST_VISIT</b> - дата
+	* последнего посещения;<br><br><i>order</i> - порядок сортировки, может
+	* принимать значения<br>     <b>ASC</b> - по возрастанию;<br>     <b>DESC</b> - по
+	* убыванию;<br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения<br>     <b>ID</b> - ID
+	* профайла;<br>     <b>USER_ID</b> - ID пользователя;<br>     <b>RANK_ID</b> - ID звания
+	* пользователя;<br>     <b>SHOW_NAME</b> - показывать имя вместо логина;<br>
+	*     <b>NUM_POSTS</b> - количество сообщений;<br>     <b>ALLOW_POST</b> - разрешено
+	* писать сообщения (т.е. не забанен);<br><br> фильтруемое поле может
+	* иметь содержать перед названием тип проверки фильтра<br> "!" - не
+	* равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
+	* "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
+	* не фильтруются.
+	*
+	*
+	*
+	* @param array $arAddParams = array() Массив параметров. </h
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li> </ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID"=>"ASC"), $arFilter = Array(), $arAddParams = array())
 	{
 		global $DB;

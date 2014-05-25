@@ -31,8 +31,6 @@ class UserTable extends Entity\DataManager
 		$connection = Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
-		global $DB;
-
 		return array(
 			'ID' => array(
 				'data_type' => 'integer',
@@ -58,8 +56,7 @@ class UserTable extends Entity\DataManager
 			'DATE_REG_SHORT' => array(
 				'data_type' => 'datetime',
 				'expression' => array(
-//					$helper->getDatetimeToDateFunction('%s'), 'DATE_REGISTER'
-					$DB->datetimeToDateFunction('%s'), 'DATE_REGISTER'
+					$helper->getDatetimeToDateFunction('%s'), 'DATE_REGISTER'
 				)
 			),
 			'LAST_LOGIN' => array(
@@ -68,8 +65,7 @@ class UserTable extends Entity\DataManager
 			'LAST_LOGIN_SHORT' => array(
 				'data_type' => 'datetime',
 				'expression' => array(
-//					$helper->getDatetimeToDateFunction('%s'), 'LAST_LOGIN'
-					$DB->datetimeToDateFunction('%s'), 'LAST_LOGIN'
+					$helper->getDatetimeToDateFunction('%s'), 'LAST_LOGIN'
 				)
 			),
 			'LAST_ACTIVITY_DATE' => array(
@@ -93,6 +89,9 @@ class UserTable extends Entity\DataManager
 			'LID' => array(
 				'data_type' => 'string'
 			),
+			'WORK_PHONE' => array(
+				'data_type' => 'string'
+			),
 			'WORK_POSITION' => array(
 				'data_type' => 'string'
 			),
@@ -102,11 +101,13 @@ class UserTable extends Entity\DataManager
 			'PERSONAL_GENDER' => array(
 				'data_type' => 'string'
 			),
+			'PERSONAL_PHOTO' => array(
+				'data_type' => 'integer'
+			),
 			'SHORT_NAME' => array(
 				'data_type' => 'string',
 				'expression' => array(
-//					$helper->getConcatFunction("%s","' '", "UPPER(".$helper->getSubstrFunction("%s", 1, 1).")", "'.'"),
-					$DB->concat("%s","' '", "UPPER(".$DB->substr("%s", 1, 1).")", "'.'"),
+					$helper->getConcatFunction("%s","' '", "UPPER(".$helper->getSubstrFunction("%s", 1, 1).")", "'.'"),
 					'LAST_NAME', 'NAME'
 				)
 			),
@@ -133,11 +134,6 @@ class UserTable extends Entity\DataManager
 
 	public static function getActiveUsersCount()
 	{
-		$sql = "SELECT COUNT(ID) ".
-			"FROM b_user ".
-			"WHERE ACTIVE = 'Y' ".
-			"   AND LAST_LOGIN IS NOT NULL";
-
 		if (ModuleManager::isModuleInstalled("intranet"))
 		{
 			$sql = "SELECT COUNT(U.ID) ".
@@ -155,8 +151,30 @@ class UserTable extends Entity\DataManager
 				"           AND UF.VALUE_INT <> 0".
 				"   )";
 		}
+		else
+		{
+			$sql = "SELECT COUNT(ID) ".
+				"FROM b_user ".
+				"WHERE ACTIVE = 'Y' ".
+				"   AND LAST_LOGIN IS NOT NULL";
+		}
 
 		$connection = Application::getConnection();
 		return $connection->queryScalar($sql);
+	}
+
+	public static function add(array $data)
+	{
+		throw new NotImplementedException("Use CUser class.");
+	}
+
+	public static function update($primary, array $data)
+	{
+		throw new NotImplementedException("Use CUser class.");
+	}
+
+	public static function delete($primary)
+	{
+		throw new NotImplementedException("Use CUser class.");
 	}
 }

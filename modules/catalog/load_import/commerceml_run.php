@@ -1,12 +1,11 @@
 <?
 //<title>CommerceML</title>
-//include(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/import_setup_templ.php"));
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/import_setup_templ.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/import_setup_templ.php');
 $startImportExecTime = getmicrotime();
 
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -49,7 +48,7 @@ class XMLNode
 
 	public function GetAttribute($name)
 	{
-		return $this->attributes[$name];
+		return (isset($this->attributes[$name]) ? $this->attributes[$name] : null);
 	}
 
 	public function XMLSetValue($new_val)
@@ -65,11 +64,11 @@ class XMLNode
 		if (!($p = strpos($tmp, "/")))
 			$p = strlen($tmp);
 		$str_node = trim(substr($tmp, 0, $p));
-		if(strlen($str_node)<=0)
+		if('' === $str_node)
 			return $this;
 
 		$tmp = trim(substr($tmp, $p+1));
-		if(strlen($tmp)<=0)
+		if('' === $tmp)
 			return $this->childs[$str_node];
 
 		return $this->childs[$str_node][0]->select_nodes($tmp);
@@ -77,7 +76,7 @@ class XMLNode
 		if(!is_array($this->childs)) return array();
 		$result=array(0=>$this->childs);
 
-		for($i=1;$i<count($tmp);$i++)
+		for ($i = 1, $intCount=count($tmp);$i < $intCount; $i++)
 		{
 			if($tmp[$i]!="")
 			{
@@ -176,8 +175,8 @@ class XMLParser
 					$bAmp = false;
 
 				preg_match_all("/(\\S+)\\s*=\\s*[\"](.*?)[\"]/s".BX_UTF_PCRE_MODIFIER, $at, $attrs_tmp);
-				$attrs = Array();
-				for($i=0; $i<count($attrs_tmp[1]); $i++)
+				$attrs = array();
+				for($i=0, $intCount = count($attrs_tmp[1]); $i < $intCount; $i++)
 					$attrs[$attrs_tmp[1][$i]] = ($bAmp ? $this->unquote($attrs_tmp[2][$i]) : $attrs_tmp[2][$i]);
 				$this->startElement($name, $attrs);
 				if(substr($tag_cont, -1) === "/")
@@ -217,7 +216,7 @@ class XMLParser
 	{
 		$tmp=$this->select_nodes($str_node);
 		$result=array();
-		for($i=0;$i<count($tmp);$i++)
+		for($i=0, $intCount = count($tmp);$i < $intCount;$i++)
 		{
 			$arTemp=$tmp[$i]->attributes;
 			$result[]=$arTemp;
@@ -231,7 +230,7 @@ class XMLParser
 		if(!is_object($this->xml)) return array();
 		$result=array(0=>$this->xml);
 		$tmp = explode ("/", $str_node);
-		for($i=2;$i<count($tmp);$i++)
+		for($i=2, $intCount = count($tmp);$i<$intCount;$i++)
 		{
 			if($tmp[$i]!="")
 			{
@@ -256,13 +255,13 @@ function AddSectionsRecursive($parent="", $parent_id=0)
 
 	$arChld = $arGrTmp[$tmpid.$parent];
 	if(!is_array($arChld)) return;
-	for($i=0; $i<count($arChld); $i++)
+	for($i=0, $intCount = count($arChld); $i<$intCount; $i++)
 	{
 		$GROUP_XML_ID = $arChld[$i]["GROUP_XML_ID"];
 		$GROUP_NAME = $arChld[$i]["GROUP_NAME"];
 
 		$bs = new CIBlockSection();
-		$res = CIBlockSection::GetList(Array(), Array("XML_ID"=>$GROUP_XML_ID, "IBLOCK_ID"=>$IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'));
+		$res = CIBlockSection::GetList(array(), Array("XML_ID"=>$GROUP_XML_ID, "IBLOCK_ID"=>$IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'));
 		$bNewGroup_tmp = False;
 		if($arr = $res->Fetch())
 		{
@@ -376,7 +375,7 @@ if ($outFileAction!="F" && $outFileAction!="H" && $outFileAction!="D")
 if ($outFileAction!="F" && $outFileAction!="H")
 	$outFileAction = "D";
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' === $strImportErrorMessage)
 {
 	$xml = new XMLParser();
 	$xml_content = file_get_contents($DATA_FILE_NAME);
@@ -385,7 +384,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		$strImportErrorMessage .= GetMessage("CICML_NO_LOAD_DATA")."<br>";
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' === $strImportErrorMessage)
 {
 	if ($CONVERT_UTF8 != "Y" && $CONVERT_UTF8 != "N")
 		$CONVERT_UTF8 = COption::GetOptionString("catalog", "default_convert_utf8", "N");
@@ -424,7 +423,7 @@ include(dirname(__FILE__).'/ru/commerceml_run_name.php');
 if (!isset($nameUTF) || !is_array($nameUTF) || empty($nameUTF))
 	$strImportErrorMessage .= GetMessage('CAT_ADM_CML1_IMP_ERR_NAMEUTF').'<br>';
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' === $strImportErrorMessage)
 {
 	$xml->LoadString($xml_content);
 
@@ -435,18 +434,26 @@ if (strlen($strImportErrorMessage) <= 0)
 		if (!is_object($comm[0]))
 			$strImportErrorMessage .= GetMessage("CICML_INVALID_FILE")."<br>";
 	}
+	$strVersion = $comm[0]->GetAttribute($nameUTF['CommerceInfoVersion']);
+	if (null !== $strVersion)
+	{
+		if (version_compare($strVersion, '2.0') >= 0)
+		{
+			$strImportErrorMessage .= GetMessage("CICML_INVALID_VERSION")."<br>";
+		}
+	}
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' === $strImportErrorMessage)
 {
-	$arPriceType = Array();
+	$arPriceType = array();
 	$offerlists = $comm[0]->select_nodes("/".$nameUTF['OffersList']);
-	for ($i = 0; $i < count($offerlists); $i++)
+	for ($i = 0, $intOFCount = count($offerlists); $i < $intOFCount; $i++)
 	{
 		$xOfferListNode = $offerlists[$i];
 
 		$props = $xOfferListNode->select_nodes("/".$nameUTF['PropertyValue']);
-		for($j=0; $j<count($props); $j++)
+		for($j=0, $intPropCount = count($props); $j<$intPropCount; $j++)
 		{
 			$arPriceType[$props[0]->GetAttribute($nameUTF['CatalogID'])] = $props[0]->GetAttribute($nameUTF['PropertyId']);
 			break;
@@ -463,10 +470,11 @@ if (strlen($strImportErrorMessage) <= 0)
 	}
 
 	$tmpid = md5(uniqid(""));
-	$arCatalogs = Array();
-	$arCatalogsParams = Array();
+	$arCatalogs = array();
+	$arCatalogsParams = array();
 	$catalogs = $comm[0]->select_nodes("/".$nameUTF['Catalog']);
-	for ($i = 0; $i < count($catalogs); $i++)
+	$ib = new CIBlock();
+	for ($i = 0, $intCatCount = count($catalogs); $i < $intCatCount; $i++)
 	{
 		$xCatNode = $catalogs[$i];
 
@@ -474,8 +482,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		$IBLOCK_NAME = $xCatNode->GetAttribute($nameUTF['Name']);
 		$IBLOCK_DESC = $xCatNode->GetAttribute($nameUTF['Description']);
 
-		$ib = new CIBlock;
-		$res = CIBlock::GetList(Array(), Array("=TYPE" => $IBLOCK_TYPE_ID, "=XML_ID"=>$IBLOCK_XML_ID, 'CHECK_PERMISSIONS' => 'Y', 'MIN_PERMISSION' => 'W'));
+		$res = CIBlock::GetList(array(), Array("=TYPE" => $IBLOCK_TYPE_ID, "=XML_ID"=>$IBLOCK_XML_ID, 'CHECK_PERMISSIONS' => 'Y', 'MIN_PERMISSION' => 'W'));
 		$bNewRecord_tmp = False;
 		if ($res_arr = $res->Fetch())
 		{
@@ -603,11 +610,11 @@ if (strlen($strImportErrorMessage) <= 0)
 				CCatalog::Add(Array("IBLOCK_ID"=>$IBLOCK_ID));
 
 
-			$arProperties = Array();
+			$arProperties = array();
 			$ibp = new CIBlockProperty();
 			$props = $xCatNode->select_nodes("/".$nameUTF['Property']);
 
-			for($j=0; $j<count($props); $j++)
+			for($j=0, $intPropCount = count($props); $j<$intPropCount; $j++)
 			{
 				$xPropNode = $props[$j];
 
@@ -624,7 +631,7 @@ if (strlen($strImportErrorMessage) <= 0)
 				if($arPriceType[$IBLOCK_XML_ID]==$PROP_XML_ID)
 					continue;
 
-				$res = CIBlock::GetProperties($IBLOCK_ID, Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "XML_ID"=>$PROP_XML_ID));
+				$res = CIBlock::GetProperties($IBLOCK_ID, array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "XML_ID"=>$PROP_XML_ID));
 				$bNewRecord_tmp = False;
 				if($res_arr = $res->Fetch())
 				{
@@ -673,9 +680,9 @@ if (strlen($strImportErrorMessage) <= 0)
 				if($PROP_TYPE=="L")
 				{
 					$pren = new CIBlockPropertyEnum();
-					$arPropertiesEnum[$PROP_XML_ID] = Array();
+					$arPropertiesEnum[$PROP_XML_ID] = array();
 					$prop_enums = $xPropNode->select_nodes("/".$nameUTF['PropertyVariant']);
-					for($k=0; $k<count($prop_enums); $k++)
+					for($k=0, $intEnumPropCount = count($prop_enums); $k<$intEnumPropCount; $k++)
 					{
 						$xPropEnum = $prop_enums[$k];
 						$PROP_ENUM_XML_ID = $xPropEnum->GetAttribute($nameUTF['ID']);
@@ -689,7 +696,7 @@ if (strlen($strImportErrorMessage) <= 0)
 							"PROPERTY_ID"=>$PROP_ID,
 							"XML_ID"=>$PROP_ENUM_XML_ID
 						);
-						$res = CIBlockPropertyEnum::GetList(Array(), Array("PROPERTY_ID"=>$PROP_ID, "XML_ID"=>$PROP_ENUM_XML_ID));
+						$res = CIBlockPropertyEnum::GetList(array(), Array("PROPERTY_ID"=>$PROP_ID, "XML_ID"=>$PROP_ENUM_XML_ID));
 						if($arr = $res->Fetch())
 						{
 							$PROP_ENUM_ID = $arr["ID"];
@@ -707,9 +714,9 @@ if (strlen($strImportErrorMessage) <= 0)
 			if (function_exists("catalog_property_mutator_1c"))
 				catalog_property_mutator_1c();
 
-			$arGrTmp = Array();
+			$arGrTmp = array();
 			$groups = $xCatNode->select_nodes("/".$nameUTF['Category']);
-			for ($j = 0; $j < count($groups); $j++)
+			for ($j = 0, $intGroupCount = count($groups); $j < $intGroupCount; $j++)
 			{
 				$xGroupNode = $groups[$j];
 
@@ -724,14 +731,14 @@ if (strlen($strImportErrorMessage) <= 0)
 						);
 			}
 
-			$arGroups = Array();
+			$arGroups = array();
 			AddSectionsRecursive();
 			CIBlockSection::ReSort($IBLOCK_ID);
 
 			$el = new CIBlockElement();
-			$arProducts = Array();
+			$arProducts = array();
 			$products = $xCatNode->select_nodes("/".$nameUTF['Product']);
-			for ($j = 0; $j < count($products); $j++)
+			for ($j = 0, $intProdCount = count($products); $j < $intProdCount; $j++)
 			{
 				$xProductNode = $products[$j];
 
@@ -739,13 +746,13 @@ if (strlen($strImportErrorMessage) <= 0)
 				$PRODUCT_PARENT_XML_ID = $xProductNode->GetAttribute($nameUTF['ParentCategory']);
 				$PRODUCT_NAME = $xProductNode->GetAttribute($nameUTF['Name']);
 
-				$PROP = Array();
-				$GROUPS_ID = Array();
+				$PROP = array();
+				$GROUPS_ID = array();
 				if(strlen($PRODUCT_PARENT_XML_ID)>0 && strlen($arGroups[$PRODUCT_PARENT_XML_ID])>0)
 					$GROUPS_ID[] = $arGroups[$PRODUCT_PARENT_XML_ID];
 
 				$prod_groups = $xProductNode->select_nodes("/".$nameUTF['CategoryReference']);
-				for($k=0; $k<count($prod_groups); $k++)
+				for($k=0, $intProdGroupCount = count($prod_groups); $k<$intProdGroupCount; $k++)
 				{
 					$xProductGroupsNode = $prod_groups[$k];
 					$PRODUCT_GROUP_XML_ID = $xProductGroupsNode->GetAttribute($nameUTF['IdInCatalog']);
@@ -754,7 +761,7 @@ if (strlen($strImportErrorMessage) <= 0)
 				}
 
 				$prop_vals = $xProductNode->select_nodes("/".$nameUTF['PropertyValue']);
-				for($k=0; $k<count($prop_vals); $k++)
+				for($k=0, $intPropValCount = count($prop_vals); $k<$intPropValCount; $k++)
 				{
 					$xPropertyValueNode = $prop_vals[$k];
 
@@ -784,7 +791,7 @@ if (strlen($strImportErrorMessage) <= 0)
 				if ($boolTranslitElement)
 					$arLoadProductArray['CODE'] = CUtil::translit($PRODUCT_NAME, 'ru', $arTranslitElement);
 
-				$res = CIBlockElement::GetList(Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "XML_ID"=>$PRODUCT_XML_ID));
+				$res = CIBlockElement::GetList(array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "XML_ID"=>$PRODUCT_XML_ID));
 				$bNewRecord_tmp = False;
 				if ($arr = $res->Fetch())
 				{
@@ -831,13 +838,13 @@ if (strlen($strImportErrorMessage) <= 0)
 
 			if ('N' == $keepExistingProperties)
 			{
-				$res = CIBlockProperty::GetList(Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
+				$res = CIBlockProperty::GetList(array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
 				while($arr = $res->Fetch())
 				{
 					CIBlockProperty::Delete($arr["ID"]);
 				}
 
-				$res = CIBlockPropertyEnum::GetList(Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
+				$res = CIBlockPropertyEnum::GetList(array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
 				while($arr = $res->Fetch())
 				{
 					CIBlockPropertyEnum::Delete($arr["ID"]);
@@ -847,7 +854,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			if ($outFileAction!="F")
 			{
 				$bs = new CIBlockSection;
-				$res = CIBlockSection::GetList(Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
+				$res = CIBlockSection::GetList(array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
 				while($arr = $res->Fetch())
 				{
 					if ($outFileAction!="H")
@@ -860,7 +867,7 @@ if (strlen($strImportErrorMessage) <= 0)
 					}
 				}
 
-				$res = CIBlockElement::GetList(Array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
+				$res = CIBlockElement::GetList(array(), Array("IBLOCK_ID"=>$IBLOCK_ID, "!TMP_ID"=>$tmpid));
 				while($arr = $res->Fetch())
 				{
 					if ($outFileAction!="H")
@@ -891,7 +898,7 @@ if (strlen($strImportErrorMessage) <= 0)
 //	$arProductsTmp = $arCatalogsParams[$IBLOCK_XML_ID]["arProducts"];
 	$arProductsTmpA = $arCatalogsParams;
 
-	for ($i = 0; $i < count($offerlists); $i++)
+	for ($i = 0, $intOFListCount = count($offerlists); $i < $intOFListCount; $i++)
 	{
 		$xOfferListNode = $offerlists[$i];
 
@@ -920,10 +927,10 @@ if (strlen($strImportErrorMessage) <= 0)
 
 		$arProducts = $arCatalogsParams[$IBLOCK_XML_ID]["arProducts"];
 
-		$arOffers = Array();
+		$arOffers = array();
 		$offers = $xOfferListNode->select_nodes("/".$nameUTF['Offer']);
 
-		for ($j = 0; $j < count($offers); $j++)
+		for ($j = 0, $intOtOFCount = count($offers); $j < $intOtOFCount; $j++)
 		{
 			$xOfferNode = $offers[$j];
 
@@ -937,14 +944,14 @@ if (strlen($strImportErrorMessage) <= 0)
 				if (!isset($arIBlockCacheTmp[$IBLOCK_XML_ID])
 					|| IntVal($arIBlockCacheTmp[$IBLOCK_XML_ID])<=0)
 				{
-					$db_res_tmp = CIBlock::GetList(Array(), Array("XML_ID"=>$IBLOCK_XML_ID));
+					$db_res_tmp = CIBlock::GetList(array(), Array("XML_ID"=>$IBLOCK_XML_ID));
 					if ($ar_res_tmp = $db_res_tmp->Fetch())
 					{
 						$arIBlockCacheTmp[$IBLOCK_XML_ID] = IntVal($ar_res_tmp["ID"]);
 					}
 				}
 
-				$db_res_tmp = CIBlockElement::GetList(Array(), Array("XML_ID"=>$PRODUCT_XML_ID, "IBLOCK_ID"=>$arIBlockCacheTmp[$IBLOCK_XML_ID]));
+				$db_res_tmp = CIBlockElement::GetList(array(), Array("XML_ID"=>$PRODUCT_XML_ID, "IBLOCK_ID"=>$arIBlockCacheTmp[$IBLOCK_XML_ID]));
 				if ($ar_res_tmp = $db_res_tmp->Fetch())
 				{
 					$PRODUCT_ID = IntVal($ar_res_tmp["ID"]);

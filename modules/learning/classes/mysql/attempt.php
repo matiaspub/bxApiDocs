@@ -57,54 +57,54 @@ class CTestAttempt extends CAllTestAttempt
 	// 2012-04-14 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Создаёт план вопросов для указанной попытки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ATTEMPT_ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если создание плана вопросов прошло
-	 * успешно. При возникновении ошибки метод вернёт <i>false</i>, а в
-	 * исключениях будут содержаться ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 563;
-	 * 
-	 *     $success = CTestAttempt::CreateAttemptQuestions($ATTEMPT_ID);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Questions have been created.";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($ex = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$ex-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/index.php">CTestResult</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php">Add</a> </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/createattemptquestions.php
-	 * @author Bitrix
-	 */
+	* <p>Создаёт план вопросов для указанной попытки.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если создание плана вопросов прошло
+	* успешно. При возникновении ошибки метод вернёт <i>false</i>, а в
+	* исключениях будут содержаться ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 563;
+	* 
+	*     $success = CTestAttempt::CreateAttemptQuestions($ATTEMPT_ID);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Questions have been created.";
+	*     }
+	*     else
+	*     {
+	*         if($ex = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$ex-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/index.php">CTestResult</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php">Add</a> </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/createattemptquestions.php
+	* @author Bitrix
+	*/
 	public static function CreateAttemptQuestions($ATTEMPT_ID)
 	{
 		// This function generates database-specific SQL code

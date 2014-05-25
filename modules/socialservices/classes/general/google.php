@@ -8,14 +8,12 @@ class CSocServGoogleOAuth extends CSocServAuth
 
 	/** @var CGoogleOAuthInterface null  */
 	protected $entityOAuth = null;
-	/**
-	 * @var CUser null
-	 */
-	protected $user = null;
 
-	public function __construct($user = null)
+	protected $userId = null;
+
+	public function __construct($userId = null)
 	{
-		$this->user = $user;
+		$this->userId = $userId;
 	}
 
 	public function getEntityOAuth()
@@ -47,7 +45,7 @@ class CSocServGoogleOAuth extends CSocServAuth
 		$appSecret = trim(self::GetOption("google_appsecret"));
 
 		$this->entityOAuth = new CGoogleOAuthInterface($appID, $appSecret);
-		if($this->user == null)
+		if($this->userId == null)
 			$this->entityOAuth->setRefreshToken("skip");
 		if($addScope !== null)
 			$this->entityOAuth->addScope($addScope);
@@ -55,7 +53,9 @@ class CSocServGoogleOAuth extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"].'&mode='.$location));
+			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php?state=";
+			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;
+			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
 		else
 		{
@@ -69,9 +69,10 @@ class CSocServGoogleOAuth extends CSocServAuth
 	public function getStorageToken()
 	{
 		$accessToken = null;
-		if(is_object($this->user))
+		$userId = intval($this->userId);
+		if($userId > 0)
 		{
-			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $this->user->GetID(), "EXTERNAL_AUTH_ID" => "GoogleOAuth"), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
+			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $userId, "EXTERNAL_AUTH_ID" => "GoogleOAuth"), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
 			if($arOauth = $dbSocservUser->Fetch())
 			{
 				$accessToken = $arOauth["OATOKEN"];
@@ -79,7 +80,7 @@ class CSocServGoogleOAuth extends CSocServAuth
 				if(empty($accessToken) || ((intval($arOauth["OATOKEN_EXPIRES"]) > 0) && (intval($arOauth["OATOKEN_EXPIRES"] < intval(time())))))
 				{
 					if(isset($arOauth['REFRESH_TOKEN']))
-						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $this->user->GetID(), true);
+						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $userId, true);
 					if(($accessToken = $this->entityOAuth->getToken()) === false)
 						return null;
 				}
@@ -159,7 +160,7 @@ class CSocServGoogleOAuth extends CSocServAuth
 						$arFields["REFRESH_TOKEN"] = $arGoogleUser['refresh_token'];
 
 					if(isset($arGoogleUser['expires_in']))
-						$arFields["OATOKEN_EXPIRES"] = time() + $arGoogleUser['expires_in'];
+						$arFields["OATOKEN_EXPIRES"] = $arGoogleUser['expires_in'];
 
 					if(strlen(SITE_ID) > 0)
 						$arFields["SITE_ID"] = SITE_ID;
@@ -221,7 +222,7 @@ class CSocServGoogleOAuth extends CSocServAuth
 		';
 
 		echo $JSScript;
-		
+
 		die();
 	}
 }
@@ -243,9 +244,16 @@ class CGoogleOAuthInterface
 		'https://www.googleapis.com/auth/userinfo.profile',
 	);
 
+	protected $arResult = array();
+
 	public function getAccessTokenExpires()
 	{
 		return $this->accessTokenExpires;
+	}
+
+	public function setAccessTokenExpires($accessTokenExpires)
+	{
+		$this->accessTokenExpires = $accessTokenExpires;
 	}
 
 	public function getAppID()
@@ -256,6 +264,11 @@ class CGoogleOAuthInterface
 	public function getAppSecret()
 	{
 		return $this->appSecret;
+	}
+
+	public function setToken($access_token)
+	{
+		$this->access_token = $access_token;
 	}
 
 	public function getToken()
@@ -271,6 +284,11 @@ class CGoogleOAuthInterface
 		$this->refresh_token = $refresh_token;
 	}
 
+	public function getRefreshToken()
+	{
+		return $this->refresh_token;
+	}
+
 	public function setScope($scope)
 	{
 		$this->scope = $scope;
@@ -279,6 +297,11 @@ class CGoogleOAuthInterface
 	public function getScope()
 	{
 		return $this->scope;
+	}
+
+	public function setCode($code)
+	{
+		$this->code = $code;
 	}
 
 	public function addScope($scope)
@@ -293,6 +316,18 @@ class CGoogleOAuthInterface
 	public function getScopeEncode()
 	{
 		return implode('+', array_map('urlencode', array_unique($this->getScope())));
+	}
+
+	public function getResult()
+	{
+		return $this->arResult;
+	}
+
+	public function getError()
+	{
+		return is_array($this->arResult) && isset($this->arResult['error'])
+			? $this->arResult['error']
+			: '';
 	}
 
 	public function __construct($appID, $appSecret, $code = false)
@@ -344,16 +379,16 @@ class CGoogleOAuthInterface
 			"grant_type"=>"authorization_code",
 		), array(), $this->httpTimeout);
 
-		$arResult = CUtil::JsObjectToPhp($result);
+		$this->arResult = CUtil::JsObjectToPhp($result);
 
-		if(isset($arResult["access_token"]) && $arResult["access_token"] <> '')
+		if(isset($this->arResult["access_token"]) && $this->arResult["access_token"] <> '')
 		{
-			if(isset($arResult["refresh_token"]) && $arResult["refresh_token"] <> '')
+			if(isset($this->arResult["refresh_token"]) && $this->arResult["refresh_token"] <> '')
 			{
-				$this->refresh_token = $arResult["refresh_token"];
+				$this->refresh_token = $this->arResult["refresh_token"];
 			}
-			$this->access_token = $arResult["access_token"];
-			$this->accessTokenExpires = $arResult["expires_in"];
+			$this->access_token = $this->arResult["access_token"];
+			$this->accessTokenExpires = $this->arResult["expires_in"] + time();
 			return true;
 		}
 		return false;
@@ -394,15 +429,18 @@ class CGoogleOAuthInterface
 		return $accessToken;
 	}
 
-	private function checkAccessToken()
+	public function checkAccessToken()
 	{
 		return (($this->accessTokenExpires - 30) < time()) ? false : true;
 	}
 
-	public function getNewAccessToken($refreshToken, $userId = 0, $save = false)
+	public function getNewAccessToken($refreshToken = false, $userId = 0, $save = false)
 	{
 		if($this->appID == false || $this->appSecret == false)
 			return false;
+
+		if($refreshToken == false)
+			$refreshToken = $this->refresh_token;
 
 		$result = CHTTP::sPostHeader(self::TOKEN_URL, array(
 			"refresh_token"=>$refreshToken,
@@ -411,17 +449,17 @@ class CGoogleOAuthInterface
 			"grant_type"=>"refresh_token",
 		), array(), $this->httpTimeout);
 
-		$arResult = CUtil::JsObjectToPhp($result);
+		$this->arResult = CUtil::JsObjectToPhp($result);
 
-		if(isset($arResult["access_token"]) && $arResult["access_token"] <> '')
+		if(isset($this->arResult["access_token"]) && $this->arResult["access_token"] <> '')
 		{
-			$this->access_token = $arResult["access_token"];
-			$this->accessTokenExpires = $arResult["expires_in"];
+			$this->access_token = $this->arResult["access_token"];
+			$this->accessTokenExpires = $this->arResult["expires_in"] + time();
 			if($save && intval($userId) > 0)
 			{
 				$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => intval($userId), "EXTERNAL_AUTH_ID" => "GoogleOAuth"), false, false, array("ID"));
 				if($arOauth = $dbSocservUser->Fetch())
-					CSocServAuthDB::Update($arOauth["ID"], array("OATOKEN" => $this->access_token,"OATOKEN_EXPIRES" => time() + $this->accessTokenExpires));
+					CSocServAuthDB::Update($arOauth["ID"], array("OATOKEN" => $this->access_token,"OATOKEN_EXPIRES" => $this->accessTokenExpires));
 			}
 			return true;
 		}

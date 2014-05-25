@@ -82,7 +82,7 @@ class CUserTypeBoolean
 
 	public static function GetEditFormHTML($arUserField, $arHtmlControl)
 	{
-		if($arUserField["ENTITY_VALUE_ID"]<1)
+		if($arUserField["ENTITY_VALUE_ID"] !== null && $arUserField["ENTITY_VALUE_ID"]<1)
 			$arHtmlControl["VALUE"] = intval($arUserField["SETTINGS"]["DEFAULT_VALUE"]);
 		switch($arUserField["SETTINGS"]["DISPLAY"])
 		{

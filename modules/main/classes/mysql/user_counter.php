@@ -5,45 +5,47 @@ class CUserCounter extends CAllUserCounter
 {
 	
 	/**
-	 * <p>Функция позволяет задать для счётчика произвольное число.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.2
-	 *
-	 *
-	 *
-	 * @param valu $e  11.5.2
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.2
-	 *
-	 *
-	 *
-	 * @param ta $g = "" 11.5.6
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter::Set($USER-&gt;GetID(), 'code2', 100500);
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/set.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет задать для счётчика произвольное число.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Идентификатор пользователя
+	*
+	*
+	*
+	* @param cod $e  Код счётчика
+	*
+	*
+	*
+	* @param valu $e  Устанавливаемое значение
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* подставляется текущий сайт.
+	*
+	*
+	*
+	* @param ta $g = "" Необязательный. Используется для удаления сразу группы похожих
+	* счетчиков.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter::Set($USER-&gt;GetID(), 'code2', 100500);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/set.php
+	* @author Bitrix
+	*/
 	public static function Set($user_id, $code, $value, $site_id = SITE_ID, $tag = '', $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -112,37 +114,51 @@ class CUserCounter extends CAllUserCounter
 
 	
 	/**
-	 * <p>Функция позволяет увеличить счётчик пользователя на 1.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.2
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.2
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter::Increment($USER-&gt;GetID(), 'code1');
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/increment.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет увеличить счётчик пользователя на нужное значение.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Идентификатор пользователя
+	*
+	*
+	*
+	* @param cod $e  Код счётчика
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* подставляется текущий сайт.
+	*
+	*
+	*
+	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
+	* установке модуля и активации работы с "Сервером очередей", без
+	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
+	* данный счетчик не требуется пробрасывать, необходимо указать
+	* <i>false</i>. По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @param incremen $t = 1 Значение, на которое нужно увеличить счетчик.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter::Increment($USER-&gt;GetID(), 'code1');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/increment.php
+	* @author Bitrix
+	*/
 	public static function Increment($user_id, $code, $site_id = SITE_ID, $sendPull = true, $increment = 1)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -192,37 +208,50 @@ class CUserCounter extends CAllUserCounter
 
 	
 	/**
-	 * <p>Функция осуществляет уменьшение счетчика на единицу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.6
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.6
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.6
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter::Decrement($USER-&gt;GetID(), 'code1');
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/decremen.php
-	 * @author Bitrix
-	 */
+	* <p>Функция осуществляет уменьшение счетчика на нужное значение.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Описание параметра </ht
+	*
+	*
+	*
+	* @param cod $e  Описание необязательного параметра
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	*
+	*
+	*
+	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
+	* установке модуля и активации работы с "Сервером очередей", без
+	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
+	* данный счетчик не требуется пробрасывать, необходимо указать
+	* <i>false</i>. По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @param decremen $t = 1 Значение, на которое нужно уменьшить счетчик.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter::Decrement($USER-&gt;GetID(), 'code1');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/decremen.php
+	* @author Bitrix
+	*/
 	public static function Decrement($user_id, $code, $site_id = SITE_ID, $sendPull = true, $decrement = 1)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -348,37 +377,47 @@ class CUserCounter extends CAllUserCounter
 
 	
 	/**
-	 * <p>Функция обнуляет данные счётчика.</p> <p><b>Примечание</b>: возможное примечание.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.2
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.2
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter::Clear($USER-&gt;GetID(), "code3");
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clear.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обнуляет данные счётчика.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Идентификатор пользователя
+	*
+	*
+	*
+	* @param cod $e  Код счётчика
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* подставляется текущий сайт.
+	*
+	*
+	*
+	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
+	* установке модуля и активации работы с "Сервером очередей", без
+	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
+	* данный счетчик не требуется пробрасывать, необходимо указать
+	* <i>false</i>. По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter::Clear($USER-&gt;GetID(), "code3");
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clear.php
+	* @author Bitrix
+	*/
 	public static function Clear($user_id, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;

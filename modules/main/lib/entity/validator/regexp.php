@@ -3,21 +3,17 @@
  * Bitrix Framework
  * @package    bitrix
  * @subpackage main
- * @copyright  2001-2012 Bitrix
+ * @copyright  2001-2013 Bitrix
  */
 
 namespace Bitrix\Main\Entity\Validator;
 
 use Bitrix\Main\Entity;
-use \Bitrix\Main\Config\ConfigurationException;
+use Bitrix\Main\ArgumentTypeException;
+use Bitrix\Main\Localization\Loc;
 
-IncludeModuleLangFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
-/**
- * Class description
- * @package    bitrix
- * @subpackage main
- */
 class RegExp extends Base
 {
 	/**
@@ -28,19 +24,19 @@ class RegExp extends Base
 	/**
 	 * @var string
 	 */
-	protected $errorPhrase = 'MAIN_ENTITY_VALIDATOR_REGEXP';
+	protected $errorPhraseCode = 'MAIN_ENTITY_VALIDATOR_REGEXP';
 
 	/**
 	 * @param string $pattern
 	 * @param null   $errorPhrase
 	 *
-	 * @throws ConfigurationException
+	 * @throws ArgumentTypeException
 	 */
 	public function __construct($pattern, $errorPhrase = null)
 	{
 		if (!is_string($pattern))
 		{
-			throw new ConfigurationException('Pattern should be a string');
+			throw new ArgumentTypeException('pattern', 'string');
 		}
 
 		$this->pattern = $pattern;

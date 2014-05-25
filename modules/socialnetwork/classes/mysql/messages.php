@@ -21,42 +21,42 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	 * <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров нового сообщения. Может содержать ключи:<br>
-	 * FROM_USER_ID - от кого (обязательное поле),<br> TO_USER_ID - кому (обязательное
-	 * поле),<br> MESSAGE - сообщение (обязательное поле),<br> DATE_CREATE - дата
-	 * создания сообщения (обязательное поле),<br> MESSAGE_TYPE - тип сообщения: P
-	 * - персональное, S - системное.
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает ID созданного сообщения в случае успешного
-	 * завершения или false в случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array( 
-	 *    "FROM_USER_ID" =&gt; 1, 
-	 *    "TO_USER_ID" =&gt; 2, 
-	 *    "MESSAGE" =&gt; "Привет!", 
-	 *    "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(), 
-	 *    "MESSAGE_TYPE" =&gt; "P", 
-	 * ); 
-	 * CSocNetMessages::Add($arFields);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров нового сообщения. Может содержать
+	* ключи:<br><b>FROM_USER_ID</b> - от кого (обязательное поле),<br><b>TO_USER_ID</b> - кому
+	* (обязательное поле),<br><b>MESSAGE</b> - сообщение (обязательное
+	* поле),<br><b>DATE_CREATE</b> - дата создания сообщения (обязательное
+	* поле),<br><b>MESSAGE_TYPE</b> - тип сообщения: P - персональное, S - системное.
+	*
+	*
+	*
+	* @return int <p>Метод возвращает ID созданного сообщения в случае успешного
+	* завершения или false в случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array( 
+	*    "FROM_USER_ID" =&gt; 1, 
+	*    "TO_USER_ID" =&gt; 2, 
+	*    "MESSAGE" =&gt; "Привет!", 
+	*    "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(), 
+	*    "MESSAGE_TYPE" =&gt; "P", 
+	* ); 
+	* CSocNetMessages::Add($arFields);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -133,30 +133,31 @@ class CSocNetMessages extends CAllSocNetMessages
 
 	
 	/**
-	 * <p>Метод изменяет параметры сообщения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код сообщения.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив измененных параметров сообщения. Может содержать ключи:<br>
-	 * FROM_USER_ID - от кого,<br> TO_USER_ID - кому,<br> MESSAGE - сообщение,<br> DATE_CREATE - дата
-	 * создания сообщения,<br> DATE_VIEW - дата прочтения сообщения,<br> MESSAGE_TYPE -
-	 * тип сообщения: P - персональное, S - системное,<br> SEND_MAIL - флаг (Y/N) -
-	 * сообщение было отправлено по почте.
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает ID сообщения в случае успешного завершения или
-	 * false в случае ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры сообщения.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код сообщения.
+	*
+	*
+	*
+	* @param array $arFields  Массив измененных параметров сообщения. Может содержать
+	* ключи:<br><b>FROM_USER_ID</b> - от кого,<br><b>TO_USER_ID</b> - кому,<br><b>MESSAGE</b> -
+	* сообщение,<br><b>DATE_CREATE</b> - дата создания сообщения,<br><b>DATE_VIEW</b> - дата
+	* прочтения сообщения,<br><b>MESSAGE_TYPE</b> - тип сообщения: P - персональное,
+	* S - системное,<br><b>SEND_MAIL</b> - флаг (Y/N) - сообщение было отправлено по
+	* почте.
+	*
+	*
+	*
+	* @return int <p>Метод возвращает ID сообщения в случае успешного завершения или
+	* false в случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -218,66 +219,69 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает список сообщений в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID,
-	 * FROM_USER_ID, TO_USER_ID, DATE_CREATE, DATE_VIEW, MESSAGE_TYPE, FROM_DELETED, TO_DELETED, SEND_MAIL, EMAIL_TEMPLATE,
-	 * FROM_USER_NAME, FROM_USER_LAST_NAME, FROM_USER_LOGIN, FROM_USER_LID, TO_USER_NAME, TO_USER_LAST_NAME, TO_USER_LOGIN,
-	 * TO_USER_EMAIL, TO_USER_LID.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимые
-	 * поля: ID, FROM_USER_ID, TO_USER_ID, DATE_CREATE, DATE_VIEW, MESSAGE_TYPE, FROM_DELETED, TO_DELETED, SEND_MAIL,
-	 * EMAIL_TEMPLATE, FROM_USER_NAME, FROM_USER_LAST_NAME, FROM_USER_LOGIN, FROM_USER_LID, TO_USER_NAME, TO_USER_LAST_NAME,
-	 * TO_USER_LOGIN, TO_USER_EMAIL, TO_USER_LID.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, FROM_USER_ID, TO_USER_ID, MESSAGE, DATE_CREATE, DATE_VIEW, MESSAGE_TYPE, FROM_DELETED, TO_DELETED. В
-	 * массиве допустимы любые поля из списка полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetByID.php">CSocNetMessages::GetById</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает список сообщений в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
+	* <b>FROM_USER_ID</b>, <b>TO_USER_ID</b>, <b>DATE_CREATE</b>, <b>DATE_VIEW</b>, <b>MESSAGE_TYPE</b>, <b>FROM_DELETED</b>,
+	* <b>TO_DELETED</b>, <b>SEND_MAIL</b>, <b>EMAIL_TEMPLATE</b>, <b>FROM_USER_NAME</b>, <b>FROM_USER_LAST_NAME</b>,
+	* <b>FROM_USER_LOGIN</b>, <b>FROM_USER_LID</b>, <b>TO_USER_NAME</b>, <b>TO_USER_LAST_NAME</b>, <b>TO_USER_LOGIN</b>,
+	* <b>TO_USER_EMAIL</b>, <b>TO_USER_LID</b>.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимые
+	* поля: <b>ID</b>, <b>FROM_USER_ID</b>, <b>TO_USER_ID</b>, <b>DATE_CREATE</b>, <b>DATE_VIEW</b>, <b>MESSAGE_TYPE</b>,
+	* <b>FROM_DELETED</b>, <b>TO_DELETED</b>, <b>SEND_MAIL</b>, <b>EMAIL_TEMPLATE</b>, <b>FROM_USER_NAME</b>,
+	* <b>FROM_USER_LAST_NAME</b>, <b>FROM_USER_LOGIN</b>, <b>FROM_USER_LID</b>, <b>TO_USER_NAME</b>, <b>TO_USER_LAST_NAME</b>,
+	* <b>TO_USER_LOGIN</b>, <b>TO_USER_EMAIL</b>, <b>TO_USER_LID</b>.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>FROM_USER_ID</b>, <b>TO_USER_ID</b>, <b>MESSAGE</b>, <b>DATE_CREATE</b>, <b>DATE_VIEW</b>,
+	* <b>MESSAGE_TYPE</b>, <b>FROM_DELETED</b>, <b>TO_DELETED</b>. В массиве допустимы любые поля
+	* из списка полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getbyid.php">CSocNetMessages::GetById</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -419,31 +423,31 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает дату последнего сообщения в переписке между пользователями.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID1  Первый пользователь.
-	 *
-	 *
-	 *
-	 * @param int $userID2  Второй пользователь.
-	 *
-	 *
-	 *
-	 * @return string <p>Строка, содержащая дату последнего сообщения между
-	 * пользователями в формате YYYY-MM-DD 00:00:00. Если сообщений между
-	 * пользователями нет, то возвращается текущая дата в указанном
-	 * формате.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetChatLastDate.php
-	 * @author Bitrix
-	 */
-	public static function GetChatLastDate($currentUserID, $userID)
+	* <p>Возвращает дату последнего сообщения в переписке между пользователями.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID1  Первый пользователь. </htm
+	*
+	*
+	*
+	* @param int $userID2  Второй пользователь. </htm
+	*
+	*
+	*
+	* @return string <p>Строка, содержащая дату последнего сообщения между
+	* пользователями в формате YYYY-MM-DD 00:00:00. Если сообщений между
+	* пользователями нет, то возвращается текущая дата в указанном
+	* формате.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getchatlastdate.php
+	* @author Bitrix
+	*/
+	public static 	function GetChatLastDate($currentUserID, $userID)
 	{
 		global $DB;
 
@@ -480,51 +484,52 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $date;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает сообщения переписки между пользователями.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userId1  Код первого пользователя.
-	 *
-	 *
-	 *
-	 * @param int $userId2  Код второго пользователя.
-	 *
-	 *
-	 *
-	 * @param string $date = false Дата, начиная с которой выбираются сообщения. Должна иметь формат
-	 * YYYY-MM-DD HH:II:SS. Если задан параметр replyMessId, то дата не учитывается.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Параметр для организации постраничной навигации.
-	 *
-	 *
-	 *
-	 * @param int $replyMessId = false Код сообщения, начиная с которого выбираются сообщения.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Объект типа CDBResult, содержащий сообщения переписки. Каждое
-	 * сообщение имеет поля:<br> WHO - входящее или исходящее сообщение
-	 * (IN/OUT),<br> ID - код сообщения,<br> USER_ID - код пользователя, с которым
-	 * ведется переписка,<br> MESSAGE - сообщение,<br> DATE_VIEW - дата прочтения,<br>
-	 * DATE_CREATE - дата создания,<br> DATE_CREATE_FMT - дата создания в формате YYYY-MM-DD
-	 * HH:II:SS. </p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetMessagesForChat.php
-	 * @author Bitrix
-	 */
-	public static function GetMessagesForChat($currentUserID, $userID, $date = false, $arNavStartParams = false, $replyMessId=false)
+	* <p>Возвращает сообщения переписки между пользователями.</p>
+	*
+	*
+	*
+	*
+	* @param int $currentUserID  Код текущего пользователя.
+	*
+	*
+	*
+	* @param int $userID  Код второго пользователя.
+	*
+	*
+	*
+	* @param string $date = false Дата, начиная с которой выбираются сообщения. Должна иметь формат
+	* YYYY-MM-DD HH:II:SS. Если задан параметр replyMessId, то дата не учитывается.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Параметр для организации постраничной навигации.
+	*
+	*
+	*
+	* @param int $replyMessId = false Код сообщения, начиная с которого выбираются сообщения.
+	*
+	*
+	*
+	* @return CDBResult <p>Объект типа CDBResult, содержащий сообщения переписки. <br> Каждое
+	* сообщение имеет поля:<br><b>WHO</b> - входящее или исходящее сообщение
+	* (IN/OUT),<br><b>ID</b> - код сообщения,<br><b>USER_ID</b> - код пользователя, с
+	* которым ведется переписка,<br><b>MESSAGE</b> - сообщение,<br><b>DATE_VIEW</b> - дата
+	* прочтения,<br><b>DATE_CREATE</b> - дата создания,<br><b>DATE_CREATE_FMT</b> - дата
+	* создания в формате YYYY-MM-DD HH:II:SS. </p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetMessagesForChat.php
+	* @author Bitrix
+	*/
+	public static 	function GetMessagesForChat($currentUserID, $userID, $date = false, $arNavStartParams = false, $replyMessId=false)
 	{
 		global $DB;
 
@@ -615,54 +620,60 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает список пользователей, имеющих переписку с данным пользователем.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Параметры постраничной навигации.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Объект типа CDBResult, содержащий список пользователей. Каждое
-	 * сообщение имеет поля:<br> ID - код пользователя,<br> LOGIN - логин
-	 * пользователя,<br> NAME - имя пользователя,<br> LAST_NAME - фамилия
-	 * пользователя,<br> PERSONAL_PHOTO - код фотографии пользователя,<br> TOTAL -
-	 * всего сообщений в переписке,<br> MAX_DATE - дата последнего
-	 * сообщения,<br> UNREAD - количество непрочтенных сообщений. </p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выберем пользователей, имеющих переписку с текущим пользователем для постраничной навигации в 20 записей
-	 * $arNavParams = array("nPageSize" =&gt; 20, "bDescPageNumbering" =&gt; false);
-	 * $dbMessages = CSocNetMessages::GetMessagesUsers($GLOBALS["USER"]-&gt;GetID(), $arNavParams);
-	 * while ($arMessages = $dbMessages-&gt;GetNext())
-	 * {
-	 *      . . .
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetMessagesUsers.php
-	 * @author Bitrix
-	 */
-	public static function GetMessagesUsers($userID, $arNavStartParams = false, $online_interval = 120)
+	* <p>Возвращает список пользователей, имеющих переписку с данным пользователем.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Параметры постраничной навигации.
+	*
+	*
+	*
+	* @param int $online_interval = 120 Параметр времени опроса сервера в сек. Необязательный параметр.
+	* По умолчанию равен 120.
+	*
+	*
+	*
+	* @return CDBResult <p>Объект типа CDBResult, содержащий список пользователей. Каждое
+	* сообщение имеет поля:<br><b>ID</b> - код пользователя,<br><b>LOGIN</b> - логин
+	* пользователя,<br><b>NAME</b> - имя пользователя,<br><b>LAST_NAME</b> - фамилия
+	* пользователя,<br><b>PERSONAL_PHOTO</b> - код фотографии
+	* пользователя,<br><b>TOTAL</b> - всего сообщений в переписке,<br><b>MAX_DATE</b> -
+	* дата последнего сообщения,<br><b>UNREAD</b> - количество непрочитанных
+	* сообщений. </p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выберем пользователей, имеющих переписку с текущим пользователем для постраничной навигации в 20 записей
+	* $arNavParams = array("nPageSize" =&gt; 20, "bDescPageNumbering" =&gt; false);
+	* $dbMessages = CSocNetMessages::GetMessagesUsers($GLOBALS["USER"]-&gt;GetID(), $arNavParams);
+	* while ($arMessages = $dbMessages-&gt;GetNext())
+	* {
+	*      . . .
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getmessagesusers.php
+	* @author Bitrix
+	*/
+	public static 	function GetMessagesUsers($userID, $arNavStartParams = false, $online_interval = 120)
 	{
 		global $DB;
 
@@ -728,7 +739,7 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-	public static function Now()
+public static 	function Now()
 	{
 		global $DB;
 

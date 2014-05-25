@@ -274,46 +274,40 @@ class CRatings extends CAllRatings
 	// insert result calculate rating-components
 	
 	/**
-	 * <p>Обновляет дату следующего подсчета критерия рейтингования.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	 * допустимо использовать: <ul> <li> <b>RATING_ID</b> – идентификатор
-	 * рейтинга</li> <li> <b>COMPLEX_NAME</b> – комплексное имя критерия</li> <li>
-	 * <b>REFRESH_INTERVAL</b> – периодичность перерасчета критерия (в минутах)</li>
-	 * </ul> Все поля являются обязательными.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // обновляем дату следующего расчета критерия рейтингования
-	 * $arConfigs = array(
-	 * 	"RATING_ID" =&gt; "4",
-	 * 	"COMPLEX_NAME" =&gt; "USER_FORUM_VOTE_TOPIC",
-	 * 	"REFRESH_INTERVAL" =&gt; 3600
-	 * );
-	 * CRatings::AddComponentResults($arConfigs);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_component">Структура
-	 * таблицы "Настройки критериев рейтингования"</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/addcomponentresults.php
-	 * @author Bitrix
-	 */
+	* <p>Обновляет дату следующего подсчета критерия рейтингования.</p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
+	* допустимо использовать: <ul> <li> <b>RATING_ID</b> – идентификатор
+	* рейтинга</li> <li> <b>COMPLEX_NAME</b> – комплексное имя критерия</li> <li>
+	* <b>REFRESH_INTERVAL</b> – периодичность перерасчета критерия (в минутах)</li>
+	* </ul> Все поля являются обязательными.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // обновляем дату следующего расчета критерия рейтингования
+	* $arConfigs = array(
+	* 	"RATING_ID" =&gt; "4",
+	* 	"COMPLEX_NAME" =&gt; "USER_FORUM_VOTE_TOPIC",
+	* 	"REFRESH_INTERVAL" =&gt; 3600
+	* );
+	* CRatings::AddComponentResults($arConfigs);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/addcomponentresults.php
+	* @author Bitrix
+	*/
 	public static function AddComponentResults($arComponentConfigs)
 	{
 		global $DB;

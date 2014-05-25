@@ -6,8 +6,18 @@ class CIBlockPropertyDateTime
 	public static function AddFilterFields($arProperty, $strHTMLControlName, &$arFilter, &$filtered)
 	{
 		$filtered = false;
+
 		$from_name = $strHTMLControlName["VALUE"].'_from';
-		$from = isset($_REQUEST[$from_name])? $_REQUEST[$from_name]: "";
+		if (isset($_REQUEST[$from_name]))
+			$from = $_REQUEST[$from_name];
+		elseif (
+			isset($strHTMLControlName["GRID_ID"])
+			&& isset($_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$from_name])
+		)
+			$from = $_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$from_name];
+		else
+			$from = "";
+
 		if($from)
 		{
 			if(CheckDateTime($from))
@@ -24,7 +34,16 @@ class CIBlockPropertyDateTime
 		}
 
 		$to_name = $strHTMLControlName["VALUE"].'_to';
-		$to = isset($_REQUEST[$to_name])? $_REQUEST[$to_name]: "";
+		if (isset($_REQUEST[$to_name]))
+			$to = $_REQUEST[$to_name];
+		elseif (
+			isset($strHTMLControlName["GRID_ID"])
+			&& isset($_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$to_name])
+		)
+			$to = $_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$to_name];
+		else
+			$to = "";
+
 		if($to)
 		{
 			if(CheckDateTime($to))
@@ -62,8 +81,26 @@ class CIBlockPropertyDateTime
 	{
 		$from_name = $strHTMLControlName["VALUE"].'_from';
 		$to_name = $strHTMLControlName["VALUE"].'_to';
-		$from = isset($_REQUEST[$from_name])? $_REQUEST[$from_name]: "";
-		$to = isset($_REQUEST[$to_name])? $_REQUEST[$to_name]: "";
+
+		if (isset($_REQUEST[$from_name]))
+			$from = $_REQUEST[$from_name];
+		elseif (
+			isset($strHTMLControlName["GRID_ID"])
+			&& isset($_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$from_name])
+		)
+			$from = $_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$from_name];
+		else
+			$from = "";
+
+		if (isset($_REQUEST[$to_name]))
+			$to = $_REQUEST[$to_name];
+		elseif (
+			isset($strHTMLControlName["GRID_ID"])
+			&& isset($_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$to_name])
+		)
+			$to = $_SESSION["main.interface.grid"][$strHTMLControlName["GRID_ID"]]["filter"][$to_name];
+		else
+			$to = "";
 
 		ob_start();
 
@@ -95,7 +132,9 @@ class CIBlockPropertyDateTime
 			if(!CheckDateTime($value["VALUE"]))
 				$value = CIBlockPropertyDateTime::ConvertFromDB($arProperty, $value);
 
-			if($strHTMLControlName["MODE"] == "CSV_EXPORT")
+			if(isset($strHTMLControlName["MODE"]) && $strHTMLControlName["MODE"] == "CSV_EXPORT")
+				return $value["VALUE"];
+			elseif(isset($strHTMLControlName["MODE"]) && ($strHTMLControlName["MODE"] == "SIMPLE_TEXT" || $strHTMLControlName["MODE"] == "ELEMENT_TEMPLATE"))
 				return $value["VALUE"];
 			else
 				return str_replace(" ", "&nbsp;", htmlspecialcharsex($value["VALUE"]));

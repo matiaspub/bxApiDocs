@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами <br>
+ * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br>
  *
  *
  *
@@ -44,52 +44,52 @@ class CAllIBlockRSS
 
 	
 	/**
-	 * <p>Загружает xml c указанного адреса и разбирает его в массив. В качестве значения user-agent'а используется "BitrixSMRSS". После загрузки xml будет конвертирован в кодировку текущего сайта. Если во время работы функции возникли ошибки, то массив результата будет пустым. <br></p> <p><b>Примечание</b>: xml кешируется на время указанное в элементе ttl или если время не указано, то на один час.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $SITE  IP адрес или доменное имя сайта. <br>
-	 *
-	 *
-	 *
-	 * @param string $PORT  Номер порта к которовму будет выполнено подключение. HTTP порт по
-	 * умолчанию -  80.
-	 *
-	 *
-	 *
-	 * @param string $PATH  Объединяются через знак вопроса ("?") и передаются HTTP команде GET.
-	 *
-	 *
-	 *
-	 * @param string $QUERY_STR  Требуется указать true, если новости находтся вне элемента channel. <br>
-	 *
-	 *
-	 *
-	 * @param bool $bOutChannel = false 
-	 *
-	 *
-	 *
-	 * @return array <p>Массив представления xml.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arRSS = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>print_r($arRSS);<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS::</a><a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php
-	 * @author Bitrix
-	 */
+	* <p>Загружает xml c указанного адреса и разбирает его в массив. В качестве значения user-agent'а используется "BitrixSMRSS". После загрузки xml будет конвертирован в кодировку текущего сайта. Если во время работы функции возникли ошибки, то массив результата будет пустым. <br></p> <p><b>Примечание</b>: xml кешируется на время указанное в элементе ttl или если время не указано, то на один час.</p>
+	*
+	*
+	*
+	*
+	* @param string $SITE  IP-адрес или доменное имя сайта.
+	*
+	*
+	*
+	* @param string $PORT  Номер порта к которовму будет выполнено подключение. HTTP порт по
+	* умолчанию -  80.
+	*
+	*
+	*
+	* @param string $PATH  Объединяются через знак вопроса ("?") и передаются HTTP команде GET.
+	*
+	*
+	*
+	* @param string $QUERY_STR  Требуется указать true, если новости находятся вне элемента channel.
+	*
+	*
+	*
+	* @param bool $bOutChannel = false 
+	*
+	*
+	*
+	* @return array <p>Массив представления xml.</p> </ht
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arRSS = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>print_r($arRSS);<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS::</a><a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php
+	* @author Bitrix
+	*/
 	public static function GetNewsEx($SITE, $PORT, $PATH, $QUERY_STR, $bOutChannel = False)
 	{
 		global $APPLICATION;
@@ -170,15 +170,28 @@ class CAllIBlockRSS
 			if($res !== false)
 			{
 				$ar = $objXML->GetArray();
-				//$ar = xmlize_rss($text1);
-
 				if (!$bOutChannel)
 				{
-					$arRes = $ar["rss"]["#"]["channel"][0]["#"];
+					if (
+						is_array($ar) && isset($ar["rss"])
+						&& is_array($ar["rss"]) && isset($ar["rss"]["#"])
+						&& is_array($ar["rss"]["#"]) && isset($ar["rss"]["#"]["channel"])
+						&& is_array($ar["rss"]["#"]["channel"]) && isset($ar["rss"]["#"]["channel"][0])
+						&& is_array($ar["rss"]["#"]["channel"][0]) && isset($ar["rss"]["#"]["channel"][0]["#"])
+					)
+						$arRes = $ar["rss"]["#"]["channel"][0]["#"];
+					else
+						$arRes = array();
 				}
 				else
 				{
-					$arRes = $ar["rss"]["#"];
+					if (
+						is_array($ar) && isset($ar["rss"])
+						&& is_array($ar["rss"]) && isset($ar["rss"]["#"])
+					)
+						$arRes = $ar["rss"]["#"];
+					else
+						$arRes = array();
 				}
 
 				$arRes["rss_charset"] = strtolower(SITE_CHARSET);
@@ -216,58 +229,58 @@ class CAllIBlockRSS
 
 	
 	/**
-	 * <p>Функция преобразует результат функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arRes  Массив описания xml. Результат работы функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx.</a>
-	 *
-	 *
-	 *
-	 * @param array $bOutChannel = false Параметр должен быть синхронизирован с одноименным функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a>.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив следующего вида:</p><ul> <li>title - заголовок rss ленты;</li> <li>link -
-	 * ссылка;</li> <li>description - описание;</li> <li>lastBuildDate - время в rss формате (см.
-	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> <li>ttl -
-	 * время действия в минутах;</li> <li>image - описание картинки:</li> <ul> <li>title -
-	 * заголовок;</li> <li>url;</li> <li>link - ссылка;</li> <li>width - ширина;</li> <li>height -
-	 * высота;</li> </ul> <li>item - массив элементами которого являются
-	 * нововсти:</li> <ul> <li>title - заголовок новости; <br> </li> <li>link - ссылка; <br>
-	 * </li> <li>description - подробное описание; <br> </li> <li>enclosure - вложение (не
-	 * обязательно):</li> <ul> <li>url;</li> <li>length;</li> <li>type;</li> <li>width - не
-	 * обязательно;</li> <li>height - не обязательно;</li> </ul> <li>category - категория;
-	 * <br> </li> <li>pubDate - время в rss формате (см. <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> </ul> </ul>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arXML = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>if(count($arXML) &gt; 0)<br>{<br>    $arRSS = CIBlockRSS::FormatArray($arXML);<br>    print_r($arRSS);<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php
-	 * @author Bitrix
-	 */
+	* <p>Функция преобразует результат функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление.</p>
+	*
+	*
+	*
+	*
+	* @param array $arRes  Массив описания xml. Результат работы функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx.</a>
+	*
+	*
+	*
+	* @param array $bOutChannel = false Параметр должен быть синхронизирован с одноименным функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a>.
+	*
+	*
+	*
+	* @return array <p>Массив следующего вида:</p> <ul> <li>title - заголовок rss ленты;</li> <li>link -
+	* ссылка;</li> <li>description - описание;</li> <li>lastBuildDate - время в rss формате (см.
+	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> <li>ttl -
+	* время действия в минутах;</li> <li>image - описание картинки:</li> <ul> <li>title -
+	* заголовок;</li> <li>url;</li> <li>link - ссылка;</li> <li>width - ширина;</li> <li>height -
+	* высота;</li> </ul> <li>item - массив элементами которого являются
+	* нововсти:</li> <ul> <li>title - заголовок новости; <br> </li> <li>link - ссылка; <br>
+	* </li> <li>description - подробное описание; <br> </li> <li>enclosure - вложение (не
+	* обязательно):</li> <ul> <li>url;</li> <li>length;</li> <li>type;</li> <li>width - не
+	* обязательно;</li> <li>height - не обязательно;</li> </ul> <li>category - категория;
+	* <br> </li> <li>pubDate - время в rss формате (см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> </ul> </ul>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arXML = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>if(count($arXML) &gt; 0)<br>{<br>    $arRSS = CIBlockRSS::FormatArray($arXML);<br>    print_r($arRSS);<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php
+	* @author Bitrix
+	*/
 	public static function FormatArray(&$arRes, $bOutChannel=false)
 	{
 		if (!$bOutChannel)
@@ -409,38 +422,43 @@ class CAllIBlockRSS
 
 	
 	/**
-	 * <p>Преобразует дату из rss формата в формат "DD.MM.YYYY".</p> <p><b>Примечание</b>: под rss форматом даты понимается формат, описанный в rfc 822.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $dateXML  rss дата/время. <br>
-	 *
-	 *
-	 *
-	 * @return string <p>строка.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arXML = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>if(count($arXML) &gt; 0)<br>{<br>    $arRSS = CIBlockRSS::FormatArray($arXML);<br>    foreach($arRSS["item"] as $arItem)<br>    {<br>        echo $arItem["title"].":".CIBlockRSS::XMLDate2Dec($arItem["pubDate"]);<br>    }<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> http://www.w3.org/Protocols/rfc822/ </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php
-	 * @author Bitrix
-	 */
+	* <p>Преобразует дату из rss формата в формат "DD.MM.YYYY".</p> <p><b>Примечание</b>: под rss форматом даты понимается формат, описанный в rfc 822.</p>
+	*
+	*
+	*
+	*
+	* @param string $dateXML  rss дата/время.
+	*
+	*
+	*
+	* @param string $dateFormat = "DD.MM.YYYY" Формат даты. Необязательный параметр. По умолчанию используется
+	* формат "DD.MM.YYYY".
+	*
+	*
+	*
+	* @return string <p>строка.</p></bod
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arXML = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>if(count($arXML) &gt; 0)<br>{<br>    $arRSS = CIBlockRSS::FormatArray($arXML);<br>    foreach($arRSS["item"] as $arItem)<br>    {<br>        echo $arItem["title"].":".CIBlockRSS::XMLDate2Dec($arItem["pubDate"]);<br>    }<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> http://www.w3.org/Protocols/rfc822/ </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php
+	* @author Bitrix
+	*/
 	public static function XMLDate2Dec($date_XML, $dateFormat = "DD.MM.YYYY")
 	{
 		static $MonthChar2Num = Array("","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec");

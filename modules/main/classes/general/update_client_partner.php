@@ -39,7 +39,7 @@ $GLOBALS["CACHE4UPDATESYS_LICENSE_KEY"] = "";
 
 class CUpdateClientPartner
 {
-	public static function RegisterModules(&$strError, $lang = false, $stableVersionsOnly = false)
+public static 	function RegisterModules(&$strError, $lang = false, $stableVersionsOnly = false)
 	{
 		$strError_tmp = "";
 
@@ -169,7 +169,7 @@ class CUpdateClientPartner
 			return True;
 	}
 
-	public static function LoadModuleNoDemand($moduleId, &$strError, $stableVersionsOnly = "Y", $lang = false)
+public static 	function LoadModuleNoDemand($moduleId, &$strError, $stableVersionsOnly = "Y", $lang = false)
 	{
 		$strError_tmp = "";
 
@@ -256,7 +256,7 @@ class CUpdateClientPartner
 			return True;
 	}
 
-	public static function SearchModulesEx($arOrder, $arFilter, $searchPage, $lang, &$strError)
+public static 	function SearchModulesEx($arOrder, $arFilter, $searchPage, $lang, &$strError)
 	{
 		$strError_tmp = "";
 		$arResult = array();
@@ -329,7 +329,7 @@ class CUpdateClientPartner
 			return $arResult;
 	}
 
-	public static function SearchModules($searchModule, $lang)
+public static 	function SearchModules($searchModule, $lang)
 	{
 		$strError_tmp = "";
 		$arResult = array();
@@ -387,7 +387,7 @@ class CUpdateClientPartner
 	}
 	
 	/** Пишет сообщения в лог файл системы обновлений. Чистит лог, если нужно. **/
-	public static function AddMessage2Log($sText, $sErrorCode = "")
+public static 	function AddMessage2Log($sText, $sErrorCode = "")
 	{
 		$MAX_LOG_SIZE = 1000000;
 		$READ_PSIZE = 8000;
@@ -453,7 +453,7 @@ class CUpdateClientPartner
 		}
 	}
 
-	public static function GetRequestedModules($strAddModule)
+public static 	function GetRequestedModules($strAddModule)
 	{
 		$arRequestedModules = array();
 
@@ -485,7 +485,7 @@ class CUpdateClientPartner
 	}
 
 	/** Получение лицензионного ключа текущего клиента **/
-	public static function GetLicenseKey()
+public static 	function GetLicenseKey()
 	{
 		if (defined("US_LICENSE_KEY"))
 			return US_LICENSE_KEY;
@@ -502,7 +502,7 @@ class CUpdateClientPartner
 	}
 
 	/* Получить обновления следующего шага */
-	public static function GetNextStepUpdates(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $bStrongList = false)
+public static 	function GetNextStepUpdates(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $bStrongList = false)
 	{
 		$strError_tmp = "";
 
@@ -553,7 +553,7 @@ class CUpdateClientPartner
 	}
 
 	// Распаковывает архив файлов update_archive.gz в папкy $updatesDir
-	public static function UnGzipArchive(&$updatesDir, &$strError, $bDelArch = true)
+public static 	function UnGzipArchive(&$updatesDir, &$strError, $bDelArch = true)
 	{
 		$strError_tmp = "";
 
@@ -735,7 +735,7 @@ class CUpdateClientPartner
 	}
 
 	// Возвращает информацию по загруженным в папку $updatesDir обновлениям модулей
-	public static function CheckUpdatability($updatesDir, &$strError)
+public static 	function CheckUpdatability($updatesDir, &$strError)
 	{
 		$strError_tmp = "";
 
@@ -804,7 +804,7 @@ class CUpdateClientPartner
 	}
 
 	// Возвращает информацию по загруженным в папку $updatesDir обновлениям модулей
-	public static function GetStepUpdateInfo($updatesDir, &$strError)
+public static 	function GetStepUpdateInfo($updatesDir, &$strError)
 	{
 		$arResult = array();
 		$strError_tmp = "";
@@ -946,7 +946,7 @@ class CUpdateClientPartner
 	}
 
 	/** Собирает клиентские модули с версиями **/
-	public static function GetCurrentModules(&$strError)
+public static 	function GetCurrentModules(&$strError)
 	{
 		$arClientModules = array();
 
@@ -986,7 +986,8 @@ class CUpdateClientPartner
 						}
 						else
 						{
-							$arClientModules[$dir] = array("VERSION" => $arInfo["VERSION"], "IS_DEMO" => $arInfo["IS_DEMO"]);
+							if($arInfo["ACTIVE"] == "Y")
+								$arClientModules[$dir] = array("VERSION" => $arInfo["VERSION"], "IS_DEMO" => $arInfo["IS_DEMO"]);
 						}
 					}
 					else
@@ -1009,7 +1010,7 @@ class CUpdateClientPartner
 	}
 
 	/* Получить список доступных обновлений */
-	public static function GetUpdatesList(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $aditData = Array())
+public static 	function GetUpdatesList(&$strError, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $aditData = Array())
 	{
 		$strError_tmp = "";
 		$arResult = array();
@@ -1060,13 +1061,13 @@ class CUpdateClientPartner
 			return $arResult;
 	}
 
-	public static function ClearUpdateFolder($updatesDirFull)
+public static 	function ClearUpdateFolder($updatesDirFull)
 	{
 		CUpdateClientPartner::__DeleteDirFilesEx($updatesDirFull);
 		bx_accelerator_reset();
 	}
 
-	public static function LoadModulesUpdates(&$errorMessage, &$arUpdateDescription, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $bStrongList = false)
+public static 	function LoadModulesUpdates(&$errorMessage, &$arUpdateDescription, $lang = false, $stableVersionsOnly = "Y", $arRequestedModules = array(), $bStrongList = false)
 	{
 		$arUpdateDescription = array();
 		$startTime = CUpdateClientPartner::__GetMicroTime();
@@ -1350,7 +1351,7 @@ class CUpdateClientPartner
 		return "E";
 	}
 
-	public static function UpdateStepModules($updatesDir, &$strError, $bSaveUpdaters = False)
+public static 	function UpdateStepModules($updatesDir, &$strError, $bSaveUpdaters = False)
 	{
 		global $DB;
 		$strError_tmp = "";
@@ -1543,7 +1544,7 @@ class CUpdateClientPartner
 		}
 	}
 
-	public static function ActivateCoupon($coupon, &$strError, $lang = false, $stableVersionsOnly = "Y")
+public static 	function ActivateCoupon($coupon, &$strError, $lang = false, $stableVersionsOnly = "Y")
 	{
 		$strError_tmp = "";
 
@@ -1608,7 +1609,7 @@ class CUpdateClientPartner
 	}
 
 	/** Запускает updater модуля **/
-	public static function __RunUpdaterScript($path, &$strError, $updateDirFrom, $moduleID)
+public static 	function __RunUpdaterScript($path, &$strError, $updateDirFrom, $moduleID)
 	{
 		global $DBType, $DB, $APPLICATION, $USER;
 
@@ -1651,7 +1652,7 @@ class CUpdateClientPartner
 	/** Возвращает 1, если $strVers1 > $strVers2  **/
 	/** Возвращает -1, если $strVers1 < $strVers2 **/
 	/** Возвращает 0, если $strVers1 == $strVers2 **/
-	public static function __CompareVersions($strVers1, $strVers2)
+public static 	function __CompareVersions($strVers1, $strVers2)
 	{
 		$strVers1 = Trim($strVers1);
 		$strVers2 = Trim($strVers2);
@@ -1680,7 +1681,7 @@ class CUpdateClientPartner
 	/** Запрашивает методом POST страницу $page со списком параметров **/
 	/** $strVars и возвращает тело ответа. В параметре $strError      **/
 	/** возвращается текст ошибки, если таковая была.                 **/
-	public static function __GetHTTPPage($page, $strVars, &$strError)
+public static 	function __GetHTTPPage($page, $strVars, &$strError)
 	{
 		global $SERVER_NAME, $DB;
 
@@ -1842,7 +1843,7 @@ class CUpdateClientPartner
 
 	/** Проверяет на ошибки ответ сервера $strServerOutput **/
 	/** и парсит в массив $arRes                           **/
-	public static function __ParseServerData(&$strServerOutput, &$arRes, &$strError)
+public static 	function __ParseServerData(&$strServerOutput, &$arRes, &$strError)
 	{
 		$strError_tmp = "";
 		$arRes = array();
@@ -1908,7 +1909,7 @@ class CUpdateClientPartner
 	}
 
 	/** Проверка на установку GZip компрессии **/
-	public static function __IsGzipInstalled()
+public static 	function __IsGzipInstalled()
 	{
 		if (function_exists("gzcompress"))
 			return (COption::GetOptionString("main", "update_is_gzip_installed", "Y") == "Y" ? true : false);
@@ -1916,7 +1917,7 @@ class CUpdateClientPartner
 		return False;
 	}
 
-	public static function __GetFooPath()
+public static 	function __GetFooPath()
 	{
 		$db = CLang::GetList($by="", $order="", array("ACTIVE" => "Y"));
 		$cnt = 0;
@@ -1925,7 +1926,7 @@ class CUpdateClientPartner
 		return $cnt;
 	}
 
-	public static function __GetFooPath1($v = 0)
+	function __GetFooPath1($v = 0)
 	{
 		$q = "SELECT COUNT(ID) as C FROM b_user WHERE ACTIVE = 'Y' AND LAST_LOGIN IS NOT NULL";
 		if ($v == 0)
@@ -1938,7 +1939,7 @@ class CUpdateClientPartner
 	}
 
 	/** Создание путя, если его нет, и установка прав писать **/
-	public static function __CheckDirPath($path, $bPermission = true)
+public static 	function __CheckDirPath($path, $bPermission = true)
 	{
 		$badDirs = Array();
 		$path = str_replace("\\", "/", $path);
@@ -1978,7 +1979,7 @@ class CUpdateClientPartner
 	}
 
 	/** Рекурсивное копирование из $path_from в $path_to **/
-	public static function __CopyDirFiles($path_from, $path_to, &$strError, $bSkipUpdater = True)
+public static 	function __CopyDirFiles($path_from, $path_to, &$strError, $bSkipUpdater = True)
 	{
 		$strError_tmp = "";
 
@@ -2097,7 +2098,7 @@ class CUpdateClientPartner
 	}
 
 	/** Рекурсивное удаление $path **/
-	public static function __DeleteDirFilesEx($path)
+public static 	function __DeleteDirFilesEx($path)
 	{
 		if (!file_exists($path))
 			return False;
@@ -2129,7 +2130,7 @@ class CUpdateClientPartner
 		return True;
 	}
 
-	public static function __bxstrrpos($haystack, $needle)
+public static 	function __bxstrrpos($haystack, $needle)
 	{
 		$index = strpos(strrev($haystack), strrev($needle));
 		if($index === false)
@@ -2139,7 +2140,7 @@ class CUpdateClientPartner
 	}
 
 	/** Возвращает экземпляр класса-инсталятора модуля по абсолютному пути $path **/
-	public static function __GetModuleInfo($path)
+public static 	function __GetModuleInfo($path)
 	{
 		$arModuleVersion = array();
 //		include($path."/install/version.php");
@@ -2150,22 +2151,27 @@ class CUpdateClientPartner
 
 		$arr = explode("/", $path);
 		$i = array_search("modules", $arr);
-		$class_name = $arr[$i+1];
+		$module_code = $arr[$i+1];
 
-		$class_name = str_replace(".", "_", $class_name);
+		$class_name = str_replace(".", "_", $module_code);
 		if (!class_exists($class_name))
 			return array();
 
 		$cls = new $class_name;
-
-		return array(
+		$result = array(
 			"VERSION" => $cls->MODULE_VERSION,
 			"VERSION_DATE" => $cls->MODULE_VERSION_DATE,
-			"IS_DEMO" => ((defined($class_name."_DEMO") && constant($class_name."_DEMO")) ? "Y" : "N")
+			"IS_DEMO" => ((defined($class_name."_DEMO") && constant($class_name."_DEMO")) ? "Y" : "N"),
+			"ACTIVE" => "Y",
 		);
+
+		if($result["IS_DEMO"] == "Y" && IsModuleInstalled($module_code) && CModule::IncludeModuleEx($module_code) == MODULE_DEMO_EXPIRED)
+			$result["ACTIVE"] = "N";
+
+		return $result;
 	}
 
-	public static function __GetMicroTime()
+public static 	function __GetMicroTime()
 	{
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);

@@ -48,9 +48,15 @@ class CSearchParameters
 						"=MODULE_ID" => "crm",
 					);
 					break;
+				case "no":
+					break;
 				default:
 					if(strpos($strFILTER, "iblock_") === 0)
 						$exFILTER[] = CSearchParameters::_iblock($arParams[$strFilterParamName."_".$strFILTER], $strFILTER);
+					else
+						$exFILTER[] = array(
+							"=MODULE_ID" => $strFILTER,
+						);
 					break;
 				}
 			}

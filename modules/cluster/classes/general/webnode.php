@@ -59,7 +59,7 @@ class CClusterWebnode
 		$bHost = false;
 		if(isset($arFields["HOST"]))
 		{
-			if(preg_match("/^([0-9a-zA-Z-_.]+)\$/", $arFields["HOST"], $match))
+			if(preg_match("/^([0-9a-zA-Z-_.]+)\$/", $arFields["HOST"]))
 				$bHost = true;
 
 			if(!$bHost)
@@ -78,7 +78,7 @@ class CClusterWebnode
 
 		if(!$bStatus)
 		{
-			$aMsg[] = array("id" => "STATUS_URL", "text" => GetMessage("CLU_WEBNODE_WRONG_STATUS_URL"));
+			//$aMsg[] = array("id" => "STATUS_URL", "text" => GetMessage("CLU_WEBNODE_WRONG_STATUS_URL"));
 		}
 
 		if(!empty($aMsg))
@@ -195,6 +195,8 @@ class CClusterWebnode
 
 	public static function GetStatus($host, $port, $url)
 	{
+		$errno = 0;
+		$errstr = "";
 		$FP = fsockopen($host, $port, $errno, $errstr, 2);
 		if($FP)
 		{
@@ -222,6 +224,7 @@ class CClusterWebnode
 
 			fclose($FP);
 
+			$match = array();
 			if(preg_match_all('#<dt>(.*?)\\s*:\\s*(.*?)</dt>#', $text, $match))
 			{
 				$arResult = array();
@@ -231,10 +234,11 @@ class CClusterWebnode
 					$value = $match[2][$i];
 					if($key == 'Total accesses')
 					{
-						if(preg_match('/^(.*) - (.*)\\s*:\\s*(.*)$/', $value, $m))
+						$accessMatch = array();
+						if(preg_match('/^(.*) - (.*)\\s*:\\s*(.*)$/', $value, $accessMatch))
 						{
-							$value = $m[1];
-							$arResult[$m[2]] = $m[3];
+							$value = $accessMatch[1];
+							$arResult[$accessMatch[2]] = $accessMatch[3];
 						}
 					}
 					$arResult[$key] = $value;
@@ -244,6 +248,30 @@ class CClusterWebnode
 		}
 
 		return false;
+	}
+
+	static public function getServerList()
+	{
+		global $DB;
+		$result = array();
+		$rsData = $DB->Query("
+			SELECT ID, GROUP_ID, HOST
+			FROM b_cluster_webnode
+			ORDER BY GROUP_ID, ID
+		");
+		while ($arData = $rsData->Fetch())
+		{
+			$result[] = array(
+				"ID" => $arData["ID"],
+				"GROUP_ID" => $arData["GROUP_ID"],
+				"SERVER_TYPE" => "web",
+				"ROLE_ID" => "",
+				"HOST" => $arData["HOST"],
+				"DEDICATED" => "Y",
+				"EDIT_URL" => "/bitrix/admin/cluster_webnode_edit.php?lang=".LANGUAGE_ID."&group_id=".$arData["GROUP_ID"]."&ID=".$arData["ID"],
+			);
+		}
+		return $result;
 	}
 
 	function ParseDateTime($str)
@@ -263,8 +291,9 @@ class CClusterWebnode
 		}
 
 		$str = str_replace($search, $replace, $str);
-		if(preg_match('/(\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}:\\d{2})/', $str, $match))
-			return MakeTimeStamp($match[1], "DD-MM-YYYY HH:MI:SS");
+		$dateMatch = array();
+		if(preg_match('/(\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}:\\d{2})/', $str, $dateMatch))
+			return MakeTimeStamp($dateMatch[1], "DD-MM-YYYY HH:MI:SS");
 		else
 			return false;
 	}

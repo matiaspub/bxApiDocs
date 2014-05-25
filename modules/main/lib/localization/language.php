@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Main\Localization;
 
-use \Bitrix\Main\Entity;
+use Bitrix\Main\Entity;
 
 class LanguageTable extends Entity\DataManager
 {
@@ -24,11 +24,11 @@ class LanguageTable extends Entity\DataManager
 			),
 			'ID' => array(
 				'data_type' => 'string',
-				'column_name' => 'LID',
+				'expression' => array('%s', 'LID'),
 			),
 			'LANGUAGE_ID' => array(
 				'data_type' => 'string',
-				'column_name' => 'LID',
+				'expression' => array('%s', 'LID'),
 			),
 			'SORT' => array(
 				'data_type' => 'integer',

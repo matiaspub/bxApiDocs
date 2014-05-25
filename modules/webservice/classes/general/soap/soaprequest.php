@@ -72,36 +72,36 @@ class CSOAPRequest extends CSOAPEnvelope
     
     
     /**
-     * <p>Метод добавляет в SOAP запрос часть заголовка. </p>
-     *
-     *
-     *
-     *
-     * @param string $name  Название сообщения в заголовке soap запроса.
-     *
-     *
-     *
-     * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
-     * заголовке запроса. См. CXMLCreator::encodeValueLight.
-     *
-     *
-     *
-     * @return void 
-     *
-     *
-     * <h4>Example</h4> 
-     * <pre>
-     * $request-&gt;addSOAPHeader( 
-     *     "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
-     *     array(
-     *         "UnregisteredUser" =&gt; array( "EmailAddress" =&gt; "qwerty@mail.ru" ))
-     *     );
-     * </pre>
-     *
-     *
-     * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addsoapheader.php
-     * @author Bitrix
-     */
+    * <p>Метод добавляет в SOAP запрос часть заголовка. </p>
+    *
+    *
+    *
+    *
+    * @param string $name  Название сообщения в заголовке soap запроса.
+    *
+    *
+    *
+    * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
+    * заголовке запроса. См. CXMLCreator::encodeValueLight.
+    *
+    *
+    *
+    * @return void 
+    *
+    *
+    * <h4>Example</h4> 
+    * <pre>
+    * $request-&gt;addSOAPHeader( 
+    *     "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
+    *     array(
+    *         "UnregisteredUser" =&gt; array( "EmailAddress" =&gt; "qwerty@mail.ru" ))
+    *     );
+    * </pre>
+    *
+    *
+   * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addsoapheader.php
+    * @author Bitrix
+    */
     public function addSOAPHeader( $name, $value )
     {
     	$this->Headers[] = CXMLCreator::encodeValueLight($name, $value);
@@ -110,24 +110,24 @@ class CSOAPRequest extends CSOAPEnvelope
 	//     Adds a new attribute to the body element.
     
     /**
-     * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. </p>
-     *
-     *
-     *
-     *
-     * @param string $name  Название атрибута.
-     *
-     *
-     *
-     * @param string $value  Значение атрибута.
-     *
-     *
-     *
-     * @return void 
-     *
-     * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addbodyattribute.php
-     * @author Bitrix
-     */
+    * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. </p>
+    *
+    *
+    *
+    *
+    * @param string $name  Название атрибута. </ht
+    *
+    *
+    *
+    * @param string $value  Значение атрибута. </ht
+    *
+    *
+    *
+    * @return void 
+    *
+   * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addbodyattribute.php
+    * @author Bitrix
+    */
     public function addBodyAttribute( $name, $value )
     {
         $this->BodyAttributes[$name] = $value;
@@ -137,26 +137,26 @@ class CSOAPRequest extends CSOAPEnvelope
 	//      and value.
     
     /**
-     * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса - параметры вызываемого метода.</p>
-     *
-     *
-     *
-     *
-     * @param string $name  Название параметра.
-     *
-     *
-     *
-     * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
-     * заголовке запроса. См. <a
-     * href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
-     *
-     *
-     *
-     * @return void 
-     *
-     * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addparameter.php
-     * @author Bitrix
-     */
+    * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса - параметры вызываемого метода.</p>
+    *
+    *
+    *
+    *
+    * @param string $name  Название параметра. </ht
+    *
+    *
+    *
+    * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
+    * заголовке запроса. См. <a
+    * href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
+    *
+    *
+    *
+    * @return void 
+    *
+   * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/csoaprequest/addparameter.php
+    * @author Bitrix
+    */
     public function addParameter( $name, $value )
     {
         $this->Parameters[$name] = $value;        

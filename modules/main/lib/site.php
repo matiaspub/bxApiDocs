@@ -8,9 +8,40 @@
 namespace Bitrix\Main;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\IO;
 
 class SiteTable extends Entity\DataManager
 {
+	private static $documentRootCache = array();
+
+	public static function getDocumentRoot($siteId = null)
+	{
+		if ($siteId === null)
+		{
+			$context = Application::getInstance()->getContext();
+			$siteId = $context->getSite();
+		}
+
+		if (!isset(self::$documentRootCache[$siteId]))
+		{
+			$ar = SiteTable::getRow(array("filter" => array("LID" => $siteId)));
+			if ($ar && ($docRoot = $ar["DOC_ROOT"]) && (strlen($docRoot) > 0))
+			{
+				if (!IO\Path::isAbsolute($docRoot))
+					$docRoot = IO\Path::combine(Application::getDocumentRoot(), $docRoot);
+
+				self::$documentRootCache[$siteId] = $docRoot;
+			}
+			else
+			{
+				self::$documentRootCache[$siteId] = Application::getDocumentRoot();
+			}
+		}
+
+		return self::$documentRootCache[$siteId];
+	}
+
+
 	public static function getFilePath()
 	{
 		return __FILE__;

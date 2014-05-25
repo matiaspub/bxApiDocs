@@ -104,14 +104,14 @@ class CVoteCacheManager
 		endif;
 	}
 
-	public static function OnAfterVoteQuestionAdd(&$ID, &$arFields)
+	public static function OnAfterVoteQuestionAdd($ID, $arFields)
 	{
 		self::ClearTag("V", $arFields['VOTE_ID']);
 	}
 
 	public static function OnBeforeVoteQuestionUpdate(&$ID, &$arFields)
 	{
-		if (array_key_exists($arFields, "VOTE_ID")){
+		if (array_key_exists("VOTE_ID", $arFields)){
 			$db_res = CVoteQuestion::GetByID($ID);
 			if ($db_res && ($res = $db_res->Fetch()))
 				self::ClearTag("V", $res["VOTE_ID"]);
@@ -120,7 +120,7 @@ class CVoteCacheManager
 
 	public static function OnAfterVoteQuestionUpdate($ID, $arFields)
 	{
-		if (array_key_exists($arFields, "VOTE_ID")) {
+		if (array_key_exists("VOTE_ID", $arFields)) {
 			self::ClearTag("V", $arFields["VOTE_ID"]);
 		} else {
 			$db_res = CVoteQuestion::GetByID($ID);
@@ -142,16 +142,16 @@ class CVoteCacheManager
 
 	public static function OnBeforeVoteAnswerUpdate($ID, $arFields)
 	{
-		if (array_key_exists($arFields, "QUESTION_ID")) {
+		if (array_key_exists("QUESTION_ID", $arFields)) {
 			$res = $GLOBALS["DB"]->Query("SELECT QUESTION_ID FROM b_vote_answer WHERE ID=".$ID, false, "File:".__FILE__." Line: ".__LINE__);
 			if ($row = $res->Fetch())
-				self::ClearTag("Q", $res["QUESTION_ID"]);
+				self::ClearTag("Q", $row["QUESTION_ID"]);
 		}
 	}
 
 	public static function OnAfterVoteAnswerUpdate($ID, $arFields)
 	{
-		if (array_key_exists($arFields, "QUESTION_ID")) {
+		if (array_key_exists("QUESTION_ID", $arFields)) {
 			self::ClearTag("Q", $arFields["QUESTION_ID"]);
 		} else {
 			$db_res = $GLOBALS["DB"]->Query("SELECT QUESTION_ID FROM b_vote_answer WHERE ID=".$ID, false, "File:".__FILE__." Line: ".__LINE__);

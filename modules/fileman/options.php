@@ -46,33 +46,156 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		$default_edit="text";
 	COption::SetOptionString($module_id, "default_edit", $default_edit);
 
-	if($htmleditor_fullscreen!="Y")
-		$htmleditor_fullscreen = "N";
-	COption::SetOptionString($module_id, "htmleditor_fullscreen", $htmleditor_fullscreen);
-
-	COption::SetOptionString($module_id, "show_untitled_styles", $show_untitled_styles);
-	COption::SetOptionString($module_id, "render_styles_in_classlist", $render_styles_in_classlist);
-	COption::SetOptionString($module_id, "allow_render_components", $allow_render_components == 'Y' ? 'Y' : 'N');
 	COption::SetOptionString($module_id, "use_medialib", $use_medialib == 'Y' ? 'Y' : 'N');
+	COption::SetOptionString($module_id, "use_editor_3", $use_editor_3);
+	$useEditor3 = $use_editor_3 == "Y";
+
+	if (!$useEditor3)
+	{
+		COption::SetOptionString($module_id, "htmleditor_fullscreen", $htmleditor_fullscreen == "Y" ? "Y" : "N");
+		COption::SetOptionString($module_id, "show_untitled_styles", $show_untitled_styles);
+		COption::SetOptionString($module_id, "render_styles_in_classlist", $render_styles_in_classlist);
+		COption::SetOptionString($module_id, "allow_render_components", $allow_render_components == 'Y' ? 'Y' : 'N');
+
+
+		/* **********  Toolbars config ************/
+		if (isset($_POST['tlbr']) && is_array($_POST['tlbr']))
+		{
+			foreach ($_POST['tlbr'] as $type => $arToolbars)
+			{
+				if ($arToolbars == 'clean')
+					COption::RemoveOption($module_id, "toolbar_config_".$type);
+
+				// Global toolbar
+				if (count($arToolbars) == 1 && is_array($arToolbars['global']))
+					COption::SetOptionString($module_id, "toolbar_config_".$type, serialize($arToolbars['global']));
+				else // Standart mode
+					COption::SetOptionString($module_id, "toolbar_config_".$type, serialize($arToolbars));
+			}
+		}
+
+		// LCA - limit component access
+		COption::SetOptionString($module_id, "use_lca", ($use_lca == 'Y' ? 'Y' : 'N'));
+
+		// ******** Spell ********
+		COption::SetOptionString($module_id, "spell_check_first_client", (isset($_POST['spell_check_first_client']) ? 'Y' : 'N'));
+		if (isset($_POST['use_pspell']))
+			COption::SetOptionString($module_id, "use_pspell", "Y");
+		else
+			COption::SetOptionString($module_id, "use_pspell", "N");
+
+
+		if (isset($_POST['user_dics_path']) && $_POST['user_dics_path']!='')
+			COption::SetOptionString($module_id, "user_dics_path", $_POST['user_dics_path']);
+		else
+			COption::SetOptionString($module_id, "user_dics_path","/bitrix/modules/fileman/u_dics");
+
+
+		if (isset($_POST['use_separeted_dics']))
+			COption::SetOptionString($module_id, "use_separeted_dics", "Y");
+		else
+			COption::SetOptionString($module_id, "use_separeted_dics", "N");
+
+		COption::SetOptionString($module_id, "use_custom_spell", "N");
+
+
+		//Handle dictionary loading
+		if (isset($_POST['dic_lang']) && isset($_FILES['dic_aff']) && isset($_FILES['dic_base']) && $_FILES['dic_aff']['name'] != '' && 	$_FILES['dic_base']['name'] != '')
+		{
+			$dic_lang = $_POST['dic_lang'];
+			if (isValidLang($dic_lang))
+			{
+				$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang;
+				$dics_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang.'/dics';
+
+				if (!file_exists($lang_dir))
+					mkdir($lang_dir, BX_DIR_PERMISSIONS);
+
+				$source=$_FILES['dic_base']['tmp_name'];
+				$target = $lang_dir.'/'.$dic_lang.'.dic';
+				if (file_exists($target))
+					unlink ($target);
+				move_uploaded_file($source, $target);
+
+				$source=$_FILES['dic_aff']['tmp_name'];
+				$target = $lang_dir.'/'.$dic_lang.'.aff';
+				if (file_exists($target))
+					unlink ($target);
+				move_uploaded_file($source, $target);
+
+				if (!file_exists($dics_dir))
+					mkdir($dics_dir, BX_DIR_PERMISSIONS);
+				COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "N");
+			}
+		}
+
+		//Handle dictionary removing
+		if (isset($_POST['del_dic']))
+		{
+			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['del_dic'];
+			if (file_exists($lang_dir) && is_dir($lang_dir))
+			{
+				$dicDir = dir($lang_dir);
+				while (false !== ($entry = $dicDir->read()))
+				{
+					$entry_path = $dicDir->path.'/'.$entry;
+					if (is_dir($entry_path) && $entry=='dics')
+					{
+						//Removing files from 'dics' directory
+						$dicsDir = dir($entry_path);
+						while (false !== ($dic = $dicsDir->read()))
+						{
+							$dic_path = $dicsDir->path.'/'.$dic;
+							if (is_file($dic_path))
+								unlink ($dic_path);
+						}
+						$dicsDir->close();
+						//removing 'dics' directory
+						rmdir($entry_path);
+					}
+					elseif (is_file($entry_path))
+					{
+						unlink ($entry_path);
+					}
+				}
+				$dicDir->close();
+				rmdir($lang_dir);
+			}
+		}
+
+		//Handle dictionary indexing
+		if (isset($_POST['index_dic']))
+		{
+			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['index_dic'];
+			if (file_exists($lang_dir) && is_dir($lang_dir))
+			{
+				$dicsDir = dir($lang_dir.'/dics');
+				while (false !== ($dic = $dicsDir->read()))
+				{
+					$dic_path = $dicsDir->path.'/'.$dic;
+					if (is_file($dic_path))
+						unlink ($dic_path);
+				}
+				$dicsDir->close();
+
+				require($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/fileman/admin/spell_createDictionary.php');
+
+				$CD = new createDictionary();
+				$lang = $_POST['index_dic'];
+				$CD->init($lang,$lang_dir);
+				if ($CD->create())
+					COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "Y");
+			}
+		}
+		// ******** Spell END ********
+	}
+
+	//Entities
+	COption::SetOptionString($module_id, "ar_entities", count($ar_entities) <= 0 ? 'none' : implode(',',$ar_entities));
 
 	COption::SetOptionString($module_id, "editor_body_id", htmlspecialcharsbx($editor_body_id));
 	COption::SetOptionString($module_id, "editor_body_class", htmlspecialcharsbx($editor_body_class));
 
-	/* **********  Toolbars config ************/
-	if (isset($_POST['tlbr']) && is_array($_POST['tlbr']))
-	{
-		foreach ($_POST['tlbr'] as $type => $arToolbars)
-		{
-			if ($arToolbars == 'clean')
-				COption::RemoveOption($module_id, "toolbar_config_".$type);
-
-			// Global toolbar
-			if (count($arToolbars) == 1 && is_array($arToolbars['global']))
-				COption::SetOptionString($module_id, "toolbar_config_".$type, serialize($arToolbars['global']));
-			else // Standart mode
-				COption::SetOptionString($module_id, "toolbar_config_".$type, serialize($arToolbars));
-		}
-	}
 
 	/* **********  Medialib ************/
 	$cur_ml_width = COption::GetOptionInt($module_id, "ml_thumb_width", 140);
@@ -180,16 +303,6 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		COption::SetOptionString($module_id, "~allowed_components", $allowed_components);
 	}
 
-	// LCA - limit component access
-	COption::SetOptionString($module_id, "use_lca", ($use_lca == 'Y' ? 'Y' : 'N'));
-
-	//Entities
-	if (count($ar_entities) <= 0)
-		$str_ar_entities = 'none';
-	else
-		$str_ar_entities = implode(',',$ar_entities);
-	COption::SetOptionString($module_id, "ar_entities", $str_ar_entities);
-
 	$siteList_ID = unserialize($mSiteList);
 
 	if(isset($dif_settings))
@@ -289,7 +402,7 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 	COption::SetOptionString($module_id, "search_mask", $search_mask);
 
 	COption::SetOptionString($module_id, "show_inc_icons", (isset($_POST['show_inc_icons']) ? 'Y' : 'N'));
-	COption::SetOptionString($module_id, "spell_check_first_client", (isset($_POST['spell_check_first_client']) ? 'Y' : 'N'));
+
 
 	COption::SetOptionString($module_id, "hide_physical_struc", (isset($_POST['hide_physical_struc'])));
 	COption::SetOptionString($module_id, "use_translit", (isset($_POST['use_translit'])));
@@ -298,114 +411,7 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 	COption::SetOptionString($module_id, "log_page", (isset($_POST['log_page']) ? 'Y' : 'N'));
 	COption::SetOptionString($module_id, "use_code_editor", (isset($_POST['use_code_editor']) ? 'Y' : 'N'));
 
-	if (isset($_POST['use_pspell']))
-		COption::SetOptionString($module_id, "use_pspell", "Y");
-	else
-		COption::SetOptionString($module_id, "use_pspell", "N");
 
-
-	if (isset($_POST['user_dics_path']) && $_POST['user_dics_path']!='')
-		COption::SetOptionString($module_id, "user_dics_path", $_POST['user_dics_path']);
-	else
-		COption::SetOptionString($module_id, "user_dics_path","/bitrix/modules/fileman/u_dics");
-
-
-	if (isset($_POST['use_separeted_dics']))
-		COption::SetOptionString($module_id, "use_separeted_dics", "Y");
-	else
-		COption::SetOptionString($module_id, "use_separeted_dics", "N");
-
-	COption::SetOptionString($module_id, "use_custom_spell", "N");
-
-
-	//Handle dictionary loading
-	if (isset($_POST['dic_lang']) && isset($_FILES['dic_aff']) && isset($_FILES['dic_base']) && $_FILES['dic_aff']['name'] != '' && 	$_FILES['dic_base']['name'] != '')
-	{
-		$dic_lang = $_POST['dic_lang'];
-		if (isValidLang($dic_lang))
-		{
-			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang;
-			$dics_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang.'/dics';
-
-			if (!file_exists($lang_dir))
-				mkdir($lang_dir, BX_DIR_PERMISSIONS);
-
-			$source=$_FILES['dic_base']['tmp_name'];
-			$target = $lang_dir.'/'.$dic_lang.'.dic';
-			if (file_exists($target))
-				unlink ($target);
-			move_uploaded_file($source, $target);
-
-			$source=$_FILES['dic_aff']['tmp_name'];
-			$target = $lang_dir.'/'.$dic_lang.'.aff';
-			if (file_exists($target))
-				unlink ($target);
-			move_uploaded_file($source, $target);
-
-			if (!file_exists($dics_dir))
-				mkdir($dics_dir, BX_DIR_PERMISSIONS);
-			COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "N");
-		}
-	}
-
-	//Handle dictionary removing
-	if (isset($_POST['del_dic']))
-	{
-		$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['del_dic'];
-		if (file_exists($lang_dir) && is_dir($lang_dir))
-		{
-			$dicDir = dir($lang_dir);
-			while (false !== ($entry = $dicDir->read()))
-			{
-				$entry_path = $dicDir->path.'/'.$entry;
-				if (is_dir($entry_path) && $entry=='dics')
-				{
-					//Removing files from 'dics' directory
-					$dicsDir = dir($entry_path);
-					while (false !== ($dic = $dicsDir->read()))
-					{
-						$dic_path = $dicsDir->path.'/'.$dic;
-						if (is_file($dic_path))
-							unlink ($dic_path);
-					}
-					$dicsDir->close();
-					//removing 'dics' directory
-					rmdir($entry_path);
-				}
-				elseif (is_file($entry_path))
-				{
-					unlink ($entry_path);
-				}
-			}
-			$dicDir->close();
-			rmdir($lang_dir);
-		}
-	}
-
-	//Handle dictionary indexing
-	if (isset($_POST['index_dic']))
-	{
-		$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['index_dic'];
-		if (file_exists($lang_dir) && is_dir($lang_dir))
-		{
-			$dicsDir = dir($lang_dir.'/dics');
-			while (false !== ($dic = $dicsDir->read()))
-			{
-				$dic_path = $dicsDir->path.'/'.$dic;
-				if (is_file($dic_path))
-					unlink ($dic_path);
-			}
-			$dicsDir->close();
-
-			require($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/fileman/admin/spell_createDictionary.php');
-
-			$CD = new createDictionary();
-			$lang = $_POST['index_dic'];
-			$CD->init($lang,$lang_dir);
-			if ($CD->create())
-				COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "Y");
-		}
-	}
 
 	//default groups
 	$sGroups = '';
@@ -421,7 +427,9 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 }
 
 
-if ($REQUEST_METHOD=="GET" && isset($_GET['load_dic']) && $USER->CanDoOperation('fileman_edit_all_settings'))
+if ($REQUEST_METHOD=="GET" && isset($_GET['load_dic']) &&
+	$USER->CanDoOperation('fileman_edit_all_settings') &&
+	COption::GetOptionString($module_id, "use_editor_3", "N") == "Y")
 {
 	if (isValidLang($_GET['load_dic']))
 	{
@@ -452,6 +460,7 @@ $aTabs = array(
 		$i++;
 	}
 	$siteCount = $i;
+	$useEditor3 = COption::GetOptionString($module_id, "use_editor_3", "N") == "Y";
 
 	unset($rsSites);
 	unset($arRes);
@@ -809,6 +818,12 @@ $aTabs = array(
 	<!--end of archive-->
 <?$tabControl->BeginNextTab();?>
 <tr>
+	<td valign="top"><label for="use_editor_3"><?= GetMessage('FILEMAN_OPTION_USE_EDITOR_3')?></label></td>
+	<td><input type="checkbox" name="use_editor_3" id="use_editor_3" value="Y" <?if(COption::GetOptionString($module_id, "use_editor_3", "N") == "Y") echo " checked"?>></td>
+</tr>
+
+<? if (!$useEditor3):?>
+<tr>
 	<td valign="top"><label for="show_untitled_styles"><?= GetMessage('FILEMAN_OPTION_USE_ONLY_DEFINED_STYLES')?></label></td>
 	<td><input type="checkbox" name="show_untitled_styles" id="show_untitled_styles" value="Y" <?if(COption::GetOptionString($module_id, "show_untitled_styles", "N")=="Y")echo " checked"?>></td>
 </tr>
@@ -824,7 +839,7 @@ $aTabs = array(
 	<td valign="top"><label for="allow_render_components"><?= GetMessage('FILEMAN_OPT_ALLOW_RENDER_COMPONENTS')?>:</label></td>
 	<td><input type="checkbox" name="allow_render_components" id="allow_render_components" value="Y" <?if(COption::GetOptionString($module_id, "allow_render_components", "N") == "Y") echo " checked"?>></td>
 </tr>
-
+<? endif; // $useEditor3?>
 	<tr>
 		<td valign="top"><label for="editor_body_id"><?= GetMessage('FILEMAN_OPTION_EDITOR_BODY_ID')?>:</label></td>
 		<td><input type="text" id="editor_body_id" name="editor_body_id" value="<?= COption::GetOptionString($module_id, "editor_body_id", "")?>" /></td>
@@ -834,6 +849,7 @@ $aTabs = array(
 		<td><input type="text" id="editor_body_class" name="editor_body_class" value="<?= COption::GetOptionString($module_id, "editor_body_class", "")?>" /></td>
 	</tr>
 
+<? if (!$useEditor3):?>
 	<tr class="heading">
 		<td colspan="2"><?= GetMessage("FILEMAN_EDITOR_TOOLBAR_SETTINGS");?></td>
 	</tr>
@@ -939,8 +955,8 @@ for ($i = 0, $l = count($arEdTypes); $i < $l; $i++)
 		// }
 	// }
 }
-
 ?>
+
 	<tr>
 		<td width="50%"><label for='ed_toolbar_type'><?= GetMessage("FILEMAN_EDITOR_TYPE");?>:</td>
 		<td  valign="top">
@@ -1333,22 +1349,22 @@ BXButtonConfig.prototype =
 
 new BXButtonConfig();
 
-
-
-
 </script>
 		</td>
 	</tr>
 
+<?endif; // $useEditor3?>
 	<tr class="heading">
 		<td colspan="2"><? echo GetMessage("FILEMAN_EDITOR_CONVERT_SETTINGS");?></td>
 	</tr>
+	<? if (!$useEditor3):?>
 	<tr>
 		<td width="50%" valign="top"><label for='use_lca'><?echo GetMessage("FILEMAN_USE_LCA");?>:</td>
 		<td  valign="top">
 			<input type="checkbox" name="use_lca" id='use_lca' value="Y" <? if (COption::GetOptionString($module_id, "use_lca", 'N') == 'Y') echo 'checked';?>>
 		</td>
 	</tr>
+	<? endif; //!$useEditor3 ?>
 	<tr>
 		<td width="50%" valign="top"><?echo GetMessage("FILEMAN_ENTITIES_GROUPS");?>:</td>
 		<td  valign="top">
@@ -1375,6 +1391,7 @@ new BXButtonConfig();
 			</table>
 		</td>
 	</tr>
+<? if (!$useEditor3):?>
 	<tr class="heading">
 		<td colspan="2"><? echo GetMessage("FILEMAN_OPTION_SPELL_SET");?></td>
 	</tr>
@@ -1423,6 +1440,7 @@ new BXButtonConfig();
 		</td>
 	</tr>
 	<?endif;?>
+<? endif; //!$useEditor3?>
 
 <?
 /* MEDIALIB TAB*/

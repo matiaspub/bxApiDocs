@@ -4,42 +4,42 @@ error_reporting(COption::GetOptionInt("main", "error_reporting", E_COMPILE_ERROR
 class CMainPage
 {
 	// определяет сайт по HTTP_HOST в таблице сайтов
-	
+
 	/**
-	 * <p>Возвращает идентификатор сайта, определяя его по текущему хосту. Если идентификатор сайта неверный, то вернет - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
-	 * 
-	 * if($page = CMainPage::GetIncludeSitePage(<b>CMainPage::GetSiteByHost</b>()))
-	 *     require_once($page);
-	 * 
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
-	 * &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
-	 * терминов</a> </li> <li> <a
-	 * href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
-	 * >Конфигурирование многосайтовости</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getsitebyhost.php
-	 * @author Bitrix
-	 */
-	public static function GetSiteByHost()
+	* <p>Возвращает идентификатор сайта, определяя его по текущему хосту. Если идентификатор сайта неверный, то вернет - "false".</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
+	* 
+	* if($page = CMainPage::GetIncludeSitePage(<b>CMainPage::GetSiteByHost</b>()))
+	*     require_once($page);
+	* 
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
+	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
+	* терминов</a> </li> <li> <a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
+	* >Конфигурирование многосайтовости</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getsitebyhost.php
+	* @author Bitrix
+	*/
+	public static 	function GetSiteByHost()
 	{
 		$cur_host = $_SERVER["HTTP_HOST"];
 		$arURL = parse_url("http://".$cur_host);
@@ -74,55 +74,57 @@ class CMainPage
 	}
 
 	// определяет сайт по HTTP_ACCEPT_LANGUAGE
-	
+
 	/**
-	 * <p>Возвращает идентификатор сайта, определяя его по переменной Accept-Language в настройках браузера посетителя. Приоритетным для данной функции является порядок языков установленный в настройках браузера посетителя. Если ни один из этих языков не подойдет, то будет выбран [link=89624]сайт[/link] с установленным флагом "Сайт по умолчанию".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param bool $compare_site_id = false Если значение "true", то поиск сайта будет осуществляться через
-	 * сравнение идентификатора языка из Accept-Language и идентификатора
-	 * сайта, если значение "false" - то сравнение будет между
-	 * идентификатором языка из Accept-Languageи идентификатором языка
-	 * выбранного в настройках сайта.<br>Необязательный. По умолчанию -
-	 * "false".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Для использования данного примера в качестве индексной страницы портала необходимо убедиться что:
-	 * <br>1. Многосайтовость организована по способу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">Многосайтовость на одном домене</a>.
-	 * <br>2. Ни у одного из сайтов в поле "Папка сайта" не указано значение - "/". 
-	 * 
-	 * &lt;?
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
-	 * 
-	 * if ($sid = <b>CMainPage::GetSiteByAcceptLanguage</b>())
-	 *     CMainPage::RedirectToSite($sid);
-	 * 
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
-	 * &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
-	 * терминов</a> </li> <li> <a
-	 * href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
-	 * >Конфигурирование многосайтовости</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getsitebyacceptlanguage.php
-	 * @author Bitrix
-	 */
-	public static function GetSiteByAcceptLanguage($compare_site_id=false)
+	* <p>Возвращает идентификатор сайта, определяя его по переменной Accept-Language в настройках браузера посетителя. Приоритетным для данной функции является порядок языков установленный в настройках браузера посетителя. Если ни один из этих языков не подойдет, то будет выбран [link=89624]сайт[/link] с установленным флагом "Сайт по умолчанию".</p>
+	*
+	*
+	*
+	*
+	* @param bool $compare_site_id = false Если значение "true", то поиск сайта будет осуществляться через
+	* сравнение идентификатора языка из Accept-Language и идентификатора
+	* сайта, если значение "false" - то сравнение будет между
+	* идентификатором языка из Accept-Languageи идентификатором языка
+	* выбранного в настройках сайта.<br>Необязательный. По умолчанию -
+	* "false".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Для использования данного примера в качестве индексной страницы портала необходимо убедиться что:
+	* <br>1. Многосайтовость организована по способу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">Многосайтовость на одном домене</a>.
+	* <br>2. Ни у одного из сайтов в поле "Папка сайта" не указано значение - "/". 
+	* 
+	* 
+	* 
+	* &lt;?
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
+	* 
+	* if ($sid = <b>CMainPage::GetSiteByAcceptLanguage</b>())
+	*     CMainPage::RedirectToSite($sid);
+	* 
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
+	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
+	* терминов</a> </li> <li> <a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
+	* >Конфигурирование многосайтовости</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getsitebyacceptlanguage.php
+	* @author Bitrix
+	*/
+	public static 	function GetSiteByAcceptLanguage($compare_site_id=false)
 	{
 		$site_id = false;
 		$arUserLang = explode(",", $_SERVER["HTTP_ACCEPT_LANGUAGE"]);
@@ -153,50 +155,53 @@ class CMainPage
 	}
 
 	// делает перенаправление на сайт
-	
+
 	/**
-	 * <p>Перенаправляет на индексную страницу [link=89624]сайта[/link].</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $site_id  Идентификатор [link=89624]сайта[/link].
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Для использования данного примера в качестве индексной страницы портала  необходимо убедиться что:
-	 * <br>1. Многосайтовость организована по способу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">многосайтовости на одном домене</a>.
-	 * <br>2. Ни у одного из сайтов в поле "Папка сайта" не указано значение - "/". Т.е. корень каждого сайта - отдельный подкаталог.
-	 * 
-	 * &lt;?
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
-	 * 
-	 * if ($sid = CMainPage::GetSiteByAcceptLanguage())
-	 *     <b>CMainPage::RedirectToSite</b>($sid);
-	 * 
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
-	 * &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
-	 * терминов</a> </li> <li> <a
-	 * href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
-	 * >Конфигурирование многосайтовости</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/redirecttosite.php
-	 * @author Bitrix
-	 */
-	public static function RedirectToSite($site)
+	* <p>Перенаправляет на индексную страницу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $site  Идентификатор [<a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Для использования данного примера в качестве индексной страницы портала  необходимо убедиться что:
+	* <br>1. Многосайтовость организована по способу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">многосайтовости на одном домене</a>.
+	* <br>2. Ни у одного из сайтов в поле "Папка сайта" не указано значение - "/". Т.е. корень каждого сайта - отдельный подкаталог.
+	* 
+	* 
+	* 
+	* &lt;?
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
+	* 
+	* if ($sid = CMainPage::GetSiteByAcceptLanguage())
+	*     <b>CMainPage::RedirectToSite</b>($sid);
+	* 
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
+	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
+	* терминов</a> </li> <li> <a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
+	* >Конфигурирование многосайтовости</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/redirecttosite.php
+	* @author Bitrix
+	*/
+	public static 	function RedirectToSite($site)
 	{
 		if(strlen($site)<=0) return false;
 		$db_site = CSite::GetByID($site);
@@ -209,46 +214,47 @@ class CMainPage
 	}
 
 	// подключает страницу с папки другого сайта
-	
+
 	/**
-	 * <p>Возвращает абсолютный путь на индексную страницу заданного сайта, для дальнейшего ее подключения при помощи require() или include(). Если ни один из сайтов не найден по хосту, то функция вернет - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $site_id  Идентификатор [link=89624]сайта[/link].
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
-	 * 
-	 * if($page = <b>CMainPage::GetIncludeSitePage</b>(CMainPage::GetSiteByHost()))
-	 *     require_once($page);
-	 * 
-	 * require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
-	 * &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
-	 * терминов</a> </li> <li> <a
-	 * href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
-	 * >Конфигурирование многосайтовости</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getincludesitepage.php
-	 * @author Bitrix
-	 */
-	public static function GetIncludeSitePage($site)
+	* <p>Возвращает абсолютный путь на индексную страницу заданного сайта, для дальнейшего ее подключения при помощи require() или include(). Если ни один из сайтов не найден по хосту, то функция вернет - "false".</p>
+	*
+	*
+	*
+	*
+	* @param string $site  Идентификатор <a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/include/mainpage.php");
+	* 
+	* if($page = <b>CMainPage::GetIncludeSitePage</b>(CMainPage::GetSiteByHost()))
+	*     require_once($page);
+	* 
+	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
+	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2833" >Список
+	* терминов</a> </li> <li> <a
+	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=03987"
+	* >Конфигурирование многосайтовости</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmainpage/getincludesitepage.php
+	* @author Bitrix
+	*/
+	public static 	function GetIncludeSitePage($site)
 	{
 		if(strlen($site)<=0) return false;
 		$db_site = CSite::GetByID($site);

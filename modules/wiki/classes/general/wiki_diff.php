@@ -107,25 +107,25 @@ class CWikiDiff
 
 	
 	/**
-	 * <p>Метод сравнивает две страницы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $X  Страница исходная.
-	 *
-	 *
-	 *
-	 * @param string $Y  Страница, с которой сравниваем.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikidiff/getDiff.php
-	 * @author Bitrix
-	 */
+	* <p>Метод сравнивает две страницы.</p>
+	*
+	*
+	*
+	*
+	* @param string $X  Страница исходная. </ht
+	*
+	*
+	*
+	* @param string $Y  Страница, с которой сравниваем.
+	*
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikidiff/getDiff.php
+	* @author Bitrix
+	*/
 	static function getDiff($X, $Y)
 	{
 

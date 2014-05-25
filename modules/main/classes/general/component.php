@@ -14,6 +14,9 @@ class CBitrixComponent
 
 	private $__templateName = "";
 	public $__templatePage = "";
+
+	private static $__componentCounter = 0;
+	private $__currentCounter = 0;
 	/** @var CBitrixComponentTemplate */
 	public $__template = null;
 
@@ -47,36 +50,38 @@ class CBitrixComponent
 	private $__editButtons = array();
 	private static $__classes_map = array();
 	private $classOfComponent = "";
+	private $randomSequence = null;
+	private $frameMode = true;
 
 	/**
-	* Event called from includeComponent before component execution.
-	*
-	* <p>Takes component parameters as argument and should return it formatted as needed.</p>
-	* @param array[string]mixed $arParams
-	* @return array[string]mixed
-	*
-	*/
+	 * Event called from includeComponent before component execution.
+	 *
+	 * <p>Takes component parameters as argument and should return it formatted as needed.</p>
+	 * @param array[string]mixed $arParams
+	 * @return array[string]mixed
+	 *
+	 */
 	static public function onPrepareComponentParams($arParams)
 	{
 		return $arParams;
 	}
 	/**
-	* Event called from includeComponent before component execution.
-	*
-	* <p>Includes component.php from within lang directory of the component.</p>
-	* @return void
-	*
-	*/
+	 * Event called from includeComponent before component execution.
+	 *
+	 * <p>Includes component.php from within lang directory of the component.</p>
+	 * @return void
+	 *
+	 */
 	public function onIncludeComponentLang()
 	{
 		$this->includeComponentLang();
 	}
 	/**
-	* Function calls __includeComponent in order to execute the component.
-	*
-	* @return mixed
-	*
-	*/
+	 * Function calls __includeComponent in order to execute the component.
+	 *
+	 * @return mixed
+	 *
+	 */
 	public function executeComponent()
 	{
 		return $this->__includeComponent();
@@ -88,6 +93,7 @@ class CBitrixComponent
 	 */
 	public function __construct($component = null)
 	{
+		self::$__componentCounter++;
 		if(is_object($component) && ($component instanceof cbitrixcomponent))
 		{
 			$this->__name = $component->__name;
@@ -114,14 +120,15 @@ class CBitrixComponent
 			$this->__editButtons = $component->__editButtons;
 			$this->classOfComponent = $component->classOfComponent;
 		}
+		$this->__currentCounter = self::$__componentCounter;
 	}
 	/**
-	* Function returns component name in form bitrix:component.name
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return string
-	*
-	*/
+	 * Function returns component name in form bitrix:component.name
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return string
+	 *
+	 */
 	final public function getName()
 	{
 		if ($this->__bInited)
@@ -130,12 +137,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns path to component in form /bitrix/component.name
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return string
-	*
-	*/
+	 * Function returns path to component in form /bitrix/component.name
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return string
+	 *
+	 */
 	final public function getRelativePath()
 	{
 		if ($this->__bInited)
@@ -144,12 +151,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns path to component relative to Web server DOCUMENT_ROOT in form /bitrix/components/bitrix/component.name
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return string
-	*
-	*/
+	 * Function returns path to component relative to Web server DOCUMENT_ROOT in form /bitrix/components/bitrix/component.name
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return string
+	 *
+	 */
 	final public function getPath()
 	{
 		if ($this->__bInited)
@@ -158,12 +165,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns the name of the template
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return string
-	*
-	*/
+	 * Function returns the name of the template
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return string
+	 *
+	 */
 	final public function getTemplateName()
 	{
 		if ($this->__bInited)
@@ -172,13 +179,13 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function sets the name of the template. Returns true on success.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param string $templateName
-	* @return bool
-	*
-	*/
+	 * Function sets the name of the template. Returns true on success.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param string $templateName
+	 * @return bool
+	 *
+	 */
 	final public function setTemplateName($templateName)
 	{
 		if (!$this->__bInited)
@@ -188,12 +195,12 @@ class CBitrixComponent
 		return true;
 	}
 	/**
-	* Function returns the template page witch was set with initComponentTemplate
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return string
-	*
-	*/
+	 * Function returns the template page witch was set with initComponentTemplate
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return string
+	 *
+	 */
 	final public function getTemplatePage()
 	{
 		if ($this->__bInited)
@@ -202,12 +209,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns the template object
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return CBitrixComponentTemplate
-	*
-	*/
+	 * Function returns the template object
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return CBitrixComponentTemplate
+	 *
+	 */
 	final public function getTemplate()
 	{
 		if ($this->__bInited && $this->__template)
@@ -216,12 +223,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns the parent component (if exists)
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return CBitrixComponent
-	*
-	*/
+	 * Function returns the parent component (if exists)
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return CBitrixComponent
+	 *
+	 */
 	final public function getParent()
 	{
 		if ($this->__bInited && $this->__parent)
@@ -230,12 +237,12 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function returns current template css files or null if there is no template.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return array[string][int]string
-	*
-	*/
+	 * Function returns current template css files or null if there is no template.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return array[string][int]string
+	 *
+	 */
 	final public function getTemplateCachedData()
 	{
 		if ($this->__bInited && $this->__template)
@@ -244,39 +251,39 @@ class CBitrixComponent
 			return null;
 	}
 	/**
-	* Function applies collection of the css files to the current template.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param array[string][int]string $templateCachedData
-	* @return void
-	*
-	*/
+	 * Function applies collection of the css files to the current template.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param array[string][int]string $templateCachedData
+	 * @return void
+	 *
+	 */
 	final public function setTemplateCachedData($templateCachedData)
 	{
 		if ($this->__bInited)
 			CBitrixComponentTemplate::ApplyCachedData($templateCachedData);
 	}
 	/**
-	* Function includes class of the component by component name bitrix:component.base
-	*
-	* @param string $componentName
-	* @return string
-	*
-	*/
+	 * Function includes class of the component by component name bitrix:component.base
+	 *
+	 * @param string $componentName
+	 * @return string
+	 *
+	 */
 	final public static function includeComponentClass($componentName)
 	{
 		$component = new CBitrixComponent;
 		$component->initComponent($componentName);
 	}
 	/**
-	* Function returns class name of the component by it's path.
-	*
-	* <p>At first class.php is checked and if exists then included.
-	* Then if there is subsclass of CBitrixComponent found? it's name is returned.</p>
-	* @param string $componentPath
-	* @return string
-	*
-	*/
+	 * Function returns class name of the component by it's path.
+	 *
+	 * <p>At first class.php is checked and if exists then included.
+	 * Then if there is subsclass of CBitrixComponent found? it's name is returned.</p>
+	 * @param string $componentPath
+	 * @return string
+	 *
+	 */
 	final private function __getClassForPath($componentPath)
 	{
 		if (!isset(self::$__classes_map[$componentPath]))
@@ -303,14 +310,14 @@ class CBitrixComponent
 		return self::$__classes_map[$componentPath];
 	}
 	/**
-	* Function initializes the component. Returns true on success.
-	*
-	* <p>It is absolutly necessery to call this function before any component usage.</p>
-	* @param string $componentName
-	* @param string|bool $componentTemplate
-	* @return bool
-	*
-	*/
+	 * Function initializes the component. Returns true on success.
+	 *
+	 * <p>It is absolutly necessery to call this function before any component usage.</p>
+	 * @param string $componentName
+	 * @param string|bool $componentTemplate
+	 * @return bool
+	 *
+	 */
 	final public function initComponent($componentName, $componentTemplate = false)
 	{
 		$this->__bInited = false;
@@ -358,12 +365,12 @@ class CBitrixComponent
 		return true;
 	}
 	/**
-	* Helper function for component parameters safe html escaping.
-	*
-	* @param array[string]mixed &$arParams
-	* @return void
-	*
-	*/
+	 * Helper function for component parameters safe html escaping.
+	 *
+	 * @param array[string]mixed &$arParams
+	 * @return void
+	 *
+	 */
 	final protected function __prepareComponentParams(&$arParams)
 	{
 		if(!is_array($arParams))
@@ -386,15 +393,15 @@ class CBitrixComponent
 		}
 	}
 	/**
-	* Function includes language files from within the component directory.
-	*
-	* <p>For example: $this->includeComponentLang("ajax.php") will include "lang/en/ajax.php" file. </p>
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param string $relativePath
-	* @param string|bool $lang
-	* @return void
-	*
-	*/
+	 * Function includes language files from within the component directory.
+	 *
+	 * <p>For example: $this->includeComponentLang("ajax.php") will include "lang/en/ajax.php" file. </p>
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param string $relativePath
+	 * @param string|bool $lang
+	 * @return void
+	 *
+	 */
 	final public function includeComponentLang($relativePath = "", $lang = false)
 	{
 		static $messCache = array();
@@ -412,9 +419,11 @@ class CBitrixComponent
 		if (!isset($messCache[$path]))
 		{
 			$messCache[$path] = array();
-			if ($lang != "en" && $lang != "ru")
+
+			$langSubst = LangSubst($lang);
+			if ($lang <> $langSubst)
 			{
-				$fname = $_SERVER["DOCUMENT_ROOT"].$this->__path."/lang/".LangSubst($lang)."/".$relativePath;
+				$fname = $_SERVER["DOCUMENT_ROOT"].$this->__path."/lang/".$langSubst."/".$relativePath;
 				if (file_exists($fname))
 					$messCache[$path] = __IncludeLang($fname, true, true);
 			}
@@ -432,13 +441,13 @@ class CBitrixComponent
 		}
 	}
 	/**
-	* Function includes component.php file thus executing the component. Returns what component.php returns.
-	*
-	* <p>Before include there is some helper variables made available for component.php scope.</p>
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return mixed
-	*
-	*/
+	 * Function includes component.php file thus executing the component. Returns what component.php returns.
+	 *
+	 * <p>Before include there is some helper variables made available for component.php scope.</p>
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return mixed
+	 *
+	 */
 	final protected function __includeComponent()
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
@@ -471,15 +480,15 @@ class CBitrixComponent
 		return include($_SERVER["DOCUMENT_ROOT"].$this->__path."/component.php");
 	}
 	/**
-	* Function executes the component. Returns the result of it's execution.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param string $componentTemplate
-	* @param array[string]mixed $arParams
-	* @param CBitrixComponent $parentComponent
-	* @return mixed
-	*
-	*/
+	 * Function executes the component. Returns the result of it's execution.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param string $componentTemplate
+	 * @param array[string]mixed $arParams
+	 * @param CBitrixComponent $parentComponent
+	 * @return mixed
+	 *
+	 */
 	final public function includeComponent($componentTemplate, $arParams, $parentComponent)
 	{
 		if (!$this->__bInited)
@@ -494,6 +503,7 @@ class CBitrixComponent
 		if ($arParams["CACHE_TYPE"] != "Y" && $arParams["CACHE_TYPE"] != "N")
 			$arParams["CACHE_TYPE"] = "A";
 
+
 		if($this->classOfComponent)
 		{
 			/** @var CBitrixComponent $component  */
@@ -503,25 +513,47 @@ class CBitrixComponent
 			$component->onIncludeComponentLang();
 			$result = $component->executeComponent();
 			$this->__arIncludeAreaIcons = $component->__arIncludeAreaIcons;
-			return $result;
+			$frameMode = $component->frameMode;
 		}
 		else
 		{
 			$this->__prepareComponentParams($arParams);
 			$this->arParams = $arParams;
 			$this->includeComponentLang();
-			return $this->__IncludeComponent();
+			$result = $this->__IncludeComponent();
+			$frameMode = $this->frameMode;
 		}
+
+		if (!$frameMode)
+		{
+			$staticHtmlCache = \Bitrix\Main\Data\StaticHtmlCache::getInstance();
+			$staticHtmlCache->markNonCacheable();
+			if (
+				defined("BX_COMPOSITE_DEBUG")
+				&& defined("USE_HTML_STATIC_CACHE")
+				&& USE_HTML_STATIC_CACHE == true
+			)
+			{
+				AddMessage2Log(
+					"Component: ".$this->__name."\n".
+					"Request URI: ".$_SERVER["REQUEST_URI"]."\n".
+					"Script: ".(isset($_SERVER["REAL_FILE_PATH"]) ? $_SERVER["REAL_FILE_PATH"] : $_SERVER["SCRIPT_NAME"]),
+					"composite"
+				);
+			}
+		}
+
+		return $result;
 	}
 	/**
-	* Function executes the template.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param string $templatePage
-	* @param string $customTemplatePath
-	* @return void
-	*
-	*/
+	 * Function executes the template.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param string $templatePage
+	 * @param string $customTemplatePath
+	 * @return void
+	 *
+	 */
 	final public function includeComponentTemplate($templatePage = "", $customTemplatePath = "")
 	{
 		if (!$this->__bInited)
@@ -539,21 +571,21 @@ class CBitrixComponent
 			$this->__showError(str_replace(
 				array("#PAGE#", "#NAME#"),
 				array($templatePage, $this->getTemplateName()),
-				"Can not find '#NAME#' template with page '#PAGE#'"
+				"Cannot find '#NAME#' template with page '#PAGE#'"
 			));
 		}
 	}
 	/**
-	* Function initializes the template of the component. Returns true on success.
-	*
-	* <p>Instansiates the template object and calls it's init function.</p>
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @param string $templatePage
-	* @param string|bool $siteTemplate
-	* @param string $customTemplatePath
-	* @return bool
-	*
-	*/
+	 * Function initializes the template of the component. Returns true on success.
+	 *
+	 * <p>Instansiates the template object and calls it's init function.</p>
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @param string $templatePage
+	 * @param string|bool $siteTemplate
+	 * @param string $customTemplatePath
+	 * @return bool
+	 *
+	 */
 	final public function initComponentTemplate($templatePage = "", $siteTemplate = false, $customTemplatePath = "")
 	{
 		if (!$this->__bInited)
@@ -568,12 +600,12 @@ class CBitrixComponent
 			return false;
 	}
 	/**
-	* Function executes initialized template of the component.
-	*
-	* <p>Note: component must be inited by initComponent method.</p>
-	* @return void
-	*
-	*/
+	 * Function executes initialized template of the component.
+	 *
+	 * <p>Note: component must be inited by initComponent method.</p>
+	 * @return void
+	 *
+	 */
 	final public function showComponentTemplate()
 	{
 		if (!$this->__bInited)
@@ -607,12 +639,12 @@ class CBitrixComponent
 		$this->endResultCache();
 	}
 	/**
-	* Function adds an Icon to the component area in the editing mode.
-	*
-	* @param array[string]mixed $arIcon
-	* @return void
-	*
-	*/
+	 * Function adds an Icon to the component area in the editing mode.
+	 *
+	 * @param array[string]mixed $arIcon
+	 * @return void
+	 *
+	 */
 	final public function addIncludeAreaIcon($arIcon)
 	{
 		if (!isset($this->__arIncludeAreaIcons) || !is_array($this->__arIncludeAreaIcons))
@@ -621,23 +653,23 @@ class CBitrixComponent
 		$this->__arIncludeAreaIcons[] = $arIcon;
 	}
 	/**
-	* Function replaces Icons displayed for the component by an collection.
-	*
-	* @param array[int][string]mixed $arIcon
-	* @return void
-	*
-	*/
+	 * Function replaces Icons displayed for the component by an collection.
+	 *
+	 * @param array[int][string]mixed $arIcon
+	 * @return void
+	 *
+	 */
 	final public function addIncludeAreaIcons($arIcons)
 	{
 		if(is_array($arIcons))
 			$this->__arIncludeAreaIcons = $arIcons;
 	}
 	/**
-	* Function returns the collection of the Icons displayed for the component.
-	*
-	* @return array[int][string]mixed
-	*
-	*/
+	 * Function returns the collection of the Icons displayed for the component.
+	 *
+	 * @return array[int][string]mixed
+	 *
+	 */
 	final public function getIncludeAreaIcons()
 	{
 		return $this->__arIncludeAreaIcons;
@@ -665,14 +697,14 @@ class CBitrixComponent
 		return $cacheID;
 	}
 	/**
-	* Function starts the caching block of the component execution.
-	*
-	* @param int|bool $cacheTime
-	* @param mixed $additionalCacheID
-	* @param string|bool $cachePath
-	* @return string
-	*
-	*/
+	 * Function starts the caching block of the component execution.
+	 *
+	 * @param int|bool $cacheTime
+	 * @param mixed $additionalCacheID
+	 * @param string|bool $cachePath
+	 * @return string
+	 *
+	 */
 	final public function startResultCache($cacheTime = false, $additionalCacheID = false, $cachePath = false)
 	{
 		/** @global CMain $APPLICATION */
@@ -692,11 +724,11 @@ class CBitrixComponent
 		if ($this->__cachePath === false)
 			$this->__cachePath = $CACHE_MANAGER->getCompCachePath($this->__relativePath);
 
-		$this->__cache = new CPHPCache;
+		$this->__cache = \Bitrix\Main\Data\Cache::createInstance();
 		if ($this->__cache->startDataCache($cacheTime, $this->__cacheID, $this->__cachePath))
 		{
 			$this->__NavNum = $GLOBALS["NavNum"];
-			if (defined("BX_COMP_MANAGED_CACHE"))
+			if (defined("BX_COMP_MANAGED_CACHE") && $this->__cache->isStarted())
 				$CACHE_MANAGER->startTagCache($this->__cachePath);
 
 			return true;
@@ -708,7 +740,32 @@ class CBitrixComponent
 			if (array_key_exists("templateCachedData", $arCache))
 			{
 				$templateCachedData = & $arCache["templateCachedData"];
-				CBitrixComponentTemplate::applyCachedData($templateCachedData);
+
+				if ($templateCachedData && is_array($templateCachedData))
+				{
+					if (array_key_exists("additionalCSS", $templateCachedData) && strlen($templateCachedData["additionalCSS"]) > 0)
+					{
+						$APPLICATION->SetAdditionalCSS($templateCachedData["additionalCSS"]);
+						if($this->__parent)
+							$this->__parent->addChildCSS($templateCachedData["additionalCSS"]);
+					}
+
+					if (array_key_exists("additionalJS", $templateCachedData) && strlen($templateCachedData["additionalJS"]) > 0)
+					{
+						$APPLICATION->AddHeadScript($templateCachedData["additionalJS"]);
+						if($this->__parent)
+							$this->__parent->addChildJS($templateCachedData["additionalJS"]);
+					}
+
+					if (array_key_exists("frames", $templateCachedData) && is_array($templateCachedData["frames"]))
+					{
+						foreach($templateCachedData["frames"] as $frameState)
+						{
+							\Bitrix\Main\Page\FrameHelper::applyCachedData($frameState);
+						}
+					}
+				}
+
 				if ($templateCachedData["__editButtons"])
 				{
 					foreach ($templateCachedData["__editButtons"] as $button)
@@ -755,12 +812,12 @@ class CBitrixComponent
 		}
 	}
 	/**
-	* Function ends the caching block of the component execution.
-	*
-	* <p>Note: automaticly called by includeComponentTemplate.</p>
-	* @return void
-	*
-	*/
+	 * Function ends the caching block of the component execution.
+	 *
+	 * <p>Note: automaticly called by includeComponentTemplate.</p>
+	 * @return void
+	 *
+	 */
 	final public function endResultCache()
 	{
 		global $NavNum, $CACHE_MANAGER;
@@ -769,7 +826,18 @@ class CBitrixComponent
 			return null;
 
 		if (!$this->__cache)
+		{
+			if ($this->__parent)
+			{
+				foreach($this->__children_css as $cssPath)
+					$this->__parent->addChildCSS($cssPath);
+				foreach($this->__children_js as $jsPath)
+					$this->__parent->addChildJS($jsPath);
+				foreach($this->__children_epilogs as $epilogFile)
+					$this->__parent->addChildEpilog($epilogFile);
+			}
 			return null;
+		}
 
 		$arCache = array(
 			"arResult" => $this->arResult,
@@ -826,20 +894,21 @@ class CBitrixComponent
 		if (!empty($this->__editButtons))
 			$arCache["templateCachedData"]["__editButtons"] = $this->__editButtons;
 
+		$cacheWasStarted = $this->__cache->isStarted();
 		$this->__cache->endDataCache($arCache);
 
-		if (defined("BX_COMP_MANAGED_CACHE"))
+		if (defined("BX_COMP_MANAGED_CACHE") && $cacheWasStarted)
 			$CACHE_MANAGER->endTagCache();
 
 		$this->__cache = null;
 	}
 	/**
-	* Function aborts the cache after it's start.
-	*
-	* <p>Note: must be called if component returns before endResultCache or includeComponentTemplate called.</p>
-	* @return void
-	*
-	*/
+	 * Function aborts the cache after it's start.
+	 *
+	 * <p>Note: must be called if component returns before endResultCache or includeComponentTemplate called.</p>
+	 * @return void
+	 *
+	 */
 	final public function abortResultCache()
 	{
 		global $CACHE_MANAGER;
@@ -850,22 +919,23 @@ class CBitrixComponent
 		if (!$this->__cache)
 			return null;
 
+		$cacheWasStarted = $this->__cache->isStarted();
 		$this->__cache->abortDataCache();
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
+		if(defined("BX_COMP_MANAGED_CACHE") && $cacheWasStarted)
 			$CACHE_MANAGER->abortTagCache();
 
 		$this->__cache = null;
 	}
 	/**
-	* Function deletes the cache created before.
-	*
-	* <p>Note: parameters must exactly match to startResultCache call.</p>
-	* @param mixed $additionalCacheID
-	* @param string|bool $cachePath
-	* @return void
-	*
-	*/
+	 * Function deletes the cache created before.
+	 *
+	 * <p>Note: parameters must exactly match to startResultCache call.</p>
+	 * @param mixed $additionalCacheID
+	 * @param string|bool $cachePath
+	 * @return void
+	 *
+	 */
 	final public function clearResultCache($additionalCacheID = false, $cachePath = false)
 	{
 		global $CACHE_MANAGER;
@@ -882,14 +952,14 @@ class CBitrixComponent
 		CPHPCache::clean($this->__cacheID, $this->__cachePath);
 	}
 	/**
-	* Function clears entire component cache.
-	*
-	* <p>Note: parameters must exactly match to startResultCache call.</p>
-	* @param string $componentName
-	* @param string $siteId
-	* @return void
-	*
-	*/
+	 * Function clears entire component cache.
+	 *
+	 * <p>Note: parameters must exactly match to startResultCache call.</p>
+	 * @param string $componentName
+	 * @param string $siteId
+	 * @return void
+	 *
+	 */
 	final public static function clearComponentCache($componentName, $siteId = "")
 	{
 		/** @global CCacheManager $CACHE_MANAGER */
@@ -904,10 +974,10 @@ class CBitrixComponent
 
 			if ($siteId == "")
 			{
-				$rsSite = CSite::GetList(($by="sort"),($order="asc"));
-				while ($site = $rsSite->Fetch())
+				$rsSite = \Bitrix\Main\SiteTable::getList(array('order' => array('SORT' => 'ASC')));
+				while ($site = $rsSite->fetch())
 				{
-					$componentCachePath = "/".$site["ID"].$componentRelativePath;
+					$componentCachePath = "/".$site["LID"].$componentRelativePath;
 					$obCache = new CPHPCache;
 					$obCache->CleanDir($componentCachePath, "cache");
 					BXClearCache(true, $componentCachePath);
@@ -926,54 +996,55 @@ class CBitrixComponent
 		}
 	}
 	/**
-	* Function returns component cache path.
-	*
-	* @return string
-	*
-	*/
+	 * Function returns component cache path.
+	 *
+	 * @return string
+	 *
+	 */
 	final public function getCachePath()
 	{
 		return $this->__cachePath;
 	}
 	/**
-	* Function marks the arResult keys to be saved to cache. Just like __sleep magic method do.
-	*
-	* <p>Note: it's call adds key, not replacing.</p>
-	* @param array[int]string $arResultCacheKeys
-	* @return void
-	*
-	*/
+	 * Function marks the arResult keys to be saved to cache. Just like __sleep magic method do.
+	 *
+	 * <p>Note: it's call adds key, not replacing.</p>
+	 * @param array[int]string $arResultCacheKeys
+	 * @return void
+	 *
+	 */
 	
 	/**
-	 * <p><code>$arResultCacheKeys</code> - это список ключей массива <b>$arResult</b>, которые должны кэшироваться при использовании встроенного кэширования компонентов.</p> <a name="example"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @param $arResultCacheKey $s  
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $this-&gt;SetResultCacheKeys(array(
-	 *    "IBLOCK_ID",
-	 *    "ID",
-	 *    "IBLOCK_SECTION_ID",
-	 *    "NAME",
-	 *    "PROPERTIES",
-	 *    "SECTION",
-	 * ));
-	 * $this-&gt;IncludeComponentTemplate();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponent/setresultcachekeys.php
-	 * @author Bitrix
-	 */
+	* <p><code>$arResultCacheKeys</code> - это список ключей массива <b>$arResult</b>, которые должны кэшироваться при использовании встроенного кэширования компонентов.</p> <a name="example"></a>
+	*
+	*
+	*
+	*
+	* @param $arResultCacheKey $s  
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $this-&gt;SetResultCacheKeys(array(
+	*    "IBLOCK_ID",
+	*    "ID",
+	*    "IBLOCK_SECTION_ID",
+	*    "NAME",
+	*    "PROPERTIES",
+	*    "SECTION",
+	* ));
+	* $this-&gt;IncludeComponentTemplate();
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponent/setresultcachekeys.php
+	* @author Bitrix
+	*/
 	final public function setResultCacheKeys($arResultCacheKeys)
 	{
 		if ($this->arResultCacheKeys === false)
@@ -982,26 +1053,26 @@ class CBitrixComponent
 			$this->arResultCacheKeys = array_merge($this->arResultCacheKeys, $arResultCacheKeys);
 	}
 	/**
-	* Function returns component area id for editing mode.
-	*
-	* @param string $entryId
-	* @return string
-	*
-	*/
+	 * Function returns component area id for editing mode.
+	 *
+	 * @param string $entryId
+	 * @return string
+	 *
+	 */
 	final public function getEditAreaId($entryId)
 	{
-		return 'bx_'.crc32($this->GetName()).'_'.$entryId;
+		return 'bx_'.abs(crc32($this->GetName().'_'.$this->__currentCounter)).'_'.$entryId;
 	}
 	/**
-	* Function adds an edit action to some area inside the component.
-	*
-	* @param string $entryId
-	* @param string $editLink
-	* @param string|bool $editTitle
-	* @param array[string]mixed $arParams
-	* @return void
-	*
-	*/
+	 * Function adds an edit action to some area inside the component.
+	 *
+	 * @param string $entryId
+	 * @param string $editLink
+	 * @param string|bool $editTitle
+	 * @param array[string]mixed $arParams
+	 * @return void
+	 *
+	 */
 	final public function addEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
 	{
 		/** @global CMain $APPLICATION */
@@ -1046,20 +1117,20 @@ class CBitrixComponent
 		));
 	}
 	/**
-	* Function adds an delete action to some area inside the component.
-	*
-	* <ul>
-	* <li>$arParams['CONFIRM'] = false - disable confirm;
-	* <li>$arParams['CONFIRM'] = 'Text' - confirm with custom text;
-	* <li>no $arParams['CONFIRM'] at all - confirm with default text
-	* </ul>
-	* @param string $entryId
-	* @param string $deleteLink
-	* @param string|bool $deleteTitle
-	* @param array[string]mixed $arParams
-	* @return void
-	*
-	*/
+	 * Function adds an delete action to some area inside the component.
+	 *
+	 * <ul>
+	 * <li>$arParams['CONFIRM'] = false - disable confirm;
+	 * <li>$arParams['CONFIRM'] = 'Text' - confirm with custom text;
+	 * <li>no $arParams['CONFIRM'] at all - confirm with default text
+	 * </ul>
+	 * @param string $entryId
+	 * @param string $deleteLink
+	 * @param string|bool $deleteTitle
+	 * @param array[string]mixed $arParams
+	 * @return void
+	 *
+	 */
 	final public function addDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
 	{
 		/** @global CMain $APPLICATION */
@@ -1108,12 +1179,12 @@ class CBitrixComponent
 		));
 	}
 	/**
-	* Function saves component epilog environment
-	*
-	* @param array[string]mixed $arEpilogInfo
-	* @return void
-	*
-	*/
+	 * Function saves component epilog environment
+	 *
+	 * @param array[string]mixed $arEpilogInfo
+	 * @return void
+	 *
+	 */
 	final public function setTemplateEpilog($arEpilogInfo)
 	{
 		$this->__component_epilog = $arEpilogInfo;
@@ -1122,12 +1193,12 @@ class CBitrixComponent
 			$this->__parent->addChildEpilog($this->__component_epilog);
 	}
 	/**
-	* Function restores component epilog environment and executes it.
-	*
-	* @param array[string]mixed $arEpilogInfo
-	* @return void
-	*
-	*/
+	 * Function restores component epilog environment and executes it.
+	 *
+	 * @param array[string]mixed $arEpilogInfo
+	 * @return void
+	 *
+	 */
 	final public function includeComponentEpilog($arEpilogInfo)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
@@ -1148,76 +1219,115 @@ class CBitrixComponent
 		}
 	}
 	/**
-	* Function shows an internal error message.
-	*
-	* @param string $errorMessage
-	* @param string $errorCode
-	* @return void
-	*
-	*/
+	 * Function shows an internal error message.
+	 *
+	 * @param string $errorMessage
+	 * @param string $errorCode
+	 * @return void
+	 *
+	 */
 	static public function __showError($errorMessage, $errorCode = "")
 	{
 		if ($errorMessage <> '')
 			echo "<font color=\"#FF0000\">".$errorMessage.($errorCode <> '' ? " [".$errorCode."]" : "")."</font>";
 	}
 	/**
-	* Function registers children css file for cache.
-	*
-	* @param string $cssPath
-	* @return void
-	*
-	*/
+	 * Function registers children css file for cache.
+	 *
+	 * @param string $cssPath
+	 * @return void
+	 *
+	 */
 	final public function addChildCSS($cssPath)
 	{
 		$this->__children_css[] = $cssPath;
 	}
 	/**
-	* Function registers children js file for cache.
-	*
-	* @param string $jsPath
-	* @return void
-	*
-	*/
+	 * Function registers children js file for cache.
+	 *
+	 * @param string $jsPath
+	 * @return void
+	 *
+	 */
 	final public function addChildJS($jsPath)
 	{
 		$this->__children_js[] = $jsPath;
 	}
 	/**
-	* Function registers children epilog file for cache.
-	*
-	* @param string $epilogFile
-	* @return void
-	*
-	*/
+	 * Function registers children epilog file for cache.
+	 *
+	 * @param string $epilogFile
+	 * @return void
+	 *
+	 */
 	final public function addChildEpilog($epilogFile)
 	{
 		$this->__children_epilogs[] = $epilogFile;
 	}
 	/**
-	* Function adds a button to be displayed.
-	*
-	* @param array[int]string $arButton
-	* @return void
-	*
-	*/
+	 * Function adds a button to be displayed.
+	 *
+	 * @param array[int]string $arButton
+	 * @return void
+	 *
+	 */
 	final public function addEditButton($arButton)
 	{
 		$this->__editButtons[] = $arButton;
 	}
 	/**
-	* Function registers new view target for the cache.
-	*
-	* @param string $target
-	* @param string $content
-	* @param int $pos
-	* @return void
-	*
-	*/
+	 * Function registers new view target for the cache.
+	 *
+	 * @param string $target
+	 * @param string $content
+	 * @param int $pos
+	 * @return void
+	 *
+	 */
 	final public function addViewTarget($target, $content, $pos)
 	{
 		if(!isset($this->__view[$target]))
 			$this->__view[$target] = array();
 
 		$this->__view[$target][] = array($content, $pos);
+	}
+
+	/**
+	 * Function returns next pseudo random value.
+	 *
+	 * @param int $length
+	 * @return string
+	 *
+	 * @see \Bitrix\Main\Type\RandomSequence::randString
+	 */
+	public function randString($length = 6)
+	{
+		static $counters = array();
+		if (!$this->randomSequence)
+		{
+			if (!isset($counters[$this->__name]))
+				$counters[$this->__name] = 1;
+			else
+				$counters[$this->__name]++;
+
+			$seed = $this->__name."|".$counters[$this->__name];
+
+			$this->randomSequence = new \Bitrix\Main\Type\RandomSequence($seed);
+		}
+		return $this->randomSequence->randString($length);
+	}
+
+	/**
+	 * Marks a component as capable of composite mode.
+	 * You should use is to mark a whole component as
+	 * composite incompatible.
+	 *
+	 * @param bool $mode
+	 * @return void
+	 *
+	 */
+	public function setFrameMode($mode)
+	{
+		$this->frameMode = ($mode === true);
 	}
 }

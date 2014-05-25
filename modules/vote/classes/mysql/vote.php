@@ -238,8 +238,10 @@ class CVote extends CAllVote
 						$str = ($strNegative=="Y"?" V.".$key." IS NULL OR NOT ":"")."(V.".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -294,18 +296,18 @@ class CVote extends CAllVote
 		return new _CVoteDBResult($DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__));
 	}
 
-	public static function GetPublicList($arFilter=Array(), $strSqlOrder="ORDER BY C.C_SORT, C.ID, V.DATE_START desc")
+	public static function GetPublicList($arFilter=Array(), $strSqlOrder="ORDER BY C.C_SORT, C.ID, V.DATE_START desc", $params = array())
 	{
 		global $DB, $USER;
 		$err_mess = (CVote::err_mess())."<br>Function: GetPublicList<br>Line: ";
 		$arSqlSearch = array();
-		$strSqlSearch = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
+		$params = (is_array($params) ? $params : array());
+
 		foreach ($arFilter as $key => $val)
 		{
-			if (empty($val) || (is_string($val) && $val === "NOT_REF")): 
+			if (empty($val) || (is_string($val) && $val === "NOT_REF"))
 				continue;
-			endif;
 			$key = strtoupper($key);
 			switch($key)
 			{
@@ -321,9 +323,9 @@ class CVote extends CAllVote
 						$arr = array();
 						foreach ($val as $v):
 							$v = trim($v);
-							if (strLen($v) > 0):
+							if (!empty($v)) {
 								$arr[] = GetFilterQuery("C.SYMBOLIC_NAME", $v, $match);
-							endif;
+							}
 						endforeach;
 						if (!empty($arr)):
 							$arSqlSearch[] = "((".implode(") OR (", $arr)."))";
@@ -340,8 +342,32 @@ class CVote extends CAllVote
 			}
 		}
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
-		$is_admin = $USER->IsAdmin();
+		$is_admin = in_array(1, $USER->GetUserGroupArray());
 		$groups = $USER->GetGroups();
+		$iCnt = 0;
+
+		if (array_key_exists("bDescPageNumbering", $params) && $params["nTopCount"] <= 0 || $params["bCount"] === true)
+		{
+			$strSql = "SELECT COUNT(V1.ID) CNT
+				FROM (
+					SELECT V.CHANNEL_ID, V.ID, ".($is_admin ? "2" : "max(G.PERMISSION)")." as MAX_PERMISSION
+					FROM b_vote V
+					INNER JOIN b_vote_channel C ON (C.ACTIVE = 'Y' AND C.HIDDEN = 'N' AND V.CHANNEL_ID = C.ID)
+					LEFT JOIN b_vote_channel_2_group G ON (G.CHANNEL_ID = C.ID and G.GROUP_ID in ($groups))
+					$left_join
+					WHERE
+						$strSqlSearch
+						AND V.ACTIVE = 'Y' AND V.DATE_START <= NOW()
+					GROUP BY V.CHANNEL_ID, V.ID
+					".($is_admin ? "" : "
+					HAVING MAX_PERMISSION > 0")."
+				) V1";
+			$db_res = $DB->Query($strSql, false, $err_mess.__LINE__);
+			if ($db_res && ($res = $db_res->Fetch()))
+				$iCnt = intval($res["CNT"]);
+			if ($params["bCount"] === true)
+				return $iCnt;
+		}
 		$strSql = "
 			SELECT C.TITLE CHANNEL_TITLE, V.*,
 				".$DB->DateToCharFunction("V.DATE_START")."	DATE_START,
@@ -373,8 +399,19 @@ class CVote extends CAllVote
 			INNER JOIN b_vote V ON (V4.ID = V.ID)
 			INNER JOIN b_vote_channel C ON (V4.CHANNEL_ID = C.ID) 
 			".$DB->ForSql($strSqlOrder);
-		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
-		return $res;
+
+		if (array_key_exists("bDescPageNumbering", $params) && $params["nTopCount"] <= 0)
+		{
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $params);
+		}
+		else
+		{
+			if ($params["nTopCount"] > 0)
+				$strSql .= " LIMIT 0,".intval($params["nTopCount"]);
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		return $db_res;
 	}
 
 	public static function GetNowTime($ResultType = "timestamp")

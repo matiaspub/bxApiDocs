@@ -199,10 +199,11 @@ class CMain extends CAllMain
 				$strSql =
 					"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
 					"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
-					"FROM b_lang L, b_culture C ".
+					"FROM b_lang L  ".
 					"	LEFT JOIN b_lang_domain LD ON L.LID=LD.LID AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN) ".
-					"WHERE C.ID=L.CULTURE_ID".
-					"	AND ('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
+					"	INNER JOIN b_culture C ON C.ID=L.CULTURE_ID ".
+					"WHERE ".
+					"	('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
 					"	AND L.ACTIVE='Y' ".
 					"ORDER BY ".
 					"	IF((L.DOMAIN_LIMITED='Y' AND LD.LID IS NOT NULL) OR L.DOMAIN_LIMITED<>'Y', ".

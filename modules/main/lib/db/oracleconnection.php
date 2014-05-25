@@ -38,6 +38,7 @@ class OracleConnection extends Connection
 		$this->isConnected = true;
 		$this->resource = $connection;
 
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $DB, $USER, $APPLICATION;
 		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
 			include($fn);
@@ -109,11 +110,14 @@ class OracleConnection extends Connection
 			if ($trackerQuery != null)
 				$trackerQuery->finishQuery();
 
-			throw new SqlException("", $this->getErrorMessage());
+			throw new SqlQueryException("", $this->getErrorMessage(), $sql);
 		}
 
 		$executionMode = $this->transaction;
+
+		/** @var \OCI_Lob[] $clob */
 		$clob = array();
+
 		if (!empty($arBinds))
 		{
 			$executionMode = OCI_DEFAULT;
@@ -127,26 +131,38 @@ class OracleConnection extends Connection
 		if (!oci_execute($result, $executionMode))
 		{
 			if ($trackerQuery != null)
+			{
 				$trackerQuery->finishQuery();
+			}
 
-			throw new SqlException("", $this->getErrorMessage());
+			throw new SqlQueryException("", $this->getErrorMessage(), $sql);
 		}
 
 		if (!empty($arBinds))
 		{
 			if (oci_num_rows($result) > 0)
+			{
 				foreach ($bindsKeys as $key)
+				{
 					$clob[$key]->save($arBinds[$key]);
+				}
+			}
 
 			if ($this->transaction == OCI_COMMIT_ON_SUCCESS)
+			{
 				oci_commit($this->resource);
+			}
 
 			foreach ($bindsKeys as $key)
+			{
 				$clob[$key]->free();
+			}
 		}
 
 		if ($trackerQuery != null)
+		{
 			$trackerQuery->finishQuery();
+		}
 
 		$this->lastQueryResult = $result;
 
@@ -300,6 +316,10 @@ class OracleConnection extends Connection
 		return $this->tableColumnsCache[$tableName];
 	}
 
+	public function renameTable($currentName, $newName)
+	{
+		$this->query('RENAME '.$this->getSqlHelper()->quote($currentName).' TO '.$this->getSqlHelper()->quote($newName));
+	}
 
 	/*********************************************************
 	 * Transaction

@@ -1,12 +1,12 @@
 <?
 //<title>Yandex</title>
 
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/export_yandex.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/export_yandex.php');
 set_time_limit(0);
 
 global $USER, $APPLICATION;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -57,49 +57,51 @@ if (!function_exists("yandex_text2xml"))
 
 if (!function_exists('yandex_get_value'))
 {
-	function yandex_get_value($arOffer, $param, $PROPERTY)
+	function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserTypeFormat)
 	{
-		global $IBLOCK_ID;
-		static $arProperties = null, $arUserTypes = null;
-
-		if (!is_array($arProperties))
-		{
-			$dbRes = CIBlockProperty::GetList(
-				array('ID' => 'ASC'),
-				array('IBLOCK_ID' => $IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N')
-			);
-
-			while ($arRes = $dbRes->Fetch())
-			{
-				$arProperties[$arRes['ID']] = $arRes;
-			}
-
-			if (!empty($arOffer['IBLOCK_ID']) && $arOffer['IBLOCK_ID'] != $IBLOCK_ID)
-			{
-				$dbRes = CIBlockProperty::GetList(
-					array('ID' => 'ASC'),
-					array('IBLOCK_ID' => $arOffer['IBLOCK_ID'], 'CHECK_PERMISSIONS' => 'N')
-				);
-
-				while ($arRes = $dbRes->Fetch())
-				{
-					$arProperties[$arRes['ID']] = $arRes;
-				}
-			}
-		}
-
 		$strProperty = '';
 		$bParam = substr($param, 0, 6) == 'PARAM_';
-		if (is_array($arProperties[$PROPERTY]))
+		if (isset($arProperties[$PROPERTY]) && !empty($arProperties[$PROPERTY]))
 		{
 			$PROPERTY_CODE = $arProperties[$PROPERTY]['CODE'];
-
-			$arProperty = $arOffer['PROPERTIES'][$PROPERTY_CODE] ? $arOffer['PROPERTIES'][$PROPERTY_CODE] : $arOffer['PROPERTIES'][$PROPERTY];
+			$arProperty = (
+				isset($arOffer['PROPERTIES'][$PROPERTY_CODE])
+				? $arOffer['PROPERTIES'][$PROPERTY_CODE]
+				: $arOffer['PROPERTIES'][$PROPERTY]
+			);
 
 			$value = '';
 			$description = '';
 			switch ($arProperties[$PROPERTY]['PROPERTY_TYPE'])
 			{
+				case 'USER_TYPE':
+					if (!empty($arProperty['VALUE']))
+					{
+						if (is_array($arProperty['VALUE']))
+						{
+							$arValues = array();
+							foreach($arProperty["VALUE"] as $oneValue)
+							{
+								$arValues[] = call_user_func_array($arUserTypeFormat[$PROPERTY],
+									array(
+										$arProperty,
+										array("VALUE" => $oneValue),
+										array('MODE' => 'SIMPLE_TEXT'),
+									));
+							}
+							$value = implode(', ', $arValues);
+						}
+						else
+						{
+							$value = call_user_func_array($arUserTypeFormat[$PROPERTY],
+								array(
+									$arProperty,
+									array("VALUE" => $arProperty["VALUE"]),
+									array('MODE' => 'SIMPLE_TEXT'),
+								));
+						}
+					}
+					break;
 				case 'E':
 					if (!empty($arProperty['VALUE']))
 					{
@@ -163,7 +165,7 @@ if (!function_exists('yandex_get_value'))
 					}
 					break;
 				case 'L':
-					if ($arProperty['VALUE'])
+					if (!empty($arProperty['VALUE']))
 					{
 						if (is_array($arProperty['VALUE']))
 							$value .= implode(', ', $arProperty['VALUE']);
@@ -238,7 +240,9 @@ else
 	{
 		if (strlen($ar_iblock['SERVER_NAME']) <= 0)
 		{
-			$rsSite = CSite::GetList(($b="sort"), ($o="asc"), array("LID" => $ar_iblock["LID"]));
+			$b = "sort";
+			$o = "asc";
+			$rsSite = CSite::GetList($b, $o, array("LID" => $ar_iblock["LID"]));
 			if($arSite = $rsSite->Fetch())
 				$ar_iblock["SERVER_NAME"] = $arSite["SERVER_NAME"];
 			if(strlen($ar_iblock["SERVER_NAME"])<=0 && defined("SITE_SERVER_NAME"))
@@ -252,12 +256,19 @@ else
 		$ar_iblock['SERVER_NAME'] = $SETUP_SERVER_NAME;
 	}
 	$ar_iblock['PROPERTY'] = array();
-	$rsProps = CIBlockProperty::GetList(array(),array('IBLOCK_ID' => $IBLOCK_ID, 'ACTIVE' => 'Y'));
+	$rsProps = CIBlockProperty::GetList(
+		array(),
+		array('IBLOCK_ID' => $IBLOCK_ID, 'ACTIVE' => 'Y', 'CHECK_PERMISSIONS' => 'N')
+	);
 	while ($arProp = $rsProps->Fetch())
 	{
 		$ar_iblock['PROPERTY'][$arProp['ID']] = $arProp;
 	}
 }
+
+$arProperties = array();
+if (isset($ar_iblock['PROPERTY']))
+	$arProperties = $ar_iblock['PROPERTY'];
 
 $boolOffers = false;
 $arOffers = false;
@@ -294,12 +305,16 @@ else
 		if (($arOfferIBlock = $rsOfferIBlocks->Fetch()))
 		{
 			$boolOffers = true;
-			$rsProps = CIBlockProperty::GetList(array('SORT' => 'ASC'),array('IBLOCK_ID' => $intOfferIBlockID,'ACTIVE' => 'Y'));
+			$rsProps = CIBlockProperty::GetList(
+				array(),
+				array('IBLOCK_ID' => $intOfferIBlockID,'ACTIVE' => 'Y', 'CHECK_PERMISSIONS' => 'N')
+			);
 			while ($arProp = $rsProps->Fetch())
 			{
 				if ($arOffers['SKU_PROPERTY_ID'] != $arProp['ID'])
 				{
 					$ar_iblock['OFFERS_PROPERTY'][$arProp['ID']] = $arProp;
+					$arProperties[$arProp['ID']] = $arProp;
 					if (in_array($arProp['PROPERTY_TYPE'],$arSelectedPropTypes))
 						$arSelectOfferProps[] = $arProp['ID'];
 					if (strlen($arProp['CODE']) > 0)
@@ -365,6 +380,21 @@ else
 					}
 				}
 			}
+		}
+	}
+}
+
+$arUserTypeFormat = array();
+foreach($arProperties as $key => $arProperty)
+{
+	$arUserTypeFormat[$arProperty["ID"]] = false;
+	if (strlen($arProperty["USER_TYPE"]))
+	{
+		$arUserType = CIBlockProperty::GetUserType($arProperty["USER_TYPE"]);
+		if (array_key_exists("GetPublicViewHTML", $arUserType))
+		{
+			$arUserTypeFormat[$arProperty["ID"]] = $arUserType["GetPublicViewHTML"];
+			$arProperties[$key]['PROPERTY_TYPE'] = 'USER_TYPE';
 		}
 	}
 }
@@ -495,16 +525,19 @@ if (empty($arRunErrors))
 	}
 	else
 	{
-		$db_acc = CCurrency::GetList(($by="sort"), ($order="asc"));
+		$by="sort";
+		$order="asc";
+		$db_acc = CCurrency::GetList($by, $order);
 		while ($arAcc = $db_acc->Fetch())
 		{
 			if (in_array($arAcc['CURRENCY'], $arCurrencyAllowed))
-				$strTmp.= "<currency id=\"".$arAcc["CURRENCY"]."\" rate=\"".(CCurrencyRates::ConvertCurrency(1, $arAcc["CURRENCY"], $RUR))."\"/>\n";
+				$strTmp.= '<currency id="'.$arAcc["CURRENCY"].'" rate="'.(CCurrencyRates::ConvertCurrency(1, $arAcc["CURRENCY"], $RUR)).'" />'."\n";
 		}
 	}
 	$strTmp.= "</currencies>\n";
 
 	@fwrite($fp, $strTmp);
+	unset($strTmp);
 
 	//*****************************************//
 
@@ -585,41 +618,44 @@ if (empty($arRunErrors))
 
 	if ('D' == $arCatalog['CATALOG_TYPE'] || 'O' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
 
-		$filter = Array("IBLOCK_ID"=>$IBLOCK_ID, "ACTIVE_DATE"=>"Y", "ACTIVE"=>"Y");
-		if (!$bAllSections)
+		$filter = array("IBLOCK_ID" => $IBLOCK_ID);
+		if (!$bAllSections && !empty($arSectionIDs))
 		{
 			$filter["INCLUDE_SUBSECTIONS"] = "Y";
 			$filter["SECTION_ID"] = $arSectionIDs;
 		}
+		$filter["ACTIVE"] = "Y";
+		$filter["ACTIVE_DATE"] = "Y";
 		$res = CIBlockElement::GetList(array(), $filter, false, false, $arSelect);
 
 		$total_sum = 0;
 		$is_exists = false;
 		$cnt = 0;
-
 		while ($obElement = $res->GetNextElement())
 		{
+			$cnt++;
 			$arAcc = $obElement->GetFields();
 			if (is_array($XML_DATA['XML_DATA']))
 			{
 				$arAcc["PROPERTIES"] = $obElement->GetProperties();
 			}
-			$arAcc['CATALOG_QUANTITY'] = '';
-			$arAcc['CATALOG_QUANTITY_TRACE'] = 'N';
-			$arProduct = CCatalogProduct::GetByID($arAcc['ID']);
-			if (!empty($arProduct))
+			$arAcc['CATALOG_AVAILABLE'] = 'Y';
+			$rsProducts = CCatalogProduct::GetList(
+				array(),
+				array('ID' => $arAcc['ID']),
+				false,
+				false,
+				array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
+			);
+			if ($arProduct = $rsProducts->Fetch())
 			{
-				$arAcc['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
-				$arAcc['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
+				$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
+				if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
+					$arAcc['CATALOG_AVAILABLE'] = 'N';
 			}
-			$str_QUANTITY = DoubleVal($arAcc["CATALOG_QUANTITY"]);
-			$str_QUANTITY_TRACE = $arAcc["CATALOG_QUANTITY_TRACE"];
-			if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
-				$str_AVAILABLE = ' available="false"';
-			else
-				$str_AVAILABLE = ' available="true"';
+			$str_AVAILABLE = ' available="'.('Y' == $arAcc['CATALOG_AVAILABLE'] ? 'true' : 'false').'"';
 
 			$minPrice = 0;
 			$minPriceRUR = 0;
@@ -707,7 +743,7 @@ if (empty($arRunErrors))
 			if ($minPrice <= 0) continue;
 
 			$boolCurrentSections = false;
-			$bNoActiveGroup = True;
+			$bNoActiveGroup = true;
 			$strTmpOff_tmp = "";
 			$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 			while ($ar_res1 = $db_res1->Fetch())
@@ -722,7 +758,7 @@ if (empty($arRunErrors))
 
 				}
 			}
-			if (false == $boolCurrentSections)
+			if (!$boolCurrentSections)
 			{
 				$boolNeedRootSection = true;
 				$strTmpOff_tmp.= "<categoryId>".$intMaxSectionID."</categoryId>\n";
@@ -796,7 +832,7 @@ if (empty($arRunErrors))
 							$strParamValue = '';
 							if ($prop_id)
 							{
-								$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id);
+								$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
 							}
 							if ('' != $strParamValue)
 								$strTmpOff .= $strParamValue."\n";
@@ -818,7 +854,7 @@ if (empty($arRunErrors))
 					else
 					{
 						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key]);
+						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 						if ('' != $strValue)
 							$strTmpOff .= $strValue."\n";
 					}
@@ -840,7 +876,7 @@ if (empty($arRunErrors))
 					if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 					{
 						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key]);
+						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 						if ('' != $strValue)
 							$strTmpOff .= $strValue."\n";
 					}
@@ -848,11 +884,20 @@ if (empty($arRunErrors))
 			}
 
 			$strTmpOff.= "</offer>\n";
+			if (100 <= $cnt)
+			{
+				$cnt = 0;
+				CCatalogDiscount::ClearDiscountCache(array(
+					'PRODUCT' => true,
+					'SECTIONS' => true,
+					'PROPERTIES' => true
+				));
+			}
 		}
 	}
 	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
 	{
-		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "ACTIVE", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
 		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, 'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
 		if (YANDEX_SKU_EXPORT_PROP == $arSKUExport['SKU_EXPORT_COND'])
 		{
@@ -866,13 +911,15 @@ if (empty($arRunErrors))
 			$arOfferFilter[$strExportKey] = $mxValues;
 		}
 
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
-		$arFilter = Array("IBLOCK_ID"=>$IBLOCK_ID, "ACTIVE_DATE"=>"Y", "ACTIVE"=>"Y");
-		if (!$bAllSections)
+		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
+		if (!$bAllSections && !empty($arSectionIDs))
 		{
 			$arFilter["INCLUDE_SUBSECTIONS"] = "Y";
 			$arFilter["SECTION_ID"] = $arSectionIDs;
 		}
+		$arFilter["ACTIVE"] = "Y";
+		$arFilter["ACTIVE_DATE"] = "Y";
 
 		$strOfferTemplateURL = '';
 		if (!empty($arSKUExport['SKU_URL_TEMPLATE_TYPE']))
@@ -893,14 +940,16 @@ if (empty($arRunErrors))
 			}
 		}
 
+		$cnt = 0;
 		$rsItems = CIBlockElement::GetList(array(), $arFilter, false, false, $arSelect);
 		while ($obItem = $rsItems->GetNextElement())
 		{
+			$cnt++;
+			$arCross = array();
 			$arItem = $obItem->GetFields();
 			$arItem['PROPERTIES'] = $obItem->GetProperties();
 			if (!empty($arItem['PROPERTIES']))
 			{
-				$arCross = array();
 				foreach ($arItem['PROPERTIES'] as &$arProp)
 				{
 					$arCross[$arProp['ID']] = $arProp;
@@ -929,7 +978,7 @@ if (empty($arRunErrors))
 					$boolNoActiveSections = false;
 				}
 			}
-			if (false == $boolCurrentSections)
+			if (!$boolCurrentSections)
 			{
 				$boolNeedRootSection = true;
 				$strSections .= "<categoryId>".$intMaxSectionID."</categoryId>\n";
@@ -1063,20 +1112,16 @@ if (empty($arRunErrors))
 					if ($boolFirst)
 					{
 						$dblAllMinPrice = $minPriceRUR;
+						$arCross = (!empty($arItem['PROPERTIES']) ? $arItem['PROPERTIES'] : array());
 						$arOfferItem['PROPERTIES'] = $obOfferItem->GetProperties();
-						$arCross = array();
-						foreach ($arOfferItem['PROPERTIES'] as $arProp)
+						if (!empty($arOfferItem['PROPERTIES']))
 						{
-							$arCross[$arProp['ID']] = $arProp;
+							foreach ($arOfferItem['PROPERTIES'] as $arProp)
+							{
+								$arCross[$arProp['ID']] = $arProp;
+							}
 						}
-						if (!empty($arItem['PROPERTIES']))
-						{
-							$arOfferItem['PROPERTIES'] = $arCross + $arItem['PROPERTIES'];
-						}
-						else
-						{
-							$arOfferItem['PROPERTIES'] = $arCross;
-						}
+						$arOfferItem['PROPERTIES'] = $arCross;
 
 						$arCurrentOffer = $arOfferItem;
 						$arCurrentPrice = array(
@@ -1091,21 +1136,17 @@ if (empty($arRunErrors))
 					{
 						if ($dblAllMinPrice > $minPriceRUR)
 						{
-							$dblAllMinPrice > $minPriceRUR;
+							$dblAllMinPrice = $minPriceRUR;
+							$arCross = (!empty($arItem['PROPERTIES']) ? $arItem['PROPERTIES'] : array());
 							$arOfferItem['PROPERTIES'] = $obOfferItem->GetProperties();
-							$arCross = array();
-							foreach ($arOfferItem['PROPERTIES'] as $arProp)
+							if (!empty($arOfferItem['PROPERTIES']))
 							{
-								$arCross[$arProp['ID']] = $arProp;
+								foreach ($arOfferItem['PROPERTIES'] as $arProp)
+								{
+									$arCross[$arProp['ID']] = $arProp;
+								}
 							}
-							if (!empty($arItem['PROPERTIES']))
-							{
-								$arOfferItem['PROPERTIES'] = $arCross + $arItem['PROPERTIES'];
-							}
-							else
-							{
-								$arOfferItem['PROPERTIES'] = $arCross;
-							}
+							$arOfferItem['PROPERTIES'] = $arCross;
 
 							$arCurrentOffer = $arOfferItem;
 							$arCurrentPrice = array(
@@ -1125,19 +1166,20 @@ if (empty($arRunErrors))
 					$minPriceRUR = $arCurrentPrice['MIN_PRICE_RUR'];
 					$minPriceGroup = $arCurrentPrice['MIN_PRICE_GROUP'];
 
-					$arOfferItem['CATALOG_QUANTITY'] = '';
-					$arOfferItem['CATALOG_QUANTITY_TRACE'] = 'N';
-					$arProduct = CCatalogProduct::GetByID($arOfferItem['ID']);
-					if (!empty($arProduct))
-					{
-						$arOfferItem['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
-						$arOfferItem['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
-					}
 					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
-					$str_QUANTITY = DoubleVal($arOfferItem["CATALOG_QUANTITY"]);
-					$str_QUANTITY_TRACE = $arOfferItem["CATALOG_QUANTITY_TRACE"];
-					if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
-						$arOfferItem['YANDEX_AVAILABLE'] = 'false';
+					$rsProducts = CCatalogProduct::GetList(
+						array(),
+						array('ID' => $arOfferItem['ID']),
+						false,
+						false,
+						array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
+					);
+					if ($arProduct = $rsProducts->Fetch())
+					{
+						$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
+						if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
+							$arOfferItem['YANDEX_AVAILABLE'] = 'false';
+					}
 
 					if (strlen($arOfferItem['DETAIL_PAGE_URL']) <= 0)
 						$arOfferItem['DETAIL_PAGE_URL'] = '/';
@@ -1217,7 +1259,7 @@ if (empty($arRunErrors))
 									$strParamValue = '';
 									if ($prop_id)
 									{
-										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id);
+										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
 									}
 									if ('' != $strParamValue)
 										$strOfferYandex .= $strParamValue."\n";
@@ -1238,7 +1280,7 @@ if (empty($arRunErrors))
 							else
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key]);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1258,7 +1300,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key]);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1276,34 +1318,31 @@ if (empty($arRunErrors))
 				while ($obOfferItem = $rsOfferItems->GetNextElement())
 				{
 					$arOfferItem = $obOfferItem->GetFields();
+					$arCross = (!empty($arItem['PROPERTIES']) ? $arItem['PROPERTIES'] : array());
 					$arOfferItem['PROPERTIES'] = $obOfferItem->GetProperties();
-					$arCross = array();
-					foreach ($arOfferItem['PROPERTIES'] as $arProp)
+					if (!empty($arOfferItem['PROPERTIES']))
 					{
-						$arCross[$arProp['ID']] = $arProp;
+						foreach ($arOfferItem['PROPERTIES'] as $arProp)
+						{
+							$arCross[$arProp['ID']] = $arProp;
+						}
 					}
-					if (!empty($arItem['PROPERTIES']))
-					{
-						$arOfferItem['PROPERTIES'] = $arCross + $arItem['PROPERTIES'];
-					}
-					else
-					{
-						$arOfferItem['PROPERTIES'] = $arCross;
-					}
+					$arOfferItem['PROPERTIES'] = $arCross;
 
-					$arOfferItem['CATALOG_QUANTITY'] = '';
-					$arOfferItem['CATALOG_QUANTITY_TRACE'] = 'N';
-					$arProduct = CCatalogProduct::GetByID($arOfferItem['ID']);
-					if (!empty($arProduct))
-					{
-						$arOfferItem['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
-						$arOfferItem['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
-					}
 					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
-					$str_QUANTITY = DoubleVal($arOfferItem["CATALOG_QUANTITY"]);
-					$str_QUANTITY_TRACE = $arOfferItem["CATALOG_QUANTITY_TRACE"];
-					if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
-						$arOfferItem['YANDEX_AVAILABLE'] = 'false';
+					$rsProducts = CCatalogProduct::GetList(
+						array(),
+						array('ID' => $arOfferItem['ID']),
+						false,
+						false,
+						array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
+					);
+					if ($arProduct = $rsProducts->Fetch())
+					{
+						$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
+						if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
+							$arOfferItem['YANDEX_AVAILABLE'] = 'false';
+					}
 
 					$minPrice = -1;
 					if ($XML_DATA['PRICE'] > 0)
@@ -1464,7 +1503,7 @@ if (empty($arRunErrors))
 									$strParamValue = '';
 									if ($prop_id)
 									{
-										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id);
+										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
 									}
 									if ('' != $strParamValue)
 										$strOfferYandex .= $strParamValue."\n";
@@ -1485,7 +1524,7 @@ if (empty($arRunErrors))
 							else
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key]);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1505,7 +1544,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key]);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1520,20 +1559,21 @@ if (empty($arRunErrors))
 			}
 			if ('X' == $arCatalog['CATALOG_TYPE'] && !$boolItemOffers)
 			{
-				$arItem['CATALOG_QUANTITY'] = '';
-				$arItem['CATALOG_QUANTITY_TRACE'] = 'N';
-				$arProduct = CCatalogProduct::GetByID($arItem['ID']);
-				if (!empty($arProduct))
+				$arItem['CATALOG_AVAILABLE'] = 'Y';
+				$rsProducts = CCatalogProduct::GetList(
+					array(),
+					array('ID' => $arItem['ID']),
+					false,
+					false,
+					array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
+				);
+				if ($arProduct = $rsProducts->Fetch())
 				{
-					$arItem['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
-					$arItem['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
+					$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
+					if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
+						$arItem['CATALOG_AVAILABLE'] = 'N';
 				}
-				$str_QUANTITY = DoubleVal($arItem["CATALOG_QUANTITY"]);
-				$str_QUANTITY_TRACE = $arItem["CATALOG_QUANTITY_TRACE"];
-				if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
-					$str_AVAILABLE = ' available="false"';
-				else
-					$str_AVAILABLE = ' available="true"';
+				$str_AVAILABLE = ' available="'.('Y' == $arItem['CATALOG_AVAILABLE'] ? 'true' : 'false').'"';
 
 				$minPrice = 0;
 				$minPriceRUR = 0;
@@ -1684,7 +1724,7 @@ if (empty($arRunErrors))
 								$strParamValue = '';
 								if ($prop_id)
 								{
-									$strParamValue = yandex_get_value($arItem, 'PARAM_'.$key, $prop_id);
+									$strParamValue = yandex_get_value($arItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
 								}
 								if ('' != $strParamValue)
 									$strValue .= $strParamValue."\n";
@@ -1705,7 +1745,7 @@ if (empty($arRunErrors))
 						}
 						else
 						{
-							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key]);
+							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 							if ('' != $strValue)
 								$strValue .= "\n";
 						}
@@ -1726,7 +1766,7 @@ if (empty($arRunErrors))
 					default:
 						if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 						{
-							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key]);
+							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 							if ('' != $strValue)
 								$strValue .= "\n";
 						}
@@ -1743,6 +1783,15 @@ if (empty($arRunErrors))
 					$boolItemOffers = true;
 					$boolItemExport = true;
 				}
+			}
+			if (100 <= $cnt)
+			{
+				$cnt = 0;
+				CCatalogDiscount::ClearDiscountCache(array(
+					'PRODUCT' => true,
+					'SECTIONS' => true,
+					'PROPERTIES' => true
+				));
 			}
 			if (!$boolItemExport)
 				continue;

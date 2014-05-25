@@ -40,18 +40,22 @@ class CultureTable extends Entity\DataManager
 			'NAME' => array(
 				'data_type' => 'string',
 				'required' => true,
+				'title' => Loc::getMessage("culture_entity_name"),
 			),
 			'FORMAT_DATE' => array(
 				'data_type' => 'string',
 				'required' => true,
+				'title' => Loc::getMessage("culture_entity_date_format"),
 			),
 			'FORMAT_DATETIME' => array(
 				'data_type' => 'string',
 				'required' => true,
+				'title' => Loc::getMessage("culture_entity_datetime_format"),
 			),
 			'FORMAT_NAME' => array(
 				'data_type' => 'string',
 				'required' => true,
+				'title' => Loc::getMessage("culture_entity_name_format"),
 			),
 			'WEEK_START' => array(
 				'data_type' => 'integer',
@@ -59,6 +63,7 @@ class CultureTable extends Entity\DataManager
 			'CHARSET' => array(
 				'data_type' => 'string',
 				'required' => true,
+				'title' => Loc::getMessage("culture_entity_charset"),
 			),
 			'DIRECTION' => array(
 				'data_type' => 'boolean',

@@ -5,6 +5,10 @@ use Bitrix\Main\Type;
 use Bitrix\Main\Text;
 use Bitrix\Main\IO;
 
+/**
+ * Class Request contains current request
+ * @package Bitrix\Main
+ */
 abstract class Request
 	extends Type\ParameterDictionary
 {
@@ -25,7 +29,7 @@ abstract class Request
 
 	public function addFilter(Type\IRequestFilter $filter)
 	{
-		$filteredValues = $filter->filter($this->arValues);
+		$filteredValues = $filter->filter($this->values);
 
 		if ($filteredValues != null)
 			$this->setValuesNoDemand($filteredValues);

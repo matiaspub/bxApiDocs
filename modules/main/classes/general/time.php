@@ -6,8 +6,6 @@
  * @copyright 2001-2013 Bitrix
  */
 
-IncludeModuleLangFile(__FILE__);
-
 class CTimeZone
 {
 	protected static $enabled = 1;
@@ -49,6 +47,8 @@ class CTimeZone
 
 	public static function GetZones()
 	{
+		IncludeModuleLangFile(__FILE__);
+
 		$aTZ = array();
 		static $aExcept = array("Etc/", "GMT", "UTC", "UCT", "HST", "PST", "MST", "CST", "EST", "CET", "MET", "WET", "EET", "PRC", "ROC", "ROK", "W-SU");
 		foreach(DateTimeZone::listIdentifiers() as $tz)
@@ -82,7 +82,7 @@ class CTimeZone
 		if(self::IsAutoTimeZone(trim($USER->GetParam("AUTO_TIME_ZONE"))))
 		{
 			$APPLICATION->AddHeadString(
-				'<script type="text/javascript">var bxDate = new Date(); document.cookie="'.$cookie_prefix.'_TIME_ZONE="+bxDate.getTimezoneOffset()+"%2C"+Math.round(bxDate.getTime()/1000)+"%2C'.time().'; path=/; expires=Fri, 01-Jan-2038 00:00:00 GMT"</script>', true
+				'<script type="text/javascript">var bxDate = new Date(); document.cookie="'.$cookie_prefix.'_TIME_ZONE="+bxDate.getTimezoneOffset()+"; path=/; expires=Fri, 01-Jan-2038 00:00:00 GMT"</script>', true
 			);
 		}
 		elseif(isset($_COOKIE[$cookie_prefix."_TIME_ZONE"]))
@@ -120,11 +120,7 @@ class CTimeZone
 
 		if(isset($_COOKIE[$cookie_prefix."_TIME_ZONE"])	&& $_COOKIE[$cookie_prefix."_TIME_ZONE"] <> '')
 		{
-			$arCookie = explode(",", $_COOKIE[$cookie_prefix."_TIME_ZONE"]);
-			if(count($arCookie) == 3)
-			{
-				return $arCookie;
-			}
+			return intval($_COOKIE[$cookie_prefix."_TIME_ZONE"]);
 		}
 
 		return null;
@@ -176,26 +172,10 @@ class CTimeZone
 						//auto time zone from DB
 						return $factOffset;
 					}
-					if(($arCookie = self::GetCookieValue()) !== null)
+					if(($cookie = self::GetCookieValue()) !== null)
 					{
 						//auto time zone from cookie
-						if($arCookie[1] >= $arCookie[2] && $arCookie[1] <= ($arCookie[2]+30*60) || $arCookie[1] <= $arCookie[2] && $arCookie[1] >= ($arCookie[2]-30*60))
-						{
-							//correct tz - offset from JS "as is"
-							$userOffset = -($arCookie[0])*60;
-						}
-						elseif($arCookie[1] > ($arCookie[2]+30*60))
-						{
-							//incorrect tz - try to determine offset
-							$diff = ($arCookie[1] - $arCookie[2]) % 3600;
-							return ($arCookie[1] + ($diff < 1800? -$diff : 3600-$diff)) - $arCookie[2];
-						}
-						elseif($arCookie[1] < ($arCookie[2]-30*60))
-						{
-							//incorrect tz - try to determine offset
-							$diff = ($arCookie[2] - $arCookie[1]) % 3600;
-							return ($arCookie[1] - ($diff < 1800? -$diff : 3600-$diff)) - $arCookie[2];
-						}
+						$userOffset = -($cookie)*60;
 					}
 				}
 				else

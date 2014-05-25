@@ -25,13 +25,22 @@ CModule::AddAutoloadClasses(
 		"CSearchUser" => "classes/general/user.php",
 		"CSearchParameters" => "classes/general/comp_parameters.php",
 		"search" => "install/index.php",
+		"CSearchFullText" => "classes/general/full_text.php",
+		"CSearchSphinx" => "tools/sphinx.php",
+		"CSearchStemTable" => "tools/stemtable.php",
 	)
 );
 
 CJSCore::RegisterExt('search_tags', array(
 	'js' => '/bitrix/js/search/tags.js',
 ));
-
+/**
+ * Returns filtered sName concatenated with random number.
+ *
+ * @param string $sName
+ * @return string
+ * @deprecated
+ */
 function GenerateUniqId($sName)
 {
 	static $arPostfix = array();
@@ -42,7 +51,7 @@ function GenerateUniqId($sName)
 
 	$arPostfix[$sPostfix] = 1;
 
-	return preg_replace("/\W/", "_", $sName).$sPostfix;
+	return preg_replace("/\\W/", "_", $sName).$sPostfix;
 }
 
 $DB_test = CDatabase::GetModuleConnection('search', true);

@@ -18,10 +18,10 @@ class CAllSaleTax
 {
 	static function DoProcessOrderBasket(&$arOrder, $arOptions, &$arErrors)
 	{
-		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && !$arOrder["USE_VAT"])
+		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
 			return;
 
-		if (!$arOrder["USE_VAT"])
+		if (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"] != "Y")
 		{
 			if (!array_key_exists("TAX_EXEMPT", $arOrder))
 			{
@@ -74,15 +74,25 @@ class CAllSaleTax
 					);
 
 					foreach ($arOrder["TAX_LIST"] as &$arTax)
+					{
 						$arTax["VALUE_MONEY"] += $arTax["TAX_VAL"];
+
+						if ($arTax["IS_IN_PRICE"]=="Y")
+						{
+							$arTax["VALUE_FORMATED"] = " (".(($arTax["IS_PERCENT"]=="Y")?"".DoubleVal($arTax["VALUE"])."%, ":" ").GetMessage("SOA_VAT_INCLUDED").")";
+						}
+						elseif ($arTax["IS_PERCENT"]=="Y")
+						{
+							$arTax["VALUE_FORMATED"] = " (".DoubleVal($arTax["VALUE"])."%)";
+						}
+
+						if ($arTax["IS_IN_PRICE"] != "Y")
+							$arOrder["TAX_PRICE"] += roundEx($arTax["VALUE_MONEY"], SALE_VALUE_PRECISION);
+
+					}
 					unset($arTax);
 				}
 
-				foreach ($arOrder["TAX_LIST"] as $arTax)
-				{
-					if ($arTax["IS_IN_PRICE"] != "Y")
-						$arOrder["TAX_PRICE"] += roundEx($arTax["VALUE_MONEY"], SALE_VALUE_PRECISION);
-				}
 			}
 		}
 		else
@@ -102,11 +112,12 @@ class CAllSaleTax
 				);
 			}
 		}
+
 	}
 
 	static function DoProcessOrderDelivery(&$arOrder, $arOptions, &$arErrors)
 	{
-		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && !$arOrder["USE_VAT"])
+		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
 			return;
 
 		if (!array_key_exists("COUNT_DELIVERY_TAX", $arOptions))
@@ -115,7 +126,7 @@ class CAllSaleTax
 		if (doubleval($arOrder["DELIVERY_PRICE"]) <= 0 || $arOptions["COUNT_DELIVERY_TAX"] != "Y")
 			return;
 
-		if (!$arOrder["USE_VAT"])
+		if (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"] != "Y")
 		{
 			if (!array_key_exists("TAX_EXEMPT", $arOrder))
 			{
@@ -163,20 +174,26 @@ class CAllSaleTax
 					$arOrder["TAX_LIST"],
 					$arOrder["CURRENCY"]
 				);
-				foreach ($arOrder["TAX_LIST"] as &$arTax)
-					$arTax["VALUE_MONEY"] += roundEx($arTax["TAX_VAL"], SALE_VALUE_PRECISION);
-				unset($arTax);
-				
+
 				$arOrder["TAX_PRICE"] = 0;
-				foreach ($arOrder["TAX_LIST"] as $arTax)
+				foreach ($arOrder["TAX_LIST"] as &$arTax)
 				{
+					$arTax["VALUE_MONEY"] += roundEx($arTax["TAX_VAL"], SALE_VALUE_PRECISION);
+					$arTax["TAX_VAL"] += roundEx($arTax["TAX_VAL"], SALE_VALUE_PRECISION);
+
+					$arTax['VALUE_MONEY_FORMATED'] = SaleFormatCurrency($arTax["VALUE_MONEY"], $arOrder["CURRENCY"]);
+
 					if ($arTax["IS_IN_PRICE"] != "Y")
 						$arOrder["TAX_PRICE"] += roundEx($arTax["VALUE_MONEY"], SALE_VALUE_PRECISION);
+
 				}
+				unset($arTax);
+
 			}
 		}
 		else
 		{
+
 			$deliveryVat = roundEx($arOrder["DELIVERY_PRICE"] * $arOrder["VAT_RATE"] / (1 + $arOrder["VAT_RATE"]), 2);
 
 			$arOrder["VAT_SUM"] += $deliveryVat;
@@ -197,6 +214,7 @@ class CAllSaleTax
 				);
 			//}
 		}
+
 	}
 
 	static function DoSaveOrderTax($orderId, $arTaxList, &$arErrors)
@@ -276,30 +294,30 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция обновляет параметры налога с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код налога.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров налога, ключами в котором
-	 * являются названия параметров, а значениями - соответствующие
-	 * значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> <li> <b>NAME</b>
-	 * - название налога;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li> <b>CODE</b> -
-	 * мнемонический код.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Функция возвращает код измененного налога или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__update.6e2c0ff3.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры налога с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код налога.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров налога, ключами в котором
+	* являются названия параметров, а значениями - соответствующие
+	* значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> <li> <b>NAME</b>
+	* - название налога;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li> <b>CODE</b> -
+	* мнемонический код.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Функция возвращает код измененного налога или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__update.6e2c0ff3.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -319,22 +337,22 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция удаляет налог с кодом ID. Также удаляются ставки этого налога и освобождения от уплаты налога, относящиеся к этому налогу. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код налога.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__delete.6efc76a6.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет налог с кодом ID. Также удаляются ставки этого налога и освобождения от уплаты налога, относящиеся к этому налогу. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код налога.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__delete.6efc76a6.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -352,42 +370,42 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция возвращает параметры налога с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код налога.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров налога с
-	 * ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr> <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td>
-	 * <td>Название налога.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	 * налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание налога.</td> </tr> <tr>
-	 * <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> </table><p>  </p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выведем параметры налога с кодом $TAX_ID
-	 * if ($arTax = CSaleTax::GetByID($TAX_ID))
-	 * {
-	 *    echo "&lt;pre&gt;";
-	 *    print_r($arTax);
-	 *    echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getbyid.6fbc0960.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры налога с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код налога.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров налога с
+	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr> <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td>
+	* <td>Название налога.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
+	* налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание налога.</td> </tr> <tr>
+	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> </table> <p>  </p<a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выведем параметры налога с кодом $TAX_ID
+	* if ($arTax = CSaleTax::GetByID($TAX_ID))
+	* {
+	*    echo "&lt;pre&gt;";
+	*    print_r($arTax);
+	*    echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getbyid.6fbc0960.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -408,41 +426,41 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция возвращает набор налогов, удовлетворяющих фильтру arFilter. Результирующий набор упорядочен в соответствии с массивом arOrder. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = Array("NAME"=>"ASC") Ассоциативный массив условий сортировки. Каждая пара
-	 * ключ-значение массива применяется последовательно. Ключами
-	 * являются названия параметров, по значениям которых
-	 * осуществляется сортировка, а значениями - направления
-	 * сортировки.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название
-	 * налога;</li> <li> <b>ID</b> - код налога;</li> <li> <b>LID</b> - сайт;</li> <li> <b>CODE</b> -
-	 * мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
-	 * изменения записи.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Ассоциативный массив для фильтрации налогов. Ключами являются
-	 * названия фильтруемых параметров, а значениями - условия на
-	 * значения.<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код налога;</li> <li>
-	 * <b>LID</b> - сайт;</li> <li> <b>CODE</b> - мнемонический код налога.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы параметров налогов с ключами:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr>
-	 * <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
-	 * <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
-	 * <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего
-	 * изменения записи.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getlist.726e1309.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор налогов, удовлетворяющих фильтру arFilter. Результирующий набор упорядочен в соответствии с массивом arOrder. </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("NAME"=>"ASC") Ассоциативный массив условий сортировки. Каждая пара
+	* ключ-значение массива применяется последовательно. Ключами
+	* являются названия параметров, по значениям которых
+	* осуществляется сортировка, а значениями - направления
+	* сортировки.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название
+	* налога;</li> <li> <b>ID</b> - код налога;</li> <li> <b>LID</b> - сайт;</li> <li> <b>CODE</b> -
+	* мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
+	* изменения записи.</li> </ul>
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Ассоциативный массив для фильтрации налогов. Ключами являются
+	* названия фильтруемых параметров, а значениями - условия на
+	* значения.<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код налога;</li> <li>
+	* <b>LID</b> - сайт;</li> <li> <b>CODE</b> - мнемонический код налога.</li> </ul>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы параметров налогов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr>
+	* <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
+	* <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
+	* <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего
+	* изменения записи.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getlist.726e1309.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder=Array("NAME"=>"ASC"), $arFilter=Array())
 	{
 		global $DB;
@@ -533,56 +551,56 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция возвращает набор записей из таблицы освобождений от уплаты налогов, удовлетворяющих фильтру arFilter </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Ассоциативный массив для фильтрации записей. Ключами являются
-	 * названия фильтруемых параметров, а значениями - условия на
-	 * значения.<br><br> Допустимые ключи: <ul> <li> <b>GROUP_ID</b> - код группы
-	 * пользователей, которая освобождается от уплаты налога;</li> <li>
-	 * <b>TAX_ID</b> - код налога, от уплаты которого освобождается группа
-	 * пользователей.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы параметров налогов с ключами:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>GROUP_ID</td> <td>Код группы
-	 * пользователей, которая освобождается от уплаты налога.</td> </tr> <tr>
-	 * <td>TAX_ID</td> <td>Код налога, от уплаты которого освобождается группа
-	 * пользователей.</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Заполним массив налогов, от уплаты которых освобожден текущий пользователь
-	 * $arTaxExempt = array();
-	 * if ($USER-&gt;IsAuthorized())
-	 * {
-	 *    $arUserGroups = $USER-&gt;GetUserGroupArray();
-	 *    for ($ig = 0; $ig &lt; count($arUserGroups); $ig++)
-	 *    {
-	 *       $db_tax_ex_tmp = CSaleTax::GetExemptList(Array("GROUP_ID"=&gt;$arUserGroups[$ig]));
-	 *       while ($ar_tax_ex_tmp = $db_tax_ex_tmp-&gt;Fetch())
-	 *       {
-	 *          if (!in_array(IntVal($ar_tax_ex_tmp["TAX_ID"]), $arTaxExempt))
-	 *          {
-	 *             $arTaxExempt[] = IntVal($ar_tax_ex_tmp["TAX_ID"]);
-	 *          }
-	 *       }
-	 *    }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getexemptlist.96a07443.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор записей из таблицы освобождений от уплаты налогов, удовлетворяющих фильтру arFilter </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() Ассоциативный массив для фильтрации записей. Ключами являются
+	* названия фильтруемых параметров, а значениями - условия на
+	* значения.<br><br> Допустимые ключи: <ul> <li> <b>GROUP_ID</b> - код группы
+	* пользователей, которая освобождается от уплаты налога;</li> <li>
+	* <b>TAX_ID</b> - код налога, от уплаты которого освобождается группа
+	* пользователей.</li> </ul>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы параметров налогов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>GROUP_ID</td> <td>Код группы
+	* пользователей, которая освобождается от уплаты налога.</td> </tr> <tr>
+	* <td>TAX_ID</td> <td>Код налога, от уплаты которого освобождается группа
+	* пользователей.</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Заполним массив налогов, от уплаты которых освобожден текущий пользователь
+	* $arTaxExempt = array();
+	* if ($USER-&gt;IsAuthorized())
+	* {
+	*    $arUserGroups = $USER-&gt;GetUserGroupArray();
+	*    for ($ig = 0; $ig &lt; count($arUserGroups); $ig++)
+	*    {
+	*       $db_tax_ex_tmp = CSaleTax::GetExemptList(Array("GROUP_ID"=&gt;$arUserGroups[$ig]));
+	*       while ($ar_tax_ex_tmp = $db_tax_ex_tmp-&gt;Fetch())
+	*       {
+	*          if (!in_array(IntVal($ar_tax_ex_tmp["TAX_ID"]), $arTaxExempt))
+	*          {
+	*             $arTaxExempt[] = IntVal($ar_tax_ex_tmp["TAX_ID"]);
+	*          }
+	*       }
+	*    }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getexemptlist.96a07443.php
+	* @author Bitrix
+	*/
 	public static function GetExemptList($arFilter = array())
 	{
 		global $DB;
@@ -663,25 +681,25 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция добавляет новую запись в таблицу освобождения от налогов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров новой записи с ключами:<ul> <li>
-	 * <b>GROUP_ID</b> - код группы пользователей, которая освобождается от
-	 * уплаты налога;</li> <li> <b>TAX_ID</b> - код налога, от уплаты которого
-	 * освобождается группа пользователей.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__addexempt.a94a2922.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новую запись в таблицу освобождения от налогов.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров новой записи с ключами:<ul> <li>
+	* <b>GROUP_ID</b> - код группы пользователей, которая освобождается от
+	* уплаты налога;</li> <li> <b>TAX_ID</b> - код налога, от уплаты которого
+	* освобождается группа пользователей.</li> </ul>
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__addexempt.a94a2922.php
+	* @author Bitrix
+	*/
 	public static function AddExempt($arFields)
 	{
 		global $DB;
@@ -702,27 +720,27 @@ class CAllSaleTax
 
 	
 	/**
-	 * <p>Функция удаляет записи, удовлетворяющие фильтру arFilter, из таблицы освобождений от уплаты налогов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив условий для удаления записей. Ключами в
-	 * массиве могут быть: <ul> <li> <b>GROUP_ID</b> - код группы пользователей,
-	 * члены которой освобождены от уплаты налога;</li> <li> <b>TAX_ID</b> - код
-	 * налога, от уплаты которого освобождается группа
-	 * пользователей.</li> </ul> В массиве должен присутствовать хотя бы
-	 * один ключ.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__deleteexempt.071034ae.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет записи, удовлетворяющие фильтру arFilter, из таблицы освобождений от уплаты налогов.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив условий для удаления записей. Ключами в
+	* массиве могут быть: <ul> <li> <b>GROUP_ID</b> - код группы пользователей,
+	* члены которой освобождены от уплаты налога;</li> <li> <b>TAX_ID</b> - код
+	* налога, от уплаты которого освобождается группа
+	* пользователей.</li> </ul> В массиве должен присутствовать хотя бы
+	* один ключ.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__deleteexempt.071034ae.php
+	* @author Bitrix
+	*/
 	public static function DeleteExempt($arFields)
 	{
 		global $DB;

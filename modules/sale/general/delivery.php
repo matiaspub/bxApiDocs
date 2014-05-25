@@ -33,6 +33,7 @@ class CAllSaleDelivery
 				"LOCATION_FROM" => COption::GetOptionInt('sale', 'location', '2961', $arOrder["SITE_ID"]),
 				"LOCATION_TO" => $arOrder["DELIVERY_LOCATION"],
 				"LOCATION_ZIP" => $arOrder["DELIVERY_LOCATION_ZIP"],
+				"ITEMS" => $arOrder["BASKET_ITEMS"]
 			);
 
 			$arDeliveryPrice = CSaleDeliveryHandler::CalculateFull($delivery[0], $delivery[1], $arOrderTmpDel, $arOrder["CURRENCY"]);
@@ -56,7 +57,7 @@ class CAllSaleDelivery
 		}
 	}
 
-	public static function DoLoadDelivery($location, $locationZip, $weight, $price, $currency, $siteId = null)
+	public static function DoLoadDelivery($location, $locationZip, $weight, $price, $currency, $siteId = null, $arShoppingCart = array())
 	{
 		$location = intval($location);
 		if ($location <= 0)
@@ -66,6 +67,27 @@ class CAllSaleDelivery
 			$siteId = SITE_ID;
 
 		$arResult = array();
+		$arMaxDimensions = array();
+
+		foreach ($arShoppingCart as $arBasketItem)
+		{
+			if (!is_array($arBasketItem["DIMENSIONS"]))
+			{
+				$arDim = unserialize($arBasketItem["~DIMENSIONS"]);
+				$arBasketItem["DIMENSIONS"] = $arDim;
+				unset($arBasketItems["~DIMENSIONS"]);
+			}
+			else
+				$arDim = $arBasketItem["DIMENSIONS"];
+
+			if (is_array($arDim))
+			{
+				$arMaxDimensions = CSaleDeliveryHelper::getMaxDimensions(
+					array($arDim["WIDTH"], $arDim["HEIGHT"], $arDim["LENGTH"]),
+					$arMaxDimensions
+				);
+			}
+		}
 
 		$arFilter = array(
 			"COMPABILITY" => array(
@@ -74,6 +96,8 @@ class CAllSaleDelivery
 				"LOCATION_FROM" => COption::GetOptionString('sale', 'location', false, $siteId),
 				"LOCATION_TO" => $location,
 				"LOCATION_ZIP" => $locationZip,
+				"MAX_DIMENSIONS" => $arMaxDimensions,
+				"ITEMS" => $arShoppingCart
 			),
 			"SITE_ID" => $siteId,
 		);
@@ -115,6 +139,7 @@ class CAllSaleDelivery
 						"LOCATION_FROM" => COption::GetOptionString('sale', 'location', false, $siteId),
 						"LOCATION_TO" => $location,
 						"LOCATION_ZIP" => $locationZip,
+						"ITEMS" => $arShoppingCart
 					),
 					$currency
 				);
@@ -143,7 +168,7 @@ class CAllSaleDelivery
 		{
 			$arDeliveryDescription = CSaleDelivery::GetByID($arDelivery["ID"]);
 			$arDelivery["DESCRIPTION"] = $arDeliveryDescription["DESCRIPTION"];
-		
+
 			$arDelivery["FIELD_NAME"] = "DELIVERY_ID";
 			if (intval($arDelivery["PERIOD_FROM"]) > 0 || intval($arDelivery["PERIOD_TO"]) > 0)
 			{
@@ -167,54 +192,54 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция возвращает параметры службы доставки с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код службы доставки.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров доставки с
-	 * ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код службы доставки.</td> </tr> <tr> <td>NAME</td> <td>Название
-	 * доставки.</td> </tr> <tr> <td>LID</td> <td>Код сайта, к которому привязана эта
-	 * доставка.</td> </tr> <tr> <td>PERIOD_FROM</td> <td>Минимальный срок доставки.</td> </tr>
-	 * <tr> <td>PERIOD_TO</td> <td>Максимальный срок доставки.</td> </tr> <tr> <td>PERIOD_TYPE</td>
-	 * <td>Единица измерения срока: D - дни, H - часы, M - месяцы.</td> </tr> <tr>
-	 * <td>WEIGHT_FROM</td> <td>Минимальный вес заказа, для которого возможна эта
-	 * доставка (единица измерения едина на сайте).</td> </tr> <tr> <td>WEIGHT_TO</td>
-	 * <td>Максимальный вес заказа, для которого возможна эта доставка
-	 * (единица измерения едина на сайте).</td> </tr> <tr> <td>ORDER_PRICE_FROM</td>
-	 * <td>Минимальная стоимость заказа, для которой возможна эта
-	 * доставка.</td> </tr> <tr> <td>ORDER_PRICE_TO</td> <td>Максимальная стоимость заказа,
-	 * для которой возможна эта доставка.</td> </tr> <tr> <td>ORDER_CURRENCY</td> <td>Валюта
-	 * ограничений по стоимости.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности
-	 * доставки.</td> </tr> <tr> <td>PRICE</td> <td>Стоимость доставки.</td> </tr> <tr>
-	 * <td>CURRENCY</td> <td>Валюта стоимости доставки.</td> </tr> <tr> <td>SORT</td> <td>Индекс
-	 * сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание доставки.</td> </tr>
-	 * </table><p> </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // $DELIVERY_ID - код службы доставки
-	 * 
-	 * $arDeliv = CSaleDelivery::GetByID($DELIVERY_ID);
-	 * if ($arDeliv)
-	 * {
-	 *    echo "Доставка \"".$arDeliv["NAME"]."\" стоит ".CurrencyFormat($arDeliv["PRICE"], $arDeliv["CURRENCY"]);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__getbyid.d44054be.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры службы доставки с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код службы доставки.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров доставки с
+	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код службы доставки.</td> </tr> <tr> <td>NAME</td> <td>Название
+	* доставки.</td> </tr> <tr> <td>LID</td> <td>Код сайта, к которому привязана эта
+	* доставка.</td> </tr> <tr> <td>PERIOD_FROM</td> <td>Минимальный срок доставки.</td> </tr>
+	* <tr> <td>PERIOD_TO</td> <td>Максимальный срок доставки.</td> </tr> <tr> <td>PERIOD_TYPE</td>
+	* <td>Единица измерения срока: D - дни, H - часы, M - месяцы.</td> </tr> <tr>
+	* <td>WEIGHT_FROM</td> <td>Минимальный вес заказа, для которого возможна эта
+	* доставка (единица измерения едина на сайте).</td> </tr> <tr> <td>WEIGHT_TO</td>
+	* <td>Максимальный вес заказа, для которого возможна эта доставка
+	* (единица измерения едина на сайте).</td> </tr> <tr> <td>ORDER_PRICE_FROM</td>
+	* <td>Минимальная стоимость заказа, для которой возможна эта
+	* доставка.</td> </tr> <tr> <td>ORDER_PRICE_TO</td> <td>Максимальная стоимость заказа,
+	* для которой возможна эта доставка.</td> </tr> <tr> <td>ORDER_CURRENCY</td> <td>Валюта
+	* ограничений по стоимости.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности
+	* доставки.</td> </tr> <tr> <td>PRICE</td> <td>Стоимость доставки.</td> </tr> <tr>
+	* <td>CURRENCY</td> <td>Валюта стоимости доставки.</td> </tr> <tr> <td>SORT</td> <td>Индекс
+	* сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание доставки.</td> </tr> </table>
+	* <p> </p<a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // $DELIVERY_ID - код службы доставки
+	* 
+	* $arDeliv = CSaleDelivery::GetByID($DELIVERY_ID);
+	* if ($arDeliv)
+	* {
+	*    echo "Доставка \"".$arDeliv["NAME"]."\" стоит ".CurrencyFormat($arDeliv["PRICE"], $arDeliv["CURRENCY"]);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__getbyid.d44054be.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -235,36 +260,36 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция возвращает набор местоположений по фильтру arFilter </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
-	 * ключами являются названия параметров, а значениями - условия.<br><br>
-	 * Допустимые ключи:<br><ul> <li> <b>DELIVERY_ID</b> - код доставки;</li> <li> <b>LOCATION_ID</b>
-	 * - код местоположения или группы местоположений;</li> <li> <b>LOCATION_TYPE</b> -
-	 * тип (L - местоположение, G - группа местоположений).</li> </ul>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
-	 * ассоциативных массивов с ключами:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>DELIVERY_ID</td> <td>Код службы
-	 * доставки.</td> </tr> <tr> <td>LOCATION_ID</td> <td>Код местоположения или группы
-	 * местоположений.</td> </tr> <tr> <td>LOCATION_TYPE</td> <td>Тип (L - местоположение, G -
-	 * группа местоположений) </td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__getlocationlist.e2a07bf9.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор местоположений по фильтру arFilter </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
+	* ключами являются названия параметров, а значениями - условия.<br><br>
+	* Допустимые ключи:<br><ul> <li> <b>DELIVERY_ID</b> - код доставки;</li> <li> <b>LOCATION_ID</b>
+	* - код местоположения или группы местоположений;</li> <li> <b>LOCATION_TYPE</b> -
+	* тип (L - местоположение, G - группа местоположений).</li> </ul>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
+	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>DELIVERY_ID</td> <td>Код службы
+	* доставки.</td> </tr> <tr> <td>LOCATION_ID</td> <td>Код местоположения или группы
+	* местоположений.</td> </tr> <tr> <td>LOCATION_TYPE</td> <td>Тип (L - местоположение, G -
+	* группа местоположений) </td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__getlocationlist.e2a07bf9.php
+	* @author Bitrix
+	*/
 	public static function GetLocationList($arFilter = Array())
 	{
 		global $DB;
 		$arSqlSearch = Array();
 
-		if(!is_array($arFilter)) 
+		if(!is_array($arFilter))
 			$filter_keys = Array();
 		else
 			$filter_keys = array_keys($arFilter);
@@ -306,7 +331,7 @@ class CAllSaleDelivery
 			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT DL.* ".
 			"FROM b_sale_delivery2location DL ".
 			"WHERE 1 = 1 ".
@@ -403,62 +428,62 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция изменяет параметры доставки с кодом ID на новые значения из массива arFields</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код доставки.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров доставки, ключами в
-	 * котором являются названия параметров доставки, а значениями -
-	 * значения параметров. <br> Допустимые ключи: <br><ul> <li> <b>NAME</b> -
-	 * название доставки (обязательное, задается на языке сайта, к
-	 * которому привязана эта доставка);</li> <li> <b>LID</b> - код сайта, к
-	 * которому привязана эта доставка;</li> <li> <b>PERIOD_FROM</b> - минимальный
-	 * срок доставки;</li> <li> <b>PERIOD_TO</b> - максимальный срок доставки;</li> <li>
-	 * <b>PERIOD_TYPE</b> - единица измерения срока: D - дни, H - часы, M - месяцы;</li> <li>
-	 * <b>WEIGHT_FROM</b> - минимальный вес заказа, для которого возможна эта
-	 * доставка (единица измерения должна быть едина на сайте);</li> <li>
-	 * <b>WEIGHT_TO</b> - максимальный вес заказа, для которого возможна эта
-	 * доставка (единица измерения должна быть едина на сайте);</li> <li>
-	 * <b>ORDER_PRICE_FROM</b> - минимальная стоимость заказа, для которой возможна
-	 * эта доставка;</li> <li> <b>ORDER_PRICE_TO</b> - максимальная стоимость заказа,
-	 * для которой возможна эта доставка;</li> <li> <b>ORDER_CURRENCY</b> - валюта
-	 * ограничений по стоимости;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
-	 * доставки;</li> <li> <b>PRICE</b> - стоимость доставки;</li> <li> <b>CURRENCY</b> - валюта
-	 * стоимости доставки;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li>
-	 * <b>DESCRIPTION</b> - описание доставки;</li> <li> <b>LOCATIONS</b> - массив массивов
-	 * вида: <pre class="syntax">array("LOCATION_ID" =&gt; "код местоположения или <br> группы
-	 * местоположений",<br> "LOCATION_TYPE"=&gt;"L - для местоположения, <br> G - для
-	 * группы")</pre> содержащий местоположения и группы местоположений,
-	 * для которых работает эта доставка</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращает код изменяемой записи или <i>false</i> в случае ошибки.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arFields = array(<br>   "NAME" =&gt; "Доставка курьером",<br>   "LID" =&gt; "ru",<br>   "PERIOD_FROM" =&gt; 1,<br>   "PERIOD_TO" =&gt; 3,<br>   "PERIOD_TYPE" =&gt; "D",<br>   "WEIGHT_FROM" =&gt; 0,<br>   "WEIGHT_TO" =&gt; 2500,<br>   "ORDER_PRICE_FROM" =&gt; 0,<br>   "ORDER_PRICE_TO" =&gt; 10000,<br>   "ORDER_CURRENCY" =&gt; "RUB",<br>   "ACTIVE" =&gt; "Y",<br>   "PRICE" =&gt; 58,<br>   "CURRENCY" =&gt; "RUB",<br>   "SORT" =&gt; 100,<br>   "DESCRIPTION" =&gt; "Заказ будет доставлен Вам в течение 3 - 10 рабочих дней после передачи его в курьерскую службу.",<br>   "LOCATIONS" =&gt; array(<br>      array("LOCATION_ID"=&gt;1, "LOCATION_TYPE"=&gt;"L"),<br>      array("LOCATION_ID"=&gt;3, "LOCATION_TYPE"=&gt;"G")<br>      )<br>);<br><br>if (!CSaleDelivery::Update($ID, $arFields))<br>   echo "Ошибка изменения доставки";<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__update.dcec3766.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры доставки с кодом ID на новые значения из массива arFields</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код доставки.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров доставки, ключами в
+	* котором являются названия параметров доставки, а значениями -
+	* значения параметров. <br> Допустимые ключи: <br><ul> <li> <b>NAME</b> -
+	* название доставки (обязательное, задается на языке сайта, к
+	* которому привязана эта доставка);</li> <li> <b>LID</b> - код сайта, к
+	* которому привязана эта доставка;</li> <li> <b>PERIOD_FROM</b> - минимальный
+	* срок доставки;</li> <li> <b>PERIOD_TO</b> - максимальный срок доставки;</li> <li>
+	* <b>PERIOD_TYPE</b> - единица измерения срока: D - дни, H - часы, M - месяцы;</li> <li>
+	* <b>WEIGHT_FROM</b> - минимальный вес заказа, для которого возможна эта
+	* доставка (единица измерения должна быть едина на сайте);</li> <li>
+	* <b>WEIGHT_TO</b> - максимальный вес заказа, для которого возможна эта
+	* доставка (единица измерения должна быть едина на сайте);</li> <li>
+	* <b>ORDER_PRICE_FROM</b> - минимальная стоимость заказа, для которой возможна
+	* эта доставка;</li> <li> <b>ORDER_PRICE_TO</b> - максимальная стоимость заказа,
+	* для которой возможна эта доставка;</li> <li> <b>ORDER_CURRENCY</b> - валюта
+	* ограничений по стоимости;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
+	* доставки;</li> <li> <b>PRICE</b> - стоимость доставки;</li> <li> <b>CURRENCY</b> - валюта
+	* стоимости доставки;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li>
+	* <b>DESCRIPTION</b> - описание доставки;</li> <li> <b>LOCATIONS</b> - массив массивов
+	* вида: <pre class="syntax">array("LOCATION_ID" =&gt; "код местоположения или <br> группы
+	* местоположений",<br> "LOCATION_TYPE"=&gt;"L - для местоположения, <br> G - для
+	* группы")</pre> содержащий местоположения и группы местоположений,
+	* для которых работает эта доставка</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращает код изменяемой записи или <i>false</i> в случае ошибки.</p>
+	* <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arFields = array(<br>   "NAME" =&gt; "Доставка курьером",<br>   "LID" =&gt; "ru",<br>   "PERIOD_FROM" =&gt; 1,<br>   "PERIOD_TO" =&gt; 3,<br>   "PERIOD_TYPE" =&gt; "D",<br>   "WEIGHT_FROM" =&gt; 0,<br>   "WEIGHT_TO" =&gt; 2500,<br>   "ORDER_PRICE_FROM" =&gt; 0,<br>   "ORDER_PRICE_TO" =&gt; 10000,<br>   "ORDER_CURRENCY" =&gt; "RUB",<br>   "ACTIVE" =&gt; "Y",<br>   "PRICE" =&gt; 58,<br>   "CURRENCY" =&gt; "RUB",<br>   "SORT" =&gt; 100,<br>   "DESCRIPTION" =&gt; "Заказ будет доставлен Вам в течение 3 - 10 рабочих дней после передачи его в курьерскую службу.",<br>   "LOCATIONS" =&gt; array(<br>      array("LOCATION_ID"=&gt;1, "LOCATION_TYPE"=&gt;"L"),<br>      array("LOCATION_ID"=&gt;3, "LOCATION_TYPE"=&gt;"G")<br>      )<br>);<br><br>if (!CSaleDelivery::Update($ID, $arFields))<br>   echo "Ошибка изменения доставки";<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__update.dcec3766.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
 
 		$ID = intval($ID);
-		
-		if ($ID <= 0 || !CSaleDelivery::CheckFields("UPDATE", $arFields)) 
+
+		if ($ID <= 0 || !CSaleDelivery::CheckFields("UPDATE", $arFields))
 			return false;
 
 		if (array_key_exists("LOGOTIP", $arFields) && is_array($arFields["LOGOTIP"]))
@@ -497,36 +522,36 @@ class CAllSaleDelivery
 
 	
 	/**
-	 * <p>Функция удаляет доставку с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код доставки.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * CSaleDelivery::Delete(8);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__delete.cb546e37.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет доставку с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код доставки.
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* CSaleDelivery::Delete(8);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledelivery/csaledelivery__delete.cb546e37.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
 		$ID = IntVal($ID);
-		
+
 		$db_orders = CSaleOrder::GetList(
 				array("DATE_UPDATE" => "DESC"),
 				array("DELIVERY_ID" => $ID)
@@ -536,7 +561,7 @@ class CAllSaleDelivery
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGPS_ORDERS_TO_DELIVERY"), "SKGPS_ORDERS_TO_DELIVERY");
 			return False;
 		}
-		
+
 		$DB->Query("DELETE FROM b_sale_delivery2location WHERE DELIVERY_ID = ".$ID."", true);
 		$DB->Query("DELETE FROM b_sale_delivery2paysystem WHERE DELIVERY_ID = ".$ID."", true);
 		return $DB->Query("DELETE FROM b_sale_delivery WHERE ID = ".$ID."", true);
@@ -551,40 +576,15 @@ class CAllSaleDelivery
 	*/
 	public static function GetDelivery2PaySystem($arFilter = array())
 	{
-		global $DB;
-
-		$strSqlSearch = "";
-
-		foreach ($arFilter as $key => $val)
-		{
-			$val = $DB->ForSql($val);
-
-			switch(ToUpper($key))
-			{
-			case "DELIVERY_ID":
-				$strSqlSearch .= " AND DELIVERY_ID = '".trim($val)."' ";
-				break;
-			case "PAYSYSTEM_ID":
-				$strSqlSearch .= " AND PAYSYSTEM_ID = '".IntVal($val)."' ";
-				break;
-			}
-		}
-
-		$strSql =
-			"SELECT * ".
-			"FROM b_sale_delivery2paysystem ".
-			"WHERE 1 = 1";
-
-		if (strlen($strSqlSearch) > 0)
-			$strSql .= " ".$strSqlSearch;
-
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		return $dbRes;
+		return CSaleDelivery2PaySystem::GetList(
+											$arFilter,
+											array("DELIVERY_ID", "PAYSYSTEM_ID"),
+											array("DELIVERY_ID", "PAYSYSTEM_ID")
+										);
 	}
 
 	/**
-	* The function select delivery and paysystem
+	* The function updates delivery and paysystem
 	*
 	* @param int $ID - code delivery
 	* @param array $arFields - paysytem
@@ -592,30 +592,15 @@ class CAllSaleDelivery
 	*/
 	public static function UpdateDeliveryPay($ID, $arFields)
 	{
-		global $DB;
-
 		$ID = trim($ID);
 
-		if (strlen($ID) <= 0)
+		if (strlen($ID) <= 0 || !is_array($arFields) || empty($arFields))
 			return false;
 
 		if ($arFields[0] == "")
 			unset($arFields[0]);
 
-		$DB->Query("DELETE FROM b_sale_delivery2paysystem WHERE DELIVERY_ID = '".$DB->ForSql($ID)."'");
-
-		foreach ($arFields as $val)
-		{
-			$arTmp = array("PAYSYSTEM_ID" => $val);
-			$arInsert = $DB->PrepareInsert("b_sale_delivery2paysystem", $arTmp);
-
-			$strSql =
-				"INSERT INTO b_sale_delivery2paysystem (DELIVERY_ID, ".$arInsert[0].") ".
-				"VALUES('".$ID."', ".$arInsert[1].")";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		return $ID;
+		return CSaleDelivery2PaySystem::UpdateDelivery($ID, array("PAYSYSTEM_ID" => $arFields));
 	}
 }
 ?>

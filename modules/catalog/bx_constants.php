@@ -85,11 +85,6 @@ define('BT_COND_BUILD_SALE_ACTIONS', 2);
 define('CATALOG_LOAD_NO_STEP', true);
 
 /**
- * CATALOG_DISCOUNT_SAVE_FILE
- */
-define('CATALOG_DISCOUNT_SAVE_FILE', '/bitrix/modules/catalog/discount_save.php');
-
-/**
  * CATALOG_PATH2EXPORTS
  */
 define('CATALOG_PATH2EXPORTS', "/bitrix/php_interface/include/catalog_export/");
@@ -180,16 +175,6 @@ define('CATALOG_DISCOUNT_NEW_VERSION', 2);
 define('BX_CATALOG_FILENAME_REG', '/[^a-zA-Z0-9\s!#\$%&\(\)\[\]\{\}+\.;=@\^_\~\/\\\\\-]/i');
 
 /**
- * CATALOG_DISCOUNT_FILE
- */
-define('CATALOG_DISCOUNT_FILE', "/bitrix/modules/catalog/discount_data.php");
-
-/**
- * CATALOG_DISCOUNT_CPN_FILE
- */
-define('CATALOG_DISCOUNT_CPN_FILE', "/bitrix/modules/catalog/discount_cpn_data.php");
-
-/**
  * CONTRACTOR_INDIVIDUAL
  */
 define('CONTRACTOR_INDIVIDUAL', 1);
@@ -225,6 +210,11 @@ define('DOC_DEDUCT', 'D');
 define('DOC_INVENTORY', 'I');
 
 /**
+ * CATALOG_VALUE_EPSILON
+ */
+define('CATALOG_VALUE_EPSILON', 1e-6);
+
+/**
  * CATALOG_VALUE_PRECISION
  */
 define('CATALOG_VALUE_PRECISION', 2);
@@ -255,11 +245,6 @@ define('BX_CAT_CRON', true);
 define('NO_AGENT_CHECK', true);
 
 /**
- * LANG
- */
-define('LANG', "ru");
-
-/**
  * STOP_STATISTICS
  */
 define('STOP_STATISTICS', true);
@@ -272,12 +257,12 @@ define('BX_SECURITY_SHOW_MESSAGE', true);
 /**
  * CML_DEBUG
  */
-define('CML_DEBUG', False);
+define('CML_DEBUG', false);
 
 /**
  * CML_MEMORY_DEBUG
  */
-define('CML_MEMORY_DEBUG', False);
+define('CML_MEMORY_DEBUG', false);
 
 /**
  * CML_DEBUG_FILE_NAME
@@ -292,32 +277,32 @@ define('CML_GROUP_OPERATION_CNT', 100);
 /**
  * CML_CLEAR_TEMP_TABLES
  */
-define('CML_CLEAR_TEMP_TABLES', False);
+define('CML_CLEAR_TEMP_TABLES', false);
 
 /**
  * CML_DELETE_COMMENTS
  */
-define('CML_DELETE_COMMENTS', False);
+define('CML_DELETE_COMMENTS', false);
 
 /**
  * CML_KEEP_EXISTING_PROPERTIES
  */
-define('CML_KEEP_EXISTING_PROPERTIES', True);
+define('CML_KEEP_EXISTING_PROPERTIES', true);
 
 /**
  * CML_KEEP_EXISTING_DATA
  */
-define('CML_KEEP_EXISTING_DATA', False);
+define('CML_KEEP_EXISTING_DATA', false);
 
 /**
  * CML_ACTIVATE_FILE_DATA
  */
-define('CML_ACTIVATE_FILE_DATA', True);
+define('CML_ACTIVATE_FILE_DATA', true);
 
 /**
  * CML_USE_SYSTEM_DELETE
  */
-define('CML_USE_SYSTEM_DELETE', False);
+define('CML_USE_SYSTEM_DELETE', false);
 
 /**
  * CATALOG_NEW_OFFERS_IBLOCK_NEED
@@ -333,6 +318,11 @@ define('ADMIN_MODULE_NAME', "catalog");
  * ADMIN_MODULE_ICON
  */
 define('ADMIN_MODULE_ICON', '<a href="/bitrix/admin/cat_index.php?lang='.LANGUAGE_ID.'"><img src="/bitrix/images/catalog/catalog.gif" width="48" height="48" border="0" alt="'.GetMessage("CATALOG_ICON_TITLE").'" title="'.GetMessage("CATALOG_ICON_TITLE").'"></a>');
+
+/**
+ * NO_AGENT_STATISTIC
+ */
+define('NO_AGENT_STATISTIC', true);
 
 
 ?>

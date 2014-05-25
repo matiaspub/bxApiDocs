@@ -105,41 +105,42 @@ class CXMLCreator {
 	// returns created CXMLCreator node with setted TagName and Attributes
 	
 	/**
-	 * <p>Статический метод возвращает созданный тэг <b>CXMLCreator</b> из названия <i>heavyTag</i>,<i> </i>записанного в особенном формате. Если формат <i>heavyTag</i> неверен, возвращается <i>true</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $heavyTag  Строка названия тэга в формате:<br><br><i>[Индекс:]НазваниеТэга
-	 * [Атрибут="Значение атрибута" ...]</i><br><br><i>Индекс </i>- число,
-	 * помогающее поместить в ассоциативном массиве сразу несколько
-	 * тегов с одинаковым названием.<br><br><i>Атрибут</i> может быть записан
-	 * в виде: <i>симв:симв = "Значение" </i>
-	 *
-	 *
-	 *
-	 * @return static 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <buttononclick>
-	 * CXMLCreator::createTagAttributed( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"");
-	 * 
-	 * // Или
-	 * CXMLCreator::encodeValueLight( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
-	 * array(
-	 * 	"1:ArrayOfStringEl" =&gt; "Строка1", 
-	 * 	"2:ArrayOfStringEl" =&gt; "Строка2"
-	 * 	)
-	 * );</buttononclick>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/createtagattributed.php
-	 * @author Bitrix
-	 */
+	* <p>Статический метод возвращает созданный тэг <b>CXMLCreator</b> из названия <i>heavyTag</i>,<i> </i>записанного в особенном формате. Если формат <i>heavyTag</i> неверен, возвращается <i>true</i>.</p>
+	*
+	*
+	*
+	*
+	* @param string $heavyTag  Строка названия тэга в формате:<br><br><i>[Индекс:]НазваниеТэга
+	* [Атрибут="Значение атрибута" ...]</i><br><br><i>Индекс </i>- число,
+	* помогающее поместить в ассоциативном массиве сразу несколько
+	* тегов с одинаковым названием.<br><br><i>Атрибут</i> может быть записан
+	* в виде: <i>симв:симв = "Значение" </i>
+	*
+	*
+	*
+	* @return static 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <buttononclick>
+	* CXMLCreator::createTagAttributed( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"");
+	* 
+	* // Или
+	* CXMLCreator::encodeValueLight( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
+	* array(
+	* 	"1:ArrayOfStringEl" =&gt; "Строка1", 
+	* 	"2:ArrayOfStringEl" =&gt; "Строка2"
+	* 	)
+	* );</buttononclick>
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/createtagattributed.php
+	* @author Bitrix
+	*/
 	public static function createTagAttributed($heavyTag, $value = null)
 	{
 		$heavyTag = trim($heavyTag);

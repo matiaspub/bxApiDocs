@@ -364,30 +364,6 @@ class CIBlockRights
 	{
 		$obStorage = $this->_storage_object();
 
-		foreach($arOldParents as $i => $oid)
-		{
-			foreach($arNewParents as $j => $nid)
-			{
-				if($oid == $nid)
-				{
-					unset($arOldParents[$i]);
-					unset($arNewParents[$j]);
-				}
-			}
-		}
-
-		foreach($arNewParents as $j => $nid)
-		{
-			foreach($arOldParents as $i => $oid)
-			{
-				if($oid == $nid)
-				{
-					unset($arOldParents[$i]);
-					unset($arNewParents[$j]);
-				}
-			}
-		}
-
 		foreach($arOldParents as $id)
 		{
 			$ob = $this->_get_parent_object($id);
@@ -474,6 +450,7 @@ class CIBlockRights
 				$arRights[$RIGHT_ID]["TASK_ID"] = $arDBRights[$RIGHT_ID]["TASK_ID"];
 		}
 
+		$bCleanUp = false;
 		$obStorage = $this->_storage_object();
 		foreach($arRights as $RIGHT_ID => $arRightSet)
 		{
@@ -494,7 +471,7 @@ class CIBlockRights
 			)
 			{
 				$obStorage->DeleteChildrenSet($GROUP_CODE, CIBlockRights::GROUP_CODE);
-				$obStorage->CleanUp();
+				$bCleanUp = true;
 			}
 
 			if(substr($RIGHT_ID, 0, 1) == "n")
@@ -552,6 +529,9 @@ class CIBlockRights
 				}
 			}
 		}
+
+		if ($bCleanUp)
+			$obStorage->CleanUp();
 
 		if(defined("BX_COMP_MANAGED_CACHE"))
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("iblock_id_".$this->IBLOCK_ID);
@@ -1248,7 +1228,7 @@ class CIBlockElementRights extends CIBlockRights
 		if ($USER_ID > 0)
 		{
 			$acc = new CAccess;
-			$acc->UpdateCodes();
+			$acc->UpdateCodes(array('USER_ID' => $USER_ID));
 		}
 
 		if(!is_array($arID))
@@ -1845,6 +1825,15 @@ class CIBlockRightsStorage
 			WHERE
 				BR.IBLOCK_ID = ".$this->IBLOCK_ID."
 				AND BR.ENTITY_TYPE = 'element'
+				AND BE.ID NOT IN (
+					SELECT ER0.ELEMENT_ID
+					FROM
+						b_iblock_right BR0
+						INNER JOIN b_iblock_element_right ER0 ON ER0.RIGHT_ID = BR0.ID
+					WHERE
+						BR0.IBLOCK_ID = ".$this->IBLOCK_ID."
+						AND BR0.ENTITY_TYPE = 'element'
+				)
 		");
 		//Sections
 		$rs = $DB->Query("

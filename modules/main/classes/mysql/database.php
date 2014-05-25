@@ -52,76 +52,77 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Открывает транзакцию. Для закрытия используйте <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">Commit</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">Rollback</a>.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         $DB-&gt;PrepareFields("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 *         <b>$DB-&gt;StartTransaction();</b>
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             $DB-&gt;Commit();
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *         else $DB-&gt;Rollback();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php
-	 * @author Bitrix
-	 */
+	* <p>Открывает транзакцию. Для закрытия используйте <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">Commit</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">Rollback</a>.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         $DB-&gt;PrepareFields("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	*         <b>$DB-&gt;StartTransaction();</b>
+	*         if ($ID&gt;0) 
+	*         {
+	*             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             $DB-&gt;Commit();
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*         else $DB-&gt;Rollback();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php
+	* @author Bitrix
+	*/
 	public function StartTransaction()
 	{
 		$this->Query("START TRANSACTION");
@@ -129,76 +130,77 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Завершает открытую транзакцию.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         $DB-&gt;PrepareFields("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 * 		$DB-&gt;StartTransaction();
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             &lt;b&gt;$DB-&gt;Commit&lt;/b&gt;();
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *         else $DB-&gt;Rollback();
-	 *     }
-	 * }?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php
-	 * @author Bitrix
-	 */
+	* <p>Завершает открытую транзакцию.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         $DB-&gt;PrepareFields("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	* 		$DB-&gt;StartTransaction();
+	*         if ($ID&gt;0) 
+	*         {
+	*             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             $DB-&gt;Commit();
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*         else $DB-&gt;Rollback();
+	*     }
+	* }?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDatabase::Rollback</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php
+	* @author Bitrix
+	*/
 	public function Commit()
 	{
 		$this->Query("COMMIT", true);
@@ -206,77 +208,78 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Откатывает назад изменения произведенные открытой и незавершенной транзакцией.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         $DB-&gt;PrepareFields("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 * 		$DB-&gt;StartTransaction();
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             $DB-&gt;Commit();
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *         else <b>$DB-&gt;Rollback();</b>
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php
-	 * @author Bitrix
-	 */
+	* <p>Откатывает назад изменения произведенные открытой и незавершенной транзакцией.</p> <p class="note">Работает для Oracle, MSSQL, MySQL (для типа таблиц InnoDB).</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         $DB-&gt;PrepareFields("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	* 		$DB-&gt;StartTransaction();
+	*         if ($ID&gt;0) 
+	*         {
+	*             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             $DB-&gt;Commit();
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*         else <b>$DB-&gt;Rollback();</b>
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/commit.php">CDatabase::Commit</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/starttransaction.php">CDatabase::StartTransaction</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php
+	* @author Bitrix
+	*/
 	public function Rollback()
 	{
 		$this->Query("ROLLBACK", true);
@@ -285,58 +288,59 @@ class CDatabase extends CAllDatabase
 	//Connect to database
 	
 	/**
-	 * <p>Открывает соединение с базой данных. Функция возвращает "true" при успешном открытии соединения или "false" при ошибке.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $host  Сервер (хост) базы данных.
-	 *
-	 *
-	 *
-	 * @param string $db  Имя базы данных.
-	 *
-	 *
-	 *
-	 * @param string $login  Логин.
-	 *
-	 *
-	 *
-	 * @param string $password  Пароль.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if(!(<b>$DB-&gt;Connect</b>($DBHost, $DBName, $DBLogin, $DBPassword)))
-	 * {
-	 * 	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php"))
-	 * 	{
-	 * 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php");
-	 * 	}
-	 * 	else
-	 * 	{
-	 * 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/dbconn_error.php");
-	 * 	}
-	 * 	die();
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
-	 * @author Bitrix
-	 */
+	* <p>Открывает соединение с базой данных. Функция возвращает "true" при успешном открытии соединения или "false" при ошибке.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $host  Сервер (хост) базы данных.
+	*
+	*
+	*
+	* @param string $db  Имя базы данных.
+	*
+	*
+	*
+	* @param string $login  Логин.</b
+	*
+	*
+	*
+	* @param string $password  Пароль.</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if(!(<b>$DB-&gt;Connect</b>($DBHost, $DBName, $DBLogin, $DBPassword)))
+	* {
+	* 	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php"))
+	* 	{
+	* 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php");
+	* 	}
+	* 	else
+	* 	{
+	* 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/dbconn_error.php");
+	* 	}
+	* 	die();
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
+	* @author Bitrix
+	*/
 	public function Connect($DBHost, $DBName, $DBLogin, $DBPassword)
 	{
 		$this->type="MYSQL";
@@ -367,7 +371,12 @@ class CDatabase extends CAllDatabase
 			if ($app != null)
 			{
 				$con = $app->getConnection();
-				if ($con->isConnected())
+				if ($con->isConnected()
+					&& ($con instanceof Bitrix\Main\DB\Connection)
+					&& ($this->DBHost == $con->getDbHost())
+					&& ($this->DBLogin == $con->getDbLogin())
+					&& ($this->DBName == $con->getDbName())
+				)
 				{
 					$this->db_Conn = $con->getResource();
 
@@ -419,8 +428,15 @@ class CDatabase extends CAllDatabase
 			if ($app != null)
 			{
 				$con = $app->getConnection();
-				if (!$con->isConnected())
+				if (!$con->isConnected()
+					&& ($con instanceof Bitrix\Main\DB\Connection)
+					&& ($this->DBHost == $con->getDbHost())
+					&& ($this->DBLogin == $con->getDbLogin())
+					&& ($this->DBName == $con->getDbName())
+				)
+				{
 					$con->setConnectionResourceNoDemand($this->db_Conn);
+				}
 			}
 		}
 
@@ -428,6 +444,88 @@ class CDatabase extends CAllDatabase
 	}
 
 	//This function executes query against database
+	
+	/**
+	* <p>Функция выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $sql  SQL запрос.</bod
+	*
+	*
+	*
+	* @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
+	* возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
+	* ошибки функция прекращает выполнение всей
+	* страницы.<br>Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
+	* данная функция CDatabase::Query. Если в SQL запросе будет ошибка и если в
+	* файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
+	* то на экране будет выведена данная информация и сам SQL запрос.
+	* Необязательный.
+	*
+	*
+	*
+	* @param array $Options = array() Необязательный.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function GetByID($ID, $GET_BY_SID="N")
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: GetByID&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$where = ($GET_BY_SID=="N") ? " F.ID = '".intval($ID)."' " : " F.VARNAME='".$DB-&gt;ForSql($ID,50)."' ";
+	* 	$strSql = "
+	* 		SELECT
+	* 			F.*,
+	* 			F.FIRST_SITE_ID,
+	* 			F.FIRST_SITE_ID									LID,
+	* 			F.VARNAME,
+	* 			F.VARNAME										SID,
+	* 			".$DB-&gt;DateToCharFunction("F.TIMESTAMP_X")."	TIMESTAMP_X,
+	* 			count(distinct D1.ID)							C_FIELDS,
+	* 			count(distinct D2.ID)							QUESTIONS,
+	* 			count(distinct S.ID)							STATUSES
+	* 		FROM b_form F
+	* 		LEFT JOIN b_form_status S ON (S.FORM_ID = F.ID)
+	* 		LEFT JOIN b_form_field D1 ON (D1.FORM_ID = F.ID and D1.ADDITIONAL='Y')
+	* 		LEFT JOIN b_form_field D2 ON (D2.FORM_ID = F.ID and D2.ADDITIONAL&lt;&gt;'Y')
+	* 		WHERE 
+	* 			$where
+	* 		GROUP BY 
+	* 			F.ID
+	* 		";
+	* 	$res = <b>$DB-&gt;Query</b>($strSql, false, $err_mess.__LINE__);
+	* 	return $res;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
+	* @author Bitrix
+	*/
 	public function Query($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array())
 	{
 		global $DB;
@@ -467,7 +565,9 @@ class CDatabase extends CAllDatabase
 		{
 			$bSelect = preg_match('/^\s*(select|show)/i', $strSql) && !preg_match('/get_lock/i', $strSql);
 			if(!$bSelect && !isset($arOptions["ignore_dml"]))
+			{
 				$bSelectOnly = false;
+			}
 
 			if($bSelect && $bSelectOnly)
 			{
@@ -491,7 +591,7 @@ class CDatabase extends CAllDatabase
 			$exec_time = round(microtime(true) - $start_time, 10);
 
 			if($DB->ShowSqlStat)
-				$DB->addDebugQuery($strSql, $exec_time);
+				$DB->addDebugQuery($strSql, $exec_time, $bSelectOnly? $this->node_id: -1);
 
 			if($this->DebugToFile)
 			{
@@ -550,54 +650,54 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция возвращает строку "SYSDATE" для Oracle версии и "now()" для MySQL.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $DB-&gt;Update("my_table", Array("TIME_CHANGE" =&gt; <b>$DB-&gt;CurrentTimeFunction</b>()), 
-	 * "WHERE ID=45", $err_mess.__LINE__);
-	 * ?&gt;
-	 * &lt;?
-	 * $strSql = "
-	 *     UPDATE my_table SET 
-	 *         TIME_CHANGE=".<b>$DB-&gt;CurrentTimeFunction</b>()." 
-	 *     WHERE ID=45
-	 *     ";
-	 * $Query($strSql, false, "FILE: ".__FILE__."&lt;br&gt;LINE: ".__LINE__);
-	 * ?&gt;
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID
-	 *     FROM 
-	 *         my_table
-	 *     WHERE 
-	 *         TIME_CHANGE &lt;= ".<b>$DB-&gt;CurrentTimeFunction</b>()."
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currentdatefunction.php">CDatabase::CurrentDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currenttimefunction.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает строку "SYSDATE" для Oracle версии и "now()" для MySQL.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $DB-&gt;Update("my_table", Array("TIME_CHANGE" =&gt; <b>$DB-&gt;CurrentTimeFunction</b>()), 
+	* "WHERE ID=45", $err_mess.__LINE__);
+	* ?&gt;
+	* &lt;?
+	* $strSql = "
+	*     UPDATE my_table SET 
+	*         TIME_CHANGE=".<b>$DB-&gt;CurrentTimeFunction</b>()." 
+	*     WHERE ID=45
+	*     ";
+	* $Query($strSql, false, "FILE: ".__FILE__."&lt;br&gt;LINE: ".__LINE__);
+	* ?&gt;
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID
+	*     FROM 
+	*         my_table
+	*     WHERE 
+	*         TIME_CHANGE &lt;= ".<b>$DB-&gt;CurrentTimeFunction</b>()."
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currentdatefunction.php">CDatabase::CurrentDateFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currenttimefunction.php
+	* @author Bitrix
+	*/
 	public static function CurrentTimeFunction()
 	{
 		return "now()";
@@ -605,46 +705,46 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция возвращает SQL функцию, которая в свою очередь возвращающую текущую дату. А именно: "CURRENT_DATE" для MySQL и "TRUNC(SYSDATE)" для Oracle.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "UPDATE my_table SET DATE_CHANGE=".<b>$DB-&gt;CurrentDateFunction</b>()." WHERE ID=45";
-	 * $Query($strSql, false, "FILE: ".__FILE__."&lt;br&gt;LINE: ".__LINE__);
-	 * ?&gt;
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID
-	 *     FROM 
-	 *         my_table
-	 *     WHERE 
-	 *         DATE_CREATE &lt;= ".<b>$DB-&gt;CurrentDateFunction</b>()."
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currenttimefunction.php">CDatabase::CurrentTimeFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currentdatefunction.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает SQL функцию, которая в свою очередь возвращающую текущую дату. А именно: "CURRENT_DATE" для MySQL и "TRUNC(SYSDATE)" для Oracle.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "UPDATE my_table SET DATE_CHANGE=".<b>$DB-&gt;CurrentDateFunction</b>()." WHERE ID=45";
+	* $Query($strSql, false, "FILE: ".__FILE__."&lt;br&gt;LINE: ".__LINE__);
+	* ?&gt;
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID
+	*     FROM 
+	*         my_table
+	*     WHERE 
+	*         DATE_CREATE &lt;= ".<b>$DB-&gt;CurrentDateFunction</b>()."
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currenttimefunction.php">CDatabase::CurrentTimeFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/currentdatefunction.php
+	* @author Bitrix
+	*/
 	public static function CurrentDateFunction()
 	{
 		return "CURRENT_DATE";
@@ -707,54 +807,59 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в настройках языка или сайта.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Значение даты для формата текущего сайта.
-	 *
-	 *
-	 *
-	 * @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	 * времени) <br>Необязательный. По умолчанию "FULL".
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части.<br>Необязательный. По умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID,    
-	 *         ".<b>$DB-&gt;DateToCharFunction</b>("DATE_CREATE")."    DATE_CREATE
-	 *     FROM 
-	 *         my_table
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в настройках языка или сайта.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $value  Значение даты для формата текущего сайта.
+	*
+	*
+	*
+	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
+	* времени) <br>Необязательный. По умолчанию "FULL".
+	*
+	*
+	*
+	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
+	* умолчанию текущий. Отсутствовал в версях с 3.0.11 до 3.3.21.
+	*
+	*
+	*
+	* @param string $SearchInSitesOnly = false Необязательный.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID,    
+	*         ".<b>$DB-&gt;DateToCharFunction</b>("DATE_CREATE")."    DATE_CREATE
+	*     FROM 
+	*         my_table
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
+	* @author Bitrix
+	*/
 	public function DateToCharFunction($strFieldName, $strType="FULL", $lang=false, $bSearchInSitesOnly=false)
 	{
 		static $CACHE=array();
@@ -780,65 +885,65 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - функция вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в настройках языка, либо настройках сайта.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Если функция вызывается в публичной части сайта, то это - значение
-	 * даты для формата текущего сайта. Если функция вызывается в
-	 * административной части, то это - значение даты для формата
-	 * текущего языка.
-	 *
-	 *
-	 *
-	 * @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	 * времени) <br>Необязательный. По умолчанию "FULL".
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части.<br>Необязательный. По умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arr = getdate();
-	 * $ndate = mktime(9,0,0,$arr["mon"],$arr["mday"],$arr["year"]);
-	 * $next_exec = <b>$DB-&gt;CharToDateFunction</b>(GetTime($ndate,"FULL"));
-	 * CAgent::AddAgent("SendDailyStatistics();","statistic","Y",86400,"","Y",$next_exec, 25);
-	 * ?&gt;
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID
-	 *     FROM 
-	 *         my_table
-	 *     WHERE 
-	 *         DATE_CREATE &lt;= ".<b>$DB-&gt;CharToDateFunction</b>("10.01.2003 23:59:59")."
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - функция вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в настройках языка, либо настройках сайта.</p>
+	*
+	*
+	*
+	*
+	* @param string $value  Если функция вызывается в публичной части сайта, то это - значение
+	* даты для формата текущего сайта. Если функция вызывается в
+	* административной части, то это - значение даты для формата
+	* текущего языка.
+	*
+	*
+	*
+	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
+	* времени) <br>Необязательный. По умолчанию "FULL".
+	*
+	*
+	*
+	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
+	* умолчанию текущий. Отсутствовал в версиях с 3.0.11 по 3.3.21.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arr = getdate();
+	* $ndate = mktime(9,0,0,$arr["mon"],$arr["mday"],$arr["year"]);
+	* $next_exec = <b>$DB-&gt;CharToDateFunction</b>(GetTime($ndate,"FULL"));
+	* CAgent::AddAgent("SendDailyStatistics();","statistic","Y",86400,"","Y",$next_exec, 25);
+	* ?&gt;
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID
+	*     FROM 
+	*         my_table
+	*     WHERE 
+	*         DATE_CREATE &lt;= ".<b>$DB-&gt;CharToDateFunction</b>("10.01.2003 23:59:59")."
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php
+	* @author Bitrix
+	*/
 	public static function CharToDateFunction($strValue, $strType="FULL", $lang=false)
 	{
 		$sFieldExpr = "'".CDatabase::FormatDate($strValue, CLang::GetDateFormat($strType, $lang), ($strType=="SHORT"? "Y-M-D":"Y-M-D H:I:S"))."'";
@@ -859,38 +964,38 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Позволяет выбирать дату в формате UNIX_TIMESTAMP без обращения к <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a> (с версии main 12.5.12).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param TABLE_FIEL $D  Поле в БД которое требуется перевести из формата DATE TIME в формат
-	 * TIMESTAMP.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает валидный <b>timestamp</b>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 * ID, 
-	 * ".$DB-&gt; DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE
-	 * FROM 
-	 * my_table
-	 * ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetimetotimestampfunction.php
-	 * @author Bitrix
-	 */
+	* <p>Позволяет выбирать дату в формате UNIX_TIMESTAMP без обращения к <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/maketimestamp.php">MakeTimeStamp</a>.</p>
+	*
+	*
+	*
+	*
+	* @param TABLE_FIEL $D  Поле в БД которое требуется перевести из формата DATE TIME в формат
+	* TIMESTAMP.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает валидный <b>timestamp</b>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	* ID, 
+	* ".$DB-&gt; DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE
+	* FROM 
+	* my_table
+	* ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetimetotimestampfunction.php
+	* @author Bitrix
+	*/
 	public static function DatetimeToTimestampFunction($fieldName)
 	{
 		$timeZone = "";
@@ -916,54 +1021,55 @@ class CDatabase extends CAllDatabase
 	// -1 if date1 < date2
 	
 	/**
-	 * <p>Сравнивает между собой две даты. Возвращаемые значения:</p> <table class="tnormal"> <tr> <th width="50%">Условие</th> <th width="50%">Возвращаемое значение</th> </tr> <tr> <td align="center" nowrap> <i>date1</i> &gt; <i>date2</i> </td> <td align="center">1</td> </tr> <tr> <td align="center" nowrap> <i>date1</i> &lt; <i>date2</i> </td> <td align="center">-1</td> </tr> <tr> <td align="center" nowrap> <i>date1</i> = <i>date2</i> </td> <td align="center">0</td> </tr> </table>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $date1  1
-	 *
-	 *
-	 *
-	 * @param string $date2  -1
-	 *
-	 *
-	 *
-	 * @return int <h4>Параметры функции</h4><table class="tnormal" width="100%"> <tr> <th
-	 * width="30%">Параметр</th> <th>Описание</th> </tr> <tr> <td><i>date1</i></td> <td>Первая дата
-	 * для сравнения.</td> </tr> <tr> <td><i>date2</i></td> <td>Вторая дата для
-	 * сравнения.</td> </tr> </table>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // зададим дату 1
-	 * $date1 = "01.01.2005";
-	 * 
-	 * // зададим дату 2
-	 * $date2 = "01.01.2006";
-	 * 
-	 * $result = <b>$DB-&gt;CompareDates</b>($date2, $date1);
-	 * 
-	 * if ($result==1) echo $date1." &gt; ".$date2;
-	 * elseif ($result==-1) echo $date1." &lt; ".$date2;
-	 * elseif ($result==0) echo $date1." = ".$date2;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/comparedates.php
-	 * @author Bitrix
-	 */
+	* <p>Сравнивает между собой две даты. Возвращаемые значения:</p> <table class="tnormal"> <tr> <th width="50%">Условие</th> <th width="50%">Возвращаемое значение</th> </tr> <tr> <td align="center" nowrap> <i>date1</i> &gt; <i>date2</i> </td> <td align="center">1</td> </tr> <tr> <td align="center" nowrap> <i>date1</i> &lt; <i>date2</i> </td> <td align="center">-1</td> </tr> <tr> <td align="center" nowrap> <i>date1</i> = <i>date2</i> </td> <td align="center">0</td> </tr> </table>
+	*
+	*
+	*
+	*
+	* @param string $date1  1
+	*
+	*
+	*
+	* @param string $date2  -1
+	*
+	*
+	*
+	* @return int <h4>Параметры функции</h4> </htm<table class="tnormal" width="100%"> <tr> <th
+	* width="30%">Параметр</th> <th>Описание</th> </tr> <tr> <td><i>date1</i></td> <td>Первая дата
+	* для сравнения.</td> </tr> <tr> <td><i>date2</i></td> <td>Вторая дата для
+	* сравнения.</td> </tr> </table>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // зададим дату 1
+	* $date1 = "01.01.2005";
+	* 
+	* // зададим дату 2
+	* $date2 = "01.01.2006";
+	* 
+	* $result = <b>$DB-&gt;CompareDates</b>($date2, $date1);
+	* 
+	* if ($result==1) echo $date1." &gt; ".$date2;
+	* elseif ($result==-1) echo $date1." &lt; ".$date2;
+	* elseif ($result==0) echo $date1." = ".$date2;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
+	* датой и временем</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/comparedates.php
+	* @author Bitrix
+	*/
 	public function CompareDates($date1, $date2)
 	{
 		$s_date1 = $this->CharToDateFunction($date1);
@@ -982,39 +1088,40 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция возвращает ID последней вставленной записи.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function AddResultAnswer($arFields)
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$arInsert = $DB-&gt;PrepareInsert("b_form_result_answer", $arFields, "form");
-	 * 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
-	 * 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * 	return intval(<b>$DB-&gt;LastID()</b>);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a></li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/lastid.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает ID последней вставленной записи.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function AddResultAnswer($arFields)
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$arInsert = $DB-&gt;PrepareInsert("b_form_result_answer", $arFields, "form");
+	* 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
+	* 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* 	return intval(<b>$DB-&gt;LastID()</b>);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a></li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/lastid.php
+	* @author Bitrix
+	*/
 	public function LastID()
 	{
 		$this->DoConnect();
@@ -1024,31 +1131,32 @@ class CDatabase extends CAllDatabase
 	//Closes database connection
 	
 	/**
-	 * <p>Закрывает соединение с базой данных.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * <b>$DB-&gt;Disconnect();</b>
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDatabase::Connect</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php
-	 * @author Bitrix
-	 */
+	* <p>Закрывает соединение с базой данных.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* <b>$DB-&gt;Disconnect();</b>
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDatabase::Connect</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php
+	* @author Bitrix
+	*/
 	public function Disconnect()
 	{
 		if(!DBPersistent && $this->bConnected)
@@ -1074,98 +1182,99 @@ class CDatabase extends CAllDatabase
 			}
 		}
 
-		foreach(self::$arNodes as $arNode)
+		foreach(self::$arNodes as $i => $arNode)
 		{
 			if(is_array($arNode) && array_key_exists("DB", $arNode))
 			{
 				mysql_close($arNode["DB"]->db_Conn);
-				unset($arNode["DB"]);
+				unset(self::$arNodes[$i]["DB"]);
 			}
 		}
 	}
 
 	
 	/**
-	 * <p> Функция подготавливает глобальные переменные, соответствующие именам полей таблицы <i>table</i> для записи в БД.</p> <p>Создает глобальные переменные ${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} и устанавливает их значениями глобальных переменных, соответствующих именам полей из таблицы <i>table</i>, предварительно преобразовав их в зависимости от типа поля. <br><br>Например, для поля типа <b>int</b> будет выполнено: </p> <pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = intval(${<i>имя_поля</i>});</pre> Для поля типа <b>varchar</b>:<br><br><pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = CDatabase::ForSql(${<i>имя_поля</i>}, <i>размер_поля</i>);</pre> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Имя таблицы.
-	 *
-	 *
-	 *
-	 * @param string $prefix = "str_" Префикс переменных. <br>Необязательный. По умолчанию "str_".
-	 *
-	 *
-	 *
-	 * @param string $postfix = "" Постфикс переменных. <br>Необязательный. По умолчанию пустая
-	 * строка.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         <b>$DB-&gt;PrepareFields</b>("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php">CDatabase::InitTableVarsForEdit</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php
-	 * @author Bitrix
-	 */
+	* <p> Функция подготавливает глобальные переменные, соответствующие именам полей таблицы <i>table</i> для записи в БД.</p> <p>Создает глобальные переменные ${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} и устанавливает их значениями глобальных переменных, соответствующих именам полей из таблицы <i>table</i>, предварительно преобразовав их в зависимости от типа поля. <br><br>Например, для поля типа <b>int</b> будет выполнено: </p> <pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = intval(${<i>имя_поля</i>});</pre> Для поля типа <b>varchar</b>:<br><br><pre>${<i>prefix</i>.<i>имя_поля</i>.<i>postfix</i>} = CDatabase::ForSql(${<i>имя_поля</i>}, <i>размер_поля</i>);</pre> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
+	*
+	*
+	*
+	*
+	* @param string $TableName  Имя таблицы.
+	*
+	*
+	*
+	* @param string $prefix = "str_" Префикс переменных. <br>Необязательный. По умолчанию "str_".
+	*
+	*
+	*
+	* @param string $Suffix = "" Постфикс переменных. <br>Необязательный. По умолчанию пустая
+	* строка.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         <b>$DB-&gt;PrepareFields</b>("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	*         if ($ID&gt;0) 
+	*         {
+	*             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php">CDatabase::InitTableVarsForEdit</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php
+	* @author Bitrix
+	*/
 	public function PrepareFields($strTableName, $strPrefix = "str_", $strSuffix = "")
 	{
 		$arColumns = $this->GetTableFields($strTableName);
@@ -1192,61 +1301,62 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля. </p> <p></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Имя таблицы для вставки записи.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	 * поля2"=&gt;"значение2" [, ...]. <br> Если необходимо вставить значение NULL,
-	 * то значение должно быть равно false.
-	 *
-	 *
-	 *
-	 * @param string $dir = "" Не используется.
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части. Используется для определения формата
-	 * даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	 * умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function AddResultAnswer($arFields)
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$arInsert = <b>$DB-&gt;PrepareInsert</b>("b_form_result_answer", $arFields, "form");
-	 * 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
-	 * 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * 	return intval($DB-&gt;LastID());
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
-	 * @author Bitrix
-	 */
+	* <p>Функция подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля. </p> <p></p>
+	*
+	*
+	*
+	*
+	* @param string $TableName  Имя таблицы для вставки записи.
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
+	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо вставить значение NULL,
+	* то значение должно быть равно false.
+	*
+	*
+	*
+	* @param string $FileDir = "" Не используется.
+	*
+	*
+	*
+	* @param string $lang = false Код сайта для публичной части, либо код языка для
+	* административной части. Используется для определения формата
+	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
+	* умолчанию false.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function AddResultAnswer($arFields)
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$arInsert = <b>$DB-&gt;PrepareInsert</b>("b_form_result_answer", $arFields, "form");
+	* 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
+	* 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* 	return intval($DB-&gt;LastID());
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
+	* @author Bitrix
+	*/
 	public function PrepareInsert($strTableName, $arFields, $strFileDir="", $lang=false)
 	{
 		$strInsert1 = "";
@@ -1277,6 +1387,7 @@ class CDatabase extends CAllDatabase
 								$strInsert2 .= ", ".CDatabase::CharToDateFunction($value, "FULL", $lang);
 							break;
 						case "date":
+						case "timestamp":
 							if(strlen($value)<=0)
 								$strInsert2 .= ", NULL ";
 							else
@@ -1310,62 +1421,67 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Имя таблицы.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	 * поля2"=&gt;"значение2" [, ...]. <br> Если необходимо изменить значение на
-	 * NULL, то значение в массиве должно быть равно false.
-	 *
-	 *
-	 *
-	 * @param string $dir = "" Не используется.
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части. Используется для определения формата
-	 * даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	 * умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function UpdateResultField($arFields, $RESULT_ID, $FIELD_ID)
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: UpdateResultField&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$RESULT_ID = intval($RESULT_ID);
-	 * 	$FIELD_ID = intval($FIELD_ID);
-	 * 	$strUpdate = <b>$DB-&gt;PrepareUpdate</b>("b_form_result_answer", $arFields, "form");
-	 * 	$strSql = "UPDATE b_form_result_answer SET ".$strUpdate." WHERE RESULT_ID=".$RESULT_ID." and FIELD_ID=".$FIELD_ID;
-	 * 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
-	 * @author Bitrix
-	 */
+	* <p>Функция подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля.</p>
+	*
+	*
+	*
+	*
+	* @param string $TableName  Имя таблицы.
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
+	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо изменить значение на
+	* NULL, то значение в массиве должно быть равно false.
+	*
+	*
+	*
+	* @param string $FileDir = "" Не используется.
+	*
+	*
+	*
+	* @param string $lang = false Код сайта для публичной части, либо код языка для
+	* административной части. Используется для определения формата
+	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
+	* умолчанию false.
+	*
+	*
+	*
+	* @param string $TableAlias = "" Необязательный.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function UpdateResultField($arFields, $RESULT_ID, $FIELD_ID)
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: UpdateResultField&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$RESULT_ID = intval($RESULT_ID);
+	* 	$FIELD_ID = intval($FIELD_ID);
+	* 	$strUpdate = <b>$DB-&gt;PrepareUpdate</b>("b_form_result_answer", $arFields, "form");
+	* 	$strSql = "UPDATE b_form_result_answer SET ".$strUpdate." WHERE RESULT_ID=".$RESULT_ID." and FIELD_ID=".$FIELD_ID;
+	* 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
+	* @author Bitrix
+	*/
 	public function PrepareUpdate($strTableName, $arFields, $strFileDir="", $lang = false, $strTableAlias = "")
 	{
 		$arBinds = array();
@@ -1432,111 +1548,112 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция вставляет запись в таблицу <i>table</i> с значениями полей <i>fields</i>. Необходимые условия использования данной функции: </p> <ul> <li>Необходимо наличие поля "ID" в таблице, представляющее из себя Primary Key для данной таблицы. </li> <li>Для MySQL поле "ID" должно быть auto increment (если при вызове функции явно не задается параметр exist_id). </li> <li>Для Oracle обязательно наличие sequence (последовательности) с именем вида "SQ_.<i>table</i>". </li> </ul> Возвращает ID вставленной записи или false в случае ошибки. <p><b>Примечание</b>. Если необходимо вставить запись с определенным ID и при этом указать его в параметре fields, то функция возвращает 0, при этом запись вставляется. Если необходимо, чтобы функция вернула ID, который вы указывали, то его необходимо указывать в параметре exist_id.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Название таблицы.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив вида значений полей "поле"=&gt;"значение",...
-	 *
-	 *
-	 *
-	 * @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
-	 * данная функция CDatabase::Insert. Если в SQL запросе будет ошибка и если в
-	 * файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
-	 * то на экране будет выведена данная информация и сам SQL запрос.
-	 *
-	 *
-	 *
-	 * @param bool $debug = false Если значение - "true", то на экран будет выведен текст SQL запроса.
-	 *
-	 *
-	 *
-	 * @param int $exist_id = "" Если данный параметр задан в виде положительного числа, то при
-	 * вставке записи в таблицу, будет добавлено поле с именем "ID" и
-	 * значением <i>exist_id</i>. Если данный параметр явно не задан, то для Oracle
-	 * таблицы будет добавлено поле "ID", со значением SQ_<i>table</i>.nextval().
-	 *
-	 *
-	 *
-	 * @param bool $ignore_errors = false если значение "true", то в случае ошибки возникшей в результате
-	 * выполнения SQL запроса, она будет проигнорирована и работа скрипта
-	 * продолжена.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         $DB-&gt;PrepareFields("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 * 		$DB-&gt;StartTransaction();
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = <b>$DB-&gt;Insert</b>("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             $DB-&gt;Commit();
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *         else $DB-&gt;Rollback();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php
-	 * @author Bitrix
-	 */
+	* <p>Функция вставляет запись в таблицу <i>table</i> с значениями полей <i>fields</i>. Необходимые условия использования данной функции: </p> <ul> <li>Необходимо наличие поля "ID" в таблице, представляющее из себя Primary Key для данной таблицы. </li> <li>Для MySQL поле "ID" должно быть auto increment (если при вызове функции явно не задается параметр exist_id). </li> <li>Для Oracle обязательно наличие sequence (последовательности) с именем вида "SQ_.<i>table</i>". </li> </ul> Возвращает ID вставленной записи или false в случае ошибки. <p><b>Примечание</b>. Если необходимо вставить запись с определенным ID и при этом указать его в параметре fields, то функция возвращает 0, при этом запись вставляется. Если необходимо, чтобы функция вернула ID, который вы указывали, то его необходимо указывать в параметре exist_id.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $table  Название таблицы.
+	*
+	*
+	*
+	* @param array $fields  Массив вида значений полей "поле"=&gt;"значение",...
+	*
+	*
+	*
+	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
+	* данная функция CDatabase::Insert. Если в SQL запросе будет ошибка и если в
+	* файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
+	* то на экране будет выведена данная информация и сам SQL запрос.
+	*
+	*
+	*
+	* @param bool $debug = false Если значение - "true", то на экран будет выведен текст SQL запроса.
+	*
+	*
+	*
+	* @param int $exist_id = "" Если данный параметр задан в виде положительного числа, то при
+	* вставке записи в таблицу, будет добавлено поле с именем "ID" и
+	* значением <i>exist_id</i>. Если данный параметр явно не задан, то для Oracle
+	* таблицы будет добавлено поле "ID", со значением SQ_<i>table</i>.nextval().
+	*
+	*
+	*
+	* @param bool $ignore_errors = false если значение "true", то в случае ошибки возникшей в результате
+	* выполнения SQL запроса, она будет проигнорирована и работа скрипта
+	* продолжена.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         $DB-&gt;PrepareFields("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	* 		$DB-&gt;StartTransaction();
+	*         if ($ID&gt;0) 
+	*         {
+	*             $DB-&gt;Update("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = <b>$DB-&gt;Insert</b>("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             $DB-&gt;Commit();
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*         else $DB-&gt;Rollback();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php
+	* @author Bitrix
+	*/
 	public function Insert($table, $arFields, $error_position="", $DEBUG=false, $EXIST_ID="", $ignore_errors=false)
 	{
 		if (!is_array($arFields))
@@ -1578,109 +1695,114 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Функция изменяет записи в таблицы <i>table</i> значениями полей <i>fields</i>. Возвращает количество измененных записей.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Название таблицы.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив вида значений полей "поле"=&gt;"значение",...
-	 *
-	 *
-	 *
-	 * @param string $where = "" Ограничение для WHERE в формате SQL<br> Необязательный. По умолчанию
-	 * все записи в таблице будут изменены.
-	 *
-	 *
-	 *
-	 * @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
-	 * данная функция CDatabase::Update. Если в SQL запросе будет ошибка и если в
-	 * файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
-	 * то на экране будет выведена данная информация и сам SQL запрос.
-	 *
-	 *
-	 *
-	 * @param bool $debug = false Если значение - "true", то на экран будет выведен текст SQL запроса.
-	 *
-	 *
-	 *
-	 * @param bool $ignore_errors = false если значение "true", то в случае ошибки возникшей в результате
-	 * выполнения SQL запроса, она будет проигнорирована и работа скрипта
-	 * продолжена.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0)
-	 * {
-	 *     if (CheckFields())
-	 *     {
-	 *         $DB-&gt;PrepareFields("b_form");
-	 *         $arFields = array(
-	 *             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
-	 *             "NAME"                    =&gt; "'".trim($str_NAME)."'",
-	 *             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
-	 *             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
-	 *             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
-	 *             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
-	 *             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
-	 *             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
-	 *             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
-	 *             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
-	 *             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
-	 *             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
-	 *             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
-	 *             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
-	 *             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
-	 *             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
-	 *             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
-	 *             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
-	 *             );
-	 * 		$DB-&gt;StartTransaction();
-	 *         if ($ID&gt;0) 
-	 *         {
-	 *             <b>$DB-&gt;Update</b>("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
-	 *         }
-	 *         else 
-	 *         {
-	 *             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
-	 *             $new="Y";
-	 *         }
-	 *         $ID = intval($ID);
-	 *         if (strlen($strError)&lt;=0) 
-	 *         {
-	 *             $DB-&gt;Commit();
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
-	 *             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
-	 *         }
-	 *         else $DB-&gt;Rollback();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет записи в таблицы <i>table</i> значениями полей <i>fields</i>. Возвращает количество измененных записей.</p> <p class="note">Примечание: все значения полей должны быть подготовлены для SQL запроса, например, при помощи функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $table  Название таблицы.
+	*
+	*
+	*
+	* @param array $fields  Массив вида значений полей "поле"=&gt;"значение",...
+	*
+	*
+	*
+	* @param string $where = "" Ограничение для WHERE в формате SQL<br> Необязательный. По умолчанию
+	* все записи в таблице будут изменены.
+	*
+	*
+	*
+	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
+	* данная функция CDatabase::Update. Если в SQL запросе будет ошибка и если в
+	* файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
+	* то на экране будет выведена данная информация и сам SQL запрос.
+	*
+	*
+	*
+	* @param bool $debug = false Если значение - "true", то на экран будет выведен текст SQL запроса.
+	*
+	*
+	*
+	* @param bool $ignore_errors = false если значение "true", то в случае ошибки возникшей в результате
+	* выполнения SQL запроса, она будет проигнорирована и работа скрипта
+	* продолжена.
+	*
+	*
+	*
+	* @param string $additional_check = true Необязательный. По умолчанию true.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0)
+	* {
+	*     if (CheckFields())
+	*     {
+	*         $DB-&gt;PrepareFields("b_form");
+	*         $arFields = array(
+	*             "TIMESTAMP_X"             =&gt; $DB-&gt;GetNowFunction(),
+	*             "NAME"                    =&gt; "'".trim($str_NAME)."'",
+	*             "VARNAME"                 =&gt; "'".trim($str_VARNAME)."'",
+	*             "C_SORT"                  =&gt; "'".intval($str_C_SORT)."'",
+	*             "FIRST_SITE_ID"           =&gt; "'".$DB-&gt;ForSql($FIRST_SITE_ID,2)."'",
+	*             "BUTTON"                  =&gt; "'".$str_BUTTON."'",
+	*             "DESCRIPTION"             =&gt; "'".$str_DESCRIPTION."'",
+	*             "DESCRIPTION_TYPE"        =&gt; "'".$str_DESCRIPTION_TYPE."'",
+	*             "SHOW_TEMPLATE"           =&gt; "'".trim($str_SHOW_TEMPLATE)."'",
+	*             "MAIL_EVENT_TYPE"         =&gt; "'".$DB-&gt;ForSql("FORM_FILLING_".$str_VARNAME,50)."'",
+	*             "SHOW_RESULT_TEMPLATE"    =&gt; "'".trim($str_SHOW_RESULT_TEMPLATE)."'",
+	*             "PRINT_RESULT_TEMPLATE"   =&gt; "'".trim($str_PRINT_RESULT_TEMPLATE)."'",
+	*             "EDIT_RESULT_TEMPLATE"    =&gt; "'".trim($str_EDIT_RESULT_TEMPLATE)."'",
+	*             "FILTER_RESULT_TEMPLATE"  =&gt; "'".trim($str_FILTER_RESULT_TEMPLATE)."'",
+	*             "TABLE_RESULT_TEMPLATE"   =&gt; "'".trim($str_TABLE_RESULT_TEMPLATE)."'",
+	*             "STAT_EVENT1"             =&gt; "'".trim($str_STAT_EVENT1)."'",
+	*             "STAT_EVENT2"             =&gt; "'".trim($str_STAT_EVENT2)."'",
+	*             "STAT_EVENT3"             =&gt; "'".trim($str_STAT_EVENT3)."'"
+	*             );
+	* 		$DB-&gt;StartTransaction();
+	*         if ($ID&gt;0) 
+	*         {
+	*             <b>$DB-&gt;Update</b>("b_form", $arFields, "WHERE ID='".$ID."'", $err_mess.__LINE__);
+	*         }
+	*         else 
+	*         {
+	*             $ID = $DB-&gt;Insert("b_form", $arFields, $err_mess.__LINE__);
+	*             $new="Y";
+	*         }
+	*         $ID = intval($ID);
+	*         if (strlen($strError)&lt;=0) 
+	*         {
+	*             $DB-&gt;Commit();
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID);
+	*             elseif ($new=="Y") LocalRedirect("form_edit.php?lang=".LANGUAGE_ID."&amp;ID=".$ID);
+	*         }
+	*         else $DB-&gt;Rollback();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php
+	* @author Bitrix
+	*/
 	public function Update($table, $arFields, $WHERE="", $error_position="", $DEBUG=false, $ignore_errors=false, $additional_check=true)
 	{
 		$rows = 0;
@@ -1754,52 +1876,52 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Исходная строка.
-	 *
-	 *
-	 *
-	 * @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
-	 * обрезается).
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID 
-	 *     FROM 
-	 *         b_stat_phrase_list 
-	 *     WHERE 
-	 *         PHRASE='".<b>$DB-&gt;ForSql</b>($search_phrase)."' 
-	 *     and SESSION_ID='".$_SESSION["SESS_SESSION_ID"]."'
-	 *     ";
-	 * $w = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php
-	 * @author Bitrix
-	 */
+	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $value  Исходная строка. </h
+	*
+	*
+	*
+	* @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
+	* обрезается).
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID 
+	*     FROM 
+	*         b_stat_phrase_list 
+	*     WHERE 
+	*         PHRASE='".<b>$DB-&gt;ForSql</b>($search_phrase)."' 
+	*     and SESSION_ID='".$_SESSION["SESS_SESSION_ID"]."'
+	*     ";
+	* $w = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php
+	* @author Bitrix
+	*/
 	public static function ForSql($strValue, $iMaxLength = 0)
 	{
 		if ($iMaxLength > 0)
@@ -1838,76 +1960,77 @@ class CDatabase extends CAllDatabase
 
 	
 	/**
-	 * <p>Создает глобальные переменные с именами ${<i>prefix_to</i>.имя_поля} и присваивает им значения переменных с именами ${<i>prefix_from</i>.имя_поля.<i>postfix_from</i>} переводя при этом в HTML-безопасный вид. Под "имя_поля" подразумеваются имена полей таблицы <i>table</i>.</p> <p> </p> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Название таблицы.
-	 *
-	 *
-	 *
-	 * @param string $prefix_from = "str_" Префикс для переменных ИЗ которых будет производиться
-	 * преобразование. <br> Необязательный. По умолчанию "str_".
-	 *
-	 *
-	 *
-	 * @param string $prefix_to = "str_" Префикс для переменных В которые будет производиться
-	 * преобразование. <br> Необязательный. По умолчанию "str_".
-	 *
-	 *
-	 *
-	 * @param string $postfix_from = "" Суффикс (постфикс) для переменных ИЗ которых будет производиться
-	 * преобразование. <br> Необязательный. По умолчанию "".
-	 *
-	 *
-	 *
-	 * @param bool $init_anyway = false Значение "true" - инициализировать переменные всегда, т.е. не
-	 * зависимо были ли они изначально. <br> Необязательный. По умолчанию -
-	 * "false".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $stoplist = CStoplist::GetByID($ID);
-	 * if (!($stoplist &amp;&amp; $stoplist-&gt;ExtractFields()))
-	 * {
-	 * 	$ID=0; 
-	 * 	$str_ACTIVE="Y";
-	 * 	$str_MASK_1="255";
-	 * 	$str_MASK_2="255";
-	 * 	$str_MASK_3="255";
-	 * 	$str_MASK_4="255";
-	 * 	$str_IP_1 = $net1;
-	 * 	$str_IP_2 = $net2;
-	 * 	$str_IP_3 = $net3;
-	 * 	$str_IP_4 = $net4;
-	 * 	$str_USER_AGENT = $user_agent;
-	 * 	$str_DATE_START=GetTime(time(),"FULL");
-	 * 	$str_MESSAGE = GetMessage("STAT_DEFAULT_MESSAGE");
-	 * 	$str_MESSAGE_LID = LANGUAGE_ID;
-	 * 	$str_SAVE_STATISTIC = "Y";
-	 * }
-	 * if (strlen($strError)&gt;0) <b>$DB-&gt;InitTableVarsForEdit</b>("b_stop_list", "", "str_");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php">CDatabase::PrepareFields</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php
-	 * @author Bitrix
-	 */
+	* <p>Создает глобальные переменные с именами ${<i>prefix_to</i>.имя_поля} и присваивает им значения переменных с именами ${<i>prefix_from</i>.имя_поля.<i>postfix_from</i>} переводя при этом в HTML-безопасный вид. Под "имя_поля" подразумеваются имена полей таблицы <i>table</i>.</p> <p> </p> <p class="note">Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</p>
+	*
+	*
+	*
+	*
+	* @param string $tablename  Название таблицы.
+	*
+	*
+	*
+	* @param string $IdentFrom = "str_" Префикс для переменных ИЗ которых будет производиться
+	* преобразование. <br> Необязательный. По умолчанию "str_".
+	*
+	*
+	*
+	* @param string $IdentTo = "str_" Префикс для переменных В которые будет производиться
+	* преобразование. <br> Необязательный. По умолчанию "str_".
+	*
+	*
+	*
+	* @param string $SuffixFrom = "" Суффикс (постфикс) для переменных ИЗ которых будет производиться
+	* преобразование. <br> Необязательный. По умолчанию "".
+	*
+	*
+	*
+	* @param bool $Always = false Значение "true" - инициализировать переменные всегда, т.е. не
+	* зависимо были ли они изначально. <br> Необязательный. По умолчанию -
+	* "false".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $stoplist = CStoplist::GetByID($ID);
+	* if (!($stoplist &amp;&amp; $stoplist-&gt;ExtractFields()))
+	* {
+	* 	$ID=0; 
+	* 	$str_ACTIVE="Y";
+	* 	$str_MASK_1="255";
+	* 	$str_MASK_2="255";
+	* 	$str_MASK_3="255";
+	* 	$str_MASK_4="255";
+	* 	$str_IP_1 = $net1;
+	* 	$str_IP_2 = $net2;
+	* 	$str_IP_3 = $net3;
+	* 	$str_IP_4 = $net4;
+	* 	$str_USER_AGENT = $user_agent;
+	* 	$str_DATE_START=GetTime(time(),"FULL");
+	* 	$str_MESSAGE = GetMessage("STAT_DEFAULT_MESSAGE");
+	* 	$str_MESSAGE_LID = LANGUAGE_ID;
+	* 	$str_SAVE_STATISTIC = "Y";
+	* }
+	* if (strlen($strError)&gt;0) <b>$DB-&gt;InitTableVarsForEdit</b>("b_stop_list", "", "str_");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/preparefields.php">CDatabase::PrepareFields</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/inittablevarsforedit.php
+	* @author Bitrix
+	*/
 	public function InitTableVarsForEdit($tablename, $strIdentFrom="str_", $strIdentTo="str_", $strSuffixFrom="", $bAlways=false)
 	{
 		$this->DoConnect();
@@ -2159,34 +2282,35 @@ class CDBResult extends CAllDBResult
 	 */
 	
 	/**
-	 * <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - функция вернет "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsUser = CUser::GetByID($USER_ID);
-	 * $arUser = <b>$rsUser-&gt;Fetch</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
-	 * @author Bitrix
-	 */
+	* <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - функция вернет "false".</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsUser = CUser::GetByID($USER_ID);
+	* $arUser = <b>$rsUser-&gt;Fetch</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
+	* @author Bitrix
+	*/
 	public function Fetch()
 	{
 		global $DB;
@@ -2198,100 +2322,98 @@ class CDBResult extends CAllDBResult
 			elseif($res = current($this->arResult))
 				next($this->arResult);
 		}
-		elseif($this->SqlTraceIndex)
-		{
-			$start_time = microtime(true);
-
-			if(!$this->arUserMultyFields)
-			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-			}
-			else
-			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-				if($res)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
-			}
-
-			if ($res && $this->arReplacedAliases)
-			{
-				foreach($this->arReplacedAliases as $tech => $human)
-				{
-					$res[$human] = $res[$tech];
-					unset($res[$tech]);
-				}
-			}
-
-			$exec_time = round(microtime(true) - $start_time, 10);
-			$DB->addDebugTime($this->SqlTraceIndex, $exec_time);
-			$DB->timeQuery += $exec_time;
-		}
 		else
 		{
-			if(!$this->arUserMultyFields)
+			if($this->SqlTraceIndex)
 			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-			}
-			else
-			{
-				$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
-				if($res)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
+				$start_time = microtime(true);
 			}
 
-			if ($res && $this->arReplacedAliases)
+			$res = $this->FetchInternal();
+
+			if($this->SqlTraceIndex)
 			{
-				foreach($this->arReplacedAliases as $tech => $human)
-				{
-					$res[$human] = $res[$tech];
-					unset($res[$tech]);
-				}
+				/** @noinspection PhpUndefinedVariableInspection */
+				$exec_time = round(microtime(true) - $start_time, 10);
+				$DB->addDebugTime($this->SqlTraceIndex, $exec_time);
+				$DB->timeQuery += $exec_time;
 			}
 		}
 
 		return $res;
 	}
 
+	protected function FetchInternal()
+	{
+		if($this->resultObject !== null)
+		{
+			$res = $this->resultObject->fetch();
+		}
+		else
+		{
+			$res = mysql_fetch_array($this->result, MYSQL_ASSOC);
+			if(!$res)
+			{
+				return false;
+			}
+
+			if($this->arUserMultyFields)
+			{
+				foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
+					if($res[$FIELD_NAME])
+						$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
+			}
+
+			if ($this->arReplacedAliases)
+			{
+				foreach($this->arReplacedAliases as $tech => $human)
+				{
+					$res[$human] = $res[$tech];
+					unset($res[$tech]);
+				}
+			}
+		}
+		return $res;
+	}
+
 	
 	/**
-	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
-	 * $rsBanners-&gt;NavStart(20);
-	 * if (intval(<b>$rsBanners-&gt;SelectedRowsCount()</b>)&gt;0):
-	 *     echo $rsBanners-&gt;NavPrint("Баннеры");
-	 *     while($rsBanners-&gt;NavNext(true, "f_")):
-	 *          echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
-	 *     endwhile;
-	 *     echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
+	* $rsBanners-&gt;NavStart(20);
+	* if (intval(<b>$rsBanners-&gt;SelectedRowsCount()</b>)&gt;0):
+	*     echo $rsBanners-&gt;NavPrint("Баннеры");
+	*     while($rsBanners-&gt;NavNext(true, "f_")):
+	*          echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
+	*     endwhile;
+	*     echo $rsBanners-&gt;NavPrint("Баннеры");
+	* endif;
+	* ?&gt;
+	* </ht
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
+	* @author Bitrix
+	*/
 	public function SelectedRowsCount()
 	{
 		if($this->nSelectedCount !== false)
@@ -2305,58 +2427,58 @@ class CDBResult extends CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 * 	INSERT INTO b_stat_day(
-	 * 		ID,
-	 * 		DATE_STAT,
-	 * 		TOTAL_HOSTS)
-	 * 	SELECT
-	 * 		SQ_B_STAT_DAY.NEXTVAL,
-	 * 		trunc(SYSDATE),
-	 * 		nvl(PREV.MAX_TOTAL_HOSTS,0)
-	 * 	FROM
-	 * 		(SELECT	max(TOTAL_HOSTS) AS MAX_TOTAL_HOSTS	FROM b_stat_day) PREV						
-	 * 	WHERE			
-	 * 		not exists(SELECT 'x' FROM b_stat_day D WHERE TRUNC(D.DATE_STAT) = TRUNC(SYSDATE))
-	 * 	";
-	 * $q = $DB-&gt;Query($strSql, true, $err_mess.__LINE__);
-	 * if ($q &amp;&amp; intval(<b>$q-&gt;AffectedRowsCount</b>())&gt;0)
-	 * {
-	 * 	$arFields = Array("LAST"=&gt;"'N'");
-	 * 	$DB-&gt;Update("b_stat_adv_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_adv_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_searcher_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_country_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_guest",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_session",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	* 	INSERT INTO b_stat_day(
+	* 		ID,
+	* 		DATE_STAT,
+	* 		TOTAL_HOSTS)
+	* 	SELECT
+	* 		SQ_B_STAT_DAY.NEXTVAL,
+	* 		trunc(SYSDATE),
+	* 		nvl(PREV.MAX_TOTAL_HOSTS,0)
+	* 	FROM
+	* 		(SELECT	max(TOTAL_HOSTS) AS MAX_TOTAL_HOSTS	FROM b_stat_day) PREV						
+	* 	WHERE			
+	* 		not exists(SELECT 'x' FROM b_stat_day D WHERE TRUNC(D.DATE_STAT) = TRUNC(SYSDATE))
+	* 	";
+	* $q = $DB-&gt;Query($strSql, true, $err_mess.__LINE__);
+	* if ($q &amp;&amp; intval(<b>$q-&gt;AffectedRowsCount</b>())&gt;0)
+	* {
+	* 	$arFields = Array("LAST"=&gt;"'N'");
+	* 	$DB-&gt;Update("b_stat_adv_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_adv_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_searcher_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_country_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_guest",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_session",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
+	* @author Bitrix
+	*/
 	public static function AffectedRowsCount()
 	{
 		if(is_object($this) && is_object($this->DB))
@@ -2383,38 +2505,39 @@ class CDBResult extends CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает количество полей результата выборки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rs = $DB-&gt;Query($query,true);
-	 * $intNumFields = <b>$rs-&gt;FieldsCount</b>();
-	 * $i = 0;
-	 * while ($i &lt; $intNumFields) 
-	 * {
-	 * 	$arFieldName[] = $rs-&gt;FieldName($i);
-	 * 	$i++;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество полей результата выборки.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rs = $DB-&gt;Query($query,true);
+	* $intNumFields = <b>$rs-&gt;FieldsCount</b>();
+	* $i = 0;
+	* while ($i &lt; $intNumFields) 
+	* {
+	* 	$arFieldName[] = $rs-&gt;FieldName($i);
+	* 	$i++;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
+	* @author Bitrix
+	*/
 	public function FieldsCount()
 	{
 		if(is_resource($this->result))
@@ -2425,42 +2548,43 @@ class CDBResult extends CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает название поля по его номеру.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $column  
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rs = $DB-&gt;Query($query,true);
-	 * $intNumFields = $rs-&gt;FieldsCount();
-	 * $i = 0;
-	 * while ($i &lt; $intNumFields) 
-	 * {
-	 * 	$arFieldName[] = <b>$rs-&gt;FieldName</b>($i);
-	 * 	$i++;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает название поля по его номеру.</p>
+	*
+	*
+	*
+	*
+	* @param int $column  
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rs = $DB-&gt;Query($query,true);
+	* $intNumFields = $rs-&gt;FieldsCount();
+	* $i = 0;
+	* while ($i &lt; $intNumFields) 
+	* {
+	* 	$arFieldName[] = <b>$rs-&gt;FieldName</b>($i);
+	* 	$i++;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
+	* @author Bitrix
+	*/
 	public function FieldName($iCol)
 	{
 		return mysql_field_name($this->result, $iCol);
@@ -2498,25 +2622,12 @@ class CDBResult extends CAllDBResult
 			$start_time = microtime(true);
 
 		mysql_data_seek($this->result, $NavFirstRecordShow);
+
 		$temp_arrray = array();
 		for($i=$NavFirstRecordShow; $i<$NavLastRecordShow; $i++)
 		{
-			if(($res = mysql_fetch_array($this->result, MYSQL_ASSOC)))
+			if(($res = $this->FetchInternal()))
 			{
-				if($this->arUserMultyFields)
-					foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-						if($res[$FIELD_NAME])
-							$res[$FIELD_NAME] = unserialize($res[$FIELD_NAME]);
-
-				if ($this->arReplacedAliases)
-				{
-					foreach($this->arReplacedAliases as $tech => $human)
-					{
-						$res[$human] = $res[$tech];
-						unset($res[$tech]);
-					}
-				}
-
 				$temp_arrray[] = $res;
 			}
 			else
@@ -2626,6 +2737,9 @@ class CDBResult extends CAllDBResult
 		if ($bIgnoreErrors && ($res_tmp === false))
 			return false;
 
+		$this->result = $res_tmp->result;
+		$this->DB = $res_tmp->DB;
+
 		if($this->SqlTraceIndex)
 			$start_time = microtime(true);
 
@@ -2633,23 +2747,9 @@ class CDBResult extends CAllDBResult
 		$temp_arrray_add = array();
 		$tmp_cnt = 0;
 
-		while($ar = mysql_fetch_array($res_tmp->result, MYSQL_ASSOC))
+		while($ar = $this->FetchInternal())
 		{
 			$tmp_cnt++;
-			if($this->arUserMultyFields)
-				foreach($this->arUserMultyFields as $FIELD_NAME=>$flag)
-					if($ar[$FIELD_NAME])
-						$ar[$FIELD_NAME] = unserialize($ar[$FIELD_NAME]);
-
-			if ($this->arReplacedAliases)
-			{
-				foreach($this->arReplacedAliases as $tech => $human)
-				{
-					$ar[$human] = $ar[$tech];
-					unset($ar[$tech]);
-				}
-			}
-
 			if (intval($NavLastRecordShow - $NavFirstRecordShow) > 0 && $tmp_cnt > ($NavLastRecordShow - $NavFirstRecordShow))
 				$temp_arrray_add[] = $ar;
 			else
@@ -2664,13 +2764,11 @@ class CDBResult extends CAllDBResult
 			$DB->timeQuery += $exec_time;
 		}
 
-		$this->result = $res_tmp->result; // added for FieldsCount and other compatibility
-		$this->arResult = (count($temp_arrray)? $temp_arrray : false);
-		$this->arResultAdd = (count($temp_arrray_add)? $temp_arrray_add : false);
+		$this->arResult = (!empty($temp_arrray)? $temp_arrray : false);
+		$this->arResultAdd = (!empty($temp_arrray_add)? $temp_arrray_add : false);
 		$this->nSelectedCount = $cnt;
 		$this->bDescPageNumbering = $bDescPageNumbering;
 		$this->bFromLimited = true;
-		$this->DB = $res_tmp->DB;
 
 		return null;
 	}

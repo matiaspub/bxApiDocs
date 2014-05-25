@@ -6,7 +6,7 @@
 # mailto:admin@bitrixsoft.com                #
 ##############################################
 require_once(dirname(__FILE__)."/../include/prolog_admin_before.php");
-require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/prolog_user.php");
+require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/prolog.php");
 
 if(!($USER->CanDoOperation('view_subordinate_users') || $USER->CanDoOperation('view_all_users')))
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
@@ -208,14 +208,6 @@ while($arRes = $rsData->GetNext())
 	);
 	$row->AddActions($arActions);
 }
-
-// "подвал" списка
-$lAdmin->AddFooter(
-	array(
-		array("title"=>GetMessage("MAIN_ADMIN_LIST_SELECTED"), "value"=>$rsData->SelectedRowsCount()),
-		array("counter"=>true, "title"=>GetMessage("MAIN_ADMIN_LIST_CHECKED"), "value"=>"0"),
-	)
-);
 
 $lAdmin->AddAdminContextMenu(array());
 

@@ -59,7 +59,7 @@ class CIMMail
 					"SECOND_NAME"	=> $arNotify["FROM_USER_SECOND_NAME"],
 					"LOGIN"		=> $arNotify["FROM_USER_LOGIN"]), true));
 
-			$arNotify['NOTIFY_TAG_MD5'] = md5($arNotify['NOTIFY_TAG']);
+			$arNotify['NOTIFY_TAG_MD5'] = md5($arNotify["TO_USER_ID"].'|'.$arNotify['NOTIFY_TAG']);
 			$arUnsendNotify[$id] = $arNotify;
 			if ($arNotify["EMAIL_TEMPLATE"] == "IM_NEW_NOTIFY" && $arNotify['NOTIFY_TAG'] != '')
 			{
@@ -299,7 +299,7 @@ class CIMMail
 		if (COption::GetOptionString('dav', 'exchange_use_login', 'Y') == 'Y')
 			return false;
 
-		if (!CUserOptions::GetOption('dav', 'davex_mailbox'))
+		if (!CUserOptions::GetOption('global', 'davex_mailbox'))
 		{
 			$arUser = CUser::GetList(
 				$by = 'ID', $order = 'ASC',
@@ -307,10 +307,10 @@ class CIMMail
 				array('SELECT' => array('UF_BXDAVEX_MAILBOX'), 'FIELDS' => array('ID'))
 			)->Fetch();
 
-			CUserOptions::SetOption('dav', 'davex_mailbox', empty($arUser['UF_BXDAVEX_MAILBOX']) ? 'N' : 'Y');
+			CUserOptions::SetOption('global', 'davex_mailbox', empty($arUser['UF_BXDAVEX_MAILBOX']) ? 'N' : 'Y');
 		}
 
-		if (CUserOptions::GetOption('dav', 'davex_mailbox') == 'Y')
+		if (CUserOptions::GetOption('global', 'davex_mailbox') == 'Y')
 			return false;
 
 		return true;

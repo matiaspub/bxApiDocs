@@ -18,7 +18,7 @@
  */
 class CAllForm extends CForm_old
 {
-	public static function err_mess()
+public static 	function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -27,38 +27,38 @@ class CAllForm extends CForm_old
 
 	// true - если текущий пользователь имеет полный доступ к модулю
 	// false - в противном случае
-	
+
 	/**
-	 * <p>Возвращает "true", если текущий пользователь имеет административные <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">права</a> на модуль <b>Веб-формы</b>, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (<b>CForm::IsAdmin</b>())
-	 * {
-	 *     echo "У вас административные права на модуль Веб-форм.";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">Права на модуль</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/isadmin.php
-	 * @author Bitrix
-	 */
-	public static function IsAdmin()
+	* <p>Возвращает "true", если текущий пользователь имеет административные <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">права</a> на модуль <b>Веб-формы</b>, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (<b>CForm::IsAdmin</b>())
+	* {
+	*     echo "У вас административные права на модуль Веб-форм.";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#module">Права на модуль</a>
+	* </li></ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/isadmin.php
+	* @author Bitrix
+	*/
+	public static 	function IsAdmin()
 	{
 		global $USER, $APPLICATION;
 		if (!is_object($USER)) $USER = new CUser;
@@ -68,192 +68,195 @@ class CAllForm extends CForm_old
 	}
 
 	// Функция возвращает массивы, содержащие данные по вопросам и полям формы, а также ответы и их значения.
-	
+
 	/**
-	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, а также <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответы на вопросы</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID формы.
-	 *
-	 *
-	 *
-	 * @param array &$columns  Массив, описывающий те вопросы и поля формы, которые: <ol> <li>
-	 * активны;</li> <li>включены в таблицу результатов.</li> </ol> Ключами
-	 * данного массива являются ID вопросов/полей, а значениями - массив,
-	 * описывающий сам вопрос/поле, в свою очередь, имеющий следующие
-	 * ключи: <ul> <li> <b>ID</b> - ID вопроса/поля; </li> <li> <b>FORM_ID</b> - ID формы; </li> <li>
-	 * <b>TIMESTAMP_X</b> - дата изменения вопроса/поля; </li> <li> <b>ACTIVE</b> - флаг
-	 * активности [Y|N]; </li> <li> <b>TITLE</b> - текст вопроса, либо заголовок поля;
-	 * </li> <li> <b>TITLE_TYPE</b> - тип текста; </li> <li> <b>SID</b> - символьный
-	 * идентификатор вопроса/поля; </li> <li> <b>C_SORT</b> - порядок сортировки;
-	 * </li> <li> <b>ADDITIONAL</b> - если Y - то данная запись является вопросом; если N
-	 * - то полем формы; </li> <li> <b>REQUIRED</b> - флаг обязательности ответа на
-	 * вопрос [Y|N]; </li> <li> <b>IN_FILTER</b> - флаг показывающий отражен ли
-	 * вопрос/поле в фильтре формы результатов [Y|N]; </li> <li> <b>IN_RESULTS_TABLE</b> -
-	 * флаг показывающий отображается ли вопрос/поле в таблице
-	 * результатов [Y|N]; </li> <li> <b>IN_EXCEL_TABLE</b> - флаг показывающий
-	 * отображается ли вопрос/поле в Excel-таблице результатов [Y|N]; </li> <li>
-	 * <b>FIELD_TYPE</b> тип поля, возможны следующие значения: <ul> <li> <b>text</b> -
-	 * текст; </li> <li> <b>integer</b> - число; </li> <li> <b>date</b> - дата. </li> </ul> </li> <li>
-	 * <b>IMAGE_ID</b> - ID изображения в описании вопроса; </li> <li> <b>COMMENTS</b> -
-	 * служебный комментарий; </li> <li> <b>FILTER_TITLE</b> - заголовок поля фильтра
-	 * по данному вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> - заголовок столбца
-	 * таблицы результатов. </li> </ul> <b>Пример:</b> <pre style="height:450px">Array ( [140] =&gt;
-	 * Array ( [ID] =&gt; 140 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 19.05.2005 11:42:04 [ACTIVE] =&gt; Y [TITLE] =&gt;
-	 * Фамилия, имя, отчество [TITLE_TYPE] =&gt; html [SID] =&gt; VS_NAME [C_SORT] =&gt; 100 [ADDITIONAL]
-	 * =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; N [IN_EXCEL_TABLE] =&gt; N [FIELD_TYPE] =&gt;
-	 * [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; ) [144] =&gt; Array ( [ID] =&gt; 144
-	 * [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 11.11.2004 18:11:21 [ACTIVE] =&gt; Y [TITLE] =&gt; Какие области
-	 * знаний вас интересуют ? [TITLE_TYPE] =&gt; text [SID] =&gt; VS_INTEREST [C_SORT] =&gt; 500
-	 * [ADDITIONAL] =&gt; N [REQUIRED] =&gt; N [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y [IN_EXCEL_TABLE] =&gt; Y
-	 * [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$answers  Массив, содержащий ответы на вопросы формы, а также значения
-	 * полей формы. Ключами данного массива являются: <ul> <li> <b>RESULT_ID</b> - ID
-	 * результата; </li> <li> <b>FIELD_ID</b> - ID вопроса/поля; </li> <li> <b>SID</b> -
-	 * символьный идентификатор вопроса/поля; </li> <li> <b>TITLE</b> - текст
-	 * вопроса или заголовок поля веб-формы; </li> <li> <b>TITLE_TYPE</b> - тип текста
-	 * вопроса, допустимы следующие значения: <ul> <li> <b>text</b> - текст; </li> <li>
-	 * <b>html</b> - HTML код. </li> </ul> </li> <li> <b>FILTER_TITLE</b> - подпись поля фильтра по
-	 * данному вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> - подпись столбца
-	 * таблицы результатов; </li> <li> <b>ANSWER_ID</b> - ID ответа; </li> <li> <b>ANSWER_TEXT</b> -
-	 * параметр ответа <font color="green">ANSWER_TEXT</font>, записанный в таблицу
-	 * результата; </li> <li> <b>MESSAGE</b> - параметр ответа <font color="green">ANSWER_TEXT</font>,
-	 * хранящийся в таблице ответов (синоним ключа <b>ANSWER_TEXT</b>); </li> <li>
-	 * <b>ANSWER_VALUE</b> - параметр ответа <font color="red">ANSWER_VALUE</font>, записанный в
-	 * таблицу результата; </li> <li> <b>VALUE</b> - параметр ответа <font
-	 * color="red">ANSWER_VALUE</font>, хранящийся в таблице ответов (синоним ключа
-	 * <b>ANSWER_VALUE</b>); </li> <li> <b>USER_TEXT</b> - текстовое значение, введенное
-	 * пользователем; </li> <li> <b>USER_DATE</b> - дата, введенная пользователем
-	 * (данный ключ может содержать значение, только если <b>FIELD_TYPE</b>="date");
-	 * </li> <li> <b>USER_FILE_ID</b> - ID файла загруженного пользователем (данный
-	 * ключ может содержать значение, только если <b>FIELD_TYPE</b>="image" или
-	 * <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_NAME</b> - оригинальное имя загруженного
-	 * файла (данный ключ может содержать значение, только если
-	 * <b>FIELD_TYPE</b>="image" или <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_IS_IMAGE</b> - "Y" - если
-	 * <b>FIELD_TYPE</b>="image", "N" - если <b>FIELD_TYPE</b>="file" </li> <li> <b>USER_FILE_HASH</b> -
-	 * уникальный хеш, используемый при показе файла (данный ключ может
-	 * содержать значение, только если <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_SUFFIX</b>
-	 * - суффикс к расширению загруженного файла (данный ключ может
-	 * содержать значение, только если <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_SIZE</b> -
-	 * размер файла в байтах (данный ключ может содержать значение,
-	 * только если <b>FIELD_TYPE</b>="image" или <b>FIELD_TYPE</b>="file"); </li> <li> <b>FIELD_TYPE</b> - тип
-	 * поля ответа, возможны следующие значения: <ul> <li> <b>text</b> -
-	 * однострочное текстовое поле; </li> <li> <b>textarea</b> - многострочное
-	 * текстовое поле; </li> <li> <b>radio</b> - переключатель одиночного выбора;
-	 * </li> <li> <b>checkbox</b> - флаг множественного выбора; </li> <li> <b>dropdown</b> -
-	 * элемента выпадающего списка одиночного выбора; </li> <li> <b>multiselect</b> -
-	 * элемента списка множественного выбора; </li> <li> <b>date</b> - поле для
-	 * ввода дата в календарем; </li> <li> <b>image</b> - поле для ввода
-	 * изображения; </li> <li> <b>file</b> - поле для ввода произвольного файла; </li>
-	 * <li> <b>password</b> - однострочное поле для ввода пароля. </li> </ul> </li> <li>
-	 * <b>FIELD_WIDTH</b> - ширина поля ответа; </li> <li> <b>FIELD_HEIGHT</b> - высота поля
-	 * ответа; </li> <li> <b>FIELD_PARAM</b> - параметры поля ответа. </li> </ul> <b>Пример:</b>
-	 * <pre style="height:450px"> Array ( [186] =&gt; Array ( [140] =&gt; Array ( [586] =&gt; Array ( [RESULT_ID] =&gt; 186
-	 * [FIELD_ID] =&gt; 140 [SID] =&gt; VS_NAME [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html
-	 * [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 586 [ANSWER_TEXT] =&gt; [MESSAGE] =&gt;
-	 * [ANSWER_VALUE] =&gt; [VALUE] =&gt; [USER_TEXT] =&gt; Иванов Дмитрий Витальевич [USER_DATE] =&gt;
-	 * [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
-	 * [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; ) )
-	 * [144] =&gt; Array ( [594] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt;
-	 * Какие области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
-	 * [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 594 [ANSWER_TEXT] =&gt; иностранные языки [MESSAGE] =&gt;
-	 * иностранные языки [ANSWER_VALUE] =&gt; 4 [VALUE] =&gt; 4 [USER_TEXT] =&gt; [USER_DATE] =&gt;
-	 * [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
-	 * [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; )
-	 * [595] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt; Какие
-	 * области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
-	 * [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 595 [ANSWER_TEXT] =&gt; програмирование [MESSAGE] =&gt;
-	 * програмирование [ANSWER_VALUE] =&gt; 5 [VALUE] =&gt; 5 [USER_TEXT] =&gt; [USER_DATE] =&gt; [USER_FILE_ID]
-	 * =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE]
-	 * =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED
-	 * class=inputcheckbox ) ) ... ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$answers2 = array() Массив, содержащий, по сути, те же данные, что и массив <i>answers</i>, но
-	 * имеющий несколько другую структуру. <br><br><b>Пример:</b> <pre
-	 * style="height:450px"> Array ( [186] =&gt; Array ( [VS_NAME] =&gt; Array ( [0] =&gt; Array ( [RESULT_ID] =&gt; 186
-	 * [FIELD_ID] =&gt; 140 [SID] =&gt; VS_NAME [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html
-	 * [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 586 [ANSWER_TEXT] =&gt; [MESSAGE] =&gt;
-	 * [ANSWER_VALUE] =&gt; [VALUE] =&gt; [USER_TEXT] =&gt; Иванов Дмитрий Витальевич [USER_DATE] =&gt;
-	 * [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
-	 * [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; ) )
-	 * [VS_INTEREST] =&gt; Array ( [0] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE]
-	 * =&gt; Какие области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
-	 * [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 594 [ANSWER_TEXT] =&gt; иностранные языки [MESSAGE] =&gt;
-	 * иностранные языки [ANSWER_VALUE] =&gt; 4 [VALUE] =&gt; 4 [USER_TEXT] =&gt; [USER_DATE] =&gt;
-	 * [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
-	 * [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; )
-	 * [1] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt; Какие
-	 * области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
-	 * [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 595 [ANSWER_TEXT] =&gt; програмирование [MESSAGE] =&gt;
-	 * програмирование [ANSWER_VALUE] =&gt; 5 [VALUE] =&gt; 5 [USER_TEXT] =&gt; [USER_DATE] =&gt; [USER_FILE_ID]
-	 * =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE]
-	 * =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED
-	 * class=inputcheckbox ) ) ... ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array $filter = array() Массив для фильтрации выбираемых значений. В массиве допустимы
-	 * следующие ключи: <ul> <li> <b>RESULT_ID</b>* - ID результата (по умолчанию будет
-	 * искаться точное совпадение); </li> <li>RESULT_ID_EXACT_MATCH - если значение
-	 * равно "N", то при фильтрации по <b>RESULT_ID</b> будет искаться вхождение;
-	 * </li> <li> <b>FIELD_ID</b>* - ID вопроса/поля (по умолчанию будет искаться
-	 * точное совпадение); </li> <li> <b>FIELD_ID_EXACT_MATCH</b> - если значение равно "N",
-	 * то при фильтрации по <b>FIELD_ID</b> будет искаться вхождение; </li> <li>
-	 * <b>FIELD_SID</b>* - символьный код вопроса/поля (по умолчанию будет
-	 * искаться вхождение); </li> <li> <b>FIELD_SID_EXACT_MATCH</b> - если значение равно
-	 * "Y", то при фильтрации по <b>FIELD_SID</b> будет искаться точное
-	 * совпадение; </li> <li> <b>IN_RESULTS_TABLE</b> - если значение равно "Y", то ответы
-	 * на вопрос (либо значения поля веб-формы) будет отображены в
-	 * таблице результатов; </li> <li> <b>IN_EXCEL_TABLE</b> - если значение равно "Y", то
-	 * ответы на вопрос (либо значения поля веб-формы) будет отображены в
-	 * Excel таблице результатов. </li> </ul> * - допускается сложная логика.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // получим данные по результату ID=145
-	 * <b>CForm::GetResultAnswerArray</b>($FORM_ID, 
-	 * 	$arrColumns, 
-	 * 	$arrAnswers, 
-	 * 	$arrAnswersVarname, 
-	 * 	array("RESULT_ID" =&gt; "145"));
-	 * 
-	 * echo "&lt;pre&gt;";
-	 * echo "arrColumns:";
-	 * print_r($arrColumns);
-	 * echo "arrAnswers:";
-	 * print_r($arrAnswers);
-	 * echo "arrAnswersVarname:";
-	 * print_r($arrAnswersVarname);
-	 * echo "&lt;/pre&gt;";
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/getlist.php">CFormAnswer::GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php
-	 * @author Bitrix
-	 */
-	public static function GetResultAnswerArray($WEB_FORM_ID, &$arrColumns, &$arrAnswers, &$arrAnswersSID, $arFilter=Array())
+	* <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, а также <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответы на вопросы</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID формы.
+	*
+	*
+	*
+	* @param array &$columns  Параметр примет значение ссылки на массив, описывающий те
+	* вопросы и поля формы, которые: <ol> <li> активны;</li> <li>включены в
+	* таблицу результатов.</li> </ol> Ключами данного массива являются ID
+	* вопросов/полей, а значениями - массив, описывающий сам
+	* вопрос/поле, в свою очередь, имеющий следующие ключи: <ul> <li> <b>ID</b> -
+	* ID вопроса/поля; </li> <li> <b>FORM_ID</b> - ID формы; </li> <li> <b>TIMESTAMP_X</b> - дата
+	* изменения вопроса/поля; </li> <li> <b>ACTIVE</b> - флаг активности [Y|N]; </li> <li>
+	* <b>TITLE</b> - текст вопроса, либо заголовок поля; </li> <li> <b>TITLE_TYPE</b> - тип
+	* текста; </li> <li> <b>SID</b> - символьный идентификатор вопроса/поля; </li>
+	* <li> <b>C_SORT</b> - порядок сортировки; </li> <li> <b>ADDITIONAL</b> - если Y - то данная
+	* запись является вопросом; если N - то полем формы; </li> <li> <b>REQUIRED</b> -
+	* флаг обязательности ответа на вопрос [Y|N]; </li> <li> <b>IN_FILTER</b> - флаг
+	* показывающий отражен ли вопрос/поле в фильтре формы результатов
+	* [Y|N]; </li> <li> <b>IN_RESULTS_TABLE</b> - флаг показывающий отображается ли
+	* вопрос/поле в таблице результатов [Y|N]; </li> <li> <b>IN_EXCEL_TABLE</b> - флаг
+	* показывающий отображается ли вопрос/поле в Excel-таблице
+	* результатов [Y|N]; </li> <li> <b>FIELD_TYPE</b> тип поля, возможны следующие
+	* значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>integer</b> - число; </li> <li> <b>date</b> -
+	* дата. </li> </ul> </li> <li> <b>IMAGE_ID</b> - ID изображения в описании вопроса; </li>
+	* <li> <b>COMMENTS</b> - служебный комментарий; </li> <li> <b>FILTER_TITLE</b> - заголовок
+	* поля фильтра по данному вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> -
+	* заголовок столбца таблицы результатов. </li> </ul> <b>Пример:</b> <pre
+	* style="height:450px">Array ( [140] =&gt; Array ( [ID] =&gt; 140 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 19.05.2005
+	* 11:42:04 [ACTIVE] =&gt; Y [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html [SID] =&gt;
+	* VS_NAME [C_SORT] =&gt; 100 [ADDITIONAL] =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; N
+	* [IN_EXCEL_TABLE] =&gt; N [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE]
+	* =&gt; ) [144] =&gt; Array ( [ID] =&gt; 144 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 11.11.2004 18:11:21 [ACTIVE] =&gt; Y
+	* [TITLE] =&gt; Какие области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [SID] =&gt;
+	* VS_INTEREST [C_SORT] =&gt; 500 [ADDITIONAL] =&gt; N [REQUIRED] =&gt; N [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y
+	* [IN_EXCEL_TABLE] =&gt; Y [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE]
+	* =&gt; ) ... ) </pre>
+	*
+	*
+	*
+	* @param array &$answers  Параметр примет значение ссылки на массив, содержащий ответы на
+	* вопросы формы, а также значения полей формы. Ключами данного
+	* массива являются: <ul> <li> <b>RESULT_ID</b> - ID результата; </li> <li> <b>FIELD_ID</b> - ID
+	* вопроса/поля; </li> <li> <b>SID</b> - символьный идентификатор
+	* вопроса/поля; </li> <li> <b>TITLE</b> - текст вопроса или заголовок поля
+	* веб-формы; </li> <li> <b>TITLE_TYPE</b> - тип текста вопроса, допустимы
+	* следующие значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>html</b> - HTML код. </li>
+	* </ul> </li> <li> <b>FILTER_TITLE</b> - подпись поля фильтра по данному
+	* вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> - подпись столбца таблицы
+	* результатов; </li> <li> <b>ANSWER_ID</b> - ID ответа; </li> <li> <b>ANSWER_TEXT</b> - параметр
+	* ответа <font color="green">ANSWER_TEXT</font>, записанный в таблицу результата; </li>
+	* <li> <b>MESSAGE</b> - параметр ответа <font color="green">ANSWER_TEXT</font>, хранящийся в
+	* таблице ответов (синоним ключа <b>ANSWER_TEXT</b>); </li> <li> <b>ANSWER_VALUE</b> -
+	* параметр ответа <font color="red">ANSWER_VALUE</font>, записанный в таблицу
+	* результата; </li> <li> <b>VALUE</b> - параметр ответа <font color="red">ANSWER_VALUE</font>,
+	* хранящийся в таблице ответов (синоним ключа <b>ANSWER_VALUE</b>); </li> <li>
+	* <b>USER_TEXT</b> - текстовое значение, введенное пользователем; </li> <li>
+	* <b>USER_DATE</b> - дата, введенная пользователем (данный ключ может
+	* содержать значение, только если <b>FIELD_TYPE</b>="date"); </li> <li> <b>USER_FILE_ID</b> -
+	* ID файла загруженного пользователем (данный ключ может содержать
+	* значение, только если <b>FIELD_TYPE</b>="image" или <b>FIELD_TYPE</b>="file"); </li> <li>
+	* <b>USER_FILE_NAME</b> - оригинальное имя загруженного файла (данный ключ
+	* может содержать значение, только если <b>FIELD_TYPE</b>="image" или
+	* <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_IS_IMAGE</b> - "Y" - если <b>FIELD_TYPE</b>="image", "N" -
+	* если <b>FIELD_TYPE</b>="file" </li> <li> <b>USER_FILE_HASH</b> - уникальный хеш,
+	* используемый при показе файла (данный ключ может содержать
+	* значение, только если <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_SUFFIX</b> - суффикс
+	* к расширению загруженного файла (данный ключ может содержать
+	* значение, только если <b>FIELD_TYPE</b>="file"); </li> <li> <b>USER_FILE_SIZE</b> - размер
+	* файла в байтах (данный ключ может содержать значение, только если
+	* <b>FIELD_TYPE</b>="image" или <b>FIELD_TYPE</b>="file"); </li> <li> <b>FIELD_TYPE</b> - тип поля ответа,
+	* возможны следующие значения: <ul> <li> <b>text</b> - однострочное
+	* текстовое поле; </li> <li> <b>textarea</b> - многострочное текстовое поле; </li>
+	* <li> <b>radio</b> - переключатель одиночного выбора; </li> <li> <b>checkbox</b> - флаг
+	* множественного выбора; </li> <li> <b>dropdown</b> - элемента выпадающего
+	* списка одиночного выбора; </li> <li> <b>multiselect</b> - элемента списка
+	* множественного выбора; </li> <li> <b>date</b> - поле для ввода дата в
+	* календарем; </li> <li> <b>image</b> - поле для ввода изображения; </li> <li>
+	* <b>file</b> - поле для ввода произвольного файла; </li> <li> <b>password</b> -
+	* однострочное поле для ввода пароля. </li> </ul> </li> <li> <b>FIELD_WIDTH</b> -
+	* ширина поля ответа; </li> <li> <b>FIELD_HEIGHT</b> - высота поля ответа; </li> <li>
+	* <b>FIELD_PARAM</b> - параметры поля ответа. </li> </ul> <b>Пример:</b> <pre
+	* style="height:450px"> Array ( [186] =&gt; Array ( [140] =&gt; Array ( [586] =&gt; Array ( [RESULT_ID] =&gt; 186
+	* [FIELD_ID] =&gt; 140 [SID] =&gt; VS_NAME [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html
+	* [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 586 [ANSWER_TEXT] =&gt; [MESSAGE] =&gt;
+	* [ANSWER_VALUE] =&gt; [VALUE] =&gt; [USER_TEXT] =&gt; Иванов Дмитрий Витальевич [USER_DATE] =&gt;
+	* [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
+	* [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; ) )
+	* [144] =&gt; Array ( [594] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt;
+	* Какие области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
+	* [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 594 [ANSWER_TEXT] =&gt; иностранные языки [MESSAGE] =&gt;
+	* иностранные языки [ANSWER_VALUE] =&gt; 4 [VALUE] =&gt; 4 [USER_TEXT] =&gt; [USER_DATE] =&gt;
+	* [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt;
+	* [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; )
+	* [595] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt; Какие
+	* области знаний вас интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt;
+	* [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 595 [ANSWER_TEXT] =&gt; програмирование [MESSAGE] =&gt;
+	* програмирование [ANSWER_VALUE] =&gt; 5 [VALUE] =&gt; 5 [USER_TEXT] =&gt; [USER_DATE] =&gt; [USER_FILE_ID]
+	* =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE]
+	* =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED
+	* class=inputcheckbox ) ) ... ) ... ) </pre>
+	*
+	*
+	*
+	* @param array &$answers2 = array() Параметр примет значение ссылки на массив, содержащий, по сути, те
+	* же данные, что и массив answers, но имеющий несколько другую
+	* структуру. <br><br><b>Пример:</b> <pre style="height:450px"> Array ( [186] =&gt; Array ( [VS_NAME] =&gt;
+	* Array ( [0] =&gt; Array ( [RESULT_ID] =&gt; 186 [FIELD_ID] =&gt; 140 [SID] =&gt; VS_NAME [TITLE] =&gt; Фамилия,
+	* имя, отчество [TITLE_TYPE] =&gt; html [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 586
+	* [ANSWER_TEXT] =&gt; [MESSAGE] =&gt; [ANSWER_VALUE] =&gt; [VALUE] =&gt; [USER_TEXT] =&gt; Иванов Дмитрий
+	* Витальевич [USER_DATE] =&gt; [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE] =&gt;
+	* [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50
+	* [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; ) ) [VS_INTEREST] =&gt; Array ( [0] =&gt; Array ( [RESULT_ID] =&gt; 186
+	* [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt; Какие области знаний вас
+	* интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 594
+	* [ANSWER_TEXT] =&gt; иностранные языки [MESSAGE] =&gt; иностранные языки [ANSWER_VALUE]
+	* =&gt; 4 [VALUE] =&gt; 4 [USER_TEXT] =&gt; [USER_DATE] =&gt; [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt;
+	* [USER_FILE_IS_IMAGE] =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt;
+	* checkbox [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; ) [1] =&gt; Array ( [RESULT_ID] =&gt; 186
+	* [FIELD_ID] =&gt; 144 [SID] =&gt; VS_INTEREST [TITLE] =&gt; Какие области знаний вас
+	* интересуют ? [TITLE_TYPE] =&gt; text [FILTER_TITLE] =&gt; [RESULTS_TABLE_TITLE] =&gt; [ANSWER_ID] =&gt; 595
+	* [ANSWER_TEXT] =&gt; програмирование [MESSAGE] =&gt; програмирование [ANSWER_VALUE] =&gt; 5
+	* [VALUE] =&gt; 5 [USER_TEXT] =&gt; [USER_DATE] =&gt; [USER_FILE_ID] =&gt; [USER_FILE_NAME] =&gt; [USER_FILE_IS_IMAGE]
+	* =&gt; [USER_FILE_HASH] =&gt; [USER_FILE_SUFFIX] =&gt; [USER_FILE_SIZE] =&gt; [FIELD_TYPE] =&gt; checkbox [FIELD_WIDTH]
+	* =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED class=inputcheckbox ) ) ... ) ... ) </pre>
+	*
+	*
+	*
+	* @param array $filter = array() Массив для фильтрации выбираемых значений. Необязательный
+	* параметр. В массиве допустимы следующие ключи: <ul> <li> <b>RESULT_ID</b>* - ID
+	* результата (по умолчанию будет искаться точное совпадение); </li>
+	* <li>RESULT_ID_EXACT_MATCH - если значение равно "N", то при фильтрации по
+	* <b>RESULT_ID</b> будет искаться вхождение; </li> <li> <b>FIELD_ID</b>* - ID
+	* вопроса/поля (по умолчанию будет искаться точное совпадение); </li>
+	* <li> <b>FIELD_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>FIELD_ID</b> будет искаться вхождение; </li> <li> <b>FIELD_SID</b>* - символьный
+	* код вопроса/поля (по умолчанию будет искаться вхождение); </li> <li>
+	* <b>FIELD_SID_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>FIELD_SID</b> будет искаться точное совпадение; </li> <li> <b>IN_RESULTS_TABLE</b> -
+	* если значение равно "Y", то ответы на вопрос (либо значения поля
+	* веб-формы) будет отображены в таблице результатов; </li> <li>
+	* <b>IN_EXCEL_TABLE</b> - если значение равно "Y", то ответы на вопрос (либо
+	* значения поля веб-формы) будет отображены в Excel таблице
+	* результатов. </li> </ul> * - допускается сложная логика.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // получим данные по результату ID=145
+	* <b>CForm::GetResultAnswerArray</b>($FORM_ID, 
+	* 	$arrColumns, 
+	* 	$arrAnswers, 
+	* 	$arrAnswersVarname, 
+	* 	array("RESULT_ID" =&gt; "145"));
+	* 
+	* echo "&lt;pre&gt;";
+	* echo "arrColumns:";
+	* print_r($arrColumns);
+	* echo "arrAnswers:";
+	* print_r($arrAnswers);
+	* echo "arrAnswersVarname:";
+	* print_r($arrAnswersVarname);
+	* echo "&lt;/pre&gt;";
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/getlist.php">CFormAnswer::GetList</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php
+	* @author Bitrix
+	*/
+	public static 	function GetResultAnswerArray($WEB_FORM_ID, &$arrColumns, &$arrAnswers, &$arrAnswersSID, $arFilter=Array())
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetResultAnswerArray<br>Line: ";
 		global $DB, $strError;
@@ -266,7 +269,8 @@ class CAllForm extends CForm_old
 			elseif (strlen($arFilter["FIELD_VARNAME"])>0) $arFilter["FIELD_SID"] = $arFilter["FIELD_VARNAME"];
 
 			$filter_keys = array_keys($arFilter);
-			for ($i=0; $i<count($filter_keys); $i++)
+			$cntFilterKeys = count($filter_keys);
+			for ($i=0; $i<$cntFilterKeys; $i++)
 			{
 				$key = $filter_keys[$i];
 				$val = $arFilter[$filter_keys[$i]];
@@ -334,22 +338,14 @@ class CAllForm extends CForm_old
 				"ACTIVE"			=> "Y"),
 			$is_filtered
 			);
-		while ($qr = $q->Fetch()) $arrColumns[$qr["ID"]] = $qr;
-
-		/*
-		echo "<pre>";
-		echo "arrColumns:";
-		print_r($arrColumns);
-		echo "arrAnswers:";
-		print_r($arrAnswers);
-		echo "arrAnswersSID:";
-		print_r($arrAnswersSID);
-		echo "</pre>";
-		*/
+		while ($qr = $q->Fetch())
+		{
+			$arrColumns[$qr["ID"]] = $qr;
+		}
 	}
 
 	// получаем массив почтовых шаблонов связанных с формой
-	public static function GetMailTemplateArray($FORM_ID)
+public static 	function GetMailTemplateArray($FORM_ID)
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetMailTemplateArray<br>Line: ";
 		global $DB, $USER, $strError;
@@ -371,7 +367,7 @@ class CAllForm extends CForm_old
 	}
 
 	// получаем массив сайтов связанных с формой
-	public static function GetSiteArray($FORM_ID)
+public static 	function GetSiteArray($FORM_ID)
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetSiteArray<br>Line: ";
 		global $DB, $USER, $strError;
@@ -393,7 +389,7 @@ class CAllForm extends CForm_old
 	}
 
 	// функция вызывает заданный обработчик до смены статуса
-	public static function ExecHandlerBeforeChangeStatus($RESULT_ID, $ACTION, $NEW_STATUS_ID=0)
+public static 	function ExecHandlerBeforeChangeStatus($RESULT_ID, $ACTION, $NEW_STATUS_ID=0)
 	{
 		global $arrPREV_RESULT_STATUS, $DB, $MESS, $APPLICATION, $USER, $HTTP_POST_VARS, $HTTP_GET_VARS, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: ExecHandlerBeforeChangeStatus<br>Line: ";
@@ -439,7 +435,7 @@ class CAllForm extends CForm_old
 	}
 
 	// функция вызывает заданный обработчик после смены статуса
-	public static function ExecHandlerAfterChangeStatus($RESULT_ID, $ACTION)
+public static 	function ExecHandlerAfterChangeStatus($RESULT_ID, $ACTION)
 	{
 		global $arrCURRENT_RESULT_STATUS, $arrPREV_RESULT_STATUS, $DB, $MESS, $APPLICATION, $USER, $HTTP_POST_VARS, $HTTP_GET_VARS, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: ExecHandlerAfterChangeStatus<br>Line: ";
@@ -486,7 +482,7 @@ class CAllForm extends CForm_old
 	}
 
 	// права на веб-форму
-	public static function GetPermissionList($get_default="Y")
+public static 	function GetPermissionList($get_default="Y")
 	{
 		global $MESS, $strError;
 		$ref_id = array(1,10,15,20,25,30);
@@ -513,60 +509,60 @@ class CAllForm extends CForm_old
 		return $arr;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">право доступа к веб-форме</a>:</p> <ul> <li> <b>1</b> - доступ закрыт (форма и ее результаты полностью недоступны); </li> <li> <b>10</b> - заполнение формы (посетитель может только заполнить и сохранить форму); </li> <li> <b>15</b> - редактирование своего результата (посетитель получает возможность видеть список своих результатов, который он может фильтровать и сортировать; также посетитель может просмотреть, изменить и удалить свой результат); </li> <li> <b>20</b> - просмотр всех результатов (посетитель получает возможность просмотра всех активных результатов); </li> <li> <b>25</b> - редактирование всех результатов и просмотр настроек формы (посетитель получает возможность просмотра и редактирования всех результатов в зависимости от их статусов; также, если у него открыт доступ к административной части модуля, доступ на просмотр настроек формы); </li> <li> <b>30</b> - полный доступ (включает в себя все вышеописанные права, а также право на изменение настроек формы). </li> </ul>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param array $groups = false Массив ID групп пользователей, для которых нужно определить право
-	 * доступа.<br><br>Параметр необязательный. По умолчанию - "false" (группы
-	 * текущего пользователя).
-	 *
-	 *
-	 *
-	 * @param string $from_db = "" Если значение равно "Y", право доступа определяется без учета
-	 * значения по умолчанию, устанавливаемого в настройках модуля
-	 * <b>Веб-формы</b>.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4;
-	 * // получим права текущего пользователя
-	 * $permission = <b>CForm::GetPermission</b>($FORM_ID);
-	 * if ($permission==10) echo "У вас есть право на заполнение веб-формы";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php
-	 * @author Bitrix
-	 */
-	public static function GetPermission($form_id, $arGroups=false, $get_from_database="")
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">право доступа к веб-форме</a>:</p> <ul> <li> <b>1</b> - доступ закрыт (форма и ее результаты полностью недоступны); </li> <li> <b>10</b> - заполнение формы (посетитель может только заполнить и сохранить форму); </li> <li> <b>15</b> - редактирование своего результата (посетитель получает возможность видеть список своих результатов, который он может фильтровать и сортировать; также посетитель может просмотреть, изменить и удалить свой результат); </li> <li> <b>20</b> - просмотр всех результатов (посетитель получает возможность просмотра всех активных результатов); </li> <li> <b>25</b> - редактирование всех результатов и просмотр настроек формы (посетитель получает возможность просмотра и редактирования всех результатов в зависимости от их статусов; также, если у него открыт доступ к административной части модуля, доступ на просмотр настроек формы); </li> <li> <b>30</b> - полный доступ (включает в себя все вышеописанные права, а также право на изменение настроек формы). </li> </ul>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @param array $groups = false Массив ID групп пользователей, для которых нужно определить право
+	* доступа.<br><br>Параметр необязательный. По умолчанию - "false" (группы
+	* текущего пользователя).
+	*
+	*
+	*
+	* @param string $from_db = "" Если значение равно "Y", право доступа определяется без учета
+	* значения по умолчанию, устанавливаемого в настройках модуля
+	* <b>Веб-формы</b>. Параметр необязательный.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4;
+	* // получим права текущего пользователя
+	* $permission = <b>CForm::GetPermission</b>($FORM_ID);
+	* if ($permission==10) echo "У вас есть право на заполнение веб-формы";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	* </li> </ul> </htm<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php
+	* @author Bitrix
+	*/
+	public static 	function GetPermission($form_id, $arGroups=false, $get_from_database="")
 	{
 		global $DB, $USER, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetPermission<br>Line: ";
@@ -623,7 +619,7 @@ class CAllForm extends CForm_old
 		return $right;
 	}
 
-	public static function GetTemplateList($type="SHOW", $path="xxx", $WEB_FORM_ID=0)
+public static 	function GetTemplateList($type="SHOW", $path="xxx", $WEB_FORM_ID=0)
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetTemplateList<br>Line: ";
 		global $DB, $strError;
@@ -699,7 +695,7 @@ class CAllForm extends CForm_old
 		return $arr;
 	}
 
-	public static function GetMenuList($arFilter=Array(), $check_rights="Y")
+public static 	function GetMenuList($arFilter=Array(), $check_rights="Y")
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetMenuList<br>Line: ";
 		global $DB, $USER, $strError;
@@ -708,7 +704,8 @@ class CAllForm extends CForm_old
 		if (is_array($arFilter))
 		{
 			$filter_keys = array_keys($arFilter);
-			for ($i=0; $i<count($filter_keys); $i++)
+			$cntFilterKeys = count($filter_keys);
+			for ($i=0; $i<$cntFilterKeys; $i++)
 			{
 				$key = $filter_keys[$i];
 				$val = $arFilter[$filter_keys[$i]];
@@ -788,7 +785,7 @@ class CAllForm extends CForm_old
 		return $res;
 	}
 
-	public static function GetNextSort()
+public static 	function GetNextSort()
 	{
 		global $DB, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetNextSort<br>Line: ";
@@ -798,193 +795,196 @@ class CAllForm extends CForm_old
 		return (intval($zr["MAX_SORT"])+100);
 	}
 
-	public static function ShowRequired($flag)
+public static 	function ShowRequired($flag)
 	{
 		if ($flag=="Y") return "<font color='red'><span class='form-required starrequired'>*</span></font>";
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы веб-формы</a> или текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя однострочное текстовое поле и флаг для установки точности фильтрации.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i> - однострочное текстовое поля<br><b>find_</b><i>filter_sid</i><b>_exact_match</b> - флаг для установки точности фильтрации </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
-	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_text</b>,</nobr><br> где: <ul> <li>
-	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
-	 * тип параметра по которому будет фильтрация, возможны следующие
-	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
-	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
-	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
-	 * </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param int $size = 45 Ширина однострочного текстового поля:<br><code> &lt;input type="text"
-	 * size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "45".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в тег однострочного
-	 * текстового поля:<br><code> &lt;input type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в тег флага для установки
-	 * точности фильтрации:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i>
-	 * ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
-	 * "class=\"inputcheckbox\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Фамилия:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             echo <b>CForm::GetTextFilter</b>(
-	 *                 "ANKETA_USER_NAME_USER_text", 
-	 *                 45, 
-	 *                 "class=\"inputtext\"", 
-	 *                 "class=\"inputcheckbox\""
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" value="Фильтр"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php
-	 * @author Bitrix
-	 */
-	public static function GetTextFilter($FID, $size="45", $field_text="class=\"inputtext\"", $field_checkbox="class=\"inputcheckbox\"")
+	* <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы веб-формы</a> или текстовым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя однострочное текстовое поле и флаг для установки точности фильтрации.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i> - однострочное текстовое поля<br><b>find_</b><i>filter_sid</i><b>_exact_match</b> - флаг для установки точности фильтрации </p>
+	*
+	*
+	*
+	*
+	* @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
+	* шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_text</b>,</nobr><br> где: <ul> <li>
+	* <i>FSID</i> - символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	* тип параметра по которому будет фильтрация, возможны следующие
+	* значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
+	* веб-формы - вводимое с клавиатуры значение, для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
+	* этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
+	* </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
+	*
+	*
+	*
+	* @param int $size = 45 Ширина однострочного текстового поля:<br><code> &lt;input type="text"
+	* size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "45".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в тег однострочного
+	* текстового поля:<br><code> &lt;input type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class='typeinput'". С версии 4.0.4 -
+	* "class=\"inputtext\""
+	*
+	*
+	*
+	* @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в тег флага для установки
+	* точности фильтрации:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i>
+	* ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
+	* "class=\"inputcheckbox\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Фамилия:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             echo <b>CForm::GetTextFilter</b>(
+	*                 "ANKETA_USER_NAME_USER_text", 
+	*                 45, 
+	*                 "class=\"inputtext\"", 
+	*                 "class=\"inputcheckbox\""
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" value="Фильтр"&gt;
+	* &lt;/form&gt;
+	* 
+	* </h
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php
+	* @author Bitrix
+	*/
+	public static 	function GetTextFilter($FID, $size="45", $field_text="class=\"inputtext\"", $field_checkbox="class=\"inputcheckbox\"")
 	{
 		$var = "find_".$FID;
 		$var_exec_match = "find_".$FID."_exact_match";
-		global $$var, $$var_exec_match;
-		$checked = ($$var_exec_match=="Y") ? "checked" : "";
-		return '<input '.$field_text.' type="text" name="'.$var.'" size="'.$size.'" value="'.htmlspecialcharsbx($$var).'"><input '.$field_checkbox.' type="checkbox" value="Y" name="'.$var.'_exact_match" title="'.GetMessage("FORM_EXACT_MATCH").'" '.$checked.'>'.ShowFilterLogicHelp();
+		global ${$var}, ${$var_exec_match};
+		$checked = (${$var_exec_match}=="Y") ? "checked" : "";
+		return '<input '.$field_text.' type="text" name="'.$var.'" size="'.$size.'" value="'.htmlspecialcharsbx(${$var}).'"><input '.$field_checkbox.' type="checkbox" value="Y" name="'.$var.'_exact_match" title="'.GetMessage("FORM_EXACT_MATCH").'" '.$checked.'>'.ShowFilterLogicHelp();
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по датам, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы типа "дата". Возвращаемый HTML код включает в себя два поля, предназначенных для ввода интервала дат, а также некоторые вспомогательные элементы (календарь, выпадающий список дней).</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля интервала дат (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле интервала дат (по) </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
-	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_USER_date</b>,</nobr><br> где: <ul> <li> <i>FSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. </li> </ul> Примеры:
-	 * <ul> <li>ANKETA_USER_BIRTHDAY_USER_date </li> <li>ANKETA_DATE_FIELD_USER_date </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string $html_form_name = "form1" Имя HTML формы, в которой выводится фильтр.<br><code> &lt;form
-	 * name="<i>html_form_name</i>" ...&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "form1".
-	 *
-	 *
-	 *
-	 * @param string $show_dropdown = "Y" Если значение "Y", то возвращаемый HTML код будет включать
-	 * выпадающий список дней, предназначенный для облегчения выбора
-	 * даты.<br><br>Параметр необязательный. По умолчанию - "Y" (вывести
-	 * выпадающий список дней).
-	 *
-	 *
-	 *
-	 * @param string $add_to_dropdown = "class=\"inputselect\"" Если <i>show_dropdown</i>="Y", то в данном параметре можно указать
-	 * произвольный HTML, который будет добавлен в тег выпадающего списка
-	 * дней:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputselect\"".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в теги однострочных
-	 * текстовых полей, предназначенных для ввода даты:<br><code> &lt;input
-	 * type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;form name="form1" action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Дата рождения:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             echo <b>CForm::GetDateFilter</b>(
-	 *                 "ANKETA_USER_BIRTHDAY_USER_date", 
-	 *                 "form1", 
-	 *                 "Y", 
-	 *                 "class=\"inputselect\"", 
-	 *                 "class=\"inputtext\""
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" value="Фильтр"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php
-	 * @author Bitrix
-	 */
-	public static function GetDateFilter($FID, $form_name="form1", $show_select="Y", $field_select="class=\"inputselect\"", $field_input="class=\"inputtext\"")
+	* <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по датам, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы типа "дата". Возвращаемый HTML код включает в себя два поля, предназначенных для ввода интервала дат, а также некоторые вспомогательные элементы (календарь, выпадающий список дней).</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля интервала дат (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле интервала дат (по) </p>
+	*
+	*
+	*
+	*
+	* @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
+	* шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_USER_date</b>,</nobr><br> где: <ul> <li> <i>FSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. </li> </ul> Примеры:
+	* <ul> <li>ANKETA_USER_BIRTHDAY_USER_date </li> <li>ANKETA_DATE_FIELD_USER_date </li> </ul>
+	*
+	*
+	*
+	* @param string $html_form_name = "form1" Имя HTML формы, в которой выводится фильтр.<br><code> &lt;form
+	* name="<i>html_form_name</i>" ...&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "form1".
+	*
+	*
+	*
+	* @param string $show_dropdown = "Y" Если значение "Y", то возвращаемый HTML код будет включать
+	* выпадающий список дней, предназначенный для облегчения выбора
+	* даты.<br><br>Параметр необязательный. По умолчанию - "Y" (вывести
+	* выпадающий список дней).
+	*
+	*
+	*
+	* @param string $add_to_dropdown = "class=\"inputselect\"" Если <i>show_dropdown</i>="Y", то в данном параметре можно указать
+	* произвольный HTML, который будет добавлен в тег выпадающего списка
+	* дней:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputselect\"".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в теги однострочных
+	* текстовых полей, предназначенных для ввода даты:<br><code> &lt;input
+	* type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "class=\"inputtext\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;form name="form1" action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Дата рождения:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             echo <b>CForm::GetDateFilter</b>(
+	*                 "ANKETA_USER_BIRTHDAY_USER_date", 
+	*                 "form1", 
+	*                 "Y", 
+	*                 "class=\"inputselect\"", 
+	*                 "class=\"inputtext\""
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" value="Фильтр"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php
+	* @author Bitrix
+	*/
+	public static 	function GetDateFilter($FID, $form_name="form1", $show_select="Y", $field_select="class=\"inputselect\"", $field_input="class=\"inputtext\"")
 	{
 		$var1 = "find_".$FID."_1";
 		$var2 = "find_".$FID."_2";
 
-		global $APPLICATION, $$var1, $$var2;
+		global $APPLICATION, ${$var1}, ${$var2};
 
 		if (!defined('ADMIN_SECTION'))
 		{
@@ -997,8 +997,8 @@ class CAllForm extends CForm_old
 					'FORM_NAME' => $form_name,
 					'INPUT_NAME' => $var1,
 					'INPUT_NAME_FINISH' => $var2,
-					'INPUT_VALUE' => $$var1,
-					'INPUT_VALUE_FINISH' => $$var2,
+					'INPUT_VALUE' => ${$var1},
+					'INPUT_VALUE_FINISH' => ${$var2},
 					'SHOW_TIME' => 'N',
 				),
 				null,
@@ -1010,253 +1010,255 @@ class CAllForm extends CForm_old
 			return $res;
 		}
 		else
-			return CalendarPeriod($var1, htmlspecialcharsbx($$var1), $var2, htmlspecialcharsbx($$var2), $form_name, $show_select, $field_select, $field_input);
+			return CalendarPeriod($var1, htmlspecialcharsbx(${$var1}), $var2, htmlspecialcharsbx(${$var2}), $form_name, $show_select, $field_select, $field_input);
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по цифровым значениям, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо цифровым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя два поля, предназначенных для ввода числового интервала.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля числового интервала (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле числового интервала (по) </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
-	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_integer</b>,</nobr><br> где: <ul> <li>
-	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, </li> <li> <i>QSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
-	 * тип параметра, по которому будет фильтрация, возможны следующие
-	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
-	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
-	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_AGE_USER_integer; </li>
-	 * <li>ANKETA_CAR_POWER_ANSWER_VALUE_integer. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param int $size = "10" Ширина однострочного текстового поля:<br><code>&lt;input type="text" size="<i>size</i>"
-	 * ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "10".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в теги однострочных
-	 * текстовых полей, в которых вводится дата:<br><code> &lt;input type="text"
-	 * <i>add_to_text</i> ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
-	 * "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;form name="form1" action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Возраст:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             echo <b>CForm::GetNumberFilter</b>(
-	 *                 "ANKETA_AGE_USER_integer", 
-	 *                 "10", 
-	 *                 "class=\"inputtext\""
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" value="Фильтр"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php
-	 * @author Bitrix
-	 */
-	public static function GetNumberFilter($FID, $size="10", $field="class=\"inputtext\"")
+	* <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по цифровым значениям, введенным в качестве ответа на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы, либо цифровым значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возвращаемый HTML код включает в себя два поля, предназначенных для ввода числового интервала.</p> <p class="note"><b>Примечание</b><br>Имена результирующих HTML полей будут сформированы по следующим маскам:<br><b>find_</b><i>filter_sid</i><b>_1</b> - первое поля числового интервала (с) <br><b>find_</b><i>filter_sid</i><b>_2</b> - второе поле числового интервала (по) </p>
+	*
+	*
+	*
+	*
+	* @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
+	* шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_integer</b>,</nobr><br> где: <ul> <li>
+	* <i>FSID</i> - символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>, </li> <li> <i>QSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	* тип параметра, по которому будет фильтрация, возможны следующие
+	* значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
+	* веб-формы - вводимое с клавиатуры значение, для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
+	* этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_AGE_USER_integer; </li>
+	* <li>ANKETA_CAR_POWER_ANSWER_VALUE_integer. </li> </ul>
+	*
+	*
+	*
+	* @param int $size = "10" Ширина однострочного текстового поля:<br><code>&lt;input type="text" size="<i>size</i>"
+	* ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "10".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в теги однострочных
+	* текстовых полей, в которых вводится дата:<br><code> &lt;input type="text"
+	* <i>add_to_text</i> ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
+	* "class=\"inputtext\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;form name="form1" action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Возраст:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             echo <b>CForm::GetNumberFilter</b>(
+	*                 "ANKETA_AGE_USER_integer", 
+	*                 "10", 
+	*                 "class=\"inputtext\""
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" value="Фильтр"&gt;
+	* &lt;/form&gt;
+	* 
+	* </ht
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/calendarperiod.php">CalendarPeriod</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php
+	* @author Bitrix
+	*/
+	public static 	function GetNumberFilter($FID, $size="10", $field="class=\"inputtext\"")
 	{
 		global $MESS;
 		$var1 = "find_".$FID."_1";
 		$var2 = "find_".$FID."_2";
-		global $$var1, $$var2;
-		return '<input '.$field.' type="text" name="'.$var1.'" size="'.$size.'" value="'.htmlspecialcharsbx($$var1).'">&nbsp;'.GetMessage("FORM_TILL").'&nbsp;<input '.$field.' type="text" name="'.$var2.'" size="'.$size.'" value="'.htmlspecialcharsbx($$var2).'">';
+		global ${$var1}, ${$var2};
+		return '<input '.$field.' type="text" name="'.$var1.'" size="'.$size.'" value="'.htmlspecialcharsbx(${$var1}).'">&nbsp;'.GetMessage("FORM_TILL").'&nbsp;<input '.$field.' type="text" name="'.$var2.'" size="'.$size.'" value="'.htmlspecialcharsbx(${$var2}).'">';
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос веб-формы</a> или факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. Возвращаемый HTML код включает в себя флаг множественного выбора (<b>checkbox</b>).</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
-	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_exist</b>,</nobr><br> где: <ul> <li>
-	 * <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
-	 * тип параметра по которому будет фильтрация, возможны следующие
-	 * значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
-	 * <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
-	 * веб-формы - вводимое с клавиатуры значение, для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
-	 * этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
-	 * </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML который будет добавлен в тег флага выпадающего
-	 * списка:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputcheckbox\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Есть фотография?&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             echo <b>CForm::GetExistFlagFilter</b>(
-	 *                 "ANKETA_PHOTO_USER_exist", 
-	 *                 "class=\"inputcheckbox\""
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" value="Фильтр"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php
-	 * @author Bitrix
-	 */
-	public static function GetExistFlagFilter($FID, $field="class=\"inputcheckbox\"")
+	* <p>Возвращает HTML код поля фильтра, предназначенного для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос веб-формы</a> или факту существования значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. Возвращаемый HTML код включает в себя флаг множественного выбора (<b>checkbox</b>).</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
+	*
+	*
+	*
+	*
+	* @param int $filter_sid  Идентификатор поля фильтра. Формируется по следующему
+	* шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_exist</b>,</nobr><br> где: <ul> <li>
+	* <i>FSID</i> - символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	* тип параметра по которому будет фильтрация, возможны следующие
+	* значения: <ul> <li> <i>ANSWER_TEXT</i> - параметр <font color="green">ANSWER_TEXT</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>ANSWER_VALUE</i> - параметр <font color="red">ANSWER_VALUE</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> веб-формы; </li> <li>
+	* <i>USER</i> - для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>
+	* веб-формы - вводимое с клавиатуры значение, для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы - значение
+	* этого поля веб-формы. </li> </ul> </li> </ul> Примеры: <ul> <li>ANKETA_USER_NAME_USER_text;
+	* </li> <li>ANKETA_TEST_FIELD_USER_text. </li> </ul>
+	*
+	*
+	*
+	* @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML который будет добавлен в тег флага выпадающего
+	* списка:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputcheckbox\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Есть фотография?&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             echo <b>CForm::GetExistFlagFilter</b>(
+	*                 "ANKETA_PHOTO_USER_exist", 
+	*                 "class=\"inputcheckbox\""
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" value="Фильтр"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">CForm::GetDropDownFilter</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php
+	* @author Bitrix
+	*/
+	public static 	function GetExistFlagFilter($FID, $field="class=\"inputcheckbox\"")
 	{
 		global $MESS;
 		$var = "find_".$FID;
-		global $$var;
-		return InputType("checkbox", $var, "Y", $$var, false, "", $field);
+		global ${$var};
+		return InputType("checkbox", $var, "Y", ${$var}, false, "", $field);
 	}
 
-	public static function GetCrmFlagFilter($FID, $field="class=\"inputselect\"")
+public static 	function GetCrmFlagFilter($FID, $field="class=\"inputselect\"")
 	{
 		$var = "find_".$FID;
-		global $$var;
+		global ${$var};
 		$arr = array("reference_id"=>array('Y', 'N'), "reference"=>array(GetMessage('MAIN_YES'), GetMessage('MAIN_NO')));
-		return SelectBoxFromArray($var, $arr, $$var, GetMessage("FORM_ALL"), $field);
+		return SelectBoxFromArray($var, $arr, ${$var}, GetMessage("FORM_ALL"), $field);
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля фильтра, представляющего из себя выпадающий список одиночного выбора. Данный выпадающий список может быть использован для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по значению <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Значения этого выпадающего списка формируются из значений параметров <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> - <font color="green">ANSWER_TEXT</font> или <font color="red">ANSWER_VALUE</font>.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.
-	 *
-	 *
-	 *
-	 * @param string $parameter_type  Тип параметра <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>,
-	 * допустимы следующие значения: <ul> <li> <b>ANSWER_TEXT</b>; </li> <li> <b>ANSWER_VALUE</b>.
-	 * </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string $filter_sid  Идентификатор поля фильтра. Формируется по следующему
-	 * шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_dropdown</b>,</nobr><br> где: <ul>
-	 * <li> <i>FSID</i> - символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
-	 * символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
-	 * тип параметра ответа, задаваемый в <i>parameter_type.</i> </li> </ul> Примеры: <ul>
-	 * <li>ANKETA_MARRIED_ANSWER_TEXT_dropdown; </li> <li>ANKETA_CAR_ANSWER_VALUE_dropdown. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string $add_to_dropdown = "class=\"inputselect\"" Произвольный HTML который будет добавлен в тег выпадающего
-	 * списка:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputselect\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;form name="form1" action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Образование:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             $FIELD_ID = 15; // ID вопроса "Ваше образование?"
-	 *             echo <b>CForm::GetDropDownFilter</b>(
-	 *                 $FIELD_ID, 
-	 *                 "ANSWER_TEXT", 
-	 *                 "ANKETA_EDUCATION_ANSWER_TEXT_dropdown", 
-	 *                 "class=\"inputselect\""
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" value="Фильтр"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php
-	 * @author Bitrix
-	 */
-	public static function GetDropDownFilter($ID, $PARAMETER_NAME, $FID, $field="class=\"inputselect\"")
+	* <p>Возвращает HTML код поля фильтра, представляющего из себя выпадающий список одиночного выбора. Данный выпадающий список может быть использован для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по значению <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Значения этого выпадающего списка формируются из значений параметров <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> - <font color="green">ANSWER_TEXT</font> или <font color="red">ANSWER_VALUE</font>.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>find_</b><i>filter_sid</i></p>
+	*
+	*
+	*
+	*
+	* @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.
+	*
+	*
+	*
+	* @param string $parameter_type  Тип параметра <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>,
+	* допустимы следующие значения: <ul> <li> <b>ANSWER_TEXT</b>; </li> <li> <b>ANSWER_VALUE</b>.
+	* </li> </ul>
+	*
+	*
+	*
+	* @param string $filter_sid  Идентификатор поля фильтра. Формируется по следующему
+	* шаблону:<br><nobr><i>FSID</i><b>_</b><i>QSID</i><b>_</b><i>PTYPE</i><b>_dropdown</b>,</nobr><br> где: <ul>
+	* <li> <i>FSID</i> - символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <i>QSID</i> -
+	* символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <i>PTYPE</i> -
+	* тип параметра ответа, задаваемый в <i>parameter_type.</i> </li> </ul> Примеры: <ul>
+	* <li>ANKETA_MARRIED_ANSWER_TEXT_dropdown; </li> <li>ANKETA_CAR_ANSWER_VALUE_dropdown. </li> </ul>
+	*
+	*
+	*
+	* @param string $add_to_dropdown = "class=\"inputselect\"" Произвольный HTML который будет добавлен в тег выпадающего
+	* списка:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputselect\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;form name="form1" action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Образование:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             $FIELD_ID = 15; // ID вопроса "Ваше образование?"
+	*             echo <b>CForm::GetDropDownFilter</b>(
+	*                 $FIELD_ID, 
+	*                 "ANSWER_TEXT", 
+	*                 "ANKETA_EDUCATION_ANSWER_TEXT_dropdown", 
+	*                 "class=\"inputselect\""
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" value="Фильтр"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">CForm::GetTextFilter</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">CForm::GetDateFilter</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">CForm::GetNumberFilter</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">CForm::GetExistFlagFilter</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php
+	* @author Bitrix
+	*/
+	public static 	function GetDropDownFilter($ID, $PARAMETER_NAME, $FID, $field="class=\"inputselect\"")
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetDropDownFilter<br>Line: ";
 		global $DB, $MESS, $strError;
@@ -1286,109 +1288,109 @@ class CAllForm extends CForm_old
 		}
 		$arr = array("reference_id"=>$ref_id, "reference"=>$ref);
 		$var = "find_".$FID;
-		global $$var;
-		return SelectBoxFromArray($var, $arr, $$var, GetMessage("FORM_ALL"), $field);
+		global ${$var};
+		return SelectBoxFromArray($var, $arr, ${$var}, GetMessage("FORM_ALL"), $field);
 	}
 
-	
+
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
-	 * элементом которого является элемент с ключом <b>VALUE</b> и со
-	 * значением в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило таким
-	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Фамилия:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий однострочное текстовое поле
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 586,   // ID поля для ответа на вопрос "Ваша фамилия?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetTextValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo CForm::GetTextField(
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfield.php">CForm::GetTextField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextvalue.php
-	 * @author Bitrix
-	 */
-	public static function GetTextValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param array $answer  Массив, описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
+	* элементом которого является элемент с ключом <b>VALUE</b> и со
+	* значением в котором содержится значение по умолчанию для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило таким
+	* значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Фамилия:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий однострочное текстовое поле
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 586,   // ID поля для ответа на вопрос "Ваша фамилия?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetTextValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo CForm::GetTextField(
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfield.php">CForm::GetTextField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextvalue.php
+	* @author Bitrix
+	*/
+	public static 	function GetTextValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_text_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname])) $value = $arrVALUES[$fname];
@@ -1406,101 +1408,101 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
-	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
-	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
-	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Пароль:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий поле для ввода пароля
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 609,   // ID поля для ответа на вопрос "Пароль"
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetPasswordValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo CForm::GetPasswordField(
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordfield.php">CForm::GetPasswordField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordvalue.php
-	 * @author Bitrix
-	 */
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param array $answer  Массив, описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
+	* элементом которого является элемент с ключом <b>VALUE</b> и значением,
+	* в котором содержится значение по умолчанию для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	* значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Пароль:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий поле для ввода пароля
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 609,   // ID поля для ответа на вопрос "Пароль"
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetPasswordValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo CForm::GetPasswordField(
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordfield.php">CForm::GetPasswordField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordvalue.php
+	* @author Bitrix
+	*/
 	public static function GetPasswordValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_password_".$FIELD_NAME;
@@ -1509,7 +1511,7 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	public static function GetEmailValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+public static 	function GetEmailValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_email_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname])) $value = $arrVALUES[$fname];
@@ -1517,7 +1519,7 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	public static function GetUrlValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+public static 	function GetUrlValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_url_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname])) $value = $arrVALUES[$fname];
@@ -1525,362 +1527,363 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_text_</b><i>answer_id</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="text"
-	 * value="<i>value</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param mixed $size = "" Ширина результирующего текстового поля:<br><code> &lt;input type="text"
-	 * size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
-	 * текстового поля:<br><code> &lt;input type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Фамилия:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий однострочное текстовое поле
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 586,   // ID поля для ответа на вопрос "Ваша фамилия?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = CForm::GetTextValue($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo <b>CForm::GetTextField</b>(
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextvalue.php">CForm::GetTextValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfield.php
-	 * @author Bitrix
-	 */
-	public static function GetTextField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
+	* <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "text".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_text_</b><i>answer_id</i></p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="text"
+	* value="<i>value</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param mixed $size = "" Ширина результирующего текстового поля:<br><code> &lt;input type="text"
+	* size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
+	* текстового поля:<br><code> &lt;input type="text" <i>add_to_text</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputtext\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Фамилия:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий однострочное текстовое поле
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 586,   // ID поля для ответа на вопрос "Ваша фамилия?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = CForm::GetTextValue($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo <b>CForm::GetTextField</b>(
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextvalue.php">CForm::GetTextValue</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfield.php
+	* @author Bitrix
+	*/
+	public static 	function GetTextField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputtext\" ";
 		return "<input type=\"text\" ".$PARAM." name=\"form_text_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" size=\"".$SIZE."\" />";
 	}
 
-	public static function GetHiddenField($FIELD_NAME, $VALUE="", $PARAM="")
+public static 	function GetHiddenField($FIELD_NAME, $VALUE="", $PARAM="")
 	{
 		return "<input type=\"hidden\" ".$PARAM." name=\"form_hidden_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" />";
 	}
 
 
-	public static function GetEmailField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
+public static 	function GetEmailField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputtext\" ";
 		return "<input type=\"text\" ".$PARAM." name=\"form_email_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" size=\"".$SIZE."\" />";
 	}
 
-	public static function GetUrlField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
+public static 	function GetUrlField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputtext\" ";
 		return "<input type=\"text\" ".$PARAM." name=\"form_url_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" size=\"".$SIZE."\" />";
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_password_</b><i>answer_id</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="password"
-	 * value="<i>value</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param mixed $size = "" Ширина результирующего текстового поля:<br><code> &lt;input type="password"
-	 * size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
-	 * текстового поля:<br><code> &lt;input type="password" <i>add_to_text</i>
-	 * ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Пароль:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий поле для ввода пароля
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 609,   // ID поля для ответа на вопрос "Пароль"
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = CForm::GetPasswordValue($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo <b>CForm::GetPasswordField</b>(
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordvalue.php">CForm::GetPasswordValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordfield.php
-	 * @author Bitrix
-	 */
-	public static function GetPasswordField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
+	* <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "password".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_password_</b><i>answer_id</i></p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="password"
+	* value="<i>value</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param mixed $size = "" Ширина результирующего текстового поля:<br><code> &lt;input type="password"
+	* size="<i>size</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
+	* текстового поля:<br><code> &lt;input type="password" <i>add_to_text</i>
+	* ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "class=\"inputtext\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Пароль:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий поле для ввода пароля
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 609,   // ID поля для ответа на вопрос "Пароль"
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = CForm::GetPasswordValue($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo <b>CForm::GetPasswordField</b>(
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordvalue.php">CForm::GetPasswordValue</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpasswordfield.php
+	* @author Bitrix
+	*/
+	public static 	function GetPasswordField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputtext\" ";
 		return "<input type=\"password\" ".$PARAM." name=\"form_password_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" size=\"".$SIZE."\" />";
 	}
 
-	
+	f
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "dropdown" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> выбранного по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция вернет ID данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer_list  Массив ответов типа "dropdown" на вопрос <i>question_sid</i>. Минимально
-	 * требуемая структура данного массива: <pre> Array ( [reference_id] =&gt; Array ( [0]
-	 * =&gt; <i>ID ответа 1</i> [1] =&gt; <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) [param] =&gt;
-	 * Array ( [0] =&gt; <i>параметр ответа 1</i> [1] =&gt; <i>параметр ответа 2</i> [2] =&gt;
-	 * <i>параметр ответа 3</i> ... ) ) </pre>
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;*Возраст:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // символьный идентификатор вопроса
-	 *             $QUESTION_SID = "AGE"; 
-	 * 
-	 *             // массив описывающий элементы выпадающего списка
-	 *             $arDropDown = array (
-	 * 
-	 *                 "reference" =&gt; array (
-	 *                         "-",
-	 *                         "10-19",
-	 *                         "20-29",
-	 *                         "30-39",
-	 *                         "40-49",
-	 *                         "50-59",
-	 *                         "60 и старше"
-	 *                     ),
-	 * 
-	 *                 "reference_id" =&gt; array (
-	 *                         608,
-	 *                         596,
-	 *                         597,
-	 *                         598,
-	 *                         599,
-	 *                         600,
-	 *                         601
-	 *                     ),
-	 * 
-	 *                 "param" =&gt; array (
-	 *                         "not_answer class=\"inputselect\"", // не является ответом
-	 *                         "",
-	 *                         "checked", // значение по умолчанию
-	 *                         "",
-	 *                         "",
-	 *                         "",
-	 *                         ""
-	 *                     )
-	 *             );
-	 * 
-	 *             // получим текущее значение выпадающего списка
-	 *             $value = <b>CForm::GetDropDownValue</b>($QUESTION_SID, $arDropDown, $arrVALUES);
-	 * 
-	 *             // выведем выпадающий список
-	 *             echo CForm::GetDropDownField(
-	 *                 $QUESTION_SID,           // символьный идентификатор вопроса
-	 *                 $arDropDown,             // массив описывающий элементы списка
-	 *                 $value,                  // значение выбранного элемента списка
-	 *                 "class=\"inputselect\""  // стиль выпадающего списка
-	 *                 );            
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfield.php">CForm::GetDropDownField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php
-	 * @author Bitrix
-	 */
-	public static function GetDropDownValue($FIELD_NAME, $arDropDown, $arrVALUES=false)
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "dropdown" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> выбранного по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция вернет ID данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $answer_list  Массив ответов типа "dropdown" на вопрос <i>question_sid</i>. Минимально
+	* требуемая структура данного массива: <pre> Array ( [reference_id] =&gt; Array ( [0]
+	* =&gt; <i>ID ответа 1</i> [1] =&gt; <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) [param] =&gt;
+	* Array ( [0] =&gt; <i>параметр ответа 1</i> [1] =&gt; <i>параметр ответа 2</i> [2] =&gt;
+	* <i>параметр ответа 3</i> ... ) ) </pre>
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;*Возраст:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // символьный идентификатор вопроса
+	*             $QUESTION_SID = "AGE"; 
+	* 
+	*             // массив описывающий элементы выпадающего списка
+	*             $arDropDown = array (
+	* 
+	*                 "reference" =&gt; array (
+	*                         "-",
+	*                         "10-19",
+	*                         "20-29",
+	*                         "30-39",
+	*                         "40-49",
+	*                         "50-59",
+	*                         "60 и старше"
+	*                     ),
+	* 
+	*                 "reference_id" =&gt; array (
+	*                         608,
+	*                         596,
+	*                         597,
+	*                         598,
+	*                         599,
+	*                         600,
+	*                         601
+	*                     ),
+	* 
+	*                 "param" =&gt; array (
+	*                         "not_answer class=\"inputselect\"", // не является ответом
+	*                         "",
+	*                         "checked", // значение по умолчанию
+	*                         "",
+	*                         "",
+	*                         "",
+	*                         ""
+	*                     )
+	*             );
+	* 
+	*             // получим текущее значение выпадающего списка
+	*             $value = <b>CForm::GetDropDownValue</b>($QUESTION_SID, $arDropDown, $arrVALUES);
+	* 
+	*             // выведем выпадающий список
+	*             echo CForm::GetDropDownField(
+	*                 $QUESTION_SID,           // символьный идентификатор вопроса
+	*                 $arDropDown,             // массив описывающий элементы списка
+	*                 $value,                  // значение выбранного элемента списка
+	*                 "class=\"inputselect\""  // стиль выпадающего списка
+	*                 );            
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfield.php">CForm::GetDropDownField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php
+	* @author Bitrix
+	*/
+	public static unction GetDropDownValue($FIELD_NAME, $arDropDown, $arrVALUES=false)
 	{
 		$fname = "form_dropdown_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname]))
 		{
 			$value = intval($arrVALUES[$fname]);
 		}
-		else
+		elseif (is_array($arDropDown[$FIELD_NAME]["param"]))
 		{
-			if (is_array($arDropDown[$FIELD_NAME]["param"]) && count($arDropDown[$FIELD_NAME]["param"])>0)
+			$c = count($arDropDown[$FIELD_NAME]["param"]);
+			if ($c>0)
 			{
-				for ($i=0; $i<=count($arDropDown[$FIELD_NAME]["param"])-1; $i++)
+				for ($i=0; $i<=$c-1; $i++)
 				{
 					if (strpos(strtolower($arDropDown[$FIELD_NAME]["param"][$i]), "selected")!==false || strpos(strtolower($arDropDown[$FIELD_NAME]["param"][$i]), "checked")!==false)
 					{
@@ -1893,139 +1896,139 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код выпадающего списка одиночного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> из группы ответов типа "dropdown" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_dropdown_</b><i>question_sid</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $list  Массив ответов типа "dropdown" на вопрос <i>question_sid</i>. Минимально
-	 * требуемая структура данного массива: <pre> Array ( [reference] =&gt; Array ( [0] =&gt;
-	 * <i>заголовок ответа 1</i> [1] =&gt; <i>заголовок ответа 2</i> [2] =&gt;
-	 * <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; Array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
-	 * <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
-	 * <i>заголовком элемента</i> понимается параметр <font
-	 * color="green">ANSWER_TEXT</font> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $value = "" Если в данном параметре будет передано значение совпадающее с <i>ID
-	 * ответа</i>, то данный ответ будет выбран в результирующем
-	 * выпадающем списке:<br><code> &lt;option value="<i>значение элемента</i>"
-	 * selected&gt;<i>заголовок ответа</i>&lt;/option&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_dropdown = "class=\"inputselect\"" Произвольный HTML который будет добавлен в результирующий HTML
-	 * тег:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр необязательный.
-	 * По умолчанию - "class=\"inputselect\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;*Возраст:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // символьный идентификатор вопроса
-	 *             $QUESTION_SID = "AGE"; 
-	 * 
-	 *             // массив описывающий элементы выпадающего списка
-	 *             $arDropDown = array (
-	 * 
-	 *                 "reference" =&gt; array (
-	 *                         "-",
-	 *                         "10-19",
-	 *                         "20-29",
-	 *                         "30-39",
-	 *                         "40-49",
-	 *                         "50-59",
-	 *                         "60 и старше"
-	 *                     ),
-	 * 
-	 *                 "reference_id" =&gt; array (
-	 *                         608,
-	 *                         596,
-	 *                         597,
-	 *                         598,
-	 *                         599,
-	 *                         600,
-	 *                         601
-	 *                     ),
-	 * 
-	 *                 "param" =&gt; array (
-	 *                         "not_answer class=\"inputselect\"", // не является ответом
-	 *                         "",
-	 *                         "checked", // значение по умолчанию
-	 *                         "",
-	 *                         "",
-	 *                         "",
-	 *                         ""
-	 *                     )
-	 *             );
-	 * 
-	 *             // получим текущее значение выпадающего списка
-	 *             $value = CForm::GetDropDownValue($QUESTION_SID, $arDropDown, $arrVALUES);
-	 * 
-	 *             // выведем выпадающий список
-	 *             echo <b>CForm::GetDropDownField</b>(
-	 *                 $QUESTION_SID,           // символьный идентификатор вопроса
-	 *                 $arDropDown,             // массив описывающий элементы списка
-	 *                 $value,                  // значение выбранного элемента списка
-	 *                 "class=\"inputselect\""  // стиль выпадающего списка
-	 *                 );            
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php">CForm::GetDropDownValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfield.php
-	 * @author Bitrix
-	 */
-	public static function GetDropDownField($FIELD_NAME, $arDropDown, $VALUE, $PARAM="")
+	* <p>Возвращает HTML код выпадающего списка одиночного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> из группы ответов типа "dropdown" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_dropdown_</b><i>question_sid</i></p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $list  Массив ответов типа "dropdown" на вопрос <i>question_sid</i>. Минимально
+	* требуемая структура данного массива: <pre> Array ( [reference] =&gt; Array ( [0] =&gt;
+	* <i>заголовок ответа 1</i> [1] =&gt; <i>заголовок ответа 2</i> [2] =&gt;
+	* <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; Array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
+	* <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
+	* <i>заголовком элемента</i> понимается параметр <font
+	* color="green">ANSWER_TEXT</font> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param mixed $value = "" Если в данном параметре будет передано значение совпадающее с <i>ID
+	* ответа</i>, то данный ответ будет выбран в результирующем
+	* выпадающем списке:<br><code> &lt;option value="<i>значение элемента</i>"
+	* selected&gt;<i>заголовок ответа</i>&lt;/option&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_dropdown = "class=\"inputselect\"" Произвольный HTML который будет добавлен в результирующий HTML
+	* тег:<br><code> &lt;select <i>add_to_dropdown</i> ...&gt;</code><br><br>Параметр необязательный.
+	* По умолчанию - "class=\"inputselect\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;*Возраст:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // символьный идентификатор вопроса
+	*             $QUESTION_SID = "AGE"; 
+	* 
+	*             // массив описывающий элементы выпадающего списка
+	*             $arDropDown = array (
+	* 
+	*                 "reference" =&gt; array (
+	*                         "-",
+	*                         "10-19",
+	*                         "20-29",
+	*                         "30-39",
+	*                         "40-49",
+	*                         "50-59",
+	*                         "60 и старше"
+	*                     ),
+	* 
+	*                 "reference_id" =&gt; array (
+	*                         608,
+	*                         596,
+	*                         597,
+	*                         598,
+	*                         599,
+	*                         600,
+	*                         601
+	*                     ),
+	* 
+	*                 "param" =&gt; array (
+	*                         "not_answer class=\"inputselect\"", // не является ответом
+	*                         "",
+	*                         "checked", // значение по умолчанию
+	*                         "",
+	*                         "",
+	*                         "",
+	*                         ""
+	*                     )
+	*             );
+	* 
+	*             // получим текущее значение выпадающего списка
+	*             $value = CForm::GetDropDownValue($QUESTION_SID, $arDropDown, $arrVALUES);
+	* 
+	*             // выведем выпадающий список
+	*             echo <b>CForm::GetDropDownField</b>(
+	*                 $QUESTION_SID,           // символьный идентификатор вопроса
+	*                 $arDropDown,             // массив описывающий элементы списка
+	*                 $value,                  // значение выбранного элемента списка
+	*                 "class=\"inputselect\""  // стиль выпадающего списка
+	*                 );            
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php">CForm::GetDropDownValue</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfield.php
+	* @author Bitrix
+	*/
+	public static 	function GetDropDownField($FIELD_NAME, $arDropDown, $VALUE, $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputselect\" ";
 		return SelectBoxFromArray("form_dropdown_".$FIELD_NAME, $arDropDown, $VALUE, "", $PARAM);
@@ -2033,119 +2036,119 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных среди группы ответов типа "<b>multiselect</b>" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция добавит данный ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>) в результирующий массив.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer_list  Массив ответов типа "multiselect" на вопрос <i>question_sid</i>. Минимально
-	 * требуемая структура данного массива: <pre> Array ( [reference_id] =&gt; Array ( [0]
-	 * =&gt; <i>ID ответа 1</i> [1] =&gt; <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) [param] =&gt;
-	 * Array ( [0] =&gt; <i>параметр ответа 1</i> [1] =&gt; <i>параметр ответа 2</i> [2] =&gt;
-	 * <i>параметр ответа 3</i> ... ) ) </pre>
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *   // используем данные пришедшие с формы
-	 *   $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *   // сформируем этот массив из данных по результату
-	 *   $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *   &lt;tr&gt;
-	 *     &lt;td&gt;Ваше образование:&lt;/td&gt;
-	 *     &lt;td&gt;&lt;?
-	 * 
-	 *       // символьный идентификатор вопроса
-	 *       $QUESTION_SID = "EDUCATION"; 
-	 * 
-	 *       // массив описывающий элементы списка множественного выбора
-	 *       $arMultiSelect = array (
-	 * 
-	 *         "reference" =&gt; array (
-	 *             "начальное",
-	 *             "средне-специальное",
-	 *             "высшее",
-	 *           ),
-	 * 
-	 *         "reference_id" =&gt; array (
-	 *             602,
-	 *             603,
-	 *             604,
-	 *           ),
-	 * 
-	 *         "param" =&gt; array (
-	 *             "",
-	 *             "",
-	 *             "checked", // значение по умолчанию
-	 *           )
-	 *       );
-	 * 
-	 *       // получим текущее значение выпадающего списка
-	 *       $arValues = <b>CForm::GetMultiSelectValue</b>($QUESTION_SID, $arMultiSelect, $arrVALUES);
-	 * 
-	 *       // выведем список множественного выбора
-	 *       echo CForm::GetMultiSelectField(
-	 *         $QUESTION_SID,           // символьный идентификатор вопроса
-	 *         $arMultiSelect,          // массив описывающий элементы списка
-	 *         $arValues,               // значения выбранных элементов списка
-	 *         10,                      // высота списка
-	 *         "class=\"inputselect\""  // стиль списка
-	 *         );      
-	 *       ?&gt;&lt;/td&gt;
-	 *   &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectfield.php">CForm::GetMultiSelectField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectvalue.php
-	 * @author Bitrix
-	 */
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных среди группы ответов типа "<b>multiselect</b>" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>, выбранных по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция добавит данный ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>) в результирующий массив.</p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $answer_list  Массив ответов типа "multiselect" на вопрос <i>question_sid</i>. Минимально
+	* требуемая структура данного массива: <pre> Array ( [reference_id] =&gt; Array ( [0]
+	* =&gt; <i>ID ответа 1</i> [1] =&gt; <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) [param] =&gt;
+	* Array ( [0] =&gt; <i>параметр ответа 1</i> [1] =&gt; <i>параметр ответа 2</i> [2] =&gt;
+	* <i>параметр ответа 3</i> ... ) ) </pre>
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*   // используем данные пришедшие с формы
+	*   $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*   // сформируем этот массив из данных по результату
+	*   $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*   &lt;tr&gt;
+	*     &lt;td&gt;Ваше образование:&lt;/td&gt;
+	*     &lt;td&gt;&lt;?
+	* 
+	*       // символьный идентификатор вопроса
+	*       $QUESTION_SID = "EDUCATION"; 
+	* 
+	*       // массив описывающий элементы списка множественного выбора
+	*       $arMultiSelect = array (
+	* 
+	*         "reference" =&gt; array (
+	*             "начальное",
+	*             "средне-специальное",
+	*             "высшее",
+	*           ),
+	* 
+	*         "reference_id" =&gt; array (
+	*             602,
+	*             603,
+	*             604,
+	*           ),
+	* 
+	*         "param" =&gt; array (
+	*             "",
+	*             "",
+	*             "checked", // значение по умолчанию
+	*           )
+	*       );
+	* 
+	*       // получим текущее значение выпадающего списка
+	*       $arValues = <b>CForm::GetMultiSelectValue</b>($QUESTION_SID, $arMultiSelect, $arrVALUES);
+	* 
+	*       // выведем список множественного выбора
+	*       echo CForm::GetMultiSelectField(
+	*         $QUESTION_SID,           // символьный идентификатор вопроса
+	*         $arMultiSelect,          // массив описывающий элементы списка
+	*         $arValues,               // значения выбранных элементов списка
+	*         10,                      // высота списка
+	*         "class=\"inputselect\""  // стиль списка
+	*         );      
+	*       ?&gt;&lt;/td&gt;
+	*   &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectfield.php">CForm::GetMultiSelectField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectvalue.php
+	* @author Bitrix
+	*/
 	public static function GetMultiSelectValue($FIELD_NAME, $arMultiSelect, $arrVALUES=false)
 	{
 		$fname = "form_multiselect_".$FIELD_NAME;
@@ -2153,11 +2156,12 @@ class CAllForm extends CForm_old
 		{
 			$value=$arrVALUES[$fname];
 		}
-		else
+		elseif (is_array($arMultiSelect[$FIELD_NAME]["param"]))
 		{
-			if (is_array($arMultiSelect[$FIELD_NAME]["param"]) && count($arMultiSelect[$FIELD_NAME]["param"])>0)
+			$c = count($arMultiSelect[$FIELD_NAME]["param"]);
+			if ($c>0)
 			{
-				for ($i=0;$i<=count($arMultiSelect[$FIELD_NAME]["param"])-1;$i++)
+				for ($i=0;$i<=$c-1;$i++)
 				{
 					if (strpos(strtolower($arMultiSelect[$FIELD_NAME]["param"][$i]), "selected")!==false || strpos(strtolower($arMultiSelect[$FIELD_NAME]["param"][$i]), "checked")!==false)
 						$value[] = $arMultiSelect[$FIELD_NAME]["reference_id"][$i];
@@ -2167,241 +2171,241 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код списка множественного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> из группы ответов типа "multiselect" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_multiselect_</b><i>question_sid</i><b>[]</b></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $list  Массив ответов типа "multiselect" на вопрос <i>question_sid</i>. Минимально
-	 * требуемая структура данного массива: <pre> Array ( [reference] =&gt; array ( [0] =&gt;
-	 * <i>заголовок ответа 1</i> [1] =&gt; <i>заголовок ответа 2</i> [2] =&gt;
-	 * <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
-	 * <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
-	 * <i>заголовком ответа</i> понимается параметр <font color="green">ANSWER_TEXT</font> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param array $values = array() Если в данном параметре будет передан массив со значениями,
-	 * совпадающими с <i>ID ответов</i>, данные ответы будут выбраны
-	 * (выделены) в результирующем списке:<br><code> &lt;option value="<i>значение
-	 * элемента</i>" selected&gt;<i>заголовок
-	 * элемента</i>&lt;/option&gt;</code><br><br>Параметр необязательный. По умолчанию
-	 * - array() (пустой массив).
-	 *
-	 *
-	 *
-	 * @param mixed $height = "" Высота результирующего списка множественного выбора:<br><code> &lt;select
-	 * multiple size="<i>height</i>" ...&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "class=\"inputselect\"".
-	 *
-	 *
-	 *
-	 * @param string $add_to_multiselect = "class=\"inputselect\"" Произвольный HTML, который будет добавлен в результирующий HTML
-	 * тег:<br><code> &lt;select <i>add_to_multiselect</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputselect\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *   // используем данные пришедшие с формы
-	 *   $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *   // сформируем этот массив из данных по результату
-	 *   $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *   &lt;tr&gt;
-	 *     &lt;td&gt;Ваше образование:&lt;/td&gt;
-	 *     &lt;td&gt;&lt;?
-	 * 
-	 *       // символьный идентификатор вопроса
-	 *       $QUESTION_SID = "EDUCATION"; 
-	 * 
-	 *       // массив описывающий элементы списка множественного выбора
-	 *       $arMultiSelect = array (
-	 * 
-	 *         "reference" =&gt; array (
-	 *             "начальное",
-	 *             "средне-специальное",
-	 *             "высшее",
-	 *           ),
-	 * 
-	 *         "reference_id" =&gt; array (
-	 *             602,
-	 *             603,
-	 *             604,
-	 *           ),
-	 * 
-	 *         "param" =&gt; array (
-	 *             "",
-	 *             "",
-	 *             "checked", // значение по умолчанию
-	 *           )
-	 *       );
-	 * 
-	 *       // получим текущее значение выпадающего списка
-	 *       $arValues = CForm::GetMultiSelectValue($QUESTION_SID, $arMultiSelect, $arrVALUES);
-	 * 
-	 *       // выведем список множественного выбора
-	 *       echo <b>CForm::GetMultiSelectField</b>(
-	 *         $QUESTION_SID,           // символьный идентификатор вопроса
-	 *         $arMultiSelect,          // массив описывающий элементы списка
-	 *         $arValues,               // значения выбранных элементов списка
-	 *         10,                      // высота списка
-	 *         "class=\"inputselect\""  // стиль списка
-	 *         );      
-	 *       ?&gt;&lt;/td&gt;
-	 *   &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectvalue.php">CForm::GetMultiSelectValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectfield.php
-	 * @author Bitrix
-	 */
-	public static function GetMultiSelectField($FIELD_NAME, $arMultiSelect, $arSELECTED=array(), $HEIGHT="", $PARAM="")
+	* <p>Возвращает HTML код списка множественного выбора, предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> из группы ответов типа "multiselect" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_multiselect_</b><i>question_sid</i><b>[]</b></p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $list  Массив ответов типа "multiselect" на вопрос <i>question_sid</i>. Минимально
+	* требуемая структура данного массива: <pre> Array ( [reference] =&gt; array ( [0] =&gt;
+	* <i>заголовок ответа 1</i> [1] =&gt; <i>заголовок ответа 2</i> [2] =&gt;
+	* <i>заголовок ответа 3</i> ... ) [reference_id] =&gt; array ( [0] =&gt; <i>ID ответа 1</i> [1] =&gt;
+	* <i>ID ответа 2</i> [2] =&gt; <i>ID ответа 3</i> ... ) ) </pre> В данном массиве под
+	* <i>заголовком ответа</i> понимается параметр <font color="green">ANSWER_TEXT</font> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param array $values = array() Если в данном параметре будет передан массив со значениями,
+	* совпадающими с <i>ID ответов</i>, данные ответы будут выбраны
+	* (выделены) в результирующем списке:<br><code> &lt;option value="<i>значение
+	* элемента</i>" selected&gt;<i>заголовок
+	* элемента</i>&lt;/option&gt;</code><br><br>Параметр необязательный. По умолчанию
+	* - array() (пустой массив).
+	*
+	*
+	*
+	* @param mixed $height = "" Высота результирующего списка множественного выбора:<br><code> &lt;select
+	* multiple size="<i>height</i>" ...&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "class=\"inputselect\"".
+	*
+	*
+	*
+	* @param string $add_to_multiselect = "class=\"inputselect\"" Произвольный HTML, который будет добавлен в результирующий HTML
+	* тег:<br><code> &lt;select <i>add_to_multiselect</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputselect\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*   // используем данные пришедшие с формы
+	*   $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*   // сформируем этот массив из данных по результату
+	*   $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*   &lt;tr&gt;
+	*     &lt;td&gt;Ваше образование:&lt;/td&gt;
+	*     &lt;td&gt;&lt;?
+	* 
+	*       // символьный идентификатор вопроса
+	*       $QUESTION_SID = "EDUCATION"; 
+	* 
+	*       // массив описывающий элементы списка множественного выбора
+	*       $arMultiSelect = array (
+	* 
+	*         "reference" =&gt; array (
+	*             "начальное",
+	*             "средне-специальное",
+	*             "высшее",
+	*           ),
+	* 
+	*         "reference_id" =&gt; array (
+	*             602,
+	*             603,
+	*             604,
+	*           ),
+	* 
+	*         "param" =&gt; array (
+	*             "",
+	*             "",
+	*             "checked", // значение по умолчанию
+	*           )
+	*       );
+	* 
+	*       // получим текущее значение выпадающего списка
+	*       $arValues = CForm::GetMultiSelectValue($QUESTION_SID, $arMultiSelect, $arrVALUES);
+	* 
+	*       // выведем список множественного выбора
+	*       echo <b>CForm::GetMultiSelectField</b>(
+	*         $QUESTION_SID,           // символьный идентификатор вопроса
+	*         $arMultiSelect,          // массив описывающий элементы списка
+	*         $arValues,               // значения выбранных элементов списка
+	*         10,                      // высота списка
+	*         "class=\"inputselect\""  // стиль списка
+	*         );      
+	*       ?&gt;&lt;/td&gt;
+	*   &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectvalue.php">CForm::GetMultiSelectValue</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getmultiselectfield.php
+	* @author Bitrix
+	*/
+	public static 	function GetMultiSelectField($FIELD_NAME, $arMultiSelect, $arSELECTED=array(), $HEIGHT="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputselect\" ";
 		return SelectBoxMFromArray("form_multiselect_".$FIELD_NAME."[]", $arMultiSelect, $arSELECTED, "", false, $HEIGHT, $PARAM);
 	}
 
-	
+
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
-	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
-	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
-	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form name="ANKETA" action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Дата рождения:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий поле для ввода даты
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 587,   // ID поля для ответа на вопрос "Дата рождения?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetDateValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo CForm::GetDateField(
-	 *                 $arAnswer["ID"],
-	 *                 "ANKETA",
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefield.php">CForm::GetDateField</a>
-	 * </li></ul><a name="examples"></a><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatevalue.php
-	 * @author Bitrix
-	 */
-	public static function GetDateValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param array $answer  Массив, описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
+	* элементом которого является элемент с ключом <b>VALUE</b> и значением,
+	* в котором содержится значение по умолчанию для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	* значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form name="ANKETA" action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Дата рождения:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий поле для ввода даты
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 587,   // ID поля для ответа на вопрос "Дата рождения?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetDateValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo CForm::GetDateField(
+	*                 $arAnswer["ID"],
+	*                 "ANKETA",
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefield.php">CForm::GetDateField</a>
+	* </li></ul><a name="examples"></a><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatevalue.php
+	* @author Bitrix
+	*/
+	public static 	function GetDateValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_date_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname])) $value = $arrVALUES[$fname];
@@ -2414,111 +2418,111 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date". В результирующий HTML код будет добавлена иконка, ведущая на страницу с календарем.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля для ввода даты будет сформировано по следующей маске:<br><b>form_date_</b><i>answer_id</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param string $html_form_name  Имя HTML формы для создания нового <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> или
-	 * редактирования существующего.<br><code> &lt;form name="<i>html_form_name</i>"
-	 * ...&gt;<br></code> <br>Параметр необязательный. По умолчанию - "form1".
-	 *
-	 *
-	 *
-	 * @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="text"
-	 * value="<i>value</i>" ...&gt;<br><br></code>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param mixed $size = "" Ширина результирующего текстового поля для ввода даты:<br><code>
-	 * &lt;input type="text" size="<i>size</i>" ...&gt;<br><br></code>Параметр необязательный. По
-	 * умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML который будет добавлен в результирующий HTML тег
-	 * текстового поля для ввода даты:<br><code> &lt;input type="text" <i>add_to_text</i>
-	 * ...&gt;<br><br></code>Параметр необязательный. По умолчанию - "class=\"inputtext\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form name="ANKETA" action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Дата рождения:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описывающий поле для ввода даты
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 587,   // ID поля для ответа на вопрос "Дата рождения?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = CForm::GetDateValue($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo <b>CForm::GetDateField</b>(
-	 *                 $arAnswer["ID"],
-	 *                 "ANKETA",
-	 *                 $value,
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatevalue.php">CForm::GetDateValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefield.php
-	 * @author Bitrix
-	 */
-	public static function GetDateField($FIELD_NAME, $FORM_NAME, $VALUE="", $FIELD_WIDTH="", $PARAM="")
+	* <p>Возвращает HTML код однострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "date". В результирующий HTML код будет добавлена иконка, ведущая на страницу с календарем.</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля для ввода даты будет сформировано по следующей маске:<br><b>form_date_</b><i>answer_id</i></p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param string $html_form_name  Имя HTML формы для создания нового <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> или
+	* редактирования существующего.<br><code> &lt;form name="<i>html_form_name</i>"
+	* ...&gt;<br></code> <br>Параметр необязательный. По умолчанию - "form1".
+	*
+	*
+	*
+	* @param string $value = "" Значение результирующего текстового поля:<br><code> &lt;input type="text"
+	* value="<i>value</i>" ...&gt;<br><br></code>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param mixed $size = "" Ширина результирующего текстового поля для ввода даты:<br><code>
+	* &lt;input type="text" size="<i>size</i>" ...&gt;<br><br></code>Параметр необязательный. По
+	* умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_text = "class=\"inputtext\"" Произвольный HTML который будет добавлен в результирующий HTML тег
+	* текстового поля для ввода даты:<br><code> &lt;input type="text" <i>add_to_text</i>
+	* ...&gt;<br><br></code>Параметр необязательный. По умолчанию - "class=\"inputtext\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form name="ANKETA" action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Дата рождения:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описывающий поле для ввода даты
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 587,   // ID поля для ответа на вопрос "Дата рождения?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = CForm::GetDateValue($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo <b>CForm::GetDateField</b>(
+	*                 $arAnswer["ID"],
+	*                 "ANKETA",
+	*                 $value,
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatevalue.php">CForm::GetDateValue</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefield.php
+	* @author Bitrix
+	*/
+	public static 	function GetDateField($FIELD_NAME, $FORM_NAME, $VALUE="", $FIELD_WIDTH="", $PARAM="")
 	{
 		global $APPLICATION;
 		//if (strlen($PARAM)<=0) $PARAM = " class=\"inputtext\" ";
@@ -2547,432 +2551,439 @@ class CAllForm extends CForm_old
 		//return CalendarDate("form_date_".$FIELD_NAME, $VALUE, $FORM_NAME, $FIELD_WIDTH, $PARAM);
 	}
 
-	
+
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values</i>, инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), в случае если он был выбран среди группы ответов типа "checkbox" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values</i>, не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответом по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
-	 * ключами: <ul> <li> <b>ID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
-	 * значение этого ключа содержит слово "checked", то ID этого ответа будет
-	 * возвращен данной функцией по умолчанию (т.е. при создании нового <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Какие области знаний вас интересуют ?&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             
-	 *             //<*********************************************************
-	 *                 выводим два checkbox'а (математика/физика) 
-	 *                 как варианты ответа на вопрос 
-	 *                 "Какие области знаний вас интересуют ?"
-	 *             *********************************************************>//
-	 * 
-	 *             $QUESTION_SID = "INTEREST"; // символьный идентификатор вопроса
-	 * 
-	 *             //<**********************
-	 *               checkbox "математика"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий один checkbox
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 591,            // ID checkbox'а
-	 *                 "FIELD_PARAM"   =&gt; "checked class=\"inputcheckbox\""   // параметр ответа
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetCheckBoxValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем checkbox
-	 *             echo CForm::GetCheckBoxField(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "математика&lt;br&gt;";
-	 * 
-	 *             //<**********************
-	 *                 checkbox "физика"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий один checkbox
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 593,       // ID checkbox'а
-	 *                 "FIELD_PARAM"   =&gt; ""         // параметр ответа
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetCheckBoxValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем checkbox
-	 *             echo CForm::GetCheckBoxField(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "физика";
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxfield.php">CForm::GetCheckBoxField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxvalue.php
-	 * @author Bitrix
-	 */
-	public static function GetCheckBoxValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+	* <p>Если массив, переданный в параметре <i>form_values</i>, инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), в случае если он был выбран среди группы ответов типа "checkbox" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values</i>, не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответом по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $answer  Массив, описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
+	* ключами: <ul> <li> <b>ID</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
+	* значение этого ключа содержит слово "checked", то ID этого ответа будет
+	* возвращен данной функцией по умолчанию (т.е. при создании нового <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Какие области знаний вас интересуют ?&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             
+	*             //<*********************************************************
+	*                 выводим два checkbox'а (математика/физика) 
+	*                 как варианты ответа на вопрос 
+	*                 "Какие области знаний вас интересуют ?"
+	*             *********************************************************>//
+	* 
+	*             $QUESTION_SID = "INTEREST"; // символьный идентификатор вопроса
+	* 
+	*             //<**********************
+	*               checkbox "математика"
+	*             **********************>//
+	* 
+	*             // массив описывающий один checkbox
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 591,            // ID checkbox'а
+	*                 "FIELD_PARAM"   =&gt; "checked class=\"inputcheckbox\""   // параметр ответа
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetCheckBoxValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем checkbox
+	*             echo CForm::GetCheckBoxField(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "математика&lt;br&gt;";
+	* 
+	*             //<**********************
+	*                 checkbox "физика"
+	*             **********************>//
+	* 
+	*             // массив описывающий один checkbox
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 593,       // ID checkbox'а
+	*                 "FIELD_PARAM"   =&gt; ""         // параметр ответа
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetCheckBoxValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем checkbox
+	*             echo CForm::GetCheckBoxField(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "физика";
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxfield.php">CForm::GetCheckBoxField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxvalue.php
+	* @author Bitrix
+	*/
+	public static 	function GetCheckBoxValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_checkbox_".$FIELD_NAME;
 
-		if (is_array($arrVALUES) && isset($arrVALUES[$fname]))
+		if (is_array($arrVALUES))
 		{
-			$arr = $arrVALUES[$fname];
-			if (is_array($arr) && in_array($arAnswer["ID"],$arr)) $value = $arAnswer["ID"];
+			if(isset($arrVALUES[$fname]))
+			{
+				$arr = $arrVALUES[$fname];
+				if (is_array($arr) && in_array($arAnswer["ID"],$arr))
+				{
+					$value = $arAnswer["ID"];
+				}
+			}
 		}
 		else
 		{
 			if ($value<=0)
 			{
 				if (strpos(strtolower($arAnswer["FIELD_PARAM"]), "selected")!==false || strpos(strtolower($arAnswer["FIELD_PARAM"]), "checked")!==false)
+				{
 					$value = $arAnswer["ID"];
+				}
 			}
 		}
 
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код флага множественного выбора (checkbox), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "checkbox" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_checkbox_</b><i>question_sid</i><b>[]</b></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $value = "" Если в данном параметре будет передано значение, совпадающее с
-	 * <i>answer_id</i>, то флаг множественного выбора будет отмечен
-	 * (<i>checked</i>):<br><code> &lt;input type="checkbox" checked ...&gt;</code> <br><br>Параметр
-	 * необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
-	 * флага множественного выбора:<br> &lt;input type="checkbox" <i>add_to_checkbox</i>
-	 * ...&gt;<br><br> Необходимо учитывать, что если в данном параметре задать
-	 * ключевое слово "checked", то данный переключатель будет выбран по
-	 * умолчанию. <br><br>Параметр необязательный. По умолчанию -
-	 * "class=\"inputcheckbox\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Какие области знаний вас интересуют ?&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             
-	 *             //<*********************************************************
-	 *                 выводим два checkbox'а (математика/физика) 
-	 *                 как варианты ответа на вопрос 
-	 *                 "Какие области знаний вас интересуют ?"
-	 *             *********************************************************>//
-	 * 
-	 *             $QUESTION_SID = "INTEREST"; // символьный идентификатор вопроса
-	 * 
-	 *             //<**********************
-	 *               checkbox "математика"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий один checkbox
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 591,            // ID checkbox'а
-	 *                 "FIELD_PARAM"   =&gt; "checked class=\"inputcheckbox\""   // параметр ответа
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = CForm::GetCheckBoxValue($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем checkbox
-	 *             echo <b>CForm::GetCheckBoxField</b>(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "математика&lt;br&gt;";
-	 * 
-	 *             //<**********************
-	 *                 checkbox "физика"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий один checkbox
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 593,       // ID checkbox'а
-	 *                 "FIELD_PARAM"   =&gt; ""         // параметр ответа
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = CForm::GetCheckBoxValue($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем checkbox
-	 *             echo <b>CForm::GetCheckBoxField</b>(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "физика";
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxvalue.php">CForm::GetCheckBoxValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxfield.php
-	 * @author Bitrix
-	 */
-	public static function GetCheckBoxField($FIELD_NAME, $FIELD_ID, $VALUE="", $PARAM="")
+	* <p>Возвращает HTML код флага множественного выбора (checkbox), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "checkbox" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_checkbox_</b><i>question_sid</i><b>[]</b></p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param mixed $value = "" Если в данном параметре будет передано значение, совпадающее с
+	* <i>answer_id</i>, то флаг множественного выбора будет отмечен
+	* (<i>checked</i>):<br><code> &lt;input type="checkbox" checked ...&gt;</code> <br><br>Параметр
+	* необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в результирующий HTML тег
+	* флага множественного выбора:<br> &lt;input type="checkbox" <i>add_to_checkbox</i>
+	* ...&gt;<br><br> Необходимо учитывать, что если в данном параметре задать
+	* ключевое слово "checked", то данный переключатель будет выбран по
+	* умолчанию. <br><br>Параметр необязательный. По умолчанию -
+	* "class=\"inputcheckbox\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Какие области знаний вас интересуют ?&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             
+	*             //<*********************************************************
+	*                 выводим два checkbox'а (математика/физика) 
+	*                 как варианты ответа на вопрос 
+	*                 "Какие области знаний вас интересуют ?"
+	*             *********************************************************>//
+	* 
+	*             $QUESTION_SID = "INTEREST"; // символьный идентификатор вопроса
+	* 
+	*             //<**********************
+	*               checkbox "математика"
+	*             **********************>//
+	* 
+	*             // массив описывающий один checkbox
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 591,            // ID checkbox'а
+	*                 "FIELD_PARAM"   =&gt; "checked class=\"inputcheckbox\""   // параметр ответа
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = CForm::GetCheckBoxValue($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем checkbox
+	*             echo <b>CForm::GetCheckBoxField</b>(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "математика&lt;br&gt;";
+	* 
+	*             //<**********************
+	*                 checkbox "физика"
+	*             **********************>//
+	* 
+	*             // массив описывающий один checkbox
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 593,       // ID checkbox'а
+	*                 "FIELD_PARAM"   =&gt; ""         // параметр ответа
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = CForm::GetCheckBoxValue($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем checkbox
+	*             echo <b>CForm::GetCheckBoxField</b>(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "физика";
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxvalue.php">CForm::GetCheckBoxValue</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getcheckboxfield.php
+	* @author Bitrix
+	*/
+	public static 	function GetCheckBoxField($FIELD_NAME, $FIELD_ID, $VALUE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputcheckbox\" ";
-
 		return InputType("checkbox", "form_checkbox_".$FIELD_NAME."[]", $FIELD_ID, $VALUE, false, "", $PARAM);
 	}
 
-	
+
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "radio" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответами по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
-	 * ключами: <ul> <li> <b>ID</b> - ID <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
-	 * значение этого ключа содержит слово "checked", то ID этого ответа будет
-	 * возвращен данной функцией по умолчанию (т.е. при создании нового <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Вы курите?&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             
-	 *             //<*********************************************************
-	 *                 выводим две radio-кнопки (да/нет) 
-	 *                 как варианты ответа на вопрос "Вы курите?"
-	 *             *********************************************************>//
-	 * 
-	 *             $QUESTION_SID = "SMOKE"; // символьный идентификатор вопроса
-	 * 
-	 *             //<**********************
-	 *                 radio-кнопка "да"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий одну radio-кнопку
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 589,    // ID radio-кнопки
-	 *                 "FIELD_PARAM"   =&gt; "checked class=\"inputradio\""   // параметр ответа
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetRadioValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем radio-кнопку
-	 *             echo CForm::GetRadioField(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "да &lt;br&gt;";
-	 * 
-	 *             //<**********************
-	 *                 radio-кнопка "нет"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий одну radio-кнопку
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 590,    // ID radio-кнопки
-	 *                 "FIELD_PARAM"   =&gt; ""      // параметр ответа
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetRadioValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем radio-кнопку
-	 *             echo CForm::GetRadioField(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "нет";
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiofield.php">CForm::GetRadioField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiovalue.php
-	 * @author Bitrix
-	 */
-	public static function GetRadioValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "radio" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (<nobr><i>answer</i>["ID"]</nobr>), если он был установлен как ответ по умолчанию (ответами по умолчанию считаются те, у которых присутствует строка "checked" в <nobr><i>answer</i>["FIELD_PARAM"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param array $answer  Массив описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, с обязательными
+	* ключами: <ul> <li> <b>ID</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>FIELD_PARAM</b> - если
+	* значение этого ключа содержит слово "checked", то ID этого ответа будет
+	* возвращен данной функцией по умолчанию (т.е. при создании нового <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>). </li> </ul>
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Вы курите?&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             
+	*             //<*********************************************************
+	*                 выводим две radio-кнопки (да/нет) 
+	*                 как варианты ответа на вопрос "Вы курите?"
+	*             *********************************************************>//
+	* 
+	*             $QUESTION_SID = "SMOKE"; // символьный идентификатор вопроса
+	* 
+	*             //<**********************
+	*                 radio-кнопка "да"
+	*             **********************>//
+	* 
+	*             // массив описывающий одну radio-кнопку
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 589,    // ID radio-кнопки
+	*                 "FIELD_PARAM"   =&gt; "checked class=\"inputradio\""   // параметр ответа
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetRadioValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем radio-кнопку
+	*             echo CForm::GetRadioField(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "да &lt;br&gt;";
+	* 
+	*             //<**********************
+	*                 radio-кнопка "нет"
+	*             **********************>//
+	* 
+	*             // массив описывающий одну radio-кнопку
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 590,    // ID radio-кнопки
+	*                 "FIELD_PARAM"   =&gt; ""      // параметр ответа
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetRadioValue</b>($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем radio-кнопку
+	*             echo CForm::GetRadioField(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "нет";
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiofield.php">CForm::GetRadioField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiovalue.php
+	* @author Bitrix
+	*/
+	public static 	function GetRadioValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_radio_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname]))
@@ -2987,139 +2998,139 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код переключателя одиночного выбора (radio-кнопка), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "radio" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note">Имя результирующего HTML поля будет сформировано по следующей маске: <b>form_radio_</b><i>question_sid</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $question_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $value = "" Если в данном параметре будет передано значение совпадающее с
-	 * <i>answer_id</i>, то переключатель одиночного выбора будет выбран
-	 * (checked):<br> &lt;input type="radio" checked ...&gt; <br>Параметр необязательный. По
-	 * умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_radio = "class=\"inputradio\"" Произвольный HTML который будет добавлен в результирующий HTML тег
-	 * переключателя одиночного выбора:<br> &lt;input type="radio" <i>add_to_radio</i> ...&gt;<br>
-	 * Необходимо учитывать что если в данном параметре задать ключевое
-	 * слово "checked", то данный переключатель будет выбран по умолчанию.
-	 * <br>Параметр необязательный. По умолчанию - "class=\"inputradio\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Вы курите?&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 *             
-	 *             //<*********************************************************
-	 *                 выводим две radio-кнопки (да/нет) 
-	 *                 как варианты ответа на вопрос "Вы курите?"
-	 *             *********************************************************>//
-	 * 
-	 *             $QUESTION_SID = "SMOKE"; // символьный идентификатор вопроса
-	 * 
-	 *             //<**********************
-	 *                 radio-кнопка "да"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий одну radio-кнопку
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 589,    // ID radio-кнопки
-	 *                 "FIELD_PARAM"   =&gt; "checked class=\"inputradio\""   // параметр ответа
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = CForm::GetRadioValue($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем radio-кнопку
-	 *             echo <b>CForm::GetRadioField</b>(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "да &lt;br&gt;";
-	 * 
-	 *             //<**********************
-	 *                 radio-кнопка "нет"
-	 *             **********************>//
-	 * 
-	 *             // массив описывающий одну radio-кнопку
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 590,    // ID radio-кнопки
-	 *                 "FIELD_PARAM"   =&gt; ""      // параметр ответа
-	 *                 );
-	 *             
-	 *             // получим текущее значение
-	 *             $value = CForm::GetRadioValue($QUESTION_SID, $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем radio-кнопку
-	 *             echo <b>CForm::GetRadioField</b>(
-	 *                 $QUESTION_SID,
-	 *                 $arAnswer["ID"],
-	 *                 $value,
-	 *                 $arAnswer["FIELD_PARAM"]
-	 *                 );            
-	 *             echo "нет";
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiovalue.php">CForm::GetRadioValue</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiofield.php
-	 * @author Bitrix
-	 */
-	public static function GetRadioField($FIELD_NAME, $FIELD_ID, $VALUE="", $PARAM="")
+	* <p>Возвращает HTML код переключателя одиночного выбора (radio-кнопка), предназначенного для выбора <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "radio" на вопрос, символьный идентификатор которого передается в параметре <i>question_sid</i>.</p> <p>Функция может использоваться как в форме содания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note">Имя результирующего HTML поля будет сформировано по следующей маске: <b>form_radio_</b><i>question_sid</i></p>
+	*
+	*
+	*
+	*
+	* @param string $question_sid  Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param mixed $value = "" Если в данном параметре будет передано значение совпадающее с
+	* <i>answer_id</i>, то переключатель одиночного выбора будет выбран
+	* (checked):<br> &lt;input type="radio" checked ...&gt; <br>Параметр необязательный. По
+	* умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_radio = "class=\"inputradio\"" Произвольный HTML который будет добавлен в результирующий HTML тег
+	* переключателя одиночного выбора:<br> &lt;input type="radio" <i>add_to_radio</i> ...&gt;<br>
+	* Необходимо учитывать что если в данном параметре задать ключевое
+	* слово "checked", то данный переключатель будет выбран по умолчанию.
+	* <br>Параметр необязательный. По умолчанию - "class=\"inputradio\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Вы курите?&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	*             
+	*             //<*********************************************************
+	*                 выводим две radio-кнопки (да/нет) 
+	*                 как варианты ответа на вопрос "Вы курите?"
+	*             *********************************************************>//
+	* 
+	*             $QUESTION_SID = "SMOKE"; // символьный идентификатор вопроса
+	* 
+	*             //<**********************
+	*                 radio-кнопка "да"
+	*             **********************>//
+	* 
+	*             // массив описывающий одну radio-кнопку
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 589,    // ID radio-кнопки
+	*                 "FIELD_PARAM"   =&gt; "checked class=\"inputradio\""   // параметр ответа
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = CForm::GetRadioValue($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем radio-кнопку
+	*             echo <b>CForm::GetRadioField</b>(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "да &lt;br&gt;";
+	* 
+	*             //<**********************
+	*                 radio-кнопка "нет"
+	*             **********************>//
+	* 
+	*             // массив описывающий одну radio-кнопку
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 590,    // ID radio-кнопки
+	*                 "FIELD_PARAM"   =&gt; ""      // параметр ответа
+	*                 );
+	*             
+	*             // получим текущее значение
+	*             $value = CForm::GetRadioValue($QUESTION_SID, $arAnswer, $arrVALUES);
+	* 
+	*             // выведем radio-кнопку
+	*             echo <b>CForm::GetRadioField</b>(
+	*                 $QUESTION_SID,
+	*                 $arAnswer["ID"],
+	*                 $value,
+	*                 $arAnswer["FIELD_PARAM"]
+	*                 );            
+	*             echo "нет";
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiovalue.php">CForm::GetRadioValue</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getradiofield.php
+	* @author Bitrix
+	*/
+	public static 	function GetRadioField($FIELD_NAME, $FIELD_ID, $VALUE="", $PARAM="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputradio\" ";
 
@@ -3128,104 +3139,104 @@ class CAllForm extends CForm_old
 
 	
 	/**
-	 * <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param array $answer  Массив, описывающий параметры <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
-	 * элементом которого является элемент с ключом <b>VALUE</b> и значением,
-	 * в котором содержится значение по умолчанию для <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
-	 * значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
-	 * создании нового или редактировании существующего <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
-	 * массив <b>$_REQUEST</b>). Данный массив может быть также получен с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
-	 * необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Адрес:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описыващий многострочное текстовое поле
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 588,   // ID поля для ответа на вопрос "Ваш адрес?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_HEIGHT"  =&gt; 5,     // высота поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = <b>CForm::GetTextAreaValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo CForm::GetTextAreaField(
-	 *                 $arAnswer["ID"], 
-	 *                 $arAnswer["FIELD_WIDTH"], 
-	 *                 $arAnswer["FIELD_HEIGHT"], 
-	 *                 $arAnswer["FIELD_PARAM"],
-	 *                 $value
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareafield.php">CForm::GetTextAreaField</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareavalue.php
-	 * @author Bitrix
-	 */
+	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает текущее значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea", ID которого передается в параметре <i>answer_id</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет значение по умолчанию для данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (т.е. то что задается в <nobr><i>answer</i>["VALUE"]</nobr>).</p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param array $answer  Массив, описывающий параметры <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, обязательным
+	* элементом которого является элемент с ключом <b>VALUE</b> и значением,
+	* в котором содержится значение по умолчанию для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. Как правило, таким
+	* значением по умолчанию становится параметр <font color="red">ANSWER_VALUE</font>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
+	*
+	*
+	*
+	* @param mixed $form_values = false Ассоциированный массив значений, пришедших с веб-формы при
+	* создании нового или редактировании существующего <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> (стандартный
+	* массив <b>$_REQUEST</b>). Данный массив может быть также получен с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>.<br><br>Параметр
+	* необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Адрес:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описыващий многострочное текстовое поле
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 588,   // ID поля для ответа на вопрос "Ваш адрес?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_HEIGHT"  =&gt; 5,     // высота поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = <b>CForm::GetTextAreaValue</b>($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo CForm::GetTextAreaField(
+	*                 $arAnswer["ID"], 
+	*                 $arAnswer["FIELD_WIDTH"], 
+	*                 $arAnswer["FIELD_HEIGHT"], 
+	*                 $arAnswer["FIELD_PARAM"],
+	*                 $value
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareafield.php">CForm::GetTextAreaField</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareavalue.php
+	* @author Bitrix
+	*/
 	public static function GetTextAreaValue($FIELD_NAME, $arAnswer, $arrVALUES=false)
 	{
 		$fname = "form_textarea_".$FIELD_NAME;
@@ -3234,294 +3245,294 @@ class CAllForm extends CForm_old
 		return $value;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код многострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_textarea_</b><i>answer_id</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param int $cols = "" Ширина результирующего многострочного текстового поля:<br><code>
-	 * &lt;textarea cols="<i>cols</i>" ...&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param int $rows = "" Высота результирующего многострочного текстового поля:<br><code>
-	 * &lt;textarea rows="<i>rows</i>" ...&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_textarea = "class=\"inputtextarea\"" Произвольный HTML, который будет добавлен в результирующий тег
-	 * многострочного текстового поля:<br><code> &lt;textarea <i>add_to_textarea</i>
-	 * ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
-	 * "class=\"inputtextarea\"".
-	 *
-	 *
-	 *
-	 * @param string $value = "" Значение результирующего многострочного текстового поля:<br><code>
-	 * &lt;textarea ...&gt;<i>value</i>&lt;/textarea&gt;</code><br><br>Параметр необязательный. По
-	 * умолчанию - "".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * 
-	 * // если была нажата кнопка "Сохранить" то
-	 * if (strlen($_REQUEST["save"])&gt;0)
-	 * {
-	 *     // используем данные пришедшие с формы
-	 *     $arrVALUES = $_REQUEST; 
-	 * }
-	 * else
-	 * {
-	 *     // сформируем этот массив из данных по результату
-	 *     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
-	 * }
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Адрес:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             // массив описыващий многострочное текстовое поле
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 588,   // ID поля для ответа на вопрос "Ваш адрес?"
-	 *                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_HEIGHT"  =&gt; 5,     // высота поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // получим текущее значение
-	 *             $value = CForm::GetTextAreaValue($arAnswer["ID"], $arAnswer, $arrVALUES);
-	 * 
-	 *             // выведем поле
-	 *             echo <b>CForm::GetTextAreaField</b>(
-	 *                 $arAnswer["ID"], 
-	 *                 $arAnswer["FIELD_WIDTH"], 
-	 *                 $arAnswer["FIELD_HEIGHT"], 
-	 *                 $arAnswer["FIELD_PARAM"],
-	 *                 $value
-	 *                 );
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareavalue.php">CForm::GetTextAreaValue</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareafield.php
-	 * @author Bitrix
-	 */
-	public static function GetTextAreaField($FIELD_NAME, $WIDTH="", $HEIGHT="", $PARAM="", $VALUE="")
+	* <p>Возвращает HTML код многострочного текстового поля. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "textarea".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_textarea_</b><i>answer_id</i></p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param int $cols = "" Ширина результирующего многострочного текстового поля:<br><code>
+	* &lt;textarea cols="<i>cols</i>" ...&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "".
+	*
+	*
+	*
+	* @param int $rows = "" Высота результирующего многострочного текстового поля:<br><code>
+	* &lt;textarea rows="<i>rows</i>" ...&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_textarea = "class=\"inputtextarea\"" Произвольный HTML, который будет добавлен в результирующий тег
+	* многострочного текстового поля:<br><code> &lt;textarea <i>add_to_textarea</i>
+	* ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
+	* "class=\"inputtextarea\"".
+	*
+	*
+	*
+	* @param string $value = "" Значение результирующего многострочного текстового поля:<br><code>
+	* &lt;textarea ...&gt;<i>value</i>&lt;/textarea&gt;</code><br><br>Параметр необязательный. По
+	* умолчанию - "".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* 
+	* // если была нажата кнопка "Сохранить" то
+	* if (strlen($_REQUEST["save"])&gt;0)
+	* {
+	*     // используем данные пришедшие с формы
+	*     $arrVALUES = $_REQUEST; 
+	* }
+	* else
+	* {
+	*     // сформируем этот массив из данных по результату
+	*     $arrVALUES = CFormResult::GetDataByIDForHTML($RESULT_ID); 
+	* }
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Адрес:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             // массив описыващий многострочное текстовое поле
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 588,   // ID поля для ответа на вопрос "Ваш адрес?"
+	*                 "VALUE"         =&gt; "",    // параметр ANSWER_VALUE (значение по умолчанию)
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_HEIGHT"  =&gt; 5,     // высота поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // получим текущее значение
+	*             $value = CForm::GetTextAreaValue($arAnswer["ID"], $arAnswer, $arrVALUES);
+	* 
+	*             // выведем поле
+	*             echo <b>CForm::GetTextAreaField</b>(
+	*                 $arAnswer["ID"], 
+	*                 $arAnswer["FIELD_WIDTH"], 
+	*                 $arAnswer["FIELD_HEIGHT"], 
+	*                 $arAnswer["FIELD_PARAM"],
+	*                 $value
+	*                 );
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareavalue.php">CForm::GetTextAreaValue</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextareafield.php
+	* @author Bitrix
+	*/
+	public static 	function GetTextAreaField($FIELD_NAME, $WIDTH="", $HEIGHT="", $PARAM="", $VALUE="")
 	{
 		if (strlen($PARAM)<=0) $PARAM = " class=\"inputtextarea\" ";
 		return "<textarea name=\"form_textarea_".$FIELD_NAME."\" cols=\"".$WIDTH."\" rows=\"".$HEIGHT."\" ".$PARAM.">".htmlspecialcharsbx($VALUE)."</textarea>";
 	}
 
-	
+
 	/**
-	 * <p>Возвращает HTML код поля для загрузки файла. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "<b>image</b>" или "<b>file</b>".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_</b><i>file_type</i><b>_</b><i>answer_id</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $width = "" Ширина результирующего поля для ввода файла:<br><code> &lt;input type="file"
-	 * size="<i>width</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $file_type = "IMAGE" Тип файла, допустимы следующие значения: <ul> <li> <b>IMAGE</b> -
-	 * изображение; </li> <li> <b>FILE</b> - произвольный файл. </li> </ul> Параметр
-	 * необязательный. По умолчанию - "IMAGE" (изображение).
-	 *
-	 *
-	 *
-	 * @param int $max_file_size = 0 Максимальный размер загружаемого файла (в байтах).<br><br>Параметр
-	 * необязательный. По умолчанию - 0 (без ограничений).
-	 *
-	 *
-	 *
-	 * @param mixed $file_id = "" ID загруженного (редактируемого) файла.<br><br>Параметр
-	 * необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param string $add_to_file = "class=\"inputfile\"" Произвольный HTML, который будет добавлен в HTML тег поля для
-	 * загрузки файла:<br><code> &lt;input type="file" <i>add_to_file</i> ...&gt;</code><br><br>Параметр
-	 * необязательный. По умолчанию - "class=\"inputfile\"".
-	 *
-	 *
-	 *
-	 * @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в HTML тег флага удаления
-	 * редактируемого файла:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i>
-	 * ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
-	 * "class=\"inputcheckbox\"".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<******************************************
-	 *        Редактирование результата
-	 * ******************************************>//
-	 * 
-	 * $RESULT_ID = 12; // ID результата
-	 * ?&gt;
-	 * &lt;form action="" method="POST"&gt;
-	 * &lt;table&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Фотография:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             //<***********************************************************
-	 *                                     Изображение
-	 *             ***********************************************************>//
-	 * 
-	 *             // массив описывающий поле ответа
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 607,   // ID поля для ответа на вопрос "Фотография"
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // попробуем получить параметры загруженного файла
-	 *             if ($arFile = CFormResult::GetFileByAnswerID($RESULT_ID, $arAnswer["ID"])):
-	 *                 // если файл был получен то
-	 *                 if (intval($arFile["USER_FILE_ID"])&gt;0):
-	 *                     // если это изображение то
-	 *                     if ($arFile["USER_FILE_IS_IMAGE"]=="Y") :
-	 *                         // выведем изображение
-	 *                         echo CFile::ShowImage(
-	 *                             $arFile["USER_FILE_ID"], 
-	 *                             0, 
-	 *                             0, 
-	 *                             "border=0", 
-	 *                             "", 
-	 *                             true);
-	 *                     endif;
-	 *                     echo "&lt;br&gt;&lt;br&gt;"; 
-	 *                 endif;
-	 *             endif;
-	 * 
-	 *             // выведем поле для ввода файла
-	 *             echo <b>CForm::GetFileField</b>(
-	 *                 $arAnswer["ID"],
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 "IMAGE",
-	 *                 0,  // максимальный размер файла не ограничен
-	 *                 $arFile["USER_FILE_ID"],
-	 *                 $arAnswer["FIELD_PARAM"]);
-	 * 
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 *     &lt;tr&gt;
-	 *         &lt;td&gt;Резюме:&lt;/td&gt;
-	 *         &lt;td&gt;&lt;?
-	 * 
-	 *             //<***********************************************************
-	 *                                 Произвольный файл
-	 *             ***********************************************************>//
-	 * 
-	 *             // массив описывающий поле ответа
-	 *             // содержит минимально-необходимые поля
-	 *             $arAnswer = array(
-	 *                 "ID"            =&gt; 610,   // ID поля для ответа на вопрос "Резюме"
-	 *                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
-	 *                 "FIELD_PARAM"   =&gt; ""     // параметры поля
-	 *                 );
-	 * 
-	 *             // попробуем получить параметры загруженного файла
-	 *             if ($arFile = CFormResult::GetFileByAnswerID($RESULT_ID, $arAnswer["ID"])):
-	 *                 // если файл был получен то
-	 *                 if (intval($arFile["USER_FILE_ID"])&gt;0):
-	 * 
-	 *                     // выведем информацию о файле
-	 *                     ?&gt;
-	 *                     
-	 *                     &lt;a title="Просмотр файла" target="_blank" class="tablebodylink" href="/bitrix/tools/form_show_file.php?rid=&lt;?=$result_id?&gt;&amp;hash=&lt;?echo $arFile["USER_FILE_HASH"]?&gt;&#9001;=&lt;?=LANGUAGE_ID?&gt;"&gt;&lt;?=htmlspecialchars($arFile["USER_FILE_NAME"])?&gt;&lt;/a&gt;
-	 *                     &amp;nbsp;
-	 *                     (&lt;?
-	 *                     $a = array("b", "Kb", "Mb", "Gb");
-	 *                     $pos = 0;
-	 *                     $size = $arFile["USER_FILE_SIZE"];
-	 *                     while($size&gt;=1024) {$size /= 1024; $pos++;}
-	 *                     echo round($size,2)." ".$a[$pos];
-	 *                     ?&gt;)
-	 *                     &amp;nbsp;&amp;nbsp;
-	 *                     [&amp;nbsp;&lt;a title="&lt;?echo str_replace("#FILE_NAME#", $arFile["USER_FILE_NAME"], "Скачать")?&gt;" class="tablebodylink" href="/bitrix/tools/form_show_file.php?rid=&lt;?=$result_id?&gt;&amp;hash=&lt;?echo $arFile["USER_FILE_HASH"]?&gt;&#9001;=&lt;?=LANGUAGE_ID?&gt;&amp;action=download"&gt;Скачать&lt;/a&gt;&amp;nbsp;]
-	 *                     &lt;br&gt;&lt;br&gt;
-	 *                     
-	 *                     &lt;?
-	 *                 endif;
-	 *             endif;
-	 * 
-	 *             // выведем поле для ввода файла
-	 *             echo <b>CForm::GetFileField</b>(
-	 *                 $arAnswer["ID"],
-	 *                 $arAnswer["FIELD_WIDTH"],
-	 *                 "FILE",
-	 *                 0,  // максимальный размер файла не ограничен
-	 *                 $arFile["USER_FILE_ID"],
-	 *                 $arAnswer["FIELD_PARAM"]);
-	 * 
-	 *             ?&gt;&lt;/td&gt;
-	 *     &lt;/tr&gt;
-	 * &lt;/table&gt;
-	 * &lt;input type="submit" name="save" value="Сохранить"&gt;
-	 * &lt;/form&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getfilebyanswerid.php">CFormResult::GetFileByAnswerID</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getfilefield.php
-	 * @author Bitrix
-	 */
-	public static function GetFileField($FIELD_NAME, $WIDTH="", $FILE_TYPE="IMAGE", $MAX_FILE_SIZE=0, $VALUE="", $PARAM_FILE="", $PARAM_CHECKBOX="")
+	* <p>Возвращает HTML код поля для загрузки файла. Данное поле предназначено для ввода <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "<b>image</b>" или "<b>file</b>".</p> <p>Функция может использоваться как в форме создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, так и в форме редактирования существующего.</p> <p class="note"><b>Примечание</b><br>Имя результирующего HTML поля будет сформировано по следующей маске:<br><b>form_</b><i>file_type</i><b>_</b><i>answer_id</i></p>
+	*
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @param mixed $width = "" Ширина результирующего поля для ввода файла:<br><code> &lt;input type="file"
+	* size="<i>width</i>" ...&gt;</code><br><br>Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $file_type = "IMAGE" Тип файла, допустимы следующие значения: <ul> <li> <b>IMAGE</b> -
+	* изображение; </li> <li> <b>FILE</b> - произвольный файл. </li> </ul> Параметр
+	* необязательный. По умолчанию - "IMAGE" (изображение).
+	*
+	*
+	*
+	* @param int $max_file_size = 0 Максимальный размер загружаемого файла (в байтах).<br><br>Параметр
+	* необязательный. По умолчанию - 0 (без ограничений).
+	*
+	*
+	*
+	* @param mixed $file_id = "" ID загруженного (редактируемого) файла.<br><br>Параметр
+	* необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param string $add_to_file = "class=\"inputfile\"" Произвольный HTML, который будет добавлен в HTML тег поля для
+	* загрузки файла:<br><code> &lt;input type="file" <i>add_to_file</i> ...&gt;</code><br><br>Параметр
+	* необязательный. По умолчанию - "class=\"inputfile\"".
+	*
+	*
+	*
+	* @param string $add_to_checkbox = "class=\"inputcheckbox\"" Произвольный HTML, который будет добавлен в HTML тег флага удаления
+	* редактируемого файла:<br><code> &lt;input type="checkbox" <i>add_to_checkbox</i>
+	* ...&gt;</code><br><br>Параметр необязательный. По умолчанию -
+	* "class=\"inputcheckbox\"".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<******************************************
+	*        Редактирование результата
+	* ******************************************>//
+	* 
+	* $RESULT_ID = 12; // ID результата
+	* ?&gt;
+	* &lt;form action="" method="POST"&gt;
+	* &lt;table&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Фотография:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             //<***********************************************************
+	*                                     Изображение
+	*             ***********************************************************>//
+	* 
+	*             // массив описывающий поле ответа
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 607,   // ID поля для ответа на вопрос "Фотография"
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // попробуем получить параметры загруженного файла
+	*             if ($arFile = CFormResult::GetFileByAnswerID($RESULT_ID, $arAnswer["ID"])):
+	*                 // если файл был получен то
+	*                 if (intval($arFile["USER_FILE_ID"])&gt;0):
+	*                     // если это изображение то
+	*                     if ($arFile["USER_FILE_IS_IMAGE"]=="Y") :
+	*                         // выведем изображение
+	*                         echo CFile::ShowImage(
+	*                             $arFile["USER_FILE_ID"], 
+	*                             0, 
+	*                             0, 
+	*                             "border=0", 
+	*                             "", 
+	*                             true);
+	*                     endif;
+	*                     echo "&lt;br&gt;&lt;br&gt;"; 
+	*                 endif;
+	*             endif;
+	* 
+	*             // выведем поле для ввода файла
+	*             echo <b>CForm::GetFileField</b>(
+	*                 $arAnswer["ID"],
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 "IMAGE",
+	*                 0,  // максимальный размер файла не ограничен
+	*                 $arFile["USER_FILE_ID"],
+	*                 $arAnswer["FIELD_PARAM"]);
+	* 
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	*     &lt;tr&gt;
+	*         &lt;td&gt;Резюме:&lt;/td&gt;
+	*         &lt;td&gt;&lt;?
+	* 
+	*             //<***********************************************************
+	*                                 Произвольный файл
+	*             ***********************************************************>//
+	* 
+	*             // массив описывающий поле ответа
+	*             // содержит минимально-необходимые поля
+	*             $arAnswer = array(
+	*                 "ID"            =&gt; 610,   // ID поля для ответа на вопрос "Резюме"
+	*                 "FIELD_WIDTH"   =&gt; 10,    // ширина поля
+	*                 "FIELD_PARAM"   =&gt; ""     // параметры поля
+	*                 );
+	* 
+	*             // попробуем получить параметры загруженного файла
+	*             if ($arFile = CFormResult::GetFileByAnswerID($RESULT_ID, $arAnswer["ID"])):
+	*                 // если файл был получен то
+	*                 if (intval($arFile["USER_FILE_ID"])&gt;0):
+	* 
+	*                     // выведем информацию о файле
+	*                     ?&gt;
+	*                     
+	*                     &lt;a title="Просмотр файла" target="_blank" class="tablebodylink" href="/bitrix/tools/form_show_file.php?rid=&lt;?=$result_id?&gt;&amp;hash=&lt;?echo $arFile["USER_FILE_HASH"]?&gt;&#9001;=&lt;?=LANGUAGE_ID?&gt;"&gt;&lt;?=htmlspecialchars($arFile["USER_FILE_NAME"])?&gt;&lt;/a&gt;
+	*                     &amp;nbsp;
+	*                     (&lt;?
+	*                     $a = array("b", "Kb", "Mb", "Gb");
+	*                     $pos = 0;
+	*                     $size = $arFile["USER_FILE_SIZE"];
+	*                     while($size&gt;=1024) {$size /= 1024; $pos++;}
+	*                     echo round($size,2)." ".$a[$pos];
+	*                     ?&gt;)
+	*                     &amp;nbsp;&amp;nbsp;
+	*                     [&amp;nbsp;&lt;a title="&lt;?echo str_replace("#FILE_NAME#", $arFile["USER_FILE_NAME"], "Скачать")?&gt;" class="tablebodylink" href="/bitrix/tools/form_show_file.php?rid=&lt;?=$result_id?&gt;&amp;hash=&lt;?echo $arFile["USER_FILE_HASH"]?&gt;&#9001;=&lt;?=LANGUAGE_ID?&gt;&amp;action=download"&gt;Скачать&lt;/a&gt;&amp;nbsp;]
+	*                     &lt;br&gt;&lt;br&gt;
+	*                     
+	*                     &lt;?
+	*                 endif;
+	*             endif;
+	* 
+	*             // выведем поле для ввода файла
+	*             echo <b>CForm::GetFileField</b>(
+	*                 $arAnswer["ID"],
+	*                 $arAnswer["FIELD_WIDTH"],
+	*                 "FILE",
+	*                 0,  // максимальный размер файла не ограничен
+	*                 $arFile["USER_FILE_ID"],
+	*                 $arAnswer["FIELD_PARAM"]);
+	* 
+	*             ?&gt;&lt;/td&gt;
+	*     &lt;/tr&gt;
+	* &lt;/table&gt;
+	* &lt;input type="submit" name="save" value="Сохранить"&gt;
+	* &lt;/form&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getfilebyanswerid.php">CFormResult::GetFileByAnswerID</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getfilefield.php
+	* @author Bitrix
+	*/
+	public static 	function GetFileField($FIELD_NAME, $WIDTH="", $FILE_TYPE="IMAGE", $MAX_FILE_SIZE=0, $VALUE="", $PARAM_FILE="", $PARAM_CHECKBOX="")
 	{
 		global $USER;
 		if (!is_object($USER)) $USER = new CUser;
@@ -3532,173 +3543,173 @@ class CAllForm extends CForm_old
 	}
 
 	// возвращает массивы описывающие поля и вопросы формы
-	
+
 	/**
-	 * <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и поля для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>. Сама функция возвращает ID веб-формы в случае положительного результата, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param array &$form  Массив, содержащий параметры формы. Ключи данного массива: <ul> <li>
-	 * <b>ID</b> - ID веб-формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения; </li> <li> <b>NAME</b> -
-	 * наименование; </li> <li> <b>SID</b> - символьный идентификатор; </li> <li>
-	 * <b>BUTTON</b> - подпись к кнопке при редактировании результата или
-	 * создании нового результата; </li> <li> <b>C_SORT</b> - порядок сортировки;
-	 * </li> <li> <b>IMAGE_ID</b> - ID изображения; </li> <li> <b>DESCRIPTION</b> - описание; </li> <li>
-	 * <b>DESCRIPTION_TYPE</b> - тип описания, допустимы следующие значения: <ul> <li>
-	 * <b>text</b> - текст; </li> <li> <b>html</b> - HTML код. </li> </ul> </li> <li> <b>MAIL_EVENT_TYPE</b> -
-	 * идентификатор типа почтового события; </li> <li> <b>FILTER_RESULT_TEMPLATE</b> -
-	 * путь относительно корня к скрипту, отображающему фильтр по
-	 * результатам веб-форм в административной части модуля; </li> <li>
-	 * <b>TABLE_RESULT_TEMPLATE</b> - путь относительно корня к скрипту,
-	 * отображающему таблицу результатов веб-формы в административной
-	 * части модуля; </li> <li> <b>STAT_EVENT1</b> - идентификатор event1 типа события
-	 * для модуля "Статистика"; </li> <li> <b>STAT_EVENT2</b> - идентификатор event2 типа
-	 * события для модуля "Статистика"; </li> <li> <b>STAT_EVENT3</b> - дополнительный
-	 * параметр event3 события для модуля "Статистика"; </li> <li> <b>QUESTIONS</b> -
-	 * количество вопросов формы; </li> <li> <b>C_FIELDS</b> - количество полей
-	 * формы; </li> <li> <b>STATUSES</b> - количество статусов. </li> </ul> <b>Пример:</b> <pre>
-	 * Array ( [ID] =&gt; 4 [TIMESTAMP_X] =&gt; 18.05.2005 12:17:05 [NAME] =&gt; Анкета посетителя сайта
-	 * [SID] =&gt; ANKETA [BUTTON] =&gt; Сохранить [C_SORT] =&gt; 300 [IMAGE_ID] =&gt; 1053 [DESCRIPTION] =&gt;
-	 * Тестовая форма. [DESCRIPTION_TYPE] =&gt; text [MAIL_EVENT_TYPE] =&gt; FORM_FILLING_ANKETA
-	 * [FILTER_RESULT_TEMPLATE] =&gt; [TABLE_RESULT_TEMPLATE] =&gt; [STAT_EVENT1] =&gt; form [STAT_EVENT2] =&gt; anketa
-	 * [STAT_EVENT3] =&gt; [C_FIELDS] =&gt; 1 [QUESTIONS] =&gt; 6 [STATUSES] =&gt; 4 ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$questions  Массив, содержащий вопросы и поля формы. Ключами данного массива
-	 * являются идентификаторы вопросов/полей, а значениями - массивы,
-	 * каждый из которых описывает один вопрос/поле.<br><br>Ключи массива,
-	 * описывающего один вопрос/поле: <ul> <li> <b>ID</b> - ID вопроса/поля; </li> <li>
-	 * <b>FORM_ID</b> - ID формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения вопроса/поля;
-	 * </li> <li> <b>ACTIVE</b> - флаг активности [Y|N]; </li> <li> <b>TITLE</b> - текст вопроса
-	 * либо заголовок поля; </li> <li> <b>TITLE_TYPE</b> - тип текста; </li> <li> <b>SID</b> -
-	 * символьный идентификатор вопроса/поля; </li> <li> <b>C_SORT</b> - порядок
-	 * сортировки; </li> <li> <b>ADDITIONAL</b> - если <b> Y</b> - то данная запись
-	 * является вопросом; если <b> N</b> - то полем формы; </li> <li> <b>REQUIRED</b> -
-	 * флаг обязательности ответа на вопрос [Y|N]; </li> <li> <b>IN_FILTER</b> - флаг,
-	 * показывающий отражен ли вопрос/поле в фильтре формы результатов
-	 * [Y|N]; </li> <li> <b>IN_RESULTS_TABLE</b> - флаг, показывающий отображается ли
-	 * вопрос/поле в таблице результатов [Y|N]; </li> <li> <b>IN_EXCEL_TABLE</b> - флаг,
-	 * показывающий отображается ли вопрос/поле в Excel-таблице
-	 * результатов [Y|N]; </li> <li> <b>FIELD_TYPE</b> тип поля, возможны следующие
-	 * значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>integer</b> - число; </li> <li> <b>date</b> -
-	 * дата. </li> </ul> </li> <li> <b>IMAGE_ID</b> - ID изображения в описании вопроса; </li>
-	 * <li> <b>COMMENTS</b> - служебный комментарий; </li> <li> <b>FILTER_TITLE</b> - заголовок
-	 * поля фильтра по данному вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> -
-	 * заголовок столбца таблицы результатов. </li> </ul> <b>Пример:</b> <pre> Array (
-	 * [VS_NAME] =&gt; Array ( [ID] =&gt; 140 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 28.08.2003 11:45:57 [ACTIVE] =&gt; Y
-	 * [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html [SID] =&gt; VS_NAME [C_SORT] =&gt; 100
-	 * [ADDITIONAL] =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y [IN_EXCEL_TABLE] =&gt; Y
-	 * [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; ФИО [RESULTS_TABLE_TITLE] =&gt; ФИО )
-	 * [VS_MARRIED] =&gt; Array ( [ID] =&gt; 143 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 11.11.2004 18:13:21 [ACTIVE] =&gt; Y
-	 * [TITLE] =&gt; Вы женаты / замужем ? [TITLE_TYPE] =&gt; text [SID] =&gt; VS_MARRIED [C_SORT] =&gt; 400
-	 * [ADDITIONAL] =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y [IN_EXCEL_TABLE] =&gt; Y
-	 * [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; Семейный статус
-	 * [RESULTS_TABLE_TITLE] =&gt; Семейный статус ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$answers  Массив, содержащие данные по полям для ответа на вопросы
-	 * веб-формы. Ключами данного массива являются идентификаторы
-	 * вопросов, а значениями - массивы, каждый из которых описывает
-	 * набор полей для ответа на вопрос.<br><br>Структура массива,
-	 * описывающего одно поле ответа: <ul> <li> <b>ID</b> - ID поля для ответа; </li>
-	 * <li> <b>FIELD_ID</b> - ID вопроса формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения
-	 * поля; </li> <li> <b>MESSAGE</b> - текст [ANSWER_TEXT]; </li> <li> <b>C_SORT</b> - порядок
-	 * сортировки; </li> <li> <b>ACTIVE</b> - флаг активности [Y|N]; </li> <li> <b>VALUE</b> -
-	 * значение [ANSWER_VALUE]; </li> <li> <b>FIELD_TYPE</b> - тип поля ответа, допустимы
-	 * следующие значения: <ul> <li> <b>text</b> - однострочное текстовое поле; </li>
-	 * <li> <b>textarea</b> - многострочное текстовое поле; </li> <li> <b>radio</b> -
-	 * переключатель одиночного выбора; </li> <li> <b>checkbox</b> - флаг
-	 * множественного выбора; </li> <li> <b>dropdown</b> - элемента выпадающего
-	 * списка одиночного выбора; </li> <li> <b>multiselect</b> - элемента списка
-	 * множественного выбора; </li> <li> <b>date</b> - поле для ввода дата в
-	 * календарем; </li> <li> <b>image</b> - поле для ввода изображения; </li> <li>
-	 * <b>file</b> - поле для ввода произвольного файла; </li> <li> <b>password</b> -
-	 * однострочное поле для ввода пароля. </li> </ul> </li> <li> <b>FIELD_WIDTH</b> -
-	 * ширина поля ответа; </li> <li> <b>FIELD_HEIGHT</b> - высота поля ответа; </li> <li>
-	 * <b>FIELD_PARAM</b> - параметры поля ответа. </li> </ul> <b>Пример</b> <pre> Array ( [VS_NAME]
-	 * =&gt; Array ( [0] =&gt; Array ( [ID] =&gt; 586 [FIELD_ID] =&gt; 140 [TIMESTAMP_X] =&gt; 2003-08-28 11:45:57 [MESSAGE]
-	 * =&gt; [C_SORT] =&gt; 100 [ACTIVE] =&gt; Y [VALUE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50 [FIELD_HEIGHT]
-	 * =&gt; 0 [FIELD_PARAM] =&gt; ) ) [VS_MARRIED] =&gt; Array ( [0] =&gt; Array ( [ID] =&gt; 589 [FIELD_ID] =&gt; 143
-	 * [TIMESTAMP_X] =&gt; 2004-11-11 18:13:21 [MESSAGE] =&gt; да [C_SORT] =&gt; 100 [ACTIVE] =&gt; Y [VALUE] =&gt;
-	 * [FIELD_TYPE] =&gt; radio [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED class="inputradio" )
-	 * [1] =&gt; Array ( [ID] =&gt; 590 [FIELD_ID] =&gt; 143 [TIMESTAMP_X] =&gt; 2004-11-11 18:13:21 [MESSAGE] =&gt; нет
-	 * [C_SORT] =&gt; 200 [ACTIVE] =&gt; Y [VALUE] =&gt; [FIELD_TYPE] =&gt; radio [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0
-	 * [FIELD_PARAM] =&gt; ) ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$dropdown  Массив, предназначенный для построения выпадающих списков
-	 * одиночного выбора; содержит данные по всем полям ответа типа <b>
-	 * dropdown</b>.<br><br><b>Пример:</b> <pre> Array ( [VS_AGE] =&gt; Array ( [reference] =&gt; Array ( [0] =&gt; - [1]
-	 * =&gt; 10-19 [2] =&gt; 20-29 [3] =&gt; 30-39 [4] =&gt; 40-49 [5] =&gt; 50-59 [6] =&gt; 60 и старше )
-	 * [reference_id] =&gt; Array ( [0] =&gt; 608 [1] =&gt; 596 [2] =&gt; 597 [3] =&gt; 598 [4] =&gt; 599 [5] =&gt; 600 [6]
-	 * =&gt; 601 ) [param] =&gt; Array ( [0] =&gt; NOT_ANSWER [1] =&gt; [2] =&gt; SELECTED [3] =&gt; [4] =&gt; [5] =&gt; [6]
-	 * =&gt; ) ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param array &$multiselect  Массив, предназначенный для построения списков множественного
-	 * выбора; содержит данные по всем полям для ответа типа <b>
-	 * multiselect</b>.<br><br><b>Пример:</b> <pre> Array ( [VS_EDUCATION] =&gt; Array ( [reference] =&gt; Array ( [0]
-	 * =&gt; начальное [1] =&gt; средне-специальное [2] =&gt; высшее [3] =&gt; ясли с
-	 * отличием ) [reference_id] =&gt; Array ( [0] =&gt; 602 [1] =&gt; 603 [2] =&gt; 604 [3] =&gt; 605 ) [param] =&gt;
-	 * Array ( [0] =&gt; [1] =&gt; [2] =&gt; SELECTED [3] =&gt; ) ) ... ) </pre>
-	 *
-	 *
-	 *
-	 * @param string $get_fields = "Y" Если значение данного параметра равно "Y", то в массиве
-	 * <i>questions</i>будут представлены только поля формы.<br> Если значение
-	 * равно "" - вопросы и поля формы.<br> В остальных случаях - в массиве
-	 * <i>questions</i>будут описаны только вопросы формы.<br><br> Параметр
-	 * необязательный. По умолчанию - "N" (не добавлять в массив
-	 * <i>questions</i>данные о полях веб-формы).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (<b>CForm::GetDataByID</b>($FORM_ID, 
-	 *     $form, 
-	 *     $questions, 
-	 *     $answers, 
-	 *     $dropdown, 
-	 *     $multiselect))
-	 * {
-	 *     echo "&lt;pre&gt;";
-	 *         print_r($form);
-	 *         print_r($questions);
-	 *         print_r($answers);
-	 *         print_r($dropdown);
-	 *         print_r($multiselect);
-	 *     echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatabyid.php
-	 * @author Bitrix
-	 */
-	public static function GetDataByID($WEB_FORM_ID, &$arForm, &$arQuestions, &$arAnswers, &$arDropDown, &$arMultiSelect, $additional="N", $active="N")
+	* <p>Возвращает массивы, описывающие <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и поля для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>. Сама функция возвращает ID веб-формы в случае положительного результата, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы. С версии 3.3.10 переименован в <i>web_form_id</i>
+	*
+	*
+	*
+	* @param array &$form  Массив, содержащий параметры формы. Ключи данного массива: <ul> <li>
+	* <b>ID</b> - ID веб-формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения; </li> <li> <b>NAME</b> -
+	* наименование; </li> <li> <b>SID</b> - символьный идентификатор; </li> <li>
+	* <b>BUTTON</b> - подпись к кнопке при редактировании результата или
+	* создании нового результата; </li> <li> <b>C_SORT</b> - порядок сортировки;
+	* </li> <li> <b>IMAGE_ID</b> - ID изображения; </li> <li> <b>DESCRIPTION</b> - описание; </li> <li>
+	* <b>DESCRIPTION_TYPE</b> - тип описания, допустимы следующие значения: <ul> <li>
+	* <b>text</b> - текст; </li> <li> <b>html</b> - HTML код. </li> </ul> </li> <li> <b>MAIL_EVENT_TYPE</b> -
+	* идентификатор типа почтового события; </li> <li> <b>FILTER_RESULT_TEMPLATE</b> -
+	* путь относительно корня к скрипту, отображающему фильтр по
+	* результатам веб-форм в административной части модуля; </li> <li>
+	* <b>TABLE_RESULT_TEMPLATE</b> - путь относительно корня к скрипту,
+	* отображающему таблицу результатов веб-формы в административной
+	* части модуля; </li> <li> <b>STAT_EVENT1</b> - идентификатор event1 типа события
+	* для модуля "Статистика"; </li> <li> <b>STAT_EVENT2</b> - идентификатор event2 типа
+	* события для модуля "Статистика"; </li> <li> <b>STAT_EVENT3</b> - дополнительный
+	* параметр event3 события для модуля "Статистика"; </li> <li> <b>QUESTIONS</b> -
+	* количество вопросов формы; </li> <li> <b>C_FIELDS</b> - количество полей
+	* формы; </li> <li> <b>STATUSES</b> - количество статусов. </li> </ul> <b>Пример:</b> <pre>
+	* Array ( [ID] =&gt; 4 [TIMESTAMP_X] =&gt; 18.05.2005 12:17:05 [NAME] =&gt; Анкета посетителя сайта
+	* [SID] =&gt; ANKETA [BUTTON] =&gt; Сохранить [C_SORT] =&gt; 300 [IMAGE_ID] =&gt; 1053 [DESCRIPTION] =&gt;
+	* Тестовая форма. [DESCRIPTION_TYPE] =&gt; text [MAIL_EVENT_TYPE] =&gt; FORM_FILLING_ANKETA
+	* [FILTER_RESULT_TEMPLATE] =&gt; [TABLE_RESULT_TEMPLATE] =&gt; [STAT_EVENT1] =&gt; form [STAT_EVENT2] =&gt; anketa
+	* [STAT_EVENT3] =&gt; [C_FIELDS] =&gt; 1 [QUESTIONS] =&gt; 6 [STATUSES] =&gt; 4 ) </pre>
+	*
+	*
+	*
+	* @param array &$questions  Массив, содержащий вопросы и поля формы. Ключами данного массива
+	* являются идентификаторы вопросов/полей, а значениями - массивы,
+	* каждый из которых описывает один вопрос/поле.<br><br>Ключи массива,
+	* описывающего один вопрос/поле: <ul> <li> <b>ID</b> - ID вопроса/поля; </li> <li>
+	* <b>FORM_ID</b> - ID формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения вопроса/поля;
+	* </li> <li> <b>ACTIVE</b> - флаг активности [Y|N]; </li> <li> <b>TITLE</b> - текст вопроса
+	* либо заголовок поля; </li> <li> <b>TITLE_TYPE</b> - тип текста; </li> <li> <b>SID</b> -
+	* символьный идентификатор вопроса/поля; </li> <li> <b>C_SORT</b> - порядок
+	* сортировки; </li> <li> <b>ADDITIONAL</b> - если <b> Y</b> - то данная запись
+	* является вопросом; если <b> N</b> - то полем формы; </li> <li> <b>REQUIRED</b> -
+	* флаг обязательности ответа на вопрос [Y|N]; </li> <li> <b>IN_FILTER</b> - флаг,
+	* показывающий отражен ли вопрос/поле в фильтре формы результатов
+	* [Y|N]; </li> <li> <b>IN_RESULTS_TABLE</b> - флаг, показывающий отображается ли
+	* вопрос/поле в таблице результатов [Y|N]; </li> <li> <b>IN_EXCEL_TABLE</b> - флаг,
+	* показывающий отображается ли вопрос/поле в Excel-таблице
+	* результатов [Y|N]; </li> <li> <b>FIELD_TYPE</b> тип поля, возможны следующие
+	* значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>integer</b> - число; </li> <li> <b>date</b> -
+	* дата. </li> </ul> </li> <li> <b>IMAGE_ID</b> - ID изображения в описании вопроса; </li>
+	* <li> <b>COMMENTS</b> - служебный комментарий; </li> <li> <b>FILTER_TITLE</b> - заголовок
+	* поля фильтра по данному вопросу/полю; </li> <li> <b>RESULTS_TABLE_TITLE</b> -
+	* заголовок столбца таблицы результатов. </li> </ul> <b>Пример:</b> <pre> Array (
+	* [VS_NAME] =&gt; Array ( [ID] =&gt; 140 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 28.08.2003 11:45:57 [ACTIVE] =&gt; Y
+	* [TITLE] =&gt; Фамилия, имя, отчество [TITLE_TYPE] =&gt; html [SID] =&gt; VS_NAME [C_SORT] =&gt; 100
+	* [ADDITIONAL] =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y [IN_EXCEL_TABLE] =&gt; Y
+	* [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; ФИО [RESULTS_TABLE_TITLE] =&gt; ФИО )
+	* [VS_MARRIED] =&gt; Array ( [ID] =&gt; 143 [FORM_ID] =&gt; 4 [TIMESTAMP_X] =&gt; 11.11.2004 18:13:21 [ACTIVE] =&gt; Y
+	* [TITLE] =&gt; Вы женаты / замужем ? [TITLE_TYPE] =&gt; text [SID] =&gt; VS_MARRIED [C_SORT] =&gt; 400
+	* [ADDITIONAL] =&gt; N [REQUIRED] =&gt; Y [IN_FILTER] =&gt; Y [IN_RESULTS_TABLE] =&gt; Y [IN_EXCEL_TABLE] =&gt; Y
+	* [FIELD_TYPE] =&gt; [IMAGE_ID] =&gt; [COMMENTS] =&gt; [FILTER_TITLE] =&gt; Семейный статус
+	* [RESULTS_TABLE_TITLE] =&gt; Семейный статус ) ... ) </pre>
+	*
+	*
+	*
+	* @param array &$answers  Массив, содержащие данные по полям для ответа на вопросы
+	* веб-формы. Ключами данного массива являются идентификаторы
+	* вопросов, а значениями - массивы, каждый из которых описывает
+	* набор полей для ответа на вопрос.<br><br>Структура массива,
+	* описывающего одно поле ответа: <ul> <li> <b>ID</b> - ID поля для ответа; </li>
+	* <li> <b>FIELD_ID</b> - ID вопроса формы; </li> <li> <b>TIMESTAMP_X</b> - дата изменения
+	* поля; </li> <li> <b>MESSAGE</b> - текст [ANSWER_TEXT]; </li> <li> <b>C_SORT</b> - порядок
+	* сортировки; </li> <li> <b>ACTIVE</b> - флаг активности [Y|N]; </li> <li> <b>VALUE</b> -
+	* значение [ANSWER_VALUE]; </li> <li> <b>FIELD_TYPE</b> - тип поля ответа, допустимы
+	* следующие значения: <ul> <li> <b>text</b> - однострочное текстовое поле; </li>
+	* <li> <b>textarea</b> - многострочное текстовое поле; </li> <li> <b>radio</b> -
+	* переключатель одиночного выбора; </li> <li> <b>checkbox</b> - флаг
+	* множественного выбора; </li> <li> <b>dropdown</b> - элемента выпадающего
+	* списка одиночного выбора; </li> <li> <b>multiselect</b> - элемента списка
+	* множественного выбора; </li> <li> <b>date</b> - поле для ввода дата в
+	* календарем; </li> <li> <b>image</b> - поле для ввода изображения; </li> <li>
+	* <b>file</b> - поле для ввода произвольного файла; </li> <li> <b>password</b> -
+	* однострочное поле для ввода пароля. </li> </ul> </li> <li> <b>FIELD_WIDTH</b> -
+	* ширина поля ответа; </li> <li> <b>FIELD_HEIGHT</b> - высота поля ответа; </li> <li>
+	* <b>FIELD_PARAM</b> - параметры поля ответа. </li> </ul> <b>Пример</b> <pre> Array ( [VS_NAME]
+	* =&gt; Array ( [0] =&gt; Array ( [ID] =&gt; 586 [FIELD_ID] =&gt; 140 [TIMESTAMP_X] =&gt; 2003-08-28 11:45:57 [MESSAGE]
+	* =&gt; [C_SORT] =&gt; 100 [ACTIVE] =&gt; Y [VALUE] =&gt; [FIELD_TYPE] =&gt; text [FIELD_WIDTH] =&gt; 50 [FIELD_HEIGHT]
+	* =&gt; 0 [FIELD_PARAM] =&gt; ) ) [VS_MARRIED] =&gt; Array ( [0] =&gt; Array ( [ID] =&gt; 589 [FIELD_ID] =&gt; 143
+	* [TIMESTAMP_X] =&gt; 2004-11-11 18:13:21 [MESSAGE] =&gt; да [C_SORT] =&gt; 100 [ACTIVE] =&gt; Y [VALUE] =&gt;
+	* [FIELD_TYPE] =&gt; radio [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0 [FIELD_PARAM] =&gt; SELECTED class="inputradio" )
+	* [1] =&gt; Array ( [ID] =&gt; 590 [FIELD_ID] =&gt; 143 [TIMESTAMP_X] =&gt; 2004-11-11 18:13:21 [MESSAGE] =&gt; нет
+	* [C_SORT] =&gt; 200 [ACTIVE] =&gt; Y [VALUE] =&gt; [FIELD_TYPE] =&gt; radio [FIELD_WIDTH] =&gt; 0 [FIELD_HEIGHT] =&gt; 0
+	* [FIELD_PARAM] =&gt; ) ) ... ) </pre>
+	*
+	*
+	*
+	* @param array &$dropdown  Массив, предназначенный для построения выпадающих списков
+	* одиночного выбора; содержит данные по всем полям ответа типа <b>
+	* dropdown</b>.<br><br><b>Пример:</b> <pre> Array ( [VS_AGE] =&gt; Array ( [reference] =&gt; Array ( [0] =&gt; - [1]
+	* =&gt; 10-19 [2] =&gt; 20-29 [3] =&gt; 30-39 [4] =&gt; 40-49 [5] =&gt; 50-59 [6] =&gt; 60 и старше )
+	* [reference_id] =&gt; Array ( [0] =&gt; 608 [1] =&gt; 596 [2] =&gt; 597 [3] =&gt; 598 [4] =&gt; 599 [5] =&gt; 600 [6]
+	* =&gt; 601 ) [param] =&gt; Array ( [0] =&gt; NOT_ANSWER [1] =&gt; [2] =&gt; SELECTED [3] =&gt; [4] =&gt; [5] =&gt; [6]
+	* =&gt; ) ) ... ) </pre>
+	*
+	*
+	*
+	* @param array &$multiselect  Массив, предназначенный для построения списков множественного
+	* выбора; содержит данные по всем полям для ответа типа <b>
+	* multiselect</b>.<br><br><b>Пример:</b> <pre> Array ( [VS_EDUCATION] =&gt; Array ( [reference] =&gt; Array ( [0]
+	* =&gt; начальное [1] =&gt; средне-специальное [2] =&gt; высшее [3] =&gt; ясли с
+	* отличием ) [reference_id] =&gt; Array ( [0] =&gt; 602 [1] =&gt; 603 [2] =&gt; 604 [3] =&gt; 605 ) [param] =&gt;
+	* Array ( [0] =&gt; [1] =&gt; [2] =&gt; SELECTED [3] =&gt; ) ) ... ) </pre>
+	*
+	*
+	*
+	* @param string $get_fields = "Y" Если значение данного параметра равно "Y", то в массиве
+	* <i>questions</i>будут представлены только поля формы.<br> Если значение
+	* равно "" - вопросы и поля формы.<br> В остальных случаях - в массиве
+	* <i>questions</i>будут описаны только вопросы формы.<br><br> Параметр
+	* необязательный. По умолчанию - "N" (не добавлять в массив
+	* <i>questions</i>данные о полях веб-формы).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (<b>CForm::GetDataByID</b>($FORM_ID, 
+	*     $form, 
+	*     $questions, 
+	*     $answers, 
+	*     $dropdown, 
+	*     $multiselect))
+	* {
+	*     echo "&lt;pre&gt;";
+	*         print_r($form);
+	*         print_r($questions);
+	*         print_r($answers);
+	*         print_r($dropdown);
+	*         print_r($multiselect);
+	*     echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatabyid.php
+	* @author Bitrix
+	*/
+	public static 	function GetDataByID($WEB_FORM_ID, &$arForm, &$arQuestions, &$arAnswers, &$arDropDown, &$arMultiSelect, $additional="N", $active="N")
 	{
 		global $strError;
 		$WEB_FORM_ID = intval($WEB_FORM_ID);
@@ -3764,23 +3775,13 @@ class CAllForm extends CForm_old
 			reset($arDropDown);
 			reset($arMultiSelect);
 
-			/*
-			echo "<pre>";
-			print_r($arForm);
-			print_r($arQuestions);
-			print_r($arAnswers);
-			print_r($arDropDown);
-			print_r($arMultiSelect);
-			echo "</pre>";
-			*/
-
 			return $arForm["ID"];
 		}
 		else return false;
 
 	}
 
-	public static function __check_PushError(&$container, $MESSAGE, $key = false)
+public static 	function __check_PushError(&$container, $MESSAGE, $key = false)
 	{
 		if (is_array($container))
 		{
@@ -3791,86 +3792,86 @@ class CAllForm extends CForm_old
 	}
 
 	// check form field values for required fields, date format validation, file type validation, additional validators
-	
+
 	/**
-	 * <p>Функция проверяет введенные значения на обязательность, правильность формата даты и правильность типа файла. При необходимости проверяются права текущего пользователя. В случае неудачи - возвращает текст ошибки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
-	 *
-	 *
-	 *
-	 * @param array $values = false Массив значений введенных в веб-форме.<br>Параметр необязательный.
-	 * По умолчанию - "false" (использовать стандартный массив
-	 * $_REQUEST).<br><br><b>Пример:</b> <pre> Array ( [form_text_586] =&gt; Иванов Иван Иванович
-	 * [form_date_587] =&gt; 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589
-	 * [form_checkbox_VS_INTEREST] =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
-	 * [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
-	 * =&gt; 1045 [form_file_607] =&gt; 1049 ) </pre>
-	 *
-	 *
-	 *
-	 * @param int $result_id = false Если данная функция вызывается для проверки полей при
-	 * редактировании результата, то в данном параметре необходимо
-	 * указать его ID.<br>Параметр необязательный. По умолчанию - "false"
-	 * (новый результат).
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * успешной проверки прав, производимой данной функцией,
-	 * пользователь должен обладать как минимум правом <b>[10] Заполнение
-	 * формы</b> на форму, указанную в параметре <i>form_id</i>. <br> Параметр
-	 * необязательный. По умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @param string $return_array = "N" Если данный параметр не установлен или равен "N", то функция
-	 * возвращает отформатированный список ошибок.<br> Если же
-	 * установлен в "Y", то функция возвращает массив, в котором сообщения
-	 * об ошибках, связанные с конкретными полями, идут с ключом, равным
-	 * строковому идентификатору поля, а остальные - с числовым ключом.
-	 * Например,<br><pre>array( 0 =&gt; "Неверно введено слово с картинки", "test_fld"
-	 * =&gt; "Не указано значение обязательных полей: Первое поле" )</pre>
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // проверим корректность введенных параметров и 
-	 * // права пользователя
-	 * $error = <b>CForm::Check</b>($FORM_ID, $_REQUEST, $RESULT_ID);
-	 * 
-	 * // если функция не вернула текст ошибки, то
-	 * if (strlen($error)&lt;=0) 
-	 * {
-	 *     // обновляем результат
-	 *     CFormResult::Update($RESULT_ID, $_REQUEST);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/check.php
-	 * @author Bitrix
-	 */
-	public static function Check($WEB_FORM_ID, $arrVALUES=false, $RESULT_ID=false, $CHECK_RIGHTS="Y", $RETURN_ARRAY="N")
+	* <p>Функция проверяет введенные значения на обязательность, правильность формата даты и правильность типа файла. При необходимости проверяются права текущего пользователя. В случае неудачи - возвращает текст ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
+	*
+	*
+	*
+	* @param array $values = false Массив значений введенных в веб-форме.<br>Параметр необязательный.
+	* По умолчанию - "false" (использовать стандартный массив
+	* $_REQUEST).<br><br><b>Пример:</b> <pre> Array ( [form_text_586] =&gt; Иванов Иван Иванович
+	* [form_date_587] =&gt; 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589
+	* [form_checkbox_VS_INTEREST] =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
+	* [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
+	* =&gt; 1045 [form_file_607] =&gt; 1049 ) </pre>
+	*
+	*
+	*
+	* @param int $result_id = false Если данная функция вызывается для проверки полей при
+	* редактировании результата, то в данном параметре необходимо
+	* указать его ID.<br>Параметр необязательный. По умолчанию - "false"
+	* (новый результат).
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* успешной проверки прав, производимой данной функцией,
+	* пользователь должен обладать как минимум правом <b>[10] Заполнение
+	* формы</b> на форму, указанную в параметре <i>form_id</i>. <br> Параметр
+	* необязательный. По умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @param string $return_array = "N" Если данный параметр не установлен или равен "N", то функция
+	* возвращает отформатированный список ошибок.<br> Если же
+	* установлен в "Y", то функция возвращает массив, в котором сообщения
+	* об ошибках, связанные с конкретными полями, идут с ключом, равным
+	* строковому идентификатору поля, а остальные - с числовым ключом.
+	* Например,<br><pre>array( 0 =&gt; "Неверно введено слово с картинки", "test_fld"
+	* =&gt; "Не указано значение обязательных полей: Первое поле" )</pre>
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // проверим корректность введенных параметров и 
+	* // права пользователя
+	* $error = <b>CForm::Check</b>($FORM_ID, $_REQUEST, $RESULT_ID);
+	* 
+	* // если функция не вернула текст ошибки, то
+	* if (strlen($error)&lt;=0) 
+	* {
+	*     // обновляем результат
+	*     CFormResult::Update($RESULT_ID, $_REQUEST);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/check.php
+	* @author Bitrix
+	*/
+	public static 	function Check($WEB_FORM_ID, $arrVALUES=false, $RESULT_ID=false, $CHECK_RIGHTS="Y", $RETURN_ARRAY="N")
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: Check<br>Line: ";
 		global $DB, $APPLICATION, $USER, $_REQUEST, $HTTP_POST_VARS, $HTTP_GET_VARS, $HTTP_POST_FILES;
@@ -4181,7 +4182,6 @@ class CAllForm extends CForm_old
 						}
 					}
 
-					//echo "<pre>"; print_r($REQUIRED_FIELDS); echo "</pre>";
 					if (is_array($REQUIRED_FIELDS) && count($REQUIRED_FIELDS)>0)
 					{
 						foreach ($REQUIRED_FIELDS as $key => $value)
@@ -4226,7 +4226,7 @@ class CAllForm extends CForm_old
 	}
 
 	// проверка формы
-	public static function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
+public static 	function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: CheckFields<br>Line: ";
 		global $DB, $strError, $APPLICATION, $USER;
@@ -4293,197 +4293,199 @@ class CAllForm extends CForm_old
 	}
 
 	// добавление/обновление формы
-	
+
 	/**
-	 * <p>Добавляет новую <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> или обновляет заданную. Возвращает ID обновленной или добавленной веб-формы в случае положительного результата, в противном случае - "false".</p> <p class="note"><b>Примечание</b><br>При обновлении существующей веб-формы (или при добавлении новой веб-формы), автоматически <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">обновляется</a> тип почтового события (либо <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">создаётся</a> новый тип).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей; в качестве ключей массива допустимы: <ul> <li>
-	 * <b>NAME</b><font color="red">*</font> - заголовок веб-формы; </li> <li> <b>SID</b><font
-	 * color="red">*</font> - символьный идентификатор веб-формы; </li> <li> <b>C_SORT</b> -
-	 * индекс сортировки; </li> <li> <b>BUTTON</b> - подпись к кнопке при создании
-	 * или редактировании результата; </li> <li> <b>USE_RESTRICTIONS</b> - использовать
-	 * ограничения; </li> <li> <b>RESTRICT_USER</b> - максимальное количество
-	 * результатов от пользователя; </li> <li> <b>RESTRICT_TIME</b> - минимальный
-	 * промежуток времени между результатами; </li> <li> <b>DESCRIPTION</b> -
-	 * описание; </li> <li> <b>DESCRIPTION_TYPE</b> - тип описания, допустимы следующие
-	 * значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>html</b> - HTML код. </li> </ul> </li> <li>
-	 * <b>FILTER_RESULT_TEMPLATE</b> - путь относительно корня к файлу, который будет
-	 * использован для показа фильтра результатов в административной
-	 * части модуля; </li> <li> <b>TABLE_RESULT_TEMPLATE</b> - путь относительно корня к
-	 * файлу, который будет использован для показа таблицы результатов
-	 * в административной части модуля; </li> <li> <b>STAT_EVENT1</b> - идентификатор
-	 * EVENT1 типа события для модуля "Статистика"; </li> <li> <b>STAT_EVENT2</b> -
-	 * идентификатор EVENT2 типа события для модуля "Статистика"; </li> <li>
-	 * <b>STAT_EVENT3</b> - дополнительный параметр события для модуля
-	 * "Статистика"; </li> <li> <b>arIMAGE</b> - массив, описывающий изображение
-	 * веб-формы, допустимы следующие ключи этого массива: <ul> <li> <b>name</b> -
-	 * имя файла; </li> <li> <b>size</b> - размер файла; </li> <li> <b>tmp_name</b> - временный
-	 * путь на сервере; </li> <li> <b>type</b> - тип загружаемого файла; </li> <li> <b>del</b>
-	 * - если значение равно "Y", то изображение будет удалено; </li> <li>
-	 * <b>MODULE_ID</b> - идентификатор модуля "Веб-формы" ("form"). </li> </ul> </li> <li>
-	 * <b>arSITE</b> - массив идентификаторов сайтов, к которым будет
-	 * привязана данная форма: <pre>array("ID_САЙТА_1", "ID_САЙТА_2", ...)</pre> </li> <li>
-	 * <b>arMAIL_TEMPLATE</b> - массив ID почтовых шаблонов, приписанных к данной
-	 * форме: <pre>array("ID_ШАБЛОНА_1", "ID_ШАБЛОНА_2", ...)</pre> </li> <li> <b>arMENU</b> - массив
-	 * заголовков меню, отображаемого в административной части и
-	 * ведущего на результаты данной формы: <pre>array("ID_ЯЗЫКА_1" =&gt; "МЕНЮ_1",
-	 * "ID_ЯЗЫКА_2" =&gt; "МЕНЮ_2", ...)</pre> </li> <li> <b>arGROUP</b> - массив, описывающий
-	 * права групп пользователей на данную веб-форму: <pre>array("ID_ГРУППЫ_1"
-	 * =&gt; "ПРАВО_1", "ID_ГРУППЫ_2" =&gt; "ПРАВО_2", ...)</pre> </li> </ul> <font color="red">*</font> -
-	 * обязательно к заполнению.
-	 *
-	 *
-	 *
-	 * @param mixed $form_id = false ID обновляемой веб-формы.<br><br>Параметр необязательный. По
-	 * умолчанию - "false" (добавление новой веб-формы).
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * обновления параметров веб-формы необходимо иметь право <b>[30]
-	 * Полный доступ</b> на форму, указанную в параметре <i>form_id</i>. Для
-	 * добавления новой веб-формы необходимо иметь право <b>[W] Полный
-	 * доступ</b> на модуль <b>Веб-формы</b>.<br><br>Параметр необязательный. По
-	 * умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //<************************************************
-	 *              Добавление веб-формы
-	 * ************************************************>//
-	 * 
-	 * // создадим массив описывающий изображение 
-	 * // находящееся в файле на сервере
-	 * $arIMAGE = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/web_form.gif");
-	 * $arIMAGE["MODULE_ID"] = "form";
-	 * 
-	 * $arFields = array(
-	 *     "NAME"              =&gt; "Анкета посетителя",
-	 *     "SID"               =&gt; "VISITOR_FORM",
-	 *     "C_SORT"            =&gt; 300,
-	 *     "BUTTON"            =&gt; "Сохранить",
-	 *     "DESCRIPTION"       =&gt; "Заполните пож-та анкету",
-	 *     "DESCRIPTION_TYPE"  =&gt; "text",
-	 *     "STAT_EVENT1"       =&gt; "form",
-	 *     "STAT_EVENT2"       =&gt; "visitor_form",
-	 *     "arSITE"            =&gt; array("r1"),
-	 *     "arMENU"            =&gt; array("ru" =&gt; "Анкета посетителя", "en" =&gt; "Visitor Form"),
-	 *     "arGROUP"           =&gt; array("2" =&gt; "15", "3" =&gt; "20"),
-	 *     "arIMAGE"           =&gt; $arIMAGE
-	 *     );
-	 * 
-	 * // добавим новую веб-форму
-	 * $NEW_ID = <b>CForm::Set</b>($arFields);
-	 * if ($NEW_ID&gt;0) echo "Добавлена веб-форма с ID=".$NEW_ID;
-	 * else // ошибка
-	 * {
-	 *     // выводим текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * // пример обновления веб-формы параметры которой были визуально 
-	 * // отредактированы в административной части
-	 * 
-	 * $w = CGroup::GetList($v1, $v2, Array("ADMIN"=&gt;"N"), $v3);
-	 * $arGroups = array();
-	 * while ($wr=$w-&gt;Fetch()) $arGroups[] = array("ID"=&gt;$wr["ID"], "NAME"=&gt;$wr["NAME"]);
-	 * 
-	 * $z = CLanguage::GetList($v1, $v2, array("ACTIVE" =&gt; "Y"));
-	 * $arFormMenuLang = array();
-	 * while ($zr=$z-&gt;Fetch()) $arFormMenuLang[] = array("LID"=&gt;$zr["LID"], "NAME"=&gt;$zr["NAME"]);
-	 * 
-	 * $rs = CSite::GetList(($by="sort"), ($order="asc"));
-	 * while ($ar = $rs-&gt;Fetch()) 
-	 * {
-	 *     if ($ar["DEF"]=="Y") $def_site_id = $ar["ID"];
-	 *     $arrSites[$ar["ID"]] = $ar;
-	 * }
-	 * 
-	 * if ((strlen($save)&gt;0 || strlen($apply)&gt;0) &amp;&amp; $REQUEST_METHOD=="POST")
-	 * {
-	 *     $arIMAGE_ID = $HTTP_POST_FILES["IMAGE_ID"];
-	 *     $arIMAGE_ID["MODULE_ID"] = "form";
-	 *     $arIMAGE_ID["del"] = ${"IMAGE_ID_del"};
-	 *     $arFields = array(
-	 *         "NAME"                      =&gt; $NAME,
-	 *         "SID"                       =&gt; $SID,
-	 *         "C_SORT"                    =&gt; $C_SORT,
-	 *         "BUTTON"                    =&gt; $BUTTON,
-	 *         "DESCRIPTION"               =&gt; $DESCRIPTION,
-	 *         "DESCRIPTION_TYPE"          =&gt; $DESCRIPTION_TYPE,
-	 *         "FILTER_RESULT_TEMPLATE"    =&gt; $FILTER_RESULT_TEMPLATE,
-	 *         "TABLE_RESULT_TEMPLATE"     =&gt; $TABLE_RESULT_TEMPLATE,
-	 *         "STAT_EVENT1"               =&gt; $STAT_EVENT1,
-	 *         "STAT_EVENT2"               =&gt; $STAT_EVENT2,
-	 *         "STAT_EVENT3"               =&gt; $STAT_EVENT3,
-	 *         "arIMAGE"                   =&gt; $arIMAGE_ID,
-	 *         "arSITE"                    =&gt; $arSITE,
-	 *         "arMAIL_TEMPLATE"           =&gt; $arMAIL_TEMPLATE
-	 *         );
-	 * 
-	 *     // меню
-	 *     $arMENU = array();
-	 *     reset($arFormMenuLang);
-	 *     while (list(,$arrL)=each($arFormMenuLang))
-	 *     {
-	 *         $var = "MENU_".$arrL["LID"];
-	 *         global $$var;
-	 *         $arMENU[$arrL["LID"]] = $$var;
-	 *     }
-	 *     $arFields["arMENU"] = $arMENU;
-	 * 
-	 *     // права доступа
-	 *     $arGROUP = array();
-	 *     reset($arGroups);
-	 *     while (list(,$arrG)=each($arGroups))
-	 *     {
-	 *         $var = "PERMISSION_".$arrG["ID"];
-	 *         global $$var;
-	 *         $arGROUP[$arrG["ID"]] = $$var;
-	 *     }
-	 *     $arFields["arGROUP"] = $arGROUP;
-	 *     
-	 *     if ($ID = <b>CForm::Set</b>($arFields, $ID))
-	 *     {
-	 *         if (strlen($strError)&lt;=0)
-	 *         {
-	 *             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID); 
-	 *             else LocalRedirect("form_edit.php?ID=".$ID."&#9001;=".LANGUAGE_ID);
-	 *         }
-	 *     }
-	 *     $DB-&gt;PrepareFields("b_form");
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a> <br> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php
-	 * @author Bitrix
-	 */
-	public static function Set($arFields, $FORM_ID=false, $CHECK_RIGHTS="Y")
+	* <p>Добавляет новую <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> или обновляет заданную. Возвращает ID обновленной или добавленной веб-формы в случае положительного результата, в противном случае - "false".</p> <p class="note"><b>Примечание</b><br>При обновлении существующей веб-формы (или при добавлении новой веб-формы), автоматически <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">обновляется</a> тип почтового события (либо <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php">создаётся</a> новый тип).</p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей; в качестве ключей массива допустимы: <ul> <li>
+	* <b>NAME</b><font color="red">*</font> - заголовок веб-формы; </li> <li> <b>SID</b><font
+	* color="red">*</font> - символьный идентификатор веб-формы; </li> <li> <b>C_SORT</b> -
+	* индекс сортировки; </li> <li> <b>BUTTON</b> - подпись к кнопке при создании
+	* или редактировании результата; </li> <li> <b>USE_RESTRICTIONS</b> - использовать
+	* ограничения; </li> <li> <b>RESTRICT_USER</b> - максимальное количество
+	* результатов от пользователя; </li> <li> <b>RESTRICT_TIME</b> - минимальный
+	* промежуток времени между результатами; </li> <li> <b>DESCRIPTION</b> -
+	* описание; </li> <li> <b>DESCRIPTION_TYPE</b> - тип описания, допустимы следующие
+	* значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>html</b> - HTML код. </li> </ul> </li> <li>
+	* <b>FILTER_RESULT_TEMPLATE</b> - путь относительно корня к файлу, который будет
+	* использован для показа фильтра результатов в административной
+	* части модуля; </li> <li> <b>TABLE_RESULT_TEMPLATE</b> - путь относительно корня к
+	* файлу, который будет использован для показа таблицы результатов
+	* в административной части модуля; </li> <li> <b>STAT_EVENT1</b> - идентификатор
+	* EVENT1 типа события для модуля "Статистика"; </li> <li> <b>STAT_EVENT2</b> -
+	* идентификатор EVENT2 типа события для модуля "Статистика"; </li> <li>
+	* <b>STAT_EVENT3</b> - дополнительный параметр события для модуля
+	* "Статистика"; </li> <li> <b>arIMAGE</b> - массив, описывающий изображение
+	* веб-формы, допустимы следующие ключи этого массива: <ul> <li> <b>name</b> -
+	* имя файла; </li> <li> <b>size</b> - размер файла; </li> <li> <b>tmp_name</b> - временный
+	* путь на сервере; </li> <li> <b>type</b> - тип загружаемого файла; </li> <li> <b>del</b>
+	* - если значение равно "Y", то изображение будет удалено; </li> <li>
+	* <b>MODULE_ID</b> - идентификатор модуля "Веб-формы" ("form"). </li> </ul> </li> <li>
+	* <b>arSITE</b> - массив идентификаторов сайтов, к которым будет
+	* привязана данная форма: <pre>array("ID_САЙТА_1", "ID_САЙТА_2", ...)</pre> </li> <li>
+	* <b>arMAIL_TEMPLATE</b> - массив ID почтовых шаблонов, приписанных к данной
+	* форме: <pre>array("ID_ШАБЛОНА_1", "ID_ШАБЛОНА_2", ...)</pre> </li> <li> <b>arMENU</b> - массив
+	* заголовков меню, отображаемого в административной части и
+	* ведущего на результаты данной формы: <pre>array("ID_ЯЗЫКА_1" =&gt; "МЕНЮ_1",
+	* "ID_ЯЗЫКА_2" =&gt; "МЕНЮ_2", ...)</pre> </li> <li> <b>arGROUP</b> - массив, описывающий
+	* права групп пользователей на данную веб-форму: <pre>array("ID_ГРУППЫ_1"
+	* =&gt; "ПРАВО_1", "ID_ГРУППЫ_2" =&gt; "ПРАВО_2", ...)</pre> </li> </ul> <font color="red">*</font> -
+	* обязательно к заполнению.
+	*
+	*
+	*
+	* @param mixed $form_id = false ID обновляемой веб-формы.<br><br>Параметр необязательный. По
+	* умолчанию - "false" (добавление новой веб-формы).
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* обновления параметров веб-формы необходимо иметь право <b>[30]
+	* Полный доступ</b> на форму, указанную в параметре <i>form_id</i>. Для
+	* добавления новой веб-формы необходимо иметь право <b>[W] Полный
+	* доступ</b> на модуль <b>Веб-формы</b>.<br><br>Параметр необязательный. По
+	* умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //<************************************************
+	*              Добавление веб-формы
+	* ************************************************>//
+	* 
+	* // создадим массив описывающий изображение 
+	* // находящееся в файле на сервере
+	* $arIMAGE = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/web_form.gif");
+	* $arIMAGE["MODULE_ID"] = "form";
+	* 
+	* $arFields = array(
+	*     "NAME"              =&gt; "Анкета посетителя",
+	*     "SID"               =&gt; "VISITOR_FORM",
+	*     "C_SORT"            =&gt; 300,
+	*     "BUTTON"            =&gt; "Сохранить",
+	*     "DESCRIPTION"       =&gt; "Заполните пож-та анкету",
+	*     "DESCRIPTION_TYPE"  =&gt; "text",
+	*     "STAT_EVENT1"       =&gt; "form",
+	*     "STAT_EVENT2"       =&gt; "visitor_form",
+	*     "arSITE"            =&gt; array("r1"),
+	*     "arMENU"            =&gt; array("ru" =&gt; "Анкета посетителя", "en" =&gt; "Visitor Form"),
+	*     "arGROUP"           =&gt; array("2" =&gt; "15", "3" =&gt; "20"),
+	*     "arIMAGE"           =&gt; $arIMAGE
+	*     );
+	* 
+	* // добавим новую веб-форму
+	* $NEW_ID = <b>CForm::Set</b>($arFields);
+	* if ($NEW_ID&gt;0) echo "Добавлена веб-форма с ID=".$NEW_ID;
+	* else // ошибка
+	* {
+	*     // выводим текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* 
+	* 
+	* 
+	* &lt;?
+	* // пример обновления веб-формы параметры которой были визуально 
+	* // отредактированы в административной части
+	* 
+	* $w = CGroup::GetList($v1, $v2, Array("ADMIN"=&gt;"N"), $v3);
+	* $arGroups = array();
+	* while ($wr=$w-&gt;Fetch()) $arGroups[] = array("ID"=&gt;$wr["ID"], "NAME"=&gt;$wr["NAME"]);
+	* 
+	* $z = CLanguage::GetList($v1, $v2, array("ACTIVE" =&gt; "Y"));
+	* $arFormMenuLang = array();
+	* while ($zr=$z-&gt;Fetch()) $arFormMenuLang[] = array("LID"=&gt;$zr["LID"], "NAME"=&gt;$zr["NAME"]);
+	* 
+	* $rs = CSite::GetList(($by="sort"), ($order="asc"));
+	* while ($ar = $rs-&gt;Fetch()) 
+	* {
+	*     if ($ar["DEF"]=="Y") $def_site_id = $ar["ID"];
+	*     $arrSites[$ar["ID"]] = $ar;
+	* }
+	* 
+	* if ((strlen($save)&gt;0 || strlen($apply)&gt;0) &amp;&amp; $REQUEST_METHOD=="POST")
+	* {
+	*     $arIMAGE_ID = $HTTP_POST_FILES["IMAGE_ID"];
+	*     $arIMAGE_ID["MODULE_ID"] = "form";
+	*     $arIMAGE_ID["del"] = ${"IMAGE_ID_del"};
+	*     $arFields = array(
+	*         "NAME"                      =&gt; $NAME,
+	*         "SID"                       =&gt; $SID,
+	*         "C_SORT"                    =&gt; $C_SORT,
+	*         "BUTTON"                    =&gt; $BUTTON,
+	*         "DESCRIPTION"               =&gt; $DESCRIPTION,
+	*         "DESCRIPTION_TYPE"          =&gt; $DESCRIPTION_TYPE,
+	*         "FILTER_RESULT_TEMPLATE"    =&gt; $FILTER_RESULT_TEMPLATE,
+	*         "TABLE_RESULT_TEMPLATE"     =&gt; $TABLE_RESULT_TEMPLATE,
+	*         "STAT_EVENT1"               =&gt; $STAT_EVENT1,
+	*         "STAT_EVENT2"               =&gt; $STAT_EVENT2,
+	*         "STAT_EVENT3"               =&gt; $STAT_EVENT3,
+	*         "arIMAGE"                   =&gt; $arIMAGE_ID,
+	*         "arSITE"                    =&gt; $arSITE,
+	*         "arMAIL_TEMPLATE"           =&gt; $arMAIL_TEMPLATE
+	*         );
+	* 
+	*     // меню
+	*     $arMENU = array();
+	*     reset($arFormMenuLang);
+	*     while (list(,$arrL)=each($arFormMenuLang))
+	*     {
+	*         $var = "MENU_".$arrL["LID"];
+	*         global $$var;
+	*         $arMENU[$arrL["LID"]] = $$var;
+	*     }
+	*     $arFields["arMENU"] = $arMENU;
+	* 
+	*     // права доступа
+	*     $arGROUP = array();
+	*     reset($arGroups);
+	*     while (list(,$arrG)=each($arGroups))
+	*     {
+	*         $var = "PERMISSION_".$arrG["ID"];
+	*         global $$var;
+	*         $arGROUP[$arrG["ID"]] = $$var;
+	*     }
+	*     $arFields["arGROUP"] = $arGROUP;
+	*     
+	*     if ($ID = <b>CForm::Set</b>($arFields, $ID))
+	*     {
+	*         if (strlen($strError)&lt;=0)
+	*         {
+	*             if (strlen($save)&gt;0) LocalRedirect("form_list.php?lang=".LANGUAGE_ID); 
+	*             else LocalRedirect("form_edit.php?ID=".$ID."&#9001;=".LANGUAGE_ID);
+	*         }
+	*     }
+	*     $DB-&gt;PrepareFields("b_form");
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a> <br> </li> </ul>
+	* <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php
+	* @author Bitrix
+	*/
+	public static 	function Set($arFields, $FORM_ID=false, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: Set<br>Line: ";
 		global $DB, $USER, $strError, $APPLICATION;
@@ -4710,61 +4712,61 @@ class CAllForm extends CForm_old
 	}
 
 	// копирует веб-форму
-	
+
 	/**
-	 * <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> с ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. Возвращает ID новой веб-формы в случае положительного результата, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID формы.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * копирования веб-формы необходимо право <b>[W] Полный доступ" на
-	 * модуль "Веб-формы</b><b>"</b>. <br>Параметр необязательный. По умолчанию
-	 * - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4;
-	 * // скопируем веб-форму
-	 * if ($NEW_FORM_ID=<b>CForm::Copy</b>($FORM_ID))
-	 * {
-	 *     echo "Веб-форма #4 успешно скопирована в новую веб-форму #".$NEW_FORM_ID;
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php">CFormStatus::Copy</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/copy.php
-	 * @author Bitrix
-	 */
-	public static function Copy($ID, $CHECK_RIGHTS="Y")
+	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> с ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a>, <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. Возвращает ID новой веб-формы в случае положительного результата, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID формы.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* копирования веб-формы необходимо право <b>[W] Полный доступ" на
+	* модуль "Веб-формы</b><b>"</b>. <br>Параметр необязательный. По умолчанию
+	* - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4;
+	* // скопируем веб-форму
+	* if ($NEW_FORM_ID=<b>CForm::Copy</b>($FORM_ID))
+	* {
+	*     echo "Веб-форма #4 успешно скопирована в новую веб-форму #".$NEW_FORM_ID;
+	* }
+	* else
+	* {
+	*     // выведем текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php">CFormStatus::Copy</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/copy.php
+	* @author Bitrix
+	*/
+	public static 	function Copy($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $APPLICATION, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: Copy<br>Line: ";
@@ -4853,62 +4855,62 @@ class CAllForm extends CForm_old
 	}
 
 	// delete web-form
-	
+
 	/**
-	 * <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> со всеми ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * удаления веб-формы необходимо иметь право <b>[W] Полный доступ на
-	 * модуль "Веб-формы"</b>. <br>Параметр необязательный. По умолчанию - "Y"
-	 * (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4;
-	 * // удалим веб-форму
-	 * if (<b>CForm::Delete</b>($FORM_ID))
-	 * {
-	 *     echo "Веб-форма #4 удалена.";
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php
-	 * @author Bitrix
-	 */
-	public static function Delete($ID, $CHECK_RIGHTS="Y")
+	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форму</a> со всеми ее <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* удаления веб-формы необходимо иметь право <b>[W] Полный доступ на
+	* модуль "Веб-формы"</b>. <br>Параметр необязательный. По умолчанию - "Y"
+	* (права необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4;
+	* // удалим веб-форму
+	* if (<b>CForm::Delete</b>($FORM_ID))
+	* {
+	*     echo "Веб-форма #4 удалена.";
+	* }
+	* else
+	* {
+	*     // выведем текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php
+	* @author Bitrix
+	*/
+	public static 	function Delete($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: Delete<br>Line: ";
@@ -4974,62 +4976,62 @@ class CAllForm extends CForm_old
 	}
 
 	// удаляем результаты формы
-	
+
 	/**
-	 * <p>Удаляет все <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результаты</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	 * </ul> Для удаления всех результатов веб-формы необходимо иметь <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
-	 * доступ</b> на форму, указанную в параметре <i>form_id</i>.<br><br>Параметр
-	 * необязательный. По умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4;
-	 * // удалим результаты веб-формы
-	 * if (<b>CForm::Reset</b>($FORM_ID))
-	 * {
-	 *     echo "Результаты веб-формы #4 удалены.";
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/reset.php">CFormResult::Reset</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/reset.php
-	 * @author Bitrix
-	 */
-	public static function Reset($ID, $CHECK_RIGHTS="Y")
+	* <p>Удаляет все <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результаты</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
+	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
+	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> Для удаления всех результатов веб-формы необходимо иметь <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	* доступ</b> на форму, указанную в параметре <i>form_id</i>.<br><br>Параметр
+	* необязательный. По умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4;
+	* // удалим результаты веб-формы
+	* if (<b>CForm::Reset</b>($FORM_ID))
+	* {
+	*     echo "Результаты веб-формы #4 удалены.";
+	* }
+	* else
+	* {
+	*     // выведем текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/reset.php">CFormResult::Reset</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/reset.php
+	* @author Bitrix
+	*/
+	public static 	function Reset($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: Reset<br>Line: ";
@@ -5053,65 +5055,65 @@ class CAllForm extends CForm_old
 	}
 
 	// создает тип почтового события и шаблон на языке формы
-	
+
 	/**
-	 * <p>Создает или обновляет тип почтового события для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. При необходимости могут быть созданы почтовые шаблоны. Функция возвращает массив идентификаторов новых почтовых шаблонов, если они были созданы.</p> <p class="note"><b>Примечание</b><br>При создании нового типа почтового события, символьный идентификатор этого типа задается в виде <b>FORM_FILLING_</b><i>символьный ID веб-формы</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы, для которой необходимо создать или обновить тип
-	 * почтового события.
-	 *
-	 *
-	 *
-	 * @param string $add_template = "Y" Если значение равно "Y", то будут созданы почтовые шаблоны для
-	 * обновленного или вновь созданного типа почтового
-	 * события.<br><br>Параметр необязательный. По умолчанию - "Y" (создать
-	 * почтовые шаблоны).
-	 *
-	 *
-	 *
-	 * @param string $old_form_sid = "" Если в данном параметре будет задан символьный идентификатор
-	 * веб-формы, то все почтовые шаблоны, принадлежащие этой веб-форме,
-	 * будут приписаны к вновь созданному типу почтового события.
-	 * Данный параметр используется, как правило, при редактировании
-	 * веб-формы в момент смены символьного
-	 * идентификатора.<br><br>Параметр необязательный. По умолчанию - "" (не
-	 * приписывать почтовые шаблоны к новому типу почтового события).
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // добавляем для веб-формы новый типа почтового события
-	 * // при этом создаем почтовые шаблоны
-	 * 
-	 * $arTemplates = <b>CForm::SetMailTemplate</b>($FORM_ID);
-	 * 
-	 * // приписываем вновь созданные почтовые шаблоны данной веб-форме
-	 * 
-	 * CForm::Set(array("arMAIL_TEMPLATE" = $arTemplates), $FORM_ID);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php
-	 * @author Bitrix
-	 */
-	public static function SetMailTemplate($WEB_FORM_ID, $ADD_NEW_TEMPLATE="Y", $old_SID="", $bReturnFullInfo = false)
+	* <p>Создает или обновляет тип почтового события для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>. При необходимости могут быть созданы почтовые шаблоны. Функция возвращает массив идентификаторов новых почтовых шаблонов, если они были созданы.</p> <p class="note"><b>Примечание</b><br>При создании нового типа почтового события, символьный идентификатор этого типа задается в виде <b>FORM_FILLING_</b><i>символьный ID веб-формы</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы, для которой необходимо создать или обновить тип
+	* почтового события.
+	*
+	*
+	*
+	* @param string $add_template = "Y" Если значение равно "Y", то будут созданы почтовые шаблоны для
+	* обновленного или вновь созданного типа почтового
+	* события.<br><br>Параметр необязательный. По умолчанию - "Y" (создать
+	* почтовые шаблоны).
+	*
+	*
+	*
+	* @param string $old_form_sid = "" Если в данном параметре будет задан символьный идентификатор
+	* веб-формы, то все почтовые шаблоны, принадлежащие этой веб-форме,
+	* будут приписаны к вновь созданному типу почтового события.
+	* Данный параметр используется, как правило, при редактировании
+	* веб-формы в момент смены символьного
+	* идентификатора.<br><br>Параметр необязательный. По умолчанию - "" (не
+	* приписывать почтовые шаблоны к новому типу почтового события).
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // добавляем для веб-формы новый типа почтового события
+	* // при этом создаем почтовые шаблоны
+	* 
+	* $arTemplates = <b>CForm::SetMailTemplate</b>($FORM_ID);
+	* 
+	* // приписываем вновь созданные почтовые шаблоны данной веб-форме
+	* 
+	* CForm::Set(array("arMAIL_TEMPLATE" = $arTemplates), $FORM_ID);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul> </h<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/setmailtemplate.php
+	* @author Bitrix
+	*/
+	public static 	function SetMailTemplate($WEB_FORM_ID, $ADD_NEW_TEMPLATE="Y", $old_SID="", $bReturnFullInfo = false)
 	{
 		global $DB, $MESS, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: SetMailTemplates<br>Line: ";
@@ -5149,7 +5151,7 @@ class CAllForm extends CForm_old
 				$str .= "#RS_STAT_SESSION_ID# - ".GetMessage("FORM_L_STAT_SESSION_ID")."\n";
 
 				$strFIELDS = "";
-				$w = CFormField::GetList($WEB_FORM_ID,"ALL", $by, $order, array(), $is_filtered);
+				$w = CFormField::GetList($WEB_FORM_ID,"ALL", $by, $order, array("ACTIVE" => "Y"), $is_filtered);
 				while ($wr=$w->Fetch())
 				{
 					if (strlen($wr["RESULTS_TABLE_TITLE"])>0)
@@ -5250,44 +5252,44 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 		return $arrReturn;
 	}
 
-	
+
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $form_sid  
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_SID = "ANKETA";
-	 * $rsForm = <b>CForm::GetBySID</b>($FORM_SID);
-	 * $arForm = $rsForm-&gt;Fetch();
-	 * echo "&lt;pre&gt;"; print_r($arForm); echo "&lt;/pre";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbysid.php
-	 * @author Bitrix
-	 */
-	public static function GetBySID($SID)
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $form_sid  
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_SID = "ANKETA";
+	* $rsForm = <b>CForm::GetBySID</b>($FORM_SID);
+	* $arForm = $rsForm-&gt;Fetch();
+	* echo "&lt;pre&gt;"; print_r($arForm); echo "&lt;/pre";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbyid.php">CForm::GetByID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getlist.php">CForm::GetList</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getbysid.php
+	* @author Bitrix
+	*/
+	public static 	function GetBySID($SID)
 	{ return CForm::GetByID($SID, "Y"); }
 
 	/**
@@ -5297,7 +5299,7 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 	 * @param string $tpl
 	 * @return bool
 	 */
-	public static function isFieldInTemplate($FIELD_SID, $tpl)
+	funpublic static ction isFieldInTemplate($FIELD_SID, $tpl)
 	{
 		$check_str1 = '$FORM->ShowInput(\''.$FIELD_SID.'\')';
 		$check_str2 = '$FORM->ShowInput("'.$FIELD_SID.'")';
@@ -5313,7 +5315,7 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 	 * @param string $tpl
 	 * @return bool
 	 */
-	public static function isCAPTCHAInTemplate($tpl)
+public static 	function isCAPTCHAInTemplate($tpl)
 	{
 		$check_str = '$FORM->ShowCaptcha';
 
@@ -5321,7 +5323,7 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 
 	}
 
-	public static function GetByID_admin($WEB_FORM_ID, $current_section = false)
+public static 	function GetByID_admin($WEB_FORM_ID, $current_section = false)
 	{
 		$WEB_FORM_ID = intval($WEB_FORM_ID);
 		if ($WEB_FORM_ID <= 0)

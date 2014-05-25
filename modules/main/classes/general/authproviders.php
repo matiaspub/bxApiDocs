@@ -87,13 +87,10 @@ class CGroupAuthProvider extends CAuthProvider implements IProviderInterface
 		return true;
 	}
 	
-	public static function OnAfterUserUpdate(&$arFields)
+	public static function OnAfterSetUserGroup($USER_ID)
 	{
-		if(array_key_exists("GROUP_ID", $arFields))
-		{
-			$provider = new CGroupAuthProvider();
-			$provider->DeleteByUser($arFields["ID"]);
-		}
+		$provider = new CGroupAuthProvider();
+		$provider->DeleteByUser($USER_ID);
 	}
 
 	public static function OnUserLogin($USER_ID)
@@ -125,7 +122,7 @@ class CGroupAuthProvider extends CAuthProvider implements IProviderInterface
 		CAccess::ClearStat(self::ID);
 	}
 
-	public function AjaxRequest($arParams=false)
+	public function AjaxRequest()
 	{
 		global $USER;
 		if(!$USER->CanDoOperation('view_groups'))
@@ -248,7 +245,7 @@ class CUserAuthProvider extends CAuthProvider implements IProviderInterface
 		");
 	}
 	
-	public function AjaxRequest($arParams=false)
+	public function AjaxRequest()
 	{
 		global $USER;
 		if(!$USER->CanDoOperation('view_all_users'))
@@ -283,6 +280,10 @@ class CUserAuthProvider extends CAuthProvider implements IProviderInterface
 	public function GetFormHtml($arParams=false)
 	{
 		global $USER;
+
+		if(is_array($arParams["user"]) && $arParams["user"]["disabled"] == "true")
+			return false;
+
 		if(!$USER->CanDoOperation('view_all_users'))
 			return false;
 

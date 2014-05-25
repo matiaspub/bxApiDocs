@@ -3,8 +3,6 @@ namespace Bitrix\Main;
 
 abstract class Response
 {
-	private $buffer;
-
 	/**
 	 * @var Context
 	 */

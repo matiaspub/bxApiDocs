@@ -5,6 +5,11 @@
 define('CURRENCY_CACHE_DEFAULT_TIME', 10800);
 
 /**
+ * CURRENCY_ISO_STANDART_URL
+ */
+define('CURRENCY_ISO_STANDART_URL', 'http://www.iso.org/iso/home/standards/currency_codes.htm');
+
+/**
  * ADMIN_MODULE_NAME
  */
 define('ADMIN_MODULE_NAME', "currency");

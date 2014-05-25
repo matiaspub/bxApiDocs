@@ -716,19 +716,19 @@ class CSocNetSearch
 
 		case intval($this->_params["PHOTO_GROUP_IBLOCK_ID"]):
 			$path_template = trim($this->_params["PATH_TO_GROUP_PHOTO_ELEMENT"]);
- 			if(strlen($path_template))
+			if(strlen($path_template))
 				$this->IndexIBlockElement($arFields, $this->_group_id, "G", "photo", "view", $path_template, array("PREVIEW_TEXT"));
 			break;
 
 		case intval($this->_params["PHOTO_USER_IBLOCK_ID"]):
 			$path_template = trim($this->_params["PATH_TO_USER_PHOTO_ELEMENT"]);
- 			if(strlen($path_template))
+			if(strlen($path_template))
 				$this->IndexIBlockElement($arFields, $this->_user_id, "U", "photo", "view", $path_template, array("PREVIEW_TEXT"));
 			break;
 
 		case intval($this->_params["CALENDAR_GROUP_IBLOCK_ID"]):
 			$path_template = trim($this->_params["PATH_TO_GROUP_CALENDAR_ELEMENT"]);
- 			if(strlen($path_template))
+			if(strlen($path_template))
 				$this->IndexIBlockElement($arFields, $this->_group_id, "G", "calendar", "view", $path_template, array("DETAIL_TEXT"));
 			break;
 
@@ -770,7 +770,7 @@ class CSocNetSearch
 
 		case intval($this->_params["FILES_GROUP_IBLOCK_ID"]):
 			$path_template = trim($this->_params["PATH_TO_GROUP_FILES_ELEMENT"]);
- 			if(strlen($path_template))
+			if(strlen($path_template))
 			{
 				$property = strtoupper(trim($this->_params["FILES_PROPERTY_CODE"]));
 				if(strlen($property) <= 0)
@@ -796,7 +796,7 @@ class CSocNetSearch
 
 		case intval($this->_params["FILES_USER_IBLOCK_ID"]):
 			$path_template = trim($this->_params["PATH_TO_USER_FILES_ELEMENT"]);
- 			if(strlen($path_template))
+			if(strlen($path_template))
 			{
 				$property = strtoupper(trim($this->_params["FILES_PROPERTY_CODE"]));
 				if(strlen($property) <= 0)
@@ -937,16 +937,17 @@ class CSocNetSearch
 
 	public static function OnBeforeIndexUpdate($ID, $arFields)
 	{
+		if (isset($arFields["PARAMS"]) && is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
+		{
+			CBitrixComponent::clearComponentCache("bitrix:search.tags.cloud");
+		}
 	}
 
 	public static function OnAfterIndexAdd($ID, $arFields)
 	{
 		if (isset($arFields["PARAMS"]) && is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
 		{
-			$arSiteID = array_keys($arFields["SITE_ID"]);
-
-			foreach ($arSiteID as $siteID)
-				BXClearCache(true, "/".$siteID."/bitrix/search.tags.cloud/");
+			CBitrixComponent::clearComponentCache("bitrix:search.tags.cloud");
 		}
 	}
 }

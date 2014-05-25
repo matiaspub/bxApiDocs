@@ -252,7 +252,7 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 		{
 			return $arControlList;
 		}
-		elseif (array_key_exists($strControlID, $arControlList))
+		elseif (isset($arControlList[$strControlID]))
 		{
 			return $arControlList[$strControlID];
 		}
@@ -532,7 +532,7 @@ class CCatalogCondCtrlBasketProductProps extends CGlobalCondCtrlComplex
 		{
 			return $arControlList;
 		}
-		elseif (array_key_exists($strControlID, $arControlList))
+		elseif (isset($arControlList[$strControlID]))
 		{
 			return $arControlList[$strControlID];
 		}

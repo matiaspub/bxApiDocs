@@ -143,11 +143,15 @@ interface ILearnGraphRelation
  *
  * @access private
  */
-abstract class CLearnGraphRelation implements ILearnGraphRelation
+final class CLearnGraphRelation implements ILearnGraphRelation
 {
 	// For bitmask:
 	const NBRS_IMDT_PARENTS = 0x1;		// immediate parent neighbours
 	const NBRS_IMDT_CHILDS  = 0x2;		// immediate child neighbours
+
+	private static $arNodesCache = array();
+	private static $nodesCached = 0;
+
 
 	public static function ListImmediateParents ($nodeId)
 	{
@@ -187,29 +191,42 @@ abstract class CLearnGraphRelation implements ILearnGraphRelation
 				LearnException::EXC_ERR_GR_GET_NEIGHBOURS | LearnException::EXC_ERR_ALL_LOGIC);
 		}
 
-		// Get graph edge
-		$rc = $DB->Query (
-			"SELECT SOURCE_NODE, TARGET_NODE, SORT
-			FROM b_learn_lesson_edges
-			WHERE " . $sqlWhere,
-			$ignore_errors = true);
-
-		if ($rc === false)
-			throw new LearnException ('EA_SQLERROR', LearnException::EXC_ERR_GR_GET_NEIGHBOURS);
-
-		$result = array();
-
-		// Postprocessing of result
-		while ($arData = $rc->Fetch())
+		if ( ! array_key_exists($sqlWhere, self::$arNodesCache) )
 		{
-			$result[] = array (
-				'SOURCE_NODE'   => $arData['SOURCE_NODE'],
-				'TARGET_NODE'   => $arData['TARGET_NODE'],
-				'PARENT_LESSON' => $arData['SOURCE_NODE'],
-				'CHILD_LESSON'  => $arData['TARGET_NODE'],
-				'SORT'          => (int) $arData['SORT']
+			// Get graph edge
+			$rc = $DB->Query (
+				"SELECT SOURCE_NODE, TARGET_NODE, SORT
+				FROM b_learn_lesson_edges
+				WHERE " . $sqlWhere,
+				$ignore_errors = true);
+
+			if ($rc === false)
+				throw new LearnException ('EA_SQLERROR', LearnException::EXC_ERR_GR_GET_NEIGHBOURS);
+
+			$result = array();
+
+			// Postprocessing of result
+			while ($arData = $rc->Fetch())
+			{
+				$result[] = array (
+					'SOURCE_NODE'   => $arData['SOURCE_NODE'],
+					'TARGET_NODE'   => $arData['TARGET_NODE'],
+					'PARENT_LESSON' => $arData['SOURCE_NODE'],
+					'CHILD_LESSON'  => $arData['TARGET_NODE'],
+					'SORT'          => (int) $arData['SORT']
 				);
+			}
+
+			// limit static cache size to 1024 nodes
+			if (self::$nodesCached < 1024)
+			{
+				++self::$nodesCached;
+				self::$arNodesCache[$sqlWhere] = $result;
+			}
 		}
+		else
+			$result = self::$arNodesCache[$sqlWhere];
+
 
 		return ($result);
 	}
@@ -217,6 +234,10 @@ abstract class CLearnGraphRelation implements ILearnGraphRelation
 	public static function Link ($parentNodeId, $childNodeId, $arProperties)
 	{
 		global $DB;
+
+		// reset static cache
+		self::$arNodesCache = array();
+		self::$nodesCached = 0;
 
 		$args_check = is_array($arProperties) 	// must be an array
 			&& (count($arProperties) === 1)
@@ -261,6 +282,10 @@ abstract class CLearnGraphRelation implements ILearnGraphRelation
 	{
 		global $DB;
 
+		// reset static cache
+		self::$arNodesCache = array();
+		self::$nodesCached = 0;
+
 		$args_check = ($parentNodeId > 0) && ($childNodeId > 0);
 
 		if ( ! $args_check )
@@ -286,6 +311,10 @@ abstract class CLearnGraphRelation implements ILearnGraphRelation
 	public static function SetProperty ($parentNodeId, $childNodeId, $propertyName, $value)
 	{
 		global $DB;
+
+		// reset static cache
+		self::$arNodesCache = array();
+		self::$nodesCached = 0;
 
 		$args_check = ($parentNodeId > 0) && ($childNodeId > 0)
 			&& ( in_array ($propertyName, array('SORT'), true) );

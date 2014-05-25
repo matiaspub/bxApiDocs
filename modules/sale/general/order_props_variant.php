@@ -18,41 +18,41 @@ class CAllSaleOrderPropsVariant
 {
 	
 	/**
-	 * <p>Функция возвращает параметры варианта значения свойства заказа по коду свойства заказа и значению.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $PropID  Код свойства заказа.
-	 *
-	 *
-	 *
-	 * @param string $Value  Значение свойства.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив значений параметров заказа
-	 * с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Код</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код варианта значения свойства заказа.</td> </tr> <tr>
-	 * <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название
-	 * варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение варианта.</td> </tr> <tr> <td>SORT</td>
-	 * <td>Индекс сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание варианта
-	 * значения свойства заказа.</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arVal = CSaleOrderPropsVariant::GetByValue(12, "F");
-	 * echo $arVal["NAME"];
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getbyvalue.48f24a76.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры варианта значения свойства заказа по коду свойства заказа и значению.</p>
+	*
+	*
+	*
+	*
+	* @param int $PropID  Код свойства заказа. </ht
+	*
+	*
+	*
+	* @param string $Value  Значение свойства. </h
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив значений параметров заказа
+	* с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Код</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код варианта значения свойства заказа.</td> </tr> <tr>
+	* <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название
+	* варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение варианта.</td> </tr> <tr> <td>SORT</td>
+	* <td>Индекс сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание варианта
+	* значения свойства заказа.</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arVal = CSaleOrderPropsVariant::GetByValue(12, "F");
+	* echo $arVal["NAME"];
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getbyvalue.48f24a76.php
+	* @author Bitrix
+	*/
 	public static function GetByValue($PropID, $Value)
 	{
 		$PropID = IntVal($PropID);
@@ -66,27 +66,27 @@ class CAllSaleOrderPropsVariant
 
 	
 	/**
-	 * <p>Функция возвращает параметры варианта с кодом ID значения свойства заказа.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код варианта значения свойства заказа.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив значений параметров заказа
-	 * с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Код</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код варианта значения свойства заказа.</td> </tr> <tr>
-	 * <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название
-	 * варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение варианта.</td> </tr> <tr> <td>SORT</td>
-	 * <td>Индекс сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание варианта
-	 * значения свойства заказа.</td> </tr> </table><p>  </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getbyid.4e5836a2.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры варианта с кодом ID значения свойства заказа.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код варианта значения свойства заказа.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив значений параметров заказа
+	* с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Код</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код варианта значения свойства заказа.</td> </tr> <tr>
+	* <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название
+	* варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение варианта.</td> </tr> <tr> <td>SORT</td>
+	* <td>Индекс сортировки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание варианта
+	* значения свойства заказа.</td> </tr> </table> <p>  </p
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getbyid.4e5836a2.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -139,31 +139,31 @@ class CAllSaleOrderPropsVariant
 
 	
 	/**
-	 * <p>Функция обновляет параметры варианта с кодом ID на значения из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код варианта значения свойства заказа.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров нового варианта значения
-	 * свойства заказа, ключами в котором являются названия
-	 * параметров.<br><br> Допустимые ключи:<ul> <li> <b>ORDER_PROPS_ID</b> - код свойства
-	 * заказа;</li> <li> <b>NAME</b> - название варианта;</li> <li> <b>VALUE</b> - значение
-	 * варианта;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>DESCRIPTION</b> -
-	 * описание варианта.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленного варианта значения или <i>false</i> в
-	 * случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__update.c68428cc.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры варианта с кодом ID на значения из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код варианта значения свойства заказа.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров нового варианта значения
+	* свойства заказа, ключами в котором являются названия
+	* параметров.<br><br> Допустимые ключи:<ul> <li> <b>ORDER_PROPS_ID</b> - код свойства
+	* заказа;</li> <li> <b>NAME</b> - название варианта;</li> <li> <b>VALUE</b> - значение
+	* варианта;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>DESCRIPTION</b> -
+	* описание варианта.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленного варианта значения или <i>false</i> в
+	* случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__update.c68428cc.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -183,31 +183,31 @@ class CAllSaleOrderPropsVariant
 
 	
 	/**
-	 * <p>Функция удаляет вариант с кодом ID значения свойства заказа.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код варианта значения свойства заказа.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * CSaleOrderPropsVariant::Delete(12);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__delete.c78c095e.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет вариант с кодом ID значения свойства заказа.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код варианта значения свойства заказа.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* CSaleOrderPropsVariant::Delete(12);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__delete.c78c095e.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -217,22 +217,22 @@ class CAllSaleOrderPropsVariant
 
 	
 	/**
-	 * <p>Функция удаляет все варианты значений для свойства с кодом ID заказа.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код свойства заказа.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__deleteall.d5643ee4.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет все варианты значений для свойства с кодом ID заказа.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код свойства заказа. </ht
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__deleteall.d5643ee4.php
+	* @author Bitrix
+	*/
 	public static function DeleteAll($ID)
 	{
 		global $DB;

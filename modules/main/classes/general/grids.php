@@ -7,31 +7,49 @@ class CGridOptions
 	protected $all_options;
 	protected $options;
 	protected $filter;
+	protected $filterPresets;
 
-	public function __construct($grid_id)
+	public function __construct($grid_id, array $filterPresets = array())
 	{
 		$this->grid_id = $grid_id;
 		$this->options = array();
 		$this->filter = array();
+		$this->filterPresets = $filterPresets;
 
 		$aOptions = CUserOptions::GetOption("main.interface.grid", $this->grid_id, array());
 
+		if(!is_array($aOptions))
+			$aOptions = array();
 		if(!is_array($aOptions["views"]))
 			$aOptions["views"] = array();
 		if(!is_array($aOptions["filters"]))
 			$aOptions["filters"] = array();
-		if(!array_key_exists("default", $aOptions["views"]))
+		if(!isset($aOptions["views"]["default"]))
 			$aOptions["views"]["default"] = array("columns"=>"");
-		if($aOptions["current_view"] == '' || !array_key_exists($aOptions["current_view"], $aOptions["views"]))
+		if($aOptions["current_view"] == '' || !isset($aOptions["views"][$aOptions["current_view"]]))
 			$aOptions["current_view"] = "default";
 
 		$this->all_options = $aOptions;
 
-		if(array_key_exists($aOptions["current_view"], $aOptions["views"]))
+		if(isset($aOptions["views"][$aOptions["current_view"]]))
+		{
 			$this->options = $aOptions["views"][$aOptions["current_view"]];
-		if($this->options["saved_filter"] <> '' && array_key_exists($this->options["saved_filter"], $aOptions["filters"]))
-			if(is_array($aOptions["filters"][$this->options["saved_filter"]]["fields"]))
-				$this->filter = $aOptions["filters"][$this->options["saved_filter"]]["fields"];
+		}
+	}
+
+	public function InitFilter()
+	{
+		if($this->options["saved_filter"] <> '')
+		{
+			if(isset($this->all_options["filters"][$this->options["saved_filter"]]) && is_array($this->all_options["filters"][$this->options["saved_filter"]]["fields"]))
+			{
+				$this->filter = $this->all_options["filters"][$this->options["saved_filter"]]["fields"];
+			}
+			elseif(isset($this->filterPresets[$this->options["saved_filter"]]) && is_array($this->filterPresets[$this->options["saved_filter"]]["fields"]))
+			{
+				$this->filter = $this->filterPresets[$this->options["saved_filter"]]["fields"];
+			}
+		}
 	}
 
 	public function GetSorting($arParams=array())
@@ -160,7 +178,7 @@ class CGridOptions
 			//list or string
 			if(isset($_REQUEST[$field["id"]]))
 			{
-				if(is_array($_REQUEST[$field["id"]]) && !empty($_REQUEST[$field["id"]]) && $_REQUEST[$field["id"]][0] <> '' || !is_array($_REQUEST[$field["id"]]) && $_REQUEST[$field["id"]] <> '')
+				if(is_array($_REQUEST[$field["id"]]) && !empty($_REQUEST[$field["id"]]) && reset($_REQUEST[$field["id"]]) <> '' || !is_array($_REQUEST[$field["id"]]) && $_REQUEST[$field["id"]] <> '')
 					$aRes[$field["id"]] = $_REQUEST[$field["id"]];
 				else
 					unset($_SESSION["main.interface.grid"][$this->grid_id]["filter"][$field["id"]]);
@@ -176,32 +194,42 @@ class CGridOptions
 		//<-- Check for filter ID
 
 		if(!empty($aRes))
-			$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = $aRes;
-		elseif($_REQUEST["clear_filter"] <> '')
-			$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = array();
-		elseif(is_array($_SESSION["main.interface.grid"][$this->grid_id]["filter"]))
-			return $_SESSION["main.interface.grid"][$this->grid_id]["filter"];
-		elseif(!empty($this->filter))
 		{
-			foreach($arFilter as $field)
+			$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = $aRes;
+		}
+		elseif($_REQUEST["clear_filter"] <> '')
+		{
+			$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = array();
+		}
+		elseif(is_array($_SESSION["main.interface.grid"][$this->grid_id]["filter"]))
+		{
+			return $_SESSION["main.interface.grid"][$this->grid_id]["filter"];
+		}
+		else
+		{
+			$this->InitFilter();
+			if(!empty($this->filter))
 			{
-				if($this->filter[$field["id"]."_datesel"] <> '')
+				foreach($arFilter as $field)
 				{
-					$aRes[$field["id"]."_datesel"] = $this->filter[$field["id"]."_datesel"];
-					CGridOptions::CalcDates($field["id"], $this->filter, $aRes);
-					continue;
+					if($this->filter[$field["id"]."_datesel"] <> '')
+					{
+						$aRes[$field["id"]."_datesel"] = $this->filter[$field["id"]."_datesel"];
+						CGridOptions::CalcDates($field["id"], $this->filter, $aRes);
+						continue;
+					}
+					if($this->filter[$field["id"]."_list"] <> '' && $this->filter[$field["id"]] <> '')
+						$aRes[$field["id"]."_list"] = $this->filter[$field["id"]."_list"];
+					if($this->filter[$field["id"]."_from"] <> '')
+						$aRes[$field["id"]."_from"] = $this->filter[$field["id"]."_from"];
+					if($this->filter[$field["id"]."_to"] <> '')
+						$aRes[$field["id"]."_to"] = $this->filter[$field["id"]."_to"];
+					if(is_array($this->filter[$field["id"]]) && !empty($this->filter[$field["id"]]) && reset($this->filter[$field["id"]]) <> '' || !is_array($this->filter[$field["id"]]) && $this->filter[$field["id"]] <> '')
+						$aRes[$field["id"]] = $this->filter[$field["id"]];
 				}
-				if($this->filter[$field["id"]."_list"] <> '' && $this->filter[$field["id"]] <> '')
-					$aRes[$field["id"]."_list"] = $this->filter[$field["id"]."_list"];
-				if($this->filter[$field["id"]."_from"] <> '')
-					$aRes[$field["id"]."_from"] = $this->filter[$field["id"]."_from"];
-				if($this->filter[$field["id"]."_to"] <> '')
-					$aRes[$field["id"]."_to"] = $this->filter[$field["id"]."_to"];
-				if(is_array($this->filter[$field["id"]]) && !empty($this->filter[$field["id"]]) && $this->filter[$field["id"]][0] <> '' || !is_array($this->filter[$field["id"]]) && $this->filter[$field["id"]] <> '')
-					$aRes[$field["id"]] = $this->filter[$field["id"]];
+				if(!empty($aRes))
+					$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = $aRes;
 			}
-			if(!empty($aRes))
-				$_SESSION["main.interface.grid"][$this->grid_id]["filter"] = $aRes;
 		}
 
 		return $aRes;

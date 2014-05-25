@@ -43,7 +43,7 @@ class CAllSaleDiscount
 
 		if (!empty($arIDS))
 		{
-			if (array_key_exists('BASKET_ITEMS', $arOrder) && !empty($arOrder['BASKET_ITEMS']) && is_array($arOrder['BASKET_ITEMS']))
+			if (isset($arOrder['BASKET_ITEMS']) && !empty($arOrder['BASKET_ITEMS']) && is_array($arOrder['BASKET_ITEMS']))
 			{
 				$arExtend = array(
 					'catalog' => array(
@@ -55,23 +55,42 @@ class CAllSaleDiscount
 				{
 					ExecuteModuleEventEx($arEvent, array(&$arOrder['BASKET_ITEMS'], $arExtend));
 				}
+
+				foreach ($arOrder['BASKET_ITEMS'] as &$arOneItem)
+				{
+					if (
+						array_key_exists('PRODUCT_PROVIDER_CLASS', $arOneItem) && empty($arOneItem['PRODUCT_PROVIDER_CLASS'])
+						&& array_key_exists('CALLBACK_FUNC', $arOneItem) && empty($arOneItem['CALLBACK_FUNC'])
+					)
+					{
+						if (array_key_exists('DISCOUNT_PRICE', $arOneItem))
+						{
+							$arOneItem['PRICE'] += $arOneItem['DISCOUNT_PRICE'];
+							$arOneItem['DISCOUNT_PRICE'] = 0;
+						}
+					}
+				}
+				if (isset($arOneItem))
+					unset($arOneItem);
 			}
 
 			$arIDS = array_keys($arIDS);
+			$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
+			CTimeZone::Disable();
 			$rsDiscounts = CSaleDiscount::GetList(
 				array("PRIORITY" => "DESC", "SORT" => "ASC"),
 				array(
 					'ID' => $arIDS,
 					"LID" => $arOrder["SITE_ID"],
 					"ACTIVE" => "Y",
-					"!>ACTIVE_FROM" => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL"))),
-					"!<ACTIVE_TO" => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL"))),
+					"!>ACTIVE_FROM" => $strDate,
+					"!<ACTIVE_TO" => $strDate
 				),
 				false,
 				false,
 				array("ID", "PRIORITY", "LAST_DISCOUNT", "UNPACK", "APPLICATION")
 			);
-
+			CTimeZone::Enable();
 			while ($arDiscount = $rsDiscounts->Fetch())
 			{
 				if (self::__Unpack($arOrder, $arDiscount['UNPACK']))
@@ -93,16 +112,23 @@ class CAllSaleDiscount
 
 			foreach ($arOrder['BASKET_ITEMS'] as &$arShoppingCartItem)
 			{
-				$arOrder["ORDER_PRICE"] += $arShoppingCartItem["PRICE"] * $arShoppingCartItem["QUANTITY"];
-				$arOrder["ORDER_WEIGHT"] += $arShoppingCartItem["WEIGHT"] * $arShoppingCartItem["QUANTITY"];
-
-				if ($arShoppingCartItem["VAT_RATE"] > 0)
+				if (!CSaleBasketHelper::isSetItem($arShoppingCartItem))
 				{
-					$arOrder["USE_VAT"] = true;
-					if ($arShoppingCartItem["VAT_RATE"] > $arOrder["VAT_RATE"])
-						$arOrder["VAT_RATE"] = $arShoppingCartItem["VAT_RATE"];
+					$arOrder["ORDER_PRICE"] += doubleval($arShoppingCartItem["PRICE"]) * doubleval($arShoppingCartItem["QUANTITY"]);
+					$arOrder["ORDER_WEIGHT"] += $arShoppingCartItem["WEIGHT"] * $arShoppingCartItem["QUANTITY"];
 
-					$arOrder["VAT_SUM"] += $arShoppingCartItem["VAT_VALUE"] * $arShoppingCartItem["QUANTITY"];
+					$arShoppingCartItem["PRICE_FORMATED"] = SaleFormatCurrency($arShoppingCartItem["PRICE"], $arShoppingCartItem["CURRENCY"]);
+					$arShoppingCartItem["DISCOUNT_PRICE_PERCENT"] = $arShoppingCartItem["DISCOUNT_PRICE"]*100 / ($arShoppingCartItem["DISCOUNT_PRICE"] + $arShoppingCartItem["PRICE"]);
+					$arShoppingCartItem["DISCOUNT_PRICE_PERCENT_FORMATED"] = roundEx($arShoppingCartItem["DISCOUNT_PRICE_PERCENT"], SALE_VALUE_PRECISION)."%";
+
+					if ($arShoppingCartItem["VAT_RATE"] > 0)
+					{
+						$arOrder["USE_VAT"] = true;
+						if ($arShoppingCartItem["VAT_RATE"] > $arOrder["VAT_RATE"])
+							$arOrder["VAT_RATE"] = $arShoppingCartItem["VAT_RATE"];
+
+						$arOrder["VAT_SUM"] += $arShoppingCartItem["VAT_VALUE"] * $arShoppingCartItem["QUANTITY"];
+					}
 				}
 			}
 			if (isset($arShoppingCartItem))
@@ -125,7 +151,9 @@ class CAllSaleDiscount
 
 		$strSqlSearch = "";
 
-		$dbCurrency = CCurrency::GetList(($by = "sort"), ($order = "asc"));
+		$by = "sort";
+		$order = "asc";
+		$dbCurrency = CCurrency::GetList($by, $order);
 		while ($arCurrency = $dbCurrency->Fetch())
 		{
 			$val1 = roundEx(CCurrencyRates::ConvertCurrency($val, $baseSiteCurrency, $arCurrency["CURRENCY"]), SALE_VALUE_PRECISION);
@@ -144,33 +172,33 @@ class CAllSaleDiscount
 
 	
 	/**
-	 * <p>Функция возвращает параметры скидки с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код скидки.
-	 *
-	 *
-	 *
-	 * @return array <p>Ассоциативный массив параметров скидки с ключами:</p><table
-	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
-	 * <td>Код скидки.</td> </tr> <tr> <td>LID</td> <td>Код сайта, к которому привязана
-	 * эта скидка.</td> </tr> <tr> <td>PRICE_FROM</td> <td>Общая стоимость заказа, начиная
-	 * с которой предоставляется эта скидка.</td> </tr> <tr> <td>PRICE_TO</td> <td>Общая
-	 * стоимость заказа, до достижения которой предоставляется эта
-	 * скидка.</td> </tr> <tr> <td>CURRENCY</td> <td>Валюта денежных полей в записи.</td> </tr>
-	 * <tr> <td>DISCOUNT_VALUE</td> <td>Величина скидки.</td> </tr> <tr> <td>DISCOUNT_TYPE</td> <td>Тип
-	 * величины скидки (P - величина задана в процентах, V - величина
-	 * задана в абсолютной сумме).</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N)
-	 * активности скидки.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки (если по
-	 * сумме заказа доступно несколько скидок, то берется первая по
-	 * сортировке).</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__getbyid.1af201c0.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры скидки с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код скидки.
+	*
+	*
+	*
+	* @return array <p>Ассоциативный массив параметров скидки с ключами:</p> <table
+	* class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
+	* <td>Код скидки.</td> </tr> <tr> <td>LID</td> <td>Код сайта, к которому привязана
+	* эта скидка.</td> </tr> <tr> <td>PRICE_FROM</td> <td>Общая стоимость заказа, начиная
+	* с которой предоставляется эта скидка.</td> </tr> <tr> <td>PRICE_TO</td> <td>Общая
+	* стоимость заказа, до достижения которой предоставляется эта
+	* скидка.</td> </tr> <tr> <td>CURRENCY</td> <td>Валюта денежных полей в записи.</td> </tr>
+	* <tr> <td>DISCOUNT_VALUE</td> <td>Величина скидки.</td> </tr> <tr> <td>DISCOUNT_TYPE</td> <td>Тип
+	* величины скидки (P - величина задана в процентах, V - величина
+	* задана в абсолютной сумме).</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N)
+	* активности скидки.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки (если по
+	* сумме заказа доступно несколько скидок, то берется первая по
+	* сортировке).</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__getbyid.1af201c0.php
+	* @author Bitrix
+	*/
 	static public function GetByID($ID)
 	{
 		global $DB;

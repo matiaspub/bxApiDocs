@@ -52,7 +52,7 @@ class CCatalogContractor
 			"POST_INDEX" => array("FIELD" => "CC.POST_INDEX", "TYPE" => "string"),
 			"COUNTRY" => array("FIELD" => "CC.COUNTRY", "TYPE" => "string"),
 			"CITY" => array("FIELD" => "CC.CITY", "TYPE" => "string"),
-			"COMPANY" => array("FIELD" => "IF (CC.PERSON_NAME IS NOT NULL, if(CC.PERSON_TYPE = ".CONTRACTOR_INDIVIDUAL.", CC.PERSON_NAME, CONCAT(CC.COMPANY,' (',CC.PERSON_NAME,')')), CC.COMPANY)", "TYPE" => "string"),
+			"COMPANY" => array("FIELD" => "CC.COMPANY", "TYPE" => "string"),
 			"ADDRESS" => array("FIELD" => "CC.ADDRESS", "TYPE" => "string"),
 			"INN" => array("FIELD" => "CC.INN", "TYPE" => "string"),
 			"KPP" => array("FIELD" => "CC.KPP", "TYPE" => "string"),

@@ -4,7 +4,7 @@ set_time_limit(0);
 
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -140,6 +140,7 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 
 	while ($arAcc = $db_acc->GetNext())
 	{
+		$cnt++;
 		if (!array_key_exists($arAcc['LID'], $arSiteServers))
 		{
 			$rsSite = CSite::GetList(($b="sort"), ($o="asc"), array("LID" => $arAcc["LID"]));
@@ -275,8 +276,16 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 				255), true).
 			"</description>\n";
 		$strTmpOff.= "</offer>\n";
+		if (100 <= $cnt)
+		{
+			$cnt = 0;
+			CCatalogDiscount::ClearDiscountCache(array(
+				'PRODUCT' => true,
+				'SECTIONS' => true,
+				'PROPERTIES' => true
+			));
+		}
 	}
-
 }
 
 $strAll.= "<categories>\n";

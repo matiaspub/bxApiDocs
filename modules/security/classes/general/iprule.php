@@ -898,14 +898,32 @@ class CSecurityIPRule
 
 	public static function OnPageStart($use_query = false)
 	{
+		//ToDo: good candidate for refactoring
 		global $DB, $CACHE_MANAGER;
 
-		if(CSecurityIPRule::GetActiveCount())
+		if(
+			!CSecuritySystemInformation::isCliMode()
+			&& CSecurityIPRule::GetActiveCount()
+		)
 		{
-			$bMatch = false;
-
 			if(CSecurityIPRule::CheckAntiFile())
 				return;
+
+			$bMatch = false;
+
+			$uri = $_SERVER['REQUEST_URI'];
+			if (($pos = strpos($uri, '?')) !== false)
+				$uri = substr($uri, 0, $pos);
+
+			$uri = urldecode($uri);
+			$uri = preg_replace('#/+#', '/', $uri);
+			//Block any invalid uri
+			if (!static::isValidUri($uri))
+				include($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/security_403.php'); //die inside
+
+			//Normalize on Windows, because my. == my
+			if (CSecuritySystemInformation::isRunOnWin())
+				$uri = preg_replace('#(. )+[/\\\]+#', '/', $uri);
 
 			$ip2check = CSecurityIPRule::ip2number($_SERVER["REMOTE_ADDR"]);
 
@@ -1102,7 +1120,7 @@ class CSecurityIPRule
 						$bMatch = false;
 						foreach($arRule["INCL_MASKS"] as $mask)
 						{
-							if(preg_match("#^".$mask."$#", $_SERVER["REQUEST_URI"]))
+							if(preg_match("#^".$mask."$#", $uri))
 							{
 								$bMatch = true;
 								break;
@@ -1113,7 +1131,7 @@ class CSecurityIPRule
 						{
 							foreach($arRule["EXCL_MASKS"] as $mask)
 							{
-								if(preg_match("#^".$mask."$#", $_SERVER["REQUEST_URI"]))
+								if(preg_match("#^".$mask."$#", $uri))
 								{
 									$bMatch = false;
 									break;
@@ -1138,7 +1156,7 @@ class CSecurityIPRule
 					FROM
 						b_sec_iprule r
 						INNER JOIN b_sec_iprule_incl_mask im on im.IPRULE_ID = r.ID
-						LEFT  JOIN b_sec_iprule_excl_mask em on em.IPRULE_ID = r.ID AND '".$DB->ForSQL($_SERVER["REQUEST_URI"])."' like em.LIKE_MASK
+						LEFT  JOIN b_sec_iprule_excl_mask em on em.IPRULE_ID = r.ID AND '".$DB->ForSQL($uri)."' like em.LIKE_MASK
 						INNER JOIN b_sec_iprule_incl_ip   ii on ii.IPRULE_ID = r.ID
 						LEFT  JOIN b_sec_iprule_excl_ip   ei on ei.IPRULE_ID = r.ID AND ".$ip2check." between ei.IP_START and ei.IP_END
 					WHERE
@@ -1149,7 +1167,7 @@ class CSecurityIPRule
 							"AND r.ADMIN_SECTION = 'Y'":
 							"AND (r.SITE_ID IS NULL OR r.SITE_ID = '".$DB->ForSQL(SITE_ID)."')"
 						)."
-						AND '".$DB->ForSQL($_SERVER["REQUEST_URI"])."' like im.LIKE_MASK
+						AND '".$DB->ForSQL($uri)."' like im.LIKE_MASK
 						AND em.IPRULE_ID is null
 						AND ".$ip2check." between ii.IP_START and ii.IP_END
 						AND ei.IPRULE_ID is null
@@ -1167,6 +1185,23 @@ class CSecurityIPRule
 				include($_SERVER["DOCUMENT_ROOT"]."/bitrix/admin/security_403.php");
 
 		}
+	}
+
+	protected static function isValidUri($uri)
+	{
+		if (trim($uri) == '')
+			return false;
+
+		if (strpos($uri, "\0") !== false)
+			return false;
+
+		if (strpos($uri, '/') !== 0)
+			return false;
+
+		if (CHTTP::isPathTraversalUri($uri))
+			return false;
+
+		return true;
 	}
 
 	public static function CleanUpAgent()

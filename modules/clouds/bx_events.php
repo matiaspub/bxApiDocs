@@ -8,8 +8,9 @@ class _CEventsClouds {
 	/**
 	 * для подключения пользовательских облачных хранилищ.
 	 * 
+	 * 
 	 * <i>Вызывается в методе:</i><br>
-	 * CCloudStorage::_init
+	 * CCloudStorage::_init<br><br>
 	 */
 	public static function OnGetStorageService(){}
 

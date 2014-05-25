@@ -1,6 +1,5 @@
 <?
 IncludeModuleLangFile(__FILE__);
-$GLOBALS["CATALOG_BASE_GROUP"] = array();
 
 
 /**
@@ -17,68 +16,76 @@ $GLOBALS["CATALOG_BASE_GROUP"] = array();
  */
 class CAllCatalogGroup
 {
+	protected static $arBaseGroupCache = array();
+
 	
 	/**
-	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
-	 * <br><ul> <li> <b>ADD</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>;</li>
-	 * <li> <b>UPDATE</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив параметров типа цены. Допустимые ключи: <ul>
-	 * <li>BASE - Флаг (Y/N) является ли тип базовым.</li> <li>NAME - Внутреннее
-	 * название типа цены. Ключ является обязательным, если $ACTION = 'ADD'.</li>
-	 * <li>SORT - Индекс сортировки.</li> <li>XML_ID - Внешний код.</li> <li>CREATED_BY - ID
-	 * создателя типа цен.</li> <li>MODIFIED_BY - ID последнего изменившего тип
-	 * цен.</li> <li>USER_GROUP - Массив кодов групп пользователей, члены которых
-	 * могут видеть цены этого типа. Ключ является обязательным, если
-	 * $ACTION = 'ADD'.</li> <li>USER_GROUP_BUY - Массив кодов групп пользователей, члены
-	 * которых могут покупать товары по ценам этого типа. Ключ является
-	 * обязательным, если $ACTION = 'ADD'.</li> <li>USER_LANG - Ассоциативный массив
-	 * языкозависимых параметров типа цены, ключами которого являются
-	 * коды языков, а значениями - названия этого типа цены на
-	 * соответствующем языке.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param int $ID = 0 Код типа цен. Параметр является необязательным и имеет смысл
-	 * только для $ACTION = 'UPDATE'.
-	 *
-	 *
-	 *
-	 * @return bool <p> В случае корректности переданных параметров возвращает true,
-	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	 * можно получить текст ошибок.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a></li>
-	 * <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a></li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/checkfields.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
+	* <br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>;</li>
+	* <li> <b>UPDATE</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</li>
+	* </ul>
+	*
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров типа цены. Допустимые ключи: <ul>
+	* <li>BASE - Флаг (Y/N) является ли тип базовым.</li> <li>NAME - Внутреннее
+	* название типа цены. Ключ является обязательным, если $ACTION = 'ADD'.</li>
+	* <li>SORT - Индекс сортировки.</li> <li>XML_ID - Внешний код.</li> <li>CREATED_BY - ID
+	* создателя типа цен.</li> <li>MODIFIED_BY - ID последнего изменившего тип
+	* цен.</li> <li>USER_GROUP - Массив кодов групп пользователей, члены которых
+	* могут видеть цены этого типа. Ключ является обязательным, если
+	* $ACTION = 'ADD'.</li> <li>USER_GROUP_BUY - Массив кодов групп пользователей, члены
+	* которых могут покупать товары по ценам этого типа. Ключ является
+	* обязательным, если $ACTION = 'ADD'.</li> <li>USER_LANG - Ассоциативный массив
+	* языкозависимых параметров типа цены, ключами которого являются
+	* коды языков, а значениями - названия этого типа цены на
+	* соответствующем языке.</li> </ul>
+	*
+	*
+	*
+	* @param int $ID = 0 Код типа цен. Параметр является необязательным и имеет смысл
+	* только для $ACTION = 'UPDATE'.
+	*
+	*
+	*
+	* @return bool <p> В случае корректности переданных параметров возвращает true,
+	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	* можно получить текст ошибок.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a></li>
+	* </ul> </ht<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/checkfields.php
+	* @author Bitrix
+	*/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
+		global $USER;
+		global $DB;
 
 		$boolResult = true;
 		$arMsg = array();
 
-		if (array_key_exists("NAME", $arFields) || $strAction=="ADD")
+		$ACTION = strtoupper($ACTION);
+		if ('UPDATE' != $ACTION && 'ADD' != $ACTION)
+			return false;
+
+		if (array_key_exists("NAME", $arFields) || $ACTION=="ADD")
 		{
 			$arFields["NAME"] = trim($arFields["NAME"]);
 			if ('' == $arFields["NAME"])
@@ -100,18 +107,34 @@ class CAllCatalogGroup
 				$arFields["SORT"] = 100;
 		}
 
-		if (array_key_exists('CREATED_BY', $arFields))
+		$intUserID = 0;
+		$boolUserExist = CCatalog::IsUserExists();
+		if ($boolUserExist)
+			$intUserID = intval($USER->GetID());
+		$strDateFunction = $DB->GetNowFunction();
+		if (array_key_exists('TIMESTAMP_X', $arFields))
+			unset($arFields['TIMESTAMP_X']);
+		if (array_key_exists('DATE_CREATE', $arFields))
+			unset($arFields['DATE_CREATE']);
+		$arFields['~TIMESTAMP_X'] = $strDateFunction;
+		if ($boolUserExist)
 		{
-			$arFields['CREATED_BY'] = intval($arFields['CREATED_BY']);
-			if (0 >= $arFields['CREATED_BY'])
-				$arFields['CREATED_BY'] = false;
+			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+				$arFields["MODIFIED_BY"] = $intUserID;
 		}
-
-		if (array_key_exists('MODIFIED_BY', $arFields))
+		if ('ADD' == $ACTION)
 		{
-			$arFields['MODIFIED_BY'] = intval($arFields['MODIFIED_BY']);
-			if (0 >= $arFields['MODIFIED_BY'])
-				$arFields['MODIFIED_BY'] = false;
+			$arFields['~DATE_CREATE'] = $strDateFunction;
+			if ($boolUserExist)
+			{
+				if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
+					$arFields["CREATED_BY"] = $intUserID;
+			}
+		}
+		if ('UPDATE' == $ACTION)
+		{
+			if (array_key_exists('CREATED_BY', $arFields))
+				unset($arFields['CREATED_BY']);
 		}
 
 		if (is_set($arFields, 'USER_GROUP') || $ACTION=="ADD")
@@ -338,42 +361,51 @@ class CAllCatalogGroup
 
 	
 	/**
-	 * <p>Функция возвращает код и внутреннее название базового типа цен. Результат работы функции кэшируется, поэтому повторные вызовы этой функции в рамках одной страницы не приводят к дополнительным запросам базы данных.</p> <p>От цены базового типа расчитываются цены других типов, если они указаны с использованием системы наценок. Понятие базового типа цены используется только в административной части и не оказывает влияния на публичную часть. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return array <p>Функция возвращает ассоциативный массив с ключами:</p><table
-	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
-	 * <td>Код базового типа цен.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название
-	 * базового типа цен.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__getbasegroup.e06a3542.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает код и внутреннее название базового типа цен. Результат работы функции кэшируется, поэтому повторные вызовы этой функции в рамках одной страницы не приводят к дополнительным запросам базы данных.</p> <p>От цены базового типа расчитываются цены других типов, если они указаны с использованием системы наценок. Понятие базового типа цены используется только в административной части и не оказывает влияния на публичную часть. </p>
+	*
+	*
+	*
+	*
+	* @return array <p>Функция возвращает ассоциативный массив с ключами:</p> <table
+	* class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
+	* <td>Код базового типа цен.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название
+	* базового типа цен.</td> </tr> <tr> <td>NAME_LANG</td> <td>Базовая цена.</td> </tr> <tr>
+	* <td>XML_ID</td> <td>XML ID базовой цены.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__getbasegroup.e06a3542.php
+	* @author Bitrix
+	*/
 	public static function GetBaseGroup()
 	{
-		global $CATALOG_BASE_GROUP;
-		if (!isset($CATALOG_BASE_GROUP) || empty($CATALOG_BASE_GROUP) || !is_array($CATALOG_BASE_GROUP))
+		if (empty(self::$arBaseGroupCache) && is_array(self::$arBaseGroupCache))
 		{
-			$rsGroups = CCatalogGroup::GetListEx(array(), array('BASE' => 'Y'), false, false, array('ID', 'NAME', 'NAME_LANG', 'XML_ID'));
+			$rsGroups = CCatalogGroup::GetListEx(
+				array(),
+				array('BASE' => 'Y'),
+				false,
+				false,
+				array('ID', 'NAME', 'NAME_LANG', 'XML_ID')
+			);
 			if ($arGroup = $rsGroups->Fetch())
 			{
 				$arGroup['ID'] = intval($arGroup['ID']);
 				$arGroup['NAME_LANG'] = strval($arGroup['NAME_LANG']);
 				$arGroup['XML_ID'] = strval($arGroup['XML_ID']);
 
-				$CATALOG_BASE_GROUP = $arGroup;
+				self::$arBaseGroupCache = $arGroup;
 			}
 			else
 			{
-				if (isset($CATALOG_BASE_GROUP))
-					unset($CATALOG_BASE_GROUP);
-				return false;
+				self::$arBaseGroupCache = false;
+			}
+			if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+			{
+				global $CATALOG_BASE_GROUP;
+				$CATALOG_BASE_GROUP = self::$arBaseGroupCache;
 			}
 		}
-		return $CATALOG_BASE_GROUP;
+		return self::$arBaseGroupCache;
 	}
 }
 ?>

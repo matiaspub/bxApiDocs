@@ -126,4 +126,5 @@ class CCatalogStoreControlUtil
 
 		return $DB->Query("SELECT SUM(SP.AMOUNT) as SUM, CP.QUANTITY_RESERVED as RESERVED FROM b_catalog_store_product SP INNER JOIN b_catalog_product CP ON SP.PRODUCT_ID = CP.ID INNER JOIN b_catalog_store CS ON SP.STORE_ID = CS.ID WHERE SP.PRODUCT_ID = ".$productId."  AND CS.ACTIVE = 'Y' GROUP BY QUANTITY_RESERVED ", true);
 	}
+
 }

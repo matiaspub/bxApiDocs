@@ -187,7 +187,7 @@ class DbConnectionPool
 			}
 		}
 
-		public static function GetModuleConnection($module_id, $bModuleInclude = false)
+public static 		function GetModuleConnection($module_id, $bModuleInclude = false)
 		{
 			$node_id = COption::getOptionString($module_id, "dbnode_id", "N");
 			if(is_numeric($node_id))

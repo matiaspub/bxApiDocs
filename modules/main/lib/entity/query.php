@@ -2,6 +2,8 @@
 
 namespace Bitrix\Main\Entity;
 
+use Bitrix\Main;
+
 class Query
 {
 	protected
@@ -76,7 +78,7 @@ class Query
 
 	/**
 	 * @param Base|Query|string $source
-	 * @throws \Exception
+	 * @throws Main\ArgumentException
 	 */
 	public function __construct($source)
 	{
@@ -94,23 +96,41 @@ class Query
 		}
 		else
 		{
-			throw new \Exception(sprintf(
+			throw new Main\ArgumentException(sprintf(
 				'Unknown source type "%s" for new %s', gettype($source), __CLASS__
 			));
 		}
 	}
 
+	/**
+	 * Returns an array of fields for SELECT clause
+	 *
+	 * @return array
+	 */
 	public function getSelect()
 	{
 		return $this->select;
 	}
 
+	/**
+	 * Sets a list of fields for SELECT clause
+	 *
+	 * @param array $select
+	 * @return Query
+	 */
 	public function setSelect(array $select)
 	{
 		$this->select = $select;
 		return $this;
 	}
 
+	/**
+	 * Adds a field for SELECT clause
+	 *
+	 * @param mixed $definition Field
+	 * @param string $alias Field alias like SELECT field AS alias
+	 * @return Query
+	 */
 	public function addSelect($definition, $alias = '')
 	{
 		if (strlen($alias))
@@ -125,17 +145,35 @@ class Query
 		return $this;
 	}
 
+	/**
+	 * Returns an array of filters for WHERE clause
+	 *
+	 * @return array
+	 */
 	public function getFilter()
 	{
 		return $this->filter;
 	}
 
+	/**
+	 * Sets a list of filters for WHERE clause
+	 *
+	 * @param array $filter
+	 * @return Query
+	 */
 	public function setFilter(array $filter)
 	{
 		$this->filter = $filter;
 		return $this;
 	}
 
+	/**
+	 * Adds a filter for WHERE clause
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @return Query
+	 */
 	public function addFilter($key, $value)
 	{
 		if (is_null($key) && is_array($value))
@@ -150,11 +188,22 @@ class Query
 		return $this;
 	}
 
+	/**
+	 * Returns an array of fields for GROUP BY clause
+	 *
+	 * @return array
+	 */
 	public function getGroup()
 	{
 		return $this->group;
 	}
 
+	/**
+	 * Sets a list of fileds in GROUP BY clause
+	 *
+	 * @param mixed $group
+	 * @return Query
+	 */
 	public function setGroup($group)
 	{
 		$group = !is_array($group) ? array($group) : $group;
@@ -163,17 +212,34 @@ class Query
 		return $this;
 	}
 
+	/**
+	 * Adds a field to the list of fields for GROUP BY clause
+	 *
+	 * @param $group
+	 * @return Query
+	 */
 	public function addGroup($group)
 	{
 		$this->group[] = $group;
 		return $this;
 	}
 
+	/**
+	 * Returns an array of fields for ORDER BY clause
+	 *
+	 * @return array
+	 */
 	public function getOrder()
 	{
 		return $this->order;
 	}
 
+	/**
+	 * Sets a list of fields for ORDER BY clause
+	 *
+	 * @param mixed $order
+	 * @return Query
+	 */
 	public function setOrder($order)
 	{
 		$this->order = array();
@@ -198,6 +264,14 @@ class Query
 		return $this;
 	}
 
+	/**
+	 * Adds a filed to the list of fields for ORDER BY clause
+	 *
+	 * @param string $definition
+	 * @param string $order
+	 * @return Query
+	 * @throws Main\ArgumentException
+	 */
 	public function addOrder($definition, $order = 'ASC')
 	{
 		$order = strtoupper($order);
@@ -205,21 +279,19 @@ class Query
 
 		if (!in_array($order, array('ASC', 'DESC'), true))
 		{
-			throw new \Exception(sprintf('Invalid order "%s"', $order));
+			throw new Main\ArgumentException(sprintf('Invalid order "%s"', $order));
 		}
 
-		global $DBType;
+		$connection = Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
 
-		if ($DBType == 'oracle')
+		if ($order == 'ASC')
 		{
-			if ($order == 'ASC')
-			{
-				$order = 'ASC NULLS FIRST';
-			}
-			else
-			{
-				$order = 'DESC NULLS LAST';
-			}
+			$order = $helper->getAscendingOrder();
+		}
+		else
+		{
+			$order = $helper->getDescendingOrder();
 		}
 
 		$this->order[$definition] = $order;
@@ -227,22 +299,44 @@ class Query
 		return $this;
 	}
 
+	/**
+	 * Returns a limit
+	 *
+	 * @return null|int
+	 */
 	public function getLimit()
 	{
 		return $this->limit;
 	}
 
+	/**
+	 * Sets a limit for LIMIT n clause
+	 *
+	 * @param int $limit
+	 * @return Query
+	 */
 	public function setLimit($limit)
 	{
 		$this->limit = $limit;
 		return $this;
 	}
 
+	/**
+	 * Returns an offset
+	 *
+	 * @return null|int
+	 */
 	public function getOffset()
 	{
 		return $this->offset;
 	}
 
+	/**
+	 * Sets an offset for LIMIT n, m clause
+
+	 * @param int $offset
+	 * @return Query
+	 */
 	public function setOffset($offset)
 	{
 		$this->offset = $offset;
@@ -262,33 +356,55 @@ class Query
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function enableDataDoubling()
 	{
 		$this->data_doubling = true;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function disableDataDoubling()
 	{
 		$this->data_doubling = false;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getOptions()
 	{
 		return $this->options;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function setOptions($options)
 	{
 		$this->options = $options;
 		return $this;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function addOption($option_name, $option_value)
 	{
 		$this->options[$option_name] = $option_value;
 		return $this;
 	}
 
+	/**
+	 * Adds a runtime field (created dinamycally, opposite to described statically in the entity map) for SELECT clause
+	 *
+	 * @param string $name
+	 * @param array $fieldInfo
+	 * @return Query
+	 */
 	public function registerRuntimeField($name, $fieldInfo)
 	{
 		$field = $this->init_entity->initializeField($name, $fieldInfo);
@@ -313,6 +429,11 @@ class Query
 		return $this->table_alias_postfix;
 	}
 
+	/**
+	 * Builds and executes the query and returns the result
+	 *
+	 * @return \Bitrix\Main\DB\Result
+	 */
 	public function exec()
 	{
 		$this->is_executing = true;
@@ -385,7 +506,8 @@ class Query
 							// we should have own copy of build_from_chains to set join aliases there
 							// actually is copy&paste from getChainByDefinition
 							// it would be correct to form DEFINITIONs here and call getChainByDefinition for each
-							$exp_field = clone $exp_field;
+							// better to skip expressions
+							continue;
 						}
 
 						$exp_chain = clone $chain;
@@ -612,7 +734,7 @@ class Query
 			}
 
 			$prev_entity = $this->init_entity;
-			$prev_alias = strtolower($this->init_entity->getCode());
+			$prev_alias = $this->getInitAlias(false);
 
 			$map_key = '';
 
@@ -774,8 +896,9 @@ class Query
 
 			// sql
 			$sql[] = sprintf('%s JOIN %s %s ON %s',
-				$join['type'], $join['table'],
-				$helper->getLeftQuote() . $join['alias'] . $helper->getRightQuote(),
+				$join['type'],
+				$helper->quote($join['table']),
+				$helper->quote($join['alias']),
 				trim($csw->getQuery($join['reference']))
 			);
 		}
@@ -927,7 +1050,14 @@ class Query
 			$sqlOrder = $this->buildOrder();
 
 			$sqlFrom = $this->init_entity->getDBTableName();
-			$sqlFrom .= ' '.$helper->getLeftQuote() . strtolower($this->init_entity->getCode()) . $this->table_alias_postfix . $helper->getRightQuote();
+
+			if (strpos($sqlFrom, '(') === false)
+			{
+				// is not subquery
+				$sqlFrom = $helper->quote($sqlFrom);
+			}
+
+			$sqlFrom .= ' '.$helper->quote($this->getInitAlias());
 			$sqlFrom .= ' '.$sqlJoin;
 
 			$this->query_build_parts = array_filter(array(
@@ -998,14 +1128,27 @@ class Query
 				{
 					$field_type = 'string';
 
+					/** @var BooleanField $field */
+					$field = $last->getValue();
+					$values = $field->getValues();
+
+					if (is_numeric($values[0]) && is_numeric($values[1]))
+					{
+						$field_type = 'int';
+					}
+
 					if (is_scalar($filter_match))
 					{
-						$filter_match = $last->getValue()->normalizeValue($filter_match);
+						$filter_match = $field->normalizeValue($filter_match);
 					}
 				}
 				elseif ($field_type == 'float')
 				{
 					$field_type = 'double';
+				}
+				elseif ($field_type == 'enum' || $field_type == 'text')
+				{
+					$field_type = 'string';
 				}
 
 				//$is_having = $last->getValue() instanceof ExpressionField && $last->getValue()->isAggregated();
@@ -1096,17 +1239,17 @@ class Query
 
 				if (strpos($field, 'this.') === 0)
 				{
-					$k = str_replace('this.', $leftQuote.$alias_this.$rightQuote.'.'.$leftQuote, $k);
+					$k = str_replace('this.', $helper->quote($alias_this).'.'.$leftQuote, $k);
 					$k .= $rightQuote;
 				}
 				elseif (strpos($field, 'ref.') === 0)
 				{
-					$k = str_replace('ref.', $leftQuote.$alias_ref.$rightQuote.'.'.$leftQuote, $k);
+					$k = str_replace('ref.', $helper->quote($alias_ref).'.'.$leftQuote, $k);
 					$k .= $rightQuote;
 				}
 				else
 				{
-					throw new \Exception();
+					throw new Main\SystemException();
 				}
 
 				// value
@@ -1175,6 +1318,7 @@ class Query
 
 	protected function checkChainsAggregation($chain)
 	{
+		/** @var QueryChain[] $chains */
 		$chains = is_array($chain) ? $chain : array($chain);
 
 		foreach ($chains as $chain)
@@ -1322,7 +1466,7 @@ class Query
 			{
 				$nosqlResult = NosqlPrimarySelector::relayQuery($nosqlConnection, $this);
 
-				return new \Bitrix\Main\DB\ArrayResult($nosqlResult, $nosqlConnection);
+				return new \Bitrix\Main\DB\ArrayResult($nosqlResult);
 			}
 		}
 
@@ -1379,8 +1523,8 @@ Vadim: this is for paging but currently is not used
 				$replaced[$newAlias] = $alias;
 
 				$query = str_replace(
-					' AS ' . $leftQuote . $alias . $rightQuote,
-					' AS ' . $leftQuote . $newAlias . $rightQuote . '/* '.$alias.' */',
+					' AS ' . $helper->quote($alias),
+					' AS ' . $helper->quote($newAlias) . '/* '.$alias.' */',
 					$query
 				);
 			}
@@ -1458,11 +1602,21 @@ Vadim: this is for paging but currently is not used
 		return $this->join_map;
 	}
 
+	/**
+	 * Builds and returns SQL query string
+	 *
+	 * @return string
+	 */
 	public function getQuery()
 	{
 		return $this->buildQuery();
 	}
 
+	/**
+	 * Returns last executed query string
+	 *
+	 * @return string
+	 */
 	public function getLastQuery()
 	{
 		return $this->last_query;
@@ -1471,6 +1625,30 @@ Vadim: this is for paging but currently is not used
 	public function getEntity()
 	{
 		return $this->init_entity;
+	}
+
+	/**
+	 * @param bool $withPrefix
+	 * @return string
+	 */
+	public function getInitAlias($withPrefix = true)
+	{
+		$init_alias = strtolower($this->init_entity->getCode());
+
+		if ($withPrefix)
+		{
+			$init_alias .= $this->table_alias_postfix;
+		}
+
+		$connection = \Bitrix\Main\Application::getConnection();
+		$aliasLength = $connection->getSqlHelper()->getAliasLength();
+
+		if (strlen($init_alias) > $aliasLength)
+		{
+			$init_alias = 'base';
+		}
+
+		return $init_alias;
 	}
 
 	public function getReplacedAliases()

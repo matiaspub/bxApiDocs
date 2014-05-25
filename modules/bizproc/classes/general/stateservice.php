@@ -158,6 +158,27 @@ class CBPAllStateService
 		}
 	}
 
+	public static function CountDocumentWorkflows($documentId)
+	{
+		global $DB;
+
+		$arDocumentId = CBPHelper::ParseDocumentId($documentId);
+
+		$dbResult = $DB->Query(
+			"SELECT COUNT(WS.ID) CNT ".
+			"FROM b_bp_workflow_state WS ".
+			"	INNER JOIN b_bp_workflow_instance WI ON (WS.ID = WI.ID) ".
+			"WHERE WS.DOCUMENT_ID = '".$DB->ForSql($arDocumentId[2])."' ".
+			"	AND WS.ENTITY = '".$DB->ForSql($arDocumentId[1])."' ".
+			"	AND WS.MODULE_ID ".((strlen($arDocumentId[0]) > 0) ? "= '".$DB->ForSql($arDocumentId[0])."'" : "IS NULL")
+		);
+
+		if ($arResult = $dbResult->Fetch())
+			return intval($arResult["CNT"]);
+
+		return 0;
+	}
+
 	public static function GetDocumentStates($documentId, $workflowId = "")
 	{
 		global $DB;

@@ -375,51 +375,56 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает параметры рабочей группы с заданным идентификатором.</p> <p><b>Примечание</b>: при многократном вызове метода для одного и того же идентификатора рабочей группы в рамках одного хита запрос к базе направляется только один раз. В дальнейшем результат возвращается без запроса к базе.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рабочей группы
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается массив с ключами:<br><b>ID</b> - идентификатор рабочей
-	 * группы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название
-	 * группы,<br><b>DESCRIPTION</b> - описание группы,<br><b>DATE_CREATE</b> - дата
-	 * создания,<br><b>DATE_UPDATE</b> - дата последнего изменения параметров
-	 * группы,<br><b>ACTIVE</b> - активность,<br><b>VISIBLE</b> - видима ли группа в
-	 * списках,<br><b>OPENED</b> - открыта ли группа для свободного
-	 * вступления,<br><b>CLOSED</b> - является ли группа архивной,<br><b>SUBJECT_ID</b> -
-	 * код темы группы,<br><b>OWNER_ID</b> - код пользователя-владельца
-	 * группы,<br><b>KEYWORDS</b> - ключевые слова,<br><b>IMAGE_ID</b> - код
-	 * иконки,<br><b>NUMBER_OF_MEMBERS</b> - количество членов группы,<br><b>INITIATE_PERMS</b> -
-	 * кто имеет право на прием в группу новых членов,<br><b>SPAM_PERMS</b> - кто
-	 * имеет право на написание сообщений членам группы,<br><b>DATE_ACTIVITY</b> -
-	 * дата последней активности в группе,<br><b>SUBJECT_NAME</b> - название темы
-	 * группы.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arGroup = CSocNetGroup::GetByID(5);
-	 * print_r($arGroup);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetByID.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает параметры рабочей группы с заданным идентификатором.</p> <p><b>Примечание</b>: при многократном вызове метода для одного и того же идентификатора рабочей группы в рамках одного хита запрос к базе направляется только один раз. В дальнейшем результат возвращается без запроса к базе.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рабочей группы
+	*
+	*
+	*
+	* @param bool $bCheckPermissions = false Флаг проверки прав доступа. Необязательный параметр. По
+	* умолчанию равен false.
+	*
+	*
+	*
+	* @return array <p>Возвращается массив с ключами:<br><b>ID</b> - идентификатор рабочей
+	* группы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название
+	* группы,<br><b>DESCRIPTION</b> - описание группы,<br><b>DATE_CREATE</b> - дата
+	* создания,<br><b>DATE_UPDATE</b> - дата последнего изменения параметров
+	* группы,<br><b>ACTIVE</b> - активность,<br><b>VISIBLE</b> - видима ли группа в
+	* списках,<br><b>OPENED</b> - открыта ли группа для свободного
+	* вступления,<br><b>CLOSED</b> - является ли группа архивной,<br><b>SUBJECT_ID</b> -
+	* код темы группы,<br><b>OWNER_ID</b> - код пользователя-владельца
+	* группы,<br><b>KEYWORDS</b> - ключевые слова,<br><b>IMAGE_ID</b> - код
+	* иконки,<br><b>NUMBER_OF_MEMBERS</b> - количество членов группы,<br><b>INITIATE_PERMS</b> -
+	* кто имеет право на прием в группу новых членов,<br><b>SPAM_PERMS</b> - кто
+	* имеет право на написание сообщений членам группы,<br><b>DATE_ACTIVITY</b> -
+	* дата последней активности в группе,<br><b>SUBJECT_NAME</b> - название темы
+	* группы.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arGroup = CSocNetGroup::GetByID(5);
+	* print_r($arGroup);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID, $bCheckPermissions = false)
 	{
 		global $DB, $USER;
@@ -504,26 +509,26 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	 * <p>Проверяет, может ли пользователь принимать в группу новых членов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код группы
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если пользователь может принимать в группу новых членов.
-	 * Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserInitiate.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, может ли пользователь принимать в группу новых членов.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя </h
+	*
+	*
+	*
+	* @param int $groupID  Код группы
+	*
+	*
+	*
+	* @return bool <p>True, если пользователь может принимать в группу новых членов.
+	* Иначе - false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserInitiate.php
+	* @author Bitrix
+	*/
 	public static function CanUserInitiate($userID, $groupID)
 	{
 		$userID = IntVal($userID);
@@ -566,25 +571,26 @@ class CAllSocNetGroup
 
 	
 	/**
-	 * <p>Проверяет, может ли пользователь видеть группу в списке групп. Пользователь может видеть группу с списке групп, если группа видимая, либо пользователь является ее членом.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код группы
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если пользователь имеет право видеть группу. Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserViewGroup.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, может ли пользователь видеть группу в списке групп. Пользователь может видеть группу с списке групп, если группа видимая, либо пользователь является ее членом.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя </h
+	*
+	*
+	*
+	* @param int $groupID  Код группы
+	*
+	*
+	*
+	* @return bool <p>True, если пользователь имеет право видеть группу. Иначе - false.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserViewGroup.php
+	* @author Bitrix
+	*/
 	public static function CanUserViewGroup($userID, $groupID)
 	{
 		$userID = IntVal($userID);
@@ -613,25 +619,26 @@ class CAllSocNetGroup
 
 	
 	/**
-	 * <p>Проверяет, может ли пользователь просматривать групу. Пользователь может просматривать группу, если она открытая, либо если этот пользователь является членом группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код группы
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если пользователь может просматривать группу. Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserReadGroup.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, может ли пользователь просматривать групу. Пользователь может просматривать группу, если она открытая, либо если этот пользователь является членом группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя </h
+	*
+	*
+	*
+	* @param int $groupID  Код группы
+	*
+	*
+	*
+	* @return bool <p>True, если пользователь может просматривать группу. Иначе - false.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserReadGroup.php
+	* @author Bitrix
+	*/
 	public static function CanUserReadGroup($userID, $groupID)
 	{
 		$userID = IntVal($userID);
@@ -663,72 +670,77 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li> <li> <b>K</b> (Все члены группы ).</li> </ul> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ownerID  Код пользователя - владельца новой рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров новой группы. Допустимые ключи
-	 * массива:<br><b>SITE_ID</b> - код сайта (обязательное поле),<br><b>NAME</b> -
-	 * название группы (обязательное поле),<br><b>DESCRIPTION</b> - описание
-	 * группы,<br><b>VISIBLE</b> - флаг Y/N - видна ли группа в списке
-	 * групп,<br><b>OPENED</b> - флаг Y/N - открыта ли группа для свободного
-	 * вступления,<br><b>SUBJECT_ID</b> - код темы (обязательное поле),<br><b>KEYWORDS</b> -
-	 * ключевые слова,<br><b>IMAGE_ID</b> - иконка группы,<br><b>INITIATE_PERMS</b> - кто
-	 * имеет право на приглашение пользователей в группу (обязательное
-	 * поле): SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец
-	 * группы и модераторы группы , SONET_ROLES_USER - все члены группы,<br><b>CLOSED</b>
-	 * - флаг Y/N - является ли группа архивной,<br><b>SPAM_PERMS</b> - кто имеет
-	 * право на отправку сообщений в группу (обязательное поле):
-	 * SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец группы и
-	 * модераторы группы, SONET_ROLES_USER - все члены группы, SONET_ROLES_ALL - все
-	 * пользователи.
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает код вновь созданной группы или false в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arImageID = $GLOBALS["HTTP_POST_FILES"]["GROUP_IMAGE_ID"];
-	 * if (StrLen($arImageID["tmp_name"]) &gt; 0)
-	 * 	CFile::ResizeImage($arImageID, array("width" =&gt; 300, "height" =&gt; 300), BX_RESIZE_IMAGE_PROPORTIONAL);
-	 * 
-	 * $arFields = array(
-	 * 	"SITE_ID" =&gt; SITE_ID,
-	 * 	"NAME" =&gt; $_POST["GROUP_NAME"],
-	 * 	"DESCRIPTION" =&gt; $_POST["GROUP_DESCRIPTION"],
-	 * 	"VISIBLE" =&gt; ($_POST["GROUP_VISIBLE"] == "Y" ? "Y" : "N"),
-	 * 	"OPENED" =&gt; ($_POST["GROUP_OPENED"] == "Y" ? "Y" : "N"),
-	 * 	"CLOSED" =&gt; ($_POST["GROUP_CLOSED"] == "Y" ? "Y" : "N"),
-	 * 	"SUBJECT_ID" =&gt; $_POST["GROUP_SUBJECT_ID"],
-	 * 	"KEYWORDS" =&gt; $_POST["GROUP_KEYWORDS"],
-	 * 	"IMAGE_ID" =&gt; $arImageID,
-	 * 	"INITIATE_PERMS" =&gt; $_POST["GROUP_INITIATE_PERMS"],
-	 * 	"SPAM_PERMS" =&gt; $_POST["GROUP_SPAM_PERMS"],
-	 * );
-	 * 
-	 * $groupId = CSocNetGroup::CreateGroup($GLOBALS["USER"]-&gt;GetID(), $arFields);
-	 * if (!$groupId)
-	 * {
-	 * 	if ($e = $GLOBALS["APPLICATION"]-&gt;GetException())
-	 * 		$errorMessage .= $e-&gt;GetString();
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CreateGroup.php
-	 * @author Bitrix
-	 */
+	* <p>Метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li> <li> <b>K</b> (Все члены группы ).</li> </ul> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ownerID  Код пользователя - владельца новой рабочей группы.
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров новой группы. Допустимые ключи
+	* массива:<br><b>SITE_ID</b> - код сайта (обязательное поле),<br><b>NAME</b> -
+	* название группы (обязательное поле),<br><b>DESCRIPTION</b> - описание
+	* группы,<br><b>VISIBLE</b> - флаг Y/N - видна ли группа в списке
+	* групп,<br><b>OPENED</b> - флаг Y/N - открыта ли группа для свободного
+	* вступления,<br><b>SUBJECT_ID</b> - код темы (обязательное поле),<br><b>KEYWORDS</b> -
+	* ключевые слова,<br><b>IMAGE_ID</b> - иконка группы,<br><b>INITIATE_PERMS</b> - кто
+	* имеет право на приглашение пользователей в группу (обязательное
+	* поле): SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец
+	* группы и модераторы группы , SONET_ROLES_USER - все члены группы,<br><b>CLOSED</b>
+	* - флаг Y/N - является ли группа архивной,<br><b>SPAM_PERMS</b> - кто имеет
+	* право на отправку сообщений в группу (обязательное поле):
+	* SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец группы и
+	* модераторы группы, SONET_ROLES_USER - все члены группы, SONET_ROLES_ALL - все
+	* пользователи.
+	*
+	*
+	*
+	* @param bool $bAutoSubscribe = true Атоподписывание на созданную тему. Необязательный параметр. По
+	* умолчанию имеет значение True.
+	*
+	*
+	*
+	* @return int <p>Метод возвращает код вновь созданной группы или false в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arImageID = $GLOBALS["HTTP_POST_FILES"]["GROUP_IMAGE_ID"];
+	* if (StrLen($arImageID["tmp_name"]) &gt; 0)
+	* 	CFile::ResizeImage($arImageID, array("width" =&gt; 300, "height" =&gt; 300), BX_RESIZE_IMAGE_PROPORTIONAL);
+	* 
+	* $arFields = array(
+	* 	"SITE_ID" =&gt; SITE_ID,
+	* 	"NAME" =&gt; $_POST["GROUP_NAME"],
+	* 	"DESCRIPTION" =&gt; $_POST["GROUP_DESCRIPTION"],
+	* 	"VISIBLE" =&gt; ($_POST["GROUP_VISIBLE"] == "Y" ? "Y" : "N"),
+	* 	"OPENED" =&gt; ($_POST["GROUP_OPENED"] == "Y" ? "Y" : "N"),
+	* 	"CLOSED" =&gt; ($_POST["GROUP_CLOSED"] == "Y" ? "Y" : "N"),
+	* 	"SUBJECT_ID" =&gt; $_POST["GROUP_SUBJECT_ID"],
+	* 	"KEYWORDS" =&gt; $_POST["GROUP_KEYWORDS"],
+	* 	"IMAGE_ID" =&gt; $arImageID,
+	* 	"INITIATE_PERMS" =&gt; $_POST["GROUP_INITIATE_PERMS"],
+	* 	"SPAM_PERMS" =&gt; $_POST["GROUP_SPAM_PERMS"],
+	* );
+	* 
+	* $groupId = CSocNetGroup::CreateGroup($GLOBALS["USER"]-&gt;GetID(), $arFields);
+	* if (!$groupId)
+	* {
+	* 	if ($e = $GLOBALS["APPLICATION"]-&gt;GetException())
+	* 		$errorMessage .= $e-&gt;GetString();
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/creategroup.php
+	* @author Bitrix
+	*/
 	public static function CreateGroup($ownerID, $arFields, $bAutoSubscribe = true)
 	{
 		global $APPLICATION, $DB;
@@ -941,149 +953,17 @@ class CAllSocNetGroup
 		// <-- GROUP BY
 
 		// WHERE -->
-		$arSqlSearch = Array();
-
-		if (!is_array($arFilter))
-			$filter_keys = Array();
-		else
-			$filter_keys = array_keys($arFilter);
-
-		$tmp_count = count($filter_keys);
-		for ($i = 0; $i < $tmp_count; $i++)
-		{
-			$vals = $arFilter[$filter_keys[$i]];
-			if (!is_array($vals))
-				$vals = array($vals);
-
-			$key = $filter_keys[$i];
-			$key_res = CSocNetGroup::GetFilterOperation($key);
-			$key = $key_res["FIELD"];
-			$strNegative = $key_res["NEGATIVE"];
-			$strOperation = $key_res["OPERATION"];
-			$strOrNull = $key_res["OR_NULL"];
-
-			if (array_key_exists($key, $arFields))
-			{
-				$arSqlSearch_tmp = array();
-				foreach ($vals as $val)
-				{
-					if (isset($arFields[$key]["WHERE"]))
-					{
-						$arSqlSearch_tmp1 = call_user_func_array(
-								$arFields[$key]["WHERE"],
-								array($val, $key, $strOperation, $strNegative, $arFields[$key]["FIELD"], &$arFields, &$arFilter)
-							);
-						if ($arSqlSearch_tmp1 !== false)
-							$arSqlSearch_tmp[] = $arSqlSearch_tmp1;
-					}
-					else
-					{
-						if ($arFields[$key]["TYPE"] == "int")
-						{
-							if ((IntVal($val) == 0) && (strpos($strOperation, "=") !== False))
-								$arSqlSearch_tmp[] = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
-							else
-								$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".IntVal($val)." )";
-						}
-						elseif ($arFields[$key]["TYPE"] == "double")
-						{
-							$val = str_replace(",", ".", $val);
-
-							if ((DoubleVal($val) == 0) && (strpos($strOperation, "=") !== False))
-								$arSqlSearch_tmp[] = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
-							else
-								$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".DoubleVal($val)." )";
-						}
-						elseif ($arFields[$key]["TYPE"] == "string" || $arFields[$key]["TYPE"] == "char")
-						{
-							if ($strOperation == "QUERY")
-								$arSqlSearch_tmp[] = GetFilterQuery($arFields[$key]["FIELD"], $val, (strpos($val, "%") === false ? "Y" : "N"));
-							else
-							{
-								if ((strlen($val) == 0) && (strpos($strOperation, "=") !== False))
-									$arSqlSearch_tmp[] = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND NOT" : "OR")." (".$DB->Length($arFields[$key]["FIELD"])." <= 0) ".(($strNegative == "Y") ? "AND NOT" : "OR")." (".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' )";
-								else
-									$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' )";
-							}
-						}
-						elseif ($arFields[$key]["TYPE"] == "string_or_null" || $arFields[$key]["TYPE"] == "char_or_null")
-						{
-							if ($strOperation == "QUERY")
-								$arSqlSearch_tmp[] = GetFilterQuery($arFields[$key]["FIELD"], $val, (strpos($val, "%") === false ? "Y" : "N"));
-							else
-							{
-								if ((strlen($val) == 0) && (strpos($strOperation, "=") !== False))
-								{
-// future functionality
-								}
-								else
-									$arSqlSearch_tmp[] = "(".$arFields[$key]["FIELD"]." ".$strOperation." '".$DB->ForSql($val)."' OR ".$arFields[$key]["FIELD"]." IS NULL)";
-							}
-						}
-						elseif ($arFields[$key]["TYPE"] == "datetime")
-						{
-							if (strlen($val) <= 0)
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL)";
-							elseif (strtoupper($val) === "NOW")
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".$DB->GetNowFunction().")";
-							else
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".$DB->CharToDateFunction($DB->ForSql($val), "FULL").")";
-						}
-						elseif ($arFields[$key]["TYPE"] == "date")
-						{
-							if (strlen($val) <= 0)
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?"NOT":"")."(".$arFields[$key]["FIELD"]." IS NULL)";
-							else
-								$arSqlSearch_tmp[] = ($strNegative=="Y"?" ".$arFields[$key]["FIELD"]." IS NULL OR NOT ":"")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".$DB->CharToDateFunction($DB->ForSql($val), "SHORT").")";
-						}
-					}
-				}
-
-				if (isset($arFields[$key]["FROM"])
-					&& strlen($arFields[$key]["FROM"]) > 0
-					&& !in_array($arFields[$key]["FROM"], $arAlreadyJoined))
-				{
-					if (strlen($strSqlFrom) > 0)
-						$strSqlFrom .= " ";
-					$strSqlFrom .= $arFields[$key]["FROM"];
-					$arAlreadyJoined[] = $arFields[$key]["FROM"];
-				}
-
-				$strSqlSearch_tmp = "";
-				$tmp_count_1 = count($arSqlSearch_tmp);
-				for ($j = 0; $j < $tmp_count_1; $j++)
-				{
-					if ($j > 0)
-						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
-					$strSqlSearch_tmp .= "(".$arSqlSearch_tmp[$j].")";
-				}
-				if ($strOrNull == "Y")
-				{
-					if (strlen($strSqlSearch_tmp) > 0)
-						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
-					$strSqlSearch_tmp .= "(".$arFields[$key]["FIELD"]." IS ".($strNegative=="Y" ? "NOT " : "")."NULL)";
-
-					if (strlen($strSqlSearch_tmp) > 0)
-						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
-					if ($arFields[$key]["TYPE"] == "int" || $arFields[$key]["TYPE"] == "double")
-						$strSqlSearch_tmp .= "(".$arFields[$key]["FIELD"]." ".($strNegative=="Y" ? "<>" : "=")." 0)";
-					elseif ($arFields[$key]["TYPE"] == "string" || $arFields[$key]["TYPE"] == "char")
-						$strSqlSearch_tmp .= "(".$arFields[$key]["FIELD"]." ".($strNegative=="Y" ? "<>" : "=")." '')";
-				}
-
-				if ($strSqlSearch_tmp != "")
-					$arSqlSearch[] = "(".$strSqlSearch_tmp.")";
-			}
-		}
-
-		$tmp_count = count($arSqlSearch);
-		for ($i = 0; $i < $tmp_count; $i++)
-		{
-			if (strlen($strSqlWhere) > 0)
-				$strSqlWhere .= " AND ";
-			$strSqlWhere .= "(".$arSqlSearch[$i].")";
-		}
+		$arAlreadyJoinedOld = $arAlreadyJoined;
+		$strSqlWhere .= CSqlUtil::PrepareWhere($arFields, $arFilter, $arAlreadyJoined);
+		$arAlreadyJoinedDiff = array_diff($arAlreadyJoined, $arAlreadyJoinedOld);
 		
+		foreach($arAlreadyJoinedDiff as $from_tmp)
+		{
+			if (strlen($strSqlFrom) > 0)
+				$strSqlFrom .= " ";
+			$strSqlFrom .= $from_tmp;
+		}
+
 		if ($obUserFieldsSql)
 		{
 			$r = $obUserFieldsSql->GetFilter();
@@ -1264,7 +1144,7 @@ class CAllSocNetGroup
 
 		if ($obUserFieldsSql)
 			$strSqlFrom .= " ".$obUserFieldsSql->GetJoin($arFields["ID"]["FIELD"]);
-		
+
 		return array(
 			"SELECT" => $strSqlSelect,
 			"FROM" => $strSqlFrom,

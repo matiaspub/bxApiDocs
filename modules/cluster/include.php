@@ -1,5 +1,7 @@
 <?
-if(!defined("CACHED_b_cluster_dbnode")) // define("CACHED_b_cluster_dbnode", 360000);
+IncludeModuleLangFile(__FILE__);
+//Never increase caching time here. There were cache clenup problems noticed.
+if(!defined("CACHED_b_cluster_dbnode")) // define("CACHED_b_cluster_dbnode", 3600);
 global $DB;
 $db_type = strtolower($DB->type);
 CModule::AddAutoloadClasses(
@@ -19,4 +21,55 @@ CModule::AddAutoloadClasses(
 
 if(defined("BX_CLUSTER_GROUP"))
 	CClusterQueue::Run();
+
+class CCluster
+{
+	static public function checkForServers($toBeAddedCount = 0)
+	{
+		$countLimit = intval(COption::GetOptionString('main', '~PARAM_MAX_SERVERS', 0));
+		if ($countLimit > 0)
+		{
+			return (self::getServersCount() + $toBeAddedCount) <= $countLimit;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public function getServersCount()
+	{
+		static $cache = null;
+		if ($cache === null)
+		{
+			$hosts = array();
+			foreach(self::getServerList() as $server)
+			{
+				if ($server["DEDICATED"] == "Y")
+					$hosts[] = $server["HOST"];
+			}
+			$cache = count(array_unique($hosts));
+		}
+		return $cache;
+	}
+
+	static public function getServerList()
+	{
+		$servers = array_merge(
+			CClusterDBNode::getServerList()
+			,CClusterMemcache::getServerList()
+			,CClusterWebnode::getServerList()
+		);
+		if (empty($servers))
+		{
+			$servers[] = array(
+				"ID" => 0,
+				"HOST" => "",
+				"DEDICATED" => "Y",
+				"EDIT_URL" => "",
+			);
+		}
+		return $servers;
+	}
+}
 ?>

@@ -3,12 +3,14 @@ IncludeModuleLangFile(__FILE__);
 
 class CClusterMemcache
 {
+	public static $systemConfigurationUpdate = null;
 	private static $arList = false;
 
 	public static function LoadConfig()
 	{
 		if(self::$arList === false)
 		{
+			$arList = false;
 			if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/memcache.php"))
 				include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/memcache.php");
 
@@ -24,6 +26,8 @@ class CClusterMemcache
 	public static function SaveConfig($arServerList)
 	{
 		self::$arList = false;
+		$isOnline = false;
+
 		$content = '<'.'?
 // define("BX_MEMCACHE_CLUSTER", "'.EscapePHPString(CMain::GetServerUniqID()).'");
 $arList = array(
@@ -36,6 +40,8 @@ $arList = array(
 
 		foreach($arServerList as $i => $arServer)
 		{
+			$isOnline |= ($arServer["STATUS"] == "ONLINE");
+
 			$GROUP_ID = intval($arServer["GROUP_ID"]);
 			if(!array_key_exists($arServer["GROUP_ID"], $arGroups))
 				$GROUP_ID = $defGroup;
@@ -61,6 +67,44 @@ $arList = array(
 			$_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/cluster/memcache.php"
 			,$content
 		);
+		bx_accelerator_reset();
+
+		self::$systemConfigurationUpdate = null;
+		$cache = \Bitrix\Main\Config\Configuration::getValue('cache');
+		if ($isOnline)
+		{
+			if (
+				!is_array($cache)
+				|| !isset($cache['type'])
+				|| !is_array($cache['type'])
+				|| !isset($cache['type']['class_name'])
+				|| !$cache['type']['class_name'] === 'CPHPCacheMemcacheCluster'
+			)
+			{
+				\Bitrix\Main\Config\Configuration::setValue('cache', array(
+					'type' => array(
+						'class_name' => 'CPHPCacheMemcacheCluster',
+						'extension' => 'memcache',
+						'required_file' => 'modules/cluster/classes/general/memcache_cache.php',
+					),
+				));
+				self::$systemConfigurationUpdate = true;
+			}
+		}
+		else
+		{
+			if (
+				is_array($cache)
+				&& isset($cache['type'])
+				&& is_array($cache['type'])
+				&& isset($cache['type']['class_name'])
+				&& $cache['type']['class_name'] === 'CPHPCacheMemcacheCluster'
+			)
+			{
+				\Bitrix\Main\Config\Configuration::setValue('cache', null);
+				self::$systemConfigurationUpdate = false;
+			}
+		}
 	}
 
 	public static function GetList()
@@ -68,6 +112,25 @@ $arList = array(
 		$res = new CDBResult;
 		$res->InitFromArray(CClusterMemcache::LoadConfig());
 		return $res;
+	}
+
+	static public function getServerList()
+	{
+		global $DB;
+		$result = array();
+		foreach (CClusterMemcache::LoadConfig() as $arData)
+		{
+			$result[] = array(
+				"ID" => $arData["ID"],
+				"GROUP_ID" => $arData["GROUP_ID"],
+				"SERVER_TYPE" => "memcache",
+				"ROLE_ID" => "",
+				"HOST" => $arData["HOST"],
+				"DEDICATED" => "Y",
+				"EDIT_URL" => "/bitrix/admin/cluster_memcache_edit.php?lang=".LANGUAGE_ID."&group_id=".$arData["GROUP_ID"]."&ID=".$arData["ID"],
+			);
+		}
+		return $result;
 	}
 
 	public static function GetByID($id)

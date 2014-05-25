@@ -445,6 +445,8 @@ class CLearnLesson implements ILearnLesson
 		$checkPermissionsForUserId = -1		// -1 means - for current logged user
 	)
 	{
+		global $USER_FIELD_MANAGER;
+
 		$isAccessGranted = false;
 
 		if ($isCheckPermissions)
@@ -494,26 +496,49 @@ class CLearnLesson implements ILearnLesson
 			$arCourseFields = self::_ExtractAdditionalCourseFields ($arFields);
 		}
 
-		CLearnHelper::FireEvent('OnBeforeLessonAdd', $arFields);
+		if ( ! $USER_FIELD_MANAGER->CheckFields('LEARNING_LESSONS', 0, $arFields) )
+			return (false);
 
-		$lessonId = CLearnGraphNode::Create ($arFields);
+		foreach(GetModuleEvents('learning', 'OnBeforeLessonAdd', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
-		if ($isCourse)
+		if (
+			( ! isset($arFields['NAME']) )
+			|| ($arFields['NAME'] == '')
+		)
 		{
-			// Convert lesson to course
-			self::BecomeCourse ($lessonId, $arCourseFields);
+			$lessonId = false;
+
+			$arMsg = array(array("id"=>"NAME", "text"=> GetMessage("LEARNING_BAD_NAME")));
+
+			$e = new CAdminException($arMsg);
+			$GLOBALS["APPLICATION"]->ThrowException($e);
 		}
 		else
+			$lessonId = CLearnGraphNode::Create ($arFields);
+
+		if ($lessonId)
 		{
-			// Link to parent lesson, if need
-			if ($parentLessonId !== true)
-				self::RelationAdd ($parentLessonId, $lessonId, $arProperties);
+			$USER_FIELD_MANAGER->Update('LEARNING_LESSONS', $lessonId, $arFields);
+
+			if ($isCourse)
+			{
+				// Convert lesson to course
+				self::BecomeCourse ($lessonId, $arCourseFields);
+			}
+			else
+			{
+				// Link to parent lesson, if need
+				if ($parentLessonId !== true)
+					self::RelationAdd ($parentLessonId, $lessonId, $arProperties);
+			}
+
+			CLearnCacheOfLessonTreeComponent::MarkAsDirty();
 		}
 
-		CLearnCacheOfLessonTreeComponent::MarkAsDirty();
-
 		$arFields['LESSON_ID'] = $lessonId;
-		CLearnHelper::FireEvent('OnAfterLessonAdd', $arFields);
+		foreach(GetModuleEvents('learning', 'OnAfterLessonAdd', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
 		return ($lessonId);
 	}
@@ -660,7 +685,7 @@ class CLearnLesson implements ILearnLesson
 
 	final public static function Update ($id, $arFields)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		if ( isset($arFields['ACTIVE']) 
 			&& ( ! is_bool($arFields['ACTIVE']) )
@@ -672,6 +697,9 @@ class CLearnLesson implements ILearnLesson
 				$arFields['ACTIVE'] = false;
 		}
 
+		if ( ! $USER_FIELD_MANAGER->CheckFields('LEARNING_LESSONS', $id, $arFields) )
+			return (false);
+
 		$courseId = self::GetLinkedCourse ($id);
 
 		// if lesson is course, extract additional fields of course
@@ -681,7 +709,25 @@ class CLearnLesson implements ILearnLesson
 			$arCourseFields = self::_ExtractAdditionalCourseFields ($arFields);
 		}
 
-		CLearnHelper::FireEvent('OnBeforeLessonUpdate', $arFields);
+		foreach(GetModuleEvents('learning', 'OnBeforeLessonUpdate', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$arFields));
+
+		if (
+			array_key_exists('NAME', $arFields)
+			&& ($arFields['NAME'] == '')
+		)
+		{
+			$lessonId = false;
+
+			$arMsg = array(array("id"=>"NAME", "text"=> GetMessage("LEARNING_BAD_NAME")));
+
+			$e = new CAdminException($arMsg);
+			$GLOBALS["APPLICATION"]->ThrowException($e);
+
+			return(false);
+		}
+
+		$USER_FIELD_MANAGER->Update('LEARNING_LESSONS', $id, $arFields);
 
 		// Update main lesson data
 		CLearnGraphNode::Update ($id, $arFields);
@@ -749,7 +795,8 @@ class CLearnLesson implements ILearnLesson
 
 		CLearnCacheOfLessonTreeComponent::MarkAsDirty();
 
-		CLearnHelper::FireEvent('OnAfterLessonUpdate', $arFields);
+		foreach(GetModuleEvents('learning', 'OnAfterLessonUpdate', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(&$arFields, $id));
 	}
 
 
@@ -901,6 +948,8 @@ class CLearnLesson implements ILearnLesson
 	
 	final public static function Delete ($lesson_id)
 	{
+		global $USER_FIELD_MANAGER;
+
 		list ($lesson_id, $simulate, $check_permissions, $user_id) = 
 			self::_funcDelete_ParseOptions($lesson_id);
 
@@ -927,8 +976,8 @@ class CLearnLesson implements ILearnLesson
 				$oAccess->IsLessonAccessible($lesson_id, CLearnAccess::OP_LESSON_UNLINK_FROM_PARENTS);
 		}
 
-		if ($simulate === false)
-			CLearnHelper::FireEvent('OnBeforeLessonDelete', $lesson_id);
+		foreach(GetModuleEvents('learning', 'OnBeforeLessonDelete', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($lesson_id));
 
 		foreach ($arNeighboursEdges as $arEdge)
 		{
@@ -1052,7 +1101,16 @@ class CLearnLesson implements ILearnLesson
 
 			CLearnGraphNode::Remove($lesson_id);
 
+			$USER_FIELD_MANAGER->delete('LEARNING_LESSONS', $lesson_id);
+
 			CLearnCacheOfLessonTreeComponent::MarkAsDirty();
+
+			CEventLog::add(array(
+				'AUDIT_TYPE_ID' => 'LEARNING_REMOVE_ITEM',
+				'MODULE_ID'     => 'learning',
+				'ITEM_ID'       => 'L #' . $lesson_id,
+				'DESCRIPTION'   => 'lesson removed'
+			));
 
 			if (CModule::IncludeModule('search'))
 			{
@@ -1062,7 +1120,10 @@ class CLearnLesson implements ILearnLesson
 		}
 
 		if ($simulate === false)
-			CLearnHelper::FireEvent('OnAfterLessonDelete', $lesson_id);
+		{
+			foreach(GetModuleEvents('learning', 'OnAfterLessonDelete', true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($lesson_id));
+		}
 	}
 
 
@@ -1441,9 +1502,22 @@ class CLearnLesson implements ILearnLesson
 	}
 
 
-	protected static function GetListUni ($arOrder = array(), $arFilter = array(), $arSelectFields = array(), $mode = self::GET_LIST_ALL, $lessonId = -1)
+	protected static function GetListUni ($arOrder = array(), $arFilter = array(), $arSelectFields = array(), $mode = self::GET_LIST_ALL, $lessonId = -1, $arNavParams = array())
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
+
+		$obUserFieldsSql = new CUserTypeSQL();
+		$obUserFieldsSql->SetEntity('LEARNING_LESSONS', 'TL.ID');
+		$obUserFieldsSql->SetSelect($arSelectFields);
+		$obUserFieldsSql->SetFilter($arFilter);
+		$obUserFieldsSql->SetOrder($arOrder);
+
+		$bReplaceCourseId = false;
+		if (isset($arFilter['#REPLACE_COURSE_ID_TO_ID']))
+		{
+			$bReplaceCourseId = true;
+			unset($arFilter['#REPLACE_COURSE_ID_TO_ID']);
+		}
 
 		$oPermParser = new CLearnParsePermissionsFromFilter ($arFilter);
 
@@ -1539,6 +1613,10 @@ class CLearnLesson implements ILearnLesson
 				$SqlSearchLang .= ", '" . $DB->ForSql($v) . "'";
 		}
 
+		$r = $obUserFieldsSql->GetFilter();
+		if (strlen($r) > 0)
+			$arSqlSearch[] = "(".$r.")";
+
 		$sqlSearch = '';
 		foreach ($arSqlSearch as $value)
 		{
@@ -1547,7 +1625,7 @@ class CLearnLesson implements ILearnLesson
 		}
 
 		$modeSQL_join = $modeSQL_where = '';
-		$modeSQL_defaultSortField = "\n, TC.SORT AS SORT\n";
+		$modeSQL_defaultSortField = "TC.SORT";	// as SORT
 
 		// Prepare SQL's joins, if $mode need it
 		if ($mode & self::GET_LIST_IMMEDIATE_PARENTS_OF)
@@ -1584,11 +1662,14 @@ class CLearnLesson implements ILearnLesson
 
 			// Override default sort
 			$arMap['sort'] = $arMap['edge_sort'];
-			$modeSQL_defaultSortField = "\n, TLE.SORT AS SORT\n";
+			$modeSQL_defaultSortField = "TLE.SORT";		// as SORT
 
 			$arFieldsMap['EDGE_SORT'] = 'TLE.SORT';
 			$arFieldsMap['SORT']      = 'TLE.SORT';
 		}
+
+		if ($bReplaceCourseId)
+			$arFieldsMap['ID'] = $arFieldsMap['COURSE_ID'];
 
 		// Select all fields by default
 		if (count($arSelectFields) == 0)
@@ -1605,8 +1686,12 @@ class CLearnLesson implements ILearnLesson
 		// Build list of fields to be selected
 		$strSqlSelect = '';
 		$bFirstPass = true;
+		$bDefaultSortFieldSelected = false;
 		foreach ($arSelectFields as $selectFieldName)
 		{
+			if (substr($selectFieldName, 0, 3) === 'UF_')
+				continue;
+
 			if (!$bFirstPass)
 				$strSqlSelect .= ', ';
 			else
@@ -1618,8 +1703,27 @@ class CLearnLesson implements ILearnLesson
 					'EA_OTHER: UNKNOWN FIELD: ' . $selectFieldName,
 					LearnException::EXC_ERR_ALL_GIVEUP);
 			}
+
 			$strSqlSelect .= $arFieldsMap[$selectFieldName] . ' AS ' . $selectFieldName;
+
+			if (
+				($selectFieldName === 'SORT')
+				&& ($arFieldsMap[$selectFieldName] === $modeSQL_defaultSortField)
+			)
+			{
+				$bDefaultSortFieldSelected = true;
+			}
 		}
+
+		if ( ! $bDefaultSortFieldSelected )
+		{
+			if ($strSqlSelect !== '')
+				$strSqlSelect .= ', ';
+
+			$strSqlSelect .= $modeSQL_defaultSortField . ' AS SORT';
+		}
+
+		$strSqlSelect .= $obUserFieldsSql->GetSelect();
 
 		$sqlLangConstraint = '';
 
@@ -1635,23 +1739,23 @@ class CLearnLesson implements ILearnLesson
 			";
 		}
 
-		$sql = 
-		"SELECT $strSqlSelect $modeSQL_defaultSortField
-		FROM b_learn_lesson TL
-		LEFT JOIN b_learn_course TC 
-			ON TC.LINKED_LESSON_ID = TL.ID
-		LEFT JOIN b_user TU 
-			ON TU.ID = TL.CREATED_BY ";
-
-		$sql .= $modeSQL_join;		// for getting only parents/childs, if need
-		$sql .= " WHERE 1 = 1 ";
-		$sql .= $sqlLangConstraint;	// filter by site IDs
-		$sql .= $modeSQL_where;		// for getting only parents/childs, if need
+		$strSqlFrom = "FROM b_learn_lesson TL
+			LEFT JOIN b_learn_course TC 
+				ON TC.LINKED_LESSON_ID = TL.ID
+			LEFT JOIN b_user TU 
+				ON TU.ID = TL.CREATED_BY "
+			. $modeSQL_join				// for getting only parents/childs, if need
+			. $obUserFieldsSql->GetJoin("TL.ID")
+			. " WHERE 1 = 1 "
+			. $sqlLangConstraint		// filter by site IDs
+			. $modeSQL_where;			// for getting only parents/childs, if need
 
 		if ($oPermParser->IsNeedCheckPerm())
-			$sql .= " AND TL.ID IN (" . $oPermParser->SQLForAccessibleLessons() . ") ";
+			$strSqlFrom .= " AND TL.ID IN (" . $oPermParser->SQLForAccessibleLessons() . ") ";
 
-		$sql .= $sqlSearch;
+		$strSqlFrom .= $sqlSearch;
+
+		$sql = "SELECT " . $strSqlSelect . " " . $strSqlFrom;
 
 		$arSqlOrder = array();
 		foreach($arOrder as $by => $order)
@@ -1662,12 +1766,18 @@ class CLearnLesson implements ILearnLesson
 			if ($order !== 'asc')
 				$order = 'desc';
 
-			if ( ! isset($arMap[$by]) )
+			if ($s = $obUserFieldsSql->getOrder(strtolower($by)))
+				$arSqlOrder[] = ' ' . $s . ' ' . $order . ' ';
+
+			if (substr($by, 0, 3) !== 'UF_')
 			{
-				throw new LearnException(
-					'EA_PARAMS: unknown order by field: "' . $by . '"', 
-					LearnException::EXC_ERR_ALL_PARAMS
+				if ( ! isset($arMap[$by]) )
+				{
+					throw new LearnException(
+						'EA_PARAMS: unknown order by field: "' . $by . '"', 
+						LearnException::EXC_ERR_ALL_PARAMS
 					);
+				}
 			}
 
 			$arSqlOrder[] = ' ' . $arMap[$by] . ' ' . $order . ' ';
@@ -1678,29 +1788,50 @@ class CLearnLesson implements ILearnLesson
 
 		$sql .= ' ORDER BY ' . implode(', ', $arSqlOrder);
 
-		$rc = $DB->Query ($sql, true);	// ignore errors
-		if ($rc === false)
+		if (is_array($arNavParams) && ( ! empty($arNavParams) ) )
+		{
+			if (isset($arNavParams['nTopCount']) && ((int) $arNavParams['nTopCount'] > 0))
+			{
+				$sql = $DB->TopSql($sql, (int) $arNavParams['nTopCount']);
+				$res = $DB->Query($sql, true);
+			}
+			else
+			{
+				$res_cnt = $DB->Query("SELECT COUNT(TL.ID) as C " . $strSqlFrom);
+				$res_cnt = $res_cnt->fetch();
+				$res = new CDBResult();
+				$rc = $res->NavQuery($sql, $res_cnt['C'], $arNavParams, true);
+				if ($rc === false)
+					throw new LearnException ('EA_SQLERROR', LearnException::EXC_ERR_ALL_GIVEUP);
+			}
+		}
+		else
+			$res = $DB->Query($sql, true);
+
+		if ($res === false)
 			throw new LearnException ('EA_SQLERROR', LearnException::EXC_ERR_ALL_GIVEUP);
 
-		return ($rc);
+		$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields('LEARNING_LESSONS'));
+
+		return ($res);
 	}
 
 
-	final public static function GetList ($arOrder = array(), $arFilter = array(), $arSelectFields = array())
+	final public static function GetList ($arOrder = array(), $arFilter = array(), $arSelectFields = array(), $arNavParams = array())
 	{
-		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_ALL));
+		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_ALL, -1, $arNavParams));
 	}
 
 
-	final public static function GetListOfImmediateChilds ($lessonId, $arOrder = array(), $arFilter = array(), $arSelectFields = array())
+	final public static function GetListOfImmediateChilds ($lessonId, $arOrder = array(), $arFilter = array(), $arSelectFields = array(), $arNavParams = array())
 	{
-		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_IMMEDIATE_CHILDS_OF, $lessonId));
+		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_IMMEDIATE_CHILDS_OF, $lessonId, $arNavParams));
 	}
 
 
-	final public static function GetListOfImmediateParents ($lessonId, $arOrder = array(), $arFilter = array(), $arSelectFields = array())
+	final public static function GetListOfImmediateParents ($lessonId, $arOrder = array(), $arFilter = array(), $arSelectFields = array(), $arNavParams = array())
 	{
-		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_IMMEDIATE_PARENTS_OF, $lessonId));
+		return (self::GetListUni($arOrder, $arFilter, $arSelectFields, self::GET_LIST_IMMEDIATE_PARENTS_OF, $lessonId, $arNavParams));
 	}
 
 
@@ -1863,7 +1994,8 @@ class CLearnLesson implements ILearnLesson
 				break;
 
 				default:
-					throw new LearnException ('EA_PARAMS: unknown field ' . $key, LearnException::EXC_ERR_ALL_PARAMS);
+					if (substr($key, 0, 3) !== 'UF_')
+						throw new LearnException ('EA_PARAMS: unknown field ' . $key, LearnException::EXC_ERR_ALL_PARAMS);
 				break;
 			}
 		}

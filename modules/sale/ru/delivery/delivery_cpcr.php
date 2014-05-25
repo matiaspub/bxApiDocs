@@ -457,7 +457,7 @@ class CDeliveryCPCR
 		}
 	}
 
-	public static function Compability($arOrder)
+public static 	function Compability($arOrder)
 	{
 		$arLocationFrom = CDeliveryCPCR::__GetLocation($arOrder["LOCATION_FROM"]);
 		$arLocationTo = CDeliveryCPCR::__GetLocation($arOrder["LOCATION_TO"]);
@@ -510,7 +510,7 @@ class CDeliveryCPCR
 		}
 	}
 
-	public static function __Write2Log($data)
+public static 	function __Write2Log($data)
 	{
 		if (defined('DELIVERY_CPCR_WRITE_LOG') && DELIVERY_CPCR_WRITE_LOG === 1)
 		{

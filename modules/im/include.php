@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 19);
+// define("IM_REVISION", 30);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
@@ -61,11 +61,21 @@ CModule::AddAutoloadClasses(
 	)
 );
 
+$jsCoreRel = array('popup', 'ajax', 'fx', 'ls', 'date', 'json', 'webrtc');
+if (CModule::IncludeModule('voximplant'))
+	$jsCoreRel[] = 'voximplant';
+
 CJSCore::RegisterExt('im', array(
 	'js' => '/bitrix/js/im/im.js',
 	'css' => '/bitrix/js/im/css/messenger.css',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_im.php',
-	'rel' => array('popup', 'ajax', 'fx', 'ls', 'date', 'json')
+	'rel' => $jsCoreRel
 ));
 
+CJSCore::RegisterExt('desktop', array(
+	'js' => '/bitrix/js/im/desktop.js',
+	'css' => '/bitrix/js/im/css/desktop.css',
+	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_desktop.php',
+	'rel' => array('popup', 'ajax', 'fx', 'ls', 'date', 'json')
+));
 ?>

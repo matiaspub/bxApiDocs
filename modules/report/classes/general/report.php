@@ -11,7 +11,7 @@ class CReport
 		'LESS' => '<',
 		'LESS_OR_EQUAL' => '<=',
 		'NOT_EQUAL' => '!',
-		'START_WITH' => '>',
+		'START_WITH' => '>%',
 		'CONTAINS' => '%',
 		'NOT_CONTAINS' => '!%'
 	);
@@ -886,10 +886,18 @@ class CReport
 				else
 				{
 					$arConcatNameElements = array($DB->IsNull('%s', '\' \''));
-					if (($n = $nNameElements) > 1) while (--$n > 0) $arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
+					if (($n = $nNameElements) > 1)
+					{
+						while (--$n > 0)
+							$arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
+					}
 					$strConcatNameElements = call_user_func_array(array($DB, 'concat'), $arConcatNameElements);
 					$expression[0] = 'CASE WHEN '.$DB->Length('LTRIM(RTRIM('.$strConcatNameElements.'))').'>0 THEN '.$expression[0].' ELSE %s END';
-					if ($nNameElements > 1) for ($i = 1; $i <= $nNameElements; $i++) $expression[] = $expression[$i];
+					if ($nNameElements > 1)
+					{
+						for ($i = 1; $i <= $nNameElements; $i++)
+							$expression[] = $expression[$i];
+					}
 					$expression[] = (empty($pre) ? '' : $pre.'.').'LOGIN';
 				}
 
@@ -993,8 +1001,17 @@ class CReport
 
 				if ($subFilter['type'] == 'field')
 				{
+
+					$compare = self::$iBlockCompareVariations[$subFilter['compare']];
+					$name = $subFilter['name'];
+					$value = $subFilter['value'];
+					if ($compare === '>%')
+					{
+						$compare = '';
+						$value = $value.'%';
+					}
 					$iFilterItems[] = array(
-						self::$iBlockCompareVariations[$subFilter['compare']].$subFilter['name'] => $subFilter['value']
+						$compare.$name => $value
 					);
 				}
 				else if ($subFilter['type'] == 'filter')

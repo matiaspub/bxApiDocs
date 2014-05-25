@@ -499,11 +499,11 @@ class CCalendarSect
 				'ALLOW' => !!$arFields['EXPORT']['ALLOW'],
 				'SET' => (in_array($arFields['EXPORT']['set'], array('all', '3_9', '6_12'))) ? $arFields['EXPORT']['set'] : 'all'
 			);
-		}
-		if (!is_array($arFields['EXPORT']))
-			$arFields['EXPORT'] = array('ALLOW' => false,'SET' => 'all');
+			//if (!is_array($arFields['EXPORT']))
+			//	$arFields['EXPORT'] = array('ALLOW' => false,'SET' => 'all');
 
-		$arFields['EXPORT'] = serialize($arFields['EXPORT']);
+			$arFields['EXPORT'] = serialize($arFields['EXPORT']);
+		}
 
 		if ($bNew) // Add
 		{
@@ -691,7 +691,8 @@ class CCalendarSect
 	public static function CanDo($operation, $sectId = 0, $userId = false)
 	{
 		global $USER;
-		if (!isset($USER) || !$sectId)
+
+		if (!isset($USER) || !is_object($USER) || !$sectId)
 			return false;
 
 		if ($USER->CanDoOperation('edit_php'))

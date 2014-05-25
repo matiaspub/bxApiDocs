@@ -25,6 +25,9 @@ class ScalarField extends Field
 
 	protected $column_name = '';
 
+	/** @var null|callable|mixed  */
+	protected $default_value;
+
 	public function __construct($name, $dataType, Base $entity, $parameters = array())
 	{
 		parent::__construct($name, $dataType, $entity, $parameters);
@@ -35,6 +38,7 @@ class ScalarField extends Field
 		$this->is_autocomplete = (isset($parameters['autocomplete']) && $parameters['autocomplete']);
 
 		$this->column_name = isset($parameters['column_name']) ? $parameters['column_name'] : $this->name;
+		$this->default_value = isset($parameters['default_value']) ? $parameters['default_value'] : null;
 	}
 
 	public function isPrimary()
@@ -60,5 +64,25 @@ class ScalarField extends Field
 	public function getColumnName()
 	{
 		return $this->column_name;
+	}
+
+	static public function isValueEmpty($value)
+	{
+		return (strval($value) === '');
+	}
+
+	/**
+	 * @return callable|mixed|null
+	 */
+	public function getDefaultValue()
+	{
+		if (is_callable($this->default_value))
+		{
+			return call_user_func($this->default_value);
+		}
+		else
+		{
+			return $this->default_value;
+		}
 	}
 }

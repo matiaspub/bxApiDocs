@@ -1,9 +1,20 @@
 <?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
 namespace Bitrix\Main;
 
 use Bitrix\Main\Config;
 use Bitrix\Main\Type;
 
+/**
+ * Class HttpRequest extends Request. Contains http specific request data.
+ *
+ * @package Bitrix\Main
+ */
 class HttpRequest
 	extends Request
 {
@@ -32,6 +43,15 @@ class HttpRequest
 	 */
 	protected $cookiesRaw;
 
+	/**
+	 * Creates new HttpRequest object
+	 *
+	 * @param Server $server
+	 * @param array $queryString _GET
+	 * @param array $postData _POST
+	 * @param array $files _FILES
+	 * @param array $cookies _COOKIE
+	 */
 	public function __construct(Server $server, array $queryString, array $postData, array $files, array $cookies)
 	{
 		$request = array_merge($queryString, $postData);
@@ -44,13 +64,18 @@ class HttpRequest
 		$this->cookies = new Type\ParameterDictionary($this->prepareCookie($cookies));
 	}
 
+	/**
+	 * Applies filter to the http request data. Preserve original values.
+	 *
+	 * @param Type\IRequestFilter $filter Filter object
+	 */
 	public function addFilter(Type\IRequestFilter $filter)
 	{
 		$filteredValues = $filter->filter(array(
-			"get" => $this->queryString->arValues,
-			"post" => $this->postData->arValues,
-			"files" => $this->files->arValues,
-			"cookie" => $this->cookiesRaw->arValues
+			"get" => $this->queryString->values,
+			"post" => $this->postData->values,
+			"files" => $this->files->values,
+			"cookie" => $this->cookiesRaw->values
 			));
 
 		if (isset($filteredValues['get']))
@@ -66,19 +91,36 @@ class HttpRequest
 		}
 
 		if (isset($filteredValues['get']) || isset($filteredValues['post']))
-			$this->arValues = array_merge($this->queryString->arValues, $this->postData->arValues);
+			$this->values = array_merge($this->queryString->values, $this->postData->values);
 	}
 
+	/**
+	 * Returns _GET parameter of the current request.
+	 *
+	 * @param string $name Parameter name
+	 * @return null|string
+	 */
 	public function getQuery($name)
 	{
 		return $this->queryString->get($name);
 	}
 
+	/**
+	 * Return list of _GET parameters of current request.
+	 *
+	 * @return Type\ParameterDictionary
+	 */
 	public function getQueryList()
 	{
 		return $this->queryString;
 	}
 
+	/**
+	 * 
+	 *
+	 * @param $name
+	 * @return null|string
+	 */
 	public function getPost($name)
 	{
 		return $this->postData->get($name);
@@ -165,35 +207,43 @@ class HttpRequest
 	public function getRequestedPage()
 	{
 		if ($this->requestedFile != null)
+		{
 			return $this->requestedFile;
+		}
 
 		$page = $this->getRequestUri();
 		if (empty($page))
-			return $this->requestedFile = parent::getRequestedPage();
+		{
+			$this->requestedFile = parent::getRequestedPage();
+			return $this->requestedFile;
+		}
 
 		$page = urldecode($page);
 		$page = Text\Encoding::convertEncodingToCurrent($page);
 
-		$uri = new Web\Uri($page, Web\UriType::RELATIVE);
+		$this->requestedFile = $this->convertToPath($page);
 
-		return $this->requestedFile = $uri->convertToPath();
+		return $this->requestedFile;
 	}
 
 	public function getHttpHost($raw = true)
 	{
 		if ($raw)
+		{
 			return $this->server->getHttpHost();
+		}
 
 		static $host = null;
 
 		if ($host === null)
 		{
+			//scheme can be anything, it's used only for parsing
+			$scheme = "http://";
 			$host = $this->server->getHttpHost();
-			$hostScheme = $this->isHttps() ? "https://" : "http://";
 
-			$url = new Web\Uri($hostScheme.$host, Web\UriType::ABSOLUTE);
+			$url = new Web\Uri($scheme.$host);
+			$host = $url->getHost();
 
-			$host = $url->parse(Web\UriPart::HOST);
 			$host = trim($host, "\t\r\n\0 .");
 		}
 
@@ -213,8 +263,8 @@ class HttpRequest
 		{
 			parse_str($queryString, $vars);
 
-			$this->arValues += $vars;
-			$this->queryString->arValues += $vars;
+			$this->values += $vars;
+			$this->queryString->values += $vars;
 		}
 	}
 
@@ -239,5 +289,23 @@ class HttpRequest
 			$cookiesNew[substr($name, $cookiePrefixLength)] = $value;
 		}
 		return $cookiesNew;
+	}
+
+	protected function convertToPath($path)
+	{
+		$p = strpos($path, "?");
+		if ($p !== false)
+		{
+			$path = substr($path, 0, $p);
+		}
+
+		if (substr($path, -1, 1) === "/")
+		{
+			$path .= "index.php";
+		}
+
+		$path = IO\Path::normalize($path);
+
+		return $path;
 	}
 }

@@ -1350,6 +1350,11 @@
 					&& ( ! $DB->TableExists('b_learn_course_permission') )
 				)
 				{
+					// Mark that db convert process complete
+					$rc = COption::SetOptionString(self::MODULE_ID, self::OPTION_ID, self::STATUS_INSTALL_COMPLETE);
+					if ($rc === false)
+						throw new CLearnInstall201203ConvertDBException('SetOptionString() failed!');
+
 					return (true);
 				}
 				else
@@ -1746,3 +1751,4 @@
 				throw new Exception ('Shit happens.');
 		}
 	}
+

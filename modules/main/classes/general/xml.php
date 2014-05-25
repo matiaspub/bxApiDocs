@@ -802,7 +802,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	public function registerNodeHandler($nodePath, $callableHandler)
+public 	public function registerNodeHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -822,7 +822,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	public function registerElementHandler($nodePath, $callableHandler)
+public 	public function registerElementHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -841,7 +841,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	public function openFile($filePath)
+	public public function openFile($filePath)
 	{
 		$this->fileHandler = null;
 
@@ -875,7 +875,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	public function endOfFile()
+public 	public function endOfFile()
 	{
 		if ($this->fileHandler === null)
 			return true;
@@ -888,7 +888,7 @@ class CXMLFileStream
 	 * @return array[int]string
 	 *
 	 */
-	public function getPosition()
+public 	public function getPosition()
 	{
 		$this->xmlPosition = array();
 		foreach($this->elementStack as $i => $elementName)
@@ -908,7 +908,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	public function setPosition($position)
+public 	public function setPosition($position)
 	{
 		if(is_array($position))
 		{
@@ -926,7 +926,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	public function findNext()
+public 	public function findNext()
 	{
 		$bMB = defined("BX_UTF");
 		$cs = $this->fileCharset;
@@ -978,7 +978,7 @@ class CXMLFileStream
 	 * @return bool
 	 *
 	 */
-	private function getXmlChunk($bMB = false)
+public 	private function getXmlChunk($bMB = false)
 	{
 		if($this->bufPosition >= $this->bufLen)
 		{
@@ -1129,7 +1129,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-	private function endElement($xmlChunk)
+public 	private function endElement($xmlChunk)
 	{
 		$elementName = array_pop($this->elementStack);
 		$elementPosition  = array_pop($this->positionStack);
@@ -1159,12 +1159,9 @@ class CXMLFileStream
 	 * @param int $endPosition
 	 * @return CDataXML|false
 	 */
-	private function readXml($startPosition, $endPosition)
+public 	private function readXml($startPosition, $endPosition)
 	{
-		$savedPosition = ftell($this->fileHandler);
-		fseek($this->fileHandler, $startPosition);
-		$xmlChunk = fread($this->fileHandler, $endPosition - $startPosition);
-		fseek($this->fileHandler, $savedPosition);
+		$xmlChunk = $this->readFilePart($startPosition, $endPosition);
 		if ($xmlChunk && $this->fileCharset)
 		{
 			$error = "";
@@ -1176,5 +1173,21 @@ class CXMLFileStream
 			return $xmlObject;
 		else
 			return false;
+	}
+
+	/**
+	 * Reads part of the file preserving it's position
+	 *
+	 * @param int $startPosition
+	 * @param int $endPosition
+	 * @return CDataXML|false
+	 */
+public 	public function readFilePart($startPosition, $endPosition)
+	{
+		$savedPosition = ftell($this->fileHandler);
+		fseek($this->fileHandler, $startPosition);
+		$xmlChunk = fread($this->fileHandler, $endPosition - $startPosition);
+		fseek($this->fileHandler, $savedPosition);
+		return $xmlChunk;
 	}
 }

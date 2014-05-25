@@ -101,7 +101,7 @@ class CFinder
 		$arResult['NAME'] = htmlspecialcharsEx($arItem['NAME']);
 		
 		$html = '<a href="#'.$arResult['ID'].'" class="bx-finder-box-item bx-finder-element" rel="'.$arResult['ID'].'" onclick="return BX.Finder.onAddItem(\''.$arResult['PROVIDER'].'\', 1, this, \''.$arResult['ID'].'\')" hidefocus="true">'.
-						'<div class="bx-finder-box-item-text">'.$arResult['NAME'].'</div><div class="bx-finder-box-item-icon"></div>'.
+						'<div class="bx-finder-box-item-text">'.$arResult['NAME'].'</div>'.
 					'</a>';
 		return $html;
 	}
@@ -115,7 +115,6 @@ class CFinder
 		
 		$html = '<a href="#'.$arResult['ID'].'"  class="bx-finder-box-item-t2 bx-finder-element" rel="'.$arResult['ID'].'" onclick="return BX.Finder.onAddItem(\''.$arResult['PROVIDER'].'\', 2, this, \''.$arResult['ID'].'\')" hidefocus="true">
 						<div class="bx-finder-box-item-t2-text">'.$arResult['NAME'].'</div>
-						<div class="bx-finder-box-item-t2-icon"></div>
 					</a>';
 	
 		return $html;
@@ -137,7 +136,6 @@ class CFinder
 		$html = '<a href="#'.$arResult['ID'].'" class="bx-finder-box-item-t3 bx-finder-element" rel="'.$arResult['ID'].'" onclick="return BX.Finder.onAddItem(\''.$arResult['PROVIDER'].'\', 3, this, \''.$arResult['ID'].'\')" hidefocus="true">
 						<div style="'.(strlen($arResult['AVATAR'])>0? 'background:url(\''.$arResult['AVATAR'].'\') no-repeat center center': '').'" class="bx-finder-box-item-t3-avatar"></div>
 						<div class="bx-finder-box-item-t3-info">
-							<div class="bx-finder-box-item-t3-icon"></div>
 							<div class="bx-finder-box-item-t3-name">'.$arResult['NAME'].'</div>
 							<div class="bx-finder-box-item-t3-desc">'.$arResult['DESC'].'</div>
 						</div>
@@ -199,7 +197,6 @@ class CFinder
 		$html = '<a href="#'.$arResult['ID'].'" class="bx-finder-box-item-t5 bx-finder-element" rel="'.$arResult['ID'].'" onclick="return BX.Finder.onAddItem(\''.$arResult['PROVIDER'].'\', 5, this, \''.$arResult['ID'].'\')" hidefocus="true">
 						<div style="'.(strlen($arResult['AVATAR'])>0? 'background:url(\''.$arResult['AVATAR'].'\') no-repeat center center': '').'" class="bx-finder-box-item-t5-avatar"></div>
 						<div class="bx-finder-box-item-t5-info">
-							<div class="bx-finder-box-item-t5-icon"></div>
 							<div class="bx-finder-box-item-t5-name">'.$arResult['NAME'].'</div>
 							<div class="bx-finder-box-item-t5-desc">'.$arResult['DESC'].'</div>
 						</div>
@@ -297,7 +294,6 @@ class CFinder
 		$arResult['DESC'] = empty($arItem['DESC'])? '&nbsp;': htmlspecialcharsEx($arItem['DESC']);
 	
 		$html = '<a href="#'.$arResult['ID'].'" class="bx-finder-company-department-employee bx-finder-element" rel="'.$arResult['ID'].'" onclick="return BX.Finder.onAddItem(\''.$arResult['PROVIDER'].'\', \'structure\', this, \''.$arResult['ID'].'\')" hidefocus="true">
-						<div class="bx-finder-company-department-employee-icon"></div>
 						<div class="bx-finder-company-department-employee-info">
 							<div class="bx-finder-company-department-employee-name">'.$arResult['NAME'].'</div>
 							<div class="bx-finder-company-department-employee-position">'.$arResult['DESC'].'</div>

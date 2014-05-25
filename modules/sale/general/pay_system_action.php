@@ -18,29 +18,29 @@ class CAllSalePaySystemAction
 {
 	
 	/**
-	 * <p>Функция возвращает параметры обработчика платежной системы с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код обработчика платежной системы.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров обработчика
-	 * платежной системы с ключами:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код обработчика
-	 * платежной системы.</td> </tr> <tr> <td>PAY_SYSTEM_ID</td> <td>Код платежной
-	 * системы.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Код типа плательщика.</td> </tr> <tr>
-	 * <td>NAME</td> <td>Название платежной системы.</td> </tr> <tr> <td>ACTION_FILE</td>
-	 * <td>Скрипт платежной системы.</td> </tr> <tr> <td>RESULT_FILE</td> <td>Скрипт
-	 * получения результатов.</td> </tr> <tr> <td>NEW_WINDOW</td> <td>Флаг (Y/N) открывать
-	 * ли скрипт платежной системы в новом окне.</td> </tr> </table><p> </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__getbyid.3a702e2f.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры обработчика платежной системы с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код обработчика платежной системы.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров обработчика
+	* платежной системы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код обработчика
+	* платежной системы.</td> </tr> <tr> <td>PAY_SYSTEM_ID</td> <td>Код платежной
+	* системы.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Код типа плательщика.</td> </tr> <tr>
+	* <td>NAME</td> <td>Название платежной системы.</td> </tr> <tr> <td>ACTION_FILE</td>
+	* <td>Скрипт платежной системы.</td> </tr> <tr> <td>RESULT_FILE</td> <td>Скрипт
+	* получения результатов.</td> </tr> <tr> <td>NEW_WINDOW</td> <td>Флаг (Y/N) открывать
+	* ли скрипт платежной системы в новом окне.</td> </tr> </table> <p> </p
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__getbyid.3a702e2f.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -118,31 +118,31 @@ class CAllSalePaySystemAction
 
 	
 	/**
-	 * <p>Функция удаляет обработчик платежной системы с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код обработчика платежной системы.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * CSalePaySystemAction::Delete(12);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__delete.fd7a43b9.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет обработчик платежной системы с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код обработчика платежной системы.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* CSalePaySystemAction::Delete(12);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepaysystemaction/csalepaysystemaction__delete.fd7a43b9.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;

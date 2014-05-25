@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main;
+use Bitrix\Main\Type;
+
 class MssqlSqlHelper extends SqlHelper
 {
 
@@ -37,6 +40,18 @@ class MssqlSqlHelper extends SqlHelper
 		return "GETDATE()";
 	}
 
+	static public function getSubstrFunction($str, $from, $length = null)
+	{
+		$sql = 'SUBSTRING('.$str.', '.$from;
+
+		if (!is_null($length))
+			$sql .= ', '.$length;
+		else
+			$sql .= ', LEN('.$str.') + 1 - '.$from;
+
+		return $sql.')';
+	}
+
 	static public function getCurrentDateFunction()
 	{
 		return "convert(datetime, cast(year(getdate()) as varchar(4)) + '-' + cast(month(getdate()) as varchar(2)) + '-' + cast(day(getdate()) as varchar(2)), 120)";
@@ -66,7 +81,7 @@ class MssqlSqlHelper extends SqlHelper
 
 		$result = array();
 
-		foreach (preg_split("#(YYYY|MMMM|MM|MI|M|DD|HH|H|GG|G|SS|TT|T)#", $format, -1, PREG_SPLIT_DELIM_CAPTURE) as $i => $part)
+		foreach (preg_split("#(YYYY|MMMM|MM|MI|M|DD|HH|H|GG|G|SS|TT|T)#", $format, -1, PREG_SPLIT_DELIM_CAPTURE) as $part)
 		{
 			switch ($part)
 			{
@@ -104,10 +119,10 @@ class MssqlSqlHelper extends SqlHelper
 					$result[] = "\n\tREPLICATE('0',2-LEN(DATEPART(ss, $field)))+CONVERT(varchar(2),DATEPART(ss, $field))";
 					break;
 				case "TT":
-					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN 'AM' ELSE 'PM' END";
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 12 THEN 'AM' ELSE 'PM' END";
 					break;
 				case "T":
-					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 13 THEN 'AM' ELSE 'PM' END";
+					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 12 THEN 'AM' ELSE 'PM' END";
 					break;
 				default:
 					$result[] = "'".$this->forSql($part)."'";
@@ -137,30 +152,12 @@ class MssqlSqlHelper extends SqlHelper
 		return "LEN(".$field.")";
 	}
 
-	static public function getToCharFunction($expr, $length = 0)
+	static public function getCharToDateFunction($value)
 	{
-		return "CAST(".$expr." AS CHAR".($length > 0 ? "(".$length.")" : "").")";
+		return "CONVERT(datetime, '".$value."', 120)";
 	}
 
-	static public function getDateTimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
-	{
-		$customOffset = $value->getValue()->getOffset();
-
-		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getValue()->getOffset();
-
-		$diff = $customOffset - $serverOffset;
-		$valueTmp = clone $value;
-
-		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
-
-		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
-		$date = "CONVERT(datetime, '".$valueTmp->format($format)."', 120)";
-
-		return $date;
-	}
-
-	static public function getDateTimeFromDbFunction($fieldName)
+	static public function getDateToCharFunction($fieldName)
 	{
 		return "CONVERT(varchar(19), ".$fieldName.", 120)";
 	}
@@ -211,9 +208,36 @@ class MssqlSqlHelper extends SqlHelper
 			case "datetime":
 			case "timestamp":
 				if (empty($value))
+				{
 					$result = "NULL";
+				}
+				elseif($value instanceof Type\Date)
+				{
+					if($value instanceof Type\DateTime)
+					{
+						$value = clone($value);
+						$value->setDefaultTimeZone();
+					}
+					$result = $this->getCharToDateFunction($value->format("Y-m-d H:i:s"));
+				}
 				else
-					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITH_TIME);
+				{
+					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
+				}
+				break;
+			case "date":
+				if (empty($value))
+				{
+					$result = "NULL";
+				}
+				elseif($value instanceof Type\Date)
+				{
+					$result = $this->getCharToDateFunction($value->format("Y-m-d"));
+				}
+				else
+				{
+					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
+				}
 				break;
 			case "int":
 			case "tinyint":
@@ -246,7 +270,7 @@ class MssqlSqlHelper extends SqlHelper
 		$limit = intval($limit);
 
 		if ($offset > 0 && $limit <= 0)
-			throw new \Bitrix\Main\ArgumentException("Limit must be set if offset is set");
+			throw new Main\ArgumentException("Limit must be set if offset is set");
 
 		if ($limit > 0)
 		{
@@ -256,12 +280,22 @@ class MssqlSqlHelper extends SqlHelper
 			}
 			else
 			{
-				if (preg_match("#(\\s+order\\s+by(\\s+[a-z0-9_.]+(\\s+(asc|desc))?\\s*,)*(\\s+[a-z0-9_.]+(\\s+(asc|desc))?)\\s*)$#i", $sql, $matches))
+				$orderBy = '';
+				$sqlTmp = $sql;
+
+				preg_match_all("#\\sorder\\s+by\\s#i", $sql, $matches, PREG_OFFSET_CAPTURE);
+				if (isset($matches[0]) && is_array($matches[0]) && count($matches[0]) > 0)
 				{
-					$orderBy = $matches[1];
-					$sqlTmp = substr($sql, 0, -strlen($orderBy));
+					$idx = $matches[0][count($matches[0]) - 1][1];
+					$s = substr($sql, $idx);
+					if (substr_count($s, '(') === substr_count($s, ')'))
+					{
+						$orderBy = $s;
+						$sqlTmp = substr($sql, 0, $idx);
+					}
 				}
-				else
+
+				if ($orderBy === '')
 				{
 					$orderBy = "ORDER BY (SELECT 1)";
 					$sqlTmp = $sql;

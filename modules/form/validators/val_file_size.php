@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorFileSize
@@ -16,7 +15,7 @@ class CFormValidatorFileSize
 			"HANDLER" => array("CFormValidatorFileSize", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -34,12 +33,12 @@ class CFormValidatorFileSize
 
 		);
 	}
-	
+
 	public static function ToDB($arParams)
 	{
 		$arParams["SIZE_FROM"] = intval($arParams["SIZE_FROM"]);
 		$arParams["SIZE_TO"] = intval($arParams["SIZE_TO"]);
-		
+
 		if ($arParams["SIZE_FROM"] > $arParams["SIZE_TO"])
 		{
 			$tmp = $arParams["SIZE_FROM"];
@@ -49,16 +48,16 @@ class CFormValidatorFileSize
 
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
+
 		if (count($arValues) > 0)
 		{
 			foreach ($arValues as $arFile)
@@ -79,7 +78,7 @@ class CFormValidatorFileSize
 				}
 			}
 		}
-		
+
 		return true;
 	}
 }

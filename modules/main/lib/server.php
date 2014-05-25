@@ -24,7 +24,7 @@ class Server
 
 	public function addFilter(Type\IRequestFilter $filter)
 	{
-		$filteredValues = $filter->filter($this->arValues);
+		$filteredValues = $filter->filter($this->values);
 
 		if ($filteredValues != null)
 			$this->setValuesNoDemand($filteredValues);
@@ -140,22 +140,22 @@ class Server
 
 	public function rewriteUri($url, $queryString, $redirectStatus = null)
 	{
-		$this->arValues["REQUEST_URI"] = $url;
-		$this->arValues["QUERY_STRING"] = $queryString;
+		$this->values["REQUEST_URI"] = $url;
+		$this->values["QUERY_STRING"] = $queryString;
 		if ($redirectStatus != null)
-			$this->arValues["REDIRECT_STATUS"] = $redirectStatus;
+			$this->values["REDIRECT_STATUS"] = $redirectStatus;
 	}
 
 	public function transferUri($url, $queryString)
 	{
-		$this->arValues["REAL_FILE_PATH"] = $url;
+		$this->values["REAL_FILE_PATH"] = $url;
 		if ($queryString != "")
 		{
-			if (!isset($this->arValues["QUERY_STRING"]))
-				$this->arValues["QUERY_STRING"] = "";
-			if (isset($this->arValues["QUERY_STRING"]) && ($this->arValues["QUERY_STRING"] != ""))
-				$this->arValues["QUERY_STRING"] .= "&";
-			$this->arValues["QUERY_STRING"] .= $queryString;
+			if (!isset($this->values["QUERY_STRING"]))
+				$this->values["QUERY_STRING"] = "";
+			if (isset($this->values["QUERY_STRING"]) && ($this->values["QUERY_STRING"] != ""))
+				$this->values["QUERY_STRING"] .= "&";
+			$this->values["QUERY_STRING"] .= $queryString;
 		}
 	}
 }

@@ -335,7 +335,7 @@ class CAllStatistics extends CKeepStatistics
 
 	}
 
-	public static function DBDateCompare($FIELD_NAME, $DATE=false, $DATE_FORMAT="SHORT")
+public static 	function DBDateCompare($FIELD_NAME, $DATE=false, $DATE_FORMAT="SHORT")
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		if($DATE === false)
@@ -353,7 +353,7 @@ class CAllStatistics extends CKeepStatistics
 		return " $FIELD_NAME = $date ";
 	}
 
-	public static function CleanUpStatistics_1()
+public static 	function CleanUpStatistics_1()
 	{
 		__SetNoKeepStatistics();
 		if ($_SESSION["SESS_NO_AGENT_STATISTIC"]!="Y" && !defined("NO_AGENT_STATISTIC"))
@@ -377,7 +377,7 @@ class CAllStatistics extends CKeepStatistics
 		return "CStatistics::CleanUpStatistics_1();";
 	}
 
-	public static function CleanUpStatistics_2()
+public static 	function CleanUpStatistics_2()
 	{
 		__SetNoKeepStatistics();
 		if ($_SESSION["SESS_NO_AGENT_STATISTIC"]!="Y" && !defined("NO_AGENT_STATISTIC"))
@@ -391,7 +391,7 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// This is deprecated and unused method to handle internal search
 	///////////////////////////////////////////////////////////////////
-	public static function OnSearch($search_phrase)
+public static 	function OnSearch($search_phrase)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		if(intval($_SESSION["SESS_SEARCHER_ID"]) > 0)
@@ -449,7 +449,7 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// Обновляем счетчик по рекламной кампании
 	///////////////////////////////////////////////////////////////////
-	public static function Update_Adv()
+public static 	function Update_Adv()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 
@@ -691,7 +691,7 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// Устанавливаем рекламную кампанию
 	///////////////////////////////////////////////////////////////////
-	public static function Set_Adv()
+public static 	function Set_Adv()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		stat_session_register("SESS_ADV_ID"); // ID рекламной кампании
@@ -794,7 +794,7 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// Устанавливаем ID гостя
 	///////////////////////////////////////////////////////////////////
-	public static function Set_Guest()
+public static 	function Set_Guest()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		stat_session_register("SESS_GUEST_ID");			// ID гостя
@@ -1082,14 +1082,14 @@ class CAllStatistics extends CKeepStatistics
 		return false;
 	}
 
-	public static function GetAuditTypes()
+public static 	function GetAuditTypes()
 	{
 		return array(
 			"STAT_ACTIVITY_LIMIT" => "[STAT_ACTIVITY_LIMIT] ".GetMessage("STAT_DEFENCE_LOG_EVENT"),
 		);
 	}
 
-	public static function Set404($table = false, $where = false, $arrUpdate = false)
+public static 	function Set404($table = false, $where = false, $arrUpdate = false)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		static $STAT_DB_404 = array();
@@ -1125,54 +1125,54 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// очистка статистики до определенной даты
 	///////////////////////////////////////////////////////////////////
-	
+
 	/**
-	 * <p>Очищает собранные статистические данные.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $date = "" Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_date">формате
-	 * текущего сайта</a> (или языка) до которой (включительно) необходимо
-	 * очистить статистику. Если в данном параметре не указать дату, то
-	 * будут очищены все накопленные данные статистики.
-	 *
-	 *
-	 *
-	 * @param array &$errors  Если параметр <i>date</i> не содержит даты, то в данном параметре будут
-	 * возвращены возможные ошибки которые могут возникнуть в процессе
-	 * полной очистки данных статистики.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает "true", в случае успешного выполнения и "false" - в
-	 * противном случае.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // дата в формате текущего сайта или языка
-	 * // до которой включительно будет очищена вся собранная статистика
-	 * $date = "31.12.2007";
-	 * 
-	 * // очищаем
-	 * <b>CStatistics::CleanUp</b>($date);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/settings.php">Настройки модуля
-	 * "Статистика"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatistics/cleanup.php
-	 * @author Bitrix
-	 */
-	public static function CleanUp($cleanup_date="", &$arErrors)
+	* <p>Очищает собранные статистические данные.</p>
+	*
+	*
+	*
+	*
+	* @param string $date = "" Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_date">формате
+	* текущего сайта</a> (или языка) до которой (включительно) необходимо
+	* очистить статистику. Если в данном параметре не указать дату, то
+	* будут очищены все накопленные данные статистики.
+	*
+	*
+	*
+	* @param array &$errors  Если параметр <i>date</i> не содержит даты, то в данном параметре будут
+	* возвращены возможные ошибки которые могут возникнуть в процессе
+	* полной очистки данных статистики.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает "true", в случае успешного выполнения и "false" - в
+	* противном случае.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // дата в формате текущего сайта или языка
+	* // до которой включительно будет очищена вся собранная статистика
+	* $date = "31.12.2007";
+	* 
+	* // очищаем
+	* <b>CStatistics::CleanUp</b>($date);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/settings.php">Настройки модуля
+	* "Статистика"</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatistics/cleanup.php
+	* @author Bitrix
+	*/
+	public static 	function CleanUp($cleanup_date="", &$arErrors)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -1234,7 +1234,7 @@ class CAllStatistics extends CKeepStatistics
 	///////////////////////////////////////////////////////////////////
 	// пересчет финансовых показателей при смене базовой валюты
 	///////////////////////////////////////////////////////////////////
-	public static function RecountBaseCurrency($new_base_currency)
+public static 	function RecountBaseCurrency($new_base_currency)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -1279,9 +1279,9 @@ class CAllStatistics extends CKeepStatistics
 	}
 
 	// функции для совместимости
-	public static function GetEventParam($site_id=false) { return CStatEvent::GetGID($site_id); }
-	public static function Set_Event($event1, $event2="", $event3="", $goto="", $money="", $currency="", $chargeback="N", $site_id=false) { return CStatEvent::AddCurrent($event1, $event2, $event3, $money, $currency, $goto, $chargeback, $site_id); }
-	public static function CheckForDDL()
+public static 	function GetEventParam($site_id=false) { return CStatEvent::GetGID($site_id); }
+public static 	function Set_Event($event1, $event2="", $event3="", $goto="", $money="", $currency="", $chargeback="N", $site_id=false) { return CStatEvent::AddCurrent($event1, $event2, $event3, $money, $currency, $goto, $chargeback, $site_id); }
+public static 	function CheckForDDL()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$rs=$DB->Query("select count(*) CNT from b_stat_ddl", true);
@@ -1295,7 +1295,7 @@ class CAllStatistics extends CKeepStatistics
 		}
 		return false;
 	}
-	public static function GetDDL()
+public static 	function GetDDL()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$result = array();
@@ -1307,7 +1307,7 @@ class CAllStatistics extends CKeepStatistics
 		}
 		return $result;
 	}
-	public static function ExecuteDDL($ID)
+public static 	function ExecuteDDL($ID)
 	{
 		$ID = intval($ID);
 		$DB = CDatabase::GetModuleConnection('statistic');

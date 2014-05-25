@@ -39,23 +39,24 @@ class CBPWorkflow
 
 	
 	/**
-	 * <p>Метод возвращает экземпляр исполняющей среды, в которой запущен бизнес-процесс.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return CBPRuntime <p>Возвращается объект типа CBPRuntime, представляющий собой экземпляр
-	 * исполняющей среды, в которой запущен бизнес-процесс.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetRuntime.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает экземпляр исполняющей среды, в которой запущен бизнес-процесс.</p>
+	*
+	*
+	*
+	*
+	* @return CBPRuntime <p>Возвращается объект типа CBPRuntime, представляющий собой экземпляр
+	* исполняющей среды, в которой запущен бизнес-процесс.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
+	* </ul<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetRuntime.php
+	* @author Bitrix
+	*/
 	public function GetRuntime()
 	{
 		return $this->runtime;
@@ -63,21 +64,22 @@ class CBPWorkflow
 
 	
 	/**
-	 * <p>Метод возвращает текущий статус выполнения бизнес-процесса.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int <ul> <li> <b>CBPActivityExecutionStatus::Initialized</b> - бизнес-процесс создан, </li> <li>
-	 * <b>CBPActivityExecutionStatus::Executing</b> - бизнес-процесс выполняется, </li> <li>
-	 * <b>CBPActivityExecutionStatus::Canceling</b> - бизнес-процесс отменен, </li> <li>
-	 * <b>CBPActivityExecutionStatus::Closed</b> - бизнес-процесс завершен, </li> <li>
-	 * <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li>
-	 * </ul><br><br>
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionStatus.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает текущий статус выполнения бизнес-процесса.</p>
+	*
+	*
+	*
+	*
+	* @return int <ul> <li> <b>CBPActivityExecutionStatus::Initialized</b> - бизнес-процесс создан, </li> <li>
+	* <b>CBPActivityExecutionStatus::Executing</b> - бизнес-процесс выполняется, </li> <li>
+	* <b>CBPActivityExecutionStatus::Canceling</b> - бизнес-процесс отменен, </li> <li>
+	* <b>CBPActivityExecutionStatus::Closed</b> - бизнес-процесс завершен, </li> <li>
+	* <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li>
+	* </ul> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionStatus.php
+	* @author Bitrix
+	*/
 	private function GetExecutionStatus()
 	{
 		return $this->rootActivity->executionStatus;
@@ -85,29 +87,30 @@ class CBPWorkflow
 
 	
 	/**
-	 * <p>Метод возвращает результат выполнения бизнес-процесса.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int <ul> <li> <b>CBPActivityExecutionResult::None</b> - результат выполнения
-	 * бизнес-процесса не установлен, </li> <li> <b>CBPActivityExecutionResult::Succeeded</b> -
-	 * бизнес-процесс завершен успешно, </li> <li> <b>CBPActivityExecutionResult::Canceled</b> -
-	 * бизнес-процесс отменен, </li> <li> <b>CBPActivityExecutionResult::Faulted</b> -
-	 * бизнес-процесс остановлен по ошибке, </li> <li>
-	 * <b>CBPActivityExecutionResult::Uninitialized</b> - бизнес-процесс не инициализирован.
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>   $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>}<br>catch (Exception $e)<br>{<br>   //<br>}<br><br>$executionResult = $workflow-&gt;GetExecutionResult();<br>switch ($executionResult)<br>{<br>   case CBPActivityExecutionResult::None:<br>      echo "Нет";<br>      break;<br>   case CBPActivityExecutionResult::Succeeded:<br>      echo "Успешно";<br>      break;<br>   case CBPActivityExecutionResult::Canceled:<br>      echo "Отменено";<br>      break;<br>   case CBPActivityExecutionResult::Faulted:<br>      echo "Ошибка";<br>      break;<br>   case CBPActivityExecutionResult::Uninitialized:<br>      echo "Не инициализировано";<br>      break;<br>   default:<br>      echo "Не определено";<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionResult.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает результат выполнения бизнес-процесса.</p>
+	*
+	*
+	*
+	*
+	* @return int <ul> <li> <b>CBPActivityExecutionResult::None</b> - результат выполнения
+	* бизнес-процесса не установлен, </li> <li> <b>CBPActivityExecutionResult::Succeeded</b> -
+	* бизнес-процесс завершен успешно, </li> <li> <b>CBPActivityExecutionResult::Canceled</b> -
+	* бизнес-процесс отменен, </li> <li> <b>CBPActivityExecutionResult::Faulted</b> -
+	* бизнес-процесс остановлен по ошибке, </li> <li>
+	* <b>CBPActivityExecutionResult::Uninitialized</b> - бизнес-процесс не инициализирован.
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>   $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>}<br>catch (Exception $e)<br>{<br>   //<br>}<br><br>$executionResult = $workflow-&gt;GetExecutionResult();<br>switch ($executionResult)<br>{<br>   case CBPActivityExecutionResult::None:<br>      echo "Нет";<br>      break;<br>   case CBPActivityExecutionResult::Succeeded:<br>      echo "Успешно";<br>      break;<br>   case CBPActivityExecutionResult::Canceled:<br>      echo "Отменено";<br>      break;<br>   case CBPActivityExecutionResult::Faulted:<br>      echo "Ошибка";<br>      break;<br>   case CBPActivityExecutionResult::Uninitialized:<br>      echo "Не инициализировано";<br>      break;<br>   default:<br>      echo "Не определено";<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionResult.php
+	* @author Bitrix
+	*/
 	private function GetExecutionResult()
 	{
 		return $this->rootActivity->executionResult;
@@ -144,30 +147,31 @@ class CBPWorkflow
 	*/
 	
 	/**
-	 * <p>Конструктор создает новый экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $instanceId  Идентификатор бизнес-процесса
-	 *
-	 *
-	 *
-	 * @param CBPRuntime $runtime  Исполняющая среда
-	 *
-	 *
-	 *
-	 * @return public 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/constructor.php
-	 * @author Bitrix
-	 */
+	* <p>Конструктор создает новый экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $instanceId  Идентификатор бизнес-процесса
+	*
+	*
+	*
+	* @param CBPRuntime $runtime  Исполняющая среда </ht
+	*
+	*
+	*
+	* @return public 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/constructor.php
+	* @author Bitrix
+	*/
 	public function __construct($instanceId, CBPRuntime $runtime)
 	{
 		if (strlen($instanceId) <= 0)

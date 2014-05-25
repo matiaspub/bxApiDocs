@@ -70,21 +70,21 @@ class CAllSocNetGroupSubject
 
 	
 	/**
-	 * <p>Метод удаляет тему рабочих групп. Если есть группы с этой темой, то тема удалена не будет.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код темы.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного удаления и false - в противном случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/Delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет тему рабочих групп. Если есть группы с этой темой, то тема удалена не будет.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код темы.</bod
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -122,27 +122,27 @@ class CAllSocNetGroupSubject
 	
 	
 	/**
-	 * <p>Изменяет параметры темы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код темы.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив новых параметров темы. Ключами массива являются названия
-	 * полей темы, а значениями - их значения. Допустимые ключи: SITE_ID - код
-	 * сайта, NAME - название.
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененной темы или false в случае ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры темы.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код темы.</bod
+	*
+	*
+	*
+	* @param array $arFields  Массив новых параметров темы. Ключами массива являются названия
+	* полей темы, а значениями - их значения. Допустимые ключи: <b>SITE_ID</b> -
+	* код сайта, <b>NAME</b> - название.
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененной темы или false в случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -228,22 +228,22 @@ class CAllSocNetGroupSubject
 	/***************************************/
 	
 	/**
-	 * <p>Возвращает параметры темы. Не порождает запросов к базе данных.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код темы.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив параметров темы. Массив имеет ключи:<br> ID - код темы,<br> SITE_ID
-	 * - код сайта,<br> NAME - название. </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/GetByID.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает параметры темы. Не порождает запросов к базе данных.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код темы.</bod
+	*
+	*
+	*
+	* @return array <p>Массив параметров темы. Массив имеет ключи:<br><b>ID</b> - код
+	* темы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название. </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/GetByID.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;

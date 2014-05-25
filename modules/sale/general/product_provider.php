@@ -61,25 +61,25 @@ interface IBXSaleProductProvider
 	* @param int $arFields["PRODUCT_ID"]
 	* @param int $arFields["USER_ID"]
 	* @return array Product parameters or false
-	*/	
+	*/
 	public static function RecurringOrderProduct($arFields);
-	
+
 	/**
 	* Method is called to know if product provider supports stores
 	*
-	* @return int number of stores available or false if stores are not used
+	* @return int number of stores used as shipping centers available or false if stores are not used
 	*/
-	public static function GetStoresCount($arFields = array());	
+	public static function GetStoresCount($arFields = array());
 
 	/**
 	* Method is called to get information from the product provider
-	* about available stores for the specified product
+	* about available shipping stores for the specified product
 	*
 	* @param int $arFields["PRODUCT_ID"] - product ID
 	* @return array of stores or false if stores are not used
 	*/
 	public static function GetProductStores($arFields);
-	
+
 	/**
 	* Method is called when the product should be reserved
 	*

@@ -93,32 +93,59 @@ class CSocNetTextParser
 
 	
 	/**
-	 * <p>Функция форматирования сообщения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $text  Текст сообщения
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает отформатированную строку сообщения.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $parser = new CSocNetTextParser(LANGUAGE_ID, "/bitrix/images/socialnetwork/smile/");
-	 * $parser-&gt;MaxStringLen = 20;
-	 * $message = $parser-&gt;convert($draftMessage);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert.php
-	 * @author Bitrix
-	 */
+	* <p>Функция форматирования сообщения.</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Исходное сообщение. </htm
+	*
+	*
+	*
+	* @param bool $bPreview = true Необязательный параметр. По умолчанию равен true.
+	*
+	*
+	*
+	* @param array $arImages = array() Массив картинок сообщения.
+	*
+	*
+	*
+	* @param array $allow = array() Массив параметров для форматирования сообщения, со значениями
+	* <i>Y</i> или <i>N</i>: <ul> <li> <b>HTML</b> - в тексте могут содержаться любые HTML
+	* теги, </li> <li> <b>ANCHOR</b> - разрешен тег &lt;a&gt;, </li> <li> <b>BIU</b> - разрешены
+	* теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <b>IMG</b> - разрешен тег &lt;img&gt;, </li> <li>
+	* <b>QUOTE</b> - разрешен тег цитирования &lt;quote&gt;, </li> <li> <b>CODE</b> - разрешен
+	* тег показа кода &lt;code&gt;, </li> <li> <b>FONT</b> - разрешен тег &lt;font&gt;, </li> <li>
+	* <b>LIST</b> - разрешены теги &lt;ul&gt;, &lt;li&gt;, </li> <li> <b>SMILES</b> - показ
+	* смайликов в виде картинок, </li> <li> <b>NL2BR</b> - заменять переводы
+	* каретки на тег &lt;br&gt; при разрешении принимать любые HTML теги, </li>
+	* <li> <b>VIDEO</b> - разрешена вставка видео, </li> </ul>
+	*
+	*
+	*
+	* @param string $type = html Тип сообщения. Необязательный параметр. По умолчанию принимает
+	* значение html.
+	*
+	*
+	*
+	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $parser = new CSocNetTextParser(LANGUAGE_ID, "/bitrix/images/socialnetwork/smile/");
+	* $parser-&gt;MaxStringLen = 20;
+	* $message = $parser-&gt;convert($draftMessage);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert.php
+	* @author Bitrix
+	*/
 	public function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")	//, "KEEP_AMP" => "N"
 	{
 		global $DB;
@@ -181,7 +208,7 @@ class CSocNetTextParser
 			if ($allow["IMG"]=="Y")
 			{
 				$text = preg_replace(
-					"#<img[^>]+src\s*=[\s\"']*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?]+)+)[\s\"']*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
+					"#<img[^>]+src\s*=[\s\"']*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?%]+)+)[\s\"']*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
 					"[img]\\1[/img]", $text);
 			}
 			if ($allow["QUOTE"]=="Y")
@@ -382,21 +409,21 @@ class CSocNetTextParser
 
 	
 	/**
-	 * <p>Функция форматирования сообщения для отправки по электронной почте.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $text  Текст сообщения.
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает отформатированную строку сообщения.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert4mail.php
-	 * @author Bitrix
-	 */
+	* <p>Функция форматирования сообщения для отправки по электронной почте.</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Текст сообщения.
+	*
+	*
+	*
+	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert4mail.php
+	* @author Bitrix
+	*/
 	public static function convert4mail($text)
 	{
 		$text = Trim($text);
@@ -909,7 +936,7 @@ class CSocNetTextParser
 
 
 /**
- * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети.
+ * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети.</body> </html>
  *
  *
  *
@@ -924,60 +951,60 @@ class CSocNetTools
 {
 	
 	/**
-	 * <p>Метод возвращает параметры изображения, заданного его идентификатором. При необходимости осуществляется масштабирование изображения. В случае отсутствия изображения возвращается изображение заданное как изображение по-умолчанию.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $imageID  Размер изображения. В случае, если оригинальное изображение хотя
-	 * бы по одному измерению больше указанного размера, осуществляется
-	 * автоматическое масштабирование.
-	 *
-	 *
-	 *
-	 * @param int $imageSize  Ссылка на изображение "по-умолчанию". Используется, если
-	 * изображение не найдено.
-	 *
-	 *
-	 *
-	 * @param string $defaultImage  Размер изображения "по-умолчанию".
-	 *
-	 *
-	 *
-	 * @param int $defaultImageSize  Ссылка, на которую браузер переходит при клике на изображении.
-	 * Может быть не задана.
-	 *
-	 *
-	 *
-	 * @param string $imageUrl  Флаг, имеющий значение true, если необходимо показывать ссылку.
-	 * Иначе - false.
-	 *
-	 *
-	 *
-	 * @param string $showImageUrl  Дополнительные параметры ссылки (тега <i>a</i>).
-	 *
-	 *
-	 *
-	 * @param string $urlParams = false 
-	 *
-	 *
-	 *
-	 * @return array <p>Метод возвращает массив с ключами FILE и IMG. В ключе FILE содержится
-	 * массив, описывающий изображение (аналогичен массиву,
-	 * возвращаемому метолом CFile::GetFileArray). В ключе IMG содержится готовая
-	 * для вывода строка HTML, показывающая изображение.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arImage = CSocNetTools::InitImage($personalPhoto, 150, "/bitrix/images/socialnetwork/nopic_user_150.gif", 150, "", false);<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/InitImage.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает параметры изображения, заданного его идентификатором. При необходимости осуществляется масштабирование изображения. В случае отсутствия изображения возвращается изображение заданное как изображение по-умолчанию.</p>
+	*
+	*
+	*
+	*
+	* @param int $imageID  Идентификатор изображения.
+	*
+	*
+	*
+	* @param int $imageSize  Размер изображения. В случае, если оригинальное изображение хотя
+	* бы по одному измерению больше указанного размера, осуществляется
+	* автоматическое масштабирование.
+	*
+	*
+	*
+	* @param string $defaultImage  Ссылка на изображение "по-умолчанию". Используется, если
+	* изображение не найдено.
+	*
+	*
+	*
+	* @param int $defaultImageSize  Размер изображения "по-умолчанию".
+	*
+	*
+	*
+	* @param string $imageUrl  Ссылка, на которую браузер переходит при клике на изображении.
+	* Может быть не задана.
+	*
+	*
+	*
+	* @param string $showImageUrl  Флаг, имеющий значение true, если необходимо показывать ссылку.
+	* Иначе - false.
+	*
+	*
+	*
+	* @param string $urlParams = false Дополнительные параметры ссылки (тега <i>a</i>).
+	*
+	*
+	*
+	* @return array <p>Метод возвращает массив с ключами FILE и IMG. В ключе FILE содержится
+	* массив, описывающий изображение (аналогичен массиву,
+	* возвращаемому метолом CFile::GetFileArray). В ключе IMG содержится готовая
+	* для вывода строка HTML, показывающая изображение.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arImage = CSocNetTools::InitImage($personalPhoto, 150, "/bitrix/images/socialnetwork/nopic_user_150.gif", 150, "", false);<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/initimage.php
+	* @author Bitrix
+	*/
 	public static function InitImage($imageID, $imageSize, $defaultImage, $defaultImageSize, $imageUrl, $showImageUrl, $urlParams=false)
 	{
 		$imageFile = false;
@@ -1044,31 +1071,32 @@ class CSocNetTools
 
 	
 	/**
-	 * <p>Метод осуществляет масштабирование изображения, заданного в виде идентификатора или в виде массива, совпадающего по структуре с массивом, возвращаемым методом CFile::GetByID. Если размеры изображения превышают заданные, то осуществляется масштабирование.</p> <p><b>Примечание</b>: возможное примечание.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $aFile  Идентификатор изображения или в массив, совпадающий по структуре
-	 * с массивом, возвращаемым методом CFile::GetByID.
-	 *
-	 *
-	 *
-	 * @param int $sizeX  Масштабируемый размер по горизонтали.
-	 *
-	 *
-	 *
-	 * @param int $sizeY  Масштабируемый размер по вертикали.
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает путь к масштабируемому изображению
-	 * относительно корня сайта. В случае ошибки возвращается false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/ResizeImage.php
-	 * @author Bitrix
-	 */
+	* <p>Метод осуществляет масштабирование изображения, заданного в виде идентификатора или в виде массива, совпадающего по структуре с массивом, возвращаемым методом CFile::GetByID. Если размеры изображения превышают заданные, то осуществляется масштабирование.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	*
+	*
+	*
+	*
+	* @param mixed $aFile  Идентификатор изображения или в массив, совпадающий по структуре
+	* с массивом, возвращаемым методом CFile::GetByID.
+	*
+	*
+	*
+	* @param int $sizeX  Масштабируемый размер по горизонтали.
+	*
+	*
+	*
+	* @param int $sizeY  Масштабируемый размер по вертикали.
+	*
+	*
+	*
+	* @return string <p>Метод возвращает путь к масштабируемому изображению
+	* относительно корня сайта. В случае ошибки возвращается false.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/ResizeImage.php
+	* @author Bitrix
+	*/
 	public static function ResizeImage($aFile, $sizeX, $sizeY)
 	{
 		$result = CFile::ResizeImageGet($aFile, array("width" => $sizeX, "height" => $sizeY));
@@ -1099,31 +1127,31 @@ class CSocNetTools
 
 	
 	/**
-	 * <p>Подготавливает день рождения для вывода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param date $datetime  Дата рождения
-	 *
-	 *
-	 *
-	 * @param char $gender  Пол. Допустимые значения: M - мужской, F - женский, X - средний.
-	 *
-	 *
-	 *
-	 * @param char $showYear = "N" Показывать ли год рождения. Допустимые значения: Y - показывать, M -
-	 * показывать только для мужского пола, N - не показывать.
-	 *
-	 *
-	 *
-	 * @return array <p>Метод возвращает массив с ключами: DATE - отформатированный день
-	 * рождения, MONTH - месяц рождения, DAY - день в месяце.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/Birthday.php
-	 * @author Bitrix
-	 */
+	* <p>Подготавливает день рождения для вывода.</p>
+	*
+	*
+	*
+	*
+	* @param date $datetime  Дата рождения
+	*
+	*
+	*
+	* @param char $gender  Пол. Допустимые значения: M - мужской, F - женский, X - средний.
+	*
+	*
+	*
+	* @param char $showYear = "N" Показывать ли год рождения. Допустимые значения: Y - показывать, M -
+	* показывать только для мужского пола, N - не показывать.
+	*
+	*
+	*
+	* @return array <p>Метод возвращает массив с ключами: DATE - отформатированный день
+	* рождения, MONTH - месяц рождения, DAY - день в месяце.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/Birthday.php
+	* @author Bitrix
+	*/
 	public static function Birthday($datetime, $gender, $showYear = "N")
 	{
 		if (StrLen($datetime) <= 0)

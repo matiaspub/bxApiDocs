@@ -271,12 +271,19 @@ class CAccess
 
 		foreach(self::$arAuthProviders as $provider)
 		{
+
 			$cl = new $provider["CLASS"];
 			if(is_callable(array($cl, "GetNames")))
 			{
 				$res = call_user_func_array(array($cl, "GetNames"), array($arCodes));
 				if(is_array($res))
-					$arResult = array_merge($arResult, $res);
+				{
+					foreach ($res as $codeId => $codeValues)
+					{
+						$codeValues['provider_id'] = $provider['ID'];
+						$arResult[$codeId] = $codeValues;
+					}
+				}
 			}
 		}
 

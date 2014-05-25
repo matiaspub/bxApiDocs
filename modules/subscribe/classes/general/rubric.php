@@ -21,59 +21,71 @@ class CRubric
 	//Get list
 	
 	/**
-	 * <p>Функция возвращает список рассылок по фильтру.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayaSort = Array() Массив, содержащий признак сортировки в виде наборов "название
-	 * поля"=&gt;"направление". <br><br> Название поля может принимать
-	 * значение:<br><ul> <li> <b>NAME</b> - название рассылки;</li> <li> <b>LID</b> -
-	 * идентификатор сайта;</li> <li> <b>ACT</b> - активность рассылки;</li> <li>
-	 * <b>SORT</b> - сортировка в списке;</li> <li> <b>ID</b> - идентификатор
-	 * рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> - публичность
-	 * рассылки;</li> <li> <b>LAST_EXECUTED</b> - время последней генерации.</li> </ul>
-	 * Направление сортировки может принимать значение: <ul> <li> <b>ASC</b> - по
-	 * возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Пример: <pre
-	 * class="syntax"><code>array("LID"=&gt;"ASC", "NAME"=&gt;"DESC")</code></pre>
-	 *
-	 *
-	 *
-	 * @param array $arrayaFilter = Array() Массив, содержащий фильтр в виде наборов "название
-	 * поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
-	 * значение:<br><ul> <li> <b>LID</b> - идентификатор сайта;</li> <li> <b>ACTIVE</b> -
-	 * активность рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> -
-	 * публичность рассылки;</li> <li> <b>ID</b> - идентификатор рассылки.</li> <li>
-	 * <b>NAME</b> - название рассылки.</li> </ul> Пример: <pre
-	 * class="syntax"><code>array("LID"=&gt;SITE_ID, "ACTIVE"=&gt;"Y")</code></pre>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
-	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
-	 * "Рассылка"</a>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //get site's newsletter categories
-	 * $rub = <b>CRubric::GetList</b>(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
-	 * while($rub-&gt;ExtractFields("r_")):
-	 * ?&gt;
-	 *     &lt;input type="checkbox" name="sf_RUB_ID[]" value="&lt;?echo $r_ID?&gt;"&gt;&lt;?echo $r_NAME?&gt;&lt;br&gt;
-	 * &lt;?
-	 * endwhile;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает список рассылок по фильтру.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayaSort = Array() Массив, содержащий признак сортировки в виде наборов "название
+	* поля"=&gt;"направление". <br><br> Название поля может принимать
+	* значение:<br><ul> <li> <b>NAME</b> - название рассылки;</li> <li> <b>LID</b> -
+	* идентификатор сайта;</li> <li> <b>ACT</b> - активность рассылки;</li> <li>
+	* <b>SORT</b> - сортировка в списке;</li> <li> <b>ID</b> - идентификатор
+	* рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> - публичность
+	* рассылки;</li> <li> <b>LAST_EXECUTED</b> - время последней генерации.</li> </ul>
+	* Направление сортировки может принимать значение: <ul> <li> <b>ASC</b> - по
+	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Пример: <pre
+	* class="syntax"><code>array("LID"=&gt;"ASC", "NAME"=&gt;"DESC")</code></pre>
+	*
+	*
+	*
+	* @param array $arrayaFilter = Array() Массив, содержащий фильтр в виде наборов "название
+	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
+	* значение:<br><ul> <li> <b>LID</b> - идентификатор сайта;</li> <li> <b>ACTIVE</b> -
+	* активность рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> -
+	* публичность рассылки;</li> <li> <b>ID</b> - идентификатор рассылки.</li> <li>
+	* <b>NAME</b> - название рассылки.</li> </ul> Пример: <pre
+	* class="syntax"><code>array("LID"=&gt;SITE_ID, "ACTIVE"=&gt;"Y")</code></pre>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	* "Рассылка"</a>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //get site's newsletter categories
+	* $rub = <b>CRubric::GetList</b>(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
+	* while($rub-&gt;ExtractFields("r_")):
+	* ?&gt;
+	*     &lt;input type="checkbox" name="sf_RUB_ID[]" value="&lt;?echo $r_ID?&gt;"&gt;&lt;?echo $r_NAME?&gt;&lt;br&gt;
+	* &lt;?
+	* endwhile;
+	* ?&gt;
+	* 
+	* &lt;?
+	* // Вывод рубрик можно производить таким способом
+	* $arOrder = Array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"); 
+	* $arFilter = Array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG); 
+	* $rsRubric = CRubric::GetList($arOrder, $arFilter); 
+	* $arRubrics = array(); 
+	* while($arRubric = $rsRubric-&gt;GetNext()) 
+	* { 
+	*  $arResult["RUBRIC_LIST"][] = $arRubric; 
+	* } 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($aSort=array(), $aFilter=array())
 	{
 		global $DB;
@@ -160,37 +172,37 @@ class CRubric
 	//Get by ID
 	
 	/**
-	 * <p>Функция выбирает одну рассылку по ее идентификатору.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рассылки.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
-	 * результата методами класса CDBResult становятся доступны <a
-	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
-	 * "Рассылка"</a>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * if($ID&gt;0)
-	 * {
-	 *     $rubric = <b>CRubric::GetByID</b>($ID);
-	 *     if($rubric-&gt;ExtractFields("str_"))
-	 *         echo $str_NAME;
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Функция выбирает одну рассылку по ее идентификатору.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рассылки.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	* "Рассылка"</a>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if($ID&gt;0)
+	* {
+	*     $rubric = <b>CRubric::GetByID</b>($ID);
+	*     if($rubric-&gt;ExtractFields("str_"))
+	*         echo $str_NAME;
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -210,39 +222,39 @@ class CRubric
 	//Count of subscribers
 	
 	/**
-	 * <p>Функция возвращает количество подписчиков на указанную рассылку. Учитываются как подтвержденные, так и неподтвержденные подписчики.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рассылки.
-	 *
-	 *
-	 *
-	 * @return int <p>Функция возвращает целое число, равное количеству подписчиков
-	 * рассылки. Если подписка с заданным идентификатором не
-	 * существует, то возвращается 0.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * //get site's newsletter categories
-	 * $rub = CRubric::GetList(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
-	 * while($rub-&gt;ExtractFields("r_")):
-	 * ?&gt;
-	 *     &lt;input type="checkbox" name="sf_RUB_ID[]" value="&lt;?echo $r_ID?&gt;"&gt;
-	 *     &lt;?echo $r_NAME?&gt; (&lt;?echo <b>CRubric::GetSubscriptionCount</b>($r_ID);?&gt;)&lt;br&gt;
-	 * &lt;?
-	 * endwhile;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getsubscriptioncount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество подписчиков на указанную рассылку. Учитываются как подтвержденные, так и неподтвержденные подписчики.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рассылки.
+	*
+	*
+	*
+	* @return int <p>Функция возвращает целое число, равное количеству подписчиков
+	* рассылки. Если подписка с заданным идентификатором не
+	* существует, то возвращается 0.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* //get site's newsletter categories
+	* $rub = CRubric::GetList(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
+	* while($rub-&gt;ExtractFields("r_")):
+	* ?&gt;
+	*     &lt;input type="checkbox" name="sf_RUB_ID[]" value="&lt;?echo $r_ID?&gt;"&gt;
+	*     &lt;?echo $r_NAME?&gt; (&lt;?echo <b>CRubric::GetSubscriptionCount</b>($r_ID);?&gt;)&lt;br&gt;
+	* &lt;?
+	* endwhile;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.getsubscriptioncount.php
+	* @author Bitrix
+	*/
 	public static function GetSubscriptionCount($ID)
 	{
 		global $DB;
@@ -265,33 +277,33 @@ class CRubric
 	// delete
 	
 	/**
-	 * <p>Функция удаляет рассылку.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рассылки.
-	 *
-	 *
-	 *
-	 * @return mixed <p>В случае успешного удаления возвращается результат типа <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
-	 * случает возвращается false.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * if (($res = <b>CRubric::Delete</b>($ID)) &amp;&amp;
-	 *      $res-&gt;AffectedRowsCount() &lt; 1 ||
-	 *      $res == false)
-	 *     echo "Error";
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет рассылку.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рассылки.
+	*
+	*
+	*
+	* @return mixed <p>В случае успешного удаления возвращается результат типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
+	* случает возвращается false.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if (($res = <b>CRubric::Delete</b>($ID)) &amp;&amp;
+	*      $res-&gt;AffectedRowsCount() &lt; 1 ||
+	*      $res == false)
+	*     echo "Error";
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -450,41 +462,42 @@ class CRubric
 	//add
 	
 	/**
-	 * <p>Функция добавляет рассылку. При этом если рассылка активна и является автоматической, то в случае соответствующей настроки модуля (метод генерации не cron) добляется агент для генерации выпусков.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
-	 * "Рассылка"</a>.
-	 *
-	 *
-	 *
-	 * @return int <p>В случае успешного добавления возвращается ID рассылки. В
-	 * противном случает возвращается false, и переменная класса LAST_ERROR
-	 * содержит сообщение об ошибке.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $rubric = new CRubric;
-	 * $arFields = Array(
-	 *     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),
-	 *     "NAME" =&gt; $NAME,
-	 *     "SORT" =&gt; $SORT,
-	 *     "DESCRIPTION" =&gt; $DESCRIPTION,
-	 *     "LID" =&gt; $LID
-	 * );
-	 * $ID = <b>$rubric-&gt;Add</b>($arFields);
-	 * if($ID == false)
-	 *     echo $rubric-&gt;LAST_ERROR;
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.add.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет рассылку. При этом если рассылка активна и является автоматической, то в случае соответствующей настроки модуля (метод генерации не cron) добляется агент для генерации выпусков.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
+	* "Рассылка"</a>.
+	*
+	*
+	*
+	* @return int <p>В случае успешного добавления возвращается ID рассылки. В
+	* противном случает возвращается false, и переменная класса LAST_ERROR
+	* содержит сообщение об ошибке.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $rubric = new CRubric;
+	* $arFields = Array(
+	*     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),
+	*     "NAME" =&gt; $NAME,
+	*     "SORT" =&gt; $SORT,
+	*     "DESCRIPTION" =&gt; $DESCRIPTION,
+	*     "LID" =&gt; $LID
+	* );
+	* $ID = <b>$rubric-&gt;Add</b>($arFields);
+	* if($ID == false)
+	*     echo $rubric-&gt;LAST_ERROR;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.add.php
+	* @author Bitrix
+	*/
 	public function Add($arFields)
 	{
 		global $DB;
@@ -502,47 +515,48 @@ class CRubric
 	//update
 	
 	/**
-	 * <p>Функция модифицирует рассылку.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рассылки.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
-	 * "Рассылка"</a>.
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае успешного изменения возвращается true. В противном
-	 * случает возвращается false, и переменная класса LAST_ERROR содержит
-	 * сообщение об ошибке.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $rubric = new CRubric;
-	 * $arFields = Array(
-	 *     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),
-	 *     "NAME" =&gt; $NAME,
-	 *     "SORT" =&gt; $SORT,
-	 *     "DESCRIPTION" =&gt; $DESCRIPTION,
-	 *     "LID" =&gt; $LID
-	 * );
-	 * if($ID&gt;0)
-	 * {
-	 *     if(!$rubric-&gt;Update($ID, $arFields))
-	 *         echo $rubric-&gt;LAST_ERROR;
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.update.php
-	 * @author Bitrix
-	 */
+	* <p>Функция модифицирует рассылку.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рассылки.
+	*
+	*
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
+	* "Рассылка"</a>.
+	*
+	*
+	*
+	* @return bool <p>В случае успешного изменения возвращается true. В противном
+	* случает возвращается false, и переменная класса LAST_ERROR содержит
+	* сообщение об ошибке.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $rubric = new CRubric;
+	* $arFields = Array(
+	*     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),
+	*     "NAME" =&gt; $NAME,
+	*     "SORT" =&gt; $SORT,
+	*     "DESCRIPTION" =&gt; $DESCRIPTION,
+	*     "LID" =&gt; $LID
+	* );
+	* if($ID&gt;0)
+	* {
+	*     if(!$rubric-&gt;Update($ID, $arFields))
+	*         echo $rubric-&gt;LAST_ERROR;
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.update.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		global $DB;

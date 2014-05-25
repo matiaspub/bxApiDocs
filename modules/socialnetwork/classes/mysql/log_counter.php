@@ -52,5 +52,10 @@ class CSocNetLogCounter extends CAllSocNetLogCounter
 		return "if(".$condition.", ".$yes.", ".$no.")";
 	}
 
+	public static function dbWeeksAgo($iWeeks)
+	{
+		return "DATE_SUB(NOW(), INTERVAL ".intval($iWeeks)." WEEK)";
+	}
+
 }
 ?>

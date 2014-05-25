@@ -221,27 +221,27 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет доступ пользователя на чтение.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет доступ пользователя на чтение.</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php
+	* @author Bitrix
+	*/
 	static function IsReadable()
 	{
 		return self::CheckAccess('view');
@@ -249,27 +249,27 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет доступ пользователя на запись.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет доступ пользователя на запись.</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php
+	* @author Bitrix
+	*/
 	static function IsWriteable()
 	{
 		return self::CheckAccess('write');
@@ -288,27 +288,27 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет доступ пользователя на удаление.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет доступ пользователя на удаление.</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php
+	* @author Bitrix
+	*/
 	static function IsDeleteable()
 	{
 		return self::CheckAccess('delete');
@@ -316,31 +316,31 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет доступ пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $access  Тип проверяемого доступа (view,write,delete)
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет доступ пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param string $access  Тип проверяемого доступа (view, write, delete)
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php
+	* @author Bitrix
+	*/
 	static function CheckAccess($access = 'view')
 	{
 		global $APPLICATION, $USER, $arParams;
@@ -378,36 +378,37 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет, является ли запрашиваемая страница сервисной.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $NAME  Наименование страницы
-	 *
-	 *
-	 *
-	 * @param string &$SERVICE_NAME  Наименование сервисной страницы
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, является ли запрашиваемая страница сервисной.</p>
+	*
+	*
+	*
+	*
+	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>
+	*
+	*
+	*
+	* @param string &$SERVICE_NAME  Наименование сервисной страницы
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php
+	* @author Bitrix
+	*/
 	static function CheckServicePage($NAME, &$SERVICE_NAME)
 	{
 		$arStream = array('category', strtolower(GetMessage('CATEGORY_NAME')));
 		$arSplit = explode(':', $NAME);
+
 		if (count($arSplit) >= 2)
 		{
 			$SERVICE_PAGE = strtolower($arSplit[0]);
@@ -426,32 +427,32 @@ class CWikiUtils
 
 	
 	/**
-	 * <p>Метод проверяет, является ли запрашиваемая страница страницей категории.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $NAME  Наименование страницы
-	 *
-	 *
-	 *
-	 * @param string &$CATEGORY_NAME  Наименование категории
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php">CWikiUtils::CheckServicePage</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, является ли запрашиваемая страница страницей категории.</p>
+	*
+	*
+	*
+	*
+	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>.
+	*
+	*
+	*
+	* @param string &$CATEGORY_NAME  Наименование категории
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php">CWikiUtils::CheckServicePage</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php
+	* @author Bitrix
+	*/
 	static function IsCategoryPage($NAME, &$CATEGORY_NAME)
 	{
 		$sServiceName = self::CheckServicePage($NAME, $CATEGORY_NAME);
@@ -607,39 +608,43 @@ class CWikiUtils
 
 	static function isCategoryVirtual($name)
 	{
-
 		$result = false;
 		$sCatName = '';
 
 		if(CWikiUtils::IsCategoryPage($name, $sCatName))
+			$result = self::isVirtualCategoryExist($sCatName);
+
+		return $result;
+	}
+
+	static function isVirtualCategoryExist($categoryName)
+	{
+		$result = false;
+
+		if($categoryName == GetMessage("WIKI_CATEGORY_NOCAT") || $categoryName == GetMessage("WIKI_CATEGORY_ALL"))
 		{
-			if($sCatName == GetMessage("WIKI_CATEGORY_NOCAT")
-				||
-				$sCatName == GetMessage("WIKI_CATEGORY_ALL")
-			)
+			$result = true;
+		}
+		else
+		{
+			$categories = new CWikiCategories;
+			$rsHandlers = GetModuleEvents("wiki", "OnCategoryListCreate");
+
+			while($arHandler = $rsHandlers->Fetch())
+				ExecuteModuleEventEx($arHandler, array(&$categories, ''));
+
+			$arCats = $categories->GetItems();
+
+			foreach ($arCats as $category)
 			{
-				$result = true;
-			}
-
-			if(!$result)
-			{
-				$categories = new CWikiCategories;
-				$rsHandlers = GetModuleEvents("wiki", "OnCategoryListCreate");
-				while($arHandler = $rsHandlers->Fetch())
-					ExecuteModuleEventEx($arHandler, array(&$categories, ''));
-
-				$arCats = $categories->GetItems();
-
-				foreach ($arCats as $category)
+				if($category["NAME"] == $categoryName)
 				{
-					if($category["NAME"] == $sCatName)
-					{
-							$result = true;
-							break;
-					}
+					$result = true;
+					break;
 				}
 			}
 		}
+
 		return $result;
 	}
 }

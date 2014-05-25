@@ -7,55 +7,68 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && array_key_exists("PULL_AJAX_CALL", $_
 	die();
 }
 else if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_REQUEST['AJAX_CALL'] == 'Y')
-		&& intval($GLOBALS['USER']->GetID()) > 0 && CModule::IncludeModule('pull') && CPullOptions::CheckNeedRun())
+		&& intval($GLOBALS['USER']->GetID()) > 0 && CModule::IncludeModule('pull'))
 {
 	// define("BX_PULL_SKIP_INIT", true);
 	CJSCore::Init(array('pull'));
 
-	global $APPLICATION;
-
-	$pullConfig = Array();
-
-	if (defined('BX_PULL_SKIP_LS'))
-		$pullConfig['LOCAL_STORAGE'] = 'N';
-
-
-	$pullChannel = CPullChannel::Get($GLOBALS['USER']->GetId());
-	if (is_array($pullChannel))
+	if (CPullOptions::CheckNeedRun())
 	{
-		$pullWebSocketStatus = false;
-		$pullNginxStatus = CPullOptions::GetNginxStatus();
+		global $APPLICATION;
 
-		$pullChannels = Array($pullChannel['CHANNEL_ID']);
-		if ($pullNginxStatus)
+		$pullConfig = Array();
+
+		if (defined('BX_PULL_SKIP_LS'))
+			$pullConfig['LOCAL_STORAGE'] = 'N';
+
+		if (IsModuleInstalled('bitrix24'))
+			$pullConfig['BITRIX24'] = 'Y';
+
+		$pullChannel = CPullChannel::Get($GLOBALS['USER']->GetId());
+		if (is_array($pullChannel))
 		{
-			if (defined('BX_PULL_SKIP_WEBSOCKET'))
+			$pullWebSocketStatus = false;
+			$pullNginxStatus = CPullOptions::GetQueueServerStatus();
+
+			$pullChannels = Array($pullChannel['CHANNEL_ID']);
+			if ($pullNginxStatus)
 			{
-				$pullWebSocketStatus = false;
-				$pullConfig['WEBSOCKET'] = 'N';
+				if (defined('BX_PULL_SKIP_WEBSOCKET'))
+				{
+					$pullWebSocketStatus = false;
+					$pullConfig['WEBSOCKET'] = 'N';
+				}
+				else
+					$pullWebSocketStatus = CPullOptions::GetWebSocketStatus();
+
+				$pullChannelShared = CPullChannel::GetShared();
+				if (is_array($pullChannelShared))
+				{
+					$pullChannels[] = $pullChannelShared['CHANNEL_ID'];
+					if ($pullChannel['CHANNEL_DT'] > $pullChannelShared['CHANNEL_DT'])
+						$pullChannel['CHANNEL_DT'] = $pullChannelShared['CHANNEL_DT'];
+				}
+			}
+
+			if (defined('BX_PULL_MOBILE'))
+			{
+				$pullConfig['MOBILE'] = 'Y';
+				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels, true): CPullOptions::GetListenUrl($pullChannels, true)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
 			}
 			else
-				$pullWebSocketStatus = CPullOptions::GetWebSocketStatus();
+				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
 
-			$pullChannelShared = CPullChannel::GetShared();
-			if (is_array($pullChannelShared))
-			{
-				$pullChannels[] = $pullChannelShared['CHANNEL_ID'];
-				if ($pullChannel['CHANNEL_DT'] > $pullChannelShared['CHANNEL_DT'])
-					$pullChannel['CHANNEL_DT'] = $pullChannelShared['CHANNEL_DT'];
-			}
+			$pullConfig = $pullConfig+Array(
+				'CHANNEL_ID' => implode('/', $pullChannels),
+				'LAST_ID' => $pullChannel['LAST_ID'],
+				'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
+				'PATH' => $pullPath,
+				'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
+				'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
+			);
 		}
 
-		$pullConfig = $pullConfig+Array(
-			'CHANNEL_ID' => implode('/', $pullChannels),
-			'LAST_ID' => $pullChannel['LAST_ID'],
-			'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
-			'PATH' => ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE'),
-			'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
-			'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
-		);
+		$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
 	}
-
-	$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
 }
 ?>

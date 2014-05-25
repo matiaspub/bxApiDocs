@@ -8,7 +8,7 @@
 */
 namespace Bitrix\Security\Filter;
 
-use \Bitrix\Main\Type\IRequestFilter;
+use Bitrix\Main\Type\IRequestFilter;
 
 /**
  * Filter for Server variables, such as $_SERVER["REQUEST_URI"]

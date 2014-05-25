@@ -59,6 +59,8 @@ if (CLI && defined('BX_CRONTAB')) // start from cron_events.php
 }
 else
 {
+	// define('NO_AGENT_CHECK', true);
+	// define("STATISTIC_SKIP_ACTIVITY_CHECK", true);
 	$DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'] = realpath(dirname(__FILE__).'/../../../../');
 	require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_before.php');
 	IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
@@ -143,6 +145,9 @@ if (!is_array($arExpertBackupParams))
 $arParams = array_merge($arExpertBackupDefaultParams, $arExpertBackupParams, $arParams);
 $skip_mask_array = $arParams['skip_mask_array'];
 
+if (strtolower($DB->type) != 'mysql')
+	$arParams['dump_base'] = 0;
+
 if (!$NS['step'])
 {
 	$NS = array('step' => 1);
@@ -205,6 +210,7 @@ if ($NS['step'] <= 2)
 		$tar->gzip = $arParams['dump_use_compression'];
 		$tar->path = DOCUMENT_ROOT;
 		$tar->ReadBlockCurrent = intval($NS['ReadBlockCurrent']);
+		$tar->ReadFileSize = intval($NS['ReadFileSize']);
 
 		if (!$tar->openWrite($NS["arc_name"]))
 			RaiseErrorAndDie(GetMessage('DUMP_NO_PERMS'), 200, $NS['arc_name']);
@@ -220,6 +226,7 @@ if ($NS['step'] <= 2)
 			RaiseErrorAndDie(implode('<br>',$tar->err), 210, $NS['arc_name']);
 
 		$NS["ReadBlockCurrent"] = $tar->ReadBlockCurrent;
+		$NS["ReadFileSize"] = $tar->ReadFileSize;
 		
 		if (!haveTime())
 		{
@@ -248,7 +255,7 @@ if ($NS['step'] <= 2)
 if ($NS['step'] == 3)
 {
 	// Download cloud files
-	if ($arDumpClouds = CBackup::GetBucketList())
+	if ($arParams['dump_do_clouds'] && ($arDumpClouds = CBackup::GetBucketList()))
 	{
 		ShowBackupStatus('Downloading cloud files');
 		foreach($arDumpClouds as $arBucket)
@@ -293,6 +300,7 @@ if ($NS['step'] == 4)
 		$tar->gzip = $arParams['dump_use_compression'];
 		$tar->path = DOCUMENT_ROOT_SITE;
 		$tar->ReadBlockCurrent = intval($NS['ReadBlockCurrent']);
+		$tar->ReadFileSize = intval($NS['ReadFileSize']);
 
 		if (!$tar->openWrite($NS["arc_name"]))
 			RaiseErrorAndDie(GetMessage('DUMP_NO_PERMS'), 400, $NS['arc_name']);
@@ -309,6 +317,7 @@ if ($NS['step'] == 4)
 			RaiseErrorAndDie(implode('<br>',array_merge($tar->err,$DirScan->err)), 410);
 
 		$NS["ReadBlockCurrent"] = $tar->ReadBlockCurrent;
+		$NS["ReadFileSize"] = $tar->ReadFileSize;
 		$NS["startPath"] = $DirScan->nextPath;
 		$NS["cnt"] += $DirScan->FileCount;
 
@@ -381,7 +390,8 @@ if ($NS['step'] == 6)
 				$obBucket = null;
 				if (!$NS['obBucket'])
 				{
-					try {
+					try
+					{
 						$backup = CBitrixCloudBackup::getInstance();
 						$q = $backup->getQuota();
 						if ($NS['arc_size'] > $q)
@@ -390,7 +400,8 @@ if ($NS['step'] == 6)
 						$obBucket = $backup->getBucketToWriteFile(CTar::getCheckword($NS['dump_encrypt_key']), basename($NS['arc_name']));
 						$NS['obBucket'] = serialize($obBucket);
 					}
-					catch (Exception $e) {
+					catch (Exception $e)
+					{
 						unset($NS['obBucket']);
 						RaiseErrorAndDie($e->getMessage(), 630);
 					}
@@ -517,6 +528,9 @@ if ($NS['step'] == 7)
 					if (!is_file($f))
 						continue;
 
+					if (!preg_match('#\.(sql|tar|gz|enc|[0-9]+)$#', $item))
+						continue;
+
 					$name = CTar::getFirstName($item);
 					if ($name == $arc_name)
 						continue;
@@ -629,7 +643,7 @@ function RaiseErrorAndDie($strError, $errCode = 0, $ITEM_ID = '')
 		echo 'Error ['.$errCode.']: '.str_replace('<br>',"\n",$strError)."\n";
 	else
 	{
-		echo "ERROR_".$errCode."\n".htmlspecialchars($strError)."\n";
+		echo "ERROR_".$errCode."\n".htmlspecialcharsbx($strError)."\n";
 	}
 
 	if (is_object($DB))

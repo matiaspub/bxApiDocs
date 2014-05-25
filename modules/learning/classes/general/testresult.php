@@ -1,6 +1,5 @@
-<?
+<?php
 
-// 2012-04-16 Checked/modified for compatibility with new data model
 
 /**
  * 
@@ -16,7 +15,6 @@
  */
 class CTestResult
 {
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function CheckFields(&$arFields, $ID = false)
 	{
 		global $DB, $APPLICATION;
@@ -80,70 +78,70 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод добавляет новый вопрос плана тестирования.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="../../fields.php#test_result">всех полей</a> плана тестирования.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает идентификатор добавленного вопроса плана
-	 * тестирования, если добавление прошло успешно. При возникновении
-	 * ошибки метод вернёт <i>false</i>, а в исключениях будут содержаться
-	 * ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 588;
-	 *     $QUESTION_ID = 128;
-	 * 
-	 *     $arFields = Array(
-	 *         "ATTEMPT_ID" =&gt; $ATTEMPT_ID,
-	 *         "QUESTION_ID" =&gt; $QUESTION_ID
-	 *     );
-	 * 
-	 *     $plan = new CTestResult;
-	 *     $ID = $plan-&gt;Add($arFields);
-	 *     $success = ($ID&gt;0);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="../ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="../ctestattempt/createattemptquestions.php">CreateAttemptQuestions</a> </li> <li> <a
-	 * href="index.php">CTestResult</a>::<a href="update.php">Update</a> </li> <li> <a href="index.php">CTestResult</a>::<a
-	 * href="addresponse.php">AddResponse</a> </li> <li><a href="../../fields.php#test_result">Поля плана
-	 * тестирования</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новый вопрос плана тестирования.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
+	* href="../../fields.php#test_result">всех полей</a> плана тестирования.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return int <p>Метод возвращает идентификатор добавленного вопроса плана
+	* тестирования, если добавление прошло успешно. При возникновении
+	* ошибки метод вернёт <i>false</i>, а в исключениях будут содержаться
+	* ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 588;
+	*     $QUESTION_ID = 128;
+	* 
+	*     $arFields = Array(
+	*         "ATTEMPT_ID" =&gt; $ATTEMPT_ID,
+	*         "QUESTION_ID" =&gt; $QUESTION_ID
+	*     );
+	* 
+	*     $plan = new CTestResult;
+	*     $ID = $plan-&gt;Add($arFields);
+	*     $success = ($ID&gt;0);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="../ctestattempt/index.php">CTestAttempt</a>::<a
+	* href="../ctestattempt/createattemptquestions.php">CreateAttemptQuestions</a> </li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="update.php">Update</a> </li> <li> <a href="index.php">CTestResult</a>::<a
+	* href="addresponse.php">AddResponse</a> </li> <li><a href="../../fields.php#test_result">Поля плана
+	* тестирования</a></li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php
+	* @author Bitrix
+	*/
 	public function Add($arFields)
 	{
 		global $DB;
@@ -161,53 +159,52 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Сохраняет ответ учащегося и устанавливает, отвечен ли вопрос правильно.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $TEST_RESULT_ID  Идентификатор вопроса в плане тестирования.
-	 *
-	 *
-	 *
-	 * @param mixed $RESPONSE  Идентификатор или массив идентификаторов <a
-	 * href="../../fields.php#answer">ответов на вопрос</a>.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	 * возникновении ошибки функция вернёт <i>false</i>. При возникновении
-	 * ошибки в исключениях будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_TESULT_ID = 2962;
-	 *     $RESPONSE = 186; //< or Array(186,187); >//
-	 * 
-	 *     $res = CTestResult::AddResponse($TEST_RESULT_ID, $RESPONSE);
-	 *     if($res)
-	 *      echo "Response has been added ";
-	 *     else
-	 *      echo "Error";
-	 * }
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="index.php">CTestResult</a>::<a href="update.php">Update</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/addresponse.php
-	 * @author Bitrix
-	 */
+	* <p>Сохраняет ответ учащегося и устанавливает, отвечен ли вопрос правильно.</p>
+	*
+	*
+	*
+	*
+	* @param int $TEST_RESULT_ID  Идентификатор вопроса в плане тестирования.
+	*
+	*
+	*
+	* @param mixed $RESPONSE  Идентификатор или массив идентификаторов <a
+	* href="../../fields.php#answer">ответов на вопрос</a>.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* возникновении ошибки функция вернёт <i>false</i>. При возникновении
+	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_TESULT_ID = 2962;
+	*     $RESPONSE = 186; //< or Array(186,187); >//
+	* 
+	*     $res = CTestResult::AddResponse($TEST_RESULT_ID, $RESPONSE);
+	*     if($res)
+	*      echo "Response has been added ";
+	*     else
+	*      echo "Error";
+	* }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="index.php">CTestResult</a>::<a href="update.php">Update</a> </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/addresponse.php
+	* @author Bitrix
+	*/
 	public static function AddResponse($TEST_RESULT_ID, $RESPONSE)
 	{
 		global $DB;
@@ -288,69 +285,69 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод изменяет параметры вопроса плана тестирования с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор вопроса в плане тестирования.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="../../fields.php#test_result">всех полей</a> плана тестирования.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	 * возникновении ошибки функция вернёт <i>false</i>. При возникновении
-	 * ошибки в исключениях будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_TESULT_ID = 2962;
-	 * 
-	 *     $arFields = Array(
-	 *         "CORRECT" =&gt; "Y",
-	 *         "POINT" =&gt; "20"
-	 *     );
-	 * 
-	 *     $plan = new CTestResult;
-	 *     $success = $plan-&gt;Update($TEST_TESULT_ID, $arFields);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="../../fields.php#test_result">Поля плана тестирования</a></li> <li> <a
-	 * href="index.php">CTestResult</a>::<a href="add.php">Add</a> </li> <li> <a href="index.php">CTestResult</a>::<a
-	 * href="addresponse.php">AddResponse</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры вопроса плана тестирования с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	*
+	*
+	*
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="../../fields.php#test_result">всех полей</a> плана тестирования.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* возникновении ошибки функция вернёт <i>false</i>. При возникновении
+	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_TESULT_ID = 2962;
+	* 
+	*     $arFields = Array(
+	*         "CORRECT" =&gt; "Y",
+	*         "POINT" =&gt; "20"
+	*     );
+	* 
+	*     $plan = new CTestResult;
+	*     $success = $plan-&gt;Update($TEST_TESULT_ID, $arFields);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="../../fields.php#test_result">Поля плана тестирования</a></li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="add.php">Add</a> </li> <li> <a href="index.php">CTestResult</a>::<a
+	* href="addresponse.php">AddResponse</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/update.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		global $DB;
@@ -378,49 +375,48 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод удаляет вопрос плана тестирования с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор вопроса в плане тестирования.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления результата
-	 * тестирования, в противном случае возвращает <i>false</i>.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_RESULT_ID = 2967;
-	 * 
-	 *     @set_time_limit(0);
-	 *     $DB-&gt;StartTransaction();
-	 *     if (!CTestResult::Delete($TEST_RESULT_ID))
-	 *     {
-	 *         echo "Error!";
-	 *         $DB-&gt;Rollback();
-	 *     }
-	 *     else
-	 *         $DB-&gt;Commit();
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет вопрос плана тестирования с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления результата
+	* тестирования, в противном случае возвращает <i>false</i>.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_RESULT_ID = 2967;
+	* 
+	*     @set_time_limit(0);
+	*     $DB-&gt;StartTransaction();
+	*     if (!CTestResult::Delete($TEST_RESULT_ID))
+	*     {
+	*         echo "Error!";
+	*         $DB-&gt;Rollback();
+	*     }
+	*     else
+	*         $DB-&gt;Commit();
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -437,81 +433,77 @@ class CTestResult
 	}
 
 
-	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает список вопросов плана тестирования по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	 * сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	 * сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	 * вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> - идентификатор
-	 * попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса; </li> <li> <b>POINT</b> -
-	 * количество баллов; </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N); </li> <li>
-	 * <b>CORRECT</b> - вопрос правильно отвечен (Y|N); </li> <li> <b>QUESTION_NAME</b> -
-	 * название вопроса; </li> <li> <b>RAND</b> - случайный порядок. </li>
-	 * </ul>Направление сортировки может принимать значения: <ul> <li> <b>asc</b> -
-	 * по возрастанию; </li> <li> <b>desc</b> - по убыванию; </li> </ul>Необязательный.
-	 * По умолчанию фильтруется по убыванию идентификатора вопроса в
-	 * плане тестирования.
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	 * Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	 * идентификатор вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> -
-	 * идентификатор попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса;
-	 * </li> <li> <b>POINT</b> - количество баллов; </li> <li> <b>RESPONSE</b> - ответ учащегося
-	 * (можно искать по шаблону [%_]); </li> <li> <b>QUESTION_NAME</b> - название вопроса
-	 * (можно искать по шаблону [%_]); </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N);
-	 * </li> <li> <b>CORRECT</b> - вопрос правильно отвечен (Y|N). </li> </ul>Перед
-	 * названием фильтруемого поля может указать тип фильтрации: <ul> <li>"!"
-	 * - не равно </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;"
-	 * - больше </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения
-	 * фильтра</i>" - одиночное значение или массив.<br><br>Необязательный. По
-	 * умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 590;
-	 *     $res = CTestResult::GetList(
-	 *         Array("ID" =&gt; "ASC"), 
-	 *         Array("ANSWERED" =&gt; "N", "ATTEMPT_ID" =&gt; $ATTEMPT_ID)
-	 *     );
-	 * 
-	 *     while ($arQuestionPlan = $res-&gt;GetNext())
-	 *     {
-	 *         echo "Question ID: ".$arQuestionPlan["QUESTION_ID"].<br>             "; Correct answer: ".$arQuestionPlan["CORRECT"].<br>             "; Question name:".$arQuestionPlan["QUESTION_NAME"]."&lt;br&gt;";
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="index.php">CTestResult</a>::<a href="getbyid.php">GetByID</a> </li> <li><a
-	 * href="../../fields.php#test_result">Поля плана тестирования</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getlist.php
-	 * @author Bitrix
-	 */
-	public static function GetList($arOrder=array(), $arFilter=array())
+	* <p>Возвращает список вопросов плана тестирования по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
+	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
+	* вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> - идентификатор
+	* попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса; </li> <li> <b>POINT</b> -
+	* количество баллов; </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N); </li> <li>
+	* <b>CORRECT</b> - вопрос правильно отвечен (Y|N); </li> <li> <b>QUESTION_NAME</b> -
+	* название вопроса; </li> <li> <b>RAND</b> - случайный порядок. </li>
+	* </ul>Направление сортировки может принимать значения: <ul> <li> <b>asc</b> -
+	* по возрастанию; </li> <li> <b>desc</b> - по убыванию; </li> </ul>Необязательный.
+	* По умолчанию фильтруется по убыванию идентификатора вопроса в
+	* плане тестирования.
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
+	* идентификатор вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> -
+	* идентификатор попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса;
+	* </li> <li> <b>POINT</b> - количество баллов; </li> <li> <b>RESPONSE</b> - ответ учащегося
+	* (можно искать по шаблону [%_]); </li> <li> <b>QUESTION_NAME</b> - название вопроса
+	* (можно искать по шаблону [%_]); </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N);
+	* </li> <li> <b>CORRECT</b> - вопрос правильно отвечен (Y|N). </li> </ul>Перед
+	* названием фильтруемого поля может указать тип фильтрации: <ul> <li>"!"
+	* - не равно </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;"
+	* - больше </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения
+	* фильтра</i>" - одиночное значение или массив.<br><br>Необязательный. По
+	* умолчанию записи не фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 590;
+	*     $res = CTestResult::GetList(
+	*         Array("ID" =&gt; "ASC"), 
+	*         Array("ANSWERED" =&gt; "N", "ATTEMPT_ID" =&gt; $ATTEMPT_ID)
+	*     );
+	* 
+	*     while ($arQuestionPlan = $res-&gt;GetNext())
+	*     {
+	*         echo "Question ID: ".$arQuestionPlan["QUESTION_ID"].<br>             "; Correct answer: ".$arQuestionPlan["CORRECT"].<br>             "; Question name:".$arQuestionPlan["QUESTION_NAME"]."&lt;b
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="getbyid.php">GetByID</a> </li> <li><a
+	* href="../../fields.php#test_result">Поля плана тестирования</a></li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getlist.php
+	* @author Bitrix
+	*/
+	public static function GetList($arOrder=array(), $arFilter=array(), $arNavParams = array())
 	{
 		global $DB, $USER, $APPLICATION;
 
@@ -521,42 +513,27 @@ class CTestResult
 		$oPermParser = new CLearnParsePermissionsFromFilter ($arFilter);
 		$arSqlSearch = CTestResult::GetFilter($arFilter);
 
-		$strSqlSearch = "";
-		$arSqlSearchCnt = count($arSqlSearch);
-		for($i=0; $i<$arSqlSearchCnt; $i++)
-			if(strlen($arSqlSearch[$i])>0)
-				$strSqlSearch .= " AND ".$arSqlSearch[$i]." ";
-
-		$strSql =
-		"SELECT TR.*, Q.QUESTION_TYPE, Q.NAME as QUESTION_NAME, Q.POINT as QUESTION_POINT, Q.LESSON_ID
-		FROM b_learn_test_result TR 
-		INNER JOIN b_learn_question Q ON TR.QUESTION_ID = Q.ID 
-		INNER JOIN b_learn_lesson L ON Q.LESSON_ID = L.ID 
-		WHERE 1=1 ";
+		// Remove empty strings from array
+		$arSqlSearch = array_filter($arSqlSearch);
 
 		if ($oPermParser->IsNeedCheckPerm())
-			$strSql .= " AND L.ID IN (" . $oPermParser->SQLForAccessibleLessons() . ") ";
-		
-		$strSql .= $strSqlSearch;
+			$arSqlSearch[] = " L.ID IN (" . $oPermParser->SQLForAccessibleLessons() . ") ";
 
-		/* was:
-		$bCheckPerm = ($APPLICATION->GetUserRight("learning") < "W" && !$USER->IsAdmin() && $arFilter["CHECK_PERMISSIONS"] != "N");
+		$strSqlSearch = ' ';
+		if ( ! empty($arSqlSearch) )
+		{
+			$strSqlSearch = ' WHERE ';
+			$strSqlSearch .= implode(' AND ', $arSqlSearch);
+		}
 
-		$strSql =
-		"SELECT TR.*, Q.QUESTION_TYPE, Q.NAME as QUESTION_NAME, Q.POINT as QUESTION_POINT, Q.LESSON_ID
-		FROM b_learn_test_result TR 
-		INNER JOIN b_learn_question Q ON TR.QUESTION_ID = Q.ID 
-		INNER JOIN b_learn_lesson L ON Q.LESSON_ID = L.ID "
-		"INNER JOIN b_learn_course C ON L.COURSE_ID = C.ID ".
-		. "WHERE 1=1 "
-		. ($bCheckPerm ?
-		"AND EXISTS (SELECT * FROM b_learn_course_permission CP WHERE ".
-		"CP.USER_GROUP_ID IN (".$USER->GetGroups().") ".
-		"AND CP.PERMISSION >= '".(strlen($arFilter["MIN_PERMISSION"])==1 ? $arFilter["MIN_PERMISSION"] : "R")."' ".
-		"AND (CP.PERMISSION='X' OR C.ACTIVE='Y'))"
-		:"")
-		. $strSqlSearch;
-		*/
+		$strSqlFrom = "FROM b_learn_test_result TR 
+			INNER JOIN b_learn_question Q ON TR.QUESTION_ID = Q.ID 
+			INNER JOIN b_learn_lesson L ON Q.LESSON_ID = L.ID "
+			. $strSqlSearch;
+
+		$strSql = "SELECT TR.*, Q.QUESTION_TYPE, Q.NAME as QUESTION_NAME, 
+			Q.POINT as QUESTION_POINT, Q.LESSON_ID "
+			. $strSqlFrom;
 
 		if (!is_array($arOrder))
 			$arOrder = Array();
@@ -568,14 +545,22 @@ class CTestResult
 			if ($order!="asc")
 				$order = "desc";
 
-			if ($by == "id") $arSqlOrder[] = " TR.ID ".$order." ";
-			elseif ($by == "attempt_id") $arSqlOrder[] = " TR.ATTEMPT_ID ".$order." ";
-			elseif ($by == "question_id") $arSqlOrder[] = " TR.QUESTION_ID ".$order." ";
-			elseif ($by == "point") $arSqlOrder[] = " TR.POINT ".$order." ";
-			elseif ($by == "correct") $arSqlOrder[] = " TR.CORRECT ".$order." ";
-			elseif ($by == "answered") $arSqlOrder[] = " TR.ANSWERED ".$order." ";
-			elseif ($by == "question_name") $arSqlOrder[] = " QUESTION_NAME ".$order." ";
-			elseif ($by == "rand") $arSqlOrder[] = CTest::GetRandFunction();
+			if ($by == "id")
+				$arSqlOrder[] = " TR.ID ".$order." ";
+			elseif ($by == "attempt_id")
+				$arSqlOrder[] = " TR.ATTEMPT_ID ".$order." ";
+			elseif ($by == "question_id")
+				$arSqlOrder[] = " TR.QUESTION_ID ".$order." ";
+			elseif ($by == "point")
+				$arSqlOrder[] = " TR.POINT ".$order." ";
+			elseif ($by == "correct")
+				$arSqlOrder[] = " TR.CORRECT ".$order." ";
+			elseif ($by == "answered")
+				$arSqlOrder[] = " TR.ANSWERED ".$order." ";
+			elseif ($by == "question_name")
+				$arSqlOrder[] = " QUESTION_NAME ".$order." ";
+			elseif ($by == "rand")
+				$arSqlOrder[] = CTest::GetRandFunction();
 			else
 			{
 				$arSqlOrder[] = " TR.ID ".$order." ";
@@ -598,66 +583,80 @@ class CTestResult
 
 		$strSql .= $strSqlOrder;
 
-		//echo $strSql;
+		if (is_array($arNavParams) && ( ! empty($arNavParams) ) )
+		{
+			if (isset($arNavParams['nTopCount']) && ((int) $arNavParams['nTopCount'] > 0))
+			{
+				$strSql = $DB->TopSql($strSql, (int) $arNavParams['nTopCount']);
+				$res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+			}
+			else
+			{
+				$res_cnt = $DB->Query("SELECT COUNT(TR.ID) as C " . $strSqlFrom);
+				$res_cnt = $res_cnt->fetch();
+				$res = new CDBResult();
+				$res->NavQuery($strSql, $res_cnt['C'], $arNavParams);
+			}
+		}
+		else
+			$res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
 
-		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		return $res;
 	}
 
 
-	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает вопрос плана тестирования по идентификатору ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор вопроса в плане тестирования.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_RESULT_ID = 2894;
-	 *     
-	 *     $res = CTestResult::GetByID($TEST_RESULT_ID);
-	 * 
-	 *     if ($arResult = $res-&gt;GetNext())
-	 *     {
-	 *         echo " Question name: ".$arResult["QUESTION_NAME"];
-	 *         echo " Answered: ".$arResult["ANSWERED"];
-	 *         echo " Point: ".$arResult["POINT"];
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="../../fields.php#test_result">Поля плана тестирования</a> </li> <li> <a
-	 * href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает вопрос плана тестирования по идентификатору ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_RESULT_ID = 2894;
+	*     
+	*     $res = CTestResult::GetByID($TEST_RESULT_ID);
+	* 
+	*     if ($arResult = $res-&gt;GetNext())
+	*     {
+	*         echo " Question name: ".$arResult["QUESTION_NAME"];
+	*         echo " Answered: ".$arResult["ANSWERED"];
+	*         echo " Point: ".$arResult["POINT"];
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="../../fields.php#test_result">Поля плана тестирования</a> </li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		return CTestResult::GetList(Array(), Array("ID"=>$ID));
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetFilter($arFilter)
 	{
 		if (!is_array($arFilter))
@@ -701,7 +700,6 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function OnTestResultChange($TEST_RESULT_ID)
 	{
 		global $DB;
@@ -741,48 +739,47 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает количество отвеченных и неотвеченных вопросов плана тестирования.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ATTEMPT_ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return array <p>Метод возвращает ассоциативный массив с ключами:</p><ul> <li> <b>DONE</b> -
-	 * количество отвеченных вопросов теста.</li> <li> <b>TODO</b> - количество
-	 * неотвеченных вопросов теста.</li> </ul>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 588;
-	 * 
-	 *     $arStat = CTestResult::GetProgress($ATTEMPT_ID);
-	 * 
-	 *     echo $arStat["TODO"];
-	 *     echo $arStat["DONE"];
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getprogress.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество отвеченных и неотвеченных вопросов плана тестирования.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return array <p>Метод возвращает ассоциативный массив с ключами:</p> <ul> <li> <b>DONE</b>
+	* - количество отвеченных вопросов теста.</li> <li> <b>TODO</b> - количество
+	* неотвеченных вопросов теста.</li> </ul>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 588;
+	* 
+	*     $arStat = CTestResult::GetProgress($ATTEMPT_ID);
+	* 
+	*     echo $arStat["TODO"];
+	*     echo $arStat["DONE"];
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getprogress.php
+	* @author Bitrix
+	*/
 	public static function GetProgress($ATTEMPT_ID)
 	{
 		global $DB;
@@ -804,46 +801,45 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает количество вопросов плана тестирования для указанной попытки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ATTEMPT_ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return int <p>Число - количество вопросов плана тестирования.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 588;
-	 * 
-	 *     $cnt = CTestResult::GetCount($ATTEMPT_ID);
-	 * 
-	 *     echo "Number of questions:".$cnt;
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество вопросов плана тестирования для указанной попытки.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return int <p>Число - количество вопросов плана тестирования.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 588;
+	* 
+	*     $cnt = CTestResult::GetCount($ATTEMPT_ID);
+	* 
+	*     echo "Number of questions:".$cnt;
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/getcount.php
+	* @author Bitrix
+	*/
 	public static function GetCount($ATTEMPT_ID)
 	{
 		global $DB;
@@ -867,7 +863,6 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetPercent($ATTEMPT_ID)
 	{
 		global $DB;
@@ -888,7 +883,6 @@ class CTestResult
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetCorrectCount($ATTEMPT_ID)
 	{
 		global $DB;

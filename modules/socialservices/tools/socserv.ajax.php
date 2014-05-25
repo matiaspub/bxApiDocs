@@ -94,6 +94,14 @@ BX.loadScript('/bitrix/js/socialservices/ss_timeman.js?<?=$t?>', function(){
 			if(isset($_POST["ENDTEXT"]))
 				$userSocServEndText = $_POST["ENDTEXT"];
 
+			if($userSocServSendStart === 'Y' || $userSocServSendEnd === 'Y')
+			{
+				CUserOptions::SetOption("socialservices","user_socserv_enable", 'Y', false, $userId);
+			}
+			else
+			{
+				CUserOptions::SetOption("socialservices","user_socserv_enable", 'N', false, $userId);
+			}
 			CUserOptions::SetOption("socialservices","user_socserv_array",$arUserSocServ, false, $userId);
 			CUserOptions::SetOption("socialservices","user_socserv_start_day",$userSocServSendStart, false, $userId);
 			CUserOptions::SetOption("socialservices","user_socserv_end_day",$userSocServSendEnd, false, $userId);

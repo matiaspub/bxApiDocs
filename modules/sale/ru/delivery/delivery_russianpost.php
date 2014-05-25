@@ -228,7 +228,7 @@ class CDeliveryRUSSIANPOST
 		$cache_id = "sale|8.0.3|russianpost|".$profile."|".$arConfig["category"]["VALUE"]."|".$arOrder["LOCATION_FROM"]."|".($arLocationTo["IS_RUSSIAN"] == 'Y' ? $arLocationTo["ZIP"][0] : $arOrder["LOCATION_TO"]);
 
 		if (in_array($arConfig["category"]["VALUE"], array(23, 12, 13, 26, 16)))
-			$cache_id .= "|".ceil(CSaleMeasure::Convert($arOrder["WEIGHT"], "G", "KG")/20);
+			$cache_id .= "|".ceil(CSaleMeasure::Convert($arOrder["WEIGHT"], "G", "KG")/0.5);
 		else
 			$cache_id .= "|".ceil(CSaleMeasure::Convert($arOrder["WEIGHT"], "G", "KG")/500);
 
@@ -397,7 +397,7 @@ class CDeliveryRUSSIANPOST
 			);
 	}
 
-	public static function Compability($arOrder, $arConfig)
+public static 	function Compability($arOrder, $arConfig)
 	{
 		$arLocationFrom = CSaleLocation::GetByID($arOrder["LOCATION_FROM"]);
 
@@ -427,7 +427,7 @@ class CDeliveryRUSSIANPOST
 		}
 	}
 
-	public static function __IsRussian($arLocation)
+public static 	function __IsRussian($arLocation)
 	{
 		return
 			(ToUpper($arLocation["COUNTRY_NAME_ORIG"]) == "Р РћРЎРЎР?РЇ"
@@ -444,7 +444,7 @@ class CDeliveryRUSSIANPOST
 			|| ToUpper($arLocation["COUNTRY_NAME_LANG"]) == "RUSSIAN FEDERATION");
 	}
 
-	public static function __Write2Log($data)
+public static 	function __Write2Log($data)
 	{
 		if (defined('DELIVERY_RUSSIANPOST_WRITE_LOG') && DELIVERY_RUSSIANPOST_WRITE_LOG === 1)
 		{

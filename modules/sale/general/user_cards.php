@@ -125,22 +125,22 @@ class CAllSaleUserCards
 
 	
 	/**
-	 * <p>Метод удаляет информацию о пластиковой карте пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код удаляемой информации о карте.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет информацию о пластиковой карте пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код удаляемой информации о карте.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
+	* случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -162,18 +162,18 @@ class CAllSaleUserCards
 
 	
 	/**
-	 * <p>Метод проверяет, установлен ли пароль для шифрации номеров карт.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если пароль установлен, и <i>false</i> в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.checkpassword.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, установлен ли пароль для шифрации номеров карт.</p>
+	*
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если пароль установлен, и <i>false</i> в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.checkpassword.php
+	* @author Bitrix
+	*/
 	public static function CheckPassword()
 	{
 		$strFileName = COption::GetOptionString("sale", "sale_data_file", "");
@@ -193,25 +193,26 @@ class CAllSaleUserCards
 
 	
 	/**
-	 * <p>Метод изменяет шифрует и расшифровывает номер пластиковой карты.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $data  Шифруемые (расшифровываемые) данные.
-	 *
-	 *
-	 *
-	 * @param string $type  Для шифрования данных значение "E", для расшифровки - "D"
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает результат шифрования (расшифровывания).</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет шифрует и расшифровывает номер пластиковой карты.</p>
+	*
+	*
+	*
+	*
+	* @param string $data  Шифруемые (расшифровываемые) данные.
+	*
+	*
+	*
+	* @param string $type  Для шифрования данных значение "E", для расшифровки - "D"
+	*
+	*
+	*
+	* @return string <p>Метод возвращает результат шифрования (расшифровывания).</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php
+	* @author Bitrix
+	*/
 	public static function CryptData($data, $type)
 	{
 		$type = ToUpper($type);
@@ -324,52 +325,52 @@ class CAllSaleUserCards
 
 	
 	/**
-	 * <p>Метод определяет тип пластиковой карты по ее номеру.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $ccNum  Номер карты.
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает тип карты.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Сохраним новую карту текущего пользователя
-	 * 
-	 * if (CSaleUserCards::CheckPassword())
-	 * {
-	 *     $arFields = array(
-	 *             "USER_ID" =&gt; $USER-&gt;GetID(),
-	 *             "ACTIVE" =&gt; "Y",
-	 *             "SORT" =&gt; "100",
-	 *             "PAY_SYSTEM_ACTION_ID" =&gt; 11,
-	 *             "CURRENCY" =&gt; "USD",
-	 *             "CARD_TYPE" =&gt; CSaleUserCards::IdentifyCardType("4111111111111"),
-	 *             "CARD_NUM" =&gt; CSaleUserCards::CryptData("4111111111111", "E"),
-	 *             "CARD_EXP_MONTH" =&gt; 11,
-	 *             "CARD_EXP_YEAR" =&gt; 2007,
-	 *             "DESCRIPTION" =&gt; False,
-	 *             "CARD_CODE" =&gt; "123",
-	 *             "SUM_MIN" =&gt; False,
-	 *             "SUM_MAX" =&gt; False,
-	 *             "SUM_CURRENCY" =&gt; False
-	 *         );
-	 * 
-	 *     $UserCardID = CSaleUserCards::Add($arFields);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.identifycardtype.php
-	 * @author Bitrix
-	 */
+	* <p>Метод определяет тип пластиковой карты по ее номеру.</p>
+	*
+	*
+	*
+	*
+	* @param string $ccNum  Номер карты.
+	*
+	*
+	*
+	* @return string <p>Метод возвращает тип карты.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Сохраним новую карту текущего пользователя
+	* 
+	* if (CSaleUserCards::CheckPassword())
+	* {
+	*     $arFields = array(
+	*             "USER_ID" =&gt; $USER-&gt;GetID(),
+	*             "ACTIVE" =&gt; "Y",
+	*             "SORT" =&gt; "100",
+	*             "PAY_SYSTEM_ACTION_ID" =&gt; 11,
+	*             "CURRENCY" =&gt; "USD",
+	*             "CARD_TYPE" =&gt; CSaleUserCards::IdentifyCardType("4111111111111"),
+	*             "CARD_NUM" =&gt; CSaleUserCards::CryptData("4111111111111", "E"),
+	*             "CARD_EXP_MONTH" =&gt; 11,
+	*             "CARD_EXP_YEAR" =&gt; 2007,
+	*             "DESCRIPTION" =&gt; False,
+	*             "CARD_CODE" =&gt; "123",
+	*             "SUM_MIN" =&gt; False,
+	*             "SUM_MAX" =&gt; False,
+	*             "SUM_CURRENCY" =&gt; False
+	*         );
+	* 
+	*     $UserCardID = CSaleUserCards::Add($arFields);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.identifycardtype.php
+	* @author Bitrix
+	*/
 	public static function IdentifyCardType($ccNum)
 	{
 		//*CARD TYPES            *PREFIX           *WIDTH

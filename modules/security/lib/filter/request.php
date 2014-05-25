@@ -31,6 +31,7 @@ class Request
 	private $action = 'filter';
 	private $doLog = false;
 	private $changedVars = array();
+	private $isAuditorsTriggered = false;
 	private $filteringMap = array(
 		'get' => array(
 			'Name' => '$_GET',
@@ -151,10 +152,21 @@ class Request
 			return $values;
 	}
 
+
+	/**
+	 * @since 14.0.3
+	 * @return bool
+	 */
+	public function isAuditorsTriggered()
+	{
+		return $this->isAuditorsTriggered;
+	}
+
 	protected function onFilterStarted()
 	{
 		$this->changedContext = array();
 		$this->changedVars = array();
+		$this->isAuditorsTriggered = false;
 	}
 
 	protected function onFilterFinished()
@@ -181,6 +193,8 @@ class Request
 		{
 			if ($auditor->process($filteredValue))
 			{
+				$this->isAuditorsTriggered = true;
+
 				if ($this->isLogNeeded())
 				{
 					$this->logVariable($value, $name, $auditName);
@@ -197,7 +211,6 @@ class Request
 					$filteredValue = '';
 					break;
 				}
-
 			}
 		}
 

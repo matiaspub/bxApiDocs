@@ -1828,22 +1828,26 @@ class CIBlockPropertyVideo extends CVideoProperty
 
 	public static function PrepareSettings($arProperty)
 	{
-		return CUserTypeVideo::BasePrepareSettings($arProperty, "USER_TYPE_SETTINGS");
+		$arResult = CUserTypeVideo::BasePrepareSettings($arProperty, "USER_TYPE_SETTINGS");
+		$arResult['SMART_FILTER'] = 'N';
+		$arFields['USER_TYPE_SETTINGS'] = $arResult;
+
+		return $arFields;
 	}
 
-	public static function GetSettingsHTML($arProperty, $strHTMLControlName, $arPropertyFields)
+	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
-		$result = '';
 		$arPropertyFields = array(
-			"HIDE" => array("FILTRABLE", "ROW_COUNT", "COL_COUNT", "DEFAULT_VALUE"), //will hide the field
-			"SET" => array("FILTRABLE" => "N"), //if set then hidden field will get this value
+			"HIDE" => array("FILTRABLE", "ROW_COUNT", "COL_COUNT", "DEFAULT_VALUE", "SMART_FILTER"), //will hide the field
+			"SET" => array("FILTRABLE" => "N", "SMART_FILTER" => "N"), //if set then hidden field will get this value
 			"USER_TYPE_SETTINGS_TITLE" => GetMessage("IBLOCK_PROP_VIDEO_SET_NAME")
 		);
 
-		$arProperty["USER_TYPE_SETTINGS"] = CIBlockPropertyVideo::PrepareSettings($arProperty);
-		$val = $arProperty["USER_TYPE_SETTINGS"];
+		$arSettings = CIBlockPropertyVideo::PrepareSettings($arProperty);
+		if (isset($arSettings['USER_TYPE_SETTINGS']))
+			$arSettings = $arSettings['USER_TYPE_SETTINGS'];
 
-		return CIBlockPropertyVideo::BaseGetSettingsHTML($strHTMLControlName["NAME"], $val);
+		return CIBlockPropertyVideo::BaseGetSettingsHTML($strHTMLControlName["NAME"], $arSettings);
 	}
 
 	public static function GetSearchContent($arProperty, $value, $strHTMLControlName)

@@ -538,7 +538,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		$additional_headers = array();
 		if($this->_public)
 			$additional_headers["x-amz-acl"] = "public-read";
-		$additional_headers["x-amz-copy-source"] = CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").$arFile["SUBDIR"]."/".$arFile["FILE_NAME"], "UTF-8");
+		$additional_headers["x-amz-copy-source"] = CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").($arFile["SUBDIR"]? $arFile["SUBDIR"]."/": "").$arFile["FILE_NAME"], "UTF-8");
 		$additional_headers["Content-Type"] = $arFile["CONTENT_TYPE"];
 
 		$response = $this->SendRequest(

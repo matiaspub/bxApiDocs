@@ -1,13 +1,13 @@
 <?
 //<title>Yandex simple</title>
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/export_setup_templ.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/export_setup_templ.php');
 set_time_limit(0);
 
 global $APPLICATION;
 
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -159,6 +159,7 @@ if (strlen($strExportErrorMessage)<=0)
 
 			while ($arAcc = $res->GetNext())
 			{
+				$cnt++;
 				if (strlen($SETUP_SERVER_NAME) <= 0)
 				{
 					if (!array_key_exists($arAcc['LID'], $arSiteServers))
@@ -282,6 +283,15 @@ if (strlen($strExportErrorMessage)<=0)
 						255), true).
 					"</description>\n";
 				$strTmpOff.= "</offer>\n";
+				if (100 <= $cnt)
+				{
+					$cnt = 0;
+					CCatalogDiscount::ClearDiscountCache(array(
+						'PRODUCT' => true,
+						'SECTIONS' => true,
+						'PROPERTIES' => true
+					));
+				}
 			}
 		}
 	}

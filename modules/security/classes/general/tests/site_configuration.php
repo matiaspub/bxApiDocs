@@ -1,4 +1,6 @@
 <?
+use Bitrix\Main\SystemException;
+
 /**
  * Bitrix Framework
  * @package bitrix
@@ -38,16 +40,15 @@ class CSecuritySiteConfigurationTest
 			"method" => "checkDbPassword"
 		),
 		"scriptExtension" => array(
-			"method" => "checkScriptExtension"
+			"method" => "checkScriptExtension",
+			"base_message_key" => "SECURITY_SITE_CHECKER_SCRIPT_EXTENSIONS",
+			"critical" => CSecurityCriticalLevel::HIGHT
 		),
 		"modulesVersion" => array(
 			"method" => "checkModulesVersion",
 			"base_message_key" => "SECURITY_SITE_CHECKER_MODULES_VERSION",
 			"critical" => CSecurityCriticalLevel::HIGHT
-		),
-//		"otp" => array(
-//			"method" => "checkOtp"
-//		),
+		)
 	);
 
 	protected static $actualScriptExtensions = "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp";
@@ -66,33 +67,8 @@ class CSecuritySiteConfigurationTest
 			explode(",", self::$actualScriptExtensions),
 			getScriptFileExt()
 		);
-		if(!empty($missingExtensions))
-		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_SCRIPT_EXTENSIONS", CSecurityCriticalLevel::HIGHT);
-		}
-	}
 
-	protected function checkOtp()
-	{
-		if(IsModuleInstalled('intranet')) //OTP not used in Bitrix Intranet Portal
-			return;
-
-		if(CSecurityUser::isActive())
-		{
-			$dbUser = CUser::GetList($by = 'ID', $order = 'ASC', array("GROUPS_ID" => 1, "ACTIVE" => "Y"), array("FIELDS" => "ID"));
-			while($user = $dbUser->fetch())
-			{
-				$userInfo = CSecurityUser::getSecurityUserInfo($user["ID"]);
-				if(!$userInfo)
-				{
-					$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
-				}
-			}
-		}
-		else
-		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_OTP_NOT_USED", CSecurityCriticalLevel::MIDDLE);
-		}
+		return empty($missingExtensions);
 	}
 
 	protected function checkSecurityLevel()
@@ -159,11 +135,16 @@ class CSecuritySiteConfigurationTest
 	 */
 	protected function checkModulesVersion()
 	{
-		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client.php");
+		try
+		{
+			return !$this->isModuleUpdateAvailable();
+		}
+		catch (SystemException $e)
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_MODULES_VERSION_ERROR", CSecurityCriticalLevel::HIGHT);
+		}
 
-		$modules = array();
-		$errors = '';
-		return !CUpdateClient::IsUpdateAvailable($modules, $errors);
+		return true;
 	}
 
 	protected function checkDbPassword()
@@ -171,7 +152,7 @@ class CSecuritySiteConfigurationTest
 		/** @global CDataBase $DB */
 		global $DB;
 		$password = $DB->DBPassword;
-		$sign = ",.#!*%$:-^@";
+		$sign = ",.#!*%$:-^@{}[]()'\"-+=<>?`&;";
 		$dit = "1234567890";
 		if(trim($password) == "")
 		{
@@ -196,6 +177,57 @@ class CSecuritySiteConfigurationTest
 				$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_DB_MIN_LEN_PASS", CSecurityCriticalLevel::HIGHT);
 			}
 		}
+	}
+
+	/**
+	 * @since 14.0.7
+	 * @return bool
+	 * @throws Bitrix\Main\SystemException
+	 */
+	protected function isModuleUpdateAvailable()
+	{
+		require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/classes/general/update_client.php');
+
+		$errors = null;
+		$installedModules = CUpdateClient::GetCurrentModules($errors);
+		if ($errors !== null)
+			throw new SystemException($errors);
+
+		$stableVersionsOnly = COption::GetOptionString('main', 'stable_versions_only', 'Y');
+		$errors = null;
+		$updateList = CUpdateClient::GetUpdatesList($errors, LANG, $stableVersionsOnly);
+		if ($errors !== null)
+			throw new SystemException($errors);
+
+		if (
+			!isset($updateList['MODULES'])
+			|| !is_array($updateList['MODULES'])
+			|| !isset($updateList['MODULES'][0]['#'])
+		)
+		{
+			throw new SystemException('Empty update modules list');
+		}
+
+		if (!$updateList['MODULES'][0]['#'])
+		{
+			return false;
+		}
+
+		if (
+			!isset($updateList['MODULES'][0]['#']['MODULE'])
+			|| !is_array($updateList['MODULES'][0]['#']['MODULE'])
+		)
+		{
+			throw new SystemException('Empty update module list');
+		}
+
+		foreach ($updateList['MODULES'][0]['#']['MODULE'] as $module)
+		{
+			if (array_key_exists($module['@']['ID'], $installedModules))
+				return true;
+		}
+
+		return false;
 	}
 
 	/**

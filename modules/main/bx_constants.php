@@ -20,7 +20,7 @@ define('SITE_SERVER_NAME', $arLang["SERVER_NAME"]);
 define('SITE_TEMPLATE_PATH', BX_PERSONAL_ROOT.'/templates/'.SITE_TEMPLATE_ID);
 
 /**
- * Поле "Кодировка" в настройках текущего сайта.
+ * Поле "Кодировка" в настройках текущего сайта. <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.
  */
 define('SITE_CHARSET', $arLang["CHARSET"]);
 
@@ -40,7 +40,7 @@ define('FORMAT_DATETIME', $arLang["FORMAT_DATETIME"]);
 define('LANGUAGE_ID', 'en');
 
 /**
- * В данной константе содержится значение кодировки, указанной в секции 	<i>Параметры</i> формы настроек текущего сайта.
+ * В данной константе содержится значение кодировки, указанной в секции 	<i>Параметры</i> формы настроек текущего сайта. <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.
  */
 define('LANG_CHARSET', $arLang["CHARSET"]);
 
@@ -62,12 +62,12 @@ define('B_PROLOG_INCLUDED', true);
 /**
  * Текущая версия главного модуля.
  */
-define('SM_VERSION', "14.0.3");
+define('SM_VERSION', "14.5.0");
 
 /**
  * Дата выпуска текущей версии главного модуля.
  */
-define('SM_VERSION_DATE', "2013-10-24 12:00:00");
+define('SM_VERSION_DATE', "2014-04-10 12:30:00");
 
 /**
  * Если необходимо подключать пролог административной части, то значение данной константы - "true".
@@ -82,6 +82,7 @@ define('ADMIN_SECTION', true);
  *         <p>Необходимость инициализации этой константы связана с тем, что на несуществующие страницы отослать данные методом POST нельзя, а именно с этим методом и работают вышеперечисленные компоненты. Поэтому если файл текущей страницы физически не существует на сервере, то без этой константы компоненты работать не будут.</p>
  *        	Пример: 
  *         <pre>define("AUTH_404", "Y");</pre>
+ *
  */
 define('AUTH_404', "Y");
 
@@ -91,6 +92,7 @@ define('AUTH_404', "Y");
  *        Пример: 
  *         <pre>define("HELP_FILE",
  *        "my_admin_script.php");</pre>
+ *
  */
 define('HELP_FILE', "updates/index.php");
 
@@ -99,6 +101,7 @@ define('HELP_FILE', "updates/index.php");
  *         <br><br>
  *        Пример: 
  *         <pre>define("NEED_AUTH", true);</pre>
+ *
  */
 define('NEED_AUTH', true);
 
@@ -108,6 +111,7 @@ define('NEED_AUTH', true);
  *        Пример: 
  *         <pre>define("ERROR_EMAIL", 
  *        "admin@site.ru, support@site.ru");</pre>
+ *
  */
 define('ERROR_EMAIL', null);
 
@@ -118,6 +122,7 @@ define('ERROR_EMAIL', null);
  *         <pre>define("LOG_FILENAME", 
  *        $_SERVER["DOCUMENT_ROOT"].
  *            "/log.txt");</pre>
+ *
  */
 define('LOG_FILENAME', null);
 
@@ -128,6 +133,7 @@ define('LOG_FILENAME', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("STATISTIC_ONLY", true);</pre>
+ *
  */
 define('STATISTIC_ONLY', true);
 
@@ -136,6 +142,7 @@ define('STATISTIC_ONLY', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("NO_KEEP_STATISTIC", true);</pre>
+ *        	
  */
 define('NO_KEEP_STATISTIC', true);
 
@@ -154,6 +161,7 @@ define('NO_KEEP_STATISTIC', true);
  * CStatistics::Keep(true);
  * 
  * ...</pre>
+ *
  */
 define('STOP_STATISTICS', true);
 
@@ -168,6 +176,7 @@ define('STOP_STATISTICS', true);
  *          </ul>
  *        Пример: 
  *         <pre>define("NO_AGENT_STATISTIC", true);</pre>
+ *
  */
 define('NO_AGENT_STATISTIC', true);
 
@@ -176,6 +185,7 @@ define('NO_AGENT_STATISTIC', true);
  *         <p>Пример: </p>
  *        
  *         <pre>define("NO_AGENT_CHECK", true);</pre>
+ *
  */
 define('NO_AGENT_CHECK', true);
 
@@ -184,6 +194,7 @@ define('NO_AGENT_CHECK', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("NOT_CHECK_PERMISSIONS", true);</pre>
+ *
  */
 define('NOT_CHECK_PERMISSIONS', true);
 
@@ -192,6 +203,7 @@ define('NOT_CHECK_PERMISSIONS', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("ONLY_EMAIL", "admin@site.ru");</pre>
+ *
  */
 define('ONLY_EMAIL', null);
 
@@ -200,6 +212,7 @@ define('ONLY_EMAIL', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_CRONTAB", true);</pre>
+ *
  */
 define('BX_CRONTAB', true);
 
@@ -208,22 +221,25 @@ define('BX_CRONTAB', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_FILE_PERMISSIONS", 0755);</pre>
+ *
  */
-define('BX_FILE_PERMISSIONS', 0644);
+define('BX_FILE_PERMISSIONS', null);
 
 /**
  * Unix-права для вновь создаваемых каталогов. 	 
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_DIR_PERMISSIONS", 0755);</pre>
+ *
  */
-define('BX_DIR_PERMISSIONS', 0700);
+define('BX_DIR_PERMISSIONS', 0755);
 
 /**
  * Инициализация данной константы значением "true" позволит отключить все модули системы за исключением главного и модуля "<a href="../../../../../fileman/help/ru/index.php.html">Управление структурой</a>". 	 
  *         <br><br>
  *        Пример: 
  *         <pre>define("SM_SAFE_MODE", true);</pre>
+ *
  */
 define('SM_SAFE_MODE', null);
 
@@ -239,6 +255,7 @@ define('SM_SAFE_MODE', null);
  *     default.html 
  *     index.php3
  * ");</pre>
+ *
  */
 define('DIRECTORY_INDEX', null);
 
@@ -247,6 +264,7 @@ define('DIRECTORY_INDEX', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("MYSQL_TABLE_TYPE", "InnoDB");</pre>
+ *
  */
 define('MYSQL_TABLE_TYPE', null);
 
@@ -255,6 +273,7 @@ define('MYSQL_TABLE_TYPE', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("DBPersistent", true);</pre>
+ *
  */
 define('DBPersistent', true);
 
@@ -287,6 +306,16 @@ define('BX_ROOT', "/bitrix");
  * BX_PERSONAL_ROOT
  */
 define('BX_PERSONAL_ROOT', BX_ROOT);
+
+/**
+ * ENABLE_HTML_STATIC_CACHE_JS
+ */
+define('ENABLE_HTML_STATIC_CACHE_JS', true);
+
+/**
+ * USE_HTML_STATIC_CACHE
+ */
+define('USE_HTML_STATIC_CACHE', true);
 
 /**
  * HTML_PAGES_FILE
@@ -384,9 +413,14 @@ define('MODULE_DEMO', 2);
 define('MODULE_DEMO_EXPIRED', 3);
 
 /**
- * NO_BITRIX_AUTOLOAD
+ * LICENSE_HASH
  */
-define('NO_BITRIX_AUTOLOAD', true);
+define('LICENSE_HASH', md5('CONNECTION_TEST'));
+
+/**
+ * BX_UTF_PCRE_MODIFIER
+ */
+define('BX_UTF_PCRE_MODIFIER', '');
 
 /**
  * US_SHARED_KERNEL_PATH
@@ -417,6 +451,11 @@ define('UPDATE_SYSTEM_VERSION', "11.0.12");
  * __CUpdateOutputScript
  */
 define('__CUpdateOutputScript', true);
+
+/**
+ * DisableEventsCheck
+ */
+define('DisableEventsCheck', true);
 
 /**
  * T_INCLUDE_RESULT_MODIFIER
@@ -554,11 +593,6 @@ define('START_EXEC_PROLOG_AFTER_1', microtime());
 define('START_EXEC_PROLOG_AFTER_2', microtime());
 
 /**
- * ADMIN_SECTION_LOAD_AUTH
- */
-define('ADMIN_SECTION_LOAD_AUTH', 1);
-
-/**
  * START_EXEC_PROLOG_BEFORE_1
  */
 define('START_EXEC_PROLOG_BEFORE_1', microtime());
@@ -599,11 +633,6 @@ define('BX_ADMIN_SECTION_404', 'Y');
 define('ADMIN_THEMES_PATH', "/bitrix/themes");
 
 /**
- * DisableEventsCheck
- */
-define('DisableEventsCheck', true);
-
-/**
  * BX_SEARCH_ADMIN
  */
 define('BX_SEARCH_ADMIN', true);
@@ -612,31 +641,6 @@ define('BX_SEARCH_ADMIN', true);
  * ADMIN_THEME_ID
  */
 define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme());
-
-/**
- * BX_COMP_MANAGED_CACHE
- */
-define('BX_COMP_MANAGED_CACHE', true);
-
-/**
- * BX_CRONTAB_SUPPORT
- */
-define('BX_CRONTAB_SUPPORT', defined);
-
-/**
- * BX_STARTED
- */
-define('BX_STARTED', true);
-
-/**
- * START_EXEC_AGENTS_1
- */
-define('START_EXEC_AGENTS_1', microtime);
-
-/**
- * START_EXEC_AGENTS_2
- */
-define('START_EXEC_AGENTS_2', microtime);
 
 /**
  * LANG
@@ -654,14 +658,19 @@ define('LANG_DIR', $arLang["DIR"]);
 define('LANG_ADMIN_LID', $arLang["LANGUAGE_ID"]);
 
 /**
+ * BX_STARTED
+ */
+define('BX_STARTED', true);
+
+/**
  * LICENSE_KEY
  */
 define('LICENSE_KEY', $dispatcher->getLicenseKey());
 
 /**
- * BX_UTF_PCRE_MODIFIER
+ * BX_COMP_MANAGED_CACHE
  */
-define('BX_UTF_PCRE_MODIFIER', '');
+define('BX_COMP_MANAGED_CACHE', true);
 
 /**
  * CACHED_b_lang
@@ -739,19 +748,24 @@ define('CACHED_b_rating', 3600);
 define('ADMIN_MODULE_NAME', 'main');
 
 /**
- * ADMIN_MODULE_ICON
- */
-define('ADMIN_MODULE_ICON', '<a href="'.BX_ROOT.'/admin/index.php?lang='.LANG.'"><img src="'.BX_ROOT.'/images/main/user.gif" width="48" height="48" border="0" alt="'.GetMessage('MAIN_MODULE_TITLE').'" title="'.GetMessage('MAIN_MODULE_TITLE').'"></a>');
-
-/**
  * START_TIME
  */
 define('START_TIME', time());
 
 /**
+ * CLI
+ */
+define('CLI', php_sapi_name() == 'cli');
+
+/**
  * LOCK_FILE
  */
 define('LOCK_FILE', $_SERVER['DOCUMENT_ROOT'].'/bitrix/backup/auto_lock');
+
+/**
+ * STATISTIC_SKIP_ACTIVITY_CHECK
+ */
+define('STATISTIC_SKIP_ACTIVITY_CHECK', true);
 
 /**
  * DOCUMENT_ROOT
@@ -769,11 +783,6 @@ define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
 define('BX_PUBLIC_TOOLS', true);
 
 /**
- * CLI
- */
-define('CLI', php_sapi_name() == 'cli');
-
-/**
  * BX_SECURITY_SHOW_MESSAGE
  */
 define('BX_SECURITY_SHOW_MESSAGE', 1);
@@ -782,6 +791,21 @@ define('BX_SECURITY_SHOW_MESSAGE', 1);
  * NOT_CHECK_FILE_PERMISSIONS
  */
 define('NOT_CHECK_FILE_PERMISSIONS', true);
+
+/**
+ * AM_PM_NONE
+ */
+define('AM_PM_NONE', false);
+
+/**
+ * AM_PM_UPPER
+ */
+define('AM_PM_UPPER', 1);
+
+/**
+ * AM_PM_LOWER
+ */
+define('AM_PM_LOWER', 2);
 
 
 ?>

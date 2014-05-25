@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main;
+use Bitrix\Main\Type;
+
 class OracleSqlHelper extends SqlHelper
 {
 	/**
@@ -19,6 +22,11 @@ class OracleSqlHelper extends SqlHelper
 	static public function getRightQuote()
 	{
 		return '"';
+	}
+
+	static public function quote($identifier)
+	{
+		return parent::quote(strtoupper($identifier));
 	}
 
 	static public function getQueryDelimiter()
@@ -138,31 +146,12 @@ class OracleSqlHelper extends SqlHelper
 		return "LENGTH(".$field.")";
 	}
 
-	static public function getToCharFunction($expr, $length = 0)
+	static public function getCharToDateFunction($value)
 	{
-		return "CAST(".$expr." AS CHAR".($length > 0? "(".$length.")":"").")";
+		return "TO_DATE('".$value."', 'YYYY-MM-DD HH24:MI:SS')";
 	}
 
-	static public function getDateTimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
-	{
-		$customOffset = $value->getValue()->getOffset();
-
-		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getValue()->getOffset();
-
-		$diff = $customOffset - $serverOffset;
-		$valueTmp = clone $value;
-
-		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
-
-		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
-		$formatDb = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "YYYY-MM-DD" : "YYYY-MM-DD HH24:MI:SS");
-		$date = "TO_DATE('".$valueTmp->format($format)."', '".$formatDb."')";
-
-		return $date;
-	}
-
-	static public function getDateTimeFromDbFunction($fieldName)
+	static public function getDateToCharFunction($fieldName)
 	{
 		return "TO_CHAR(".$fieldName.", 'YYYY-MM-DD HH24:MI:SS')";
 	}
@@ -211,7 +200,7 @@ class OracleSqlHelper extends SqlHelper
 			{
 				if (($columnInfo["TYPE"] == "CLOB") && ($fields[$columnName] !== null) && (strlen($fields[$columnName]) > 0))
 				{
-					$binds[] = $columnName;
+					$binds[$columnName] = $fields[$columnName];
 				}
 			}
 		}
@@ -235,34 +224,60 @@ class OracleSqlHelper extends SqlHelper
 		{
 			case "DATE":
 				if (empty($value))
+				{
 					$result = "NULL";
+				}
+				elseif($value instanceof Type\Date)
+				{
+					if($value instanceof Type\DateTime)
+					{
+						$value = clone($value);
+						$value->setDefaultTimeZone();
+					}
+					$result = $this->getCharToDateFunction($value->format("Y-m-d H:i:s"));
+				}
 				else
-					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITH_TIME);
+				{
+					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
+				}
 				break;
 			case "CLOB":
 				if (empty($value))
+				{
 					$result = "NULL";
+				}
 				else
+				{
 					$result = "EMPTY_CLOB()";
+				}
 				break;
 			case "NUMBER":
 				if (strlen($columnInfo["DATA_SCALE"]) <= 0)
+				{
 					$result = doubleval($value);
+				}
 				elseif (intval($columnInfo["DATA_SCALE"]) <= 0)
+				{
 					$result = intval($value);
+				}
 				else
+				{
 					$result = round(doubleval($value), $columnInfo["DATA_SCALE"]);
+				}
 
 				if ($columnInfo["DATA_PRECISION"] > 0 && strlen(intval($result)) > intval($columnInfo["DATA_PRECISION"])-intval($columnInfo["DATA_SCALE"]))
+				{
 					$result = intval(str_repeat('9', $columnInfo["DATA_PRECISION"] - $columnInfo["DATA_SCALE"]));
+				}
 				break;
 
-			case "VARCHAR2": case "CHAR":
-				$result = "'".str_replace("'", "''", substr($value, 0, $columnInfo["CHAR_LENGTH"]))."'";
+			case "VARCHAR2":
+			case "CHAR":
+				$result = "'".$this->forSql($value, $columnInfo["CHAR_LENGTH"])."'";
 				break;
 
 			default:
-				$result = "'".str_replace("'", "''", $value)."'";
+				$result = "'".$this->forSql($value)."'";
 				break;
 		}
 
@@ -299,5 +314,15 @@ class OracleSqlHelper extends SqlHelper
 			}
 		}
 		return $sql;
+	}
+
+	static public function getAscendingOrder()
+	{
+		return 'ASC NULLS FIRST';
+	}
+
+	static public function getDescendingOrder()
+	{
+		return 'DESC NULLS LAST';
 	}
 }

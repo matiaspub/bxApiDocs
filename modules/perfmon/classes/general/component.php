@@ -49,6 +49,9 @@ class CPerfomanceComponent
 					}
 					break;
 				case "CACHE_SIZE":
+				case "CACHE_COUNT_R":
+				case "CACHE_COUNT_W":
+				case "CACHE_COUNT_C":
 				case "COMPONENT_TIME":
 				case "QUERIES":
 				case "QUERIES_TIME":
@@ -109,6 +112,9 @@ class CPerfomanceComponent
 					}
 					break;
 				case "CACHE_SIZE":
+				case "CACHE_COUNT_R":
+				case "CACHE_COUNT_W":
+				case "CACHE_COUNT_C":
 				case "COMPONENT_TIME":
 				case "QUERIES":
 				case "QUERIES_TIME":
@@ -121,6 +127,18 @@ class CPerfomanceComponent
 					{
 						if($bGroup)
 							$arQuerySelect[$strGroupFunc."_".$strColumn] = $strGroupFunc."(c.".$strColumn.") ".$strGroupFunc."_".$strColumn;
+					}
+					break;
+				case "CACHE_COUNT":
+					if($strGroupFunc == "")
+					{
+						if(!$bGroup)
+							$arQuerySelect[$strColumn] = "(c.CACHE_COUNT_R + c.CACHE_COUNT_W + c.CACHE_COUNT_C) CACHE_COUNT";
+					}
+					else
+					{
+						if($bGroup)
+							$arQuerySelect[$strGroupFunc."_".$strColumn] = $strGroupFunc."(c.CACHE_COUNT_R + c.CACHE_COUNT_W + c.CACHE_COUNT_C) ".$strGroupFunc."_".$strColumn;
 					}
 					break;
 				case "COUNT":

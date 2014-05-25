@@ -18,80 +18,96 @@ class CForumTopic extends CAllForumTopic
 {
 	
 	/**
-	 * <p>Возвращает список тем по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID темы;<br>     <i>TITLE</i> - заголовок темы;<br>     <i>STATE</i> -
-	 * состояние темы;<br>     <i>USER_START_ID</i> - ID пользователя, который создал
-	 * тему;<br>     <i>USER_START_NAME</i> - имя пользователя, который создал
-	 * тему;<br>     <i>START_DATE</i> - дата создания темы;<br>     <i>POSTS</i> -
-	 * количество ответов в теме;<br>     <i>VIEWS</i> - количество просмотров
-	 * темы;<br>     <i>APPROVED</i> - опубликованность темы;<br>     <i>LAST_POST_DATE</i> -
-	 * дата последнего сообщения в теме;<br>     <i>SORT</i> - индекс
-	 * сортировки;<br><br><i>order</i> - порядок сортировки, может принимать
-	 * значения<br>     <i>ASC</i> - по возрастанию;<br>     <i>DESC</i> - по
-	 * убыванию;<br><br> Необязательный. По умолчанию равен Array("SORT"=&gt;"ASC")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения: <ul> <i>STATE</i> - состояние
-	 * темы;<br><i>FORUM_ID</i> - ID форума;<br><i>ID</i> - ID темы;<br><i>APPROVED</i> -
-	 * опубликованность;<br><i>LAST_POST_DATE</i> - дата последнего сообщения в
-	 * теме; <br><i>USER_START_ID</i> - ID автора темы. </ul> фильтруемое поле может
-	 * иметь содержать перед названием тип проверки фильтра<br> "!" - не
-	 * равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
-	 * "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
-	 * не фильтруются.
-	 *
-	 *
-	 *
-	 * @param bool $bCount  Если параметр равен True, то возвращается только количество тем,
-	 * которое соответствует установленному фильтру. Необязательный.
-	 * По умолчанию равен False.
-	 *
-	 *
-	 *
-	 * @param int $iNum  Ограничение числа возвращаемых записей. Если параметр iNum отличен
-	 * от нуля, то возвращается не более iNum записей. Поддерживается не
-	 * для всех баз данных. Если параметр не поддерживается, то его
-	 * установки игнорируются. Необязательный. По умолчанию равен 0.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // выберем все опубликованные темы форума с кодом $FID, 
-	 * // отсортированные сначала по индексу сортировки, а потом 
-	 * // по дате последнего сообщения в теме
-	 * $db_res = CForumTopic::GetList(array("SORT"=&gt;"ASC", "LAST_POST_DATE"=&gt;"DESC"), array("FORUM_ID"=&gt;$FID));
-	 * while ($ar_res = $db_res-&gt;Fetch())
-	 * {
-	 *   echo $ar_res["TITLE"]."&lt;br&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список тем по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <b>ID</b> - ID темы;<br>     <b>TITLE</b> - заголовок темы;<br>     <b>STATE</b> -
+	* состояние темы;<br>     <b>USER_START_ID</b> - ID пользователя, который создал
+	* тему;<br>     <b>USER_START_NAME</b> - имя пользователя, который создал
+	* тему;<br>     <b>START_DATE</b> - дата создания темы;<br>     <b>POSTS</b> -
+	* количество ответов в теме;<br>     <b>VIEWS</b> - количество просмотров
+	* темы;<br>     <b>APPROVED</b> - опубликованность темы;<br>     <b>LAST_POST_DATE</b> -
+	* дата последнего сообщения в теме;<br>     <b>SORT</b> - индекс
+	* сортировки;<br><br><i>order</i> - порядок сортировки, может принимать
+	* значения<br>     <b>ASC</b> - по возрастанию;<br>     <b>DESC</b> - по
+	* убыванию;<br><br> Необязательный. По умолчанию равен Array("SORT"=&gt;"ASC")
+	*
+	*
+	*
+	* @param array $arFilter = Array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения: <ul> <b>STATE</b> - состояние
+	* темы;<br><b>FORUM_ID</b> - ID форума;<br><b>ID</b> - ID темы;<br><b>APPROVED</b> -
+	* опубликованность;<br><b>LAST_POST_DATE</b> - дата последнего сообщения в
+	* теме; <br><b>USER_START_ID</b> - ID автора темы. </ul> фильтруемое поле может
+	* иметь содержать перед названием тип проверки фильтра<br> "!" - не
+	* равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
+	* "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
+	* не фильтруются.
+	*
+	*
+	*
+	* @param bool $bCount = false Если параметр равен True, то возвращается только количество тем,
+	* которое соответствует установленному фильтру. Необязательный.
+	* По умолчанию равен False.
+	*
+	*
+	*
+	* @param int $iNum = 0 Ограничение числа возвращаемых записей. Если параметр iNum отличен
+	* от нуля, то возвращается не более iNum записей. Поддерживается не
+	* для всех баз данных. Если параметр не поддерживается, то его
+	* установки игнорируются. Необязательный. По умолчанию равен 0.
+	*
+	*
+	*
+	* @param array $arAddParams = Array() Массив параметров. </h
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // выберем все опубликованные темы форума с кодом $FID, 
+	* // отсортированные сначала по индексу сортировки, а потом 
+	* // по дате последнего сообщения в теме
+	* $db_res = CForumTopic::GetList(array("SORT"=&gt;"ASC", "LAST_POST_DATE"=&gt;"DESC"), array("FORUM_ID"=&gt;$FID));
+	* while ($ar_res = $db_res-&gt;Fetch())
+	* {
+	*   echo $ar_res["TITLE"]."&lt;br&gt;";
+	* }
+	* ?&gt;
+	* 
+	* 
+	* 
+	* &lt;?
+	* // Если нужно выбрать темы по массиву их ID, то пишем перед ID символ "@":
+	* $filter = array("@ID"=&gt;array(10,5,23,111),"APPROVED"=&gt;"Y");
+	* $rs = CForumTopic::GetList(array("SORT"=&gt;"ASC","LAST_POST_DATE"=&gt;"DESC"),$filter);
+	* while($topic = $rs-&gt;fetch())
+	* {
+	*     $arResult["TOPICS"][] = $topic;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("SORT"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
 	{
 		global $DB;
@@ -263,6 +279,7 @@ class CForumTopic extends CAllForumTopic
 			$strSql = 
 				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
+				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
 				"	FT.POSTS, FT.LAST_POSTER_ID, FT.LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.LAST_POST_DATE", "FULL")." as LAST_POST_DATE, \n".
@@ -270,7 +287,7 @@ class CForumTopic extends CAllForumTopic
 				"	FT.POSTS_UNAPPROVED, FT.ABS_LAST_POSTER_ID, FT.ABS_LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE, \n".
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
-				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML".$arSQL["select"]." \n".
+				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID".$arSQL["select"]." \n".
 				" FROM ( \n".
 				"		SELECT FT.ID".$strSqlSelect." \n".
 				"		FROM b_forum_topic FT \n".
@@ -285,6 +302,7 @@ class CForumTopic extends CAllForumTopic
 			$strSql = 
 				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
+				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
 				"	FT.POSTS, FT.LAST_POSTER_ID, FT.LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.LAST_POST_DATE", "FULL")." as LAST_POST_DATE, \n".
@@ -292,7 +310,7 @@ class CForumTopic extends CAllForumTopic
 				"	FT.POSTS_UNAPPROVED, FT.ABS_LAST_POSTER_ID, FT.ABS_LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE, \n".
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
-				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML".$strSqlSelect.$arSQL["select"]." \n".
+				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID".$strSqlSelect.$arSQL["select"]." \n".
 				" FROM b_forum_topic FT ".$arSQL["join"]. " \n".
 				" WHERE 1 = 1 ".$strSqlSearch." \n".
 				$strSqlOrder;
@@ -321,71 +339,60 @@ class CForumTopic extends CAllForumTopic
 
 	
 	/**
-	 * <p>Возвращает список тем (включая связаные данные) по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]). Подробное
-	 * описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
-	 *
-	 *
-	 *
-	 * @param  $array  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]). <br>
-	 * Подробное описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
-	 *
-	 *
-	 *
-	 * @param arFilte $r  Если параметр равен True, то возвращается только количество
-	 * сообщений, которое соответствует установленному фильтру.
-	 * Необязательный. По умолчанию равен False.
-	 *
-	 *
-	 *
-	 * @param  $bool  Ограничение числа возвращаемых записей. Если параметр iNum отличен
-	 * от нуля, то возвращается не более iNum записей. Поддерживается не
-	 * для всех баз данных. Если параметр не поддерживается, то его
-	 * установки игнорируются. Необязательный. По умолчанию равен 0.
-	 *
-	 *
-	 *
-	 * @param bCoun $t  Осуществляет настройки постраничной навигации. На какое
-	 * количество сообщений разбивать список сообщений и использовать
-	 * ли обратную постраничную навигацию. Пример: array("nPageSize"=&gt;20,
-	 * "bDescPageNumbering"=&gt;true).
-	 *
-	 *
-	 *
-	 * @param  $int  
-	 *
-	 *
-	 *
-	 * @param iNu $m  
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>// выберем все опубликованные темы форума с кодом $FID, <br>// отсортированные сначала по индексу сортировки, а потом <br>// по дате последнего сообщения в теме<br>$db_res = CForumTopic::GetList(array("SORT"=&gt;"ASC", "LAST_POST_DATE"=&gt;"DESC"), array("FORUM_ID"=&gt;$FID));<br>while ($ar_res = $db_res-&gt;Fetch())<br>{<br>  echo "&lt;pre&gt;";<br>  print_r($ar_res);<br>  echo "&lt;/pre&gt;&lt;br&gt;";<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlistex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список тем (включая связаные данные) по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]). Подробное
+	* описание параметра смотрите в описании функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
+	*
+	*
+	*
+	* @param array $arFilter = Array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]). <br>
+	* Подробное описание параметра смотрите в описании функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlist.php">CForumTopic::GetList</a>.
+	*
+	*
+	*
+	* @param bool $bCount = false Если параметр равен True, то возвращается только количество
+	* сообщений, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @param int $iNum = 0 Ограничение числа возвращаемых записей. Если параметр iNum отличен
+	* от нуля, то возвращается не более iNum записей. Поддерживается не
+	* для всех баз данных. Если параметр не поддерживается, то его
+	* установки игнорируются. Необязательный. По умолчанию равен 0.
+	*
+	*
+	*
+	* @param array $arAddParams = Array() Массив параметров. </h
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>// выберем все опубликованные темы форума с кодом $FID, <br>// отсортированные сначала по индексу сортировки, а потом <br>// по дате последнего сообщения в теме<br>$db_res = CForumTopic::GetList(array("SORT"=&gt;"ASC", "LAST_POST_DATE"=&gt;"DESC"), array("FORUM_ID"=&gt;$FID));<br>while ($ar_res = $db_res-&gt;Fetch())<br>{<br>  echo "&lt;pre&gt;";<br>  print_r($ar_res);<br>  echo "&lt;/pre&gt;&lt;br&gt;";<br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getlistex.php
+	* @author Bitrix
+	*/
 	public static function GetListEx($arOrder = Array("SORT"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
 	{
 		global $DB, $USER;
@@ -431,7 +438,7 @@ class CForumTopic extends CAllForumTopic
 				case "TOPICS":
 					if (($strOperation!="IN")&&(intVal($val)>0))
 						$arSqlSearch[] = ($strNegative=="Y"?" FT.".$key." IS NULL OR NOT ":"")."(FT.".$key." ".$strOperation." ".intVal($val)." )";
-					elseif (($strOperation =="IN") && ((is_array($val) && (array_sum($val) > 0)) || (strlen($val) > 0) ))
+					elseif (($strOperation =="IN") && ((is_array($val) && (array_sum($val) > 0)) || (is_string($val) && strlen($val) > 0) ))
 					{
 						if (!is_array($val))
 							$val = explode(',', $val);
@@ -645,7 +652,7 @@ class CForumTopic extends CAllForumTopic
 					"STATE", "APPROVED", "SORT", "VIEWS", "USER_START_ID", "USER_START_NAME", "START_DATE", 
 					"POSTS", "LAST_POSTER_ID", "LAST_POSTER_NAME", "LAST_POST_DATE", "LAST_MESSAGE_ID", 
 					"POSTS_UNAPPROVED", "ABS_LAST_POSTER_ID", "ABS_LAST_POSTER_NAME", "ABS_LAST_POST_DATE", "ABS_LAST_MESSAGE_ID", 
-					"SOCNET_GROUP_ID", "OWNER_ID", "HTML"))):
+					"SOCNET_GROUP_ID", "OWNER_ID", "HTML", "XML_ID"))):
 				$arSqlOrder[] = "FT.".$by." ".$order;
 			elseif ($by == "FORUM_NAME"):
 				$arSqlOrder[] = "F.NAME ".$order;
@@ -711,6 +718,7 @@ class CForumTopic extends CAllForumTopic
 			$strSql =
 				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
+				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
 				"	FT.POSTS, FT.LAST_POSTER_ID, FT.LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.LAST_POST_DATE", "FULL")." as LAST_POST_DATE, \n".
@@ -718,7 +726,7 @@ class CForumTopic extends CAllForumTopic
 				"	FT.POSTS_UNAPPROVED, FT.ABS_LAST_POSTER_ID, FT.ABS_LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE, \n".
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
-				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, \n".
+				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID, \n".
 				"	F.NAME as FORUM_NAME, \n".
 				"	FS.IMAGE, '' as IMAGE_DESCR ".$arSQL["select"]." \n".
 				" FROM \n".
@@ -740,6 +748,7 @@ class CForumTopic extends CAllForumTopic
 			$strSql = 
 				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
+				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
 				"	FT.POSTS, FT.LAST_POSTER_ID, FT.LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.LAST_POST_DATE", "FULL")." as LAST_POST_DATE, \n".
@@ -747,7 +756,7 @@ class CForumTopic extends CAllForumTopic
 				"	FT.POSTS_UNAPPROVED, FT.ABS_LAST_POSTER_ID, FT.ABS_LAST_POSTER_NAME, \n".
 				"	".$DB->DateToCharFunction("FT.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE, \n".
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
-				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, \n".
+				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID, \n".
 				"	F.NAME as FORUM_NAME, \n".
 				"	FS.IMAGE, '' as IMAGE_DESCR".$strSqlSelect.$arSQL["select"]." \n".
 				" FROM b_forum_topic FT \n".

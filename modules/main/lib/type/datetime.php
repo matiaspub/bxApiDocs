@@ -4,197 +4,179 @@ namespace Bitrix\Main\Type;
 use Bitrix\Main;
 use Bitrix\Main\Context;
 
-class DateTime
+class DateTime extends Date
 {
-	const DATE_WITH_TIME = 0;
-	const DATE_WITHOUT_TIME = 1;
-
 	/**
-	 * @var \DateTime
+	 * @param string $time String representation of datetime
+	 * @param string $format PHP datetime format. If not specified, the format is got from the current culture.
+	 * @param \DateTimeZone $timezone
+	 * @throws Main\ObjectException
 	 */
-	protected $value;
-
 	public function __construct($time = null, $format = null, \DateTimeZone $timezone = null)
 	{
-		if (($time === null) || ($time === ""))
+		if ($time === null || $time === "")
 		{
 			if ($timezone === null)
+			{
 				$this->value = new \DateTime();
+			}
 			else
+			{
 				$this->value = new \DateTime(null, $timezone);
+			}
 		}
 		else
 		{
 			if ($format === null)
-				$format = self::DATE_WITH_TIME;
-
-			if (($format === self::DATE_WITH_TIME) || ($format === self::DATE_WITHOUT_TIME))
-				$format = static::getFormatFromCulture($format);
+			{
+				$format = static::getFormat();
+			}
 
 			if ($timezone === null)
+			{
 				$this->value = \DateTime::createFromFormat($format, $time);
+			}
 			else
+			{
 				$this->value = \DateTime::createFromFormat($format, $time, $timezone);
+			}
+
+			if (empty($this->value))
+			{
+				throw new Main\ObjectException("Incorrect date/time: ".$time);
+			}
 		}
-	}
-
-	public static function createFromPhp(\DateTime $datetime)
-	{
-		$d = new static();
-		$d->value = $datetime;
-		return $d;
-	}
-
-	public function format($format)
-	{
-		return $this->value->format($format);
-	}
-
-	public function __clone()
-	{
-		$this->value = clone $this->value;
 	}
 
 	/**
-	 * @param $interval
-	 *    Each duration period is represented by an integer value followed by a period
-	 *    designator. If the duration contains time elements, that portion of the
-	 *    specification is preceded by the letter T.
-	 *    Period Designators: Y - years, M - months, D - days, W - weeks, H - hours,
-	 *    M - minutes, S - seconds.
-	 *    Examples: two days - 2D, two seconds - T2S, six years and five minutes - 6YT5M.
-	 *    The unit types must be entered from the largest scale unit on the left to the
-	 *    smallest scale unit on the right.
-	 *    Use first "-" char for negative periods.
-	 *    OR
-	 *    Relative period.
-	 *    Examples: "+5 weeks", "12 day", "-7 weekdays", '3 months - 5 days'
+	 * Converts date to string, using Culture and global timezone settings
 	 *
-	 * @return DateTime
+	 * @param Context\Culture $culture Culture contains datetime format
+	 * @return string
 	 */
-	public function add($interval)
+	static public function toString(Context\Culture $culture = null)
 	{
-		$i = null;
-		try
+		if(\CTimeZone::Enabled())
 		{
-			$intervalTmp = strtoupper($interval);
-			$isNegative = false;
-			$firstChar = substr($intervalTmp, 0, 1);
-			if ($firstChar === "-")
-			{
-				$isNegative = true;
-				$intervalTmp = substr($intervalTmp, 1);
-				$firstChar = substr($intervalTmp, 0, 1);
-			}
+			$userTime = clone $this;
+			$userTime->toUserTime();
 
-			if ($firstChar !== "P")
-				$intervalTmp = "P".$intervalTmp;
-			$i = new \DateInterval($intervalTmp);
-			if ($isNegative)
-				$i->invert = 1;
+			$format = static::getFormat($culture);
+			return $userTime->format($format);
 		}
-		catch (\Exception $e)
+		else
 		{
+			return parent::toString($culture);
 		}
-
-		if ($i == null)
-			$i = \DateInterval::createFromDateString($interval);
-
-		$this->value->add($i);
-
-		return $this;
 	}
 
-	public function getTimezoneOffset()
-	{
-		return $this->value->getOffset();
-	}
-
-	public function getTimestamp()
-	{
-		return $this->value->getTimestamp();
-	}
-
+	/**
+	 * Returns timezone object
+	 *
+	 * @return \DateTimeZone
+	 */
 	public function getTimeZone()
 	{
 		return $this->value->getTimezone();
 	}
 
-	public static function __set_state($arr)
+	/**
+	 * Sets timezone object
+	 *
+	 * @param \DateTimeZone $timezone
+	 * @return DateTime
+	 */
+	public function setTimeZone(\DateTimeZone $timezone)
 	{
-		$obj = new DateTime();
-		$obj->value = $arr['value'];
-		return $obj;
-	}
-
-	public function toString($type = self::DATE_WITH_TIME, Context\Culture $culture = null)
-	{
-		$format = static::getFormatFromCulture($type, $culture);
-		return $this->format($format);
-	}
-
-	public function __toString()
-	{
-		return $this->toString();
-	}
-
-	protected static function getFormatFromCulture($type = self::DATE_WITH_TIME, Context\Culture $culture = null)
-	{
-		if ($culture == null)
-		{
-			$context = Main\Application::getInstance()->getContext();
-			$culture = $context->getCulture();
-		}
-		$format = ($type == self::DATE_WITH_TIME) ? $culture->getDateTimeFormat() : $culture->getDateFormat();
-		return static::convertDateTimeFormatToPhp($format);
-	}
-
-	public static function convertDateTimeFormatToPhp($format)
-	{
-		$format = str_replace("YYYY", "Y", $format);		// 1999
-		$format = str_replace("MMMM", "F", $format);		// January - December
-		$format = str_replace("MM", "m", $format);		// 01 - 12
-
-		$old_f = $format = str_replace("DD", "d", $format);	// 01 - 31
-		$format = str_replace("HH", "H", $format);		// 00 - 24
-		if ($old_f === $format)
-			$format = str_replace("H", "h", $format);		// 01 - 12
-
-		$format = str_replace("TT", "A", $format);		// AM - PM
-
-		$old_f = $format = str_replace("T", "a", $format);	// am - pm
-		$format = str_replace("GG", "G", $format);		// 0 - 24
-		if ($old_f === $format)
-			$format = str_replace("G", "g", $format);		// 1 - 12
-
-		$format = str_replace("MI", "i", $format);		// 00 - 59
-		return str_replace("SS", "s", $format);		// 00 - 59
-	}
-
-	public static function isCorrect($time, $format = null)
-	{
-		if (empty($time))
-			return false;
-
-		$result = true;
-
-		try
-		{
-			$obj = new static($time, $format);
-		}
-		catch (\Exception $ex)
-		{
-			$result = false;
-		}
-
-		return $result;
+		$this->value->setTimezone($timezone);
+		return $this;
 	}
 
 	/**
-	 * @return \DateTime
+	 * Sets default timezone
+	 *
+	 * @return DateTime
 	 */
-	public function getValue()
+	public function setDefaultTimeZone()
 	{
-		return $this->value;
+		$time = new \DateTime();
+		$this->setTimezone($time->getTimezone());
+		return $this;
+	}
+
+	/**
+	 * @param int $hour
+	 * @param int $minute
+	 * @param int $second
+	 * @return DateTime
+	 */
+	public function setTime($hour, $minute, $second = 0)
+	{
+		$this->value->setTime($hour, $minute, $second);
+		return $this;
+	}
+
+	/**
+	 * Changes time from server time to user time using global timezone settings
+	 *
+	 * @return DateTime
+	 */
+	public function toUserTime()
+	{
+		//first, move to server timezone
+		$this->setDefaultTimeZone();
+
+		//second, adjust time according global timezone offset
+		static $diff = null;
+		if($diff === null)
+		{
+			$diff = \CTimeZone::GetOffset();
+		}
+		if($diff <> 0)
+		{
+			$this->add(($diff < 0? "-":"")."PT".abs($diff)."S");
+		}
+		return $this;
+	}
+
+	/**
+	 * Creates DateTime object from local user time using global timezone settings and default culture
+	 *
+	 * @param string $timeString
+	 * @return DateTime
+	 */
+	public static function createFromUserTime($timeString)
+	{
+		/** @var DateTime $time */
+		try
+		{
+			//try full datetime format
+			$time = new static($timeString);
+		}
+		catch(Main\ObjectException $e)
+		{
+			//try short date format
+			$time = new static($timeString, Date::getFormat());
+			$time->setTime(0, 0, 0);
+		}
+
+		if(\CTimeZone::Enabled())
+		{
+			static $diff = null;
+			if($diff === null)
+			{
+				$diff = \CTimeZone::GetOffset();
+			}
+			if($diff <> 0)
+			{
+				$time->add(($diff > 0? "-":"")."PT".abs($diff)."S");
+			}
+		}
+		return $time;
+	}
+
+	protected static function getCultureFormat(Context\Culture $culture)
+	{
+		return $culture->getDateTimeFormat();
 	}
 }

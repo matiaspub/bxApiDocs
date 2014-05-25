@@ -4,7 +4,7 @@ This class is used to parse and load an xml file into database table.
 */
 
 /**
- * <b>CIBlockXMLFile</b> - класс для работы с файлами XML. <br>
+ * <br><br>
  *
  *
  *
@@ -122,23 +122,23 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	 * <p>Удаляет таблицы содержащие ранее загруженный файл. Необходимо вызывать функцию перед началом загрузки XML. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае возникновения ошибки функция возвращает false.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/droptemporarytables.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет таблицы содержащие ранее загруженный файл. Необходимо вызывать функцию перед началом загрузки XML. <br></p>
+	*
+	*
+	*
+	*
+	* @return bool <p>В случае возникновения ошибки функция возвращает false.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/droptemporarytables.php
+	* @author Bitrix
+	*/
 	public static function DropTemporaryTables()
 	{
 		if(!isset($this) || !is_object($this) || strlen($this->_table_name) <= 0)
@@ -158,24 +158,30 @@ class CIBlockXMLFile
 
 	
 	/**
-	 * <p>Создает таблицы для загрузки XML.</p> <p><b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае если таблицы создать не удалось функция возвращает
-	 * false.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
-	 * </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php
-	 * @author Bitrix
-	 */
+	* <p>Создает таблицы для загрузки XML.</p> <p><b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа. <br></p>
+	*
+	*
+	*
+	*
+	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
+	* поддержкой нескольких сессий "одновременного" импорта. Введён
+	* для совместимости. Необязательный параметр.
+	*
+	*
+	*
+	* @return bool <p>В случае если таблицы создать не удалось функция возвращает
+	* false.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* </ul><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php
+	* @author Bitrix
+	*/
 	public static function CreateTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)
@@ -204,6 +210,10 @@ class CIBlockXMLFile
 					PRIMARY KEY (ID)
 				)
 			");
+
+			if ($res && defined("BX_XML_CREATE_INDEXES_IMMEDIATELY"))
+				$res = $this->IndexTemporaryTables($with_sess_id);
+
 			return $res;
 		}
 	}
@@ -218,24 +228,30 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	 * <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>Если во время создания индексов произойдет ошибка БД, функция
-	 * вернет false.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
-	 * </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php
-	 * @author Bitrix
-	 */
+	* <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. <br></p>
+	*
+	*
+	*
+	*
+	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
+	* поддержкой нескольких сессий "одновременного" импорта. Введён
+	* для совместимости. Необязательный параметр.
+	*
+	*
+	*
+	* @return bool <p>Если во время создания индексов произойдет ошибка БД, функция
+	* вернет false.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
+	* </ul><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php
+	* @author Bitrix
+	*/
 	public static function IndexTemporaryTables($with_sess_id = false)
 	{
 		if(!is_object($this) || strlen($this->_table_name) <= 0)
@@ -299,6 +315,56 @@ class CIBlockXMLFile
 		return $DB->LastID();
 	}
 
+	
+	/**
+	* <p>Метод возвращает объем прочитанных байт.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if ($obXMLFile-&gt;ReadXMLToDatabase($fp, $NS, 10, 1024) ) {
+	*     echo '<br>Файл прочитан полностью.';
+	* } else {
+	*     echo '<br>Файл прочитан не полностью: '.round($obXMLFile-&gt;GetFilePosition()/$total*100, 2).'%.';
+	* }
+	* 
+	* 
+	* 
+	* //пример пошагового разбора файла: 
+	*  echo '<br>Парсим файл';
+	*     $NS = &amp;$_SESSION["BX_IMPORT_NS"];
+	*     $ABS_FILE_NAME = $DOCUMENT_ROOT."/upload/TakeMe.xml";
+	*     $total = filesize($ABS_FILE_NAME);
+	*     if($fp = fopen($ABS_FILE_NAME, "rb")) {
+	*         // Чтение содержимого файла шагом в 10 секунд
+	*         if ($obXMLFile-&gt;ReadXMLToDatabase($fp, $NS, 10, 1024) ) {
+	*             echo '<br>Файл прочитан полностью.';
+	*         } else {
+	*             echo '<br>Файл прочитан не полностью: '.round($obXMLFile-&gt;GetFilePosition()/$total*100, 2).'%.';
+	*         }
+	*         fclose($fp);
+	*     } else {
+	*         // Файл открыть не удалось
+	*         echo "Ошибка открытия файла";
+	*     }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/getfileposition.php
+	* @author Bitrix
+	*/
 	public function GetFilePosition()
 	{
 		return $this->file_position;
@@ -319,44 +385,45 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	 * <p>Функция загружает данные из файла в таблицы БД. Когда весь файл прочитан она возвращает true. Если функции не удалось уложиться в time_limit секунд она вернет false и в параметре NS данные необходимые для продолжения работы на следующем шаге. <br></p> <p><b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param resource $fp  Дескриптор открытого файла. Файл рекомендуется открывать в
-	 * режиме "rb". <br>
-	 *
-	 *
-	 *
-	 * @param array &$NS  Массив с данными для продолжения работы функции прерванной на
-	 * предыдущем шаге.
-	 *
-	 *
-	 *
-	 * @param int $time_limit = 0 Ограничение работы функции по времени. В секундах. Если не задан
-	 * или равен нулю, то функция будет работать без ограничений. <br>
-	 *
-	 *
-	 *
-	 * @param int $read_size = 1024 Сколько байт считывать за одну операцию чтения файла. Большие
-	 * значения увеличивают производительность при большем
-	 * потреблении памяти.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает true если файл был полностью загружен и false в
-	 * противном случае.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
-	 * </ul><br>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/readxmltodatabase.php
-	 * @author Bitrix
-	 */
+	* <p>Функция загружает данные из файла в таблицы БД. Когда весь файл прочитан она возвращает true. Если функции не удалось уложиться в time_limit секунд она вернет false и в параметре NS данные необходимые для продолжения работы на следующем шаге. <br></p> <p><b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</p>
+	*
+	*
+	*
+	*
+	* @param resource $fp  Дескриптор открытого файла. Файл рекомендуется открывать в
+	* режиме "rb". <br>
+	*
+	*
+	*
+	* @param array &$NS  Массив с данными для продолжения работы функции прерванной на
+	* предыдущем шаге.
+	*
+	*
+	*
+	* @param int $time_limit = 0 Ограничение работы функции по времени. В секундах. Если не задан
+	* или равен нулю, то функция будет работать без ограничений. <br>
+	*
+	*
+	*
+	* @param int $read_size = 1024 Сколько байт считывать за одну операцию чтения файла. Большие
+	* значения увеличивают производительность при большем
+	* потреблении памяти.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает true если файл был полностью загружен и false в
+	* противном случае.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* </ul><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/readxmltodatabase.php
+	* @author Bitrix
+	*/
 	public function ReadXMLToDatabase($fp, &$NS, $time_limit=0, $read_size = 1024)
 	{
 		global $APPLICATION;

@@ -222,42 +222,42 @@ class CAllTicketDictionary
 
 	
 	/**
-	 * <p>Функция возвращает данные по одной записи справочника.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  ID записи.
-	 *
-	 *
-	 *
-	 * @return record 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Array
-	 * (
-	 *     [ID] =&gt; 3
-	 *     [LID] =&gt; ru
-	 *     [C_TYPE] =&gt; C
-	 *     [SID] =&gt; 
-	 *     [SET_AS_DEFAULT] =&gt; N
-	 *     [C_SORT] =&gt; 500
-	 *     [NAME] =&gt; Доставка программного продукта и обновлений
-	 *     [DESCR] =&gt; 
-	 *     [RESPONSIBLE_USER_ID] =&gt; 2
-	 *     [ <code>EVENT1</code>] =&gt; ticket
-	 *     [ <code>EVENT2</code>] =&gt; 
-	 *     [ <code>EVENT3</code>] =&gt; 
-	 * )
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/support/classes/cticketdictionary/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает данные по одной записи справочника.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  ID записи.</bo
+	*
+	*
+	*
+	* @return record 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Array
+	* (
+	*     [ID] =&gt; 3
+	*     [LID] =&gt; ru
+	*     [C_TYPE] =&gt; C
+	*     [SID] =&gt; 
+	*     [SET_AS_DEFAULT] =&gt; N
+	*     [C_SORT] =&gt; 500
+	*     [NAME] =&gt; Доставка программного продукта и обновлений
+	*     [DESCR] =&gt; 
+	*     [RESPONSIBLE_USER_ID] =&gt; 2
+	*     [ <code>EVENT1</code>] =&gt; ticket
+	*     [ <code>EVENT2</code>] =&gt; 
+	*     [ <code>EVENT3</code>] =&gt; 
+	* )
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticketdictionary/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($id)
 	{
 		$err_mess = (CAllTicketDictionary::err_mess())."<br>Function: GetByID<br>Line: ";

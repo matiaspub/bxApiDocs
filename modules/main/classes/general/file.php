@@ -12,49 +12,50 @@ class CAllFile
 {
 	
 	/**
-	 * <p>Функция предназначена для подготовки данных перед вставкой/обновлением записи в БД, содержащей ссылку на файл. Функция сохраненяет файл на диск и возвращает во входном массиве ID сохраненного файла для последующей вставки/обновления записи в БД.</p> <p><b>Примечание</b>: до версии 7.1.0 аналогичные действия выполняли функции CDatabase::PrepareInsert и CDatabse::PrepareUpdate. Начиная с версии 7.1.0 действия по сохранению файлов и вставки записи в БД разнесены по разным функциям.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array &$arFields  <p>Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	 * поля2"=&gt;"значение2" [, ...]. <br> При вставке файла, привязанного к
-	 * записи, "значение" должно быть представлено в виде массива <br> Array(
-	 * <br> "name" =&gt; "название файла", <br> "size" =&gt; "размер", <br> "tmp_name" =&gt;
-	 * "временный путь на сервере", <br> "type" =&gt; "тип загружаемого файла", <br>
-	 *   "del" =&gt; "флажок, удалить ли существующий файл (непустая строка)",  
-	 * <br> "MODULE_ID" =&gt; "название модуля"); <br><br> Массив такого вида может быть
-	 * получен, например, объединением массивов $HTTP_POST_FILES[имя поля] и
-	 * Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название модуля"); </p> <p>Значение
-	 * передается по ссылке.</p>
-	 *
-	 *
-	 *
-	 * @param string $field  Название поля в массиве <em>arFields</em>, где содержится файл.
-	 *
-	 *
-	 *
-	 * @param string $dir  Имя папки (будет находится внутри папки upload) для хранения файлов.
-	 *
-	 *
-	 *
-	 * @return bool <p><em>True</em> в случае удачи, <em>false</em> при неудаче. В значении элемента
-	 * массива <em>$arFields[$field]</em> будет возвращен ID сохраненного файла из
-	 * таблицы b_file. Если файл был удален, в этом поле будет возвращено
-	 * <em>false</em>. При неудаче элемент массива <em>$arFields[$field]</em> будет удален
-	 * (unset).</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arFields["ATTACH_IMG"] = $_FILE["ATTACH_IMG"];<br>$arFields["ATTACH_IMG"]["MODULE_ID"] = "blog";<br><br>CFile::SaveForDB($arFields, "ATTACH_IMG", "blog");<br>$arInsert = $DB-&gt;PrepareInsert("b_blog_post", $arFields);<br><br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefordb.php
-	 * @author Bitrix
-	 */
+	* <p>Функция предназначена для подготовки данных перед вставкой/обновлением записи в БД, содержащей ссылку на файл. Функция сохраненяет файл на диск и возвращает во входном массиве ID сохраненного файла для последующей вставки/обновления записи в БД.</p> <p><b>Примечание</b>: до версии 7.1.0 аналогичные действия выполняли функции CDatabase::PrepareInsert и CDatabse::PrepareUpdate. Начиная с версии 7.1.0 действия по сохранению файлов и вставки записи в БД разнесены по разным функциям.</p>
+	*
+	*
+	*
+	*
+	* @param array &$Fields  <p>Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
+	* поля2"=&gt;"значение2" [, ...]. <br> При вставке файла, привязанного к
+	* записи, "значение" должно быть представлено в виде массива <br> Array(
+	* <br> "name" =&gt; "название файла", <br> "size" =&gt; "размер", <br> "tmp_name" =&gt;
+	* "временный путь на сервере", <br> "type" =&gt; "тип загружаемого файла", <br>
+	*   "del" =&gt; "флажок, удалить ли существующий файл (непустая строка)",  
+	* <br> "MODULE_ID" =&gt; "название модуля"); <br><br> Массив такого вида может быть
+	* получен, например, объединением массивов $HTTP_POST_FILES[имя поля] и
+	* Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название модуля"); </p> <p>Значение
+	* передается по ссылке.</p>
+	*
+	*
+	*
+	* @param string $field  Название поля в массиве <em>arFields</em>, где содержится файл.
+	*
+	*
+	*
+	* @param string $SavePath  Имя папки (будет находится внутри папки upload) для хранения файлов.
+	* <br> До версии 12.0.8 параметр назывался <i>dir</i>.
+	*
+	*
+	*
+	* @return bool <p><em>True</em> в случае удачи, <em>false</em> при неудаче. В значении элемента
+	* массива <em>$arFields[$field]</em> будет возвращен ID сохраненного файла из
+	* таблицы b_file. Если файл был удален, в этом поле будет возвращено
+	* <em>false</em>. При неудаче элемент массива <em>$arFields[$field]</em> будет удален
+	* (unset).</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arFields["ATTACH_IMG"] = $_FILE["ATTACH_IMG"];<br>$arFields["ATTACH_IMG"]["MODULE_ID"] = "blog";<br><br>CFile::SaveForDB($arFields, "ATTACH_IMG", "blog");<br>$arInsert = $DB-&gt;PrepareInsert("b_blog_post", $arFields);<br><br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefordb.php
+	* @author Bitrix
+	*/
 	public static function SaveForDB(&$arFields, $field, $strSavePath)
 	{
 		$arFile = $arFields[$field];
@@ -82,8 +83,14 @@ class CAllFile
 			$arFile = $arFields[$field];
 
 			if($arFile["name"] == "")
+			{
 				return "";
+			}
 
+			if(($error = self::validateFile($arFile["name"], $arFile)) <> '')
+			{
+				return $error;
+			}
 			$fileName = self::transformName($arFile["name"]);
 			return self::validateFile($fileName, $arFile);
 		}
@@ -170,63 +177,71 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция сохраняет файл и регистрирует его в таблице файлов (b_file).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $file  Массив с данными файла формата:<br><br><pre>Array( "name" =&gt; "название файла",
-	 * "size" =&gt; "размер", "tmp_name" =&gt; "временный путь на сервере", "type" =&gt; "тип
-	 * загружаемого файла", "old_file" =&gt; "ID старого файла", "del" =&gt; "флажок -
-	 * удалить ли существующий файл (Y|N)", "MODULE_ID" =&gt; "название модуля");</pre>
-	 * Массив такого вида может быть получен, например, объединением
-	 * массивов $_FILES[имя поля] и Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" =
-	 * "название модуля");
-	 *
-	 *
-	 *
-	 * @param string $save_path  Путь к папке в которой хранятся файлы (относительно папки /upload).
-	 *
-	 *
-	 *
-	 * @return mixed <p>Функция возвращает числовой идентификатор сохранённого и
-	 * зарегистрированного в системе файла.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (strlen($save)&gt;0 &amp;&amp; $REQUEST_METHOD=="POST")
-	 * {
-	 *     $arIMAGE = $_FILES["IMAGE_ID"];
-	 *     $z = $DB-&gt;Query("SELECT IMAGE_ID FROM b_vote WHERE ID='$ID'", false, $err_mess.__LINE__);
-	 *     $zr = $z-&gt;Fetch();
-	 *     $arIMAGE["old_file"] = $zr["IMAGE_ID"];
-	 *     $arIMAGE["del"] = ${"IMAGE_ID_del"};
-	 *     $arIMAGE["MODULE_ID"] = "vote";
-	 *     if (strlen($arIMAGE["name"])&gt;0 || strlen($arIMAGE["del"])&gt;0) 
-	 *     {
-	 *         $fid = <b>CFile::SaveFile</b>($arIMAGE, "vote");
-	 *         if (intval($fid)&gt;0) $arFields["IMAGE_ID"] = intval($fid); 
-	 *         else $arFields["IMAGE_ID"] = "null";
-	 *         $DB-&gt;Update("b_vote",$arFields,"WHERE ID='".$ID."'",$err_mess.__LINE__);
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php">CFile::InputFile</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция сохраняет файл и регистрирует его в таблице файлов (b_file).</p>
+	*
+	*
+	*
+	*
+	* @param array $file  Массив с данными файла формата:<br><br><pre>Array( "name" =&gt; "название файла",
+	* "size" =&gt; "размер", "tmp_name" =&gt; "временный путь на сервере", "type" =&gt; "тип
+	* загружаемого файла", "old_file" =&gt; "ID старого файла", "del" =&gt; "флажок -
+	* удалить ли существующий файл (Y|N)", "MODULE_ID" =&gt; "название модуля");
+	* "content" =&gt; "содержимое переменной"</pre> Массив такого вида может быть
+	* получен, например, объединением массивов $_FILES[имя поля] и Array("del"
+	* =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название модуля");
+	*
+	*
+	*
+	* @param string $save_path  Путь к папке в которой хранятся файлы (относительно папки /upload).
+	*
+	*
+	*
+	* @param bool $ForceMD5 = false Необязательный. По умолчанию <i>false</i>.
+	*
+	*
+	*
+	* @param bool $SkipExt = false) Необязательный. По умолчанию <i>false</i>.
+	*
+	*
+	*
+	* @return mixed <p>Функция возвращает числовой идентификатор сохранённого и
+	* зарегистрированного в системе файла.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (strlen($save)&gt;0 &amp;&amp; $REQUEST_METHOD=="POST")
+	* {
+	*     $arIMAGE = $_FILES["IMAGE_ID"];
+	*     $z = $DB-&gt;Query("SELECT IMAGE_ID FROM b_vote WHERE ID='$ID'", false, $err_mess.__LINE__);
+	*     $zr = $z-&gt;Fetch();
+	*     $arIMAGE["old_file"] = $zr["IMAGE_ID"];
+	*     $arIMAGE["del"] = ${"IMAGE_ID_del"};
+	*     $arIMAGE["MODULE_ID"] = "vote";
+	*     if (strlen($arIMAGE["name"])&gt;0 || strlen($arIMAGE["del"])&gt;0) 
+	*     {
+	*         $fid = <b>CFile::SaveFile</b>($arIMAGE, "vote");
+	*         if (intval($fid)&gt;0) $arFields["IMAGE_ID"] = intval($fid); 
+	*         else $arFields["IMAGE_ID"] = "null";
+	*         $DB-&gt;Update("b_vote",$arFields,"WHERE ID='".$ID."'",$err_mess.__LINE__);
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php">CFile::InputFile</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php
+	* @author Bitrix
+	*/
 	public static function SaveFile($arFile, $strSavePath, $bForceMD5=false, $bSkipExt=false)
 	{
 		$strFileName = GetFileName($arFile["name"]);	/* filename.gif */
@@ -252,12 +267,18 @@ class CAllFile
 			if (!array_key_exists("size", $arFile))
 				$arFile["size"] = CUtil::BinStrlen($arFile["content"]);
 		}
-		else
+		elseif(file_exists($arFile["tmp_name"]))
 		{
 			$arFile["size"] = filesize($arFile["tmp_name"]);
 		}
 
 		$arFile["ORIGINAL_NAME"] = $strFileName;
+
+		//check before transformation
+		if (self::validateFile($strFileName, $arFile) !== "")
+		{
+			return false;
+		}
 
 		//translit, replace unsafe chars, etc.
 		$strFileName = self::transformName($strFileName, $bForceMD5, $bSkipExt);
@@ -480,49 +501,49 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция возвращает информацию по одному зарегистрированному файлу в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $file_id  Цифровой идентификатор файла.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
-	 *     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 * 	while ($obElement = $rsElements-&gt;GetNextElement()):
-	 * 		$arElement = $obElement-&gt;GetFields();
-	 * 		$rsFile = <b>CFile::GetByID</b>($arElement["PREVIEW_PICTURE"]);
-	 * 		$arFile = $rsFile-&gt;Fetch();
-	 * 		$arrImages[$arElement["ID"]][] = $arFile;
-	 * 	endwhile;
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Поля файла</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getpath.php">CFile::GetPath</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php">CFile::InputFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/copyfile.php">CFile::CopyFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает информацию по одному зарегистрированному файлу в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $file_id  Цифровой идентификатор файла.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
+	*     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	* 	while ($obElement = $rsElements-&gt;GetNextElement()):
+	* 		$arElement = $obElement-&gt;GetFields();
+	* 		$rsFile = <b>CFile::GetByID</b>($arElement["PREVIEW_PICTURE"]);
+	* 		$arFile = $rsFile-&gt;Fetch();
+	* 		$arrImages[$arElement["ID"]][] = $arFile;
+	* 	endwhile;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Поля файла</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getpath.php">CFile::GetPath</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php">CFile::InputFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/copyfile.php">CFile::CopyFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php">CFile::Delete</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($FILE_ID)
 	{
 		global $DB;
@@ -543,48 +564,56 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция возвращает отфильтрованную и отсортированную выборку зарегистрированных файлов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p><b>Примечание</b>: некоторые поля фильтра (SUBDIR, FILE_NAME) и сортировка обрабатываются начиная с версии 10.0.6 главного модуля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = array() Массив, содержащий признак сортировки в виде пар
-	 * "поле"=&gt;"направление". Поддерживаются следующие поля: ID, TIMESTAMP_X,
-	 * MODULE_ID, HEIGHT, WIDTH, FILE_SIZE, CONTENT_TYPE, SUBDIR, FILE_NAME, ORIGINAL_NAME. Направление
-	 * сортировки может принимать значения "ASC", "DESC". Если параметр пуст,
-	 * то выборка будет отсортирована по полю ID по возрастанию.
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = array() Массив, содержащий фильтр в виде пар "поле"=&gt;"значение".
-	 * Поддерживаются следующие поля фильтра: MODULE_ID, ID, SUBDIR, FILE_NAME,
-	 * ORIGINAL_NAME, CONTENT_TYPE. Если указать в начале поля символ @, то можно
-	 * передать несколько значений через запятую (применяется оператор
-	 * IN), например: "@ID"=&gt;"1,2,3,4,5". <br><br>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Объект типа  <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.
-	 * </p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//найдем самые большие файлы ядра<br>$res = CFile::GetList(array("FILE_SIZE"=&gt;"desc"), array("MODULE_ID"=&gt;"main"));<br>while($res_arr = $res-&gt;GetNext())<br>	echo $res_arr["SUBDIR"]."/".$res_arr["FILE_NAME"]." = ".$res_arr["FILE_SIZE"]."&lt;br&gt;";<br>?&gt;Получение списка файлов по фильтру. К сожалению, пока можно фильтровать и сортировать только по ID и MODULE.CFile::GetList($arOrder = Array(), $arFilter = Array(), $arParams = Array())При сортировке по ID можно передавать либо просто один ID:$arFilter = Array("ID" =&gt; 123);либо массив ID (в ключ добавляется @ и разделяется запятыми):$arFilter = Array("@ID" =&gt; "123,124,125");Параметр функции <b>$arParams</b> есть, но на данный момент вообще никак не используется в работе функции.
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Класс CFile</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/cfilegetlist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает отфильтрованную и отсортированную выборку зарегистрированных файлов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p><b>Примечание</b>: некоторые поля фильтра (SUBDIR, FILE_NAME) и сортировка обрабатываются начиная с версии 10.0.6 главного модуля.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = array() Массив, содержащий признак сортировки в виде пар
+	* "поле"=&gt;"направление". Поддерживаются следующие поля: ID, TIMESTAMP_X,
+	* MODULE_ID, HEIGHT, WIDTH, FILE_SIZE, CONTENT_TYPE, SUBDIR, FILE_NAME, ORIGINAL_NAME. Направление
+	* сортировки может принимать значения "ASC", "DESC". Если параметр пуст,
+	* то выборка будет отсортирована по полю ID по возрастанию.
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() Массив, содержащий фильтр в виде пар "поле"=&gt;"значение".
+	* Поддерживаются следующие поля фильтра: MODULE_ID, ID, SUBDIR, FILE_NAME,
+	* ORIGINAL_NAME, CONTENT_TYPE. Если указать в начале поля символ @, то можно
+	* передать несколько значений через запятую (применяется оператор
+	* IN), например: "@ID"=&gt;"1,2,3,4,5". <br><br>
+	*
+	*
+	*
+	* @return CDBResult <p>Объект типа  <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.
+	* </p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//найдем самые большие файлы ядра<br>$res = CFile::GetList(array("FILE_SIZE"=&gt;"desc"), array("MODULE_ID"=&gt;"main"));<br>while($res_arr = $res-&gt;GetNext())<br>	echo $res_arr["SUBDIR"]."/".$res_arr["FILE_NAME"]." = ".$res_arr["FILE_SIZE"]."&lt;br&gt;";<br>?&gt;
+	* 
+	* Получение списка файлов по фильтру. К сожалению, пока можно фильтровать и сортировать только по ID и MODULE.
+	* 
+	* CFile::GetList($arOrder = Array(), $arFilter = Array(), $arParams = Array())При сортировке по ID можно передавать либо просто один ID:
+	* 
+	* $arFilter = Array("ID" =&gt; 123);либо массив ID (в ключ добавляется @ и разделяется запятыми):
+	* 
+	* $arFilter = Array("@ID" =&gt; "123,124,125");Параметр функции <b>$arParams</b> есть, но на данный момент вообще никак не используется в работе функции.
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Класс CFile</a></li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/cfilegetlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array(), $arFilter = array())
 	{
 		global $DB;
@@ -690,70 +719,88 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция возвращает массив описывающий файл с заданным идентификатором или <i>false</i>, если файла с таким идентификатором не существует. Удобна когда нужно получить одной функцией и имя файла, и путь к нему на сервере.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $FILE_ID  
-	 *
-	 *
-	 *
-	 * @param $upload_di $r = false 10.0.11
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>//Покажем изображение анонса элемента инфоблока<br>//$ELEMENT_ID - идентификатор этого элемента<br>if(CModule::IncludeModule('iblock'))<br>{<br>  $rsElement = CIBlockElement::GetList(<br>    array(),<br>    array("=ID"=&gt;$ELEMENT_ID),<br>    false,<br>    false,<br>    array("PREVIEW_PICTURE")<br>  );<br>  if($arElement = $rsElement-&gt;Fetch())<br>  {<br>    $arFile = CFile::GetFileArray($arElement["PREVIEW_PICTURE"]);<br>    if($arFile)<br>       echo '&lt;img src="'.$arFile["SRC"].'" /&gt;';<br>  }<br>}<br><br>
-	Получение всех файловых свойств у элементов из массива <b></b>$arResultforeach ($arResult["ITEMS"] as $k=&gt;$v)
-	 * {
-	 *    foreach ($v["PROPERTIES"] as $kk=&gt;$vv)
-	 *    {
-	 *       if ($vv["PROPERTY_TYPE"] == "F")
-	 *       {
-	 *          if ($vv["MULTIPLE"] == "Y")
-	 *          {
-	 *             foreach ($vv["VALUE"] as $kkk=&gt;$vvv)
-	 *             {
-	 *                $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"][$kkk] = CFile::GetFileArray($vvv);
-	 *                $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"][$kkk]["DESCRIPTION"] = $vv["DESCRIPTION"][$kkk];
-	 *             }
-	 *          }
-	 *          else
-	 *          {
-	 *             $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"] = CFile::GetFileArray($vv["VALUE"]);
-	 *             $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"]["DESCRIPTION"] = $vv["DESCRIPTION"];
-	 *          }
-	 *       }
-	 *    }
-	 * }$rsElement = CIBlockElement::GetList($arSort, $arFilter, false, $arNavParams, $arSelect);
-	 * while($obElement = $rsElement-&gt;GetNextElement())
-	 * {
-	 *     $arItem = $obElement-&gt;GetFields();
-	 *     ...
-	 *     if(array_key_exists("PREVIEW_PICTURE", $arItem))
-	 *         $arItem["PREVIEW_PICTURE"] = CFile::GetFileArray($arItem["PREVIEW_PICTURE"]);
-	 *     if(array_key_exists("DETAIL_PICTURE", $arItem))
-	 *         $arItem["DETAIL_PICTURE"] = CFile::GetFileArray($arItem["DETAIL_PICTURE"]);
-	 *     ...
-	 * }
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Класс CFile</a></p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getfilearray.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает массив описывающий файл с заданным идентификатором или <i>false</i>, если файла с таким идентификатором не существует. Удобна когда нужно получить одной функцией и имя файла, и путь к нему на сервере.</p>
+	*
+	*
+	*
+	*
+	* @param int $FILE_ID    Идентификатор файла. Состав полей: <ul> <li> <b>ID</b> - идентификатор
+	* файла.</li> <li> <b>TIMESTAMP_X</b> - дата загрузки.</li> <li> <b>MODULE_ID</b> -
+	* идентификатор модуля загрузившего файл.</li> <li> <b>HEIGHT</b> - для
+	* картинок высота.</li> <li> <b>WIDTH</b> - для картинок ширина.</li> <li> <b>FILE_SIZE</b>
+	* - размер в байтах.</li> <li> <b>CONTENT_TYPE</b> - тип содержимого, выдаётся
+	* mime-type.</li> <li> <b>SUBDIR</b> - поддиректория внутри папки UPLOAD.</li> <li>
+	* <b>FILE_NAME</b> - имя файла после преобразования и убирания
+	* некорректных символов. Если стоит опция в настройках главного
+	* модуля <b>Сохранять исходные имена загружаемых файлов</b>, то
+	* фактически не будет отличаться от <b>ORIGINAL_NAME</b> (Будет приведен в
+	* безопасный вид при включённой опции <b>Автоматически заменять
+	* невалидные символы в именах загружаемых файлов</b>). </li> <li>
+	* <b>ORIGINAL_NAME</b> - оригинальное имя файла во время загрузки.</li> <li>
+	* <b>DESCRIPTION</b> - описание.</li> <li> <b>SRC</b> - относительный путь
+	* относительно DOCUMENT_ROOT.</li> </ul>
+	*
+	*
+	*
+	* @param $upload_di $r = false Директория для загрузки. По умолчанию - <i>false</i>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <br><br>//Покажем изображение анонса элемента инфоблока<br>//$ELEMENT_ID - идентификатор этого элемента<br>if(CModule::IncludeModule('iblock'))<br>{<br>  $rsElement = CIBlockElement::GetList(<br>    array(),<br>    array("=ID"=&gt;$ELEMENT_ID),<br>    false,<br>    false,<br>    array("PREVIEW_PICTURE")<br>  );<br>  if($arElement = $rsElement-&gt;Fetch())<br>  {<br>    $arFile = CFile::GetFileArray($arElement["PREVIEW_PICTURE"]);<br>    if($arFile)<br>       echo '&lt;img src="'.$arFile["SRC"].'" /&gt;';<br>  }<br>}<br><br>
+	* 
+	* 
+	* Получение всех файловых свойств у элементов из массива <b></b>$arResult
+	* 
+	* foreach ($arResult["ITEMS"] as $k=&gt;$v)
+	* {
+	*    foreach ($v["PROPERTIES"] as $kk=&gt;$vv)
+	*    {
+	*       if ($vv["PROPERTY_TYPE"] == "F")
+	*       {
+	*          if ($vv["MULTIPLE"] == "Y")
+	*          {
+	*             foreach ($vv["VALUE"] as $kkk=&gt;$vvv)
+	*             {
+	*                $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"][$kkk] = CFile::GetFileArray($vvv);
+	*                $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"][$kkk]["DESCRIPTION"] = $vv["DESCRIPTION"][$kkk];
+	*             }
+	*          }
+	*          else
+	*          {
+	*             $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"] = CFile::GetFileArray($vv["VALUE"]);
+	*             $arResult["ITEMS"][$k]["PROPERTIES"][$kk]["VALUE"]["DESCRIPTION"] = $vv["DESCRIPTION"];
+	*          }
+	*       }
+	*    }
+	* }$rsElement = CIBlockElement::GetList($arSort, $arFilter, false, $arNavParams, $arSelect);
+	* while($obElement = $rsElement-&gt;GetNextElement())
+	* {
+	*     $arItem = $obElement-&gt;GetFields();
+	*     ...
+	*     if(array_key_exists("PREVIEW_PICTURE", $arItem))
+	*         $arItem["PREVIEW_PICTURE"] = CFile::GetFileArray($arItem["PREVIEW_PICTURE"]);
+	*     if(array_key_exists("DETAIL_PICTURE", $arItem))
+	*         $arItem["DETAIL_PICTURE"] = CFile::GetFileArray($arItem["DETAIL_PICTURE"]);
+	*     ...
+	* }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <p><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">Класс CFile</a></p></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getfilearray.php
+	* @author Bitrix
+	*/
 	public static function GetFileArray($FILE_ID, $upload_dir = false)
 	{
 		if(!is_array($FILE_ID) && intval($FILE_ID) > 0)
@@ -814,42 +861,50 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция копирует зарегистрированный файл и возвращает ID нового файла копии.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $file_id  Цифровой идентификатор файла предназначенного для копирования.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
-	 *     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 * 	while ($obElement = $rsElements-&gt;GetNextElement()):
-	 * 		$arElement = $obElement-&gt;GetFields();
-	 * 		$arrNewImages[$arElement["ID"]][] = <b>CFile::CopyFile</b>($arElement["PREVIEW_PICTURE"]);
-	 * 	endwhile;
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/copydirfiles.php">CopyDirFiles</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/copyfile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция копирует зарегистрированный файл и возвращает ID нового файла копии.</p>
+	*
+	*
+	*
+	*
+	* @param int $file_id  Цифровой идентификатор файла предназначенного для копирования.
+	*
+	*
+	*
+	* @param bool $Register = true Необязательный.
+	*
+	*
+	*
+	* @param newPat $h = "" Необязательный.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
+	*     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	* 	while ($obElement = $rsElements-&gt;GetNextElement()):
+	* 		$arElement = $obElement-&gt;GetFields();
+	* 		$arrNewImages[$arElement["ID"]][] = <b>CFile::CopyFile</b>($arElement["PREVIEW_PICTURE"]);
+	* 	endwhile;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/copydirfiles.php">CopyDirFiles</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/copyfile.php
+	* @author Bitrix
+	*/
 	public static function CopyFile($FILE_ID, $bRegister = true, $newPath = "")
 	{
 		global $DB;
@@ -949,48 +1004,48 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция обновляет описание к зарегистрированному файлу. Возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $file_id  Цифровой идентификатор файла.
-	 *
-	 *
-	 *
-	 * @param string $description  Новое описание к файлу.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
-	 *     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 * 	while ($obElement = $rsElements-&gt;GetNextElement()):
-	 * 		$arElement = $obElement-&gt;GetFields();
-	 * 		<b>CFile::UpdateDesc</b>($arElement["PREVIEW_PICTURE"], "Element # ".$arElement["ID"]);
-	 * 	endwhile;
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php">CFile::GetByID</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/updatedesc.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет описание к зарегистрированному файлу. Возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $file_id  Цифровой идентификатор файла.
+	*
+	*
+	*
+	* @param string $description  Новое описание к файлу.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
+	*     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	* 	while ($obElement = $rsElements-&gt;GetNextElement()):
+	* 		$arElement = $obElement-&gt;GetFields();
+	* 		<b>CFile::UpdateDesc</b>($arElement["PREVIEW_PICTURE"], "Element # ".$arElement["ID"]);
+	* 	endwhile;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php">CFile::GetByID</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/updatedesc.php
+	* @author Bitrix
+	*/
 	public static function UpdateDesc($ID, $desc)
 	{
 		global $DB;
@@ -1000,100 +1055,106 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция возвращает HTML код предназначенный для загрузки нового, либо замены существующего файла.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $input_file_name  Название поля для ввода файла:<br>&lt;input type="file" name="<i>input_file_name</i>" ... &gt;
-	 *
-	 *
-	 *
-	 * @param int $input_file_width  Ширина поля для ввода файла:<br>&lt;input type="file" size="<i>input_file_width</i>" ... &gt;
-	 *
-	 *
-	 *
-	 * @param int $file_id  Цифровой идентификатор существующего файла.
-	 *
-	 *
-	 *
-	 * @param string $file_path = false Путь к папке от корня сайта в которой хранятся файлы. Например:
-	 * "/upload/iblock/".<br>Необязательный. По умолочанию false - путь берется из
-	 * настроек системы.
-	 *
-	 *
-	 *
-	 * @param int $file_max_size = 0 Максимальный размер файла (байт):<br> &lt;input type="hidden" name="MAX_FILE_SIZE"
-	 * value="<i>file_max_size</i>"&gt; <br>Необязательный. По умолчанию "0" - без
-	 * ограничений.
-	 *
-	 *
-	 *
-	 * @param string $file_type = "IMAGE" Тип файла, если "IMAGE", то в информацию по файлу будет добавлена
-	 * ширина и высота изображения. <br>Необязательный. По умолчанию "IMAGE".
-	 *
-	 *
-	 *
-	 * @param string $add_to_input_file = "class=typefile" Произвольный HTML который будет добавлен в поле для ввода
-	 * файла:<br>&lt;input type="file" <i>add_to_input_file</i> ... &gt; <br>Необязательный. По
-	 * умолчанию "class=typefile" - стандартный класс для полей ввода файлов в
-	 * административной части.
-	 *
-	 *
-	 *
-	 * @param int $input_description_width = 0 Ширина поля ввода для комментария к файлу:<br>&lt;input type="text"
-	 * size="<i>input_description_width</i>" ... &gt; <br>Необязательный. По умолчанию "0" - поле
-	 * ввода для комментария к файлу не показывать.
-	 *
-	 *
-	 *
-	 * @param string $add_to_input_description = "class=typeinput" Произвольный HTML который будет добавлен в поле ввода для
-	 * комментария к файлу:<br>&lt;input type="text" <i>add_to_input_description</i> ... &gt;
-	 * <br>Необязательный. По умолчанию "class=typeinput" - стандартный класс для
-	 * однострочных элементов ввода в административной части.
-	 *
-	 *
-	 *
-	 * @param string $add_to_checkbox_delete = "" Произвольный HTML который будет добавлен в поле типа "checkbox" для
-	 * удаления файла: <br>&lt;input type="checkbox" name="<i>input_file_name</i>_del" value="Y"
-	 * <i>add_to_checkbox_delete</i> ... &gt; <br>Необязательный.
-	 *
-	 *
-	 *
-	 * @param bool $show_file_info = true Флаг позволяющий включить, либо отключить показ информации по
-	 * файлу (размер, ширину, высоту). <br>Необязательный. По умолчанию -
-	 * "true" - информацию по файлу показать.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;tr valign="top"&gt;
-	 *     &lt;td align="right"&gt;&lt;font class="tablefieldtext"&gt;&lt;?=GetMessage("VOTE_IMAGE")?&gt;&lt;/font&gt;&lt;/td&gt;
-	 *     &lt;td&gt;&lt;font class="tablebodytext"&gt;&lt;?
-	 *     echo <b>CFile::InputFile</b>("IMAGE_ID", 20, $str_IMAGE_ID);
-	 *     if (strlen($str_IMAGE_ID)&gt;0):
-	 *         ?&gt;&lt;br&gt;&lt;?echo CFile::ShowImage($str_IMAGE_ID, 200, 200, "border=0", "", true);
-	 *     endif;
-	 *     ?&gt;&lt;/font&gt;
-	 *     &lt;/td&gt;
-	 * &lt;/tr&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает HTML код предназначенный для загрузки нового, либо замены существующего файла.</p>
+	*
+	*
+	*
+	*
+	* @param string $FieldName  Название поля для ввода файла:<br>&lt;input type="file" name="<i>input_file_name</i>" ... &gt;
+	*
+	*
+	*
+	* @param int $field_size  Ширина поля для ввода файла:<br>&lt;input type="file" size="<i>input_file_width</i>" ... &gt;
+	*
+	*
+	*
+	* @param int $ImageID  Цифровой идентификатор существующего файла.
+	*
+	*
+	*
+	* @param string $ImageStorePath = false Путь к папке от корня сайта в которой хранятся файлы. Например:
+	* "/upload/iblock/".<br>Необязательный. По умолочанию false - путь берется из
+	* настроек системы.
+	*
+	*
+	*
+	* @param int $file_max_size = 0 Максимальный размер файла (байт):<br> &lt;input type="hidden" name="MAX_FILE_SIZE"
+	* value="<i>file_max_size</i>"&gt; <br>Необязательный. По умолчанию "0" - без
+	* ограничений.
+	*
+	*
+	*
+	* @param string $FileType = "IMAGE" Тип файла, если "IMAGE", то в информацию по файлу будет добавлена
+	* ширина и высота изображения. <br>Необязательный. По умолчанию "IMAGE".
+	*
+	*
+	*
+	* @param string $field_file = "class=typefile" Произвольный HTML который будет добавлен в поле для ввода
+	* файла:<br>&lt;input type="file" <i>add_to_input_file</i> ... &gt; <br>Необязательный. По
+	* умолчанию "class=typefile" - стандартный класс для полей ввода файлов в
+	* административной части.
+	*
+	*
+	*
+	* @param int $description_size = 0 Ширина поля ввода для комментария к файлу:<br>&lt;input type="text"
+	* size="<i>input_description_width</i>" ... &gt; <br>Необязательный. По умолчанию "0" - поле
+	* ввода для комментария к файлу не показывать.
+	*
+	*
+	*
+	* @param string $field_text = "class=typeinput" Произвольный HTML который будет добавлен в поле ввода для
+	* комментария к файлу:<br>&lt;input type="text" <i>add_to_input_description</i> ... &gt;
+	* <br>Необязательный. По умолчанию "class=typeinput" - стандартный класс для
+	* однострочных элементов ввода в административной части.
+	*
+	*
+	*
+	* @param string $field_checkbox = "" Произвольный HTML который будет добавлен в поле типа "checkbox" для
+	* удаления файла: <br>&lt;input type="checkbox" name="<i>input_file_name</i>_del" value="Y"
+	* <i>add_to_checkbox_delete</i> ... &gt; <br>Необязательный.
+	*
+	*
+	*
+	* @param bool $ShowNotes = true Флаг позволяющий включить, либо отключить показ информации по
+	* файлу (размер, ширину, высоту). <br>Необязательный. По умолчанию -
+	* "true" - информацию по файлу показать.
+	*
+	*
+	*
+	* @param bool $ShowFilePath = True Флаг позволяющий включить, либо отключить показ пути к файлу.
+	* <br>Необязательный. По умолчанию - "true" - информацию по файлу
+	* показать.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;tr valign="top"&gt;
+	*     &lt;td align="right"&gt;&lt;font class="tablefieldtext"&gt;&lt;?=GetMessage("VOTE_IMAGE")?&gt;&lt;/font&gt;&lt;/td&gt;
+	*     &lt;td&gt;&lt;font class="tablebodytext"&gt;&lt;?
+	*     echo <b>CFile::InputFile</b>("IMAGE_ID", 20, $str_IMAGE_ID);
+	*     if (strlen($str_IMAGE_ID)&gt;0):
+	*         ?&gt;&lt;br&gt;&lt;?echo CFile::ShowImage($str_IMAGE_ID, 200, 200, "border=0", "", true);
+	*     endif;
+	*     ?&gt;&lt;/font&gt;
+	*     &lt;/td&gt;
+	* &lt;/tr&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/inputfile.php
+	* @author Bitrix
+	*/
 	public static function InputFile($strFieldName, $int_field_size, $strImageID, $strImageStorePath=false, $int_max_file_size=0, $strFileType="IMAGE", $field_file="class=typefile", $description_size=0, $field_text="class=typeinput", $field_checkbox="", $bShowNotes = true, $bShowFilePath = true)
 	{
 		$strReturn1 = "";
@@ -1167,27 +1228,27 @@ class CAllFile
 	 */
 	
 	/**
-	 * <p>Метод переводит байты в Килобайты, Мегабайты, Гигабайты и т.д. с учетом языка, установленного в текущем сайта.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $siz $e  Размер файла в байтах
-	 *
-	 *
-	 *
-	 * @param $precisio $n  Порядок округления
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает текстом размер файла, округленный до последнего
-	 * целого значения и текстовую подпись размера в байтах, килобайтах
-	 * и тд с учетом языка, установленного в текущем сайта. </p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/formatsize.php
-	 * @author Bitrix
-	 */
+	* <p>Метод переводит байты в Килобайты, Мегабайты, Гигабайты и т.д. с учетом языка, установленного в текущем сайта.</p>
+	*
+	*
+	*
+	*
+	* @param $siz $e  Размер файла в байтах
+	*
+	*
+	*
+	* @param $precisio $n  Порядок округления </ht
+	*
+	*
+	*
+	* @return mixed <p>Возвращает текстом размер файла, округленный до последнего
+	* целого значения и текстовую подпись размера в байтах, килобайтах
+	* и тд с учетом языка, установленного в текущем сайта. </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/formatsize.php
+	* @author Bitrix
+	*/
 	public static function FormatSize($size, $precision = 2)
 	{
 		static $a = array("b", "Kb", "Mb", "Gb", "Tb");
@@ -1212,73 +1273,74 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция проверяет расширение и заданный MIME тип файла. Если расширение и MIME тип файла соответствуют изображению, то возвращает "true", иначе "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $file_name  Краткое имя файла (без пути).
-	 *
-	 *
-	 *
-	 * @param mixed $mime_type = false MIME тип файла (например, "image/").<br>Необязательный. По умолчанию - "false"
-	 * - проверку на MIME тип не делать.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsFiles = CTicket::GetFileList($v1="s_id", $v2="asc", array("HASH"=&gt;$hash))) :
-	 *   if ($arFile = $rsFiles-&gt;Fetch()) :
-	 *     $filename = $_SERVER["DOCUMENT_ROOT"]."/".COption::GetOptionString("main", "upload_dir", "upload")."/".$arFile["SUBDIR"]."/".$arFile["FILE_NAME"];
-	 *     if ($f = fopen($filename, "rb"))
-	 *     {
-	 *       $is_image = <b>CFile::IsImage</b>($arFile["FILE_NAME"], $arFile["CONTENT_TYPE"]);
-	 *       // если изображение то
-	 *       if ($is_image) 
-	 *       {
-	 *         // отдадим как изображение
-	 *         header("Content-type: ".$arFile["CONTENT_TYPE"]);
-	 *         header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0"); 
-	 *         header("Expires: 0"); 
-	 *         header("Pragma: public"); 
-	 *         while ($buffer = fread($f, 4096)) echo $buffer;
-	 *       }
-	 *       else // иначе
-	 *       {
-	 *         // отдадим как текст
-	 *         header("Content-type: text/html; charset=".LANG_CHARSET);
-	 *         header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0"); 
-	 *         header("Expires: 0"); 
-	 *         header("Pragma: public"); 
-	 *         echo "&lt;pre&gt;";
-	 *         while ($buffer = fread($f, 4096)) echo htmlspecialchars($buffer);
-	 *         echo "&lt;/pre&gt;";
-	 *       }
-	 *       fclose ($f);
-	 *       die();
-	 *     }
-	 *   endif;
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php
-	 * @author Bitrix
-	 */
+	* <p>Функция проверяет расширение и заданный MIME тип файла. Если расширение и MIME тип файла соответствуют изображению, то возвращает "true", иначе "false".</p>
+	*
+	*
+	*
+	*
+	* @param string $file_name  Краткое имя файла (без пути).
+	*
+	*
+	*
+	* @param mixed $mime_type = false MIME тип файла (например, "image/").<br>Необязательный. По умолчанию - "false"
+	* - проверку на MIME тип не делать. <br> До версии 4.0.4 назывался
+	* <i>content_type</i>.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsFiles = CTicket::GetFileList($v1="s_id", $v2="asc", array("HASH"=&gt;$hash))) :
+	*   if ($arFile = $rsFiles-&gt;Fetch()) :
+	*     $filename = $_SERVER["DOCUMENT_ROOT"]."/".COption::GetOptionString("main", "upload_dir", "upload")."/".$arFile["SUBDIR"]."/".$arFile["FILE_NAME"];
+	*     if ($f = fopen($filename, "rb"))
+	*     {
+	*       $is_image = <b>CFile::IsImage</b>($arFile["FILE_NAME"], $arFile["CONTENT_TYPE"]);
+	*       // если изображение то
+	*       if ($is_image) 
+	*       {
+	*         // отдадим как изображение
+	*         header("Content-type: ".$arFile["CONTENT_TYPE"]);
+	*         header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0"); 
+	*         header("Expires: 0"); 
+	*         header("Pragma: public"); 
+	*         while ($buffer = fread($f, 4096)) echo $buffer;
+	*       }
+	*       else // иначе
+	*       {
+	*         // отдадим как текст
+	*         header("Content-type: text/html; charset=".LANG_CHARSET);
+	*         header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0"); 
+	*         header("Expires: 0"); 
+	*         header("Pragma: public"); 
+	*         echo "&lt;pre&gt;";
+	*         while ($buffer = fread($f, 4096)) echo htmlspecialchars($buffer);
+	*         echo "&lt;/pre&gt;";
+	*       }
+	*       fclose ($f);
+	*       die();
+	*     }
+	*   endif;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php
+	* @author Bitrix
+	*/
 	public static function IsImage($filename, $mime_type=false)
 	{
 		$ext = strtolower(GetFileExtension($filename));
@@ -1293,70 +1355,78 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция проверяет что файл является картинкой и проверяет ее параметры. В случае ошибки функция вернет строку с текстом ошибки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $file  Массив с данными файла формата:<br><pre>Array( "name" =&gt; "название файла",
-	 * "size" =&gt; "размер", "tmp_name" =&gt; "временный путь к файлу на сервере", "type"
-	 * =&gt; "тип загружаемого файла", "del" =&gt; "флаг: удалить ли существующий
-	 * файл из базы данных (Y|N)", "MODULE_ID" =&gt; "название модуля")</pre> Массив
-	 * такого вида может быть получен, например, объединением массивов
-	 * $_FILES[имя поля] и Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название
-	 * модуля").
-	 *
-	 *
-	 *
-	 * @param int $max_size = 0 Максимальный размер файла (байт).<br>Необязательный. По умолчанию -
-	 * "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param int $max_width = 0 Максимальная ширина картинки (пикселей).<br>Необязательный. По
-	 * умолчанию - "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param int $max_height = 0 Максимальная высота картинки (пикселей). <br>Необязательный. По
-	 * умолчанию - "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param array $possible_typies = array() Массив символьных идентификаторов типов файлов; допустимые
-	 * следующие идентификаторы: <ul> <li> <b>IMAGE</b> - изображение; </li> <li>
-	 * <b>FLASH</b> - flash файл. </li> </ul> Параметр необязательный. По умолчанию -
-	 * пустой массив (допустимы только файлы типа <b>IMAGE</b>).
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arrFile = array_merge(
-	 *     $_FILES["ATTACHED_IMAGE"], 
-	 *     array("del" =&gt; ${"ATTACHED_IMAGE_del"}, "MODULE_ID" =&gt; "forum"));
-	 * 
-	 * $res = <b>CFile::CheckImageFile</b>($arrFile, 200, 50, 50);
-	 * if (strlen($res)&gt;0) $strError .= $res."&lt;br&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php">CFile::IsImage</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция проверяет что файл является картинкой и проверяет ее параметры. В случае ошибки функция вернет строку с текстом ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param array $file  Массив с данными файла формата:<br><pre>Array( "name" =&gt; "название файла",
+	* "size" =&gt; "размер", "tmp_name" =&gt; "временный путь к файлу на сервере", "type"
+	* =&gt; "тип загружаемого файла", "del" =&gt; "флаг: удалить ли существующий
+	* файл из базы данных (Y|N)", "MODULE_ID" =&gt; "название модуля")</pre> Массив
+	* такого вида может быть получен, например, объединением массивов
+	* $_FILES[имя поля] и Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название
+	* модуля").
+	*
+	*
+	*
+	* @param int $max_size = 0 Максимальный размер файла (байт).<br>Необязательный. По умолчанию -
+	* "0" - без ограничений.
+	*
+	*
+	*
+	* @param int $max_width = 0 Максимальная ширина картинки (пикселей).<br>Необязательный. По
+	* умолчанию - "0" - без ограничений.
+	*
+	*
+	*
+	* @param int $max_height = 0 Максимальная высота картинки (пикселей). <br>Необязательный. По
+	* умолчанию - "0" - без ограничений.
+	*
+	*
+	*
+	* @param array $access_typies = array() Массив символьных идентификаторов типов файлов; допустимые
+	* следующие идентификаторы: <ul> <li> <b>IMAGE</b> - изображение; </li> <li>
+	* <b>FLASH</b> - flash файл. </li> </ul> Параметр необязательный. По умолчанию -
+	* пустой массив (допустимы только файлы типа <b>IMAGE</b>).
+	*
+	*
+	*
+	* @param bool $ForceMD5 = false Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param bool $SkipExt = false Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arrFile = array_merge(
+	*     $_FILES["ATTACHED_IMAGE"], 
+	*     array("del" =&gt; ${"ATTACHED_IMAGE_del"}, "MODULE_ID" =&gt; "forum"));
+	* 
+	* $res = <b>CFile::CheckImageFile</b>($arrFile, 200, 50, 50);
+	* if (strlen($res)&gt;0) $strError .= $res."&lt;br&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php">CFile::IsImage</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php
+	* @author Bitrix
+	*/
 	public static function CheckImageFile($arFile, $iMaxSize=0, $iMaxWidth=0, $iMaxHeight=0, $access_typies=array(), $bForceMD5=false, $bSkipExt=false)
 	{
 		if($arFile["name"] == "")
@@ -1414,70 +1484,84 @@ class CAllFile
 
 	
 	/**
-	 * <p>Функция проверяет размер, расширение и mime тип файла. В случае ошибки функция вернет строку с текстом ошибки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $file  Массив с данными файла формата:<br><br><pre>Array( "name" =&gt; "название файла",
-	 * "size" =&gt; "размер", "tmp_name" =&gt; "временный путь к файлу на сервере", "type"
-	 * =&gt; "тип загружаемого файла", "del" =&gt; "флаг - удалить ли существующий
-	 * файл из базы данных (Y|N)", "MODULE_ID" =&gt; "название модуля")</pre> Массив
-	 * такого вида может быть получен, например, объединением массивов
-	 * $_FILES[имя поля] и Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название
-	 * модуля").
-	 *
-	 *
-	 *
-	 * @param int $max_size = 0 Максимальный размер файла (байт).<br>Необязательный. По умолчанию -
-	 * "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param string $mime_types = false Разрешенный mime тип файла (например, "image/"). Проверка
-	 * осуществляется по данным полученным от посетителя, поэтому для
-	 * более безопасной проверки используйте <i>extensions</i>.
-	 * <br>Необязательный. По умолчанию - "false" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param string $extensions = false Перечисленные через запятую разрешенные расширения
-	 * файла.<br>Необязательный. По умолчанию - "false" - без ограничений.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arrFile = array_merge(
-	 *     $_FILES["ATTACHED_IMAGE"], 
-	 *     array("del" =&gt; ${"ATTACHED_IMAGE_del"}, "MODULE_ID" =&gt; "forum"));
-	 * 
-	 * $res = <b>CFile::CheckFile</b>($arrFile, 200, "image/", CFile::GetImageExtensions());
-	 * if (strlen($res)&gt;0) $strError .= $res."&lt;br&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php">CFile::IsImage</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция проверяет размер, расширение и mime тип файла. В случае ошибки функция вернет строку с текстом ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param array $file  Массив с данными файла формата:<br><br><pre>Array( "name" =&gt; "название файла",
+	* "size" =&gt; "размер", "tmp_name" =&gt; "временный путь к файлу на сервере", "type"
+	* =&gt; "тип загружаемого файла", "del" =&gt; "флаг - удалить ли существующий
+	* файл из базы данных (Y|N)", "MODULE_ID" =&gt; "название модуля")</pre> Массив
+	* такого вида может быть получен, например, объединением массивов
+	* $_FILES[имя поля] и Array("del" =&gt; ${"имя поля"."_del"}, "MODULE_ID" = "название
+	* модуля").
+	*
+	*
+	*
+	* @param int $max_size = 0 Максимальный размер файла (байт).<br>Необязательный. По умолчанию -
+	* "0" - без ограничений.
+	*
+	*
+	*
+	* @param string $mime_types = false Разрешенный mime тип файла (например, "image/"). Проверка
+	* осуществляется по данным полученным от посетителя, поэтому для
+	* более безопасной проверки используйте <i>extensions</i>.
+	* <br>Необязательный. По умолчанию - "false" - без ограничений.
+	*
+	*
+	*
+	* @param string $Ext = false Перечисленные через запятую разрешенные расширения
+	* файла.<br>Необязательный. По умолчанию - "false" - без ограничений.
+	*
+	*
+	*
+	* @param bool $ForceMD5 = false Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param bool $SkipExt = false Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arrFile = array_merge(
+	*     $_FILES["ATTACHED_IMAGE"], 
+	*     array("del" =&gt; ${"ATTACHED_IMAGE_del"}, "MODULE_ID" =&gt; "forum"));
+	* 
+	* $res = <b>CFile::CheckFile</b>($arrFile, 200, "image/", CFile::GetImageExtensions());
+	* if (strlen($res)&gt;0) $strError .= $res."&lt;br&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/isimage.php">CFile::IsImage</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php
+	* @author Bitrix
+	*/
 	public static function CheckFile($arFile, $intMaxSize=0, $strMimeType=false, $strExt=false, $bForceMD5=false, $bSkipExt=false)
 	{
 		if($arFile["name"] == "")
 		{
 			return "";
+		}
+
+		//check file before transformation
+		if(($error = self::validateFile($arFile["name"], $arFile)) <> '')
+		{
+			return $error;
 		}
 
 		//translit, replace unsafe chars, etc.
@@ -1701,42 +1785,44 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Функция возвращает путь от корня к зарегистрированному файлу. Возвращает NULL, если файл не зарегистрирован.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $file_id  ID файла, путь до файла, или http-адрес.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
-	 *   $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 *   while ($obElement = $rsElements-&gt;GetNextElement()):
-	 *     $arElement = $obElement-&gt;GetFields();
-	 *     $arImagesPath[$arElement["PREVIEW_PICTURE"]] = <b>CFile::GetPath</b>($arElement["PREVIEW_PICTURE"]);
-	 *   endwhile;
-	 * endif;
-	 * ?&gt;Получить путь к картинкеCFile::GetPath($arItem["PICTURE"]);
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php">CFile::GetByID</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getpath.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает путь от корня к зарегистрированному файлу. Возвращает NULL, если файл не зарегистрирован.</p>
+	*
+	*
+	*
+	*
+	* @param int $file_id  ID файла, путь до файла, или http-адрес.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
+	*   $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	*   while ($obElement = $rsElements-&gt;GetNextElement()):
+	*     $arElement = $obElement-&gt;GetFields();
+	*     $arImagesPath[$arElement["PREVIEW_PICTURE"]] = <b>CFile::GetPath</b>($arElement["PREVIEW_PICTURE"]);
+	*   endwhile;
+	* endif;
+	* ?&gt;Получить путь к картинке
+	* 
+	* CFile::GetPath($arItem["PICTURE"]);
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getbyid.php">CFile::GetByID</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getpath.php
+	* @author Bitrix
+	*/
 	public static function GetPath($img_id)
 	{
 		$res = CFile::_GetImgParams($img_id);
@@ -1745,93 +1831,100 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Функция возвращает HTML для показа изображения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $image  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
-	 * на другом сайте. Если задается путь к файлу на текущем сайте, то
-	 * его необходимо задавать относительно корня.
-	 *
-	 *
-	 *
-	 * @param int $max_width = 0 Максимальная ширина изображения. Если ширина картинки больше
-	 * <i>max_width</i>, то она будет пропорционально смаштабирована. <br>
-	 * Необязательный. По умолчанию - "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param int $max_height = 0 Максимальная высота изображения. Если высота картинки больше
-	 * <i>max_height</i>, то она будет пропорционально смаштабирована. <br>
-	 * Необязательный. По умолчанию - "0" - без ограничений.
-	 *
-	 *
-	 *
-	 * @param string $image_params = "border=0" Произвольный HTML добавляемый в тэг IMG: <br> &lt;img <i>image_params</i> ...&gt; <br>
-	 * Необязательный. По умолчанию "border=0". Если в этом параметре
-	 * передать атрибут alt="текст", то в теге &lt;img&gt; будет использовано
-	 * это значение (с версии 8.5.1). Иначе, если картинка имеет описание в
-	 * таблице b_file, для атрибута alt будет использовано это описание.
-	 *
-	 *
-	 *
-	 * @param string $url = "" Ссылка для перехода при нажатии на картинку. <br> Необязательный.
-	 * По умолчанию "" - не выводить ссылку.
-	 *
-	 *
-	 *
-	 * @param bool $popup = false Открывать ли при клике на изображении дополнительное popup окно с
-	 * увеличенным изображением. <br> Необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @param string $popup_alt = false Текст всплывающей подсказки на изображении (только если <i>popup</i> =
-	 * true) <br> Необязательный. По умолчанию выводится фраза "Увеличить" на
-	 * языке страницы.
-	 *
-	 *
-	 *
-	 * @param int $image_width = 0 Ширина изображения (в пикселах) (только если в параметре <i>image</i>
-	 * задан URL начинающийся с "http://") <br> Необязательный. По умолчанию "0".
-	 *
-	 *
-	 *
-	 * @param int $image_height = 0 Высота изображения (в пикселах) (только если в параметре <i>image</i>
-	 * задан URL начинающийся с "http://") <br> Необязательный. По умолчанию "0".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;tr valign="top"&gt;
-	 *     &lt;td align="right"&gt;&lt;font class="tablefieldtext"&gt;&lt;?echo 
-	 * 	GetMessage("VOTE_IMAGE")?&gt;&lt;/font&gt;&lt;/td&gt;
-	 *     &lt;td&gt;&lt;font class="tablebodytext"&gt;&lt;?
-	 *     echo CFile::InputFile("IMAGE_ID", 20, $str_IMAGE_ID);
-	 *     if (strlen($str_IMAGE_ID)&gt;0):
-	 *         ?&gt;&lt;br&gt;&lt;?
-	 *         echo <b>CFile::ShowImage</b>($str_IMAGE_ID, 200, 200, "border=0", "", true);
-	 *     endif;
-	 *     ?&gt;&lt;/font&gt;
-	 *     &lt;/td&gt;
-	 * &lt;/tr&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/show2images.php">CFile::Show2Images</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает HTML для показа изображения.</p>
+	*
+	*
+	*
+	*
+	* @param mixed $image  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
+	* на другом сайте. Если задается путь к файлу на текущем сайте, то
+	* его необходимо задавать относительно корня.
+	*
+	*
+	*
+	* @param int $MaxW = 0 Максимальная ширина изображения. Если ширина картинки больше
+	* <i>max_width</i>, то она будет пропорционально смаштабирована. <br>
+	* Необязательный. По умолчанию - "0" - без ограничений.
+	*
+	*
+	*
+	* @param int $MaxH = 0 Максимальная высота изображения. Если высота картинки больше
+	* <i>max_height</i>, то она будет пропорционально смаштабирована. <br>
+	* Необязательный. По умолчанию - "0" - без ограничений. <br> Если MaxW
+	* установлен в 0, то MaxH учитываться не будет. Чтобы ограничить
+	* высоту можно установить максимальную ширину в некое бо&#769;льшое
+	* значение (например, 9999) вместо 0.
+	*
+	*
+	*
+	* @param string $Params = "border=0" Произвольный HTML добавляемый в тэг IMG: <br> &lt;img <i>image_params</i> ...&gt; <br>
+	* Необязательный. По умолчанию "null". Если в этом параметре передать
+	* атрибут alt="текст", то в теге &lt;img&gt; будет использовано это
+	* значение (с версии 8.5.1). Иначе, если картинка имеет описание в
+	* таблице b_file, для атрибута alt будет использовано это описание.
+	*
+	*
+	*
+	* @param string $ImageUrl = "" Ссылка для перехода при нажатии на картинку. <br> Необязательный.
+	* По умолчанию "" - не выводить ссылку.
+	*
+	*
+	*
+	* @param bool $popup = false Открывать ли при клике на изображении дополнительное popup окно с
+	* увеличенным изображением. <br> Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param string $PopupTitle = false Текст всплывающей подсказки на изображении (только если <i>popup</i> =
+	* true) <br> Необязательный. По умолчанию выводится фраза "Увеличить" на
+	* языке страницы.
+	*
+	*
+	*
+	* @param int $SizeWHTTP = 0 Ширина изображения (в пикселах) (только если в параметре <i>image</i>
+	* задан URL начинающийся с "http://") <br> Необязательный. По умолчанию "0".
+	*
+	*
+	*
+	* @param int $iSizeHHTTP = 0 Высота изображения (в пикселах) (только если в параметре <i>image</i>
+	* задан URL начинающийся с "http://") <br> Необязательный. По умолчанию "0".
+	*
+	*
+	*
+	* @param string $ImageUrlTemplate = "" 
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;tr valign="top"&gt;
+	*     &lt;td align="right"&gt;&lt;font class="tablefieldtext"&gt;&lt;?echo 
+	* 	GetMessage("VOTE_IMAGE")?&gt;&lt;/font&gt;&lt;/td&gt;
+	*     &lt;td&gt;&lt;font class="tablebodytext"&gt;&lt;?
+	*     echo CFile::InputFile("IMAGE_ID", 20, $str_IMAGE_ID);
+	*     if (strlen($str_IMAGE_ID)&gt;0):
+	*         ?&gt;&lt;br&gt;&lt;?
+	*         echo <b>CFile::ShowImage</b>($str_IMAGE_ID, 200, 200, "border=0", "", true);
+	*     endif;
+	*     ?&gt;&lt;/font&gt;
+	*     &lt;/td&gt;
+	* &lt;/tr&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/show2images.php">CFile::Show2Images</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php
+	* @author Bitrix
+	*/
 	public static function ShowImage($strImage, $iMaxW=0, $iMaxH=0, $sParams=null, $strImageUrl="", $bPopup=false, $sPopupTitle=false, $iSizeWHTTP=0, $iSizeHHTTP=0, $strImageUrlTemplate="")
 	{
 		if(is_array($strImage))
@@ -1948,90 +2041,90 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Функция возвращает HTML для показа изображения при клике на которое в отдельном popup-окне отображается другое изображение.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $image1  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
-	 * на другом сайте. Если задается путь к файлу на текущем сайте, то
-	 * его необходимо задавать относительно корня. В данном параметре
-	 * задается изображение для первоначального показа.
-	 *
-	 *
-	 *
-	 * @param mixed $image2  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
-	 * на другом сайте. Если задается путь к файлу на текущем сайте, то
-	 * его необходимо задавать относительно корня. В данном параметре
-	 * задается изображение для показа в popup-окне.
-	 *
-	 *
-	 *
-	 * @param int $max_width = 0 Максимальная ширина первоначального изображения. Если ширина
-	 * картинки больше <i>max_width</i>, то она будет пропорционально
-	 * смаштабирована. <br>Необязательный. По умолчанию - "0" - без
-	 * ограничений.
-	 *
-	 *
-	 *
-	 * @param int $max_height = 0 Максимальная высота первоначального изображения. Если высота
-	 * картинки больше <i>max_height</i>, то она будет пропорционально
-	 * смаштабирована. <br>Необязательный. По умолчанию - "0" - без
-	 * ограничений.
-	 *
-	 *
-	 *
-	 * @param string $image_params = "border=0" Произвольный HTML добавляемый в тэг IMG первоначального
-	 * изображения:<br> &lt;img <i>image_params</i> ...&gt; <br>Необязательный. По
-	 * умолчанию "border=0".
-	 *
-	 *
-	 *
-	 * @param string $popup_alt = false Текст всплывающей подсказки на изображении.<br>Необязательный. По
-	 * умолчанию выводится фраза "Нажмите чтобы увеличить" на языке
-	 * страницы.
-	 *
-	 *
-	 *
-	 * @param int $image_width = 0 Ширина изображения (в пикселах) (только если в параметре <i>image</i>
-	 * задан URL начинающийся с "http://") <br>Необязательный. По умолчанию "0".
-	 *
-	 *
-	 *
-	 * @param int $image_height = 0 Высота изображения (в пикселах) (только если в параметре <i>image</i>
-	 * задан URL начинающийся с "http://") <br>Необязательный. По умолчанию "0".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
-	 *     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 * 	while ($obElement = $rsElements-&gt;GetNextElement()):
-	 * 		$arElement = $obElement-&gt;GetFields();
-	 * 		$image1 = intval($arElement["PREVIEW_PICTURE"])&lt;=0 ? $arElement["DETAIL_PICTURE"] : $arElement["PREVIEW_PICTURE"];
-	 * 		$image2 = intval($arElement["DETAIL_PICTURE"])&lt;=0 ? $arElement["PREVIEW_PICTURE"] : $arElement["DETAIL_PICTURE"];
-	 * 		echo <b>CFile::Show2Images</b>($image1, $image2, 150, 150, "hspace='0' vspace='0' border='0' title='".$arElement["NAME"]."'", true);
-	 * 	endwhile;
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/show2images.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает HTML для показа изображения при клике на которое в отдельном popup-окне отображается другое изображение.</p>
+	*
+	*
+	*
+	*
+	* @param mixed $image1  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
+	* на другом сайте. Если задается путь к файлу на текущем сайте, то
+	* его необходимо задавать относительно корня. В данном параметре
+	* задается изображение для первоначального показа.
+	*
+	*
+	*
+	* @param mixed $image2  ID файла или путь к файлу на текущем сайте либо URL к файлу лежащем
+	* на другом сайте. Если задается путь к файлу на текущем сайте, то
+	* его необходимо задавать относительно корня. В данном параметре
+	* задается изображение для показа в popup-окне.
+	*
+	*
+	*
+	* @param int $max_width = 0 Максимальная ширина первоначального изображения. Если ширина
+	* картинки больше <i>max_width</i>, то она будет пропорционально
+	* смаштабирована. <br>Необязательный. По умолчанию - "0" - без
+	* ограничений.
+	*
+	*
+	*
+	* @param int $max_height = 0 Максимальная высота первоначального изображения. Если высота
+	* картинки больше <i>max_height</i>, то она будет пропорционально
+	* смаштабирована. <br>Необязательный. По умолчанию - "0" - без
+	* ограничений.
+	*
+	*
+	*
+	* @param string $image_params = "false" Произвольный HTML добавляемый в тэг IMG первоначального
+	* изображения:<br> &lt;img <i>image_params</i> ...&gt; <br>Необязательный. По
+	* умолчанию "false".
+	*
+	*
+	*
+	* @param string $popup_alt = false Текст всплывающей подсказки на изображении.<br>Необязательный. По
+	* умолчанию выводится фраза "Нажмите чтобы увеличить" на языке
+	* страницы.
+	*
+	*
+	*
+	* @param int $image_width = 0 Ширина изображения (в пикселах) (только если в параметре <i>image</i>
+	* задан URL начинающийся с "http://") <br>Необязательный. По умолчанию "0".
+	*
+	*
+	*
+	* @param int $image_height = 0 Высота изображения (в пикселах) (только если в параметре <i>image</i>
+	* задан URL начинающийся с "http://") <br>Необязательный. По умолчанию "0".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($rsElements = GetIBlockElementListEx($IBLOCK_TYPE, $IBLOCK_ID, false, array($ELEMENT_SORT_FIELD =&gt; $ELEMENT_SORT_ORDER, "ID" =&gt; "ASC"), false, $arrFilter)):
+	*     $rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	* 	while ($obElement = $rsElements-&gt;GetNextElement()):
+	* 		$arElement = $obElement-&gt;GetFields();
+	* 		$image1 = intval($arElement["PREVIEW_PICTURE"])&lt;=0 ? $arElement["DETAIL_PICTURE"] : $arElement["PREVIEW_PICTURE"];
+	* 		$image2 = intval($arElement["DETAIL_PICTURE"])&lt;=0 ? $arElement["PREVIEW_PICTURE"] : $arElement["DETAIL_PICTURE"];
+	* 		echo <b>CFile::Show2Images</b>($image1, $image2, 150, 150, "hspace='0' vspace='0' border='0' title='".$arElement["NAME"]."'", true);
+	* 	endwhile;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/showimage.php">CFile::ShowImage</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/show2images.php
+	* @author Bitrix
+	*/
 	public static function Show2Images($strImage1, $strImage2, $iMaxW=0, $iMaxH=0, $sParams=false, $sPopupTitle=false, $iSizeWHTTP=0, $iSizeHHTTP=0)
 	{
 		if(!($arImgParams = CFile::_GetImgParams($strImage1, $iSizeWHTTP, $iSizeHHTTP)))
@@ -2095,68 +2188,74 @@ function ImgShw(ID, width, height, alt)
 	 */
 	
 	/**
-	 * <p>Функция формирует массив описывающий файл. Структура массива аналогична структуре массива $_FILES[имя] (или $HTTP_POST_FILES[имя]). Данный массив может быть использован в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">SaveFile</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CheckFile</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CheckImageFile</a>. Структура возвращаемого массива: <br><br></p> <pre>Array( "name" =&gt; "название файла", "size" =&gt; "размер", "tmp_name" =&gt; "временный путь на сервере", "type" =&gt; "тип загружаемого файла")</pre> <p></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $file  одно из значений: <ul> <li>ID файла</li> <li>абсолютный путь к файлу</li> <li>URL
-	 * к файлу лежащем на другом сайте.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param mixed $mime_type = false MIME тип файла (например, "image/gif"). <br> Необязательный. По умолчанию -
-	 * "false" - MIME тип файла будет определён автоматически.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFile = <b>CFile::MakeFileArray</b>($_SERVER["DOCUMENT_ROOT"]."/images/screen.gif");
-	 * $arFile["MODULE_ID"] = "support";
-	 * $arFields = array(
-	 *   "CREATED_MODULE_NAME"   =&gt; "mail",
-	 *   "MODIFIED_MODULE_NAME"  =&gt; "mail",
-	 *   "OWNER_SID"             =&gt; "user@mail.ru",
-	 *   "SOURCE_SID"            =&gt; "email",
-	 *   "MESSAGE_AUTHOR_SID"    =&gt; "user@mail.ru",
-	 *   "MESSAGE_SOURCE_SID"    =&gt; "email",
-	 *   "TITLE"                 =&gt; "title",
-	 *   "MESSAGE"               =&gt; "message"
-	 *   "FILES"                 =&gt; array($arFile)
-	 *   );
-	 * //$TICKET_ID = 866;
-	 * $NEW_TICKET_ID = CTicket::Set($arFields, $MESSAGE_ID, $TICKET_ID, "N");
-	 * ?&gt;Как прикреплять к автоматической рассылке файл. С помощью события <a href="/api_help/subscribe/events/beforepostingsendmail.php">BeforePostingSendMail</a> и функции <a href="/api_help/subscribe/classes/cposting/cpostingsavefile.php">CPosting::SaveFile</a> добавить файл к выпуску. В шаблоне news (идет по умолчанию) есть код "return array". В этот массив надо добавить элемент <b>FILES</b>.        return array(
-	 *                 "SUBJECT"=&gt;$SUBSCRIBE_TEMPLATE_RUBRIC["NAME"],
-	 *                 "BODY_TYPE"=&gt;"html",
-	 *                 "CHARSET"=&gt;"Windows-1251",
-	 *                 "DIRECT_SEND"=&gt;"Y",
-	 *                 "FROM_FIELD"=&gt;$SUBSCRIBE_TEMPLATE_RUBRIC["FROM_FIELD"],
-	 *                 "GROUP_ID" =&gt; array(22,30),
-	 *                 "FILES" =&gt; array(
-	 *                                 CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/upload/our_price.xls")
-	 *                 ),
-	 *         );
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php
-	 * @author Bitrix
-	 */
+	* <p>Функция формирует массив описывающий файл. Структура массива аналогична структуре массива $_FILES[имя] (или $HTTP_POST_FILES[имя]). Данный массив может быть использован в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">SaveFile</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CheckFile</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CheckImageFile</a>. Структура возвращаемого массива: </p> <pre>Array( "name" =&gt; "название файла", "size" =&gt; "размер", "tmp_name" =&gt; "временный путь на сервере", "type" =&gt; "тип загружаемого файла")</pre>
+	*
+	*
+	*
+	*
+	* @param mixed $path  одно из значений: <ul> <li>ID файла</li> <li>абсолютный путь к файлу</li> <li>URL
+	* к файлу лежащем на другом сайте.</li> </ul>
+	*
+	*
+	*
+	* @param mixed $mime_type = false MIME тип файла (например, "image/gif"). <br> Необязательный. По умолчанию -
+	* "false" - MIME тип файла будет определён автоматически.
+	*
+	*
+	*
+	* @param skipInterna $l = false Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFile = <b>CFile::MakeFileArray</b>($_SERVER["DOCUMENT_ROOT"]."/images/screen.gif");
+	* $arFile["MODULE_ID"] = "support";
+	* $arFields = array(
+	*   "CREATED_MODULE_NAME"   =&gt; "mail",
+	*   "MODIFIED_MODULE_NAME"  =&gt; "mail",
+	*   "OWNER_SID"             =&gt; "user@mail.ru",
+	*   "SOURCE_SID"            =&gt; "email",
+	*   "MESSAGE_AUTHOR_SID"    =&gt; "user@mail.ru",
+	*   "MESSAGE_SOURCE_SID"    =&gt; "email",
+	*   "TITLE"                 =&gt; "title",
+	*   "MESSAGE"               =&gt; "message"
+	*   "FILES"                 =&gt; array($arFile)
+	*   );
+	* //$TICKET_ID = 866;
+	* $NEW_TICKET_ID = CTicket::Set($arFields, $MESSAGE_ID, $TICKET_ID, "N");
+	* ?&gt;Как прикреплять к автоматической рассылке файл. С помощью события <a href="/api_help/subscribe/events/beforepostingsendmail.php">BeforePostingSendMail</a> и функции <a href="/api_help/subscribe/classes/cposting/cpostingsavefile.php">CPosting::SaveFile</a> добавить файл к выпуску. В шаблоне news (идет по умолчанию) есть код "return array". В этот массив надо добавить элемент <b>FILES</b>.
+	* 
+	*         return array(
+	*                 "SUBJECT"=&gt;$SUBSCRIBE_TEMPLATE_RUBRIC["NAME"],
+	*                 "BODY_TYPE"=&gt;"html",
+	*                 "CHARSET"=&gt;"Windows-1251",
+	*                 "DIRECT_SEND"=&gt;"Y",
+	*                 "FROM_FIELD"=&gt;$SUBSCRIBE_TEMPLATE_RUBRIC["FROM_FIELD"],
+	*                 "GROUP_ID" =&gt; array(22,30),
+	*                 "FILES" =&gt; array(
+	*                                 CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/upload/our_price.xls")
+	*                 ),
+	*         );
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/savefile.php">CFile::SaveFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkfile.php">CFile::CheckFile</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/checkimagefile.php">CFile::CheckImageFile</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php
+	* @author Bitrix
+	*/
 	public static function MakeFileArray($path, $mimetype = false, $skipInternal = false)
 	{
 		$io = CBXVirtualIo::GetInstance();
@@ -2311,41 +2410,64 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Фукция является оберткой CFile::ResizeImageFile. Изменяет размеры графического файла. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param &$arFil $e  массив файлов
-	 *
-	 *
-	 *
-	 * @param $arSiz $e  массив размеров файла
-	 *
-	 *
-	 *
-	 * @param $resizeTyp $e = BX_RESIZE_IMAGE_PROPORTIONAL тип расширения изменённого файла
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimage.php
-	 * @author Bitrix
-	 */
+	* <p>Фукция является оберткой <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimagefile.php">ResizeImageFile</a>. Изменяет размеры графического файла. </p>
+	*
+	*
+	*
+	*
+	* @param array $File  массив файла
+	*
+	*
+	*
+	* @param array $Size  Массив вида <code>array("width" =&gt; $width, "height" =&gt; $height));</code> оба ключа
+	* обязательны.
+	*
+	*
+	*
+	* @param resizeTyp $e = BX_RESIZE_IMAGE_PROPORTIONAL тип масштабирования: <ul> <li> <b>BX_RESIZE_IMAGE_EXACT</b> - масштабирует в
+	* прямоугольник $arSize без сохранения пропорций;</li> <li>
+	* <b>BX_RESIZE_IMAGE_PROPORTIONAL</b> - масштабирует с сохранением пропорций,
+	* размер ограничивается $arSize;</li> <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL_ALT</b> -
+	* масштабирует с сохранением пропорций, размер ограничивается
+	* $arSize, улучшенная обработка вертикальных картинок.</li> </ul>
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Создание миниатюр "на лету":
+	* 
+	*  $renderImage = CFile::ResizeImageGet($arResult["DETAIL_PICTURE"], Array("width" =&gt; $newWidth, "height" =&gt; $newHeight));
+	*  echo CFile::ShowImage($renderImage['src'], $newWidth, $newHeight, "border=0", "", true);
+	* Масштабирование изображения с последующим его сохранением:
+	* 
+	*      // проверяем тип и размер файла.
+	*      $checkfile = CFile::CheckFile($arFile,400000,'image/','gif,png,jpeg,jpg');
+	*      if(strlen($checkfile) &gt; 0) {
+	*         $strError .= $arFile['name'].': '.$strError.'&lt;br&gt;';
+	*      } else {
+	*        // масштабируем изображение
+	*        CAllFile::ResizeImage(
+	*           &amp;$arFile, // путь к изображению, сюда же будет записан уменьшенный файл
+	*           array(
+	*            "width" =&gt; $newWidth,  // новая ширина
+	*            "height" =&gt; $newHeight // новая высота
+	*           ),
+	*           BX_RESIZE_IMAGE_EXACT // метод масштабирования. обрезать прямоугольник без учета пропорций
+	*         );
+	*        // сохраняем уменьшенное изображение. 
+	*        $fileId = CFile::SaveFile($arFile, $IBlockType);
+	*      }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimage.php
+	* @author Bitrix
+	*/
 	public static function ResizeImage(&$arFile, $arSize, $resizeType = BX_RESIZE_IMAGE_PROPORTIONAL)
 	{
 		$sourceFile = $arFile["tmp_name"];
@@ -2376,83 +2498,83 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Функция уменьшает картинку и размещает уменьшенную копию в папку <i>/upload/resize_cache/путь</i>. Один раз уменьшив изображение получаем физический файл, который позволяет при последующих обращениях не проводить операции по уменьшению изображения. При следующем вызове функция вернет путь к уменьшенному файлу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param mixed $file  Идентификатор файла из таблицы <i>b_file</i> или массив описания файла
-	 * (<i>Array(FILE_NAME, SUBDIR, WIDTH, HEIGHT, CONTENT_TYPE)</i>), полученный методом
-	 * <b>CFile::GetFileArray</b>.
-	 *
-	 *
-	 *
-	 * @param array $arSize  Массив в виде <i>Array("width"=&gt;WIDTH, "height"=&gt;HEIGHT)</i> со значениями ширины и
-	 * высоты для уменьшаемой картинки.
-	 *
-	 *
-	 *
-	 * @param const $resizeType = BX_RESIZE_IMAGE_PROPORTIONAL Тип масштабирования: <ul> <li> <b>BX_RESIZE_IMAGE_EXACT</b> - масштабирует в
-	 * прямоугольник <i>$arSize</i> c сохранением пропорций, обрезая лишнее;</li>
-	 * <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL</b> - масштабирует с сохранением пропорций,
-	 * размер ограничивается <i>$arSize</i>;</li> <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL_ALT</b> -
-	 * масштабирует с сохранением пропорций, размер ограничивается
-	 * <i>$arSize</i>, улучшенная обработка вертикальных картинок.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param bool $bInitSizes = false Флаг возвращения в результирующем массив размеров измененной
-	 * картинки. <i>True</i> - возвращает, <i>false</i> - нет
-	 *
-	 *
-	 *
-	 * @param array $arFilters = false Массив для постобработки картинки с помощью фильтров (<i>Array("name"
-	 * =&gt; "sharpen", "precision" =&gt; 15)</i>). Фильтров пока один - <i>sharpen</i>. Задавать
-	 * его не обязательно - будет инициализирован автоматом.
-	 * Используется для наведения резкости у миниатюр.
-	 *
-	 *
-	 *
-	 * @param bool $bImmediate = false Флаг передается в обработчик события OnBeforeResizeImage, по смыслу
-	 * означает масштабирование непосредственно при вызове функции.
-	 * Обработчик в принципе может выполнять отложенное
-	 * масштабирование.
-	 *
-	 *
-	 *
-	 * @param bool $jpgQuality = false Число, устанавливающее в процентах качество JPG при
-	 * масштабировании. Чем больше значение, тем выше качество и больше
-	 * размер файла изображения.
-	 *
-	 *
-	 *
-	 * @return array <p>Функция возвращает массив вида: </p><pre class="syntax">array( 'src', // путь к
-	 * уменьшенной картинке относительно корня сайта. 'width', // Если bInitSizes
-	 * = true ширина уменьшенной картинки, иначе 0. 'height', // Если bInitSizes = true
-	 * высота уменьшенной картинки, иначе 0. )</pre><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * //$uID - идентификатор пользователя
-	 * $uDBInfo = CUser::GetByID($uID);
-	 * if ($uInfo = $uDBInfo-&gt;GetNext())
-	 * {
-	 *             if ($uInfo['PERSONAL_PHOTO'])
-	 *             {
-	 *                 $file = CFile::ResizeImageGet($uInfo['PERSONAL_PHOTO'], array('width'=&gt;150, 'height'=&gt;150), BX_RESIZE_IMAGE_PROPORTIONAL, true);                
-	 *                 $img = '&lt;img src="'.$file['src'].'" width="'.$file['width'].'" height="'.$file['height'].'" /&gt;';
-	 *                 $uInfo['PERSONAL_PHOTO'] = $img;
-	 *             }
-	 *             $arResult['ITEMS'][$k]['USER_INFO'] = $uInfo;
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimageget.php
-	 * @author Bitrix
-	 */
+	* <p>Функция уменьшает картинку и размещает уменьшенную копию в папку <i>/upload/resize_cache/путь</i>. Один раз уменьшив изображение получаем физический файл, который позволяет при последующих обращениях не проводить операции по уменьшению изображения. При следующем вызове функция вернет путь к уменьшенному файлу.</p>
+	*
+	*
+	*
+	*
+	* @param mixed $file  Идентификатор файла из таблицы <i>b_file</i> или массив описания файла
+	* (<i>Array(FILE_NAME, SUBDIR, WIDTH, HEIGHT, CONTENT_TYPE)</i>), полученный методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/getfilearray.php">GetFileArray</a>.
+	*
+	*
+	*
+	* @param array $arSize  Массив в виде <i>Array("width"=&gt;WIDTH, "height"=&gt;HEIGHT)</i> со значениями ширины и
+	* высоты для уменьшаемой картинки. Оба ключа обязательны.
+	*
+	*
+	*
+	* @param const $resizeType = BX_RESIZE_IMAGE_PROPORTIONAL Тип масштабирования: <ul> <li> <b>BX_RESIZE_IMAGE_EXACT</b> - масштабирует в
+	* прямоугольник <i>$arSize</i> c сохранением пропорций, обрезая лишнее;</li>
+	* <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL</b> - масштабирует с сохранением пропорций,
+	* размер ограничивается <i>$arSize</i>;</li> <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL_ALT</b> -
+	* масштабирует с сохранением пропорций, размер ограничивается
+	* <i>$arSize</i>, улучшенная обработка вертикальных картинок.</li> </ul>
+	*
+	*
+	*
+	* @param bool $bInitSizes = false Флаг возвращения в результирующем массив размеров измененной
+	* картинки. <i>True</i> - возвращает, <i>false</i> - нет
+	*
+	*
+	*
+	* @param array $arFilters = false Массив для постобработки картинки с помощью фильтров (<i>Array("name"
+	* =&gt; "sharpen", "precision" =&gt; 15)</i>). Фильтров пока один - <i>sharpen</i>. Задавать
+	* его не обязательно - будет инициализирован автоматом.
+	* Используется для наведения резкости у миниатюр.
+	*
+	*
+	*
+	* @param bool $bImmediate = false Флаг передается в обработчик события OnBeforeResizeImage, по смыслу
+	* означает масштабирование непосредственно при вызове функции.
+	* Обработчик в принципе может выполнять отложенное
+	* масштабирование.
+	*
+	*
+	*
+	* @param bool $jpgQuality = false Число, устанавливающее в процентах качество JPG при
+	* масштабировании. Чем больше значение, тем выше качество и больше
+	* размер файла изображения.
+	*
+	*
+	*
+	* @return array <p>Функция возвращает массив вида: </p> <pre class="syntax">array( 'src', // путь к
+	* уменьшенной картинке относительно корня сайта. 'width', // Если bInitSizes
+	* = true ширина уменьшенной картинки, иначе 0. 'height', // Если bInitSizes = true
+	* высота уменьшенной картинки, иначе 0. )</pre> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* //$uID - идентификатор пользователя
+	* $uDBInfo = CUser::GetByID($uID);
+	* if ($uInfo = $uDBInfo-&gt;GetNext())
+	* {
+	*             if ($uInfo['PERSONAL_PHOTO'])
+	*             {
+	*                 $file = CFile::ResizeImageGet($uInfo['PERSONAL_PHOTO'], array('width'=&gt;150, 'height'=&gt;150), BX_RESIZE_IMAGE_PROPORTIONAL, true);                
+	*                 $img = '&lt;img src="'.$file['src'].'" width="'.$file['width'].'" height="'.$file['height'].'" /&gt;';
+	*                 $uInfo['PERSONAL_PHOTO'] = $img;
+	*             }
+	*             $arResult['ITEMS'][$k]['USER_INFO'] = $uInfo;
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimageget.php
+	* @author Bitrix
+	*/
 	public static function ResizeImageGet($file, $arSize, $resizeType = BX_RESIZE_IMAGE_PROPORTIONAL, $bInitSizes = false, $arFilters = false, $bImmediate = false, $jpgQuality = false)
 	{
 		if (!is_array($file) && intval($file) > 0)
@@ -2969,50 +3091,64 @@ function ImgShw(ID, width, height, alt)
 
 	
 	/**
-	 * <p>Функция производит изменение размера графического файла. Если исходный файл с расширением BMP, то файл-результат будет переконвертирован как JPEG и в <b>destinationFile</b> вернется модифицированное имя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $sourceFil $e  Путь к исходному файлу
-	 *
-	 *
-	 *
-	 * @param &$destinationFil $e  Путь к файлу - результату обработки.
-	 *
-	 *
-	 *
-	 * @param $arSiz $e  Массив размеров файла
-	 *
-	 *
-	 *
-	 * @param $resizeTyp $e = BX_RESIZE_IMAGE_PROPORTIONAL Тип нового файла.
-	 *
-	 *
-	 *
-	 * @param $arWaterMar $k = array() массив с параметрами водяного знака, ключи: <ul> <li> <b>text</b> - текст</li>
-	 * <li> <b>path_to_font</b> - путь к шрифту (TTF/UTF-8)</li> <li> <b>min_size_picture</b> -
-	 * минимальная ширина картинки</li> <li> <b>color</b> - цвет "RRGGBB"</li> <li> <b>size</b> -
-	 * размер, "big"/"small"/другое</li> <li> <b>position</b> - "{m|b}{c|r}", где <b>m</b> - центр по
-	 * вертикали, <b>b</b> - низ, <b>c</b> - центр по горизонтали, <b>r</b> - правый
-	 * край.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param $jpgQualit $y = false Величина JPG-сжатия
-	 *
-	 *
-	 *
-	 * @param $arFilter $s = false Массив параметров фильтра.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimagefile.php
-	 * @author Bitrix
-	 */
+	* <p>Функция производит изменение размера графического файла. Если исходный файл с расширением BMP, то файл-результат будет переконвертирован как JPEG и в <b>destinationFile</b> вернется модифицированное имя.</p>
+	*
+	*
+	*
+	*
+	* @param $sourceFil $e  Путь к исходному файлу
+	*
+	*
+	*
+	* @param &$destinationFil $e  Путь к файлу - результату обработки. Если исходный файл в формате
+	* BMP, то файл будет переконвертирован в JPEG и в <i>destinationFile</i> вернется
+	* модифицированное имя.
+	*
+	*
+	*
+	* @param $arSiz $e  Массив вида <code>array("width" =&gt; $width, "height" =&gt; $height));</code> оба ключа
+	* обязательны.
+	*
+	*
+	*
+	* @param $resizeTyp $e = BX_RESIZE_IMAGE_PROPORTIONAL тип масштабирования: <ul> <li> <b>BX_RESIZE_IMAGE_EXACT</b> - масштабирует в
+	* прямоугольник $arSize без сохранения пропорций;</li> <li>
+	* <b>BX_RESIZE_IMAGE_PROPORTIONAL</b> - масштабирует с сохранением пропорций,
+	* размер ограничивается $arSize;</li> <li> <b>BX_RESIZE_IMAGE_PROPORTIONAL_ALT</b> -
+	* масштабирует с сохранением пропорций, размер ограничивается
+	* $arSize, улучшенная обработка вертикальных картинок.</li> </ul>
+	*
+	*
+	*
+	* @param $arWaterMar $k = array() массив с параметрами водяного знака, ключи: <ul> <li> <b>text</b> - текст
+	* водяного знака</li> <li> <b>path_to_font</b> - путь к TTF-шрифту (TTF/UTF-8)</li> <li>
+	* <b>type</b> - text или image</li> <li> <b>min_size_picture</b> - минимальная ширина
+	* картинки</li> <li> <b>color</b> - цвет "RRGGBB"</li> <li> <b>alpha_level</b> - прозрачность от
+	* 0 до 100, где 0 = прозрачно, 100 = непрозрачно</li> <li> <b>size</b> - размер. big;
+	* medium; small; real, для произвольного изменения масштаба возможно
+	* указание коэффициента через параметр 'coefficient', параметр 'real'
+	* применим только для изображений ('type'=&gt;'image')</li> <li> <b>position</b> -
+	* указание расположения водяного знака на изображении возможно в
+	* двух нотациях: <ul> <li>"{m|b}{c|r}", где <b>m</b> - центр по вертикали, <b>b</b> -
+	* низ, <b>c</b> - центр по горизонтали, <b>r</b> - правый край.</li> <li>topleft;
+	* topcenter; topright; centerleft; center; centerright; bottomleft; bottomcenter; bottomright.</li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @param $jpgQualit $y = false Величина JPG-сжатия. Необязательный. По умолчанию <i>false</i>.
+	*
+	*
+	*
+	* @param $arFilter $s = false Массив параметров фильтра. Необязательный. По умолчанию <i>false</i>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimagefile.php
+	* @author Bitrix
+	*/
 	public static function ResizeImageFile($sourceFile, &$destinationFile, $arSize, $resizeType = BX_RESIZE_IMAGE_PROPORTIONAL, $arWaterMark = array(), $jpgQuality=false, $arFilters=false)
 	{
 		$io = CBXVirtualIo::GetInstance();
@@ -3067,7 +3203,9 @@ function ImgShw(ID, width, height, alt)
 						$im->thumbnailImage($arDestinationSize["width"], $arDestinationSize["height"], true);
 						$im->writeImage();
 						$im->destroy();
-					} catch (ImagickException $e) {
+					}
+					catch (ImagickException $e)
+					{
 						$new_image = "";
 					}
 
@@ -3367,12 +3505,12 @@ function ImgShw(ID, width, height, alt)
 		if(array_key_exists("EXTENSION_SUFFIX", $arFile) && $arFile["EXTENSION_SUFFIX"] <> '')
 			$name = substr($name, 0, -strlen($arFile["EXTENSION_SUFFIX"]));
 
+		$name = $APPLICATION->ConvertCharset($name, SITE_CHARSET, "UTF-8");
+
 		// ie filename error fix
 		$ua = strtolower($_SERVER["HTTP_USER_AGENT"]);
 		if (strpos($ua, "opera") === false && strpos($ua, "msie") !== false)
 		{
-			if (SITE_CHARSET != "UTF-8")
-				$name = $APPLICATION->ConvertCharset($name, SITE_CHARSET, "UTF-8");
 			$name = str_replace(" ", "%20", $name);
 			$name = urlencode($name);
 			$name = str_replace(array("%2520", "%2F"), array("%20", "/"), $name);
@@ -3531,6 +3669,7 @@ function ImgShw(ID, width, height, alt)
 				}
 				else
 				{
+					$filename = $APPLICATION->ConvertCharset($filename, SITE_CHARSET, "UTF-8");
 					header('X-Accel-Redirect: '.$filename);
 				}
 			}
@@ -3569,7 +3708,8 @@ function ImgShw(ID, width, height, alt)
 					}
 					else
 					{
-						echo $src->Get($filename);
+						$fp = fopen("php://output", "wb");
+						$src->Download($filename, $fp);
 					}
 				}
 			}
@@ -3680,16 +3820,30 @@ function ImgShw(ID, width, height, alt)
 
 		$arColor = array("red" => hexdec(substr($color, 0, 2)), "green" => hexdec(substr($color, 2, 2)), "blue" => hexdec(substr($color, 4, 2)));
 
-		$iSize = $Params["width"] * $Params["coefficient"] / 100;
-		if ($iSize * strlen($text) * 0.7 > $Params["width"])
-			$iSize = intval($Params["width"] / (strlen($text) * 0.7));
-
-		$wm_pos = array(
-			"x" => 5, // Left
-			"y" => $iSize + 5, // Top
-			"width" => (strlen($text) * 0.7 + 1) * $iSize,
-			"height" => $iSize
-		);
+		if (CFile::IsGD2() && $Params["text_width"] > 0)
+		{
+			$textBox = imagettfbbox(20, 0, $font, $text);
+			$scale = $Params["text_width"] / ($textBox[2] - $textBox[0]);
+			$iSize = 20 * $scale;
+			$wm_pos = array(
+				"x" => 1, // Left
+				"y" => $iSize + 5, // Top
+				"width" => $Params["text_width"],
+				"height" => ($textBox[0] - $textBox[7]) * $scale,
+			);
+		}
+		else
+		{
+			$iSize = $Params["width"] * $Params["coefficient"] / 100;
+			if ($iSize * strlen($text) * 0.7 > $Params["width"])
+				$iSize = intval($Params["width"] / (strlen($text) * 0.7));
+			$wm_pos = array(
+				"x" => 5, // Left
+				"y" => $iSize + 5, // Top
+				"width" => (strlen($text) * 0.7 + 1) * $iSize,
+				"height" => $iSize
+			);
+		}
 
 		if (!CFile::IsGD2())
 		{
@@ -3742,7 +3896,7 @@ function ImgShw(ID, width, height, alt)
 	// 	file - abs path to file
 	//	alpha_level - opacity
 	// 	position - of the watermark
-	public static function WatermarkImage(&$obj, $Params = array())
+public static 	function WatermarkImage(&$obj, $Params = array())
 	{
 		$file = $Params['file'];
 
@@ -3833,21 +3987,28 @@ function ImgShw(ID, width, height, alt)
 						$main_rgb = imagecolorsforindex($obj, imagecolorat($obj, $watermark_x, $watermark_y));
 						$watermark_rbg = imagecolorsforindex($file_obj, imagecolorat($file_obj, $x, $y));
 
-						if ($watermark_rbg['alpha'])
+						if ($watermark_rbg['alpha'] == 127)
 						{
-							$watermark_alpha = round((( 127 - $watermark_rbg['alpha']) / 127), 2);
-							$watermark_alpha = $watermark_alpha * $Params["alpha_level"];
+							$res = $main_rgb;
 						}
+						else
+						{
+							if ($watermark_rbg['alpha'])
+							{
+								$watermark_alpha = round((( 127 - $watermark_rbg['alpha']) / 127), 2);
+								$watermark_alpha = $watermark_alpha * $Params["alpha_level"];
+							}
 
-						$res = array();
-						foreach(array('red', 'green', 'blue', 'alpha') as $k)
-							$res[$k] = round(($main_rgb[$k] * (1 - $watermark_alpha)) + ($watermark_rbg[$k] * $watermark_alpha));
+							$res = array();
+							foreach(array('red', 'green', 'blue', 'alpha') as $k)
+								$res[$k] = round(($main_rgb[$k] * (1 - $watermark_alpha)) + ($watermark_rbg[$k] * $watermark_alpha));
+						}
 
 						$return_color = imagecolorexactalpha($obj, $res["red"], $res["green"], $res["blue"], $res["alpha"]);
 						if ($return_color == -1)
 						{
 							$return_color = imagecolorallocatealpha($obj, $res["red"], $res["green"], $res["blue"], $res["alpha"]);
-							if ($return_color == -1)
+							if ($return_color === false)
 								$return_color = imagecolorclosestalpha($obj, $res["red"], $res["green"], $res["blue"], $res["alpha"]);
 						}
 						imagesetpixel($obj, $watermark_x, $watermark_y, $return_color);
@@ -3868,7 +4029,7 @@ function ImgShw(ID, width, height, alt)
 		return true;
 	}
 
-	public static function ImageRotate($sourceFile, $angle)
+public static 	function ImageRotate($sourceFile, $angle)
 	{
 		if (!file_exists($sourceFile) || !is_file($sourceFile))
 			return false;
@@ -3908,7 +4069,7 @@ function ImgShw(ID, width, height, alt)
 		return true;
 	}
 
-	public static function CreateImage($path, $type = false)
+public static 	function CreateImage($path, $type = false)
 	{
 		$sourceImage = false;
 		if ($type === false)
@@ -3938,7 +4099,7 @@ function ImgShw(ID, width, height, alt)
 		return $sourceImage;
 	}
 
-	public static function ExtractImageExif($src)
+public static 	function ExtractImageExif($src)
 	{
 		/** @global CMain $APPLICATION  */
 		global $APPLICATION;
@@ -3956,7 +4117,7 @@ function ImgShw(ID, width, height, alt)
 		return $arr;
 	}
 
-	public static function ExtractImageIPTC($src)
+public static 	function ExtractImageIPTC($src)
 	{
 /* Not implemented yet
 		$arr = array();
@@ -3990,7 +4151,7 @@ function ImgShw(ID, width, height, alt)
 */
 	}
 
-	public static function GetContentType($path, $bPhysicalName = false)
+public static 	function GetContentType($path, $bPhysicalName = false)
 	{
 		$io = CBXVirtualIo::GetInstance();
 		$pathX = $bPhysicalName? $path: $io->GetPhysicalName($path);

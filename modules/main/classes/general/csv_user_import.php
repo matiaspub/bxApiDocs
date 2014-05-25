@@ -1,4 +1,11 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2013 Bitrix
+ */
+
 IncludeModuleLangFile(__FILE__);
 
 class CSVUserImport
@@ -178,7 +185,7 @@ class CSVUserImport
 	public function __CreateUserProperty()
 	{
 		if ($this->attachIBlockID < 1)
-			return;
+			return false;
 
 		$success = true;
 		$dbRes = CUserTypeEntity::GetList(Array(), Array("ENTITY_ID" => "USER", "FIELD_NAME" => $this->userPropertyName));
@@ -246,7 +253,7 @@ class CSVUserImport
 				continue;
 			}
 
-			$dbSection = CIBlockSection::GetList(Array(), Array("NAME" => $sectionName, "SECTION_ID" => $sectionID));
+			$dbSection = CIBlockSection::GetList(Array(), Array("IBLOCK_ID" => $this->attachIBlockID, "NAME" => $sectionName, "SECTION_ID" => $sectionID));
 			if ($arGroup = $dbSection->Fetch())
 			{
 				$sectionID = $arGroup["ID"];
@@ -392,8 +399,7 @@ class CSVUserImport
 					$arUpdate = Array();
 					$arUpdate[$this->userPropertyName] = Array($iblockSectionID);
 
-					$success = $user->Update($userID, $arUpdate);
-
+					$user->Update($userID, $arUpdate);
 				}
 			}
 
@@ -405,4 +411,3 @@ class CSVUserImport
 
 	}
 }
-?>

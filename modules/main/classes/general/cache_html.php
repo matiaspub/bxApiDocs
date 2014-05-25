@@ -3,17 +3,24 @@
 /*. require_module 'session'; .*/
 /*. require_module 'zlib'; .*/
 /*. require_module 'pcre'; .*/
+use Bitrix\Main\IO;
+use Bitrix\Main\Application;
+use Bitrix\Main;
 
 class CHTMLPagesCache
 {
-/*. void .*/
+	public static $options = array();
+
+	/**
+	 * @return void
+	 */
 	public static function startCaching()
 	{
 		$HTML_PAGES_ROOT = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
+
 		if(
-			$_SERVER["REQUEST_METHOD"] === "POST"
-			|| array_key_exists(session_name(), $_COOKIE)
-			|| array_key_exists(session_name(), $_REQUEST)
+			isset($_SERVER["HTTP_BX_AJAX"])
+			|| (isset($_SERVER["HTTP_FORWARDED"]) && $_SERVER["HTTP_FORWARDED"]=="SSL")
 			|| (strncmp($_SERVER["REQUEST_URI"], BX_ROOT, strlen(BX_ROOT)) == 0)
 			|| (strncmp($_SERVER["REQUEST_URI"], BX_PERSONAL_ROOT, strlen(BX_ROOT)) == 0)
 			|| (preg_match("#^/index_controller\\.php#", $_SERVER["REQUEST_URI"]) > 0)
@@ -23,8 +30,68 @@ class CHTMLPagesCache
 		}
 
 		$arHTMLPagesOptions = array();
-		if(file_exists($HTML_PAGES_ROOT."/.config.php"))
+		if (file_exists($HTML_PAGES_ROOT."/.config.php"))
 			include($HTML_PAGES_ROOT."/.config.php");
+
+		$useCompositeCache = isset($arHTMLPagesOptions["COMPOSITE"]) && $arHTMLPagesOptions["COMPOSITE"] === "Y";
+		if ($useCompositeCache)
+		{
+			//to warm up localStorage
+			// define("ENABLE_HTML_STATIC_CACHE_JS", true);
+		}
+
+		if(
+			$_SERVER["REQUEST_METHOD"] !== "GET"
+			|| isset($_GET["sessid"])
+		)
+		{
+			return;
+		}
+
+		if ($useCompositeCache)
+		{
+			if (isset($_SERVER["HTTP_BX_REF"]))
+			{
+				$_SERVER["HTTP_REFERER"] = $_SERVER["HTTP_BX_REF"];
+			}
+
+			if (array_key_exists("bxrand", $_GET))
+			{
+				unset($_GET["bxrand"]);
+				unset($_REQUEST["bxrand"]);
+				if (isset($_SERVER["REQUEST_URI"]))
+				{
+					$_SERVER["REQUEST_URI"] = preg_replace("/([?&]bxrand=[0-9]+)\$/", "", $_SERVER["REQUEST_URI"]);
+				}
+				if (isset($_SERVER["QUERY_STRING"]))
+				{
+					$_SERVER["QUERY_STRING"] = preg_replace("/([?&]bxrand=[0-9]+)\$/", "", $_SERVER["QUERY_STRING"]);
+				}
+			}
+		}
+
+		if(
+			$useCompositeCache
+			&& (
+				isset($arHTMLPagesOptions["COOKIE_NCC"])
+				&& array_key_exists($arHTMLPagesOptions["COOKIE_NCC"], $_COOKIE)
+				&& $_COOKIE[$arHTMLPagesOptions["COOKIE_NCC"]] === "Y"
+			)
+		)
+		{
+			return;
+		}
+
+		if(
+			!$useCompositeCache
+			&& (
+				array_key_exists(session_name(), $_COOKIE)
+				|| array_key_exists(session_name(), $_REQUEST)
+			)
+		)
+		{
+			return;
+		}
 
 		//Check for stored authorization
 		if(
@@ -33,7 +100,15 @@ class CHTMLPagesCache
 			&& isset($_COOKIE[$arHTMLPagesOptions["COOKIE_PASS"]]) && $_COOKIE[$arHTMLPagesOptions["COOKIE_PASS"]] <> ''
 		)
 		{
-			return;
+			if (
+				!$useCompositeCache
+				|| !isset($arHTMLPagesOptions["COOKIE_CC"])
+				|| !array_key_exists($arHTMLPagesOptions["COOKIE_CC"], $_COOKIE)
+				|| $_COOKIE[$arHTMLPagesOptions["COOKIE_CC"]] !== "Y"
+			)
+			{
+				return;
+			}
 		}
 
 		//Check for masks
@@ -42,6 +117,7 @@ class CHTMLPagesCache
 			$PAGES_FILE = $_SERVER["REQUEST_URI"];
 		else
 			$PAGES_FILE = substr($_SERVER["REQUEST_URI"], 0, $p);
+
 		if(is_array($arHTMLPagesOptions["~EXCLUDE_MASK"]))
 		{
 			foreach($arHTMLPagesOptions["~EXCLUDE_MASK"] as $mask)
@@ -52,6 +128,7 @@ class CHTMLPagesCache
 				}
 			}
 		}
+
 		if(is_array($arHTMLPagesOptions["~INCLUDE_MASK"]))
 		{
 			foreach($arHTMLPagesOptions["~INCLUDE_MASK"] as $mask)
@@ -63,19 +140,50 @@ class CHTMLPagesCache
 				}
 			}
 		}
+
 		if($PAGES_FILE !== "*")
 			return;
+
+		if ($useCompositeCache)
+		{
+			if(
+				isset($arHTMLPagesOptions["DOMAINS"])
+				&& !in_array($_SERVER["HTTP_HOST"], $arHTMLPagesOptions["DOMAINS"])
+			)
+			{
+				return;
+			}
+
+			if(
+				isset($arHTMLPagesOptions["INDEX_ONLY"])
+				&& $arHTMLPagesOptions["INDEX_ONLY"]
+				&& !preg_match("#^(/[^?]+)\\.php$#", $_SERVER["REQUEST_URI"])
+				&& !preg_match("#^([^?]*)/$#", $_SERVER["REQUEST_URI"])
+				&& ! (
+					isset($arHTMLPagesOptions["~GET"])
+					&& !empty($arHTMLPagesOptions["~GET"])
+					&& isset($_GET)
+					&& !empty($_GET)
+					&& count(array_diff(array_keys($_GET), $arHTMLPagesOptions["~GET"])) === 0
+				)
+			)
+			{
+				return;
+			}
+
+			$HTML_PAGES_ROOT .= "/".preg_replace("/:(\\d+)\$/", "-\\1", $_SERVER["HTTP_HOST"]);
+		}
 
 		$arMatch = array();
 		if(preg_match("#^(/.+?)\\.php\\?(.*)#", $_SERVER["REQUEST_URI"], $arMatch) > 0)
 		{
 			if(strpos($arMatch[2], "\\")!==false || strpos($arMatch[2], "/")!==false)
 				return;
-			$PAGES_FILE = $HTML_PAGES_ROOT.$arMatch[1]."@".$arMatch[2].".html";
+			$PAGES_FILE = $arMatch[1]."@".$arMatch[2];
 		}
 		elseif(preg_match("#^(/.+)\\.php$#", $_SERVER["REQUEST_URI"], $arMatch) > 0)
 		{
-			$PAGES_FILE = $HTML_PAGES_ROOT.$arMatch[1]."@.html";
+			$PAGES_FILE = $arMatch[1]."@";
 		}
 		if(preg_match("#^(.*?)/\\?(.*)#", $_SERVER["REQUEST_URI"], $arMatch) > 0)
 		{
@@ -83,18 +191,30 @@ class CHTMLPagesCache
 				return;
 			if(strlen($arMatch[1]) && substr($arMatch[1], 0, 1)!=="/")
 				return;
-			$PAGES_FILE = $HTML_PAGES_ROOT.$arMatch[1]."/index@".$arMatch[2].".html";
+			$PAGES_FILE = $arMatch[1]."/index@".$arMatch[2];
 		}
 		elseif(preg_match("#^(.*)/$#", $_SERVER["REQUEST_URI"], $arMatch) > 0)
 		{
 			if(strlen($arMatch[1]) && substr($arMatch[1], 0, 1)!=="/")
 				return;
-			$PAGES_FILE = $HTML_PAGES_ROOT.$arMatch[1]."/index@.html";
+			$PAGES_FILE = $arMatch[1]."/index@";
 		}
+
+		$PAGES_FILE = $HTML_PAGES_ROOT.str_replace(".", "_", $PAGES_FILE).".html";
+
 		//This checks for invalid symbols
 		//TODO: make it Windows compatible
 		if(preg_match("/(\\?|\\*|\\.\\.)/", $PAGES_FILE) > 0)
 			return;
+
+		if(
+			(isset($_SERVER["HTTP_BX_CACHE_MODE"]) && $_SERVER["HTTP_BX_CACHE_MODE"] === "HTMLCACHE")
+			|| (defined("CACHE_MODE") && constant("CACHE_MODE") === "HTMLCACHE")
+		)
+		{
+			define("USE_HTML_STATIC_CACHE", true);
+			return;
+		}
 
 		if(file_exists($PAGES_FILE))
 		{
@@ -126,9 +246,6 @@ class CHTMLPagesCache
 			$fp = fopen($PAGES_FILE, "rb");
 			if($fp !== false)
 			{
-				if(version_compare(phpversion(), "5.3.0", "<") && (($v = ini_get("magic_quotes_runtime")) == 1 || strtolower($v) == 'on'))
-					set_magic_quotes_runtime(0);
-
 				$contents = fread($fp, $fsize);
 				fclose($fp);
 
@@ -181,58 +298,103 @@ class CHTMLPagesCache
 		}
 		else//if(file_exists($PAGES_FILE))
 		{
-			// define('HTML_PAGES_FILE', $PAGES_FILE);
+			if ($useCompositeCache)
+			{
+				if (isset($arHTMLPagesOptions["~FILE_QUOTA"]))
+				{
+					$cache_quota = doubleval($arHTMLPagesOptions["~FILE_QUOTA"]);
+					$arStat = CHTMLPagesCache::readStatistic();
+					if($arStat)
+						$cached_size = $arStat["FILE_SIZE"];
+					else
+						$cached_size = 0.0;
+					if ($cached_size > $cache_quota)
+					{
+						CHTMLPagesCache::writeStatistic(0, 0, 1);
+						return;
+					}
+				}
+
+				if (!defined('USE_HTML_STATIC_CACHE'))
+					// define('USE_HTML_STATIC_CACHE', true);
+			}
+			else
+			{
+				// define('HTML_PAGES_FILE', $PAGES_FILE);
+			}
 		}
 	}
 
-	//Deletes all above html_pages
-/*. float .*/
-	public static function deleteRecursive(/*. string .*/$path = "")
+	/**
+	 * Deletes all above html_pages
+	 * @param string $relativePath [optional]
+	 * @param int $validTime [optional] unix timestamp
+	 * @return float
+	 */
+	public static function deleteRecursive($relativePath = "", $validTime = 0)
 	{
-		$base_bir = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
-		//Estimate for freed space
 		$bytes = 0.0;
-		//Check if someone is trieng to escape from $base_dir
-		if(strpos($path, "..")!==false)
-			return 0;
-
-		$dh = false;
-		if(is_dir($base_bir.$path))
-			$dh = opendir($base_bir.$path);
-		if($dh !== false)
+		if (strpos($relativePath, "..") !== false)
 		{
-			while(($file = readdir($dh)) !== false)
-			{
-				if(
-					$file === "."
-					|| $file === ".."
-					|| $file === "404.php"
-					|| $file === ".htaccess"
-					|| $file === ".config.php"
-					|| $file === ".enabled"
-				)
-					continue;
-
-				$file_path = $base_bir.$path."/".$file;
-				if(is_dir($file_path))
-				{
-					$bytes += CHTMLPagesCache::deleteRecursive($path.$file."/");
-					@rmdir($file_path);
-				}
-				elseif(is_file($file_path))
-				{
-					$bytes += filesize($file_path);
-					unlink($file_path);
-				}
-			}
-			closedir($dh);
+			return $bytes;
 		}
+
+		$relativePath = rtrim($relativePath, "/");
+		$baseDir = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
+		$absPath = $baseDir.$relativePath;
+
+		if (is_file($absPath))
+		{
+			if (
+				($validTime && filemtime($absPath) > $validTime) ||
+				in_array($relativePath, array("/.enabled", "/.config.php", "/.htaccess", "/404.php")))
+			{
+				return $bytes;
+			}
+
+			$bytes = filesize($absPath);
+			@unlink($absPath);
+			return doubleval($bytes);
+		}
+		elseif (is_dir($absPath) && ($handle = opendir($absPath)) !== false)
+		{
+			while (($file = readdir($handle)) !== false)
+			{
+				if ($file === "." || $file === "..")
+				{
+					continue;
+				}
+
+				$bytes += CHTMLPagesCache::deleteRecursive($relativePath."/".$file, $validTime);
+			}
+			closedir($handle);
+			@rmdir($absPath);
+		}
+
 		return doubleval($bytes);
 	}
 
 	public static function OnEpilog()
 	{
 		global $USER;
+
+		$arOptions = CHTMLPagesCache::GetOptions();
+		if ($arOptions["COMPOSITE"] === "Y")
+		{
+			if (Main\Data\Cache::shouldClearCache())
+			{
+				$server = Main\Context::getCurrent()->getServer();
+
+				$queryString = DeleteParam(array("clear_cache", "clear_cache_session"));
+				$uri = new Bitrix\Main\Web\Uri($server->getRequestUri());
+				$refinedUri = $queryString != "" ? $uri->getPath()."?".$queryString : $uri->getPath();
+
+				$cachedFile = Main\Data\StaticHtmlCache::convertUriToPath($refinedUri, $server->getHttpHost());
+				$bytes = self::deleteRecursive($cachedFile);
+				self::updateQuota(-$bytes);
+			}
+			return;
+		}
 
 		$bAutorized = is_object($USER) && $USER->IsAuthorized();
 		if(!$bAutorized && defined("HTML_PAGES_FILE"))
@@ -310,10 +472,7 @@ class CHTMLPagesCache
 	public static function CleanAll()
 	{
 		$bytes = CHTMLPagesCache::deleteRecursive("/");
-		if($bytes > 0.0 && class_exists("cdiskquota"))
-		{
-			CDiskQuota::updateDiskQuota("file", $bytes, "delete");
-		}
+		self::updateQuota(-$bytes);
 	}
 
 	public static function writeFile($file_name, $content)
@@ -326,9 +485,7 @@ class CHTMLPagesCache
 		if($content_len <= 0)
 			return;
 
-		$arHTMLPagesOptions = CHTMLPagesCache::GetOptions(true);
-		if(!is_array($arHTMLPagesOptions))
-			return;
+		$arHTMLPagesOptions = CHTMLPagesCache::GetOptions();
 
 		//Let's be pessimists
 		$bQuota = false;
@@ -409,6 +566,12 @@ class CHTMLPagesCache
 		return file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages/.enabled");
 	}
 
+	public static function IsCompositeEnabled()
+	{
+		$options = self::GetOptions();
+		return isset($options["COMPOSITE"]) && $options["COMPOSITE"] === "Y";
+	}
+
 	public static function SetEnabled($status)
 	{
 		$file_name  = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages/.enabled";
@@ -416,6 +579,7 @@ class CHTMLPagesCache
 		{
 			RegisterModuleDependences("main", "OnEpilog", "main", "CHTMLPagesCache", "OnEpilog");
 			RegisterModuleDependences("main", "OnLocalRedirect", "main", "CHTMLPagesCache", "OnEpilog");
+			RegisterModuleDependences("main", "OnChangeFile", "main", "CHTMLPagesCache", "OnChangeFile");
 
 			//For very first run we have to fall into defaults
 			CHTMLPagesCache::SetOptions(CHTMLPagesCache::GetOptions());
@@ -432,6 +596,7 @@ class CHTMLPagesCache
 		{
 			UnRegisterModuleDependences("main", "OnEpilog", "main", "CHTMLPagesCache", "OnEpilog");
 			UnRegisterModuleDependences("main", "OnLocalRedirect", "main", "CHTMLPagesCache", "OnEpilog");
+			UnRegisterModuleDependences("main", "OnChangeFile", "main", "CHTMLPagesCache", "OnChangeFile");
 
 			if(file_exists($file_name))
 				unlink($file_name);
@@ -453,18 +618,28 @@ class CHTMLPagesCache
 			$content = "<?\n\$arHTMLPagesOptions = array(\n";
 			foreach($arOptions as $key => $value)
 			{
+				if (is_integer($key))
+					$phpKey = $key;
+				else
+					$phpKey = "\"".EscapePHPString($key)."\"";
+
 				if(is_array($value))
 				{
-					$content .= "\t\"".EscapePHPString($key)."\" => array(\n";
+					$content .= "\t".$phpKey." => array(\n";
 					foreach($value as $key2 => $val)
 					{
-						$content .= "\t\t\"".EscapePHPString($key2)."\" => \"".EscapePHPString($val)."\",\n";
+						if (is_integer($key2))
+							$phpKey2 = $key2;
+						else
+							$phpKey2 = "\"".EscapePHPString($key2)."\"";
+
+						$content .= "\t\t".$phpKey2." => \"".EscapePHPString($val)."\",\n";
 					}
 					$content .= "\t),\n";
 				}
 				else
 				{
-					$content .= "\t\"".EscapePHPString($key)."\" => \"".EscapePHPString($value)."\",\n";
+					$content .= "\t".$phpKey." => \"".EscapePHPString($value)."\",\n";
 				}
 			}
 			$content .= ");\n?>\n";
@@ -484,49 +659,74 @@ class CHTMLPagesCache
 				if(file_exists($tmp_filename))
 					unlink($tmp_filename);
 			}
+
+			self::$options = array();
 		}
 	}
 
-	public static function GetOptions($bCheck = false)
+	public static function GetOptions()
 	{
-		$arHTMLPagesOptions = array();
+		if (!empty(self::$options))
+		{
+			return self::$options;
+		}
 
+		$arHTMLPagesOptions = array();
 		$file_name = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages/.config.php";
 		if(file_exists($file_name))
 		{
 			include($file_name);
 		}
 
-		if(!is_array($arHTMLPagesOptions))
-		{
-			if($bCheck)
-				return false;
-			else
-				$arHTMLPagesOptions = array();
-		}
-
 		$bCompile = false;
+
 		if(!array_key_exists("INCLUDE_MASK", $arHTMLPagesOptions))
 		{
 			$arHTMLPagesOptions["INCLUDE_MASK"] = "*.php;*/";
 			$bCompile = true;
 		}
+
 		if(!array_key_exists("EXCLUDE_MASK", $arHTMLPagesOptions))
 		{
 			$arHTMLPagesOptions["EXCLUDE_MASK"] = "/bitrix/*;/404.php";
 			$bCompile = true;
 		}
+
 		if(!array_key_exists("FILE_QUOTA", $arHTMLPagesOptions))
 		{
 			$arHTMLPagesOptions["FILE_QUOTA"] = 100;
 			$bCompile = true;
 		}
+
+		if(!array_key_exists("COMPOSITE", $arHTMLPagesOptions))
+		{
+			$arHTMLPagesOptions["COMPOSITE"] = "N";
+			$bCompile = true;
+		}
+
+		if(!array_key_exists("BANNER_BGCOLOR", $arHTMLPagesOptions))
+		{
+			$arHTMLPagesOptions["BANNER_BGCOLOR"] = "#E94524";
+		}
+
+		if(!array_key_exists("BANNER_STYLE", $arHTMLPagesOptions))
+		{
+			$arHTMLPagesOptions["BANNER_STYLE"] = "white";
+		}
+
+		if(!array_key_exists("ONLY_PARAMETERS", $arHTMLPagesOptions))
+		{
+			$arHTMLPagesOptions["ONLY_PARAMETERS"] = "referrer1;r1;referrer2;r2;referrer3;r3;utm_source;utm_medium;utm_campaign;utm_content";
+			$bCompile = true;
+		}
+
 		if($bCompile)
 		{
 			CHTMLPagesCache::CompileOptions($arHTMLPagesOptions);
 		}
 
-		return $arHTMLPagesOptions;
+		self::$options = $arHTMLPagesOptions;
+		return self::$options;
 	}
 
 	public static function CompileOptions(&$arOptions)
@@ -534,7 +734,7 @@ class CHTMLPagesCache
 		$arOptions["~INCLUDE_MASK"] = array();
 		$inc = str_replace(
 			array("\\", ".",  "?", "*",   "'"),
-			array("/",  "\.", ".", ".*?", "\'"),
+			array("/",  "\\.", ".", ".*?", "\\'"),
 			$arOptions["INCLUDE_MASK"]
 		);
 		$arIncTmp = explode(";", $inc);
@@ -546,13 +746,13 @@ class CHTMLPagesCache
 		}
 
 		$arOptions["~EXCLUDE_MASK"] = array();
-		$inc = str_replace(
+		$exc = str_replace(
 			array("\\", ".",  "?", "*",   "'"),
-			array("/",  "\.", ".", ".*?", "\'"),
+			array("/",  "\\.", ".", ".*?", "\\'"),
 			$arOptions["EXCLUDE_MASK"]
 		);
-		$arIncTmp = explode(";", $inc);
-		foreach($arIncTmp as $mask)
+		$arExcTmp = explode(";", $exc);
+		foreach($arExcTmp as $mask)
 		{
 			$mask = trim($mask);
 			if(strlen($mask) > 0)
@@ -563,11 +763,24 @@ class CHTMLPagesCache
 			$arOptions["~FILE_QUOTA"] = doubleval($arOptions["FILE_QUOTA"]) * 1024.0 * 1024.0;
 		else
 			$arOptions["~FILE_QUOTA"] = 0.0;
+
 		$arOptions["COMPRESS"] = IsModuleInstalled('compression');
 		$arOptions["STORE_PASSWORD"] = COption::GetOptionString("main", "store_password", "Y");
 		$cookie_prefix = COption::GetOptionString('main', 'cookie_name', 'BITRIX_SM');
 		$arOptions["COOKIE_LOGIN"] = $cookie_prefix.'_LOGIN';
 		$arOptions["COOKIE_PASS"]  = $cookie_prefix.'_UIDH';
+		$arOptions["COOKIE_NCC"]  = $cookie_prefix.'_NCC';
+		$arOptions["COOKIE_CC"]  = $cookie_prefix.'_CC';
+
+		$arOptions["INDEX_ONLY"] = ($arOptions["NO_PARAMETERS"] === "Y");
+		$arOptions["~GET"] = array();
+		$arTmp = explode(";", $arOptions["ONLY_PARAMETERS"]);
+		foreach($arTmp as $str)
+		{
+			$str = trim($str);
+			if(strlen($str) > 0)
+				$arOptions["~GET"][] = $str;
+		}
 	}
 
 	public static function readStatistic()
@@ -622,6 +835,25 @@ class CHTMLPagesCache
 			fclose($fp);
 	}
 
+	/**
+	 * Update disk quota and cache statistic
+	 * @param float $bytes positive or negative value
+	 */
+	public static function updateQuota($bytes)
+	{
+		if ($bytes == 0.0)
+		{
+			return;
+		}
+
+		if (class_exists("cdiskquota"))
+		{
+			CDiskQuota::updateDiskQuota("file", abs($bytes), $bytes > 0.0 ? "copy" : "delete");
+		}
+
+		CHTMLPagesCache::writeStatistic(0, 0, 0, 0, $bytes);
+	}
+
 	public static function SetStatus($status)
 	{
 		$bCgi = (stristr(php_sapi_name(), "cgi") !== false);
@@ -632,5 +864,59 @@ class CHTMLPagesCache
 			header($_SERVER["SERVER_PROTOCOL"]." ".$status);
 	}
 
+	public static function OnUserLogin()
+	{
+		global $APPLICATION, $USER;
+		if (self::IsOn())
+		{
+			$arHTMLCacheOptions = CHTMLPagesCache::GetOptions();
+			$arHTMLCacheOptions["GROUPS"][] = "2";
+			$diff = array_diff($USER->GetUserGroupArray(), $arHTMLCacheOptions["GROUPS"]);
+
+			if ($diff)
+			{
+				$APPLICATION->set_cookie("NCC", "Y");
+				$APPLICATION->set_cookie("CC", "", 0);
+			}
+			else
+			{
+				$APPLICATION->set_cookie("CC", "Y");
+				$APPLICATION->set_cookie("NCC", "", 0);
+			}
+		}
+	}
+
+	public static function OnUserLogout()
+	{
+		global $APPLICATION;
+		if (self::IsOn())
+		{
+			$APPLICATION->set_cookie("NCC", "", 0);
+			$APPLICATION->set_cookie("CC", "", 0);
+		}
+	}
+
+	public static function OnChangeFile($path, $site)
+	{
+		$pagesDir = new IO\Directory(IO\Path::convertRelativeToAbsolute(Application::getPersonalRoot()."/html_pages"));
+		if (!$pagesDir->isExists())
+		{
+			return;
+		}
+
+		$bytes = 0.0;
+		$domainDirs = $pagesDir->getChildren();
+		$cachedFile = \Bitrix\Main\Data\StaticHtmlCache::convertUriToPath($path);
+		foreach ($domainDirs as $domainDir)
+		{
+			if ($domainDir->isDirectory())
+			{
+				$bytes += self::deleteRecursive("/".$domainDir->getName().$cachedFile);
+			}
+		}
+
+		self::updateQuota(-$bytes);
+	}
+
+
 }
-?>

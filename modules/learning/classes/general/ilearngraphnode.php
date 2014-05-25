@@ -203,6 +203,10 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 	{
 		global $DB, $USER, $DBType;
 
+		$createdBy = 1;
+		if (is_object($USER) && method_exists($USER, 'getId'))
+			$createdBy = (int) $USER->getId();
+
 		$dbtype = strtolower($DBType);
 
 		switch ($mode)
@@ -258,7 +262,7 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 						TIMESTAMP_X, DATE_CREATE, CREATED_BY) " .
 					"VALUES 
 						(" . $newLessonId . ", " . $arInsert[1] . ", " 
-						. $DB->GetNowFunction() . ", " . $DB->GetNowFunction() . ", 1)";
+						. $DB->GetNowFunction() . ", " . $DB->GetNowFunction() . ", " . $createdBy . ")";
 
 				$arBinds = array();
 
@@ -271,7 +275,7 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 				if (array_key_exists('KEYWORDS', $arFieldsToDb))
 					$arBinds['KEYWORDS'] = $arFieldsToDb['KEYWORDS'];
 
-				$rc = $DB->QueryBind($strSql, $arBinds);
+				$rc = $DB->QueryBind($strSql, $arBinds, true);
 			}
 			elseif (($dbtype === 'mssql') || ($dbtype === 'mysql'))
 			{
@@ -281,7 +285,7 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 						TIMESTAMP_X, DATE_CREATE, CREATED_BY) " .
 					"VALUES 
 						(" . $arInsert[1] . ", " 
-						. $DB->GetNowFunction() . ", " . $DB->GetNowFunction() . ", 1)";
+						. $DB->GetNowFunction() . ", " . $DB->GetNowFunction() . ", " . $createdBy . ")";
 
 				$rc = $DB->Query($strSql, true);
 
@@ -292,7 +296,10 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 		{
 			$strUpdate = $DB->PrepareUpdate('b_learn_lesson', $arFieldsToDb);
 
-			$strSql = "UPDATE b_learn_lesson SET $strUpdate, 
+			if ($strUpdate !== '')
+				$strUpdate .= ', ';
+
+			$strSql = "UPDATE b_learn_lesson SET $strUpdate 
 					TIMESTAMP_X = " . $DB->GetNowFunction()
 				. " WHERE ID = " . ($id + 0);
 
@@ -313,7 +320,7 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 			}
 			elseif (($dbtype === 'mssql') || ($dbtype === 'mysql'))
 			{
-				$rc = $DB->Query($strSql, $arBinds);
+				$rc = $DB->Query($strSql, $bIgnoreErrors = true);
 			}
 
 			// TIMESTAMP_X - date when data last changed, so update it
@@ -463,6 +470,10 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 		$arFieldsNames = array_keys($arFields);
 		foreach ($arFieldsNames as $fieldName)
 		{
+			// Skip checking user fields
+			if (substr($fieldName, 0, 3) === 'UF_')
+				continue;
+
 			// Is field exists in DB?
 			if ( ! array_key_exists ($fieldName, $arFieldsMap) )
 			{

@@ -43,6 +43,7 @@ $arClasses = array(
 	"CIBlockPropertySequence" => "classes/general/prop_seq.php",
 	"CIBlockPropertyElementAutoComplete" => "classes/general/prop_element_auto.php",
 	"CIBlockPropertySKU" => "classes/general/prop_element_sku.php",
+	"CIBlockPropertySectionAutoComplete" => "classes/general/prop_section_auto.php",
 	"CAllIBlockOffersTmp" => "classes/general/iblockoffers.php",
 	"CIBlockOffersTmp" => "classes/".$DBType."/iblockoffers.php",
 	"CEventIblock" => "classes/general/iblock_event_list.php",
@@ -57,6 +58,10 @@ $arClasses = array(
 	"Bitrix\\Iblock\\SectionTable" => "lib/section.php",
 	"Bitrix\\Iblock\\SiteTable" => "lib/site.php",
 	"CIBlockSectionPropertyLink" => "classes/general/section_property.php",
+	"Bitrix\\Iblock\\Template\\NodeRoot" => "lib/template/engine.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyEnum" => "lib/template/entity/elementproperty.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyElement" => "lib/template/entity/elementproperty.php",
+	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertySection" => "lib/template/entity/elementproperty.php",
 );
 if(IsModuleInstalled('bizproc'))
 {
@@ -200,7 +205,7 @@ function GetIBlockListLang($lang, $type, $arTypesInc = array(), $arTypesExc = ar
  *
  *
  * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей информационного
- * блока</a><code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><h4>Примечание</h4>
+ * блока</a> <code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><h4>Примечание</h4>
  *
  *
  * <h4>Example</h4> 
@@ -212,7 +217,7 @@ function GetIBlockListLang($lang, $type, $arTypesInc = array(), $arTypesExc = ar
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационных
- * блоков</a></li> </ul><a name="examples"></a>
+ * блоков</a></li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -454,7 +459,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  */
 
 /**
- * <p>Функция возвращает активные элементы из информационного блока <i>iblock_id</i>. </p>
+ * <p>Функция возвращает активные элементы из информационного блока <i>iblock_id</i>. </p> <p><b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</p>
  *
  *
  *
@@ -544,9 +549,9 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> с активными
  * элементами (у которых установлен флаг "Активен", выполняется
  * условие периода активности и находящиеся в активных
- * информационных блоках для текущего сайта).</p><h4>Примечание</h4><p>При
- * работе с результатом рекомендуется применять метод класса <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
+ * информационных блоках для текущего сайта).</p> <h4>Примечание</h4>
+ * <p>При работе с результатом рекомендуется применять метод класса
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>, результатом
  * которого будет массив с полями элемента информационного блока.
  * Все поля при этом будут преобразованы в "HTML безопасный" вид, а в
@@ -588,7 +593,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов
  * информационного блока</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">Функция
- * GetIBlockElementListEx</a> </li> </ul><a name="examples"></a>
+ * GetIBlockElementListEx</a> </li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -627,7 +632,7 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  */
 
 /**
- * <p>Функция возвращает информационный элемент с кодом <i>ID</i>. Функция-помошник, которая выбирает все базовые поля элемента, его свойства и информацию об инфоблоке. Использует <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>. </p>
+ * <p>Функция возвращает информационный элемент с кодом <i>ID</i>. Функция-помошник, которая выбирает все базовые поля элемента, его свойства и информацию об инфоблоке. Использует <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>. </p> <p><b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</p>
  *
  *
  *
@@ -645,7 +650,7 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  *
  * @return array <p>Функция возвращает массив <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей информационного
- * элемента</a> и дополнительно следующие поля: </p><table width="100%"
+ * элемента</a> и дополнительно следующие поля: </p> <table width="100%"
  * class="tnormal"><tbody> <tr> <th width="15%">Поле</th> <th>Значение</th> </tr> <tr> <td>IBLOCK_NAME</td>
  * <td>Название информационного блока.</td> </tr> <tr> <td>PROPERTIES</td> <td>Массив
  * значений свойств, имеющий в качестве индексов "Символьный код
@@ -655,10 +660,10 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * свойства", "DEFAULT_VALUE"=&gt;"значение свойства по умолчанию",
  * "VALUE"=&gt;"значение свойства или массив значений свойств, если
  * свойство множественное", "VALUE_ENUM_ID"=&gt;"Код значения свойства типа
- * &lt;Список&gt;" )</pre> </td> </tr> </tbody></table><p> Если заданным параметрам не
+ * &lt;Список&gt;" )</pre> </td> </tr> </tbody></table> <p> Если заданным параметрам не
  * найден элемент, функция вернет <i>false</i>. <br> Выборка элемента
  * происходит только из активных элементов инфоблока, неактивный
- * элемент выбран быть не может. </p><h4>Примечание</h4><p> Все
+ * элемент выбран быть не может. </p> <h4>Примечание</h4> <p> Все
  * возвращаемые поля преобразованы в "HTML безопасный" вид, а в полях
  * (LIST_PAGE_URL - списка элементов и DETAIL_PAGE_URL - детального просмотра) с
  * шаблонами URL-ов к страницам будут заменены параметры
@@ -674,7 +679,7 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля информационного
- * элемента</a></li> </ul><a name="examples"></a>
+ * элемента</a></li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -785,7 +790,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  *
  *
  *
- * @param int $ID  ID раздела.
+ * @param int $ID  ID раздела.</bod
  *
  *
  *
@@ -797,8 +802,8 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  *
  *
  *
- * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей
- * раздела</a><i>IBLOCK_NAME</i><br><h4>Примечание</h4>
+ * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей раздела</a>
+ * <i>IBLOCK_NAME</i><br><h4>Примечание</h4>
  *
  *
  * <h4>Example</h4> 
@@ -831,7 +836,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
- * информационного блока</a></li> </ul><a name="examples"></a>
+ * информационного блока</a></li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -1108,6 +1113,68 @@ function GetIBlockDropDownList($IBLOCK_ID, $strTypeName, $strIBlockName, $arFilt
  * @param bool $return_iblock_id If true will return iblock identifier (int) in case of success
  * @return bool|int|string
  */
+
+/**
+ * <p>Функция выполняет импорт xml-файла в инфоблок.</p>
+ *
+ *
+ *
+ *
+ * @param string $file_name  Путь к xml-файлу.
+ *
+ *
+ *
+ * @param string $iblock_type = "-" Тип инфоблока, в который импортировать.
+ *
+ *
+ *
+ * @param array $site_id = '' Сайт, к которому будет привязан инфоблок.
+ *
+ *
+ *
+ * @param string $section_action = "D" Действие, которое осуществляется с секциями, отсутствующими в
+ * файле импорта ("N" - ничего; "A" - деактивировать; "D" - удалить,
+ * используется по умолчанию).
+ *
+ *
+ *
+ * @param string $element_action = "D" Действие, которое осуществляется с элементами, отсутствующими в
+ * файле импорта ("N" - ничего; "A" - деактивировать; "D" - удалить,
+ * используется по умолчанию).
+ *
+ *
+ *
+ * @param bool $use_crc = false Использование контрольных сумм при импорте для увеличения
+ * производительности и избежания лишних обновлений элементов.
+ *
+ *
+ *
+ * @param bool $preview = false Если <i>true</i>, то формировать картинку анонса из детальной
+ * картинки.
+ *
+ *
+ *
+ * @param bool $sync = false Позволяет разнести процесс синхронизации с 1С и обмен новостями
+ * через контроллер.
+ *
+ *
+ *
+ * @param bool $return_last_error = false Если <i>true</i>, то функция в случае ошибки вернёт строку, иначе null.
+ *
+ *
+ *
+ * @param bool $return_iblock_id = false Если <i>true</i>, то функция в случае успеха вернёт идентификатор
+ * инфоблока (нового или обновлённого).
+ *
+ *
+ *
+ * @return mixed <p>Возвращает <i>true</i> в случае успешного импорта или строку с
+ * сообщением об ошибке.</p> <br><br>
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/iblock/functions/importxmlfile.php
+ * @author Bitrix
+ */
 function ImportXMLFile($file_name, $iblock_type="-", $site_id='', $section_action="D", $element_action="D", $use_crc=false, $preview=false, $sync=false, $return_last_error=false, $return_iblock_id=false)
 {
 	/** @global CMain $APPLICATION */
@@ -1231,7 +1298,8 @@ function ImportXMLFile($file_name, $iblock_type="-", $site_id='', $section_actio
 	$SECTION_MAP = false;
 	$PRICES_MAP = false;
 	$obCatalog->ReadCatalogData($SECTION_MAP, $PRICES_MAP);
-	$result = $obCatalog->ImportElements(time(), 0);
+	$obCatalog->ImportElements(time(), 0);
+	$obCatalog->ImportProductSets();
 
 	$obCatalog->DeactivateElement($element_action, time(), 0);
 	if($sync)

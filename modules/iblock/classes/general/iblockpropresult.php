@@ -6,6 +6,9 @@ class CIBlockPropertyResult extends CDBResult
 	protected $arProperties = array();
 	protected $arPropertiesValues = array();
 	protected $lastRes = null;
+	protected $extMode = false;
+	protected $arPropertyValuesID = array();
+	protected $arDescriptions = array();
 
 	public function Fetch()
 	{
@@ -24,7 +27,7 @@ class CIBlockPropertyResult extends CDBResult
 		if($res && $res["USER_TYPE"]!="")
 		{
 			$arUserType = CIBlockProperty::GetUserType($res["USER_TYPE"]);
-			if(array_key_exists("ConvertFromDB", $arUserType))
+			if (isset($arUserType["ConvertFromDB"]))
 			{
 				if(array_key_exists("VALUE", $res))
 				{
@@ -56,14 +59,26 @@ class CIBlockPropertyResult extends CDBResult
 					if ($arProp["MULTIPLE"] == "Y")
 					{
 						$descr_name = "DESCRIPTION_".$arProp["ID"];
+						$value_id_name = "PROPERTY_VALUE_ID_".$arProp["ID"];
 
 						if(is_object($res[$field_name]))
 							$res[$field_name] = $res[$field_name]->load();
 
+						$update = false;
 						if(strlen($res[$field_name]) <= 0)
 						{
+							$update = true;
+						}
+						else
+						{
+							$tmp = unserialize($res[$field_name]);
+							if (!isset($tmp['ID']))
+								$update = true;
+						}
+						if ($update)
+						{
 							$strSql = "
-								SELECT VALUE, DESCRIPTION
+								SELECT ID, VALUE, DESCRIPTION
 								FROM b_iblock_element_prop_m".$arProp["IBLOCK_ID"]."
 								WHERE
 									IBLOCK_ELEMENT_ID = ".intval($res["IBLOCK_ELEMENT_ID"])."
@@ -73,27 +88,50 @@ class CIBlockPropertyResult extends CDBResult
 							$rs = $DB->Query($strSql);
 							$res[$field_name] = array();
 							$res[$descr_name] = array();
+							$res[$value_id_name] = array();
 							while($ar=$rs->Fetch())
 							{
-								$res[$field_name][]=$ar["VALUE"];
-								$res[$descr_name][]=$ar["DESCRIPTION"];
+								$res[$field_name][] = $ar["VALUE"];
+								$res[$descr_name][] = $ar["DESCRIPTION"];
+								$res[$value_id_name][] = $ar['ID'];
 							}
-							$arUpdate["b_iblock_element_prop_s".$arProp["IBLOCK_ID"]]["PROPERTY_".$arProp["ID"]] = serialize(array("VALUE"=>$res[$field_name],"DESCRIPTION"=>$res[$descr_name]));
+							$arUpdate["b_iblock_element_prop_s".$arProp["IBLOCK_ID"]]["PROPERTY_".$arProp["ID"]] = serialize(array("VALUE"=>$res[$field_name],"DESCRIPTION"=>$res[$descr_name],"ID"=>$res[$value_id_name]));
 						}
 						else
 						{
-							$tmp = unserialize($res[$field_name]);
 							$res[$field_name] = $tmp["VALUE"];
 							$res[$descr_name] = $tmp["DESCRIPTION"];
+							$res[$value_id_name] = $tmp["ID"];
 						}
 
-						foreach($res[$field_name] as $VALUE)
-							$this->addPropertyValue($arProp["ID"], $VALUE);
+						if ($this->extMode)
+						{
+							foreach ($res[$field_name] as $field_key => $VALUE)
+							{
+								$this->addPropertyValue($arProp["ID"], $VALUE);
+								$this->addPropertyData($arProp["ID"], $res[$value_id_name][$field_key], $res[$descr_name][$field_key]);
+							}
+						}
+						else
+						{
+							foreach($res[$field_name] as $VALUE)
+								$this->addPropertyValue($arProp["ID"], $VALUE);
+						}
 					}
 					else
 					{
 						if ($res[$field_name] != "")
+						{
+							if ($this->extMode)
+							{
+								$res[$field_name] = CIBlock::NumberFormat($res[$field_name]);
+							}
 							$this->addPropertyValue($arProp["ID"], $res[$field_name]);
+						}
+						if ($this->extMode)
+						{
+							$this->addPropertyData($arProp["ID"], $res["IBLOCK_ELEMENT_ID"].':'.$arProp["ID"], $res["DESCRIPTION_".$arProp["ID"]]);
+						}
 					}
 				}
 				foreach($arUpdate as $strTable=>$arFields)
@@ -101,25 +139,41 @@ class CIBlockPropertyResult extends CDBResult
 					$strUpdate = $DB->PrepareUpdate($strTable, $arFields);
 					if($strUpdate!="")
 					{
-						$strSql = "UPDATE ".$strTable." SET ".$strUpdate." WHERE IBLOCK_ELEMENT_ID = ".intval($res["ID"]);
+						$strSql = "UPDATE ".$strTable." SET ".$strUpdate." WHERE IBLOCK_ELEMENT_ID = ".intval($res["IBLOCK_ELEMENT_ID"]);
 						$DB->QueryBind($strSql, $arFields);
 					}
 				}
 				$res = $this->arPropertiesValues;
+				if ($this->extMode)
+				{
+					$res['PROPERTY_VALUE_ID'] = $this->arPropertyValuesID;
+					$res['DESCRIPTION'] = $this->arDescriptions;
+				}
 			}
 			else
 			{
 				do {
-					if ($this->arProperties[$res["IBLOCK_PROPERTY_ID"]]["PROPERTY_TYPE"] == "N")
+					if ($this->arProperties[$res["IBLOCK_PROPERTY_ID"]]["PROPERTY_TYPE"] == "N" && !$this->extMode)
 						$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE_NUM"]);
 					else
 						$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE"]);
+					if ($this->extMode)
+					{
+						$this->addPropertyData($res["IBLOCK_PROPERTY_ID"], $res['PROPERTY_VALUE_ID'], $res['DESCRIPTION']);
+					}
 					$res = parent::Fetch();
 				} while ($res && ($res["IBLOCK_ELEMENT_ID"] == $this->arPropertiesValues["IBLOCK_ELEMENT_ID"]));
 
 				$this->lastRes = $res;
 				$res = $this->arPropertiesValues;
 				$this->arPropertiesValues = array();
+				if ($this->extMode)
+				{
+					$res['PROPERTY_VALUE_ID'] = $this->arPropertyValuesID;
+					$res['DESCRIPTION'] = $this->arDescriptions;
+					$this->arPropertyValuesID = array();
+					$this->arDescriptions = array();
+				}
 			}
 		}
 
@@ -146,6 +200,36 @@ class CIBlockPropertyResult extends CDBResult
 				$this->arPropertiesValues[$arProp["ID"]] = array();
 			else
 				$this->arPropertiesValues[$arProp["ID"]] = false;
+			if ($this->extMode)
+			{
+				if ($arProp["MULTIPLE"] == "Y")
+				{
+					$this->arPropertyValuesID[$arProp["ID"]] = array();
+					$this->arDescriptions[$arProp["ID"]] = array();
+				}
+				else
+				{
+					$this->arPropertyValuesID[$arProp["ID"]] = '';
+					$this->arDescriptions[$arProp["ID"]] = null;
+				}
+			}
+		}
+	}
+
+	private function addPropertyData($IBLOCK_PROPERTY_ID, $VALUE_ID, $DESCRIPTION)
+	{
+		if (isset($this->arProperties[$IBLOCK_PROPERTY_ID]))
+		{
+			if ($this->arProperties[$IBLOCK_PROPERTY_ID]["MULTIPLE"] == "Y")
+			{
+				$this->arPropertyValuesID[$IBLOCK_PROPERTY_ID][] = $VALUE_ID;
+				$this->arDescriptions[$IBLOCK_PROPERTY_ID][] = $DESCRIPTION;
+			}
+			else
+			{
+				$this->arPropertyValuesID[$IBLOCK_PROPERTY_ID] = $VALUE_ID;
+				$this->arDescriptions[$IBLOCK_PROPERTY_ID] = $DESCRIPTION;
+			}
 		}
 	}
 
@@ -157,6 +241,13 @@ class CIBlockPropertyResult extends CDBResult
 		$rsProperty = CIBlockProperty::GetList(array("ID" => "ASC"), array("IBLOCK_ID" => $IBLOCK_ID));
 		while($arProp = $rsProperty->Fetch())
 			$this->arProperties[$arProp["ID"]] = $arProp;
+	}
+
+	public function setMode($extMode)
+	{
+		$this->extMode = $extMode;
+		$this->arPropertyValuesID = array();
+		$this->arDescriptions = array();
 	}
 }
 ?>

@@ -109,14 +109,22 @@ final class Configuration
 			$this->storedData[$name] = array("value" => $value, "readonly" => false);
 	}
 
-	private function addReadonly($name, $value)
+	/**
+	 * Changes readonly params.
+	 * Warning! Developer must use this method very carfully!.
+	 * You must use this method only if you know what you do!
+	 * @param string $name
+	 * @param array $value
+	 * @return void
+	 */
+	public function addReadonly($name, $value)
 	{
 		if (!$this->isLoaded)
 			$this->loadConfiguration();
 
 		$this->data[$name] = array("value" => $value, "readonly" => true);
 		if ($this->storedData !== null)
-			$this->storedData[$name] = array("value" => $value, "readonly" => false);
+			$this->storedData[$name] = array("value" => $value, "readonly" => true);
 	}
 
 	public function delete($name)

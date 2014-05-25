@@ -16,17 +16,17 @@ class CCatalogIBlockParameters
 {
 	
 	/**
-	 * <p>Метод возвращает массив полей каталога, по которым можно сортировать.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return array <br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogiblockparameters/getcatalogsortfields.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает массив полей каталога, по которым можно сортировать.</p>
+	*
+	*
+	*
+	*
+	* @return array <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogiblockparameters/getcatalogsortfields.php
+	* @author Bitrix
+	*/
 	public static function GetCatalogSortFields()
 	{
 		return array(

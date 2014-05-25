@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityEnvironmentTest extends CSecurityBaseTest
+/**
+ * Class CSecurityEnvironmentTest
+ * @since 12.5.0
+ */
+class CSecurityEnvironmentTest
+	extends CSecurityBaseTest
 {
 	const MIN_UID = 100;
 	const MIN_GID = 100;
@@ -8,11 +19,6 @@ class CSecurityEnvironmentTest extends CSecurityBaseTest
 
 	protected $internalName = "EnvironmentTest";
 	protected $tests = array(
-		"uploadTmpDir" => array(
-			"method" => "checkPhpUploadDir",
-			"base_message_key" => "SECURITY_SITE_CHECKER_UPLOAD_TMP",
-			"critical" => CSecurityCriticalLevel::MIDDLE
-		),
 		"sessionDir" => array(
 			"method" => "checkPhpSessionDir",
 			"base_message_key" => "SECURITY_SITE_CHECKER_SESSION",
@@ -249,7 +255,7 @@ Body:----------ru--
 	/**
 	 * Return php session or upload tmp dir
 	 * @param string $pPhpSettingKey
-	 * @return null|string
+	 * @return string
 	 */
 	protected static function getTmpDir($pPhpSettingKey = "upload_tmp_dir")
 	{
@@ -265,26 +271,8 @@ Body:----------ru--
 				$result = self::getTmpDirFromEnv();
 			}
 		}
-		return $result;
-	}
 
-	/**
-	 * Check php upload tmp dir for world accessible
-	 * @return bool
-	 */
-	protected function checkPhpUploadDir()
-	{
-		if(self::isRunOnWin())
-			return true;
-
-		$tmpDir = self::getTmpDir("upload_tmp_dir");
-		if(!$tmpDir)
-			return true;
-
-		if($tmpDir == self::SYSTEM_TMP_DIR || self::isWorldAccessible($tmpDir))
-			return false;
-		else
-			return true;
+		return preg_replace('#[\\\/]+#', '/', $result);
 	}
 
 	/**
@@ -351,23 +339,33 @@ Body:----------ru--
 	 */
 	protected function checkPhpSessionDir()
 	{
-		if(self::isRunOnWin())
+		if (self::isRunOnWin())
 			return true;
 
-		if(COption::GetOptionString("security", "session") == "Y")
+		if (COption::GetOptionString("security", "session") == "Y")
 			return true;
 
-		if(ini_get("session.save_handler") != "files")
+		if (ini_get("session.save_handler") != "files")
 			return true;
 
 		$tmpDir = self::getTmpDir("session.save_path");
-		if(!$tmpDir)
+		if (!$tmpDir)
 			return true;
 
-		if($tmpDir == self::SYSTEM_TMP_DIR || self::isWorldAccessible($tmpDir))
+		if ($tmpDir === self::SYSTEM_TMP_DIR)
 			return false;
-		else
-			return true;
+
+		$dir = $tmpDir;
+		while ($dir && $dir != '/')
+		{
+			$perms = static::getFilePerm($dir);
+			if (($perms & 0x0001) === 0)
+				return true;
+
+			$dir = dirname($dir);
+		}
+
+		return false;
 	}
 
 	/**

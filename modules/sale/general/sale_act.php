@@ -8,10 +8,12 @@ IncludeModuleLangFile(__FILE__);
 
 class CSaleDiscountActionApply
 {
-	private function ClearBasket($row)
+	public static function ClearBasket($row)
 	{
 		return (
-			!array_key_exists('CUSTOM_PRICE', $row) || 'Y' != $row['CUSTOM_PRICE']
+			(!isset($row['CUSTOM_PRICE']) || 'Y' != $row['CUSTOM_PRICE']) &&
+			(!isset($row['SET_PARENT_ID']) || 0 >= intval($row['SET_PARENT_ID'])) &&
+			(!isset($row['ITEM_FIX']) || 'Y' != $row['ITEM_FIX'])
 		);
 	}
 
@@ -26,13 +28,18 @@ class CSaleDiscountActionApply
 			}
 			$dblResult = $arOrder['PRICE_DELIVERY'] + $dblValue;
 			if (0 <= $dblResult)
+			{
+				if (!isset($arOrder['PRICE_DELIVERY_DIFF']))
+					$arOrder['PRICE_DELIVERY_DIFF'] = 0;
+				$arOrder['PRICE_DELIVERY_DIFF'] -= $dblValue;
 				$arOrder['PRICE_DELIVERY'] = $dblResult;
+			}
 		}
 	}
 
 	public static function ApplyBasketDiscount(&$arOrder, $func, $dblValue, $strUnit)
 	{
-		if (array_key_exists('BASKET_ITEMS', $arOrder) && !empty($arOrder['BASKET_ITEMS']) && is_array($arOrder['BASKET_ITEMS']))
+		if (isset($arOrder['BASKET_ITEMS']) && !empty($arOrder['BASKET_ITEMS']) && is_array($arOrder['BASKET_ITEMS']))
 		{
 			$arDiscountBasket = (is_callable($func) ? array_filter($arOrder['BASKET_ITEMS'], $func) : $arOrder['BASKET_ITEMS']);
 			if (!empty($arDiscountBasket))
@@ -75,7 +82,7 @@ class CSaleDiscountActionApply
 								$arOneRow['PRICE'] = $dblResult;
 								if (array_key_exists('PRICE_DEFAULT', $arOneRow))
 									$arOneRow['PRICE_DEFAULT'] = $dblResult;
-								if (array_key_exists('DISCOUNT_PRICE', $arOneRow))
+								if (isset($arOneRow['DISCOUNT_PRICE']))
 								{
 									$arOneRow['DISCOUNT_PRICE'] = doubleval($arOneRow['DISCOUNT_PRICE']);
 									$arOneRow['DISCOUNT_PRICE'] -= $dblCurValue;
@@ -86,7 +93,7 @@ class CSaleDiscountActionApply
 								}
 								if (0 > $arOneRow['DISCOUNT_PRICE'])
 									$arOneRow['DISCOUNT_PRICE'] = 0;
-								if (array_key_exists('VAT_RATE', $arOneRow))
+								if (isset($arOneRow['VAT_RATE']))
 								{
 									$dblVatRate = doubleval($arOneRow["VAT_RATE"]);
 									if (0 < $dblVatRate)
@@ -107,6 +114,34 @@ class CSaleActionCtrl extends CGlobalCondCtrl
 	public static function GetClassName()
 	{
 		return __CLASS__;
+	}
+
+	public static function GetConditionShow($arParams)
+	{
+		if (!isset($arParams['ID']))
+			return false;
+		if ($arParams['ID'] != static::GetControlID())
+			return false;
+		$arControl = array(
+			'ID' => $arParams['ID'],
+			'ATOMS' => static::GetAtomsEx(false, true),
+		);
+
+		return static::CheckAtoms($arParams['DATA'], $arParams, $arControl, true);
+	}
+
+	public static function Parse($arOneCondition)
+	{
+		if (!isset($arOneCondition['controlId']))
+			return false;
+		if ($arOneCondition['controlId'] != static::GetControlID())
+			return false;
+		$arControl = array(
+			'ID' => $arOneCondition['controlId'],
+			'ATOMS' => static::GetAtomsEx(false, true),
+		);
+
+		return static::CheckAtoms($arOneCondition, $arOneCondition, $arControl, false);
 	}
 }
 
@@ -139,10 +174,9 @@ class CSaleActionCtrlGroup extends CGlobalCondCtrlGroup
 			'label' => '',
 			'defaultText' => '',
 			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
-			//'visual' => static::GetVisual(),
 			'control' => array(
-				GetMessage('BT_SALE_ACT_GROUP_GLOBAL_PREFIX'),
-			),
+				GetMessage('BT_SALE_ACT_GROUP_GLOBAL_PREFIX')
+			)
 		);
 
 		return $arResult;
@@ -153,14 +187,14 @@ class CSaleActionCtrlGroup extends CGlobalCondCtrlGroup
 		return array(
 			'id' => $arParams['COND_NUM'],
 			'controlId' => static::GetControlID(),
-			'values' => array(),
+			'values' => array()
 		);
 	}
 
 	public static function Parse($arOneCondition)
 	{
 		return array(
-			'All' => 'AND',
+			'All' => 'AND'
 		);
 	}
 
@@ -181,6 +215,69 @@ class CSaleActionCtrlGroup extends CGlobalCondCtrlGroup
 	}
 }
 
+class CSaleActionCtrlAction extends CGlobalCondCtrlGroup
+{
+	public static function GetClassName()
+	{
+		return __CLASS__;
+	}
+
+	public static function GetConditionShow($arParams)
+	{
+		if (!isset($arParams['ID']))
+			return false;
+		if ($arParams['ID'] != static::GetControlID())
+			return false;
+		$arControl = array(
+			'ID' => $arParams['ID'],
+			'ATOMS' => static::GetAtomsEx(false, true)
+		);
+
+		return static::CheckAtoms($arParams['DATA'], $arParams, $arControl, true);
+	}
+
+	public static function Parse($arOneCondition)
+	{
+		if (!isset($arOneCondition['controlId']))
+			return false;
+		if ($arOneCondition['controlId'] != static::GetControlID())
+			return false;
+		$arControl = array(
+			'ID' => $arOneCondition['controlId'],
+			'ATOMS' => static::GetAtomsEx(false, true)
+		);
+
+		return static::CheckAtoms($arOneCondition, $arOneCondition, $arControl, false);
+	}
+
+	public static function GetVisual()
+	{
+		return array(
+			'controls' => array(
+				'All'
+			),
+			'values' => array(
+				array(
+					'All' => 'AND'
+				),
+				array(
+					'All' => 'OR'
+				)
+			),
+			'logic' => array(
+				array(
+					'style' => 'condition-logic-and',
+					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_AND')
+				),
+				array(
+					'style' => 'condition-logic-or',
+					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_OR')
+				)
+			)
+		);
+	}
+}
+
 class CSaleActionCtrlDelivery extends CSaleActionCtrl
 {
 	public static function GetClassName()
@@ -195,16 +292,16 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 
 	public static function GetControlShow($arParams)
 	{
-		$arAtoms = static::GetAtoms();
+		$arAtoms = static::GetAtomsEx(false, false);
 		$boolCurrency = false;
 		if (static::$boolInit)
 		{
-			if (array_key_exists('CURRENCY', static::$arInitParams))
+			if (isset(static::$arInitParams['CURRENCY']))
 			{
 				$arAtoms['Unit']['values']['Cur'] = static::$arInitParams['CURRENCY'];
 				$boolCurrency = true;
 			}
-			elseif (array_key_exists('SITE_ID', static::$arInitParams))
+			elseif (isset(static::$arInitParams['SITE_ID']))
 			{
 				$strCurrency = CSaleLang::GetLangCurrency(static::$arInitParams['SITE_ID']);
 				if (!empty($strCurrency))
@@ -228,8 +325,8 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 				GetMessage('BT_SALE_ACT_DELIVERY_GROUP_PRODUCT_PREFIX'),
 				$arAtoms['Type'],
 				$arAtoms['Value'],
-				$arAtoms['Unit'],
-			),
+				$arAtoms['Unit']
+			)
 		);
 
 		return $arResult;
@@ -237,71 +334,86 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 
 	public static function GetAtoms()
 	{
-		return array(
+		return static::GetAtomsEx(false, false);
+	}
+
+	public static function GetAtomsEx($strControlID = false, $boolEx = false)
+	{
+		$boolEx = (true === $boolEx ? true : false);
+		$arAtomList = array(
 			'Type' => array(
-				'id' => 'Type',
-				'name' => 'extra',
-				'type' => 'select',
-				'values' => array(
-					'Discount' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DISCOUNT'),
-					'Extra' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_EXTRA'),
+				'JS' => array(
+					'id' => 'Type',
+					'name' => 'extra',
+					'type' => 'select',
+					'values' => array(
+						'Discount' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DISCOUNT'),
+						'Extra' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_EXTRA')
+					),
+					'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DEF'),
+					'defaultValue' => 'Discount',
+					'first_option' => '...'
 				),
-				'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DEF'),
-				'defaultValue' => 'Discount',
-				'first_option' => '...',
+				'ATOM' => array(
+					'ID' => 'Type',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => 'list'
+				)
 			),
 			'Value' => array(
-				'id' => 'Value',
-				'name' => 'extra_size',
-				'type' => 'input',
-				'value_type' => 'double',
+				'JS' => array(
+					'id' => 'Value',
+					'name' => 'extra_size',
+					'type' => 'input'
+				),
+				'ATOM' => array(
+					'ID' => 'Value',
+					'FIELD_TYPE' => 'double',
+					'MULTIPLE' => 'N',
+					'VALIDATE' => ''
+				)
 			),
 			'Unit' => array(
-				'id' => 'Unit',
-				'name' => 'extra_unit',
-				'type' => 'select',
-				'values' => array(
-					'Perc' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_PERCENT'),
-					'Cur' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_CUR'),
+				'JS' => array(
+					'id' => 'Unit',
+					'name' => 'extra_unit',
+					'type' => 'select',
+					'values' => array(
+						'Perc' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_PERCENT'),
+						'Cur' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_CUR')
+					),
+					'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_UNIT_DEF'),
+					'defaultValue' => 'Perc',
+					'first_option' => '...'
 				),
-				'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_UNIT_DEF'),
-				'defaultValue' => 'Perc',
-				'first_option' => '...',
-			),
+				'ATOM' => array(
+					'ID' => 'Unit',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => ''
+				)
+			)
 		);
+
+		if (!$boolEx)
+		{
+			foreach ($arAtomList as &$arOneAtom)
+			{
+				$arOneAtom = $arOneAtom['JS'];
+			}
+				if (isset($arOneAtom))
+					unset($arOneAtom);
+		}
+
+		return $arAtomList;
 	}
 
 	public static function GetShowIn($arControls)
 	{
 		return array(CSaleActionCtrlGroup::GetControlID());
-	}
-
-	public static function GetConditionShow($arParams)
-	{
-		if (!isset($arParams['ID']))
-			return false;
-		if ($arParams['ID'] != static::GetControlID())
-			return false;
-		$arControl = array(
-			'ID' => $arParams['ID'],
-			'ATOMS' => static::GetAtoms(),
-		);
-
-		return static::Check($arParams['DATA'], $arParams, $arControl, true);
-	}
-
-	public static function Parse($arOneCondition)
-	{
-		if (!isset($arOneCondition['controlId']))
-			return false;
-		if ($arOneCondition['controlId'] != static::GetControlID())
-			return false;
-		$arControl = array(
-			'ID' => $arOneCondition['controlId'],
-			'ATOMS' => static::GetAtoms(),
-		);
-
-		return static::Check($arOneCondition, $arOneCondition, $arControl, false);
 	}
 
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
@@ -315,7 +427,7 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 			{
 				$arControl = array(
 					'ID' => static::GetControlID(),
-					'ATOMS' => static::GetAtoms(),
+					'ATOMS' => static::GetAtoms()
 				);
 			}
 		}
@@ -331,158 +443,9 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 
 		return $mxResult;
 	}
-
-	public static function Check($arOneCondition, $arParams, $arControl, $boolShow)
-	{
-		$arResult = array();
-
-		$boolShow = (true === $boolShow);
-		$boolError = false;
-		$boolFatalError = false;
-		$arMsg = array();
-
-		$arValues = array(
-		);
-
-		if (!isset($arControl['ATOMS']) || !is_array($arControl['ATOMS']) || empty($arControl['ATOMS']))
-		{
-			$boolFatalError = true;
-			$boolError = true;
-			$arMsg[] = GetMessage('BT_SALE_ACT_ERR_ATOMS_ABSENT');
-		}
-		if (!$boolError)
-		{
-			if ($boolShow)
-			{
-				foreach ($arControl['ATOMS'] as &$arOneAtom)
-				{
-					$boolAtomError = false;
-					if (!isset($arOneCondition[$arOneAtom['id']]))
-					{
-						$boolAtomError = true;
-					}
-					elseif (!is_string($arOneCondition[$arOneAtom['id']]))
-					{
-						$boolAtomError = true;
-					}
-					if (!$boolAtomError)
-					{
-						switch ($arOneAtom['type'])
-						{
-							case 'select':
-								if (!array_key_exists($arOneCondition[$arOneAtom['id']], $arOneAtom['values']))
-								{
-									$boolAtomError = true;
-								}
-								break;
-							default:
-								if (array_key_exists('value_type', $arOneAtom) && !empty($arOneAtom['value_type']))
-								{
-									switch($arOneAtom['value_type'])
-									{
-										case 'int':
-											$arOneCondition[$arOneAtom['id']] = intval($arOneCondition[$arOneAtom['id']]);
-											break;
-										case 'double':
-											$arOneCondition[$arOneAtom['id']] = doubleval($arOneCondition[$arOneAtom['id']]);
-											break;
-									}
-								}
-								break;
-						}
-					}
-					if (!$boolAtomError)
-					{
-						$arValues[$arOneAtom['id']] = (string)$arOneCondition[$arOneAtom['id']];
-					}
-					else
-					{
-						$arValues[$arOneAtom['id']] = '';
-					}
-					if ($boolAtomError)
-						$boolError = true;
-				}
-				if (isset($arOneAtom))
-					unset($arOneAtom);
-			}
-			else
-			{
-				foreach ($arControl['ATOMS'] as &$arOneAtom)
-				{
-					$boolAtomError = false;
-					if (!isset($arOneCondition[$arOneAtom['name']]))
-					{
-						$boolAtomError = true;
-					}
-					elseif (!is_string($arOneCondition[$arOneAtom['name']]) && !is_int($arOneCondition[$arOneAtom['name']]) && !is_float($arOneCondition[$arOneAtom['name']]))
-					{
-						$boolAtomError = true;
-					}
-					if (!$boolAtomError)
-					{
-						switch ($arOneAtom['type'])
-						{
-							case 'select':
-								if (!array_key_exists($arOneCondition[$arOneAtom['name']], $arOneAtom['values']))
-								{
-									$boolAtomError = true;
-								}
-								break;
-							default:
-								if (array_key_exists('value_type', $arOneAtom) && !empty($arOneAtom['value_type']))
-								{
-									switch($arOneAtom['value_type'])
-									{
-										case 'int':
-											$arOneCondition[$arOneAtom['name']] = intval($arOneCondition[$arOneAtom['name']]);
-											break;
-										case 'double':
-											$arOneCondition[$arOneAtom['name']] = doubleval($arOneCondition[$arOneAtom['name']]);
-											break;
-									}
-								}
-								break;
-						}
-						if (!$boolAtomError)
-						{
-							$arValues[$arOneAtom['id']] = (string)$arOneCondition[$arOneAtom['name']];
-						}
-					}
-					if ($boolAtomError)
-						$boolError = true;
-				}
-				if (isset($arOneAtom))
-					unset($arOneAtom);
-			}
-		}
-
-		if ($boolShow)
-		{
-			$arResult = array(
-				'id' => $arParams['COND_NUM'],
-				'controlId' => $arControl['ID'],
-				'values' => $arValues,
-			);
-			if ($boolError)
-			{
-				$arResult['err_cond'] = 'Y';
-				if ($boolFatalError)
-					$arResult['fatal_err_cond'] = 'Y';
-				if (!empty($arMsg))
-					$arResult['err_cond_mess'] = implode('. ', $arMsg);
-			}
-
-			return $arResult;
-		}
-		else
-		{
-			$arResult = $arValues;
-			return (!$boolError ? $arResult : false);
-		}
-	}
 }
 
-class CSaleActionCtrlBasketGroup extends CGlobalCondCtrlGroup
+class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 {
 	public static function GetClassName()
 	{
@@ -496,17 +459,17 @@ class CSaleActionCtrlBasketGroup extends CGlobalCondCtrlGroup
 
 	public static function GetControlShow($arParams)
 	{
-		$arAtoms = static::GetAtoms();
+		$arAtoms = static::GetAtomsEx(false, false);
 		$boolCurrency = false;
 		if (static::$boolInit)
 		{
-			if (array_key_exists('CURRENCY', static::$arInitParams))
+			if (isset(static::$arInitParams['CURRENCY']))
 			{
 				$arAtoms['Unit']['values']['CurEach'] = str_replace('#CUR#', static::$arInitParams['CURRENCY'], $arAtoms['Unit']['values']['CurEach']);
 				$arAtoms['Unit']['values']['CurAll'] = str_replace('#CUR#', static::$arInitParams['CURRENCY'], $arAtoms['Unit']['values']['CurAll']);
 				$boolCurrency = true;
 			}
-			elseif (array_key_exists('SITE_ID', static::$arInitParams))
+			elseif (isset(static::$arInitParams['SITE_ID']))
 			{
 				$strCurrency = CSaleLang::GetLangCurrency(static::$arInitParams['SITE_ID']);
 				if (!empty($strCurrency))
@@ -535,12 +498,12 @@ class CSaleActionCtrlBasketGroup extends CGlobalCondCtrlGroup
 				$arAtoms['Value'],
 				$arAtoms['Unit'],
 				GetMessage('BT_SALE_ACT_GROUP_BASKET_DESCR'),
-				$arAtoms['All'],
+				$arAtoms['All']
 			),
 			'mess' => array(
 				'ADD_CONTROL' => GetMessage('BT_SALE_SUBACT_ADD_CONTROL'),
-				'SELECT_CONTROL' => GetMessage('BT_SALE_SUBACT_SELECT_CONTROL'),
-			),
+				'SELECT_CONTROL' => GetMessage('BT_SALE_SUBACT_SELECT_CONTROL')
+			)
 		);
 	}
 
@@ -551,79 +514,103 @@ class CSaleActionCtrlBasketGroup extends CGlobalCondCtrlGroup
 
 	public static function GetAtoms()
 	{
-		return array(
+		return static::GetAtomsEx(false, false);
+	}
+
+	public static function GetAtomsEx($strControlID = false, $boolEx = false)
+	{
+		$boolEx = (true === $boolEx ? true : false);
+		$arAtomList = array(
 			'Type' => array(
-				'id' => 'Type',
-				'name' => 'extra',
-				'type' => 'select',
-				'values' => array(
-					'Discount' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DISCOUNT'),
-					'Extra' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_EXTRA'),
+				'JS' => array(
+					'id' => 'Type',
+					'name' => 'extra',
+					'type' => 'select',
+					'values' => array(
+						'Discount' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DISCOUNT'),
+						'Extra' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_EXTRA')
+					),
+					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DEF'),
+					'defaultValue' => 'Discount',
+					'first_option' => '...'
 				),
-				'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DEF'),
-				'defaultValue' => 'Discount',
-				'first_option' => '...',
+				'ATOM' => array(
+					'ID' => 'Type',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => 'list'
+				)
 			),
 			'Value' => array(
-				'id' => 'Value',
-				'name' => 'extra_size',
-				'type' => 'input',
-				'value_type' => 'double'
+				'JS' => array(
+					'id' => 'Value',
+					'name' => 'extra_size',
+					'type' => 'input'
+				),
+				'ATOM' => array(
+					'ID' => 'Value',
+					'FIELD_TYPE' => 'double',
+					'MULTIPLE' => 'N',
+					'VALIDATE' => ''
+				)
 			),
 			'Unit' => array(
-				'id' => 'Unit',
-				'name' => 'extra_unit',
-				'type' => 'select',
-				'values' => array(
-					'Perc' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_PERCENT'),
-					'CurEach' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_EACH'),
-					'CurAll' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_ALL'),
+				'JS' => array(
+					'id' => 'Unit',
+					'name' => 'extra_unit',
+					'type' => 'select',
+					'values' => array(
+						'Perc' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_PERCENT'),
+						'CurEach' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_EACH'),
+						'CurAll' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_ALL')
+					),
+					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_UNIT_DEF'),
+					'defaultValue' => 'Perc',
+					'first_option' => '...'
 				),
-				'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_UNIT_DEF'),
-				'defaultValue' => 'Perc',
-				'first_option' => '...',
+				'ATOM' => array(
+					'ID' => 'Unit',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => 'list'
+				)
 			),
 			'All' => array(
-				'id' => 'All',
-				'name' => 'aggregator',
-				'type' => 'select',
-				'values' => array(
-					'AND' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ALL'),
-					'OR' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ANY'),
+				'JS' => array(
+					'id' => 'All',
+					'name' => 'aggregator',
+					'type' => 'select',
+					'values' => array(
+						'AND' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ALL'),
+						'OR' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ANY')
+					),
+					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_DEF'),
+					'defaultValue' => 'AND',
+					'first_option' => '...'
 				),
-				'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_DEF'),
-				'defaultValue' => 'AND',
-				'first_option' => '...',
-			),
-		);
-	}
-
-	public static function GetConditionShow($arParams)
-	{
-		if (!isset($arParams['ID']))
-			return false;
-		if ($arParams['ID'] != static::GetControlID())
-			return false;
-		$arControl = array(
-			'ID' => $arParams['ID'],
-			'ATOMS' => static::GetAtoms(),
+				'ATOM' => array(
+					'ID' => 'All',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => 'list'
+				)
+			)
 		);
 
-		return static::Check($arParams['DATA'], $arParams, $arControl, true);
-	}
+		if (!$boolEx)
+		{
+			foreach ($arAtomList as &$arOneAtom)
+			{
+				$arOneAtom = $arOneAtom['JS'];
+			}
+				if (isset($arOneAtom))
+					unset($arOneAtom);
+		}
 
-	public static function Parse($arOneCondition)
-	{
-		if (!isset($arOneCondition['controlId']))
-			return false;
-		if ($arOneCondition['controlId'] != static::GetControlID())
-			return false;
-		$arControl = array(
-			'ID' => $arOneCondition['controlId'],
-			'ATOMS' => static::GetAtoms(),
-		);
-
-		return static::Check($arOneCondition, $arOneCondition, $arControl, false);
+		return $arAtomList;
 	}
 
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
@@ -666,182 +653,6 @@ class CSaleActionCtrlBasketGroup extends CGlobalCondCtrlGroup
 			}
 		}
 		return (!$boolError ? $mxResult : false);
-	}
-
-	public static function Check($arOneCondition, $arParams, $arControl, $boolShow)
-	{
-		$arResult = array();
-
-		$boolShow = (true === $boolShow);
-		$boolError = false;
-		$boolFatalError = false;
-		$arMsg = array();
-
-		$arValues = array(
-		);
-
-		if (!isset($arControl['ATOMS']) || !is_array($arControl['ATOMS']) || empty($arControl['ATOMS']))
-		{
-			$boolFatalError = true;
-			$boolError = true;
-			$arMsg[] = GetMessage('BT_SALE_ACT_ERR_ATOMS_ABSENT');
-		}
-		if (!$boolError)
-		{
-			if ($boolShow)
-			{
-				foreach ($arControl['ATOMS'] as &$arOneAtom)
-				{
-					$boolAtomError = false;
-					if (!isset($arOneCondition[$arOneAtom['id']]))
-					{
-						$boolAtomError = true;
-					}
-					elseif (!is_string($arOneCondition[$arOneAtom['id']]))
-					{
-						$boolAtomError = true;
-					}
-					if (!$boolAtomError)
-					{
-						switch ($arOneAtom['type'])
-						{
-							case 'select':
-								if (!array_key_exists($arOneCondition[$arOneAtom['id']], $arOneAtom['values']))
-								{
-									$boolAtomError = true;
-								}
-								break;
-							default:
-								if (array_key_exists('value_type', $arOneAtom) && !empty($arOneAtom['value_type']))
-								{
-									switch($arOneAtom['value_type'])
-									{
-										case 'int':
-											$arOneCondition[$arOneAtom['id']] = intval($arOneCondition[$arOneAtom['id']]);
-											break;
-										case 'double':
-											$arOneCondition[$arOneAtom['id']] = doubleval($arOneCondition[$arOneAtom['id']]);
-											break;
-									}
-								}
-								break;
-						}
-					}
-					if (!$boolAtomError)
-					{
-						$arValues[$arOneAtom['id']] = (string)$arOneCondition[$arOneAtom['id']];
-					}
-					else
-					{
-						$arValues[$arOneAtom['id']] = '';
-					}
-					if ($boolAtomError)
-						$boolError = true;
-				}
-				if (isset($arOneAtom))
-					unset($arOneAtom);
-			}
-			else
-			{
-				foreach ($arControl['ATOMS'] as &$arOneAtom)
-				{
-					$boolAtomError = false;
-					if (!isset($arOneCondition[$arOneAtom['name']]))
-					{
-						$boolAtomError = true;
-					}
-					elseif (!is_string($arOneCondition[$arOneAtom['name']]) && !is_int($arOneCondition[$arOneAtom['name']]) && !is_float($arOneCondition[$arOneAtom['name']]))
-					{
-						$boolAtomError = true;
-					}
-					if (!$boolAtomError)
-					{
-						switch ($arOneAtom['type'])
-						{
-							case 'select':
-								if (!array_key_exists($arOneCondition[$arOneAtom['name']], $arOneAtom['values']))
-								{
-									$boolAtomError = true;
-								}
-								break;
-							default:
-								if (array_key_exists('value_type', $arOneAtom) && !empty($arOneAtom['value_type']))
-								{
-									switch($arOneAtom['value_type'])
-									{
-										case 'int':
-											$arOneCondition[$arOneAtom['name']] = intval($arOneCondition[$arOneAtom['name']]);
-											break;
-										case 'double':
-											$arOneCondition[$arOneAtom['name']] = doubleval($arOneCondition[$arOneAtom['name']]);
-											break;
-									}
-								}
-								break;
-						}
-						if (!$boolAtomError)
-						{
-							$arValues[$arOneAtom['id']] = (string)$arOneCondition[$arOneAtom['name']];
-						}
-					}
-					if ($boolAtomError)
-						$boolError = true;
-				}
-				if (isset($arOneAtom))
-					unset($arOneAtom);
-			}
-		}
-
-		if ($boolShow)
-		{
-			$arResult = array(
-				'id' => $arParams['COND_NUM'],
-				'controlId' => $arControl['ID'],
-				'values' => $arValues,
-			);
-			if ($boolError)
-			{
-				$arResult['err_cond'] = 'Y';
-				if ($boolFatalError)
-					$arResult['fatal_err_cond'] = 'Y';
-				if (!empty($arMsg))
-					$arResult['err_cond_mess'] = implode('. ', $arMsg);
-			}
-
-			return $arResult;
-		}
-		else
-		{
-			$arResult = $arValues;
-			return (!$boolError ? $arResult : false);
-		}
-	}
-
-	public static function GetVisual()
-	{
-		return array(
-			'controls' => array(
-				'All',
-			),
-			'values' => array(
-				array(
-					'All' => 'AND',
-				),
-				array(
-					'All' => 'OR',
-				),
-			),
-			'logic' => array(
-				array(
-					'style' => 'condition-logic-and',
-					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_AND'),
-				),
-				array(
-					'style' => 'condition-logic-or',
-					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_OR'),
-				),
-			)
-		);
 	}
 }
 
@@ -892,23 +703,23 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 					array(
 						'id' => 'prefix',
 						'type' => 'prefix',
-						'text' => $arOneControl['PREFIX'],
+						'text' => $arOneControl['PREFIX']
 					),
 					static::GetLogicAtom($arOneControl['LOGIC']),
-					static::GetValueAtom($arOneControl['JS_VALUE']),
-				),
+					static::GetValueAtom($arOneControl['JS_VALUE'])
+				)
 			);
 			if ('CondBsktFldPrice' == $arOneControl['ID'])
 			{
 				$boolCurrency = false;
 				if (static::$boolInit)
 				{
-					if (array_key_exists('CURRENCY', static::$arInitParams))
+					if (isset(static::$arInitParams['CURRENCY']))
 					{
 						$arOne['control'][] = static::$arInitParams['CURRENCY'];
 						$boolCurrency = true;
 					}
-					elseif (array_key_exists('SITE_ID', static::$arInitParams))
+					elseif (isset(static::$arInitParams['SITE_ID']))
 					{
 						$strCurrency = CSaleLang::GetLangCurrency(static::$arInitParams['SITE_ID']);
 						if (!empty($strCurrency))
@@ -948,13 +759,14 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 					'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
+						'discount' => 'Y'
 					),
 					'param_id' => 'n',
-					'show_value' => 'Y',
+					'show_value' => 'Y'
 				),
 				'PHP_VALUE' => array(
 					'VALIDATE' => 'element'
-				),
+				)
 			),
 			'CondBsktFldName' => array(
 				'ID' => 'CondBsktFldName',
@@ -967,9 +779,9 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'PREFIX' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
 				'JS_VALUE' => array(
-					'type' => 'input',
+					'type' => 'input'
 				),
-				'PHP_VALUE' => '',
+				'PHP_VALUE' => ''
 			),
 			'CondBsktFldPrice' => array(
 				'ID' => 'CondBsktFldPrice',
@@ -991,7 +803,7 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				),
 				'JS_VALUE' => array(
 					'type' => 'input'
-				),
+				)
 			),
 			'CondBsktFldQuantity' => array(
 				'ID' => 'CondBsktFldQuantity',
@@ -1013,7 +825,7 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				),
 				'JS_VALUE' => array(
 					'type' => 'input'
-				),
+				)
 			),
 			'CondBsktFldWeight' => array(
 				'ID' => 'CondBsktFldWeight',
@@ -1035,15 +847,15 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				),
 				'JS_VALUE' => array(
 					'type' => 'input'
-				),
-			),
+				)
+			)
 		);
 
 		if (false === $strControlID)
 		{
 			return $arControlList;
 		}
-		elseif (array_key_exists($strControlID, $arControlList))
+		elseif (isset($arControlList[$strControlID]))
 		{
 			return $arControlList[$strControlID];
 		}
@@ -1134,7 +946,7 @@ class CSaleActionTree extends CGlobalCondTree
 		if (!$this->boolError)
 		{
 			$strResult = '';
-			if (is_array($arConditions) && !empty($arConditions))
+			if (!empty($arConditions) && is_array($arConditions))
 			{
 				$arParams['FUNC_ID'] = '';
 				$arResult = $this->GenerateLevel($arConditions, $arParams, true);
@@ -1169,11 +981,11 @@ class CSaleActionTree extends CGlobalCondTree
 		$arResult = array();
 		$boolError = false;
 		$boolFirst = (true === $boolFirst);
-		if (!is_array($arLevel) || empty($arLevel))
+		if (empty($arLevel) || !is_array($arLevel))
 		{
 			return $arResult;
 		}
-		if (!array_key_exists('FUNC_ID', $arParams))
+		if (!isset($arParams['FUNC_ID']))
 		{
 			$arParams['FUNC_ID'] = '';
 		}
@@ -1186,28 +998,84 @@ class CSaleActionTree extends CGlobalCondTree
 				if (isset($this->arControlList[$arLevel['CLASS_ID']]))
 				{
 					$arOneControl = $this->arControlList[$arLevel['CLASS_ID']];
-					if (array_key_exists('Generate', $arOneControl))
+					$strEval = false;
+					if ('Y' == $arOneControl['GROUP'])
 					{
+						$arSubParams = $arParams;
+						$arSubParams['FUNC_ID'] .= '_'.$intRowNum;
+						$arSubEval = $this->GenerateLevel($arLevel['CHILDREN'], $arSubParams);
+						if (false === $arSubEval || !is_array($arSubEval))
+							return false;
+						$arGroupParams = $arParams;
+						$arGroupParams['FUNC_ID'] .= '_'.$intRowNum;
+						$mxEval = call_user_func_array($arOneControl['Generate'],
+							array($arLevel['DATA'], $arGroupParams, $arLevel['CLASS_ID'], $arSubEval)
+						);
+						if (is_array($mxEval))
+						{
+							if (isset($mxEval['FUNC']))
+							{
+								$this->arExecuteFunc[] = $mxEval['FUNC'];
+							}
+							if (isset($mxEval['COND']))
+							{
+								$strEval = $mxEval['COND'];
+							}
+							else
+							{
+								$strEval = false;
+							}
+						}
+						else
+						{
+							$strEval = $mxEval;
+						}
+					}
+					else
+					{
+						$strEval = call_user_func_array($arOneControl['Generate'],
+							array($arLevel['DATA'], $arParams, $arLevel['CLASS_ID'])
+						);
+					}
+					if (false === $strEval || !is_string($strEval) || 'false' === $strEval)
+					{
+						return false;
+					}
+					$arResult[] = $strEval;
+				}
+			}
+			$intRowNum++;
+		}
+		else
+		{
+			foreach ($arLevel as &$arOneCondition)
+			{
+				$arParams['ROW_NUM'] = $intRowNum;
+				if (isset($arOneCondition['CLASS_ID']) && !empty($arOneCondition['CLASS_ID']))
+				{
+					if (isset($this->arControlList[$arOneCondition['CLASS_ID']]))
+					{
+						$arOneControl = $this->arControlList[$arOneCondition['CLASS_ID']];
 						$strEval = false;
-						if (isset($arOneControl['GROUP']) && 'Y' == $arOneControl['GROUP'])
+						if ('Y' == $arOneControl['GROUP'])
 						{
 							$arSubParams = $arParams;
 							$arSubParams['FUNC_ID'] .= '_'.$intRowNum;
-							$arSubEval = $this->GenerateLevel($arLevel['CHILDREN'], $arSubParams);
+							$arSubEval = $this->GenerateLevel($arOneCondition['CHILDREN'], $arSubParams);
 							if (false === $arSubEval || !is_array($arSubEval))
 								return false;
 							$arGroupParams = $arParams;
 							$arGroupParams['FUNC_ID'] .= '_'.$intRowNum;
 							$mxEval = call_user_func_array($arOneControl['Generate'],
-								array($arLevel['DATA'], $arGroupParams, $arLevel['CLASS_ID'], $arSubEval)
+								array($arOneCondition['DATA'], $arGroupParams, $arOneCondition['CLASS_ID'], $arSubEval)
 							);
 							if (is_array($mxEval))
 							{
-								if (array_key_exists('FUNC', $mxEval))
+								if (isset($mxEval['FUNC']))
 								{
 									$this->arExecuteFunc[] = $mxEval['FUNC'];
 								}
-								if (array_key_exists('COND', $mxEval))
+								if (isset($mxEval['COND']))
 								{
 									$strEval = $mxEval['COND'];
 								}
@@ -1224,7 +1092,7 @@ class CSaleActionTree extends CGlobalCondTree
 						else
 						{
 							$strEval = call_user_func_array($arOneControl['Generate'],
-								array($arLevel['DATA'], $arParams, $arLevel['CLASS_ID'])
+								array($arOneCondition['DATA'], $arParams, $arOneCondition['CLASS_ID'])
 							);
 						}
 						if (false === $strEval || !is_string($strEval) || 'false' === $strEval)
@@ -1232,68 +1100,6 @@ class CSaleActionTree extends CGlobalCondTree
 							return false;
 						}
 						$arResult[] = $strEval;
-					}
-				}
-			}
-			$intRowNum++;
-		}
-		else
-		{
-			foreach ($arLevel as &$arOneCondition)
-			{
-				$arParams['ROW_NUM'] = $intRowNum;
-				if (isset($arOneCondition['CLASS_ID']) && !empty($arOneCondition['CLASS_ID']))
-				{
-					if (isset($this->arControlList[$arOneCondition['CLASS_ID']]))
-					{
-						$arOneControl = $this->arControlList[$arOneCondition['CLASS_ID']];
-						if (array_key_exists('Generate', $arOneControl))
-						{
-							$strEval = false;
-							if (isset($arOneControl['GROUP']) && 'Y' == $arOneControl['GROUP'])
-							{
-								$arSubParams = $arParams;
-								$arSubParams['FUNC_ID'] .= '_'.$intRowNum;
-								$arSubEval = $this->GenerateLevel($arOneCondition['CHILDREN'], $arSubParams);
-								if (false === $arSubEval || !is_array($arSubEval))
-									return false;
-								$arGroupParams = $arParams;
-								$arGroupParams['FUNC_ID'] .= '_'.$intRowNum;
-								$mxEval = call_user_func_array($arOneControl['Generate'],
-									array($arOneCondition['DATA'], $arGroupParams, $arOneCondition['CLASS_ID'], $arSubEval)
-								);
-								if (is_array($mxEval))
-								{
-									if (array_key_exists('FUNC', $mxEval))
-									{
-										$this->arExecuteFunc[] = $mxEval['FUNC'];
-									}
-									if (array_key_exists('COND', $mxEval))
-									{
-										$strEval = $mxEval['COND'];
-									}
-									else
-									{
-										$strEval = false;
-									}
-								}
-								else
-								{
-									$strEval = $mxEval;
-								}
-							}
-							else
-							{
-								$strEval = call_user_func_array($arOneControl['Generate'],
-									array($arOneCondition['DATA'], $arParams, $arOneCondition['CLASS_ID'])
-								);
-							}
-							if (false === $strEval || !is_string($strEval) || 'false' === $strEval)
-							{
-								return false;
-							}
-							$arResult[] = $strEval;
-						}
 					}
 				}
 				$intRowNum++;
@@ -1306,7 +1112,7 @@ class CSaleActionTree extends CGlobalCondTree
 		{
 			foreach ($arResult as $key => $value)
 			{
-				if (0 >= strlen ($value) || '()' == $value)
+				if ('' == $value || '()' == $value)
 					unset($arResult[$key]);
 			}
 		}

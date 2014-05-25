@@ -76,8 +76,6 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 	echo $APPLICATION->IncludeStringAfter($arIcons, array('TOOLTIP'=>GetMessage("main_epilog_before_menu_title"), 'ICON'=>'edit-icon', "COMPONENT_ID" => "page_edit_control"));
 }
 
-$APPLICATION->ShowSpreadCookieHTML();
-
 /*
 //Prints global url classes and  variables for HotKeys
 if($USER->IsAuthorized())

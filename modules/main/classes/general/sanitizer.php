@@ -88,34 +88,35 @@
 		 */
 		
 		/**
-		 * <p>Добавляет тэги и их атрибуты в список разрешенных к использованию.</p> <p>Возвращает количество добавленных в список тэгов.</p> <p><b>CBXSanitizer::AddTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
-		 * использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
-		 * тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
-		 * разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
-		 * <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
-		 *
-		 *
-		 *
-		 * @return int 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;AddTags( array (
-		 *                   'a' = &gt; array('href','id','style','alt'...),
-		 *                   'br' =&gt; array()
-		 *                   ));
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/addtags.php
-		 * @author Bitrix
-		 */
+		* <p>Добавляет тэги и их атрибуты в список разрешенных к использованию.</p> <p>Возвращает количество добавленных в список тэгов.</p> <p><b>CBXSanitizer::AddTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
+		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
+		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
+		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
+		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
+		*
+		*
+		*
+		* @return int 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;AddTags( array (
+		*                   'a' = &gt; array('href','id','style','alt'...),
+		*                   'br' =&gt; array()
+		*                   ));
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/addtags.php
+		* @author Bitrix
+		*/
 		public function AddTags($arTags)
 		{
 			if(!is_array($arTags))
@@ -140,34 +141,35 @@
 		 */
 		
 		/**
-		 * <p>Обновляет тэги и их атрибуты в списоке разрешенных к использованию.</p> <p>Возвращает количество обновленных в списке тэгов.</p> <p><b>CBXSanitizer::UpdateTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
-		 * использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
-		 * тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
-		 * разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
-		 * <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
-		 *
-		 *
-		 *
-		 * @return int 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;UpdateTags( array (
-		 *                   'a' = &gt; array('href','id','style','alt'...),
-		 *                   'br' =&gt; array()
-		 *                   ));
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/updatetags.php
-		 * @author Bitrix
-		 */
+		* <p>Обновляет тэги и их атрибуты в списоке разрешенных к использованию.</p> <p>Возвращает количество обновленных в списке тэгов.</p> <p><b>CBXSanitizer::UpdateTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
+		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
+		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
+		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
+		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
+		*
+		*
+		*
+		* @return int 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;UpdateTags( array (
+		*                   'a' = &gt; array('href','id','style','alt'...),
+		*                   'br' =&gt; array()
+		*                   ));
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/updatetags.php
+		* @author Bitrix
+		*/
 		public function UpdateTags($arTags)
 		{
 			return $this->AddTags($arTags);
@@ -180,29 +182,30 @@
 		 */
 		
 		/**
-		 * <p>Удаляет тэги из списка разрешенных к использованию.</p> <p>Возвращает количество удаленных из списка тэгов.</p> <p><b>CBXSanitizer::DelTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param array $arTagsNames  Массив содержащий имена тэгов, которые необходимо удалить из
-		 * списка разрешенных тэгов. <ul> <li>Имя тэга 1</li> <li>Имя тэга 2</li> <li>...</li>
-		 * </ul>
-		 *
-		 *
-		 *
-		 * @return int 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;DelTags( array ( 'a', 'br' ));
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deltags.php
-		 * @author Bitrix
-		 */
+		* <p>Удаляет тэги из списка разрешенных к использованию.</p> <p>Возвращает количество удаленных из списка тэгов.</p> <p><b>CBXSanitizer::DelTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param array $arTagsNames  Массив содержащий имена тэгов, которые необходимо удалить из
+		* списка разрешенных тэгов. <ul> <li>Имя тэга 1</li> <li>Имя тэга 2</li> <li>...</li>
+		* </ul>
+		*
+		*
+		*
+		* @return int 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;DelTags( array ( 'a', 'br' ));
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deltags.php
+		* @author Bitrix
+		*/
 		public function DelTags($arTagNames)
 		{
 			if(!is_array($arTagNames))
@@ -228,23 +231,24 @@
 		 */
 		
 		/**
-		 * <p>Удаляет все тэги из списка разрешенных к использованию.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DelAllTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>.</p>
-		 *
-		 *
-		 *
-		 *
-		 * @return void 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;DelAllTags();
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/delalltags.php
-		 * @author Bitrix
-		 */
+		* <p>Удаляет все тэги из списка разрешенных к использованию.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DelAllTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>.</p>
+		*
+		*
+		*
+		*
+		* @return void 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;DelAllTags();
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/delalltags.php
+		* @author Bitrix
+		*/
 		public function DelAllTags()
 		{
 			$this->secLevel = self::SECURE_LEVEL_CUSTOM;
@@ -274,27 +278,28 @@
 		 */
 		
 		/**
-		 * <p>Применяет, либо удаляет настройку класса - применять функцию htmlspecialchars к простому тексту и тэгам не входящим в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::ApplyHtmlSpecChars()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param bool $bApply = true Логический параметр, принимающий значения true, либо false.
-		 *
-		 *
-		 *
-		 * @return void 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;ApplyHtmlSpecChars(true);
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/applyhtmlspecchars.php
-		 * @author Bitrix
-		 */
+		* <p>Применяет, либо удаляет настройку класса - применять функцию htmlspecialchars к простому тексту и тэгам не входящим в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::ApplyHtmlSpecChars()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param bool $bApply = true Логический параметр, принимающий значения true, либо false.
+		*
+		*
+		*
+		* @return void 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;ApplyHtmlSpecChars(true);
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/applyhtmlspecchars.php
+		* @author Bitrix
+		*/
 		public function ApplyHtmlSpecChars($bApply=true)
 		{
 			if($bApply)
@@ -311,27 +316,28 @@
 		 */
 		
 		/**
-		 * <p>Применяет, либо удаляет настройку класса - удалять тэги не входящие в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DeleteSanitizedTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param bool $bApply = true Логический параметр, принимающий значения <i>true</i>, либо <i>false</i>.
-		 *
-		 *
-		 *
-		 * @return void 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;DeleteSanitizedTags(true);
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deletesanitizedtags.php
-		 * @author Bitrix
-		 */
+		* <p>Применяет, либо удаляет настройку класса - удалять тэги не входящие в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DeleteSanitizedTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param bool $bApply = true Логический параметр, принимающий значения <i>true</i>, либо <i>false</i>.
+		*
+		*
+		*
+		* @return void 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;DeleteSanitizedTags(true);
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/deletesanitizedtags.php
+		* @author Bitrix
+		*/
 		public function DeleteSanitizedTags($bApply=true)
 		{
 			if($bApply)
@@ -348,67 +354,68 @@
 		 */
 		
 		/**
-		 * <p>Заполняет массив тэгов, разрешенных к использованию в соответствии с выбранным уровнем.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::SetLevel()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param bool $secLevel  <p>Может принимать следующие значения: </p> <ul> <li>CBXSanitizer::SECURE_LEVEL_HIGH</li>
-		 * <li>CBXSanitizer::SECURE_LEVEL_MIDDLE</li> <li>CBXSanitizer::SECURE_LEVEL_LOW</li> </ul> <p>При этом в
-		 * список разрешенных будут добавлены следующие тэги и атрибуты:</p>
-		 * <pre> CBXSanitizer::SECURE_LEVEL_HIGH $arTags = array( 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(),
-		 * 'code' =&gt; array(), 'del' =&gt; array(), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt; array(), 'h1' =&gt;
-		 * array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt;
-		 * array(), 'i' =&gt; array(), 'ins' =&gt; array(), 'li' =&gt; array(), 'ol' =&gt; array(), 'p' =&gt; array(), 'small'
-		 * =&gt; array(), 's' =&gt; array(), 'sub' =&gt; array(), 'sup' =&gt; array(), 'strong' =&gt; array(), 'pre' =&gt; array(),
-		 * 'u' =&gt; array(), 'ul' =&gt; array() ); </pre> <pre> CBXSanitizer::SECURE_LEVEL_MIDDLE $arTags = array( 'a' =&gt;
-		 * array('href', 'title','name','alt'), 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(), 'code' =&gt; array(),
-		 * 'caption' =&gt; array(), 'del' =&gt; array('title'), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt;
-		 * array('color','size'), 'color' =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt;
-		 * array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'img' =&gt;
-		 * array('src','alt','height','width','title'), 'ins' =&gt; array('title'), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
-		 * =&gt; array(), 'pre' =&gt; array(), 's' =&gt; array(), 'small' =&gt; array(), 'strong' =&gt; array(), 'sub' =&gt;
-		 * array(), 'sup' =&gt; array(), 'table' =&gt; array('border','width'), 'tbody' =&gt; array('align','valign'), 'td' =&gt;
-		 * array('width','height','align','valign'), 'tfoot' =&gt; array('align','valign'), 'th' =&gt; array('width','height'),
-		 * 'thead' =&gt; array('align','valign'), 'tr' =&gt; array('align','valign'), 'u' =&gt; array(), 'ul' =&gt; array() </pre>
-		 * <pre> CBXSanitizer::SECURE_LEVEL_LOW $arTags = array( 'a' =&gt; array('href',
-		 * 'title','name','style','id','class','shape','coords','alt','target'), 'b' =&gt; array('style','id','class'), 'br' =&gt;
-		 * array('style','id','class'), 'big' =&gt; array('style','id','class'), 'caption' =&gt; array('style','id','class'),
-		 * 'code' =&gt; array('style','id','class'), 'del' =&gt; array('title','style','id','class'), 'div' =&gt;
-		 * array('title','style','id','class','align'), 'dt' =&gt; array('style','id','class'), 'dd' =&gt;
-		 * array('style','id','class'), 'font' =&gt; array('color','size','face','style','id','class'), 'h1' =&gt;
-		 * array('style','id','class','align'), 'h2' =&gt; array('style','id','class','align'), 'h3' =&gt;
-		 * array('style','id','class','align'), 'h4' =&gt; array('style','id','class','align'), 'h5' =&gt;
-		 * array('style','id','class','align'), 'h6' =&gt; array('style','id','class','align'), 'hr' =&gt;
-		 * array('style','id','class'), 'i' =&gt; array('style','id','class'), 'img' =&gt;
-		 * array('src','alt','height','width','title'), 'ins' =&gt; array('title','style','id','class'), 'li' =&gt;
-		 * array('style','id','class'), 'map' =&gt; array('shape','coords','href','alt','title','style','id','class','name'), 'ol'
-		 * =&gt; array('style','id','class'), 'p' =&gt; array('style','id','class','align'), 'pre' =&gt;
-		 * array('style','id','class'), 's' =&gt; array('style','id','class'), 'small' =&gt; array('style','id','class'), 'strong'
-		 * =&gt; array('style','id','class'), 'span' =&gt; array('title','style','id','class','align'), 'sub'
-		 * =&gt;array('style','id','class'), 'sup' =&gt;array('style','id','class'), 'table' =&gt;
-		 * array('border','width','style','id','class','cellspacing','cellpadding'), 'tbody' =&gt;
-		 * array('align','valign','style','id','class'), 'td' =&gt;
-		 * array('width','height','style','id','class','align','valign','colspan','rowspan'), 'tfoot' =&gt;
-		 * array('align','valign','style','id','class','align','valign'), 'th' =&gt;
-		 * array('width','height','style','id','class','colspan','rowspan'), 'thead' =&gt;
-		 * array('align','valign','style','id','class'), 'tr' =&gt; array('align','valign','style','id','class'), 'u' =&gt;
-		 * array('style','id','class'), 'ul' =&gt; array('style','id','class') ); </pre>
-		 *
-		 *
-		 *
-		 * @return void 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $Sanitizer-&gt;SetLevel(CBXSanitizer::SECURE_LEVEL_LOW);
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/setlevel.php
-		 * @author Bitrix
-		 */
+		* <p>Заполняет массив тэгов, разрешенных к использованию в соответствии с выбранным уровнем.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::SetLevel()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param bool $secLevel  <p>Может принимать следующие значения: </p> <ul> <li>CBXSanitizer::SECURE_LEVEL_HIGH</li>
+		* <li>CBXSanitizer::SECURE_LEVEL_MIDDLE</li> <li>CBXSanitizer::SECURE_LEVEL_LOW</li> </ul> <p>При этом в
+		* список разрешенных будут добавлены следующие тэги и атрибуты:</p>
+		* <pre> CBXSanitizer::SECURE_LEVEL_HIGH $arTags = array( 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(),
+		* 'code' =&gt; array(), 'del' =&gt; array(), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt; array(), 'h1' =&gt;
+		* array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt;
+		* array(), 'i' =&gt; array(), 'ins' =&gt; array(), 'li' =&gt; array(), 'ol' =&gt; array(), 'p' =&gt; array(), 'small'
+		* =&gt; array(), 's' =&gt; array(), 'sub' =&gt; array(), 'sup' =&gt; array(), 'strong' =&gt; array(), 'pre' =&gt; array(),
+		* 'u' =&gt; array(), 'ul' =&gt; array() ); </pre> <pre> CBXSanitizer::SECURE_LEVEL_MIDDLE $arTags = array( 'a' =&gt;
+		* array('href', 'title','name','alt'), 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(), 'code' =&gt; array(),
+		* 'caption' =&gt; array(), 'del' =&gt; array('title'), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt;
+		* array('color','size'), 'color' =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt;
+		* array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'img' =&gt;
+		* array('src','alt','height','width','title'), 'ins' =&gt; array('title'), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
+		* =&gt; array(), 'pre' =&gt; array(), 's' =&gt; array(), 'small' =&gt; array(), 'strong' =&gt; array(), 'sub' =&gt;
+		* array(), 'sup' =&gt; array(), 'table' =&gt; array('border','width'), 'tbody' =&gt; array('align','valign'), 'td' =&gt;
+		* array('width','height','align','valign'), 'tfoot' =&gt; array('align','valign'), 'th' =&gt; array('width','height'),
+		* 'thead' =&gt; array('align','valign'), 'tr' =&gt; array('align','valign'), 'u' =&gt; array(), 'ul' =&gt; array() </pre>
+		* <pre> CBXSanitizer::SECURE_LEVEL_LOW $arTags = array( 'a' =&gt; array('href',
+		* 'title','name','style','id','class','shape','coords','alt','target'), 'b' =&gt; array('style','id','class'), 'br' =&gt;
+		* array('style','id','class'), 'big' =&gt; array('style','id','class'), 'caption' =&gt; array('style','id','class'),
+		* 'code' =&gt; array('style','id','class'), 'del' =&gt; array('title','style','id','class'), 'div' =&gt;
+		* array('title','style','id','class','align'), 'dt' =&gt; array('style','id','class'), 'dd' =&gt;
+		* array('style','id','class'), 'font' =&gt; array('color','size','face','style','id','class'), 'h1' =&gt;
+		* array('style','id','class','align'), 'h2' =&gt; array('style','id','class','align'), 'h3' =&gt;
+		* array('style','id','class','align'), 'h4' =&gt; array('style','id','class','align'), 'h5' =&gt;
+		* array('style','id','class','align'), 'h6' =&gt; array('style','id','class','align'), 'hr' =&gt;
+		* array('style','id','class'), 'i' =&gt; array('style','id','class'), 'img' =&gt;
+		* array('src','alt','height','width','title'), 'ins' =&gt; array('title','style','id','class'), 'li' =&gt;
+		* array('style','id','class'), 'map' =&gt; array('shape','coords','href','alt','title','style','id','class','name'), 'ol'
+		* =&gt; array('style','id','class'), 'p' =&gt; array('style','id','class','align'), 'pre' =&gt;
+		* array('style','id','class'), 's' =&gt; array('style','id','class'), 'small' =&gt; array('style','id','class'), 'strong'
+		* =&gt; array('style','id','class'), 'span' =&gt; array('title','style','id','class','align'), 'sub'
+		* =&gt;array('style','id','class'), 'sup' =&gt;array('style','id','class'), 'table' =&gt;
+		* array('border','width','style','id','class','cellspacing','cellpadding'), 'tbody' =&gt;
+		* array('align','valign','style','id','class'), 'td' =&gt;
+		* array('width','height','style','id','class','align','valign','colspan','rowspan'), 'tfoot' =&gt;
+		* array('align','valign','style','id','class','align','valign'), 'th' =&gt;
+		* array('width','height','style','id','class','colspan','rowspan'), 'thead' =&gt;
+		* array('align','valign','style','id','class'), 'tr' =&gt; array('align','valign','style','id','class'), 'u' =&gt;
+		* array('style','id','class'), 'ul' =&gt; array('style','id','class') ); </pre>
+		*
+		*
+		*
+		* @return void 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $Sanitizer-&gt;SetLevel(CBXSanitizer::SECURE_LEVEL_LOW);
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/setlevel.php
+		* @author Bitrix
+		*/
 		public function SetLevel($secLevel)
 		{
 			if($secLevel!=self::SECURE_LEVEL_HIGH && $secLevel!=self::SECURE_LEVEL_MIDDLE && $secLevel!=self::SECURE_LEVEL_LOW)
@@ -564,7 +571,7 @@
 			{
 				case 'src':
 				case 'href':
-					if(!preg_match("#^(http://|https://|ftp://|file://|mailto:|callto:|\\#|/)#i".BX_UTF_PCRE_MODIFIER, $attrValue))
+					if(!preg_match("#^(http://|https://|ftp://|file://|mailto:|callto:|skype:|\\#|/)#i".BX_UTF_PCRE_MODIFIER, $attrValue))
 						$arAttr[3] = "http://".$arAttr[3];
 
 					$valid = (!preg_match("#javascript:|data:|[^\\w".$this->localAlph.":/\\.=@;,!~\\*\\&\\#\\)(%\\s\\+\$\\?\\-]#i".BX_UTF_PCRE_MODIFIER, $attrValue)) ? true : false;
@@ -604,23 +611,24 @@
 		 */
 		
 		/**
-		 * <p>Возвращает список разрешенных к использованию тэгов в виде отформатированного текста.</p> <p><b>CBXSanitizer::GetTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @return void 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * echo $Sanitizer-&gt;GetTags();
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/gettags.php
-		 * @author Bitrix
-		 */
+		* <p>Возвращает список разрешенных к использованию тэгов в виде отформатированного текста.</p> <p><b>CBXSanitizer::GetTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @return void 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* echo $Sanitizer-&gt;GetTags();
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/gettags.php
+		* @author Bitrix
+		*/
 		public function GetTags()
 		{
 			if(!is_array($this->arHtmlTags))
@@ -684,27 +692,28 @@
 		 */
 		
 		/**
-		 * <p>Очищает HTML переданный в качестве параметра от тэгов и атрибутов не содержащихся в списке разрешенных.</p> <p>Возвращает очищенный html.</p> <p><b>CBXSanitizer::SanitizeHtml()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		 *
-		 *
-		 *
-		 *
-		 * @param string $html  текст в формате html.
-		 *
-		 *
-		 *
-		 * @return string 
-		 *
-		 *
-		 * <h4>Example</h4> 
-		 * <pre>
-		 * $filteredHtml = $Sanitizer-&gt;SanitizeHtml("Sanitize me please!");
-		 * </pre>
-		 *
-		 *
-		 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/sanitizehtml.php
-		 * @author Bitrix
-		 */
+		* <p>Очищает HTML переданный в качестве параметра от тэгов и атрибутов не содержащихся в списке разрешенных.</p> <p>Возвращает очищенный html.</p> <p><b>CBXSanitizer::SanitizeHtml()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		*
+		*
+		*
+		*
+		* @param string $html  текст в формате html. </h
+		*
+		*
+		*
+		* @return string 
+		*
+		*
+		* <h4>Example</h4> 
+		* <pre>
+		* $filteredHtml = $Sanitizer-&gt;SanitizeHtml("Sanitize me please!");
+		* </pre>
+		*
+		*
+		* @static
+		* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/sanitizehtml.php
+		* @author Bitrix
+		*/
 		public function SanitizeHtml($html)
 		{
 			if(empty($this->arHtmlTags))

@@ -7,6 +7,7 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
 
 /**
  * Base entity field class
@@ -59,14 +60,6 @@ abstract class Field
 		if (isset($parameters['title']))
 		{
 			$this->title = $parameters['title'];
-		}
-		elseif (\HasMessage($this->getLangCode()))
-		{
-			$this->title = \GetMessage($this->getLangCode());
-		}
-		else
-		{
-			$this->title = $this->name;
 		}
 
 		// validation
@@ -154,7 +147,17 @@ abstract class Field
 
 	public function getTitle()
 	{
-		return $this->title;
+		if($this->title !== null)
+		{
+			return $this->title;
+		}
+
+		if(($title = Loc::getMessage($this->getLangCode())) <> '')
+		{
+			return $this->title = $title;
+		}
+
+		return $this->title = $this->name;
 	}
 
 	public function getDataType()
@@ -170,16 +173,5 @@ abstract class Field
 	public function getLangCode()
 	{
 		return $this->getEntity()->getLangCode().'_'.$this->getName().'_FIELD';
-	}
-
-	/**
-	 * @deprecated Use getTitle instead
-	 * @return mixed|string
-	 */
-	public function getLangText()
-	{
-		if($this->title !== null)
-			return $this->title;
-		return HasMessage($this->getLangCode()) ? GetMessage($this->getLangCode()) : $this->getName();
 	}
 }

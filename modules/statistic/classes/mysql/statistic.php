@@ -128,6 +128,7 @@ class CStatistics extends CAllStatistics
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$DAYS = intval(COption::GetOptionString("statistic", "SEARCHER_DAYS"));
+		$SID = 0;
 		if ($DAYS>=0)
 		{
 			$strSql = "
@@ -182,6 +183,7 @@ class CStatistics extends CAllStatistics
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$DAYS = intval(COption::GetOptionString("statistic", "EVENT_DYNAMIC_DAYS"));
+		$EID = 0;
 		if ($DAYS>=0)
 		{
 			$strSql = "
@@ -661,7 +663,7 @@ class CStatistics extends CAllStatistics
 	public static function DBTopSql($strSql, $nTopCount=false)
 	{
 		if($nTopCount===false)
-			$nTopCount = intval(COption::GetOptionString("statistic","RECORDS_LIMIT"));
+			$nTopCount = intval(COption::GetOptionString('statistic','RECORDS_LIMIT'));
 		else
 			$nTopCount = intval($nTopCount);
 		if($nTopCount>0)

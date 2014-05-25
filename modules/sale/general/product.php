@@ -8,7 +8,7 @@ class CALLSaleProduct
 	static function GetProductSkuProps($ID, $IBLOCK_ID = '')
 	{
 		$arSkuProps = array();
-		if (CModule::IncludeModule('iblock') && CModule::IncludeModule('catalog'))
+		if (\Bitrix\Main\Loader::includeModule('catalog'))
 		{
 			$res = CIBlockElement::GetList(
 				array(),
@@ -26,23 +26,58 @@ class CALLSaleProduct
 			$arElement = $res->Fetch();
 			if ($arElement)
 			{
-				$IBLOCK_ID = $arElement["IBLOCK_ID"];
-				$arParent = CCatalogSku::GetProductInfo($ID);
+				$arElement['ID'] = intval($arElement['ID']);
+				$arParent = CCatalogSku::GetProductInfo($ID, $arElement["IBLOCK_ID"]);
 				if ($arParent)
 				{
-					$rsOffers = CIBlockElement::GetProperty(
-						$IBLOCK_ID,
-						$ID
+					$arElement['PROPERTIES'] = array();
+					$arElementLink = array(
+						$arElement['ID'] => &$arElement
 					);
-					while ($arOffer = $rsOffers->GetNext())
+					$arFilter = array('ID' => $arElement['ID'], 'IBLOCK_ID' => $arElement["IBLOCK_ID"]);
+					CIBlockElement::GetPropertyValuesArray($arElementLink, $arElement["IBLOCK_ID"], $arFilter);
+					if (!empty($arElement['PROPERTIES']))
 					{
-						if ($arOffer["XML_ID"] != "CML2_LINK")
+						foreach ($arElement['PROPERTIES'] as &$prop)
 						{
-							if ($arOffer["PROPERTY_TYPE"] == "L")
-								$arSkuProps[$arOffer["NAME"]] = $arOffer["VALUE_ENUM"];
-							else
-								$arSkuProps[$arOffer["NAME"]] = $arOffer["VALUE"];
+							if ($prop['XML_ID'] == 'CML2_LINK' || $prop['PROPERTY_TYPE'] == 'F')
+							{
+								continue;
+							}
+							$boolArr = is_array($prop["VALUE"]);
+							if(
+								($boolArr && !empty($prop["VALUE"]))
+								|| (!$boolArr && strlen($prop["VALUE"]) > 0)
+							)
+							{
+								$displayProperty = CIBlockFormatProperties::GetDisplayValue($arElement, $prop, '');
+								$mxValues = '';
+								if ('E' == $prop['PROPERTY_TYPE'])
+								{
+									if (!empty($displayProperty['LINK_ELEMENT_VALUE']))
+									{
+										$mxValues = array();
+										foreach ($displayProperty['LINK_ELEMENT_VALUE'] as $arTempo)
+											$mxValues[] = $arTempo['NAME'].' ['.$arTempo['ID'].']';
+									}
+								}
+								elseif ('G' == $prop['PROPERTY_TYPE'])
+								{
+									if (!empty($displayProperty['LINK_SECTION_VALUE']))
+									{
+										$mxValues = array();
+										foreach ($displayProperty['LINK_SECTION_VALUE'] as $arTempo)
+											$mxValues[] = $arTempo['NAME'].' ['.$arTempo['ID'].']';
+									}
+								}
+								if (empty($mxValues))
+								{
+									$mxValues = $displayProperty["DISPLAY_VALUE"];
+								}
+								$arSkuProps[$prop["NAME"]] = strip_tags(is_array($mxValues) ? implode("/ ", $mxValues) : $mxValues);
+							}
 						}
+						unset($prop);
 					}
 				}
 			}
@@ -359,8 +394,10 @@ class CALLSaleProduct
 		return "CSaleProduct::RefreshProductList();";
 	}
 
+
+
 	/**
-	 * get recommendet product for product
+	 * Returns list of recommended products for specific product
 	 *
 	 * @param integer $USER_ID
 	 * @param string $LID
@@ -395,7 +432,13 @@ class CALLSaleProduct
 				$arBuyerGroups = CUser::GetUserGroup($USER_ID);
 
 				$arFilter = array("ACTIVE"=>"Y", "ID" => $arRecomendet);
-				$rsElement = CIBlockElement::GetList(array(), $arFilter, false, false, array("NAME", "ID", "LID", 'IBLOCK_ID', 'IBLOCK_SECTION_ID', "DETAIL_PICTURE", "PREVIEW_PICTURE", "DETAIL_PAGE_URL"));
+				$rsElement = CIBlockElement::GetList(
+					array(),
+					$arFilter,
+					false,
+					false,
+					array("NAME", "ID", "LID", 'IBLOCK_ID', 'IBLOCK_SECTION_ID', "DETAIL_PICTURE", "PREVIEW_PICTURE", "DETAIL_PAGE_URL")
+				);
 
 				while ($arElement = $rsElement->GetNext())
 				{
@@ -404,6 +447,7 @@ class CALLSaleProduct
 						if (($recomMore == "N" && $i < $cntProductDefault) || $recomMore == "Y")
 						{
 							$arElement["MODULE"] = "catalog";
+							$arElement["PRODUCT_PROVIDER_CLASS"] = "CCatalogProductProvider";
 							$arElement["PRODUCT_ID"] = $arElement["ID"];
 
 							$arPrice = CCatalogProduct::GetOptimalPrice($arElement["ID"], 1, $arBuyerGroups, "N", array(), $LID);
@@ -414,7 +458,12 @@ class CALLSaleProduct
 							$arElement["DISCOUNT_PRICE"] = $arPrice["PRICE"]["PRICE"] - $arPrice["DISCOUNT_PRICE"];
 
 							if ($arElement["IBLOCK_ID"] > 0 && $arElement["IBLOCK_SECTION_ID"] > 0)
-								$arElement["EDIT_PAGE_URL"] = "/bitrix/admin/iblock_element_edit.php?ID=".$arElement["PRODUCT_ID"]."&type=catalog&lang=".LANG."&IBLOCK_ID=".$arElement["IBLOCK_ID"]."&find_section_section=".$arElement["IBLOCK_SECTION_ID"];
+							{
+								$arElement["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arElement["IBLOCK_ID"], $arElement["PRODUCT_ID"], array(
+									"find_section_section" => $arElement["IBLOCK_SECTION_ID"],
+									'WF' => 'Y',
+								));
+							}
 
 							$arRecomendetResult[] = $arElement;
 						}
@@ -430,7 +479,7 @@ class CALLSaleProduct
 class CAllSaleViewedProduct
 {
 	/**
-	* The function updated viewed product for user
+	* Updates viewed product info for user
 	*
 	* @param int $ID - code field for update
 	* @param array $arFields - parameters for update

@@ -97,10 +97,10 @@ class CAllMailBox
 	{
 		global $DB;
 		$strSql =
-				"SELECT MB.*, l.CHARSET as LANG_CHARSET, ".
+				"SELECT MB.*, C.CHARSET as LANG_CHARSET, ".
 				"	".$DB->DateToCharFunction("MB.TIMESTAMP_X")."	as TIMESTAMP_X ".
-				"FROM b_mail_mailbox MB, b_lang l ".
-				"WHERE MB.LID=l.LID ";
+				"FROM b_mail_mailbox MB, b_lang L, b_culture C ".
+				"WHERE MB.LID=L.LID AND C.ID=L.CULTURE_ID";
 
 		if(!is_array($arFilter))
 			$arFilter = Array();
@@ -138,6 +138,7 @@ class CAllMailBox
 				case 'SERVER_TYPE':
 					$arSqlSearch[] = GetFilterQuery('MB.'.$key, ($strNegative == 'Y' ? '~' : '').$val);
 					break;
+				case 'SERVICE_ID':
 				case 'USER_ID':
 					$arSqlSearch[] = 'MB.' . $key . ($strNegative == 'Y' ? ' != ' : ' = ') . intval($val);
 					break;
@@ -286,66 +287,98 @@ class CAllMailBox
 		$err_cnt = CMailError::ErrCount();
 		$arMsg = Array();
 
-		if(is_set($arFields, "NAME") && strlen($arFields["NAME"])<1)
+		if (is_set($arFields, 'NAME') && strlen($arFields['NAME']) < 1)
 		{
-			CMailError::SetError("B_MAIL_ERR_NAME", GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_NAME")."\"");
-			$arMsg[] = array("id"=>"NAME", "text"=> GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_NAME")."\"");
+			CMailError::SetError('B_MAIL_ERR_NAME', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_NAME').'"');
+			$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_NAME').'"');
 		}
 
-		if(strtolower($arFields["SERVER_TYPE"])=="pop3" && is_set($arFields, "LOGIN") && strlen($arFields["LOGIN"])<1)
+		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap')) && is_set($arFields, 'LOGIN') && strlen($arFields['LOGIN']) < 1)
 		{
-			CMailError::SetError("B_MAIL_ERR_LOGIN", GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_LOGIN")."\"");
-			$arMsg[] = array("id"=>"LOGIN", "text"=> GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_LOGIN")."\"");
+			CMailError::SetError('B_MAIL_ERR_LOGIN', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
+			$arMsg[] = array('id' => 'LOGIN', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
 		}
 
-		if(strtolower($arFields["SERVER_TYPE"])=="pop3" && is_set($arFields, "PASSWORD") && strlen($arFields["PASSWORD"])<1)
+		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap')) && is_set($arFields, 'PASSWORD') && strlen($arFields['PASSWORD']) < 1)
 		{
-			CMailError::SetError("B_MAIL_ERR_PASSWORD", GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_PASSWORD")."\"");
-			$arMsg[] = array("id"=>"PASSWORD", "text"=> GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_PASSWORD")."\"");
+			CMailError::SetError('B_MAIL_ERR_PASSWORD', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_PASSWORD').'"');
+			$arMsg[] = array('id' => 'PASSWORD', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_PASSWORD').'"');
 		}
 
-		if(is_set($arFields, "SERVER") && strlen($arFields["SERVER"])<1)
+		if (strtolower($arFields['SERVER_TYPE']) == 'imap' && is_set($arFields, 'LINK') && strlen($arFields['LINK']) < 1)
 		{
-			CMailError::SetError("B_MAIL_ERR_SERVER_NAME", GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_SERVER")."\"");
-			$arMsg[] = array("id"=>"SERVER", "text"=> GetMessage("MAIL_CL_ERR_NAME")." \"".GetMessage("MAIL_CL_SERVER")."\"");
+			CMailError::SetError('B_MAIL_ERR_LINK', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LINK').'"');
+			$arMsg[] = array('id' => 'LINK', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LINK').'"');
 		}
-		elseif(strtolower($arFields["SERVER_TYPE"])=="smtp")
+
+		if (strtolower($arFields['SERVER_TYPE']) == 'imap' && is_set($arFields, 'USER_ID') && strlen($arFields['USER_ID']) < 1)
 		{
-			$dbres = CMailBox::GetList(array(), array("ACTIVE"=>"Y", "SERVER_TYPE"=>"smtp", "SERVER"=>$arFields["SERVER"], "PORT"=>$arFields["PORT"]));
+			CMailError::SetError('B_MAIL_ERR_USER_ID', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
+			$arMsg[] = array('id' => 'USER_ID', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
+		}
+
+		if (is_set($arFields, 'SERVER') && strlen($arFields['SERVER']) < 1)
+		{
+			CMailError::SetError('B_MAIL_ERR_SERVER_NAME', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
+			$arMsg[] = array('id' => 'SERVER', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
+		}
+		elseif (strtolower($arFields['SERVER_TYPE']) == 'smtp')
+		{
+			$dbres = CMailBox::GetList(array(), array('ACTIVE' => 'Y', 'SERVER_TYPE' => 'smtp', 'SERVER' => $arFields['SERVER'], 'PORT' => $arFields['PORT']));
 			while($arres = $dbres->Fetch())
 			{
-				if($ID===false || $arres["ID"]!=$ID)
+				if ($ID === false || $arres['ID'] != $ID)
 				{
-					CMailError::SetError("B_MAIL_ERR_SERVER_NAME",  GetMessage("B_MAIL_ERR_SN")." \"".GetMessage("MAIL_CL_SERVER")."\"");
-					$arMsg[] = array("id"=>"SERVER", "text"=> GetMessage("B_MAIL_ERR_SN")." (\"".GetMessage("MAIL_CL_SERVER")."\")");
+					CMailError::SetError('B_MAIL_ERR_SERVER_NAME',  GetMessage('B_MAIL_ERR_SN').' "'.GetMessage('MAIL_CL_SERVER').'"');
+					$arMsg[] = array('id' => 'SERVER', 'text' => GetMessage('B_MAIL_ERR_SN').' "'.GetMessage('MAIL_CL_SERVER').'"');
 					break;
 				}
 			}
 		}
 
-		if(is_set($arFields, "LID"))
+		if (is_set($arFields, 'LID'))
 		{
-			$r = CLang::GetByID($arFields["LID"]);
-			if(!$r->Fetch())
+			$r = CLang::GetByID($arFields['LID']);
+			if (!$r->Fetch())
 			{
-				CMailError::SetError("B_MAIL_ERR_BAD_LANG", GetMessage("MAIL_CL_ERR_BAD_LANG"));
-				$arMsg[] = array("id"=>"LID", "text"=> GetMessage("MAIL_CL_ERR_BAD_LANG"));
+				CMailError::SetError('B_MAIL_ERR_BAD_LANG', GetMessage('MAIL_CL_ERR_BAD_LANG'));
+				$arMsg[] = array('id' => 'LID', 'text' => GetMessage('MAIL_CL_ERR_BAD_LANG'));
 			}
 		}
-		elseif($ID===false)
+		elseif ($ID === false)
 		{
-			CMailError::SetError("B_MAIL_ERR_BAD_LANG_NA", GetMessage("MAIL_CL_ERR_BAD_LANG_NX"));
-			$arMsg[] = array("id"=>"LID", "text"=> GetMessage("MAIL_CL_ERR_BAD_LANG_NX"));
+			CMailError::SetError('B_MAIL_ERR_BAD_LANG_NA', GetMessage('MAIL_CL_ERR_BAD_LANG_NX'));
+			$arMsg[] = array('id' => 'LID', 'text' => GetMessage('MAIL_CL_ERR_BAD_LANG_NX'));
 		}
 
-		if(!empty($arMsg))
+		if ($arFields['USER_ID'])
+		{
+			if (is_set($arFields, 'SERVICE_ID'))
+			{
+				$result = Bitrix\Mail\MailServicesTable::getList(array(
+					'filter' => array('=SITE_ID' => $arFields['LID'], '=ID' => $arFields['SERVICE_ID'])
+				));
+				if (!$result->fetch())
+				{
+					CMailError::SetError('B_MAIL_ERR_BAD_SERVICE_ID', GetMessage('MAIL_CL_ERR_BAD_SERVICE_ID'));
+					$arMsg[] = array('id' => 'SERVICE_ID', 'text' => GetMessage('MAIL_CL_ERR_BAD_SERVICE_ID'));
+				}
+			}
+			else if ($ID === false)
+			{
+				CMailError::SetError('B_MAIL_ERR_BAD_SERVICE_ID_NA', GetMessage('MAIL_CL_ERR_BAD_SERVICE_ID_NX'));
+				$arMsg[] = array('id' => 'SERVICE_ID', 'text' => GetMessage('MAIL_CL_ERR_BAD_SERVICE_ID_NX'));
+			}
+		}
+
+		if (!empty($arMsg))
 		{
 			$e = new CAdminException($arMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$GLOBALS['APPLICATION']->ThrowException($e);
 			return false;
 		}
+
 		return true;
-		//return ($err_cnt == CMailError::ErrCount());
 	}
 
 	public static function Add($arFields)
@@ -373,6 +406,14 @@ class CAllMailBox
 
 		if(is_set($arFields, "PASSWORD"))
 			$arFields["PASSWORD"]=CMailUtil::Crypt($arFields["PASSWORD"]);
+
+		if ($arFields['ACTIVE'] == 'Y' && $arFields['USER_ID'] != 0)
+		{
+			CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $arFields['LID']);
+
+			CUserOptions::SetOption('global', 'last_mail_check_'.$arFields['LID'], 0, false, $arFields['USER_ID']);
+			CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$arFields['LID'], false, $arFields['USER_ID']);
+		}
 
 		$ID = CDatabase::Add("b_mail_mailbox", $arFields);
 
@@ -411,6 +452,45 @@ class CAllMailBox
 
 		if(is_set($arFields, "PASSWORD"))
 			$arFields["PASSWORD"]=CMailUtil::Crypt($arFields["PASSWORD"]);
+
+		$db_mbox = CMailbox::GetList(array('ID' => $ID));
+		if (($mbox = $db_mbox->fetch()) !== false)
+		{
+			$userChanged = isset($arFields['USER_ID']) && $mbox['USER_ID'] != $arFields['USER_ID'];
+			$siteChanged = isset($arFields['LID']) && $mbox['LID'] != $arFields['LID'];
+
+			if ($userChanged || $siteChanged)
+			{
+				if ($mbox['ACTIVE'] == 'Y' && $mbox['USER_ID'] != 0)
+					CUserOptions::DeleteOption('global', 'last_mail_check_'.$mbox['LID'], false, $mbox['USER_ID']);
+
+				$newActive = isset($arFields['ACTIVE']) ? $arFields['ACTIVE'] : $mbox['ACTIVE'];
+				if ($newActive == 'Y')
+				{
+					$newUserId = isset($arFields['USER_ID']) ? $arFields['USER_ID'] : $mbox['USER_ID'];
+					$newSiteId = isset($arFields['LID']) ? $arFields['LID'] : $mbox['LID'];
+
+					CUserOptions::SetOption('global', 'last_mail_check_'.$newSiteId, 0, false, $newUserId);
+				}
+
+				CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$mbox['LID'], false, $mbox['USER_ID']);
+				CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$newSiteId, false, $newUserId);
+			}
+
+			if ($mbox['USER_ID'] != 0 || isset($arFields['USER_ID']) && $arFields['USER_ID'] != 0)
+			{
+				CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $mbox['LID']);
+				if ($siteChanged)
+					CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $arFields['LID']);
+
+				if ($userChanged)
+				{
+					CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $mbox['LID']);
+					if (isset($arFields['LID']) && $mbox['LID'] != $arFields['LID'])
+						CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $arFields['LID']);
+				}
+			}
+		}
 
 		CAgent::RemoveAgent("CMailbox::CheckMailAgent(".$ID.");", "mail");
 		if(intval($arFields["PERIOD_CHECK"])>0 && $arFields["SERVER_TYPE"]=="pop3")
@@ -452,6 +532,15 @@ class CAllMailBox
 		{
 			if(!CMailLog::Delete($log["ID"]))
 				return false;
+		}
+
+		$db_mbox = CMailbox::GetList(array('ID' => $ID, 'ACTIVE' => 'Y', '!USER_ID' => 0));
+		if ($mbox = $db_mbox->fetch())
+		{
+			CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $mbox['LID']);
+
+			CUserOptions::DeleteOption('global', 'last_mail_check_'.$mbox['LID'], false, $mbox['USER_ID']);
+			CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$mbox['LID'], false, $mbox['USER_ID']);
 		}
 
 		CAgent::RemoveAgent("CMailbox::CheckMailAgent(".$ID.");", "mail");
@@ -585,9 +674,9 @@ class CAllMailBox
 		global $DB;
 		$mailbox_id = IntVal($mailbox_id);
 		$strSql =
-				"SELECT MB.*, l.CHARSET as LANG_CHARSET ".
-				"FROM b_mail_mailbox MB, b_lang l ".
-				"WHERE MB.LID=l.LID ".
+				"SELECT MB.*, C.CHARSET as LANG_CHARSET ".
+				"FROM b_mail_mailbox MB, b_lang L, b_culture C ".
+				"WHERE MB.LID=L.LID AND C.ID=L.CULTURE_ID ".
 				"	AND MB.ID=".$mailbox_id;
 		$dbr = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		$dbr = new _CMailBoxDBRes($dbr);
@@ -595,6 +684,10 @@ class CAllMailBox
 			return CMailError::SetError("ERR_MAILBOX_NOT_FOUND", GetMessage("MAIL_CL_ERR_MAILBOX_NOT_FOUND"), GetMessage("MAIL_CL_ERR_MAILBOX_NOT_FOUND"));
 
 		@set_time_limit(0);
+
+		// https://support.google.com/mail/answer/47948
+		if ($arMAILBOX_PARAMS["SERVER"] == 'pop.gmail.com')
+			$arMAILBOX_PARAMS["LOGIN"] = 'recent:' . $arMAILBOX_PARAMS["LOGIN"];
 
 		$server = $arMAILBOX_PARAMS["SERVER"];
 		if ($arMAILBOX_PARAMS['USE_TLS'] == 'Y' && strpos($server, 'tls://') === false)
@@ -2584,15 +2677,13 @@ class CMailFilter
 	{
 		global $DB;
 
-		$arWords = CMailFilter::getWords($message, 999);
+		$arWords = CMailFilter::getWords($message, 1000);
 
 		if (empty($arWords))
 			return 0;
 
 		// for every word find Si
-		$strWords = "''";
-		foreach($arWords as $word)
-			$strWords .= ",'".md5($word)."'";
+		$arWords = array_map("md5", $arWords);
 
 		global $BX_MAIL_SPAM_CNT;
 		if(!is_set($BX_MAIL_SPAM_CNT, "G"))
@@ -2617,7 +2708,7 @@ class CMailFilter
 			"	(BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) / (2*GOOD_CNT/".$BX_MAIL_SPAM_CNT["G"].".0 + BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) as RATING, ".
 			"	ABS((BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) / (2*GOOD_CNT/".$BX_MAIL_SPAM_CNT["G"].".0 + BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) - 0.5) as MOD_RATING ".
 			"FROM b_mail_spam_weight SW ".
-			"WHERE WORD_ID IN (".$strWords.") ".
+			"WHERE WORD_ID IN ('".implode("', '", $arWords)."') ".
 			"	AND ABS((BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) / (2*GOOD_CNT/".$BX_MAIL_SPAM_CNT["G"].".0 + BAD_CNT/".$BX_MAIL_SPAM_CNT["B"].".0) - 0.5) > 0.1 ".
 			"	AND TOTAL_CNT>".$MIN_COUNT." ".
 			"ORDER BY MOD_RATING DESC ".

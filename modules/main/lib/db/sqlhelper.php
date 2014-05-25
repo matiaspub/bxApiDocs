@@ -49,7 +49,7 @@ abstract class SqlHelper
 		// shield [[database.]tablename.]columnname
 		if (strpos($identifier, '.') !== false)
 		{
-			$identifier = str_replace('.', $this->getLeftQuote() . '.' . $this->getRightQuote(), $identifier);
+			$identifier = str_replace('.', $this->getRightQuote() . '.' . $this->getLeftQuote(), $identifier);
 		}
 
 		// shield general borders
@@ -58,8 +58,8 @@ abstract class SqlHelper
 
 	abstract public function getQueryDelimiter();
 	abstract public function forSql($value, $maxLength = 0);
-	abstract public function getDateTimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME);
-	abstract public function getDateTimeFromDbFunction($fieldName);
+	abstract public function getCharToDateFunction($value);
+	abstract public function getDateToCharFunction($fieldName);
 	abstract public function getCurrentDateTimeFunction();
 	abstract public function getCurrentDateFunction();
 	abstract public function addSecondsToDateTime($seconds, $from = null);
@@ -68,7 +68,6 @@ abstract class SqlHelper
 	abstract public function getConcatFunction();
 	abstract public function getIsNullFunction($expression, $result);
 	abstract public function getLengthFunction($field);
-	abstract public function getToCharFunction($expr, $length = 0);
 	abstract public function getTopSql($sql, $limit, $offset = 0);
 
 	static public function getSubstrFunction($str, $from, $length = null)
@@ -128,4 +127,22 @@ abstract class SqlHelper
 	}
 
 	abstract protected function convertValueToDb($value, array $columnInfo);
+
+	/**
+	 * Returns ascending order specifier for ORDER BY clause
+	 * @return string
+	 */
+	static public function getAscendingOrder()
+	{
+		return 'ASC';
+	}
+
+	/**
+	 * Returns descending order specifier for ORDER BY clause
+	 * @return string
+	 */
+	static public function getDescendingOrder()
+	{
+		return 'DESC';
+	}
 }

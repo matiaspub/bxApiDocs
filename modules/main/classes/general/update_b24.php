@@ -311,7 +311,12 @@ class CB24Updater
 
 				$errorMessageTmp = "";
 
+				syslog(LOG_INFO, $_SERVER["HTTP_HOST"]."\tstart\t".$moduleId.$arUpdaters[$i1][0]);
+
 				CUpdateClient::RunUpdaterScript($this->updatersDir.$moduleId.$arUpdaters[$i1][0], $errorMessageTmp, "", $moduleId);
+
+				syslog(LOG_INFO, $_SERVER["HTTP_HOST"]."\tend\t".$moduleId.$arUpdaters[$i1][0]."\t".$errorMessageTmp);
+
 				if (strlen($errorMessageTmp) > 0)
 					$errorMessage .= str_replace("#MODULE#", $moduleId, str_replace("#VER#", $arUpdaters[$i1][1], GetMessage("SUPP_UK_UPDN_ERR"))).": ".$errorMessageTmp.".";
 

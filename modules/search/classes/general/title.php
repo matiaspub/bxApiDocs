@@ -3,10 +3,76 @@ class CAllSearchTitle extends CDBResult
 {
 	var $_arPhrase = array();
 	var $_arStemFunc;
+	var $minLength = 1;
 
 	public function __construct()
 	{
 		$this->_arStemFunc = stemming_init(LANGUAGE_ID);
+	}
+
+	public function Search($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$this->_arPhrase = stemming_split($phrase, LANGUAGE_ID);
+		if(!empty($this->_arPhrase))
+		{
+			$nTopCount = intval($nTopCount);
+			if($nTopCount <= 0)
+				$nTopCount = 5;
+
+			$arId = CSearchFullText::GetInstance()->searchTitle($phrase, $this->_arPhrase, $nTopCount, $arParams, $bNotFilter, $order);
+			if (!is_array($arId))
+			{
+				return $this->searchTitle($phrase, $nTopCount, $arParams, $bNotFilter, $order);
+			}
+			elseif (!empty($arId))
+			{
+				$strSql = "
+					SELECT
+						sc.ID
+						,sc.MODULE_ID
+						,sc.ITEM_ID
+						,sc.TITLE
+						,sc.PARAM1
+						,sc.PARAM2
+						,sc.DATE_CHANGE
+						,L.DIR
+						,L.SERVER_NAME
+						,sc.URL as URL
+						,scsite.URL as SITE_URL
+						,scsite.SITE_ID
+						,".$this->getRankFunction($phrase)." RANK1
+					FROM
+						b_search_content sc
+						INNER JOIN b_search_content_site scsite ON sc.ID = scsite.SEARCH_CONTENT_ID
+						INNER JOIN b_lang L ON scsite.SITE_ID = L.LID
+					WHERE
+						sc.ID in (".implode(",", $arId).")
+						and scsite.SITE_ID = '".SITE_ID."'
+					ORDER BY ".$this->getSqlOrder($bOrderByRank)."
+				";
+
+				$r = $DB->Query($DB->TopSql($strSql, $nTopCount+1));
+				parent::CDBResult($r);
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public static function getRankFunction($phrase)
+	{
+		return "0";
+	}
+
+	public function setMinWordLength($minLength)
+	{
+		$minLength = intval($minLength);
+		if ($minLength > 0)
+			$this->minLength = $minLength;
 	}
 
 	public function Fetch()
@@ -20,8 +86,7 @@ class CAllSearchTitle extends CDBResult
 
 			if(substr($r["URL"], 0, 1)=="=")
 			{
-				$events = GetModuleEvents("search", "OnSearchGetURL");
-				while ($arEvent = $events->Fetch())
+				foreach (GetModuleEvents("search", "OnSearchGetURL", true) as $arEvent)
 					$r["URL"] = ExecuteModuleEventEx($arEvent, array($r));
 			}
 

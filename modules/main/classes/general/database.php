@@ -22,6 +22,7 @@ class CAllDatabase
 	var $column_cache = Array();
 	var $bModuleConnection;
 	var $bNodeConnection;
+	var $node_id;
 	var $bMasterOnly = 0;
 	/** @var CDatabase */
 	var $obSlave = null;
@@ -70,6 +71,7 @@ class CAllDatabase
 				$node_DB->debug = $DB->debug;
 				$node_DB->DebugToFile = $DB->DebugToFile;
 				$node_DB->bNodeConnection = true;
+				$node_DB->node_id = $node_id;
 				if($node_DB->Connect($node["DB_HOST"], $node["DB_NAME"], $node["DB_LOGIN"], $node["DB_PASSWORD"]))
 				{
 					if(defined("DELAY_DB_CONNECT") && DELAY_DB_CONNECT===true)
@@ -138,59 +140,59 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Открывает соединение с базой данных. Функция возвращает "true" при успешном открытии соединения или "false" при ошибке.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $host  Сервер (хост) базы данных.
-	 *
-	 *
-	 *
-	 * @param string $db  Имя базы данных.
-	 *
-	 *
-	 *
-	 * @param string $login  Логин.
-	 *
-	 *
-	 *
-	 * @param string $password  Пароль.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if(!(<b>$DB-&gt;Connect</b>($DBHost, $DBName, $DBLogin, $DBPassword)))
-	 * {
-	 * 	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php"))
-	 * 	{
-	 * 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php");
-	 * 	}
-	 * 	else
-	 * 	{
-	 * 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/dbconn_error.php");
-	 * 	}
-	 * 	die();
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
-	 * @author Bitrix
-	 */
+	* <p>Открывает соединение с базой данных. Функция возвращает "true" при успешном открытии соединения или "false" при ошибке.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $host  Сервер (хост) базы данных.
+	*
+	*
+	*
+	* @param string $db  Имя базы данных.
+	*
+	*
+	*
+	* @param string $login  Логин.</b
+	*
+	*
+	*
+	* @param string $password  Пароль.</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if(!(<b>$DB-&gt;Connect</b>($DBHost, $DBName, $DBLogin, $DBPassword)))
+	* {
+	* 	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php"))
+	* 	{
+	* 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/php_interface/dbconn_error.php");
+	* 	}
+	* 	else
+	* 	{
+	* 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/dbconn_error.php");
+	* 	}
+	* 	die();
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/disconnect.php">CDatabase::Disconnect</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
+	* @author Bitrix
+	*/
 	public static function Connect($DBHost, $DBName, $DBLogin, $DBPassword)
 	{
 		//is extended
@@ -209,55 +211,59 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в настройках языка или сайта.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Значение даты для формата текущего сайта.
-	 *
-	 *
-	 *
-	 * @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	 * времени) <br>Необязательный. По умолчанию "FULL".
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части.<br>Необязательный. По умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID,    
-	 *         ".<b>$DB-&gt;DateToCharFunction</b>("DATE_CREATE")."    DATE_CREATE
-	 *     FROM 
-	 *         my_table
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в настройках языка или сайта.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $value  Значение даты для формата текущего сайта.
+	*
+	*
+	*
+	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
+	* времени) <br>Необязательный. По умолчанию "FULL".
+	*
+	*
+	*
+	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
+	* умолчанию текущий. Отсутствовал в версях с 3.0.11 до 3.3.21.
+	*
+	*
+	*
+	* @param string $SearchInSitesOnly = false Необязательный.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID,    
+	*         ".<b>$DB-&gt;DateToCharFunction</b>("DATE_CREATE")."    DATE_CREATE
+	*     FROM 
+	*         my_table
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
+	* @author Bitrix
+	*/
 	public static function DateToCharFunction($strFieldName, $strType="FULL")
 	{
 		//is extended
@@ -265,65 +271,65 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - функция вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в настройках языка, либо настройках сайта.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Если функция вызывается в публичной части сайта, то это - значение
-	 * даты для формата текущего сайта. Если функция вызывается в
-	 * административной части, то это - значение даты для формата
-	 * текущего языка.
-	 *
-	 *
-	 *
-	 * @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	 * времени) <br>Необязательный. По умолчанию "FULL".
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части.<br>Необязательный. По умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arr = getdate();
-	 * $ndate = mktime(9,0,0,$arr["mon"],$arr["mday"],$arr["year"]);
-	 * $next_exec = <b>$DB-&gt;CharToDateFunction</b>(GetTime($ndate,"FULL"));
-	 * CAgent::AddAgent("SendDailyStatistics();","statistic","Y",86400,"","Y",$next_exec, 25);
-	 * ?&gt;
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID
-	 *     FROM 
-	 *         my_table
-	 *     WHERE 
-	 *         DATE_CREATE &lt;= ".<b>$DB-&gt;CharToDateFunction</b>("10.01.2003 23:59:59")."
-	 *     ";
-	 * $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - функция вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в настройках языка, либо настройках сайта.</p>
+	*
+	*
+	*
+	*
+	* @param string $value  Если функция вызывается в публичной части сайта, то это - значение
+	* даты для формата текущего сайта. Если функция вызывается в
+	* административной части, то это - значение даты для формата
+	* текущего языка.
+	*
+	*
+	*
+	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
+	* времени) <br>Необязательный. По умолчанию "FULL".
+	*
+	*
+	*
+	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
+	* умолчанию текущий. Отсутствовал в версиях с 3.0.11 по 3.3.21.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arr = getdate();
+	* $ndate = mktime(9,0,0,$arr["mon"],$arr["mday"],$arr["year"]);
+	* $next_exec = <b>$DB-&gt;CharToDateFunction</b>(GetTime($ndate,"FULL"));
+	* CAgent::AddAgent("SendDailyStatistics();","statistic","Y",86400,"","Y",$next_exec, 25);
+	* ?&gt;
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID
+	*     FROM 
+	*         my_table
+	*     WHERE 
+	*         DATE_CREATE &lt;= ".<b>$DB-&gt;CharToDateFunction</b>("10.01.2003 23:59:59")."
+	*     ";
+	* $rs = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php
+	* @author Bitrix
+	*/
 	public static function CharToDateFunction($strValue, $strType="FULL")
 	{
 		//is extended
@@ -364,66 +370,70 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Функция конвертирует любой формат времени допустимый в настройках сайта в формат принятый в PHP.</p> <p>Правила конвертации:</p> <p> </p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> <th width="20%">После конвертации</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Y</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>m</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>d</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>H</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>i</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>s</td> <td>Секунды (00 - 59)</td> </tr> </table>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $date_format  Год (0001 - 9999)
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // исходный формат
-	 * $format = "DD.MM.YYYY HH:MI:SS";
-	 * 
-	 * // переведем в PHP формат
-	 * $php_format = <b>$DB-&gt;DateFormatToPHP</b>($format); // d.m.Y H:i:s
-	 * ?&gt;
-	 * &lt;?
-	 * // вывод текущей даты в формате текущего сайта
-	 * 
-	 * // получим формат сайта
-	 * $site_format = CSite::GetDateFormat("SHORT");
-	 * 
-	 * // переведем формат сайта в формат PHP
-	 * $php_format = <b>$DB-&gt;DateFormatToPHP</b>($site_format);
-	 * 
-	 * // выведем текущую дату в формате текущего сайта
-	 * echo date($php_format, time());
-	 * ?&gt;
-	 * &lt;?
-	 * // вывод вчерашне даты в формате текущего сайта
-	 * 
-	 * // получим формат сайта
-	 * $site_format = CSite::GetDateFormat("SHORT");
-	 * 
-	 * // переведем формат сайта в формат PHP
-	 * $php_format = <b>$DB-&gt;DateFormatToPHP</b>($site_format);
-	 * 
-	 * // выведем вчерашнюю дату в формате текущего сайта
-	 * echo date($php_format, time()-86400);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	 * с датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php
-	 * @author Bitrix
-	 */
+	* <p>Функция конвертирует любой формат времени допустимый в настройках сайта в формат принятый в PHP.</p> <p>Правила конвертации:</p> <p> </p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> <th width="20%">После конвертации</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Y</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>m</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>d</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>H</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>i</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>s</td> <td>Секунды (00 - 59)</td> </tr> </table>
+	*
+	*
+	*
+	*
+	* @param string $format  Y
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // исходный формат
+	* $format = "DD.MM.YYYY HH:MI:SS";
+	* 
+	* // переведем в PHP формат
+	* $php_format = <b>$DB-&gt;DateFormatToPHP</b>($format); // d.m.Y H:i:s
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // вывод текущей даты в формате текущего сайта
+	* 
+	* // получим формат сайта
+	* $site_format = CSite::GetDateFormat("SHORT");
+	* 
+	* // переведем формат сайта в формат PHP
+	* $php_format = <b>$DB-&gt;DateFormatToPHP</b>($site_format);
+	* 
+	* // выведем текущую дату в формате текущего сайта
+	* echo date($php_format, time());
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // вывод вчерашне даты в формате текущего сайта
+	* 
+	* // получим формат сайта
+	* $site_format = CSite::GetDateFormat("SHORT");
+	* 
+	* // переведем формат сайта в формат PHP
+	* $php_format = <b>$DB-&gt;DateFormatToPHP</b>($site_format);
+	* 
+	* // выведем вчерашнюю дату в формате текущего сайта
+	* echo date($php_format, time()-86400);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
+	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php
+	* @author Bitrix
+	*/
 	function DateFormatToPHP($format)
 	{
 		static $cache = array();
@@ -454,105 +464,107 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Преобразует дату из одного заданного формата в другой заданный формат. В формате допустимы следующие обозначения:</p> <p> </p> <table width="100%" class="tnormal"> <tr> <th width="40%">Обозначение</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>Секунды (00 - 59)</td> </tr> </table>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $date  Год (0001 - 9999)
-	 *
-	 *
-	 *
-	 * @param string $from_format = "DD.MM.YYYY Месяц (01 - 12)
-	 *
-	 *
-	 *
-	 * @param H $H  День (01 - 31)
-	 *
-	 *
-	 *
-	 * @param M $I  Часы (00 - 24)
-	 *
-	 *
-	 *
-	 * @param S $S  Минуты (00 - 59)
-	 *
-	 *
-	 *
-	 * @param  $string  Секунды (00 - 59)
-	 *
-	 *
-	 *
-	 * @param to_forma $t = "DD.MM.YYYY 
-	 *
-	 *
-	 *
-	 * @param H $H  Дата для конвертации.
-	 *
-	 *
-	 *
-	 * @param M $I  Текущий формат даты. <br>Необязательный. По умолчанию - "DD.MM.YYYY HH:MI:SS".
-	 *
-	 *
-	 *
-	 * @param S $S  В какой формат необходимо преобразовать. <br>Необязательный. По
-	 * умолчанию - "DD.MM.YYYY HH:MI:SS".
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // зададим дату
-	 * $date = "31.12.2007";
-	 * 
-	 * // укажем формат этой даты
-	 * $format = "DD.MM.YYYY";
-	 * 
-	 * // получим формат текущего сайта
-	 * $new_format = CSite::GetDateFormat("SHORT"); // YYYY-MM-DD
-	 * 
-	 * // переведем дату из одного формата в другой
-	 * $new_date = $DB-&gt;<b>FormatDate</b>($date, $format, $new_format);
-	 * 
-	 * // в результате получим дату в новом формате
-	 * echo $new_date; // 2007-12-31
-	 * ?&gt;
-	 * &lt;?
-	 * // конвертация даты из формата одного сайта в формат другого
-	 * 
-	 * // получим формат сайта ru
-	 * $format_ru = CSite::GetDateFormat("SHORT", "ru"); // DD.MM.YYYY
-	 * 
-	 * // получим формат сайта en
-	 * $format_en = CSite::GetDateFormat("SHORT", "en"); // YYYY-MM-DD
-	 * 
-	 * // переведем дату из формата сайта ru в формат сайта en
-	 * $new_date = $DB-&gt;<b>FormatDate</b>($date, $format_ru, $format_en);
-	 * 
-	 * // в результате получим дату в новом формате
-	 * echo $date; // 2007-12-31
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/convertdatetime.php">ConvertDateTime</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php
-	 * @author Bitrix
-	 */
+	* <p>Преобразует дату из одного заданного формата в другой заданный формат. В формате допустимы следующие обозначения:</p> <p> </p> <table width="100%" class="tnormal"> <tr> <th width="40%">Обозначение</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>Секунды (00 - 59)</td> </tr> </table>
+	*
+	*
+	*
+	*
+	* @param string $date  Год (0001 - 9999)</b
+	*
+	*
+	*
+	* @param string $format = "DD.MM.YYYY Месяц (01 - 12)</bo
+	*
+	*
+	*
+	* @param H $H  День (01 - 31)</b
+	*
+	*
+	*
+	* @param M $I  Часы (00 - 24)</bo
+	*
+	*
+	*
+	* @param S $S  Минуты (00 - 59)
+	*
+	*
+	*
+	* @param  $string  Секунды (00 - 59)</bod
+	*
+	*
+	*
+	* @param new_forma $t = "DD.MM.YYYY 
+	*
+	*
+	*
+	* @param H $H  Дата для конвертации.
+	*
+	*
+	*
+	* @param M $I  Текущий формат даты. <br>Необязательный. По умолчанию - "DD.MM.YYYY HH:MI:SS".
+	*
+	*
+	*
+	* @param S $S  В какой формат необходимо преобразовать. <br>Необязательный. По
+	* умолчанию - "DD.MM.YYYY HH:MI:SS".
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // зададим дату
+	* $date = "31.12.2007";
+	* 
+	* // укажем формат этой даты
+	* $format = "DD.MM.YYYY";
+	* 
+	* // получим формат текущего сайта
+	* $new_format = CSite::GetDateFormat("SHORT"); // YYYY-MM-DD
+	* 
+	* // переведем дату из одного формата в другой
+	* $new_date = $DB-&gt;<b>FormatDate</b>($date, $format, $new_format);
+	* 
+	* // в результате получим дату в новом формате
+	* echo $new_date; // 2007-12-31
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // конвертация даты из формата одного сайта в формат другого
+	* 
+	* // получим формат сайта ru
+	* $format_ru = CSite::GetDateFormat("SHORT", "ru"); // DD.MM.YYYY
+	* 
+	* // получим формат сайта en
+	* $format_en = CSite::GetDateFormat("SHORT", "en"); // YYYY-MM-DD
+	* 
+	* // переведем дату из формата сайта ru в формат сайта en
+	* $new_date = $DB-&gt;<b>FormatDate</b>($date, $format_ru, $format_en);
+	* 
+	* // в результате получим дату в новом формате
+	* echo $date; // 2007-12-31
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php">CDatabase::DateFormatToPHP</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/convertdatetime.php">ConvertDateTime</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
+	* датой и временем</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php
+	* @author Bitrix
+	*/
 	public static function FormatDate($strDate, $format="DD.MM.YYYY HH:MI:SS", $new_format="DD.MM.YYYY HH:MI:SS")
 	{
 		$strDate = trim($strDate);
@@ -694,6 +706,88 @@ class CAllDatabase
 		return $strResult;
 	}
 
+	
+	/**
+	* <p>Функция выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $sql  SQL запрос.</bod
+	*
+	*
+	*
+	* @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
+	* возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
+	* ошибки функция прекращает выполнение всей
+	* страницы.<br>Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
+	* данная функция CDatabase::Query. Если в SQL запросе будет ошибка и если в
+	* файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
+	* то на экране будет выведена данная информация и сам SQL запрос.
+	* Необязательный.
+	*
+	*
+	*
+	* @param array $Options = array() Необязательный.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function GetByID($ID, $GET_BY_SID="N")
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: GetByID&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$where = ($GET_BY_SID=="N") ? " F.ID = '".intval($ID)."' " : " F.VARNAME='".$DB-&gt;ForSql($ID,50)."' ";
+	* 	$strSql = "
+	* 		SELECT
+	* 			F.*,
+	* 			F.FIRST_SITE_ID,
+	* 			F.FIRST_SITE_ID									LID,
+	* 			F.VARNAME,
+	* 			F.VARNAME										SID,
+	* 			".$DB-&gt;DateToCharFunction("F.TIMESTAMP_X")."	TIMESTAMP_X,
+	* 			count(distinct D1.ID)							C_FIELDS,
+	* 			count(distinct D2.ID)							QUESTIONS,
+	* 			count(distinct S.ID)							STATUSES
+	* 		FROM b_form F
+	* 		LEFT JOIN b_form_status S ON (S.FORM_ID = F.ID)
+	* 		LEFT JOIN b_form_field D1 ON (D1.FORM_ID = F.ID and D1.ADDITIONAL='Y')
+	* 		LEFT JOIN b_form_field D2 ON (D2.FORM_ID = F.ID and D2.ADDITIONAL&lt;&gt;'Y')
+	* 		WHERE 
+	* 			$where
+	* 		GROUP BY 
+	* 			F.ID
+	* 		";
+	* 	$res = <b>$DB-&gt;Query</b>($strSql, false, $err_mess.__LINE__);
+	* 	return $res;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
+	* @author Bitrix
+	*/
 	public static function Query($strSql, $bIgnoreErrors=false)
 	{
 		//is extended
@@ -703,82 +797,83 @@ class CAllDatabase
 	//query with CLOB
 	
 	/**
-	 * <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.).</p> <p>В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $sql  SQL запрос.
-	 *
-	 *
-	 *
-	 * @param array $binds  Массив полей типа BLOB, CLOB, LONG и т.п. в формате array("имя поля" =&gt;
-	 * "значение" [, ...]).
-	 *
-	 *
-	 *
-	 * @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
-	 * возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
-	 * ошибки функция прекращает выполнение всей
-	 * страницы.<br>Необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
-	 * данная функция CDatabase::QueryBind. Если в SQL запросе будет ошибка и если в
-	 * файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
-	 * то на экране будет выведена данная информация и сам SQL запрос.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-	 * $APPLICATION-&gt;SetTitle("TEST CLOB");
-	 * require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
-	 * 
-	 * // обновление поля
-	 * 
-	 * $MY_FIELD_VALUE = "123";
-	 * 
-	 * // обновим поле MY_FIELD типа CLOB
-	 * $strError = "";
-	 * $arFields["NEWS_TEXT_FCK"] = $MY_FIELD_VALUE;
-	 * $strUpdate = $DB-&gt;PrepareUpdate("aa_abc", $arFields);
-	 * if($strUpdate != "")
-	 * {
-	 * $strSql = "UPDATE aa_abc SET ".$strUpdate." WHERE ID=15";
-	 * // в переменной $MY_FIELD_VALUE содержится текст длиной более 4000 символов
-	 * $arBinds = array("NEWS_TEXT_FCK" =&gt; $MY_FIELD_VALUE);
-	 * 
-	 * // выполним запрос со связыванием :MY_FIELD с реальным значением
-	 * if(!$DB-&gt;QueryBind($strSql, $arBinds))
-	 * $strError = "Query Error!";
-	 * }
-	 * if($strError=="")
-	 * echo "all Ok!";
-	 * 
-	 * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php
-	 * @author Bitrix
-	 */
+	* <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.).</p> <p>В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol>
+	*
+	*
+	*
+	*
+	* @param string $sql  SQL запрос.</bod
+	*
+	*
+	*
+	* @param array $binds  Массив полей типа BLOB, CLOB, LONG и т.п. в формате array("имя поля" =&gt;
+	* "значение" [, ...]).
+	*
+	*
+	*
+	* @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
+	* возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
+	* ошибки функция прекращает выполнение всей
+	* страницы.<br>Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда была вызвана
+	* данная функция CDatabase::QueryBind. Если в SQL запросе будет ошибка и если в
+	* файле <b>/bitrix/php_interface/dbconn.php</b> установлена переменная <b>$DBDebug=true;</b>,
+	* то на экране будет выведена данная информация и сам SQL запрос.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+	* $APPLICATION-&gt;SetTitle("TEST CLOB");
+	* require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
+	* 
+	* // обновление поля
+	* 
+	* $MY_FIELD_VALUE = "123";
+	* 
+	* // обновим поле MY_FIELD типа CLOB
+	* $strError = "";
+	* $arFields["NEWS_TEXT_FCK"] = $MY_FIELD_VALUE;
+	* $strUpdate = $DB-&gt;PrepareUpdate("aa_abc", $arFields);
+	* if($strUpdate != "")
+	* {
+	* $strSql = "UPDATE aa_abc SET ".$strUpdate." WHERE ID=15";
+	* // в переменной $MY_FIELD_VALUE содержится текст длиной более 4000 символов
+	* $arBinds = array("NEWS_TEXT_FCK" =&gt; $MY_FIELD_VALUE);
+	* 
+	* // выполним запрос со связыванием :MY_FIELD с реальным значением
+	* if(!$DB-&gt;QueryBind($strSql, $arBinds))
+	* $strError = "Query Error!";
+	* }
+	* if($strError=="")
+	* echo "all Ok!";
+	* 
+	* require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php">CDatabase::ForSql</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php
+	* @author Bitrix
+	*/
 	public function QueryBind($strSql, $arBinds, $bIgnoreErrors=false)
 	{
 		//is extended
@@ -792,52 +887,52 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $value  Исходная строка.
-	 *
-	 *
-	 *
-	 * @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
-	 * обрезается).
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 *     SELECT 
-	 *         ID 
-	 *     FROM 
-	 *         b_stat_phrase_list 
-	 *     WHERE 
-	 *         PHRASE='".<b>$DB-&gt;ForSql</b>($search_phrase)."' 
-	 *     and SESSION_ID='".$_SESSION["SESS_SESSION_ID"]."'
-	 *     ";
-	 * $w = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php
-	 * @author Bitrix
-	 */
+	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $value  Исходная строка. </h
+	*
+	*
+	*
+	* @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
+	* обрезается).
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	*     SELECT 
+	*         ID 
+	*     FROM 
+	*         b_stat_phrase_list 
+	*     WHERE 
+	*         PHRASE='".<b>$DB-&gt;ForSql</b>($search_phrase)."' 
+	*     and SESSION_ID='".$_SESSION["SESS_SESSION_ID"]."'
+	*     ";
+	* $w = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/update.php">CDatabase::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/insert.php">CDatabase::Insert</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php
+	* @author Bitrix
+	*/
 	public static function ForSql($strValue, $iMaxLength=0)
 	{
 		//is extended
@@ -845,62 +940,62 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Функция подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля. </p> <p></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Имя таблицы для вставки записи.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	 * поля2"=&gt;"значение2" [, ...]. <br> Если необходимо вставить значение NULL,
-	 * то значение должно быть равно false.
-	 *
-	 *
-	 *
-	 * @param string $dir = "" Не используется.
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части. Используется для определения формата
-	 * даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	 * умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function AddResultAnswer($arFields)
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$arInsert = <b>$DB-&gt;PrepareInsert</b>("b_form_result_answer", $arFields, "form");
-	 * 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
-	 * 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * 	return intval($DB-&gt;LastID());
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
-	 * @author Bitrix
-	 */
+	* <p>Функция подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля. </p> <p></p>
+	*
+	*
+	*
+	*
+	* @param string $TableName  Имя таблицы для вставки записи.
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
+	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо вставить значение NULL,
+	* то значение должно быть равно false.
+	*
+	*
+	*
+	* @param string $FileDir = "" Не используется.
+	*
+	*
+	*
+	* @param string $lang = false Код сайта для публичной части, либо код языка для
+	* административной части. Используется для определения формата
+	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
+	* умолчанию false.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function AddResultAnswer($arFields)
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: AddResultAnswer&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$arInsert = <b>$DB-&gt;PrepareInsert</b>("b_form_result_answer", $arFields, "form");
+	* 	$strSql = "INSERT INTO b_form_result_answer (".$arInsert[0].") VALUES (".$arInsert[1].")";
+	* 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* 	return intval($DB-&gt;LastID());
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php">CDatabase::PrepareUpdate</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
+	* @author Bitrix
+	*/
 	public static function PrepareInsert($strTableName, $arFields)
 	{
 		//is extended
@@ -908,63 +1003,67 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Функция подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $table  Имя таблицы.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	 * поля2"=&gt;"значение2" [, ...]. <br> Если необходимо изменить значение на
-	 * NULL, то значение в массиве должно быть равно false.
-	 *
-	 *
-	 *
-	 * @param string $dir = "" Не используется.
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части. Используется для определения формата
-	 * даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	 * умолчанию текущий.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function UpdateResultField($arFields, $RESULT_ID, $FIELD_ID)
-	 * {
-	 * 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: UpdateResultField&lt;br&gt;Line: ";
-	 * 	global $DB;
-	 * 	$RESULT_ID = intval($RESULT_ID);
-	 * 	$FIELD_ID = intval($FIELD_ID);
-	 * 	$strUpdate = <b>$DB-&gt;PrepareUpdate</b>("b_form_result_answer", $arFields, "form");
-	 * 	$strSql = "UPDATE b_form_result_answer SET ".$strUpdate." WHERE RESULT_ID=".$RESULT_ID." and FIELD_ID=".$FIELD_ID;
-	 * 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
-	 * @author Bitrix
-	 */
+	* <p>Функция подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом функция сама преобразует все значение в SQL вид в зависимости от типа поля.</p>
+	*
+	*
+	*
+	*
+	* @param string $TableName  Имя таблицы.
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
+	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо изменить значение на
+	* NULL, то значение в массиве должно быть равно false.
+	*
+	*
+	*
+	* @param string $FileDir = "" Не используется.
+	*
+	*
+	*
+	* @param string $lang = false Код сайта для публичной части, либо код языка для
+	* административной части. Используется для определения формата
+	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
+	* умолчанию false.
+	*
+	*
+	*
+	* @param string $TableAlias = "" Необязательный.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function UpdateResultField($arFields, $RESULT_ID, $FIELD_ID)
+	* {
+	* 	$err_mess = (CForm::err_mess())."&lt;br&gt;Function: UpdateResultField&lt;br&gt;Line: ";
+	* 	global $DB;
+	* 	$RESULT_ID = intval($RESULT_ID);
+	* 	$FIELD_ID = intval($FIELD_ID);
+	* 	$strUpdate = <b>$DB-&gt;PrepareUpdate</b>("b_form_result_answer", $arFields, "form");
+	* 	$strSql = "UPDATE b_form_result_answer SET ".$strUpdate." WHERE RESULT_ID=".$RESULT_ID." and FIELD_ID=".$FIELD_ID;
+	* 	$DB-&gt;Query($strSql, false, $err_mess.__LINE__);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php">CDatabase::PrepareInsert</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
+	* @author Bitrix
+	*/
 	public static function PrepareUpdate($strTableName, $arFields)
 	{
 		//is extended
@@ -972,60 +1071,65 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Функция разбирает строку из пакета запросов на массив запросов и возвращает этот массив.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $sql  Строка с пакетом запросов, разделенных символом ";" для MySQL версии
-	 * и символом "/" для Oracle версии.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function RunSqlBatch($filepath)
-	 * {
-	 *     $arErr = Array();
-	 * 	// откроем файл с запросами
-	 *     $f = @fopen($filepath, "rb");
-	 *     if($f)
-	 *     {
-	 *         $contents = fread($f, filesize($filepath));
-	 *         fclose($f);
-	 *         
-	 * 		// разобьем на отдельные запросы
-	 *         $arSql = <b>$this-&gt;ParseSqlBatch</b>($contents);
-	 *         for($i=0; $i&lt;count($arSql); $i++)
-	 *         {
-	 *             $strSql = str_replace("\r\n", "\n", $arSql[$i]);
-	 *             if(!$this-&gt;Query($strSql, true))
-	 *                 $arErr[] = $this-&gt;db_Error;
-	 *         }
-	 *     }
-	 *     if(count($arErr)&gt;0)
-	 *         return $arErr;
-	 * 
-	 *     return false;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/runsqlbatch.php">CDatabase::RunSqlBatch</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/parsesqlbatch.php
-	 * @author Bitrix
-	 */
+	* <p>Функция разбирает строку из пакета запросов на массив запросов и возвращает этот массив.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $sql  Строка с пакетом запросов, разделенных символом ";" для MySQL версии
+	* и символом "/" для Oracle версии.
+	*
+	*
+	*
+	* @param bool $Incremental = False Необязательный.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function RunSqlBatch($filepath)
+	* {
+	*     $arErr = Array();
+	* 	// откроем файл с запросами
+	*     $f = @fopen($filepath, "rb");
+	*     if($f)
+	*     {
+	*         $contents = fread($f, filesize($filepath));
+	*         fclose($f);
+	*         
+	* 		// разобьем на отдельные запросы
+	*         $arSql = <b>$this-&gt;ParseSqlBatch</b>($contents);
+	*         for($i=0; $i&lt;count($arSql); $i++)
+	*         {
+	*             $strSql = str_replace("\r\n", "\n", $arSql[$i]);
+	*             if(!$this-&gt;Query($strSql, true))
+	*                 $arErr[] = $this-&gt;db_Error;
+	*         }
+	*     }
+	*     if(count($arErr)&gt;0)
+	*         return $arErr;
+	* 
+	*     return false;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/runsqlbatch.php">CDatabase::RunSqlBatch</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/parsesqlbatch.php
+	* @author Bitrix
+	*/
 	public function ParseSqlBatch($strSql, $bIncremental = False)
 	{
 		if(strtolower($this->type)=="mysql")
@@ -1170,57 +1274,58 @@ class CAllDatabase
 
 	
 	/**
-	 * <p>Проверяет дату на корректность и возвращает "true" если дата корректна, в противном случае - "false".</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $date  Строка с проверяемой датой.
-	 *
-	 *
-	 *
-	 * @param string $format = false Формат даты.<br> Необязательный. По умолчанию - "false" - определять
-	 * формат по текущему сайту, либо языку (если административная
-	 * часть).
-	 *
-	 *
-	 *
-	 * @param string $site = false Код сайта для публичной части, либо код языка для
-	 * административной части (для определения формата, если <i>format</i>
-	 * равен false).<br>Необязательный. По умолчанию - текущий сайт, либо
-	 * текущий язык (если административная часть).
-	 *
-	 *
-	 *
-	 * @param string $type = "SHORT" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	 * времени) <br>Необязательный. По умолчанию "SHORT".
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (!<b>$DB-&gt;IsDate</b>("12.10.2005 22:34:15", "DD.MM.YYYY HH:MI:SS"))
-	 *   echo "Ошибка. Неверный формат даты.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
-	 * датой и временем</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/isdate.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет дату на корректность и возвращает "true" если дата корректна, в противном случае - "false".</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $date  Строка с проверяемой датой.
+	*
+	*
+	*
+	* @param string $format = false Формат даты.<br> Необязательный. По умолчанию - "false" - определять
+	* формат по текущему сайту, либо языку (если административная
+	* часть).
+	*
+	*
+	*
+	* @param string $lang = false Код сайта для публичной части, либо код языка для
+	* административной части (для определения формата, если <i>format</i>
+	* равен false).<br>Необязательный. По умолчанию - текущий сайт, либо
+	* текущий язык (если административная часть).
+	*
+	*
+	*
+	* @param string $format_type = "SHORT" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
+	* времени) <br>Необязательный. По умолчанию "SHORT". С версии 3.3.7 до
+	* версии 4.1.0 назывался Type.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (!<b>$DB-&gt;IsDate</b>("12.10.2005 22:34:15", "DD.MM.YYYY HH:MI:SS"))
+	*   echo "Ошибка. Неверный формат даты.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
+	* датой и временем</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/isdate.php
+	* @author Bitrix
+	*/
 	public static function IsDate($value, $format=false, $lang=false, $format_type="SHORT")
 	{
 		if ($format===false) $format = CLang::GetDateFormat($format_type, $lang);
@@ -1257,7 +1362,7 @@ class CAllDatabase
 		return $res;
 	}
 
-	public function addDebugQuery($strSql, $exec_time)
+	public function addDebugQuery($strSql, $exec_time, $node_id = 0)
 	{
 		$this->cntQuery++;
 		$this->timeQuery += $exec_time;
@@ -1321,6 +1426,7 @@ class CAllDatabase
 			"TIME" => $exec_time,
 			"TRACE" => $trace,
 			"BX_STATE" => $GLOBALS["BX_STATE"],
+			"NODE_ID" => $node_id,
 		);
 	}
 
@@ -1361,7 +1467,8 @@ class CAllDBResult
 	var $is_filtered = false;
 	var $nStartPage = 0;
 	var $nEndPage = 0;
-
+	/** @var \Bitrix\Main\DB\Result */
+	var $resultObject = null;
 
 	/** @param CDBResult $res */
 	public function CAllDBResult($res = null)
@@ -1391,6 +1498,7 @@ class CAllDBResult
 			$this->bDescPageNumbering = $res->bDescPageNumbering;
 			$this->SqlTraceIndex = $res->SqlTraceIndex;
 			$this->DB = $res->DB;
+			$this->arUserMultyFields = $res->arUserMultyFields;
 		}
 		elseif($obj && $res instanceof \Bitrix\Main\DB\ArrayResult)
 		{
@@ -1399,6 +1507,7 @@ class CAllDBResult
 		elseif($obj && $res instanceof \Bitrix\Main\DB\Result)
 		{
 			$this->result = $res->getResource();
+			$this->resultObject = $res;
 		}
 		elseif(is_array($res))
 		{
@@ -1444,221 +1553,232 @@ class CAllDBResult
 	}
 
 	/**
+	 * @abstract
 	 * @return array
 	 */
 	
 	/**
-	 * <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - функция вернет "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsUser = CUser::GetByID($USER_ID);
-	 * $arUser = <b>$rsUser-&gt;Fetch</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
-	 * @author Bitrix
-	 */
+	* <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - функция вернет "false".</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsUser = CUser::GetByID($USER_ID);
+	* $arUser = <b>$rsUser-&gt;Fetch</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
+	* @author Bitrix
+	*/
 	public static function Fetch()
+	{
+		return array();
+	}
+
+	/**
+	 * @abstract
+	 * @return array
+	 */
+	protected function FetchInternal()
 	{
 		return array();
 	}
 
 	
 	/**
-	 * <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
-	 * $rsBanners-&gt;NavStart(20);
-	 * if (intval(<b>$rsBanners-&gt;SelectedRowsCount()</b>)&gt;0):
-	 *     echo $rsBanners-&gt;NavPrint("Баннеры");
-	 *     while($rsBanners-&gt;NavNext(true, "f_")):
-	 *          echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
-	 *     endwhile;
-	 *     echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
+	* $rsBanners-&gt;NavStart(20);
+	* if (intval(<b>$rsBanners-&gt;SelectedRowsCount()</b>)&gt;0):
+	*     echo $rsBanners-&gt;NavPrint("Баннеры");
+	*     while($rsBanners-&gt;NavNext(true, "f_")):
+	*          echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
+	*     endwhile;
+	*     echo $rsBanners-&gt;NavPrint("Баннеры");
+	* endif;
+	* ?&gt;
+	* </ht
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php">CDBResult::AffectedRowsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
+	* @author Bitrix
+	*/
 	public static function SelectedRowsCount()
 	{
 	}
 
 	
 	/**
-	 * <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $strSql = "
-	 * 	INSERT INTO b_stat_day(
-	 * 		ID,
-	 * 		DATE_STAT,
-	 * 		TOTAL_HOSTS)
-	 * 	SELECT
-	 * 		SQ_B_STAT_DAY.NEXTVAL,
-	 * 		trunc(SYSDATE),
-	 * 		nvl(PREV.MAX_TOTAL_HOSTS,0)
-	 * 	FROM
-	 * 		(SELECT	max(TOTAL_HOSTS) AS MAX_TOTAL_HOSTS	FROM b_stat_day) PREV						
-	 * 	WHERE			
-	 * 		not exists(SELECT 'x' FROM b_stat_day D WHERE TRUNC(D.DATE_STAT) = TRUNC(SYSDATE))
-	 * 	";
-	 * $q = $DB-&gt;Query($strSql, true, $err_mess.__LINE__);
-	 * if ($q &amp;&amp; intval(<b>$q-&gt;AffectedRowsCount</b>())&gt;0)
-	 * {
-	 * 	$arFields = Array("LAST"=&gt;"'N'");
-	 * 	$DB-&gt;Update("b_stat_adv_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_adv_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_searcher_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_country_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_guest",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
-	 * 	$DB-&gt;Update("b_stat_session",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $strSql = "
+	* 	INSERT INTO b_stat_day(
+	* 		ID,
+	* 		DATE_STAT,
+	* 		TOTAL_HOSTS)
+	* 	SELECT
+	* 		SQ_B_STAT_DAY.NEXTVAL,
+	* 		trunc(SYSDATE),
+	* 		nvl(PREV.MAX_TOTAL_HOSTS,0)
+	* 	FROM
+	* 		(SELECT	max(TOTAL_HOSTS) AS MAX_TOTAL_HOSTS	FROM b_stat_day) PREV						
+	* 	WHERE			
+	* 		not exists(SELECT 'x' FROM b_stat_day D WHERE TRUNC(D.DATE_STAT) = TRUNC(SYSDATE))
+	* 	";
+	* $q = $DB-&gt;Query($strSql, true, $err_mess.__LINE__);
+	* if ($q &amp;&amp; intval(<b>$q-&gt;AffectedRowsCount</b>())&gt;0)
+	* {
+	* 	$arFields = Array("LAST"=&gt;"'N'");
+	* 	$DB-&gt;Update("b_stat_adv_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_adv_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_searcher_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_event_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_country_day",$arFields,"WHERE LAST='Y'", $err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_guest",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
+	* 	$DB-&gt;Update("b_stat_session",$arFields,"WHERE LAST='Y'",$err_mess.__LINE__);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
+	* @author Bitrix
+	*/
 	public static function AffectedRowsCount()
 	{
 	}
 
 	
 	/**
-	 * <p>Функция возвращает количество полей результата выборки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rs = $DB-&gt;Query($query,true);
-	 * $intNumFields = <b>$rs-&gt;FieldsCount</b>();
-	 * $i = 0;
-	 * while ($i &lt; $intNumFields) 
-	 * {
-	 * 	$arFieldName[] = $rs-&gt;FieldName($i);
-	 * 	$i++;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает количество полей результата выборки.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rs = $DB-&gt;Query($query,true);
+	* $intNumFields = <b>$rs-&gt;FieldsCount</b>();
+	* $i = 0;
+	* while ($i &lt; $intNumFields) 
+	* {
+	* 	$arFieldName[] = $rs-&gt;FieldName($i);
+	* 	$i++;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php">CDBResult::FieldName</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
+	* @author Bitrix
+	*/
 	public static function FieldsCount()
 	{
 	}
 
 	
 	/**
-	 * <p>Функция возвращает название поля по его номеру.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $column  
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rs = $DB-&gt;Query($query,true);
-	 * $intNumFields = $rs-&gt;FieldsCount();
-	 * $i = 0;
-	 * while ($i &lt; $intNumFields) 
-	 * {
-	 * 	$arFieldName[] = <b>$rs-&gt;FieldName</b>($i);
-	 * 	$i++;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает название поля по его номеру.</p>
+	*
+	*
+	*
+	*
+	* @param int $column  
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rs = $DB-&gt;Query($query,true);
+	* $intNumFields = $rs-&gt;FieldsCount();
+	* $i = 0;
+	* while ($i &lt; $intNumFields) 
+	* {
+	* 	$arFieldName[] = <b>$rs-&gt;FieldName</b>($i);
+	* 	$i++;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php">CDBResult::FieldsCount</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
+	* @author Bitrix
+	*/
 	static function FieldName($iCol)
 	{
 	}
@@ -1676,42 +1796,43 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция возвращает <i>false</i>, если все записи умещаются в одну страницу. В противном случае <i>true</i>.</p> <p class="note">Перед использованием данной функции необходимо вызвать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arDirContent = array_merge($arDirs, $arFiles);
-	 * $rsDirContent = new CDBResult;
-	 * $rsDirContent-&gt;InitFromArray($arDirContent);
-	 * $rsDirContent-&gt;NavStart(50);
-	 * if(<b>$rsDirContent-&gt;IsNavPrint</b>())
-	 * {
-	 * 	echo "&lt;p&gt;";
-	 * 	$rsDirContent-&gt;NavPrint("Файлы");
-	 * 	echo "&lt;/p&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает <i>false</i>, если все записи умещаются в одну страницу. В противном случае <i>true</i>.</p> <p class="note">Перед использованием данной функции необходимо вызвать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arDirContent = array_merge($arDirs, $arFiles);
+	* $rsDirContent = new CDBResult;
+	* $rsDirContent-&gt;InitFromArray($arDirContent);
+	* $rsDirContent-&gt;NavStart(50);
+	* if(<b>$rsDirContent-&gt;IsNavPrint</b>())
+	* {
+	* 	echo "&lt;p&gt;";
+	* 	$rsDirContent-&gt;NavPrint("Файлы");
+	* 	echo "&lt;/p&gt;";
+	* }
+	* ?&gt;</b
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php
+	* @author Bitrix
+	*/
 	public function IsNavPrint()
 	{
 		if ($this->NavRecordCount == 0 || ($this->NavPageCount == 1 && $this->NavShowAll == false))
@@ -1722,115 +1843,115 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция выводит ссылки для постраничной навигации. Перед использованием данной функции необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова функции необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $title  Названия выводимых элементов.
-	 *
-	 *
-	 *
-	 * @param bool $show_always = false Если "false", то функция не будет выводить навигационные ссылки если
-	 * все записи умещаются на одну страницу. Если "true", то ссылки для
-	 * постраничной навигации будут выводиться
-	 * всегда.<br>Необязательный. По умолчанию - "false".
-	 *
-	 *
-	 *
-	 * @param string $text_css_class = "text" CSS класс шрифта для вывода навигационных
-	 * ссылок.<br>Необязательный. По умолчанию "text".
-	 *
-	 *
-	 *
-	 * @param string $template_path = false Путь к шаблону показа навигационных ссылок. Если "false", то
-	 * используется шаблон по умолчанию.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsEvents = CAdv::GetEventList($f_ID,($by="s_def"),($order="desc"), $arF, $is_filtered);
-	 * <b>$rsEvents-&gt;NavPrint</b>("События", false, "tablebodytext", 
-	 * "/bitrix/modules/statistic/admin/adv_navprint.php");
-	 * ?&gt;
-	 * &lt;?
-	 * echo('&lt;font class="'.$StyleText.'"&gt;('.$title.' ');
-	 * echo(($this-&gt;NavPageNomer-1)*$this-&gt;NavPageSize+1);
-	 * echo(' - ');
-	 * if($this-&gt;NavPageNomer != $this-&gt;NavPageCount)
-	 *   echo($this-&gt;NavPageNomer * $this-&gt;NavPageSize);
-	 * else
-	 *   echo($this-&gt;NavRecordCount); 
-	 * echo(' '.GetMessage("nav_of").' ');
-	 * echo($this-&gt;NavRecordCount);
-	 * echo(")\n \n&lt;/font&gt;");
-	 * 
-	 * echo('&lt;font class="'.$StyleText.'"&gt;');
-	 * 
-	 * if($this-&gt;NavPageNomer &gt; 1)
-	 *   echo('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'=1'.
-	 *   $strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
-	 *   $sBegin.'&lt;/a&gt; | &lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.
-	 *   $this-&gt;NavNum.'='.($this-&gt;NavPageNomer-1).$strNavQueryString.'#nav_start'.
-	 *   $add_anchor.'"&gt;'.$sPrev.'&lt;/a&gt;');
-	 * else
-	 *   echo($sBegin.' | '.$sPrev);
-	 * 
-	 * echo(' | '); 
-	 * 
-	 * $NavRecordGroup = $nStartPage;
-	 * while($NavRecordGroup &lt;= $nEndPage)
-	 * {
-	 *   if($NavRecordGroup == $this-&gt;NavPageNomer) 
-	 *     echo('&lt;b&gt;'.$NavRecordGroup.'&lt;/b&gt;&amp;nbsp'); 
-	 *   else
-	 *     echo('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'='.
-	 * 	$NavRecordGroup.$strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
-	 * 	$NavRecordGroup.'&lt;/a&gt; ');
-	 * 
-	 *   $NavRecordGroup++;
-	 * }
-	 * 
-	 * echo('| ');
-	 * if($this-&gt;NavPageNomer &lt; $this-&gt;NavPageCount)
-	 *   echo ('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'='.
-	 *   ($this-&gt;NavPageNomer+1).$strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
-	 *   $sNext.'&lt;/a&gt; | &lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.
-	 *   $this-&gt;NavNum.'='.$this-&gt;NavPageCount.$strNavQueryString.
-	 *   '#nav_start'.$add_anchor.'"&gt;'.$sEnd.'&lt;/a&gt; ');
-	 * else
-	 *   echo ($sNext.' | '.$sEnd.' ');
-	 * 
-	 * if($this-&gt;bShowAll)
-	 *   echo ($this-&gt;NavShowAll? '| &lt;a class="tablebodylink" 
-	 *   href="'.$sUrlPath.'?SHOWALL_'.$this-&gt;NavNum.'=0'.$strNavQueryString.
-	 *   '#nav_start'.$add_anchor.'"&gt;'.$sPaged.
-	 *   '&lt;/a&gt; ' : '| &lt;a class="tablebodylink" href="'.$sUrlPath.'?SHOWALL_'.
-	 *   $this-&gt;NavNum.'=1'.$strNavQueryString.
-	 *   '#nav_start'.$add_anchor.'"&gt;'.$sAll.'&lt;/a&gt; ');
-	 * 
-	 * echo('&lt;/font&gt;');
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li>
-	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/index.php">Класс CPageOption</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php
-	 * @author Bitrix
-	 */
+	* <p>Функция выводит ссылки для постраничной навигации. Перед использованием данной функции необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова функции необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre>
+	*
+	*
+	*
+	*
+	* @param string $title  Названия выводимых элементов.
+	*
+	*
+	*
+	* @param bool $show_always = false Если "false", то функция не будет выводить навигационные ссылки если
+	* все записи умещаются на одну страницу. Если "true", то ссылки для
+	* постраничной навигации будут выводиться
+	* всегда.<br>Необязательный. По умолчанию - "false".
+	*
+	*
+	*
+	* @param string $StyleText = "text" CSS класс шрифта для вывода навигационных
+	* ссылок.<br>Необязательный. По умолчанию "text".
+	*
+	*
+	*
+	* @param string $template_path = false Путь к шаблону показа навигационных ссылок. Если "false", то
+	* используется шаблон по умолчанию.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsEvents = CAdv::GetEventList($f_ID,($by="s_def"),($order="desc"), $arF, $is_filtered);
+	* <b>$rsEvents-&gt;NavPrint</b>("События", false, "tablebodytext", 
+	* "/bitrix/modules/statistic/admin/adv_navprint.php");
+	* ?&gt;</bod
+	* &lt;?
+	* echo('&lt;font class="'.$StyleText.'"&gt;('.$title.' ');
+	* echo(($this-&gt;NavPageNomer-1)*$this-&gt;NavPageSize+1);
+	* echo(' - ');
+	* if($this-&gt;NavPageNomer != $this-&gt;NavPageCount)
+	*   echo($this-&gt;NavPageNomer * $this-&gt;NavPageSize);
+	* else
+	*   echo($this-&gt;NavRecordCount); 
+	* echo(' '.GetMessage("nav_of").' ');
+	* echo($this-&gt;NavRecordCount);
+	* echo(")\n \n&lt;/font&gt;");
+	* 
+	* echo('&lt;font class="'.$StyleText.'"&gt;');
+	* 
+	* if($this-&gt;NavPageNomer &gt; 1)
+	*   echo('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'=1'.
+	*   $strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
+	*   $sBegin.'&lt;/a&gt; | &lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.
+	*   $this-&gt;NavNum.'='.($this-&gt;NavPageNomer-1).$strNavQueryString.'#nav_start'.
+	*   $add_anchor.'"&gt;'.$sPrev.'&lt;/a&gt;');
+	* else
+	*   echo($sBegin.' | '.$sPrev);
+	* 
+	* echo(' | '); 
+	* 
+	* $NavRecordGroup = $nStartPage;
+	* while($NavRecordGroup &lt;= $nEndPage)
+	* {
+	*   if($NavRecordGroup == $this-&gt;NavPageNomer) 
+	*     echo('&lt;b&gt;'.$NavRecordGroup.'&lt;/b&gt;&amp;nbsp'); 
+	*   else
+	*     echo('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'='.
+	* 	$NavRecordGroup.$strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
+	* 	$NavRecordGroup.'&lt;/a&gt; ');
+	* 
+	*   $NavRecordGroup++;
+	* }
+	* 
+	* echo('| ');
+	* if($this-&gt;NavPageNomer &lt; $this-&gt;NavPageCount)
+	*   echo ('&lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.$this-&gt;NavNum.'='.
+	*   ($this-&gt;NavPageNomer+1).$strNavQueryString.'#nav_start'.$add_anchor.'"&gt;'.
+	*   $sNext.'&lt;/a&gt; | &lt;a class="tablebodylink" href="'.$sUrlPath.'?PAGEN_'.
+	*   $this-&gt;NavNum.'='.$this-&gt;NavPageCount.$strNavQueryString.
+	*   '#nav_start'.$add_anchor.'"&gt;'.$sEnd.'&lt;/a&gt; ');
+	* else
+	*   echo ($sNext.' | '.$sEnd.' ');
+	* 
+	* if($this-&gt;bShowAll)
+	*   echo ($this-&gt;NavShowAll? '| &lt;a class="tablebodylink" 
+	*   href="'.$sUrlPath.'?SHOWALL_'.$this-&gt;NavNum.'=0'.$strNavQueryString.
+	*   '#nav_start'.$add_anchor.'"&gt;'.$sPaged.
+	*   '&lt;/a&gt; ' : '| &lt;a class="tablebodylink" href="'.$sUrlPath.'?SHOWALL_'.
+	*   $this-&gt;NavNum.'=1'.$strNavQueryString.
+	*   '#nav_start'.$add_anchor.'"&gt;'.$sAll.'&lt;/a&gt; ');
+	* 
+	* echo('&lt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li>
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/index.php">Класс CPageOption</a></li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php
+	* @author Bitrix
+	*/
 	public function NavPrint($title, $show_allways=false, $StyleText="text", $template_path=false)
 	{
 		echo $this->GetNavPrint($title, $show_allways, $StyleText, $template_path);
@@ -2040,50 +2161,51 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Объявляет глобальные переменные с именами вида ${<i>prefix</i>."имя поля"} и значениями соответствующими именам полей, приведенных в HTML-безопасный вид.<br>Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи), то функция вернет "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $prefix = "str_" Префикс глобальных переменных. <br>Необязательный. По умолчанию
-	 * "str_".
-	 *
-	 *
-	 *
-	 * @param bool $encode = true Приводить глобальные переменные в HTML-безопасный вид.
-	 * <br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;select&gt;
-	 * &lt;?
-	 * $rs = CGroup::GetList($order="ID", $by="ASC");
-	 * while (<b>$rs-&gt;ExtractFields</b>("g_")) :
-	 *    ?&gt;&lt;option value="&lt;?=$g_ID?&gt;"
-	 *    &lt;?if (IntVal($g_ID)==IntVal($show_perms_for)) echo " selected";?&gt;
-	 *    &gt;&lt;?=$g_NAME?&gt;&lt;/option&gt;&lt;?
-	 * endwhile;
-	 * ?&gt;
-	 * &lt;/select&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php
-	 * @author Bitrix
-	 */
+	* <p>Объявляет глобальные переменные с именами вида ${<i>prefix</i>."имя поля"} и значениями соответствующими именам полей, приведенных в HTML-безопасный вид.<br>Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи), то функция вернет "false".</p>
+	*
+	*
+	*
+	*
+	* @param string $prefix = "str_" Префикс глобальных переменных. <br>Необязательный. По умолчанию
+	* "str_".
+	*
+	*
+	*
+	* @param bool $encode = true Приводить глобальные переменные в HTML-безопасный вид.
+	* <br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;select&gt;
+	* &lt;?
+	* $rs = CGroup::GetList($order="ID", $by="ASC");
+	* while (<b>$rs-&gt;ExtractFields</b>("g_")) :
+	*    ?&gt;&lt;option value="&lt;?=$g_ID?&gt;"
+	*    &lt;?if (IntVal($g_ID)==IntVal($show_perms_for)) echo " selected";?&gt;
+	*    &gt;&lt;?=$g_NAME?&gt;&lt;/option&gt;&lt;?
+	* endwhile;
+	* ?&gt;
+	* &lt;/select&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php
+	* @author Bitrix
+	*/
 	public function ExtractFields($strPrefix="str_", $bDoEncode=true)
 	{
 		return $this->NavNext(true, $strPrefix, $bDoEncode);
@@ -2096,54 +2218,55 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки функция вернет <i>false</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param bool $text_html = true Если значение данного параметра - "true", то функция будет
-	 * автоматически обрабатывать поля с выбором формата
-	 * text/html.<br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @param bool $original = true Если значение данного параметра - "true", то помимо преобразованных
-	 * в HTML-безопасный вид полей, в результирующий массив будут включены
-	 * также оригинальные (исходные) значения этих полей (ключи массива
-	 * с оригинальными значениями этих полей будут иметь суффикс
-	 * "~").<br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;select&gt;
-	 * &lt;?
-	 * $rs = CGroup::GetList($order="ID", $by="ASC");
-	 * while ($arGroup=<b>$rs-&gt;GetNext</b>()) :
-	 *    ?&gt;&lt;option value="&lt;?=$arGroup["ID"]?&gt;"
-	 *    &lt;?if (IntVal($arGroup["ID"])==IntVal($show_perms_for)) echo " selected";?&gt;
-	 *    &gt;&lt;?=$arGroup["NAME"]?&gt;&lt;/option&gt;&lt;?
-	 * endwhile;
-	 * ?&gt;
-	 * &lt;/select&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки функция вернет <i>false</i>.</p>
+	*
+	*
+	*
+	*
+	* @param bool $TextHtmlAuto = true Если значение данного параметра - "true", то функция будет
+	* автоматически обрабатывать поля с выбором формата
+	* text/html.<br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @param bool $use_tilda = true Если значение данного параметра - "true", то помимо преобразованных
+	* в HTML-безопасный вид полей, в результирующий массив будут включены
+	* также оригинальные (исходные) значения этих полей (ключи массива
+	* с оригинальными значениями этих полей будут иметь суффикс
+	* "~").<br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;select&gt;
+	* &lt;?
+	* $rs = CGroup::GetList($order="ID", $by="ASC");
+	* while ($arGroup=<b>$rs-&gt;GetNext</b>()) :
+	*    ?&gt;&lt;option value="&lt;?=$arGroup["ID"]?&gt;"
+	*    &lt;?if (IntVal($arGroup["ID"])==IntVal($show_perms_for)) echo " selected";?&gt;
+	*    &gt;&lt;?=$arGroup["NAME"]?&gt;&lt;/option&gt;&lt;?
+	* endwhile;
+	* ?&gt;
+	* &lt;/select&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php
+	* @author Bitrix
+	*/
 	public function GetNext($bTextHtmlAuto=true, $use_tilda=true)
 	{
 		if($arRes = $this->Fetch())
@@ -2189,88 +2312,88 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данной функции применяется как правило для составления идентификатора кэша, который в свою очередь используется в функциях классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">CPHPCache</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $page_size = 10 Размер страницы постраничной навигации (от 1 и более).
-	 * Необязательный. По умолчанию 10.
-	 *
-	 *
-	 *
-	 * @param bool $show_all = true Разрешить ли показывать все записи (и выводить ссылку "Все" в
-	 * навигации).<br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @param int $page_number = false Принудительно ли открывать страницу с этим номером (в
-	 * независимости от параметров в URL).<br>Необязательный. По умолчанию -
-	 * "false" (открывать страницу в зависимости от параметров в URL).
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // создаем объект
-	 * $obCache = new CPageCache; 
-	 * 
-	 * // время кэширования - 30 минут
-	 * $life_time = 30*60; 
-	 * 
-	 * // получим строку идентифицирующую состояние постраничной навигации
-	 * $nav = <b>CDBResult::NavStringForCache</b>($PAGE_ELEMENT_COUNT);
-	 * 
-	 * // формируем идентификатор кэша в зависимости от всех параметров 
-	 * // которые могут повлиять на результирующий HTML
-	 * $cache_id = $nav.$ELEMENT_ID.$IBLOCK_TYPE.$USER-&gt;GetUserGroupString(); 
-	 * 
-	 * // инициализируем буферизирование вывода
-	 * if($obCache-&gt;StartDataCache($life_time, $cache_id, "/")):
-	 * 
-	 * 	// получаем список элементов
-	 * 	if ($rsElements = GetIBlockElementList($IBLOCK_ID, $SECTION_ID)):
-	 * 
-	 * 		// инициализируем постраничную навигацию
-	 * 		$rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
-	 * 
-	 * 		// выведем постраничную навигацию
-	 * 		echo $rsElements-&gt;NavPrint($ELEMENT_NAME);
-	 * 
-	 * 		// пройдемся по элементам
-	 * 		while ($obElement = $rsElements-&gt;GetNextElement()):
-	 * 
-	 * 			$arElement = $obElement-&gt;GetFields();
-	 * 			$arProperty = $obElement-&gt;GetProperties();		
-	 * 
-	 * 			echo "&lt;pre&gt;"; print_r($arElement); echo "&lt;/pre&gt;";
-	 * 			echo "&lt;pre&gt;"; print_r($arProperty); echo "&lt;/pre&gt;";
-	 * 
-	 * 		endwhile;
-	 * 	endif;
-	 * 
-	 * 	// записываем буферизированный результат на диск в файл кэша
-	 * 	$obCache-&gt;EndDataCache(); 
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">Класс CPageCache</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">Класс CPHPCache</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данной функции применяется как правило для составления идентификатора кэша, который в свою очередь используется в функциях классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">CPHPCache</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $page_size = 10 Размер страницы постраничной навигации (от 1 и более).
+	* Необязательный. По умолчанию 10.
+	*
+	*
+	*
+	* @param bool $show_all = true Разрешить ли показывать все записи (и выводить ссылку "Все" в
+	* навигации).<br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @param int $NumPage = false Принудительно ли открывать страницу с этим номером (в
+	* независимости от параметров в URL).<br>Необязательный. По умолчанию -
+	* "false" (открывать страницу в зависимости от параметров в URL).
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // создаем объект
+	* $obCache = new CPageCache; 
+	* 
+	* // время кэширования - 30 минут
+	* $life_time = 30*60; 
+	* 
+	* // получим строку идентифицирующую состояние постраничной навигации
+	* $nav = <b>CDBResult::NavStringForCache</b>($PAGE_ELEMENT_COUNT);
+	* 
+	* // формируем идентификатор кэша в зависимости от всех параметров 
+	* // которые могут повлиять на результирующий HTML
+	* $cache_id = $nav.$ELEMENT_ID.$IBLOCK_TYPE.$USER-&gt;GetUserGroupString(); 
+	* 
+	* // инициализируем буферизирование вывода
+	* if($obCache-&gt;StartDataCache($life_time, $cache_id, "/")):
+	* 
+	* 	// получаем список элементов
+	* 	if ($rsElements = GetIBlockElementList($IBLOCK_ID, $SECTION_ID)):
+	* 
+	* 		// инициализируем постраничную навигацию
+	* 		$rsElements-&gt;NavStart($PAGE_ELEMENT_COUNT);
+	* 
+	* 		// выведем постраничную навигацию
+	* 		echo $rsElements-&gt;NavPrint($ELEMENT_NAME);
+	* 
+	* 		// пройдемся по элементам
+	* 		while ($obElement = $rsElements-&gt;GetNextElement()):
+	* 
+	* 			$arElement = $obElement-&gt;GetFields();
+	* 			$arProperty = $obElement-&gt;GetProperties();		
+	* 
+	* 			echo "&lt;pre&gt;"; print_r($arElement); echo "&lt;/pre&gt;";
+	* 			echo "&lt;pre&gt;"; print_r($arProperty); echo "&lt;/pre&gt;";
+	* 
+	* 		endwhile;
+	* 	endif;
+	* 
+	* 	// записываем буферизированный результат на диск в файл кэша
+	* 	$obCache-&gt;EndDataCache(); 
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">Класс CPageCache</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">Класс CPHPCache</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php
+	* @author Bitrix
+	*/
 	public static function NavStringForCache($nPageSize=0, $bShowAll=true, $iNumPage=false)
 	{
 		$NavParams = CDBResult::GetNavParams($nPageSize, $bShowAll, $iNumPage);
@@ -2386,57 +2509,53 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данную функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>.
-	 *
-	 *
-	 *
-	 *
-	 * @param int $page_size = 10 Размер страницы (от 1 и более). Необязательный. По умолчанию 10.
-	 *
-	 *
-	 *
-	 * @param bool $show_all = true Разрешить показывать все записи (и выводить ссылку "Все" в
-	 * навигации).<br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @param int $page_number = false Принудительно всегда открывать страницу с этим номером (не
-	 * зависящую от параметров в URL).<br>Необязательный. По умолчанию - "false"
-	 * (показывать автоматически).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
-	 * <b>$rsBanners-&gt;NavStart(20)</b>;
-	 * echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * while($rsBanners-&gt;NavNext(true, "f_")):
-	 *     echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
-	 * endwhile;
-	 * echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php
-	 * @author Bitrix
-	 */
+	* <p>Функция разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данную функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>.
+	*
+	*
+	*
+	*
+	* @param int $page_size = 10 Размер страницы (от 1 и более). Необязательный. По умолчанию 10.
+	*
+	*
+	*
+	* @param bool $show_all = true Разрешить показывать все записи (и выводить ссылку "Все" в
+	* навигации).<br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
+	* <b>$rsBanners-&gt;NavStart(20)</b>;
+	* echo $rsBanners-&gt;NavPrint("Баннеры");
+	* while($rsBanners-&gt;NavNext(true, "f_")):
+	*     echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
+	* endwhile;
+	* echo $rsBanners-&gt;NavPrint("Баннеры");
+	* ?&gt;
+	* </ht
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php
+	* @author Bitrix
+	*/
 	public function NavStart($nPageSize=0, $bShowAll=true, $iNumPage=false)
 	{
 		if($this->bFromLimited)
@@ -2492,73 +2611,76 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Функция инициализирует объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $values  
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arr = array();
-	 * $arr[] = array("ID" =&gt; 1, "NAME" =&gt; "Заголовок 1");
-	 * $arr[] = array("ID" =&gt; 2, "NAME" =&gt; "Заголовок 2");
-	 * $arr[] = array("ID" =&gt; 3, "NAME" =&gt; "Заголовок 3");
-	 * $arr[] = array("ID" =&gt; 4, "NAME" =&gt; "Заголовок 4");
-	 * 
-	 * $rs = new CDBResult;
-	 * <b>$rs-&gt;InitFromArray</b>($arr);
-	 * 
-	 * $rs-&gt;NavStart(2);
-	 * if($rs-&gt;IsNavPrint())
-	 * {
-	 *      echo "&lt;p&gt;"; $rs-&gt;NavPrint("Элементы"); echo "&lt;/p&gt;";
-	 * }
-	 * ?&gt;
-	 * &lt;?
-	 * // получим список файлов и каталогов
-	 * CFileMan::GetDirList(Array($site_id, $path), $arDirs, $arFiles, $arFilter, Array($by=&gt;$order), "DF");
-	 * 
-	 * // объединим файлы и каталоги в один массив
-	 * $arDirContent = array_merge($arDirs, $arFiles);
-	 * 
-	 * // создадим объект класса CDBResult
-	 * $rsDirContent = new CDBResult;
-	 * 
-	 * // инициализируем этот объект исходным массивом
-	 * <b>$rsDirContent-&gt;InitFromArray</b>($arDirContent);
-	 * 
-	 * // теперь на данном объекте 
-	 * // мы можем использовать все методы класса CDBResult
-	 * // например, "Постраничная навигация":
-	 * $rsDirContent-&gt;NavStart(50);
-	 * if($rsDirContent-&gt;IsNavPrint()) echo "&lt;p&gt;"; $rs-&gt;NavPrint("Файлы"); echo "&lt;/p&gt;";
-	 * while ($arElement = $rsDirContent-&gt;Fetch()):
-	 *     // если это каталог то
-	 *     if ($arElement["TYPE"]=="D"):
-	 *         // выводим название каталога
-	 *         echo $arElement["NAME"];
-	 *     else: // иначе если это файл то
-	 *         // если это служебный файл то переходим к следующему элементу
-	 *         if ($arElement["NAME"]==".section.php") continue;
-	 *         // иначе выводим его название
-	 *         echo $arElement["NAME"];
-	 *     endif;
-	 * endwhile;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/initfromarray.php
-	 * @author Bitrix
-	 */
+	* <p>Функция инициализирует объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива.</p>
+	*
+	*
+	*
+	*
+	* @param array $values  
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arr = array();
+	* $arr[] = array("ID" =&gt; 1, "NAME" =&gt; "Заголовок 1");
+	* $arr[] = array("ID" =&gt; 2, "NAME" =&gt; "Заголовок 2");
+	* $arr[] = array("ID" =&gt; 3, "NAME" =&gt; "Заголовок 3");
+	* $arr[] = array("ID" =&gt; 4, "NAME" =&gt; "Заголовок 4");
+	* 
+	* $rs = new CDBResult;
+	* <b>$rs-&gt;InitFromArray</b>($arr);
+	* 
+	* $rs-&gt;NavStart(2);
+	* if($rs-&gt;IsNavPrint())
+	* {
+	*      echo "&lt;p&gt;"; $rs-&gt;NavPrint("Элементы"); echo "&lt;/p&gt;";
+	* }
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // получим список файлов и каталогов
+	* CFileMan::GetDirList(Array($site_id, $path), $arDirs, $arFiles, $arFilter, Array($by=&gt;$order), "DF");
+	* 
+	* // объединим файлы и каталоги в один массив
+	* $arDirContent = array_merge($arDirs, $arFiles);
+	* 
+	* // создадим объект класса CDBResult
+	* $rsDirContent = new CDBResult;
+	* 
+	* // инициализируем этот объект исходным массивом
+	* <b>$rsDirContent-&gt;InitFromArray</b>($arDirContent);
+	* 
+	* // теперь на данном объекте 
+	* // мы можем использовать все методы класса CDBResult
+	* // например, "Постраничная навигация":
+	* $rsDirContent-&gt;NavStart(50);
+	* if($rsDirContent-&gt;IsNavPrint()) echo "&lt;p&gt;"; $rs-&gt;NavPrint("Файлы"); echo "&lt;/p&gt;";
+	* while ($arElement = $rsDirContent-&gt;Fetch()):
+	*     // если это каталог то
+	*     if ($arElement["TYPE"]=="D"):
+	*         // выводим название каталога
+	*         echo $arElement["NAME"];
+	*     else: // иначе если это файл то
+	*         // если это служебный файл то переходим к следующему элементу
+	*         if ($arElement["NAME"]==".section.php") continue;
+	*         // иначе выводим его название
+	*         echo $arElement["NAME"];
+	*     endif;
+	* endwhile;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/initfromarray.php
+	* @author Bitrix
+	*/
 	public function InitFromArray($arr)
 	{
 		if(is_array($arr))
@@ -2570,56 +2692,62 @@ class CAllDBResult
 
 	
 	/**
-	 * <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то функция вернет "false".</p> <p><b>Примечания</b>:</p> <ul> <li>Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</li> <li>Когда явно не требуются возможности NavNext лучше использовать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.</li> </ul>
-	 *
-	 *
-	 *
-	 *
-	 * @param bool $init_globals = true Если "true", то функция будет объявлять глобальные переменные
-	 * соответствующие именам полей выборки.<br>Необязательный. По
-	 * умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @param string $prefix = "str_" Префикс глобальных переменных (только если <i>init_globals</i>
-	 * установлен).<br>Необязательный. По умолчанию - "str_".
-	 *
-	 *
-	 *
-	 * @param bool $safe_for_html = true Приводить глобальные переменные в HTML-безопасный вид (только если
-	 * <i>init_globals</i> установлен).<br>Необязательный. По умолчанию - "true".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
-	 * $rsBanners-&gt;NavStart(20);
-	 * echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * while(<b>$rsBanners-&gt;NavNext</b>(true, "f_")):
-	 *     echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
-	 * endwhile;
-	 * echo $rsBanners-&gt;NavPrint("Баннеры");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то функция вернет "false".</p> <p><b>Примечания</b>:</p> <ul> <li>Функция работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</li> <li>Когда явно не требуются возможности NavNext лучше использовать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.</li> </ul>
+	*
+	*
+	*
+	*
+	* @param bool $SetGlobalVars = true Если "true", то функция будет объявлять глобальные переменные
+	* соответствующие именам полей выборки.<br>Необязательный. По
+	* умолчанию - "true".
+	*
+	*
+	*
+	* @param string $prefix = "str_" Префикс глобальных переменных (только если <i>init_globals</i>
+	* установлен).<br>Необязательный. По умолчанию - "str_".
+	*
+	*
+	*
+	* @param bool $DoEncode = true Приводить глобальные переменные в HTML-безопасный вид (только если
+	* <i>init_globals</i> установлен).<br>Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @param bool $SkipEntities = true Необязательный. По умолчанию - "true".
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
+	* $rsBanners-&gt;NavStart(20);
+	* echo $rsBanners-&gt;NavPrint("Баннеры");
+	* while(<b>$rsBanners-&gt;NavNext</b>(true, "f_")):
+	*     echo "[".$f_ID."] ".$f_NAME."&lt;br&gt;";
+	* endwhile;
+	* echo $rsBanners-&gt;NavPrint("Баннеры");
+	* ?&gt;
+	* </ht
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php
+	* @author Bitrix
+	*/
 	public function NavNext($bSetGlobalVars=true, $strPrefix="str_", $bDoEncode=true, $bSkipEntities=true)
 	{
 		$arr = $this->Fetch();
@@ -2646,11 +2774,102 @@ class CAllDBResult
 		return $arr;
 	}
 
+	
+	/**
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <br><br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getpagenavstring.php
+	* @author Bitrix
+	*/
 	public function GetPageNavString($navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
 		return $this->GetPageNavStringEx($dummy, $navigationTitle, $templateName, $showAlways, $parentComponent);
 	}
 
+	
+	/**
+	* <p>Возвращает панель постраничной навигации в HTML виде. Формирует ее на основе параметров.</p>
+	*
+	*
+	*
+	*
+	* @param navComponentObjec $t  Использовать обратную навигацию
+	*
+	*
+	*
+	* @param navigationTitl $e  Название категорий </ht
+	*
+	*
+	*
+	* @param templateNam $e = "" Название шаблона </h
+	*
+	*
+	*
+	* @param showAlway $s = false Выводить всегда
+	*
+	*
+	*
+	* @param parentComponen $t = nul Время кеширования страниц для обратной навигации
+	*
+	*
+	*
+	* @return mixed <p></p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CModule::IncludeModule('iblock');
+	* $arSort = array();
+	* $arFilter = array('IBLOCK_ID'=&gt; '1');
+	* $arNavParams = array(
+	*         "nPageSize" =&gt; '2',
+	*         "bDescPageNumbering" =&gt; 'Описание',
+	*         "bShowAll" =&gt; 'Y',
+	*     );  
+	* 
+	* $arSelect = array("ID", "NAME");
+	* $rsElement = CIBlockElement::GetList($arSort, $arFilter, false, $arNavParams, $arSelect);
+	* $NAV_STRING = $rsElement-&gt;GetPageNavStringEx($navComponentObject, 'Заголовок', '', 'Y');
+	* echo $NAV_STRING."<br>";
+	* while($arElem = $rsElement-&gt;Fetch())
+	* {
+	*    echo $arElem['ID']."__".$arElem["NAME"]."<br>";
+	* }
+	* echo $NAV_STRING;
+	* </ht$rsElements = CIBlockElement::GetList($arSort, $arFilter, false, array("nPageSize" =&gt; $arParams["PAGE_COUNT"], "bShowAll" =&gt; false), $arSelect);
+	* ....
+	* $arResult["NAV_STRING"] = $rsElements-&gt;GetPageNavStringEx($navComponentObject, "", $arParams["PAGER_TEMPLATE"]);Теперь в $arResult["NAV_STRING"] у нас полная постраничная навигация, обернутая в шаблон $arParams["PAGER_TEMPLATE"]. Если $arParams["PAGER_TEMPLATE"] пуст, то берется .default.
+	* 
+	* Иногда надо чтобы не выводилось много страниц (1....11, 12, 13, 14, 15, 16, 17...100) а, например 3 (1....14, 15, 16...100). 
+	* 
+	* В примере выше перед вызовом <b>GetPageNavStringEx</b> надо поставить:
+	* 
+	* $rsElements-&gt;nPageWindow = 3;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <p></p><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getpagenavstringex.php
+	* @author Bitrix
+	*/
 	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null)
 	{
 		/** @global CMain $APPLICATION */

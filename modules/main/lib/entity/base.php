@@ -8,15 +8,16 @@
 
 namespace Bitrix\Main\Entity;
 
+use Bitrix\Main;
+
 /**
  * Base entity
- * @package bitrix
- * @subpackage main
  */
 class Base
 {
 	protected
 		$className,
+		$module,
 		$name,
 		$connectionName,
 		$dbTableName,
@@ -59,6 +60,11 @@ class Base
 			$entityName .= 'Table';
 		}
 
+		if (substr($entityName, 0, 1) !== '\\')
+		{
+			$entityName = '\\'.$entityName;
+		}
+
 		return self::getInstanceDirect($entityName);
 	}
 
@@ -67,6 +73,7 @@ class Base
 	{
 		if (empty(self::$instances[$className]))
 		{
+			/** @var Base $entity */
 			$entity = new static;
 			$entity->initialize($className);
 			$entity->postInitialize();
@@ -83,7 +90,7 @@ class Base
 	 * @param array  $fieldInfo
 	 *
 	 * @return BooleanField|ScalarField|ExpressionField|ReferenceField|UField
-	 * @throws \Exception
+	 * @throws Main\ArgumentException
 	 */
 	public function initializeField($fieldName, $fieldInfo)
 	{
@@ -117,7 +124,7 @@ class Base
 			}
 			else
 			{
-				throw new \Exception(sprintf(
+				throw new Main\ArgumentException(sprintf(
 					'Unknown data type "%s" found for `%s` field in %s Entity.',
 					$fieldInfo['data_type'], $fieldName, $this->getName()
 				));
@@ -130,6 +137,8 @@ class Base
 	public function initialize($className)
 	{
 		$this->className = $className;
+
+		/** @var DataManager $className */
 		//TODO: don't use $this->filePath
 		$this->filePath = $className::getFilePath();
 		$this->connectionName = $className::getConnectionName();
@@ -233,7 +242,7 @@ class Base
 
 		if (empty($this->primary))
 		{
-			throw new \Exception(sprintf('Primary not found for %s Entity', $this->name));
+			throw new Main\SystemException(sprintf('Primary not found for %s Entity', $this->name));
 		}
 	}
 
@@ -268,7 +277,7 @@ class Base
 	 * @param $name
 	 *
 	 * @return Field
-	 * @throws \Exception
+	 * @throws Main\ArgumentException
 	 */
 	public function getField($name)
 	{
@@ -277,7 +286,7 @@ class Base
 			return $this->fields[$name];
 		}
 
-		throw new \Exception(sprintf(
+		throw new Main\ArgumentException(sprintf(
 			'%s Entity has no `%s` field.', $this->getName(), $name
 		));
 	}
@@ -294,7 +303,7 @@ class Base
 			return $this->u_fields[$name];
 		}
 
-		throw new \Exception(sprintf(
+		throw new Main\ArgumentException(sprintf(
 			'%s Entity has no `%s` userfield.', $this->getName(), $name
 		));
 	}
@@ -344,13 +353,20 @@ class Base
 
 	public function getModule()
 	{
-		// Bitrix\Main\Site -> main
-		// Partner\Module\Thing -> partner.module
-		$parts = explode("\\", $this->className);
-		if($parts[0] == "Bitrix")
-			return strtolower($parts[1]);
-		else
-			return strtolower($parts[0].".".$parts[1]);
+		if($this->module === null)
+		{
+			// Bitrix\Main\Site -> "main"
+			// Partner\Module\Thing -> "partner.module"
+			// Thing -> ""
+			$parts = explode("\\", $this->className);
+			if($parts[0] == "Bitrix")
+				$this->module = strtolower($parts[1]);
+			elseif(!empty($parts[0]) && isset($parts[1]))
+				$this->module = strtolower($parts[0].".".$parts[1]);
+			else
+				$this->module = "";
+		}
+		return $this->module;
 	}
 
 	public function getDataClass()
@@ -460,7 +476,7 @@ class Base
 		}
 		elseif (!preg_match('/^[a-z0-9_]+$/i', $entity_name))
 		{
-			throw new \Exception(sprintf(
+			throw new Main\ArgumentException(sprintf(
 				'Invalid entity name `%s`.', $entity_name
 			));
 		}

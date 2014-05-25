@@ -1,11 +1,10 @@
 <?
 //<title>CSV Export</title>
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/data_export.php"));
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/csv_data.php");
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/data_export.php');
 
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -42,6 +41,19 @@ if (0 >= $NUM_CATALOG_LEVELS)
 
 $strExportErrorMessage = "";
 $arRunErrors = array();
+
+global
+	$arCatalogAvailProdFields,
+	$defCatalogAvailProdFields,
+	$arCatalogAvailPriceFields,
+	$defCatalogAvailPriceFields,
+	$arCatalogAvailValueFields,
+	$defCatalogAvailValueFields,
+	$arCatalogAvailQuantityFields,
+	$defCatalogAvailQuantityFields,
+	$arCatalogAvailGroupFields,
+	$defCatalogAvailGroupFields,
+	$defCatalogAvailCurrencies;
 
 $IBLOCK_ID = intval($IBLOCK_ID);
 if ($IBLOCK_ID<=0)
@@ -418,7 +430,7 @@ if (empty($arRunErrors))
 			$csvFile->SaveFile($_SERVER["DOCUMENT_ROOT"].$SETUP_FILE_NAME, $arNeedFields);
 		}
 
-		$res = CIBlockElement::GetList(array(), array("IBLOCK_ID" => $IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'), false, false, $selectArray);
+		$res = CIBlockElement::GetList(array('ID' => 'ASC'), array("IBLOCK_ID" => $IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'), false, false, $selectArray);
 		while ($res1 = $res->Fetch())
 		{
 			$arResSections = array();

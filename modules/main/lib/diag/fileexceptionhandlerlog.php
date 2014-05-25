@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Main\Diag;
 
-use \Bitrix\Main;
+use Bitrix\Main;
 
 class FileExceptionHandlerLog
 	extends ExceptionHandlerLog
@@ -13,6 +13,7 @@ class FileExceptionHandlerLog
 	private $logFileHistory;
 
 	private $maxLogSize;
+	private $level;
 
 	public function initialize(array $options)
 	{
@@ -29,12 +30,15 @@ class FileExceptionHandlerLog
 		$this->maxLogSize = static::MAX_LOG_SIZE;
 		if (isset($options["log_size"]) && ($options["log_size"] > 0))
 			$this->maxLogSize = intval($options["log_size"]);
+
+		if (isset($options["level"]) && ($options["level"] > 0))
+			$this->level = intval($options["level"]);
 	}
 
 	public function write(\Exception $exception, $logType)
 	{
-		$text = ExceptionHandlerFormatter::format($exception, false);
-		$this->writeToLog(date("Y-m-d H:i:s")." - ".static::logTypeToString($logType)." - ".$text."\n");
+		$text = ExceptionHandlerFormatter::format($exception, false, $this->level);
+		$this->writeToLog(date("Y-m-d H:i:s")." - Host: ".$_SERVER["HTTP_HOST"]." - ".static::logTypeToString($logType)." - ".$text."\n");
 	}
 
 	protected function writeToLog($text)
@@ -47,7 +51,7 @@ class FileExceptionHandlerLog
 
 		$oldAbortStatus = ignore_user_abort(true);
 
-		if ($fp = @fopen($logFile, "ab+"))
+		if ($fp = @fopen($logFile, "ab"))
 		{
 			if (@flock($fp, LOCK_EX))
 			{

@@ -6,12 +6,13 @@ $_SERVER["DOCUMENT_ROOT"] = "#DOCUMENT_ROOT#";
 // define("NOT_CHECK_PERMISSIONS",true);
 // define("BX_CAT_CRON", true);
 // define('NO_AGENT_CHECK', true);
-set_time_limit(0);
 $DOCUMENT_ROOT = $_SERVER["DOCUMENT_ROOT"];
 
 $profile_id = $argv[1];
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+
+set_time_limit(0);
 
 if (!defined("CATALOG_LOAD_NO_STEP"))
 	// define("CATALOG_LOAD_NO_STEP", true);

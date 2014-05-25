@@ -444,6 +444,13 @@ BX.ready(function(){
 
 	public static function GetEditFormHTML($arUserField, $arHtmlControl)
 	{
+		if (!empty($arHtmlControl))
+		{
+			if (array_key_exists("VALUE", $arHtmlControl))
+				$arUserField["VALUE"] = $arHtmlControl["VALUE"];
+			if (array_key_exists("NAME", $arHtmlControl))
+				$arUserField["FIELD_NAME"] = $arHtmlControl["NAME"];
+		}
 		ob_start();
 		$GLOBALS["APPLICATION"]->IncludeComponent(
 			"bitrix:system.field.edit",
@@ -478,10 +485,26 @@ BX.ready(function(){
 
 	public static function GetAdminListViewHTML($arUserField, $arHtmlControl)
 	{
-		if(strlen($arHtmlControl["VALUE"])>0)
-			return $arHtmlControl["VALUE"];
-		else
-			return '&nbsp;';
+		$return = '&nbsp;';
+		$return_url = $GLOBALS["APPLICATION"]->GetCurPageParam("", array("admin_history", "mode", "table_id"));
+
+		if($arHtmlControl["VALUE"] > 0)
+		{
+			$db_res = CVote::GetByIDEx($arHtmlControl["VALUE"]);
+			if ($db_res && ($arVote = $db_res->GetNext())){
+				if ($arVote["LAMP"] == "yellow")
+					$arVote["LAMP"] = ($arVote["ID"] == CVote::GetActiveVoteId($arVote["CHANNEL_ID"]) ? "green" : "red");
+				$return = "<div class=\"lamp-red\" title=\"".($arVote["ACTIVE"] != 'Y' ? GetMessage("VOTE_NOT_ACTIVE") : GetMessage("VOTE_ACTIVE_RED_LAMP"))."\"  style=\"display:inline-block;\"></div>";
+				if ($arVote["LAMP"]=="green")
+					$return = "<div class=\"lamp-green\" title=\"".GetMessage("VOTE_LAMP_ACTIVE")."\" style=\"display:inline-block;\"></div>";
+				$return .= " [<a href='vote_edit.php?lang=".LANGUAGE_ID."&ID=".$arVote["ID"]."&return_url=".urlencode($return_url)."' title='".GetMessage("VOTE_EDIT_TITLE")."'>".$arVote["ID"]."</a>] ";
+				$return .= $arVote["TITLE"].(!empty($arVote["DESCRIPTION"]) ? " <i>(".$arVote["DESCRIPTION"].")</i>" : "");
+				if ($arVote["COUNTER"] > 0)
+					$return .= GetMessage("VOTE_VOTES")." <a href=\"vote_user_votes.php?lang=".LANGUAGE_ID."&find_vote_id=".$arVote["ID"]."&find_valid=Y&set_filter=Y\">".$arVote["COUNTER"]."</a>";
+			}
+
+		}
+		return $return;
 	}
 
 	public static function GetAdminListEditHTML($arUserField, $arHtmlControl)

@@ -1,6 +1,8 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main\Type;
+
 class OracleResult extends Result
 {
 	private $resultFields = array();
@@ -15,15 +17,32 @@ class OracleResult extends Result
 		switch ($fieldType)
 		{
 			case 'DATE':
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "d-M-y");
-				break;
-			case 'CLOB':
-				if (is_object($value))
-					return $value->load();
+				if($value !== null)
+				{
+					if(strlen($value) == 19)
+					{
+						//preferable format: NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
+						$value = new Type\DateTime($value, "Y-m-d H:i:s");
+					}
+					else
+					{
+						//default Oracle date format: 03-MAR-14
+						$value = new Type\DateTime($value." 00:00:00", "d-M-y H:i:s");
+					}
+				}
 				break;
 			case 'VARCHAR2':
 				if ((strlen($value) == 19) && preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
-					return new \Bitrix\Main\Type\DateTime($value, "Y-m-d H:i:s");
+				{
+					$value = new Type\DateTime($value, "Y-m-d H:i:s");
+				}
+				break;
+			case 'CLOB':
+				if (is_object($value))
+				{
+					/** @var \OCI_Lob $value */
+					$value = $value->load();
+				}
 				break;
 			default:
 				break;

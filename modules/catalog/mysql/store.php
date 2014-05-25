@@ -18,65 +18,65 @@ class CCatalogStore
 	extends CAllCatalogStore
 {
 	/** Add new store in table b_catalog_store,
-	* @static
-	* @param $arFields
-	* @return bool|int
-	*/
+	 * @static
+	 * @param $arFields
+	 * @return bool|int
+	 */
 	
 	/**
-	 * <p>Метод добавляет новый склад, в соответствии с данными из массива arFields.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров нового склада, ключами в котором
-	 * являются названия параметров, а значениями - соответствующие
-	 * значения. Допустимые ключи: <br><ul> <li>TITLE - название склада;</li> <li>ACTIVE -
-	 * активность склада('Y' - активен, 'N' - не активен);</li> <li>ADDRESS - адрес
-	 * склада;</li> <li>DESCRIPTION - описание склада;</li> <li>GPS_N - GPS
-	 * координата(широта);</li> <li>GPS_S - GPS координата(долгота);</li> <li>IMAGE_ID - ID
-	 * картинки склада;</li> <li>PHONE - телефон;</li> <li>SCHEDULE - расписание работы
-	 * склада (максимальный размер поля 255 символов);</li> <li>XML_ID - XML_ID
-	 * склада для экспорта\импорта из 1С;</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращает <i>ID</i> вновь созданного склада, если добавление
-	 * совершено, в противном случае - <i>false</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $arFields = Array(
-	 * 		"TITLE" =&gt; $TITLE,
-	 * 		"ACTIVE" =&gt; $ACTIVE,
-	 * 		"ADDRESS" =&gt; $ADDRESS,
-	 * 		"DESCRIPTION" =&gt; $DESCRIPTION,
-	 * 		"IMAGE_ID" =&gt; $fid,
-	 * 		"GPS_N" =&gt; $GPS_N,
-	 * 		"GPS_S" =&gt; $GPS_S,
-	 * 		"PHONE" =&gt; $PHONE,
-	 * 		"SCHEDULE" =&gt; $SCHEDULE,
-	 * 		"XML_ID" =&gt; $XML_ID,
-	 * 	);
-	 * 	
-	 * 	$ID = CCatalogStore::Add($arFields);
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новый склад, в соответствии с данными из массива arFields.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров нового склада, ключами в котором
+	* являются названия параметров, а значениями - соответствующие
+	* значения. Допустимые ключи: <br><ul> <li>TITLE - название склада;</li> <li>ACTIVE -
+	* активность склада('Y' - активен, 'N' - не активен);</li> <li>ADDRESS - адрес
+	* склада;</li> <li>DESCRIPTION - описание склада;</li> <li>GPS_N - GPS
+	* координата(широта);</li> <li>GPS_S - GPS координата(долгота);</li> <li>IMAGE_ID - ID
+	* картинки склада;</li> <li>PHONE - телефон;</li> <li>SCHEDULE - расписание работы
+	* склада (максимальный размер поля 255 символов);</li> <li>XML_ID - XML_ID
+	* склада для экспорта\импорта из 1С;</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращает <i>ID</i> вновь созданного склада, если добавление
+	* совершено, в противном случае - <i>false</i>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arFields = Array(
+	* 		"TITLE" =&gt; $TITLE,
+	* 		"ACTIVE" =&gt; $ACTIVE,
+	* 		"ADDRESS" =&gt; $ADDRESS,
+	* 		"DESCRIPTION" =&gt; $DESCRIPTION,
+	* 		"IMAGE_ID" =&gt; $fid,
+	* 		"GPS_N" =&gt; $GPS_N,
+	* 		"GPS_S" =&gt; $GPS_S,
+	* 		"PHONE" =&gt; $PHONE,
+	* 		"SCHEDULE" =&gt; $SCHEDULE,
+	* 		"XML_ID" =&gt; $XML_ID,
+	* 	);
+	* 	
+	* 	$ID = CCatalogStore::Add($arFields);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php
+	* @author Bitrix
+	*/
 	static function Add($arFields)
 	{
 		/** @global CDataBase $DB */
 
 		global $DB;
 
-		if (!CBXFeatures::IsFeatureEnabled('CatMultiStore'))
+		if(!CBXFeatures::IsFeatureEnabled('CatMultiStore'))
 		{
-			$dbResultList = CCatalogStore::GetList(array());
+			$dbResultList = CCatalogStore::GetList(array(), array(), false, array('NAV_PARAMS' => array("nTopCount" => "1")), array("ID"));
 			if($arResult = $dbResultList->Fetch())
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CS_ALREADY_HAVE_STORE"));
@@ -86,7 +86,7 @@ class CCatalogStore
 
 		foreach (GetModuleEvents("catalog", "OnBeforeCatalogStoreAdd", true) as $arEvent)
 		{
-			if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
+			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
 		}
 
@@ -118,100 +118,119 @@ class CCatalogStore
 
 	
 	/**
-	 * <p>Функция возвращает результат выборки записей из таблицы складов в соответствии со своими параметрами.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
-	 * "направление_сортировки1", "название_поля2" =&gt;
-	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	 * может стоять любое поле, а в качестве
-	 * "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию). <br><br> Если массив сортировки
-	 * имеет несколько элементов, то результирующий набор сортируется
-	 * последовательно по каждому элементу (т.е. сначала сортируется по
-	 * первому элементу, потом результат сортируется по второму и т.д.). 
-	 * <br><br> Значение по умолчанию - пустой массив array() - означает, что
-	 * результат отсортирован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
-	 * вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
-	 * "значение1", "[модификатор2][оператор2]название_поля2" =&gt; "значение2",
-	 * . . . )</pre> Удовлетворяющие фильтру записи возвращаются в
-	 * результате, а записи, которые не удовлетворяют условиям фильтра,
-	 * отбрасываются. <br><br> Допустимыми являются следующие
-	 * модификаторы: <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и
-	 * пустая строка так же удовлетворяют условиям фильтра.</li> </ul>
-	 * Допустимыми являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение
-	 * поля больше или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b>
-	 * - значение поля строго больше передаваемой в фильтр величины;</li>
-	 * <li> <b>&lt;=</b> - значение поля меньше или равно передаваемой в фильтр
-	 * величины;</li> <li> <b>&lt;</b> - значение поля строго меньше передаваемой
-	 * в фильтр величины;</li> <li> <b>@</b> - оператор может использоваться для
-	 * целочисленных и вещественных данных при передаче набора
-	 * значений (массива). В этом случае при генерации sql-запроса будет
-	 * использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
-	 * <li> <b>~</b> - значение поля проверяется на соответствие
-	 * передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
-	 * проверяется на соответствие передаваемой в фильтр строке в
-	 * соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
-	 * может стоять любое поле. <br><br> Пример фильтра: <pre class="syntax">array("ACTIVE"
-	 * =&gt; "Y")</pre> Этот фильтр означает "выбрать все записи, в которых
-	 * значение в поле ACTIVE (флаг "Активность склада") равно Y". <br><br>
-	 * Значение по умолчанию - пустой массив array() - означает, что
-	 * результат отфильтрован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
-	 * class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
-	 * "название_поля<i>N</i>" может стоять любое поле. <br><br> Если массив
-	 * пустой, то функция вернет число записей, удовлетворяющих фильтру.
-	 * <br><br> Значение по умолчанию - <i>false</i> - означает, что результат
-	 * группироваться не будет.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	 * <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
-	 * ограничено сверху значением этого ключа;</li> <li>любой ключ,
-	 * принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	 * параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
-	 * параметров выборки нет.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
-	 * указать только те поля, которые необходимы. Если в массиве
-	 * присутствует значение "*", то будут возвращены все доступные поля.
-	 * <br><br> Значение по умолчанию - пустой массив array() - означает, что
-	 * будут возвращены все поля основной таблицы запроса.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает объект класса <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
-	 * коллекцию ассоциативных массивов с ключами.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает результат выборки записей из таблицы складов в соответствии со своими параметрами.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* "направление_сортировки1", "название_поля2" =&gt;
+	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	* может стоять любое поле, а в качестве
+	* "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию). <br><br> Если массив сортировки
+	* имеет несколько элементов, то результирующий набор сортируется
+	* последовательно по каждому элементу (т.е. сначала сортируется по
+	* первому элементу, потом результат сортируется по второму и т.д.). 
+	* <br><br> Значение по умолчанию - пустой массив array() - означает, что
+	* результат отсортирован не будет.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
+	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
+	* "значение1", "[модификатор2][оператор2]название_поля2" =&gt; "значение2",
+	* . . . )</pre> Удовлетворяющие фильтру записи возвращаются в
+	* результате, а записи, которые не удовлетворяют условиям фильтра,
+	* отбрасываются. <br><br> Допустимыми являются следующие
+	* модификаторы: <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и
+	* пустая строка так же удовлетворяют условиям фильтра.</li> </ul>
+	* Допустимыми являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение
+	* поля больше или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b>
+	* - значение поля строго больше передаваемой в фильтр величины;</li>
+	* <li> <b>&lt;=</b> - значение поля меньше или равно передаваемой в фильтр
+	* величины;</li> <li> <b>&lt;</b> - значение поля строго меньше передаваемой
+	* в фильтр величины;</li> <li> <b>@</b> - оператор может использоваться для
+	* целочисленных и вещественных данных при передаче набора
+	* значений (массива). В этом случае при генерации sql-запроса будет
+	* использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	* <li> <b>~</b> - значение поля проверяется на соответствие
+	* передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	* проверяется на соответствие передаваемой в фильтр строке в
+	* соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	* может стоять любое поле. <br><br> Пример фильтра: <pre class="syntax">array("ACTIVE"
+	* =&gt; "Y")</pre> Этот фильтр означает "выбрать все записи, в которых
+	* значение в поле ACTIVE (флаг "Активность склада") равно Y". <br><br>
+	* Значение по умолчанию - пустой массив array() - означает, что
+	* результат отфильтрован не будет.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
+	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
+	* "название_поля<i>N</i>" может стоять любое поле. <br><br> Если массив
+	* пустой, то функция вернет число записей, удовлетворяющих фильтру.
+	* <br><br> Значение по умолчанию - <i>false</i> - означает, что результат
+	* группироваться не будет.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* ограничено сверху значением этого ключа;</li> <li>любой ключ,
+	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
+	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
+	* параметров выборки нет.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* указать только те поля, которые необходимы. Если в массиве
+	* присутствует значение "*", то будут возвращены все доступные поля.
+	* <br><br> Значение по умолчанию - пустой массив array() - означает, что
+	* будут возвращены все поля основной таблицы запроса.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает объект класса <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
+	* коллекцию ассоциативных массивов с ключами.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/getlist.php
+	* @author Bitrix
+	*/
 	static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
-		if (empty($arSelectFields))
-			$arSelectFields = array("ID", "ACTIVE", "TITLE", "PHONE", "SCHEDULE", "ADDRESS", "DESCRIPTION", "GPS_N", "GPS_S", "IMAGE_ID", "DATE_CREATE", "DATE_MODIFY", "USER_ID", "XML_ID"/*, "BASE"*/);
 
-		if (!isset($arFilter["PRODUCT_ID"]) && isset($arSelectFields["PRODUCT_AMOUNT"]))
+		if(empty($arSelectFields))
+			$arSelectFields = array("ID", "ACTIVE", "TITLE", "PHONE", "SCHEDULE", "ADDRESS", "DESCRIPTION", "GPS_N", "GPS_S", "IMAGE_ID", "DATE_CREATE", "DATE_MODIFY", "USER_ID", "XML_ID", "SORT", "EMAIL", "ISSUING_CENTER", "SHIPPING_CENTER", "SITE_ID"/*, "BASE"*/);
+
+		$keyForDelete = array_search("PRODUCT_AMOUNT", $arSelectFields);
+		if(!isset($arFilter["PRODUCT_ID"]) && $keyForDelete !== false)
 		{
-			unset($arSelectFields["PRODUCT_AMOUNT"]);
+			unset($arSelectFields[$keyForDelete]);
 		}
-		$productID=intval($arFilter["PRODUCT_ID"]);
+		if($keyForDelete == false)
+		{
+			$keyForDelete = array_search("ELEMENT_ID", $arSelectFields);
+			if($keyForDelete !== false)
+				unset($arSelectFields[$keyForDelete]);
+		}
+		$productID = '(';
+		if(is_array($arFilter["PRODUCT_ID"]))
+		{
+			foreach($arFilter["PRODUCT_ID"] as $id)
+			{
+				$productID .= intval($id).',';
+			}
+			$productID = rtrim($productID, ',').')';
+		}
+		else
+			$productID .= intval($arFilter["PRODUCT_ID"]).')';
+
 		$arFields = array(
 			"ID" => array("FIELD" => "CS.ID", "TYPE" => "int"),
 			"ACTIVE" => array("FIELD" => "CS.ACTIVE", "TYPE" => "string"),
@@ -229,54 +248,59 @@ class CCatalogStore
 			"USER_ID" => array("FIELD" => "CS.USER_ID", "TYPE" => "int"),
 			"MODIFIED_BY" => array("FIELD" => "CS.MODIFIED_BY", "TYPE" => "int"),
 			"XML_ID" => array("FIELD" => "CS.XML_ID", "TYPE" => "string"),
-			'PRODUCT_AMOUNT' => array("FIELD" => "CP.AMOUNT", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_store_product CP ON (CS.ID = CP.STORE_ID AND CP.PRODUCT_ID=$productID)"),
-			//"BASE" => array("FIELD" => "CS.BASE", "TYPE" => "char"),
+			"SORT" => array("FIELD" => "CS.SORT", "TYPE" => "int"),
+			"EMAIL" => array("FIELD" => "CS.EMAIL", "TYPE" => "string"),
+			"ISSUING_CENTER" => array("FIELD" => "CS.ISSUING_CENTER", "TYPE" => "char"),
+			"SHIPPING_CENTER" => array("FIELD" => "CS.SHIPPING_CENTER", "TYPE" => "char"),
+			"SITE_ID" => array("FIELD" => "CS.SITE_ID", "TYPE" => "string"),
+			"PRODUCT_AMOUNT" => array("FIELD" => "CP.AMOUNT", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_store_product CP ON (CS.ID = CP.STORE_ID AND CP.PRODUCT_ID IN $productID)"),
+			"ELEMENT_ID" => array("FIELD" => "CP.PRODUCT_ID", "TYPE" => "int"),
 		);
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (empty($arGroupBy) && is_array($arGroupBy))
+		if(empty($arGroupBy) && is_array($arGroupBy))
 		{
 			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store CS ".$arSqls["FROM"];
-			if (!empty($arSqls["WHERE"]))
+			if(!empty($arSqls["WHERE"]))
 				$strSql .= " WHERE ".$arSqls["WHERE"];
-			if (!empty($arSqls["GROUPBY"]))
+			if(!empty($arSqls["GROUPBY"]))
 				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($arRes = $dbRes->Fetch())
+			if($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
 				return false;
 		}
 
 		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store CS ".$arSqls["FROM"];
-		if (!empty($arSqls["WHERE"]))
+		if(!empty($arSqls["WHERE"]))
 			$strSql .= " WHERE ".$arSqls["WHERE"];
-		if (!empty($arSqls["GROUPBY"]))
+		if(!empty($arSqls["GROUPBY"]))
 			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
-		if (!empty($arSqls["ORDERBY"]))
+		if(!empty($arSqls["ORDERBY"]))
 			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
+		if($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 		{
 			$intTopCount = intval($arNavStartParams["nTopCount"]);
 		}
-		if ($boolNavStartParams && 0 >= $intTopCount)
+		if($boolNavStartParams && 0 >= $intTopCount)
 		{
 			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_store CS ".$arSqls["FROM"];
-			if (!empty($arSqls["WHERE"]))
+			if(!empty($arSqls["WHERE"]))
 				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
-			if (!empty($arSqls["GROUPBY"]))
+			if(!empty($arSqls["GROUPBY"]))
 				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
-			if (empty($arSqls["GROUPBY"]))
+			if(empty($arSqls["GROUPBY"]))
 			{
-				if ($arRes = $dbRes->Fetch())
+				if($arRes = $dbRes->Fetch())
 					$cnt = $arRes["CNT"];
 			}
 			else
@@ -290,7 +314,7 @@ class CCatalogStore
 		}
 		else
 		{
-			if ($boolNavStartParams && 0 < $intTopCount)
+			if($boolNavStartParams && 0 < $intTopCount)
 			{
 				$strSql .= " LIMIT ".$intTopCount;
 			}

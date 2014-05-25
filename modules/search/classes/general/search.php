@@ -58,178 +58,185 @@ class CAllSearch extends CDBResult
 	//returns recordset with search results
 	
 	/**
-	 * <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа).</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearch.php">OnSearch</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arParams  Массив, содержащий условия поиска в виде наборов "название
-	 * поля"=&gt;"значение". <br><br> Название поля может принимать значение:
-	 * <ul> <li> <b>QUERY</b> - Строка запроса. Обязательный элемент. Должна быть
-	 * сформирована в соответствии с правилами языка запросов.</li> <li>
-	 * <b>TAGS</b> - Список тегов. В результате поиска будут возвращены все
-	 * элементы имеющие данные теги.</li> <li> <b>SITE_ID</b> - Сайт, в информации
-	 * которого производится поиск. Не обязательный параметр, по
-	 * умолчанию равен текущему.</li> <li> <b>MODULE_ID</b> - Код модуля, данными
-	 * которого ограничивается поиск. Если этот параметр равен false, то
-	 * поиск производится по всем модулям. Не обязательный параметр, по
-	 * умолчанию равен false.</li> <li> <b>ITEM_ID</b> - Код проиндексированного
-	 * элемента. Используется для ограничения области поиска по коду
-	 * элемента. Если параметр имеет значение false, то ограничение не
-	 * производится. Не обязательный параметр, по умолчанию равен false.</li>
-	 * <li> <b>PARAM1</b> - Первый параметр элемента или массив первых
-	 * параметров. Используется для ограничения области поиска по
-	 * произвольному параметру. Если параметр имеет значение false, то
-	 * ограничение не производится. Не обязательный параметр, по
-	 * умолчанию равен false.</li> <li> <b>PARAM2</b> - Второй параметр элемента или
-	 * массив вторых параметров. Используется для ограничения области
-	 * поиска по произвольному параметру. Если параметр имеет значение
-	 * false, то ограничение не производится. Не обязательный параметр, по
-	 * умолчанию равен false.</li> <li> <b>MODULE_ID</b> - идентификатор модуля или
-	 * массив идентификаторов;</li> <li> <b>ITEM_ID</b> - идентификатор элемента
-	 * или массив;</li> <li> <b>URL</b> - маска адреса относительно корня сайта, по
-	 * которому доступен данный элемент или массив масок адресов;</li> <li>
-	 * <b>DATE_CHANGE</b> - время изменения элемента в формате сайта (включает
-	 * время);</li> <li> <b>CHECK_DATES</b> - если задан и равен Y, то найдены будут
-	 * только активные элементы;</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $aSort = array() Массив, содержащий признак сортировки в виде наборов "название
-	 * поля"=&gt;"направление". <br><br> Название поля может принимать
-	 * значение: <ul> <li> <b>ID</b> - идентификатор в поисковом индексе;</li> <li>
-	 * <b>MODULE_ID</b> - идентификатор модуля;</li> <li> <b>ITEM_ID</b> - идентификатор
-	 * элемента поискового индекса (например для форума это
-	 * идентификатор сообщения);</li> <li> <b>TITLE</b> - заголовок;</li> <li> <b>PARAM1</b> -
-	 * Первый параметр элемента или массив первых параметров.
-	 * Используется для ограничения области поиска по произвольному
-	 * параметру. Если параметр имеет значение false, то ограничение не
-	 * производится. Не обязательный параметр, по умолчанию равен false.</li>
-	 * <li> <b>PARAM2</b> - Второй параметр элемента или массив вторых
-	 * параметров. Используется для ограничения области поиска по
-	 * произвольному параметру. Если параметр имеет значение false, то
-	 * ограничение не производится. Не обязательный параметр, по
-	 * умолчанию равен false.</li> <li> <b>DATE_FROM</b> - дата начала активности
-	 * элемента;</li> <li> <b>DATE_TO</b> - дата окончания активности элемента;</li>
-	 * <li> <b>RANK</b> - вычисленное значение релевантности;</li> <li> <b>TITLE_RANK</b> -
-	 * количество вхождений подстрок запроса в заголовок. Позволяет
-	 * повысить значимость заголовка в результатах поиска;</li> <li>
-	 * <b>CUSTOM_RANK</b> - заданное значение релевантности;</li> <li> <b>DATE_CHANGE</b> -
-	 * время изменения элемента;</li> </ul> Направление сортировки может
-	 * принимать значение: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
-	 * убыванию.</li> </ul> Пример (именно это значение считается по
-	 * умолчанию): <pre class="syntax"><code>array("CUSTOM_RANK"=&gt;"DESC", "RANK"=&gt;"DESC",
-	 * "DATE_CHANGE"=&gt;"DESC")</code></pre> В случае когда параметр bTagsCloud равен true,
-	 * допустимыми полями являются: <ul> <li> <b>DATE_CHANGE</b> - время изменения
-	 * элемента;</li> <li> <b>NAME</b> - значение тег;</li> <li> <b>CNT</b> - частота тега;</li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param array $aParamsEx = array() Массив массивов, содержащий дополнительные условия поиска в виде
-	 * наборов "название поля"=&gt;"значение". Эти условия будут объединены
-	 * по условию ИЛИ. Смотри описание параметра arParams. <br><br> Так же может
-	 * содержать элемент: <ul> <li> <b>STEMMING</b> - Если равно true, то при поиске
-	 * будет учитываться морфология. Если false, то не будет. Если не
-	 * задано, то будет использоваться настройка модуля;</li> </ul> Пример
-	 * сложного условия: <pre class="syntax"> array(<br> array(<br> "MODULE_ID" =&gt; "forum",<br> "PARAM1"
-	 * =&gt; array(1, 2),<br> ),<br> array(<br> "MODULE_ID" =&gt; "iblock",<br> "PARAM2" =&gt; 3,<br> ),<br> )</pre> В
-	 * данном случае поиск будет осуществляться в форумах с
-	 * идентификаторами 1 и 2, а также в инфоблоке с идентификатором 3.
-	 *
-	 *
-	 *
-	 * @param bool $bTagsCloud = false Признак построения облака тегов. Если задан и равен true, то будет
-	 * построено облако тегов.
-	 *
-	 *
-	 *
-	 * @return void <p>Набор записей, каждая из которых представляет собой массив
-	 * следующей структуры:</p><pre class="syntax">Array(<br> [ID] =&gt; Код индекса<br>
-	 * [DATE_CHANGE] =&gt; Дата изменения проиндексированного элемента<br> [MODULE_ID]
-	 * =&gt; Модуль, которому принадлежит проиндексированный элемент<br>
-	 * [ITEM_ID] =&gt; Код проиндексированного элемента<br> [LID] =&gt; Языковое
-	 * зеркало (язык) сайта<br> [URL] =&gt; Адрес относительно корня сайта, по
-	 * которому доступен данный элемент (с заменой специальных символов
-	 * &lt;, &gt;, " на &amp;lt;, &amp;gt;, &amp;quot;)<br> [TITLE] =&gt; Заголовок
-	 * проиндексированного элемента (с заменой спец. символов)<br> [BODY] =&gt;
-	 * Текст проиндексированного элемента (с заменой спец. символов)<br>
-	 * [SEARCHABLE_CONTENT] =&gt; Индекс элемента, по которому идет поиск (с заменой
-	 * спец. символов)<br> [PARAM1] =&gt; Первый параметр элемента<br> [PARAM2] =&gt;
-	 * Второй параметр элемента<br> [~URL] =&gt; Адрес относительно корня
-	 * сайта, по которому доступен данный элемент<br> [~TITLE] =&gt; Заголовок
-	 * проиндексированного элемента<br> [~BODY] =&gt; Текст
-	 * проиндексированного элемента<br> [~SEARCHABLE_CONTENT] =&gt; Индекс элемента,
-	 * по которому идет поиск<br> [TITLE_FORMATED] =&gt; Заголовок
-	 * проиндексированного элемента с выделением искомых слов<br>
-	 * [BODY_FORMATED] =&gt; Часть текста проиндексированного элемента с
-	 * выделением искомых слов<br> [URL_WO_PARAMS] =&gt; Адрес элемента без
-	 * параметров добавленных в обработчиках события
-	 * OnSearch.<br>)<br></pre><p>Если задано построение облака тегов, то:</p><pre
-	 * class="syntax">Array(<br> [NAME] =&gt; тег<br> [CNT] =&gt; частота<br> [DATE_CHANGE] =&gt;
-	 * Максимальная дата изменения элемента имеющего данный тег<br>
-	 * [FULL_DATE_CHANGE] =&gt; Дата изменения элемента включая время.<br>)<br></pre><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Расширение фильтров
-	<li>MODULE_ID</li>
-	 *  
-	 *   <li>ITEM_ID</li>
-	 *  
-	 *   <li> PARAM1</li>
-	 *  
-	 *   <li> PARAM2</li>
-	 *  
-	 *   <li>SITE_ID</li>
-	 *  
-	 *   <li>DATE_CHANGE</li>
-	 *  
-	 *   <li>DATE_FROM</li>
-	 *  
-	 *   <li>DATE_TO</li>
-	 *  
-	 *   <li>SITE_URL</li>
-	 *   //Поиск только среди элементов инфоблоков за исключением разделов и инфоблоков с ID 3, 5 и 7 и сообщений форума не старше одних суток. <br> array( 
-	 *    "LOGIC" =&gt; "OR", 
-	 *    array( 
-	 *      "=MODULE_ID" =&gt; "iblock", 
-	 *      "!ITEM_ID" =&gt; "S%", 
-	 *      "!=PARAM2" =&gt; array(3,5,7), 
-	 *    ), 
-	 *    array( 
-	 *      "=MODULE_ID" =&gt; "forum", 
-	 *      "&gt;=DATE_CHANGE" =&gt; ConvertTimeStamp(time()-24*60*60, "FULL"), 
-	 *    ) 
-	 *  ) &lt;?<br>$q = "жареная рыба или селедка";<br>$module_id = "forum";<br>$obSearch = new CSearch;<br>$obSearch-&gt;Search(array(<br>	"QUERY" =&gt; $q,<br>	"SITE_ID" =&gt; LANG,<br>	"MODULE_ID" =&gt; $module_id,<br>));<br>if ($obSearch-&gt;errorno!=0):<br>	?&gt;<br>	&lt;font class="text"&gt;В поисковой фразе обнаружена ошибка:&lt;/font&gt;<br>	&lt;?echo ShowError($obSearch-&gt;error);?&gt;<br>	&lt;font class="text"&gt;Исправьте поисковую фразу и повторите поиск.&lt;/font&gt;<br>	&lt;?<br>else:<br>	while($arResult = $obSearch-&gt;GetNext())<br>	{?&gt;<br>		&lt;a href="&lt;?echo $arResult["URL"]?&gt;"&gt;&lt;?echo $arResult["TITLE_FORMATED"]?&gt;&lt;/a&gt;<br>		&lt;?echo $arResult["BODY_FORMATED"]?&gt;<br>	&lt;hr size="1" color="#DFDFDF"&gt;<br>	&lt;?}<br>endif;<br>?&gt;<br>
-	
-	 *    $obSearch = new CSearch;
-	 *    $obSearch-&gt;Search(array(
-	 *       'QUERY' =&gt; $_REQUEST['q'],
-	 *       'SITE_ID' =&gt; LANG,
-	 *       'MODULE_ID' =&gt; 'iblock',
-	 *    ));
-	 *    $obSearch-&gt;NavStart();
-	 *    while ($arSearch = $obSearch-&gt;Fetch()) {
-	 *       echo($arSearch);
-	 *    }
-	 * Примечание: такой вызов NavStart() породит дополнительный PAGEN_. Если он мешает, то можно заменить NavStart на такую конструкцию:
-	 * $obSearch-&gt;Statistic = new CSearchStatistic($obSearch-&gt;strQueryText, $obSearch-&gt;strTagsText);
-	 * $obSearch-&gt;Statistic-&gt;PhraseStat($obSearch-&gt;NavRecordCount, $obSearch-&gt;NavPageNomer);
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php
-	 * @author Bitrix
-	 */
+	* <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа).</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearch.php">OnSearch</a>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arParams  Массив, содержащий условия поиска в виде наборов "название
+	* поля"=&gt;"значение". <br><br> Название поля может принимать значение:
+	* <ul> <li> <b>QUERY</b> - Строка запроса. Обязательный элемент. Должна быть
+	* сформирована в соответствии с правилами языка запросов.</li> <li>
+	* <b>TAGS</b> - Список тегов. В результате поиска будут возвращены все
+	* элементы имеющие данные теги.</li> <li> <b>SITE_ID</b> - Сайт, в информации
+	* которого производится поиск. Не обязательный параметр, по
+	* умолчанию равен текущему.</li> <li> <b>MODULE_ID</b> - Код модуля, данными
+	* которого ограничивается поиск. Если этот параметр равен false, то
+	* поиск производится по всем модулям. Не обязательный параметр, по
+	* умолчанию равен false.</li> <li> <b>ITEM_ID</b> - Код проиндексированного
+	* элемента. Используется для ограничения области поиска по коду
+	* элемента. Если параметр имеет значение false, то ограничение не
+	* производится. Не обязательный параметр, по умолчанию равен false.</li>
+	* <li> <b>PARAM1</b> - Первый параметр элемента или массив первых
+	* параметров. Используется для ограничения области поиска по
+	* произвольному параметру. Если параметр имеет значение false, то
+	* ограничение не производится. Не обязательный параметр, по
+	* умолчанию равен false.</li> <li> <b>PARAM2</b> - Второй параметр элемента или
+	* массив вторых параметров. Используется для ограничения области
+	* поиска по произвольному параметру. Если параметр имеет значение
+	* false, то ограничение не производится. Не обязательный параметр, по
+	* умолчанию равен false.</li> <li> <b>MODULE_ID</b> - идентификатор модуля или
+	* массив идентификаторов;</li> <li> <b>ITEM_ID</b> - идентификатор элемента
+	* или массив;</li> <li> <b>URL</b> - маска адреса относительно корня сайта, по
+	* которому доступен данный элемент или массив масок адресов;</li> <li>
+	* <b>DATE_CHANGE</b> - время изменения элемента в формате сайта (включает
+	* время);</li> <li> <b>CHECK_DATES</b> - если задан и равен Y, то найдены будут
+	* только активные элементы;</li> </ul>
+	*
+	*
+	*
+	* @param array $aSort = array() Массив, содержащий признак сортировки в виде наборов "название
+	* поля"=&gt;"направление". <br><br> Название поля может принимать
+	* значение: <ul> <li> <b>ID</b> - идентификатор в поисковом индексе;</li> <li>
+	* <b>MODULE_ID</b> - идентификатор модуля;</li> <li> <b>ITEM_ID</b> - идентификатор
+	* элемента поискового индекса (например для форума это
+	* идентификатор сообщения);</li> <li> <b>TITLE</b> - заголовок;</li> <li> <b>PARAM1</b> -
+	* Первый параметр элемента или массив первых параметров.
+	* Используется для ограничения области поиска по произвольному
+	* параметру. Если параметр имеет значение false, то ограничение не
+	* производится. Не обязательный параметр, по умолчанию равен false.</li>
+	* <li> <b>PARAM2</b> - Второй параметр элемента или массив вторых
+	* параметров. Используется для ограничения области поиска по
+	* произвольному параметру. Если параметр имеет значение false, то
+	* ограничение не производится. Не обязательный параметр, по
+	* умолчанию равен false.</li> <li> <b>DATE_FROM</b> - дата начала активности
+	* элемента;</li> <li> <b>DATE_TO</b> - дата окончания активности элемента;</li>
+	* <li> <b>RANK</b> - вычисленное значение релевантности;</li> <li> <b>TITLE_RANK</b> -
+	* количество вхождений подстрок запроса в заголовок. Позволяет
+	* повысить значимость заголовка в результатах поиска;</li> <li>
+	* <b>CUSTOM_RANK</b> - заданное значение релевантности;</li> <li> <b>DATE_CHANGE</b> -
+	* время изменения элемента;</li> </ul> Направление сортировки может
+	* принимать значение: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
+	* убыванию.</li> </ul> Пример (именно это значение считается по
+	* умолчанию): <pre class="syntax"><code>array("CUSTOM_RANK"=&gt;"DESC", "RANK"=&gt;"DESC",
+	* "DATE_CHANGE"=&gt;"DESC")</code></pre> В случае когда параметр bTagsCloud равен true,
+	* допустимыми полями являются: <ul> <li> <b>DATE_CHANGE</b> - время изменения
+	* элемента;</li> <li> <b>NAME</b> - значение тег;</li> <li> <b>CNT</b> - частота тега;</li>
+	* </ul>
+	*
+	*
+	*
+	* @param array $aParamsEx = array() Массив массивов, содержащий дополнительные условия поиска в виде
+	* наборов "название поля"=&gt;"значение". Эти условия будут объединены
+	* по условию ИЛИ. Смотри описание параметра arParams. <br><br> Так же может
+	* содержать элемент: <ul> <li> <b>STEMMING</b> - Если равно true, то при поиске
+	* будет учитываться морфология. Если false, то не будет. Если не
+	* задано, то будет использоваться настройка модуля;</li> </ul> Пример
+	* сложного условия: <pre class="syntax"> array(<br> array(<br> "MODULE_ID" =&gt; "forum",<br> "PARAM1"
+	* =&gt; array(1, 2),<br> ),<br> array(<br> "MODULE_ID" =&gt; "iblock",<br> "PARAM2" =&gt; 3,<br> ),<br> )</pre> В
+	* данном случае поиск будет осуществляться в форумах с
+	* идентификаторами 1 и 2, а также в инфоблоке с идентификатором 3.
+	*
+	*
+	*
+	* @param bool $bTagsCloud = false Признак построения облака тегов. Если задан и равен true, то будет
+	* построено облако тегов.
+	*
+	*
+	*
+	* @return void <p>Набор записей, каждая из которых представляет собой массив
+	* следующей структуры:</p> <pre class="syntax">Array(<br> [ID] =&gt; Код индекса<br>
+	* [DATE_CHANGE] =&gt; Дата изменения проиндексированного элемента<br> [MODULE_ID]
+	* =&gt; Модуль, которому принадлежит проиндексированный элемент<br>
+	* [ITEM_ID] =&gt; Код проиндексированного элемента<br> [LID] =&gt; Языковое
+	* зеркало (язык) сайта<br> [URL] =&gt; Адрес относительно корня сайта, по
+	* которому доступен данный элемент (с заменой специальных символов
+	* &lt;, &gt;, " на &amp;lt;, &amp;gt;, &amp;quot;)<br> [TITLE] =&gt; Заголовок
+	* проиндексированного элемента (с заменой спец. символов)<br> [BODY] =&gt;
+	* Текст проиндексированного элемента (с заменой спец. символов)<br>
+	* [SEARCHABLE_CONTENT] =&gt; Индекс элемента, по которому идет поиск (с заменой
+	* спец. символов)<br> [PARAM1] =&gt; Первый параметр элемента<br> [PARAM2] =&gt;
+	* Второй параметр элемента<br> [~URL] =&gt; Адрес относительно корня
+	* сайта, по которому доступен данный элемент<br> [~TITLE] =&gt; Заголовок
+	* проиндексированного элемента<br> [~BODY] =&gt; Текст
+	* проиндексированного элемента<br> [~SEARCHABLE_CONTENT] =&gt; Индекс элемента,
+	* по которому идет поиск<br> [TITLE_FORMATED] =&gt; Заголовок
+	* проиндексированного элемента с выделением искомых слов<br>
+	* [BODY_FORMATED] =&gt; Часть текста проиндексированного элемента с
+	* выделением искомых слов<br> [URL_WO_PARAMS] =&gt; Адрес элемента без
+	* параметров добавленных в обработчиках события OnSearch.<br>)<br></pre>
+	* <p>Если задано построение облака тегов, то:</p> <pre class="syntax">Array(<br> [NAME]
+	* =&gt; тег<br> [CNT] =&gt; частота<br> [DATE_CHANGE] =&gt; Максимальная дата изменения
+	* элемента имеющего данный тег<br> [FULL_DATE_CHANGE] =&gt; Дата изменения
+	* элемента включая время.<br>)<br></pre> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Расширение фильтров
+	* </htm
+	* <li>MODULE_ID</li>
+	*  
+	*   <li>ITEM_ID</li>
+	*  
+	*   <li> PARAM1</li>
+	*  
+	*   <li> PARAM2</li>
+	*  
+	*   <li>SITE_ID</li>
+	*  
+	*   <li>DATE_CHANGE</li>
+	*  
+	*   <li>DATE_FROM</li>
+	*  
+	*   <li>DATE_TO</li>
+	*  
+	*   <li>SITE_URL</li>
+	*   //Поиск только среди элементов инфоблоков за исключением разделов и инфоблоков с ID 3, 5 и 7 и сообщений форума не старше одних суток. <br> array( 
+	*    "LOGIC" =&gt; "OR", 
+	*    array( 
+	*      "=MODULE_ID" =&gt; "iblock", 
+	*      "!ITEM_ID" =&gt; "S%", 
+	*      "!=PARAM2" =&gt; array(3,5,7), 
+	*    ), 
+	*    array( 
+	*      "=MODULE_ID" =&gt; "forum", 
+	*      "&gt;=DATE_CHANGE" =&gt; ConvertTimeStamp(time()-24*60*60, "FULL"), 
+	*    ) 
+	*  ) 
+	* 
+	* &lt;?<br>$q = "жареная рыба или селедка";<br>$module_id = "forum";<br>$obSearch = new CSearch;<br>$obSearch-&gt;Search(array(<br>	"QUERY" =&gt; $q,<br>	"SITE_ID" =&gt; LANG,<br>	"MODULE_ID" =&gt; $module_id,<br>));<br>if ($obSearch-&gt;errorno!=0):<br>	?&gt;<br>	&lt;font class="text"&gt;В поисковой фразе обнаружена ошибка:&lt;/font&gt;<br>	&lt;?echo ShowError($obSearch-&gt;error);?&gt;<br>	&lt;font class="text"&gt;Исправьте поисковую фразу и повторите поиск.&lt;/font&gt;<br>	&lt;?<br>else:<br>	while($arResult = $obSearch-&gt;GetNext())<br>	{?&gt;<br>		&lt;a href="&lt;?echo $arResult["URL"]?&gt;"&gt;&lt;?echo $arResult["TITLE_FORMATED"]?&gt;&lt;/a&gt;<br>		&lt;?echo $arResult["BODY_FORMATED"]?&gt;<br>	&lt;hr size="1" color="#DFDFDF"&gt;<br>	&lt;?}<br>endif;<br>?&gt;<br>
+	* 
+	* 
+	* 
+	*    $obSearch = new CSearch;
+	*    $obSearch-&gt;Search(array(
+	*       'QUERY' =&gt; $_REQUEST['q'],
+	*       'SITE_ID' =&gt; LANG,
+	*       'MODULE_ID' =&gt; 'iblock',
+	*    ));
+	*    $obSearch-&gt;NavStart();
+	*    while ($arSearch = $obSearch-&gt;Fetch()) {
+	*       echo($arSearch);
+	*    }
+	* Примечание: такой вызов NavStart() породит дополнительный PAGEN_. Если он мешает, то можно заменить NavStart на такую конструкцию:
+	* 
+	* 
+	* $obSearch-&gt;Statistic = new CSearchStatistic($obSearch-&gt;strQueryText, $obSearch-&gt;strTagsText);
+	* $obSearch-&gt;Statistic-&gt;PhraseStat($obSearch-&gt;NavRecordCount, $obSearch-&gt;NavPageNomer);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php
+	* @author Bitrix
+	*/
 	public function Search($arParams, $aSort=array(), $aParamsEx=array(), $bTagsCloud = false)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 
 		if(!is_array($arParams))
-			$arParams = Array("QUERY"=>$arParams);
+			$arParams = array("QUERY"=>$arParams);
 
 		if(!is_set($arParams, "SITE_ID") && is_set($arParams, "LID"))
 		{
@@ -258,6 +265,7 @@ class CAllSearch extends CDBResult
 
 		$this->strQueryText = $strQuery = trim($arParams["QUERY"]);
 		$this->strTags = $strTags  = $arParams["TAGS"];
+
 		if((strlen($strQuery) <= 0) && (strlen($strTags) > 0))
 		{
 			$strQuery = $strTags;
@@ -267,37 +275,49 @@ class CAllSearch extends CDBResult
 		{
 			if(strlen($strTags))
 				$strQuery .= " ".$strTags;
-			$strQuery = preg_replace ("'&#(\\d+);'e", "chr(\\1)", $strQuery);
+			$strQuery = preg_replace_callback("/&#(\\d+);/", array($this, "chr"), $strQuery);
 			$bTagsSearch = false;
 		}
 
-		if(!array_key_exists("STEMMING", $aParamsEx))
-			$aParamsEx["STEMMING"] = COption::GetOptionString("search", "use_stemming", "N")=="Y";
-
-		$this->Query = new CSearchQuery("and", "yes", 0, $arParams["SITE_ID"]);
-		if($this->_opt_NO_WORD_LOGIC)
-			$this->Query->no_bool_lang = true;
-
-		$query = $this->Query->GetQueryString((BX_SEARCH_VERSION > 1? "sct": "sc").".SEARCHABLE_CONTENT", $strQuery, $bTagsSearch, $aParamsEx["STEMMING"], $this->_opt_ERROR_ON_EMPTY_STEM);
-		if(!$query || strlen(trim($query))<=0)
+		$result = CSearchFullText::GetInstance()->search($arParams, $aSort, $aParamsEx, $bTagsCloud);
+		if (is_array($result))
 		{
-			if($bTagsCloud)
+			$this->error = CSearchFullText::GetInstance()->getErrorText();
+			$this->errorno = CSearchFullText::GetInstance()->getErrorNumber();
+			$this->formatter = CSearchFullText::GetInstance()->getRowFormatter();
+			if ($this->errorno > 0)
+				return;
+		}
+		else
+		{
+			if(!array_key_exists("STEMMING", $aParamsEx))
+				$aParamsEx["STEMMING"] = COption::GetOptionString("search", "use_stemming", "N")=="Y";
+
+			$this->Query = new CSearchQuery("and", "yes", 0, $arParams["SITE_ID"]);
+			if($this->_opt_NO_WORD_LOGIC)
+				$this->Query->no_bool_lang = true;
+
+			$query = $this->Query->GetQueryString((BX_SEARCH_VERSION > 1? "sct": "sc").".SEARCHABLE_CONTENT", $strQuery, $bTagsSearch, $aParamsEx["STEMMING"], $this->_opt_ERROR_ON_EMPTY_STEM);
+			if(!$query || strlen(trim($query))<=0)
 			{
-				$query = "1=1";
+				if($bTagsCloud)
+				{
+					$query = "1=1";
+				}
+				else
+				{
+					$this->error = $this->Query->error;
+					$this->errorno = $this->Query->errorno;
+					return;
+				}
 			}
-			else
+
+			if(strlen($query)>2000)
 			{
-				$this->error = $this->Query->error;
-				$this->errorno = $this->Query->errorno;
+				$this->error = GetMessage("SEARCH_ERROR4");
+				$this->errorno = 4;
 				return;
 			}
-		}
-
-		if(strlen($query)>2000)
-		{
-			$this->error = GetMessage("SEARCH_ERROR4");
-			$this->errorno = 4;
-			return;
 		}
 
 		foreach(GetModuleEvents("search", "OnSearch", true) as $arEvent)
@@ -316,7 +336,12 @@ class CAllSearch extends CDBResult
 				$this->url_add_params[] = $r;
 		}
 
-		if(
+		if (is_array($result))
+		{
+			$r = new CDBResult;
+			$r->InitFromArray($result);
+		}
+		elseif(
 			BX_SEARCH_VERSION > 1
 			&& count($this->Query->m_stemmed_words_id)
 			&& array_sum($this->Query->m_stemmed_words_id) === 0
@@ -327,26 +352,29 @@ class CAllSearch extends CDBResult
 		}
 		else
 		{
+			$this->strSqlWhere = "";
 			$bIncSites = false;
-			$strSqlWhere = CSearch::__PrepareFilter($arParams, $bIncSites);
-			if(strlen($strSqlWhere)>0)
-				$strSqlWhere = " AND ".$strSqlWhere;
 
-			if(is_array($aParamsEx) && count($aParamsEx)>0)
+			$arSqlWhere = array();
+			if(is_array($aParamsEx) && !empty($aParamsEx))
 			{
-				$arSqlWhere=array();
 				foreach($aParamsEx as $aParamEx)
 				{
-					$s=CSearch::__PrepareFilter($aParamEx, $bIncSites);
-					if(strlen($s)>0)
-						$arSqlWhere[]=$s;
+					$strSqlWhere = CSearch::__PrepareFilter($aParamEx, $bIncSites);
+					if($strSqlWhere != "")
+						$arSqlWhere[] = $strSqlWhere;
 				}
-				if(count($arSqlWhere)>0)
-					$strSqlWhere.="\n\t\t\t\tAND (\n\t\t\t\t\t(".implode(")\n\t\t\t\t\tOR(",$arSqlWhere).")\n\t\t\t\t)";
+			}
+			if (!empty($arSqlWhere))
+			{
+				$arSqlWhere = array(
+					"\n\t\t\t\t(".implode(")\n\t\t\t\t\tOR(",$arSqlWhere)."\n\t\t\t\t)",
+				);
 			}
 
-			//This will be used in suggest
-			$this->strSqlWhere = $strSqlWhere;
+			$strSqlWhere = CSearch::__PrepareFilter($arParams, $bIncSites);
+			if($strSqlWhere != "")
+				array_unshift($arSqlWhere, $strSqlWhere);
 
 			$strSqlOrder = $this->__PrepareSort($aSort, "sc.", $bTagsCloud);
 
@@ -383,20 +411,23 @@ class CAllSearch extends CDBResult
 
 					if($hwm > 0)
 					{
-						$strSqlWhere .= " AND st.TF >= ".number_format($hwm, 2, ".", "");
+						$arSqlWhere[] = "st.TF >= ".number_format($hwm, 2, ".", "");
 						$this->tf_hwm = $hwm;
 					}
 				}
 			}
 
-			if($bTagsCloud)
-				$strSql = $this->tagsMakeSQL($query, $strSqlWhere, $strSqlOrder, $bIncSites, $bStem, $aParamsEx["LIMIT"]);
-			else
-				$strSql = $this->MakeSQL($query, $strSqlWhere, $strSqlOrder, $bIncSites, $bStem);
+			if(!empty($arSqlWhere))
+			{
+				$this->strSqlWhere = "\n\t\t\t\tAND (\n\t\t\t\t\t(".implode(")\n\t\t\t\t\tAND(",$arSqlWhere).")\n\t\t\t\t)";
+			}
 
-			//$tStart = getmicrotime();
+			if($bTagsCloud)
+				$strSql = $this->tagsMakeSQL($query, $this->strSqlWhere, $strSqlOrder, $bIncSites, $bStem, $aParamsEx["LIMIT"]);
+			else
+				$strSql = $this->MakeSQL($query, $this->strSqlWhere, $strSqlOrder, $bIncSites, $bStem);
+
 			$r = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			//echo "<pre>",htmlspecialcharsbx($strSql),"</pre><br>",(getmicrotime()-$tStart);
 		}
 		parent::CDBResult($r);
 	}
@@ -415,6 +446,11 @@ class CAllSearch extends CDBResult
 		$perm = CSearch::CheckPermissions("sc.ID");
 		$sql = preg_replace("/(DATE_FROM|DATE_TO|DATE_CHANGE)(\\s+IS\\s+NOT\\s+NULL|\\s+IS\\s+NULL|\\s*[<>!=]+\\s*'.*?')/im", "", $this->strSqlWhere);
 		return md5($perm.$sql.$this->strTags);
+	}
+
+	public static function chr($a)
+	{
+		return chr($a[1]);
 	}
 
 	public static function GetFreqStatistics($lang_id, $arStem, $site_id="")
@@ -577,10 +613,18 @@ class CAllSearch extends CDBResult
 
 			if($strType=="STEM")
 			{
-				$lw=strlen($strWhUpp);
-				for($s=$pos; $s>=0 && strpos($letters, substr($strWhUpp, $s, 1))!==false;$s--){}
+				$lw = strlen($strWhUpp);
+				for ($s = $pos; $s >= 0; $s--)
+				{
+					if (strpos($letters, substr($strWhUpp, $s, 1)) === false)
+						break;
+				}
 				$s++;
-				for($e=$pos; $e<$lw && strpos($letters, substr($strWhUpp, $e, 1))!==false;$e++){}
+				for ($e = $pos; $e < $lw; $e++)
+				{
+					if (strpos($letters, substr($strWhUpp, $e, 1)) === false)
+						break;
+				}
 				$e--;
 				$a = stemming(substr($strWhUpp,$s,$e-$s+1), $this->Query->m_lang, true);
 				foreach($a as $stem => $cnt)
@@ -657,6 +701,7 @@ class CAllSearch extends CDBResult
 		$arPosW = array(); //This is "running" words array
 		$arPosP = array(); //and their positions
 		$arPosLast = false; //Best found combination of the positions
+		$matches = array();
 		if (preg_match_all("/(".$pregMask.")/i".BX_UTF_PCRE_MODIFIER, $strUpp, $matches, PREG_SET_ORDER|PREG_OFFSET_CAPTURE))
 		{
 			foreach ($matches as $oneCase)
@@ -794,29 +839,34 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает следующий найденный элемент.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return array <p>Смотри описание возвращаемого значения метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php">CSearch::Search</a>. Если
-	 * достигнут конец выборки, возвращается false.</p><br><br>
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/fetch.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает следующий найденный элемент.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
+	*
+	*
+	*
+	*
+	* @return array <p>Смотри описание возвращаемого значения метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/search.php">CSearch::Search</a>. Если
+	* достигнут конец выборки, возвращается false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/fetch.php
+	* @author Bitrix
+	*/
 	function Fetch()
 	{
-		global $DB;
 		static $arSite = array();
 
 		$r = parent::Fetch();
-		if($r)
+		if ($r)
 		{
+			if ($this->formatter)
+				$r = $this->formatter->format($r);
+
 			$site_id = $r["SITE_ID"];
 			if(!isset($arSite[$site_id]))
 			{
+				$b = "sort";
+				$o = "asc";
 				$rsSite = CSite::GetList($b, $o, array("ID"=>$site_id));
 				$arSite[$site_id] = $rsSite->Fetch();
 			}
@@ -860,11 +910,14 @@ class CAllSearch extends CDBResult
 				}
 			}
 
-			$r["TITLE_FORMATED"] = $this->PrepareSearchResult(htmlspecialcharsex($r["TITLE"]));
-			$r["TITLE_FORMATED_TYPE"] = "html";
-			$r["TAGS_FORMATED"] = tags_prepare($r["TAGS"], SITE_ID);
-			$r["BODY_FORMATED"] = $this->PrepareSearchResult(htmlspecialcharsex($r["BODY"]));
-			$r["BODY_FORMATED_TYPE"] = "html";
+			if (!array_key_exists("TITLE_FORMATED", $r) && array_key_exists("TITLE", $r))
+			{
+				$r["TITLE_FORMATED"] = $this->PrepareSearchResult(htmlspecialcharsex($r["TITLE"]));
+				$r["TITLE_FORMATED_TYPE"] = "html";
+				$r["TAGS_FORMATED"] = tags_prepare($r["TAGS"], SITE_ID);
+				$r["BODY_FORMATED"] = $this->PrepareSearchResult(htmlspecialcharsex($r["BODY"]));
+				$r["BODY_FORMATED_TYPE"] = "html";
+			}
 		}
 
 		return $r;
@@ -877,7 +930,7 @@ class CAllSearch extends CDBResult
 		if(!is_array($SEARCH_MASKS_CACHE))
 		{
 			$arSearch = array("\\", ".",  "?", "*",   "'");
-			$arReplace = array("/",  "\.", ".", ".*?", "\'");
+			$arReplace = array("/",  "\\.", ".", ".*?", "\\'");
 
 			$arInc = array();
 			$inc = str_replace(
@@ -906,7 +959,7 @@ class CAllSearch extends CDBResult
 				$mask = trim($mask);
 				if(strlen($mask))
 				{
-					if(preg_match("#^/[a-z0-9_]+/#i", $mask))
+					if(preg_match("#^/[a-z0-9_.\\\\]+/#i", $mask))
 						$arFullExc[] = "'^".$mask."$'".BX_UTF_PCRE_MODIFIER;
 					else
 						$arExc[] = "'^".$mask."$'".BX_UTF_PCRE_MODIFIER;
@@ -978,6 +1031,8 @@ class CAllSearch extends CDBResult
 		$strRequest.= "\r\n";
 
 		$arAll = "";
+		$errno = 0;
+		$errstr = "";
 
 		$FP = fsockopen($SITE, $PORT, $errno, $errstr, 120);
 		if ($FP)
@@ -999,49 +1054,54 @@ class CAllSearch extends CDBResult
 	//       = false - add new ones. update changed and delete deleted.
 	
 	/**
-	 * <p>Функция пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param bool $bFull = false Если равен true, то на первом шаге поисковый индекс будет полностью
-	 * очищен. По умолчанию равен false, что приводит к перестройке индекса
-	 * только тех элементов, содержимое которых изменилось.
-	 *
-	 *
-	 *
-	 * @param int $max_execution_time = 0 Если задан и больше нуля, то как только время выполнения функции
-	 * превысит значение этого параметра выполнение функции
-	 * завершится. Данные для начала следующего шага будут возвращены
-	 * как результат работы функции.
-	 *
-	 *
-	 *
-	 * @param array $NS = Array() Хранит состояние процесса индексации (прогресс) на начало шага.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Функция возвращает массив, если требуется вызвать функцию еще
-	 * раз. Или число проиндексированных элементов, если переиндексация
-	 * завершена.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//Этот пример не является примером пошаговой индексации.<br>//Для этого надо вызывать функцию ReIndexAll только один раз за запуск скрипта.<br>//А промежуточное состояние (NS) можно сохранять например в файле.<br><br>$NS = false;<br>$NS = CSearch::ReIndexAll(false, 60, $NS);<br>while(is_array($NS))<br>	$NS = CSearch::ReIndexAll(false, 60, $NS);<br>echo $NS;<br><br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php
-	 * @author Bitrix
-	 */
+	* <p>Функция пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param bool $bFull = false Если равен true, то на первом шаге поисковый индекс будет полностью
+	* очищен. По умолчанию равен false, что приводит к перестройке индекса
+	* только тех элементов, содержимое которых изменилось.
+	*
+	*
+	*
+	* @param int $max_execution_time = 0 Если задан и больше нуля, то как только время выполнения функции
+	* превысит значение этого параметра выполнение функции
+	* завершится. Данные для начала следующего шага будут возвращены
+	* как результат работы функции.
+	*
+	*
+	*
+	* @param array $NS = Array() Хранит состояние процесса индексации (прогресс) на начало шага.
+	*
+	*
+	*
+	* @param bool $clear_suggest = false Удаляет историю/статистику подсказок для строки поиска.
+	* Необязательный параметр, по умолчанию принимает значение false.
+	*
+	*
+	*
+	* @return mixed <p>Функция возвращает массив, если требуется вызвать функцию еще
+	* раз. Или число проиндексированных элементов, если переиндексация
+	* завершена.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//Этот пример не является примером пошаговой индексации.<br>//Для этого надо вызывать функцию ReIndexAll только один раз за запуск скрипта.<br>//А промежуточное состояние (NS) можно сохранять например в файле.<br><br>$NS = false;<br>$NS = CSearch::ReIndexAll(false, 60, $NS);<br>while(is_array($NS))<br>	$NS = CSearch::ReIndexAll(false, 60, $NS);<br>echo $NS;<br><br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php
+	* @author Bitrix
+	*/
 	public static function ReIndexAll($bFull = false, $max_execution_time = 0, $NS = Array(), $clear_suggest = false)
 	{
 		global $APPLICATION;
@@ -1074,21 +1134,17 @@ class CAllSearch extends CDBResult
 					ExecuteModuleEventEx($arEvent);
 
 				CSearchTags::CleanCache();
-				if(BX_SEARCH_VERSION > 1)
-				{
-					$DB->Query("TRUNCATE TABLE b_search_stem", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					$DB->Query("TRUNCATE TABLE b_search_content_text", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				}
 				$DB->Query("TRUNCATE TABLE b_search_content_param", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_content_site", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_content_right", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$DB->Query("TRUNCATE TABLE b_search_content_stem", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_content_title", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_tags", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_content_freq", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_content", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_suggest", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("TRUNCATE TABLE b_search_user_right", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				CSearchFullText::getInstance()->truncate();
+				COption::SetOptionString("search", "full_reindex_required", "N");
 			}
 			elseif($clear_suggest)
 			{
@@ -1219,40 +1275,40 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	 * <p>Функция инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, переиндексация которого требуется.
-	 *
-	 *
-	 *
-	 * @param bool $bFull = false Производить ли полную переиндексацию с очисткой старых
-	 * поисковых индексов. Не обязательный параметр, по умолчанию равен
-	 * false.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * OnReindex.<br><br>// регистрируем обработчик события "OnReindex" модуля "search"<br>RegisterModuleDependences("search", "OnReindex", "my_module", "CMyModule", "OnReindex");<br><br>// создаем в модуле my_module в классе CMyModule функцию-метод OnReindex<br>function OnReindex()<br>{<br>	global $DB;<br>	$arResult = array();<br><br>	$strSql =<br>		"SELECT FT.ID, FT.TITLE, FT.MESSAGE, ".<br>		"  DATE_FORMAT(FT.POST_DATE, '%d.%m.%Y %H:%i:%s') as POST_DATE, FT.LID ".<br>		"FROM b_my_table FT ";<br><br>	$db_res = $DB-&gt;Query($strSql);<br>	while ($res = $db_res-&gt;Fetch())<br>	{<br>		$arResult[] = array(<br>			"ID" =&gt; $res["ID"],<br>			"LID" =&gt; $res["LID"],<br>			"DATE_CHANGE" =&gt; $res["POST_DATE"],<br>			"URL" =&gt; "/my_module/index.php?ID=".$res["ID"],<br>			"PERMISSIONS" =&gt; array(2),<br>			"TITLE" =&gt; $res["TITLE"],<br>			"BODY" =&gt; $res["POST_MESSAGE"]<br>		);<br>	}<br>	return $arResult;<br>}<br><br>// вызываем переиндексацию модуля<br>CSearch::ReIndexModule("my_module");<br><br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexmodule.php
-	 * @author Bitrix
-	 */
+	* <p>Функция инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, переиндексация которого требуется.
+	*
+	*
+	*
+	* @param bool $bFull = false Производить ли полную переиндексацию с очисткой старых
+	* поисковых индексов. Не обязательный параметр, по умолчанию равен
+	* false.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* OnReindex.<br><br>// регистрируем обработчик события "OnReindex" модуля "search"<br>RegisterModuleDependences("search", "OnReindex", "my_module", "CMyModule", "OnReindex");<br><br>// создаем в модуле my_module в классе CMyModule функцию-метод OnReindex<br>function OnReindex()<br>{<br>	global $DB;<br>	$arResult = array();<br><br>	$strSql =<br>		"SELECT FT.ID, FT.TITLE, FT.MESSAGE, ".<br>		"  DATE_FORMAT(FT.POST_DATE, '%d.%m.%Y %H:%i:%s') as POST_DATE, FT.LID ".<br>		"FROM b_my_table FT ";<br><br>	$db_res = $DB-&gt;Query($strSql);<br>	while ($res = $db_res-&gt;Fetch())<br>	{<br>		$arResult[] = array(<br>			"ID" =&gt; $res["ID"],<br>			"LID" =&gt; $res["LID"],<br>			"DATE_CHANGE" =&gt; $res["POST_DATE"],<br>			"URL" =&gt; "/my_module/index.php?ID=".$res["ID"],<br>			"PERMISSIONS" =&gt; array(2),<br>			"TITLE" =&gt; $res["TITLE"],<br>			"BODY" =&gt; $res["POST_MESSAGE"]<br>		);<br>	}<br>	return $arResult;<br>}<br><br>// вызываем переиндексацию модуля<br>CSearch::ReIndexModule("my_module");<br><br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a></li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexmodule.php
+	* @author Bitrix
+	*/
 	public static function ReindexModule($MODULE_ID, $bFull=false)
 	{
 		global $APPLICATION;
@@ -1300,46 +1356,46 @@ class CAllSearch extends CDBResult
 	//combination of ($MODULE_ID, $ITEM_ID) is used to determine the documents
 	
 	/**
-	 * <p>Функция переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, которому принадлежит индексируемый элемент.
-	 *
-	 *
-	 *
-	 * @param string $ITEM_ID  Код индексируемого элемента.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив свойств индексируемого элемента.
-	 *
-	 *
-	 *
-	 * @param bool $bOverWrite = false Перетирать индекс поиска элемента если элемент уже
-	 * проиндексирован. Не обязательный параметр, по умолчанию равен
-	 * false.
-	 *
-	 *
-	 *
-	 * @param string $SEARCH_SESS_ID = '' Служебный параметр, используется при пошаговой переиндексации.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>CSearch::Index(<br>	"iblock",<br>	$ID,<br>	Array(<br>		"DATE_CHANGE"=&gt;$arIBlockElement["DATE_CHANGE"],<br>		"TITLE"=&gt;$arIBlockElement["NAME"],<br>		"SITE_ID"=&gt;$arSites,<br>		"PARAM1"=&gt;$arIBlockElement["IBLOCK_TYPE_ID"],<br>		"PARAM2"=&gt;$IBLOCK_ID,<br>		"PERMISSIONS"=&gt;$arGroups,<br>		"URL"=&gt;str_replace("<code>#ID#</code>", $arIBlockElement["ID"], $DETAIL_PAGE_URL),<br>		"BODY"=&gt;$arIBlockElement["DETAIL_TEXT"],<br>		"TAGS"=&gt;$arIBlockElement["TAGS"]<br>	),<br>	$bOverWrite<br>);<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/indexs.php
-	 * @author Bitrix
-	 */
+	* <p>Функция переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, которому принадлежит индексируемый элемент.
+	*
+	*
+	*
+	* @param string $ITEM_ID  Код индексируемого элемента.
+	*
+	*
+	*
+	* @param array $arFields  Массив свойств индексируемого элемента.
+	*
+	*
+	*
+	* @param bool $bOverWrite = false Перетирать индекс поиска элемента если элемент уже
+	* проиндексирован. Не обязательный параметр, по умолчанию равен
+	* false.
+	*
+	*
+	*
+	* @param string $SEARCH_SESS_ID = '' Служебный параметр, используется при пошаговой переиндексации.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>CSearch::Index(<br>	"iblock",<br>	$ID,<br>	Array(<br>		"DATE_CHANGE"=&gt;$arIBlockElement["DATE_CHANGE"],<br>		"TITLE"=&gt;$arIBlockElement["NAME"],<br>		"SITE_ID"=&gt;$arSites,<br>		"PARAM1"=&gt;$arIBlockElement["IBLOCK_TYPE_ID"],<br>		"PARAM2"=&gt;$IBLOCK_ID,<br>		"PERMISSIONS"=&gt;$arGroups,<br>		"URL"=&gt;str_replace("<code>#ID#</code>", $arIBlockElement["ID"], $DETAIL_PAGE_URL),<br>		"BODY"=&gt;$arIBlockElement["DETAIL_TEXT"],<br>		"TAGS"=&gt;$arIBlockElement["TAGS"]<br>	),<br>	$bOverWrite<br>);<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/indexs.php
+	* @author Bitrix
+	*/
 	public static function Index($MODULE_ID, $ITEM_ID, $arFields, $bOverWrite=false, $SEARCH_SESS_ID="")
 	{
 		$DB = CDatabase::GetModuleConnection('search');
@@ -1413,9 +1469,9 @@ class CAllSearch extends CDBResult
 				FROM b_search_custom_rank CR
 				WHERE CR.SITE_ID in ('".implode("', '", $arSites)."')
 				AND CR.MODULE_ID='".$DB->ForSQL($MODULE_ID)."'
-				".(is_set($arFields, "PARAM1")?"AND (CR.PARAM1 IS NULL OR CR.PARAM1='".$DB->ForSQL($arFields["PARAM1"])."')":"")."
-				".(is_set($arFields, "PARAM2")?"AND (CR.PARAM2 IS NULL OR CR.PARAM2='".$DB->ForSQL($arFields["PARAM2"])."')":"")."
-				".($ITEM_ID<>""?"AND (CR.ITEM_ID IS NULL OR CR.ITEM_ID='".$DB->ForSQL($ITEM_ID)."')":"")."
+				".(is_set($arFields, "PARAM1")?"AND (CR.PARAM1 IS NULL OR CR.PARAM1='' OR CR.PARAM1='".$DB->ForSQL($arFields["PARAM1"])."')":"")."
+				".(is_set($arFields, "PARAM2")?"AND (CR.PARAM2 IS NULL OR CR.PARAM2='' OR CR.PARAM2='".$DB->ForSQL($arFields["PARAM2"])."')":"")."
+				".($ITEM_ID<>""?"AND (CR.ITEM_ID IS NULL OR CR.ITEM_ID='' OR CR.ITEM_ID='".$DB->ForSQL($ITEM_ID)."')":"")."
 				ORDER BY
 					PARAM1 DESC, PARAM2 DESC, ITEM_ID DESC
 			";
@@ -1443,7 +1499,7 @@ class CAllSearch extends CDBResult
 		if($bTags) $strSqlSelect .= ",TAGS";
 
 		$strSql =
-			"SELECT ID, ".$DB->DateToCharFunction("DATE_CHANGE")." as DATE_CHANGE
+			"SELECT ID, MODULE_ID, ITEM_ID, ".$DB->DateToCharFunction("DATE_CHANGE")." as DATE_CHANGE
 			".$strSqlSelect."
 			FROM b_search_content
 			WHERE MODULE_ID = '".$DB->ForSQL($MODULE_ID)."'
@@ -1466,11 +1522,9 @@ class CAllSearch extends CDBResult
 				$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				if(BX_SEARCH_VERSION > 1)
-					$DB->Query("DELETE FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				CSearchFullText::getInstance()->deleteById($ID);
 
 				return 0;
 			}
@@ -1483,50 +1537,7 @@ class CAllSearch extends CDBResult
 
 			if(is_set($arFields, "SITE_ID"))
 			{
-				$arSITE_ID = $arFields["SITE_ID"];
-				$strSql = "
-					SELECT SITE_ID, URL
-					FROM b_search_content_site
-					WHERE SEARCH_CONTENT_ID = ".$ID."
-				";
-				$rsSite = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				while($arSite = $rsSite->Fetch())
-				{
-					if(array_key_exists($arSite["SITE_ID"], $arSITE_ID))
-					{
-						if($arSite["URL"] !== $arSITE_ID[$arSite["SITE_ID"]])
-							$strSql = "
-								UPDATE b_search_content_site
-								SET URL = '".$DB->ForSql($url, 2000)."'
-								WHERE SEARCH_CONTENT_ID = ".$ID."
-								AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
-							";
-						else
-							$strSql = "";
-
-						unset($arSITE_ID[$arSite["SITE_ID"]]);
-					}
-					else
-					{
-						$strSql = "
-							DELETE FROM b_search_content_site
-							WHERE SEARCH_CONTENT_ID = ".$ID."
-							AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
-						";
-					}
-
-					if(!empty($strSql))
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				}
-
-				foreach($arSITE_ID as $site => $url)
-				{
-					$strSql = "
-						INSERT INTO b_search_content_site(SEARCH_CONTENT_ID, SITE_ID, URL)
-						VALUES(".$ID.", '".$DB->ForSql($site, 2)."', '".$DB->ForSql($url, 2000)."')
-					";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				}
+				CSearch::UpdateSite($ID, $arFields["SITE_ID"]);
 			}
 
 			if(array_key_exists("LAST_MODIFIED", $arFields))
@@ -1572,7 +1583,7 @@ class CAllSearch extends CDBResult
 				else
 					$content .= $arResult["TAGS"];
 
-				$content = preg_replace("'&#(\d+);'e", "chr(\\1)", $content);
+				$content = preg_replace_callback("/&#(\\d+);/", array("CSearch", "chr"), $content);
 				$arFields["SEARCHABLE_CONTENT"] = CSearch::KillEntities(ToUpper($content));
 			}
 
@@ -1589,42 +1600,6 @@ class CAllSearch extends CDBResult
 					CSearch::IndexTitle($arFields["SITE_ID"], $ID, $arFields["TITLE"]);
 			}
 
-			if(is_set($arFields, "SEARCHABLE_CONTENT"))
-			{
-				if(BX_SEARCH_VERSION > 1)
-				{
-					$text_md5 = md5($arFields["SEARCHABLE_CONTENT"]);
-					$rsText = $DB->Query("SELECT SEARCH_CONTENT_MD5 FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ID);
-					$arText = $rsText->Fetch();
-					if(!$arText || $arText["SEARCH_CONTENT_MD5"] !== $text_md5)
-					{
-						CSearch::CleanFreqCache($ID);
-						$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-						if (COption::GetOptionString("search", "agent_stemming") === "Y")
-							CSearch::DelayStemIndex($ID);
-						else
-							CSearch::StemIndex($arFields["SITE_ID"], $ID, $arFields["SEARCHABLE_CONTENT"]);
-						$DB->Query("DELETE FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-						$arText = array(
-							"ID" => 1,
-							"SEARCH_CONTENT_ID" => $ID,
-							"SEARCH_CONTENT_MD5" => $text_md5,
-							"SEARCHABLE_CONTENT" => $arFields["SEARCHABLE_CONTENT"]
-						);
-						$DB->Add("b_search_content_text", $arText, Array("SEARCHABLE_CONTENT"));
-					}
-				}
-				else
-				{
-					CSearch::CleanFreqCache($ID);
-					$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					if (COption::GetOptionString("search", "agent_stemming") === "Y")
-						CSearch::DelayStemIndex($ID);
-					else
-						CSearch::StemIndex($arFields["SITE_ID"], $ID, $arFields["SEARCHABLE_CONTENT"]);
-				}
-			}
-
 			if($bTags && ($arResult["TAGS"] != $arFields["TAGS"]))
 			{
 				CSearchTags::CleanCache("", $ID);
@@ -1636,6 +1611,9 @@ class CAllSearch extends CDBResult
 				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 			CSearch::Update($ID, $arFields);
+			$arFields["MODULE_ID"] = $arResult['MODULE_ID'];
+			$arFields["ITEM_ID"] = $arResult['ITEM_ID'];
+			CSearchFullText::getInstance()->replace($ID, $arFields);
 		}
 		else
 		{
@@ -1653,13 +1631,26 @@ class CAllSearch extends CDBResult
 			else
 				$content = $arFields["TITLE"]."\r\n".$arFields["BODY"]."\r\n".$arFields["TAGS"];
 
-			$content = preg_replace ("'&#(\d+);'e", "chr(\\1)", $content);
+			$content = preg_replace_callback("/&#(\\d+);/", array("CSearch", "chr"), $content);
 			$arFields["SEARCHABLE_CONTENT"] = CSearch::KillEntities(ToUpper($content));
 
 			if($SEARCH_SESS_ID!="")
 				$arFields["UPD"] = $SEARCH_SESS_ID;
 
 			$ID = CSearch::Add($arFields);
+			//We failed to add this record to the search index
+			if ($ID === false)
+			{
+				//Check if item was added
+				$strSql = "SELECT ID FROM b_search_content WHERE MODULE_ID = '".$DB->ForSQL($MODULE_ID)."' AND ITEM_ID = '".$DB->ForSQL($ITEM_ID)."' ";
+				$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$ar = $rs->Fetch();
+				if($ar)
+					return $ar["ID"];
+				else
+					return $ID;
+			}
+			CSearchFullText::getInstance()->replace($ID, $arFields);
 
 			foreach(GetModuleEvents("search", "OnAfterIndexAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
@@ -1669,13 +1660,7 @@ class CAllSearch extends CDBResult
 
 			CAllSearch::SetContentItemGroups($ID, $arGroups);
 
-			foreach($arFields["SITE_ID"] as $site=>$url)
-			{
-				$strSql = "
-					INSERT INTO b_search_content_site(SEARCH_CONTENT_ID, SITE_ID, URL)
-					VALUES(".$ID.", '".$DB->ForSql($site, 2)."', '".$DB->ForSql($url, 2000)."')";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
+			CSearch::UpdateSite($ID, $arFields["SITE_ID"]);
 
 			if(
 				!array_key_exists("INDEX_TITLE", $arFields)
@@ -1683,126 +1668,72 @@ class CAllSearch extends CDBResult
 			)
 				CSearch::IndexTitle($arFields["SITE_ID"], $ID, $arFields["TITLE"]);
 
-			if (COption::GetOptionString("search", "agent_stemming") === "Y")
-				CSearch::DelayStemIndex($ID);
-			else
-				CSearch::StemIndex($arFields["SITE_ID"], $ID, $arFields["SEARCHABLE_CONTENT"]);
-
-			if(BX_SEARCH_VERSION > 1)
-			{
-				$text_md5 = md5($arFields["SEARCHABLE_CONTENT"]);
-				$arText = array(
-					"ID" => 1,
-					"SEARCH_CONTENT_ID" => $ID,
-					"SEARCH_CONTENT_MD5" => $text_md5,
-					"SEARCHABLE_CONTENT" => $arFields["SEARCHABLE_CONTENT"]
-				);
-				$DB->Add("b_search_content_text", $arText, Array("SEARCHABLE_CONTENT"));
-			}
-
 			CSearch::TagsIndex($arFields["SITE_ID"], $ID, $arFields["TAGS"]);
-
-			CSearch::CleanFreqCache($ID);
 		}
 		//$DB->Commit();
 
 		return $ID;
 	}
 
-	public static function DelayStemIndex($ID)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-		$ID = intval($ID);
-
-		$DB->Query("
-			delete from b_search_content_stem
-			where SEARCH_CONTENT_ID = -$ID
-		");
-		$DB->Query("
-			insert into b_search_content_stem
-			(SEARCH_CONTENT_ID, LANGUAGE_ID, STEM, TF".(BX_SEARCH_VERSION > 1? ",PS": "").")
-			values
-			(-$ID, 'en', 0, 0".(BX_SEARCH_VERSION > 1? ",0": "").")
-		");
-
-		CSearch::_addAgent();
-	}
-
-	private static function _addAgent()
-	{
-		global $APPLICATION;
-
-		static $bAgentAdded = false;
-		if(!$bAgentAdded)
-		{
-			$bAgentAdded = true;
-			$rsAgents = CAgent::GetList(array("ID"=>"DESC"), array("NAME" => "CSearch::DelayedStemIndex(%"));
-			if(!$rsAgents->Fetch())
-			{
-				$res = CAgent::AddAgent(
-					"CSearch::DelayedStemIndex();",
-					"search", //module
-					"N", //period
-					1 //interval
-				);
-
-				if(!$res)
-					$APPLICATION->ResetException();
-			}
-		}
-	}
-
-	public static function DelayedStemIndex()
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-		$etime = time() + intval(COption::GetOptionString("search", "agent_duration"));
-		do {
-			$stemQueue = $DB->Query($DB->TopSql("
-				SELECT SEARCH_CONTENT_ID ID
-				FROM b_search_content_stem
-				WHERE SEARCH_CONTENT_ID < 0
-			", 1));
-			if($stemTask = $stemQueue->Fetch())
-			{
-				$ID = -$stemTask["ID"];
-
-				$sites = array();
-				$rsSite = $DB->Query("
-					SELECT SITE_ID, URL
-					FROM b_search_content_site
-					WHERE SEARCH_CONTENT_ID = ".$ID."
-				");
-				while($arSite = $rsSite->Fetch())
-					$sites[$arSite["SITE_ID"]] = $arSite["URL"];
-
-				if(BX_SEARCH_VERSION > 1)
-					$sql = "SELECT SEARCHABLE_CONTENT from b_search_content_text WHERE SEARCH_CONTENT_ID = $ID";
-				else
-					$sql = "SELECT SEARCHABLE_CONTENT from b_search_content WHERE ID = $ID";
-				$rsContent = $DB->Query($sql);
-				if ($arContent = $rsContent->Fetch())
-				{
-					$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ID);
-					CSearch::StemIndex($sites, $ID, $arContent["SEARCHABLE_CONTENT"]);
-				}
-				$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$stemTask["ID"]);
-			}
-			else
-			{
-				//Cancel the agent
-				return "";
-			}
-
-		} while ($etime >= time());
-		return "CSearch::DelayedStemIndex();";
-	}
-
 	function KillEntities($str)
 	{
 		static $arAllEntities = array(
-			'UMLYA' => ARRAY('&IQUEST;','&AGRAVE;','&AACUTE;','&ACIRC;','&ATILDE;','&AUML;','&ARING;','&AELIG;','&CCEDIL;','&EGRAVE;','&EACUTE;','&ECIRC;','&EUML;','&IGRAVE;','&IACUTE;','&ICIRC;','&IUML;','&ETH;','&NTILDE;','&OGRAVE;','&OACUTE;','&OCIRC;','&OTILDE;','&OUML;','&TIMES;','&OSLASH;','&UGRAVE;','&UACUTE;','&UCIRC;','&UUML;','&YACUTE;','&THORN;','&SZLIG;','&AGRAVE;','&AACUTE;','&ACIRC;','&ATILDE;','&AUML;','&ARING;','&AELIG;','&CCEDIL;','&EGRAVE;','&EACUTE;','&ECIRC;','&EUML;','&IGRAVE;','&IACUTE;','&ICIRC;','&IUML;','&ETH;','&NTILDE;','&OGRAVE;','&OACUTE;','&OCIRC;','&OTILDE;','&OUML;','&DIVIDE;','&OSLASH;','&UGRAVE;','&UACUTE;','&UCIRC;','&UUML;','&YACUTE;','&THORN;','&YUML;','&OELIG;','&OELIG;','&SCARON;','&SCARON;','&YUML;'),
-			'GREEK' => ARRAY('&ALPHA;','&BETA;','&GAMMA;','&DELTA;','&EPSILON;','&ZETA;','&ETA;','&THETA;','&IOTA;','&KAPPA;','&LAMBDA;','&MU;','&NU;','&XI;','&OMICRON;','&PI;','&RHO;','&SIGMA;','&TAU;','&UPSILON;','&PHI;','&CHI;','&PSI;','&OMEGA;','&ALPHA;','&BETA;','&GAMMA;','&DELTA;','&EPSILON;','&ZETA;','&ETA;','&THETA;','&IOTA;','&KAPPA;','&LAMBDA;','&MU;','&NU;','&XI;','&OMICRON;','&PI;','&RHO;','&SIGMAF;','&SIGMA;','&TAU;','&UPSILON;','&PHI;','&CHI;','&PSI;','&OMEGA;','&THETASYM;','&UPSIH;','&PIV;'),
-			'OTHER' => ARRAY('&IEXCL;','&CENT;','&POUND;','&CURREN;','&YEN;','&BRVBAR;','&SECT;','&UML;','&COPY;','&ORDF;','&LAQUO;','&NOT;','&REG;','&MACR;','&DEG;','&PLUSMN;','&SUP2;','&SUP3;','&ACUTE;','&MICRO;','&PARA;','&MIDDOT;','&CEDIL;','&SUP1;','&ORDM;','&RAQUO;','&FRAC14;','&FRAC12;','&FRAC34;','&CIRC;','&TILDE;','&ENSP;','&EMSP;','&THINSP;','&ZWNJ;','&ZWJ;','&LRM;','&RLM;','&NDASH;','&MDASH;','&LSQUO;','&RSQUO;','&SBQUO;','&LDQUO;','&RDQUO;','&BDQUO;','&DAGGER;','&DAGGER;','&PERMIL;','&LSAQUO;','&RSAQUO;','&EURO;','&BULL;','&HELLIP;','&PRIME;','&PRIME;','&OLINE;','&FRASL;','&WEIERP;','&IMAGE;','&REAL;','&TRADE;','&ALEFSYM;','&LARR;','&UARR;','&RARR;','&DARR;','&HARR;','&CRARR;','&LARR;','&UARR;','&RARR;','&DARR;','&HARR;','&FORALL;','&PART;','&EXIST;','&EMPTY;','&NABLA;','&ISIN;','&NOTIN;','&NI;','&PROD;','&SUM;','&MINUS;','&LOWAST;','&RADIC;','&PROP;','&INFIN;','&ANG;','&AND;','&OR;','&CAP;','&CUP;','&INT;','&THERE4;','&SIM;','&CONG;','&ASYMP;','&NE;','&EQUIV;','&LE;','&GE;','&SUB;','&SUP;','&NSUB;','&SUBE;','&SUPE;','&OPLUS;','&OTIMES;','&PERP;','&SDOT;','&LCEIL;','&RCEIL;','&LFLOOR;','&RFLOOR;','&LANG;','&RANG;','&LOZ;','&SPADES;','&CLUBS;','&HEARTS;','&DIAMS;'),
+			'UMLYA' => ARRAY(
+				'&IQUEST;','&AGRAVE;','&AACUTE;','&ACIRC;','&ATILDE;',
+				'&AUML;','&ARING;','&AELIG;','&CCEDIL;','&EGRAVE;',
+				'&EACUTE;','&ECIRC;','&EUML;','&IGRAVE;','&IACUTE;',
+				'&ICIRC;','&IUML;','&ETH;','&NTILDE;','&OGRAVE;',
+				'&OACUTE;','&OCIRC;','&OTILDE;','&OUML;','&TIMES;',
+				'&OSLASH;','&UGRAVE;','&UACUTE;','&UCIRC;','&UUML;',
+				'&YACUTE;','&THORN;','&SZLIG;','&AGRAVE;','&AACUTE;',
+				'&ACIRC;','&ATILDE;','&AUML;','&ARING;','&AELIG;',
+				'&CCEDIL;','&EGRAVE;','&EACUTE;','&ECIRC;','&EUML;',
+				'&IGRAVE;','&IACUTE;','&ICIRC;','&IUML;','&ETH;',
+				'&NTILDE;','&OGRAVE;','&OACUTE;','&OCIRC;','&OTILDE;',
+				'&OUML;','&DIVIDE;','&OSLASH;','&UGRAVE;','&UACUTE;',
+				'&UCIRC;','&UUML;','&YACUTE;','&THORN;','&YUML;',
+				'&OELIG;','&OELIG;','&SCARON;','&SCARON;','&YUML;',
+			),
+			'GREEK' => ARRAY(
+				'&ALPHA;','&BETA;','&GAMMA;','&DELTA;','&EPSILON;',
+				'&ZETA;','&ETA;','&THETA;','&IOTA;','&KAPPA;',
+				'&LAMBDA;','&MU;','&NU;','&XI;','&OMICRON;',
+				'&PI;','&RHO;','&SIGMA;','&TAU;','&UPSILON;',
+				'&PHI;','&CHI;','&PSI;','&OMEGA;','&ALPHA;',
+				'&BETA;','&GAMMA;','&DELTA;','&EPSILON;','&ZETA;',
+				'&ETA;','&THETA;','&IOTA;','&KAPPA;','&LAMBDA;',
+				'&MU;','&NU;','&XI;','&OMICRON;','&PI;',
+				'&RHO;','&SIGMAF;','&SIGMA;','&TAU;','&UPSILON;',
+				'&PHI;','&CHI;','&PSI;','&OMEGA;','&THETASYM;',
+				'&UPSIH;','&PIV;',
+			),
+			'OTHER' => ARRAY(
+				'&IEXCL;','&CENT;','&POUND;','&CURREN;','&YEN;',
+				'&BRVBAR;','&SECT;','&UML;','&COPY;','&ORDF;',
+				'&LAQUO;','&NOT;','&REG;','&MACR;','&DEG;',
+				'&PLUSMN;','&SUP2;','&SUP3;','&ACUTE;','&MICRO;',
+				'&PARA;','&MIDDOT;','&CEDIL;','&SUP1;','&ORDM;',
+				'&RAQUO;','&FRAC14;','&FRAC12;','&FRAC34;','&CIRC;',
+				'&TILDE;','&ENSP;','&EMSP;','&THINSP;','&ZWNJ;',
+				'&ZWJ;','&LRM;','&RLM;','&NDASH;','&MDASH;',
+				'&LSQUO;','&RSQUO;','&SBQUO;','&LDQUO;','&RDQUO;',
+				'&BDQUO;','&DAGGER;','&DAGGER;','&PERMIL;','&LSAQUO;',
+				'&RSAQUO;','&EURO;','&BULL;','&HELLIP;','&PRIME;',
+				'&PRIME;','&OLINE;','&FRASL;','&WEIERP;','&IMAGE;',
+				'&REAL;','&TRADE;','&ALEFSYM;','&LARR;','&UARR;',
+				'&RARR;','&DARR;','&HARR;','&CRARR;','&LARR;',
+				'&UARR;','&RARR;','&DARR;','&HARR;','&FORALL;',
+				'&PART;','&EXIST;','&EMPTY;','&NABLA;','&ISIN;',
+				'&NOTIN;','&NI;','&PROD;','&SUM;','&MINUS;',
+				'&LOWAST;','&RADIC;','&PROP;','&INFIN;','&ANG;',
+				'&AND;','&OR;','&CAP;','&CUP;','&INT;',
+				'&THERE4;','&SIM;','&CONG;','&ASYMP;','&NE;',
+				'&EQUIV;','&LE;','&GE;','&SUB;','&SUP;',
+				'&NSUB;','&SUBE;','&SUPE;','&OPLUS;','&OTIMES;',
+				'&PERP;','&SDOT;','&LCEIL;','&RCEIL;','&LFLOOR;',
+				'&RFLOOR;','&LANG;','&RANG;','&LOZ;','&SPADES;',
+				'&CLUBS;','&HEARTS;','&DIAMS;',
+			),
 		);
 		foreach($arAllEntities as $key => $entities)
 			$str = str_replace($entities, "", $str);
@@ -1890,7 +1821,8 @@ class CAllSearch extends CDBResult
 			if($sHeadEndPos!==false)
 			{
 				//html header detected try to get document charset
-				if(preg_match("/<(meta)\s+([^>]*)(content)\s*=\s*(['\"]).*?(charset)\s*=\s*(.*?)(\\4)/is", substr($sFile, 0, $sHeadEndPos), $arMetaMatch))
+				$arMetaMatch = array();
+				if(preg_match("/<(meta)\\s+([^>]*)(content)\\s*=\\s*(['\"]).*?(charset)\\s*=\\s*(.*?)(\\4)/is", substr($sFile, 0, $sHeadEndPos), $arMetaMatch))
 				{
 					$doc_charset = $arMetaMatch[6];
 					if(defined("BX_UTF"))
@@ -1998,7 +1930,7 @@ class CAllSearch extends CDBResult
 			}
 			else
 			{
-				//not the first step and we found last file from previos one
+				//not the first step and we found last file from previous one
 				if(
 					$max_execution_time > 0
 					&& strlen($NS["MODULE"]) > 0
@@ -2047,13 +1979,16 @@ class CAllSearch extends CDBResult
 				{
 					if($a[$i] === '\'')
 					{
+						$m = array();
 						if(preg_match('/(\\\\+)$/', $a[$i-1], $m))
 						{
 							if((strlen($m[1]) % 2) == 0) //non even slashes
 								break;
 						}
 						else
+						{
 							break;
+						}
 					}
 				}
 			}
@@ -2193,7 +2128,14 @@ class CAllSearch extends CDBResult
 				$val = $val[0];
 			switch($field)
 			{
+			case "=MODULE_ID":
+				if($val !== false && $val !== "no")
+					$arNewFilter[$field] = $val;
+				break;
 			case "MODULE_ID":
+				if($val !== false && $val !== "no")
+					$arNewFilter["=".$field] = $val;
+				break;
 			case "ITEM_ID":
 			case "PARAM1":
 			case "PARAM2":
@@ -2450,9 +2392,9 @@ class CAllSearch extends CDBResult
 		}
 
 		if(BX_SEARCH_VERSION > 1)
-			return $DB->Add("b_search_content", $arFields, array("BODY", "TAGS"));
+			return $DB->Add("b_search_content", $arFields, array("BODY", "TAGS"), true);
 		else
-			return $DB->Add("b_search_content", $arFields, array("BODY", "TAGS", "SEARCHABLE_CONTENT"));
+			return $DB->Add("b_search_content", $arFields, array("BODY", "TAGS", "SEARCHABLE_CONTENT"), true);
 	}
 
 	public static function OnChangeFilePermissions($path, $permission = array(), $old_permission = array(), $arGroups = false)
@@ -2461,9 +2403,10 @@ class CAllSearch extends CDBResult
 		global $APPLICATION;
 		$DB = CDatabase::GetModuleConnection('search');
 
+		$site = false;
 		CMain::InitPathVars($site, $path);
 		$DOC_ROOT = CSite::GetSiteDocRoot($site);
-		$path=rtrim($path, "/");
+		$path = rtrim($path, "/");
 
 		if(!is_array($arGroups))
 		{
@@ -2532,7 +2475,6 @@ class CAllSearch extends CDBResult
 			} //if(is_dir($DOC_ROOT.$path))
 		}//if(file_exists($DOC_ROOT.$path))
 	}
-
 
 	public static function SetContentItemGroups($index_id, $arGroups)
 	{
@@ -2711,6 +2653,629 @@ class CAllSearch extends CDBResult
 			$a[] = $words_count--;
 		return $this->stddev($a);
 	}
+
+	public static function DeleteOld($SESS_ID, $MODULE_ID="", $SITE_ID="")
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+
+		$strFilter = "";
+		if($MODULE_ID!="")
+			$strFilter.=" AND MODULE_ID = '".$DB->ForSql($MODULE_ID)."' ";
+
+		$strJoin = "";
+		if($SITE_ID!="")
+		{
+			$strFilter.=" AND scsite.SITE_ID = '".$DB->ForSql($SITE_ID)."' ";
+			$strJoin.=" INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID ";
+		}
+
+		if(!is_array($SESS_ID))
+			$SESS_ID = array($SESS_ID);
+
+		$strSql = "
+			SELECT ID
+			FROM b_search_content sc
+			".$strJoin."
+			WHERE (UPD not in ('".implode("', '", $SESS_ID)."') OR UPD IS NULL)
+			".$strFilter."
+		";
+
+		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
+
+		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			foreach($arEvents as $arEvent)
+				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
+
+			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			CSearchFullText::getInstance()->deleteById($ar["ID"]);
+		}
+
+		CSearchTags::CleanCache();
+	}
+
+	public static function DeleteForReindex($MODULE_ID)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+
+		$MODULE_ID = $DB->ForSql($MODULE_ID);
+		$strSql = "SELECT ID FROM b_search_content WHERE MODULE_ID = '".$MODULE_ID."'";
+
+		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
+
+		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			foreach($arEvents as $arEvent)
+				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
+
+			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			CSearchFullText::getInstance()->deleteById($ar["ID"]);
+		}
+
+		CSearchTags::CleanCache();
+	}
+
+	
+	/**
+	* <p>Функция удаляет из индекса поиска указанную информацию.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, индексацию информации которого необходимо удалить .
+	*
+	*
+	*
+	* @param string $ITEM_ID = false Код элемента, индексацию информации которого необходимо удалить.
+	* Если этот параметр равен false, то ограничение по коду элемента не
+	* устанавливается (удаляется индексация информации с любыми
+	* кодами). Не обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
+	* проиндексированных элементов, индексацию информации которых
+	* необходимо удалить. Если этот параметр равен false, то ограничение
+	* по первому параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
+	* проиндексированных элементов, индексацию информации которых
+	* необходимо удалить. Если этот параметр равен false, то ограничение
+	* по второму параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
+	* элементов, индексацию информации которых необходимо удалить.
+	* Если этот параметр равен false, то ограничение по сайту элемента не
+	* устанавливается. Необязательный параметр, по умолчанию равен
+	* false.<br><br> До версии 4.0.6 параметр назывался LID.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $path = "/ru/my_files/file.php";
+	* if (unlink($_SERVER["DOCUMENT_ROOT"].$path))
+	* {
+	* 	if (CModule::IncludeModule("search"))
+	* 		CSearch::DeleteIndex("main", $path);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/deleteindex.php
+	* @author Bitrix
+	*/
+	public static function DeleteIndex($MODULE_ID, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$bIncSites = false;
+
+		if($PARAM1 !== false && $PARAM2 !== false)
+		{
+			$strSqlWhere = CSearch::__PrepareFilter(array(
+				"MODULE_ID" => $MODULE_ID,
+				"ITEM_ID" => $ITEM_ID,
+				array(
+					"=PARAM1" => $PARAM1,
+					"PARAM2" => $PARAM2,
+				),
+				"SITE_ID" => $SITE_ID,
+			), $bIncSites);
+		}
+		else
+		{
+			$strSqlWhere = CSearch::__PrepareFilter(array(
+				"MODULE_ID" => $MODULE_ID,
+				"ITEM_ID" => $ITEM_ID,
+				"PARAM1" => $PARAM1,
+				"PARAM2" => $PARAM2,
+				"SITE_ID" => $SITE_ID,
+			), $bIncSites);
+		}
+
+		$strSql = "
+			SELECT sc.ID
+			FROM b_search_content sc
+				".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID" :"")."
+			WHERE
+			".$strSqlWhere."
+		";
+
+		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
+
+		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			foreach($arEvents as $arEvent)
+				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
+
+			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			CSearchFullText::getInstance()->deleteById($ar["ID"]);
+		}
+
+		CSearchTags::CleanCache();
+	}
+
+	public static function Update($ID, $arFields)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$bUpdate = false;
+
+		if(array_key_exists("~DATE_CHANGE", $arFields))
+		{
+			$arFields["DATE_CHANGE"] = $arFields["~DATE_CHANGE"];
+			unset($arFields["~DATE_CHANGE"]);
+		}
+		elseif(array_key_exists("LAST_MODIFIED", $arFields))
+		{
+			$arFields["DATE_CHANGE"] = $arFields["LAST_MODIFIED"];
+			unset($arFields["LAST_MODIFIED"]);
+		}
+		elseif(array_key_exists("DATE_CHANGE", $arFields))
+		{
+			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH.MI.SS", CLang::GetDateFormat());
+		}
+
+		if(BX_SEARCH_VERSION > 1)
+			unset($arFields["SEARCHABLE_CONTENT"]);
+
+		if (array_key_exists("SITE_ID", $arFields))
+		{
+			CSearch::UpdateSite($ID, $arFields["SITE_ID"]);
+			$bUpdate = true;
+		}
+
+		if (array_key_exists("PERMISSIONS", $arFields))
+		{
+			$arNewGroups = array();
+			foreach($arFields["PERMISSIONS"] as $group_id)
+			{
+				if(is_numeric($group_id))
+					$arNewGroups[$group_id] = "G".intval($group_id);
+				else
+					$arNewGroups[$group_id] = $group_id;
+			}
+			CSearch::SetContentItemGroups($ID, $arNewGroups);
+			$bUpdate = true;
+		}
+
+		if(array_key_exists("PARAMS", $arFields))
+		{
+			CSearch::SetContentItemParams($ID, $arFields["PARAMS"]);
+			$bUpdate = true;
+		}
+
+		$strUpdate = $DB->PrepareUpdate("b_search_content", $arFields);
+		if(strlen($strUpdate) > 0)
+		{
+			$arBinds=Array();
+			if(is_set($arFields, "BODY"))
+				$arBinds["BODY"] = $arFields["BODY"];
+			if(is_set($arFields, "SEARCHABLE_CONTENT"))
+				$arBinds["SEARCHABLE_CONTENT"] = $arFields["SEARCHABLE_CONTENT"];
+			if(is_set($arFields, "TAGS"))
+				$arBinds["TAGS"] = $arFields["TAGS"];
+			$DB->QueryBind("UPDATE b_search_content SET ".$strUpdate." WHERE ID=".intval($ID), $arBinds);
+			$bUpdate = true;
+		}
+
+		if ($bUpdate)
+			CSearchFullText::getInstance()->update($ID, $arFields);
+	}
+
+	public static function UpdateSite($ID, $arSITE_ID)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$ID = intval($ID);
+		if (!is_array($arSITE_ID))
+		{
+			$DB->Query("
+				DELETE FROM b_search_content_site
+				WHERE SEARCH_CONTENT_ID = ".$ID."
+			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		else
+		{
+			$rsSite = $DB->Query("
+				SELECT SITE_ID, URL
+				FROM b_search_content_site
+				WHERE SEARCH_CONTENT_ID = ".$ID."
+			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			while($arSite = $rsSite->Fetch())
+			{
+				if(!array_key_exists($arSite["SITE_ID"], $arSITE_ID))
+				{
+					$DB->Query("
+						DELETE FROM b_search_content_site
+						WHERE SEARCH_CONTENT_ID = ".$ID."
+						AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
+					", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				}
+				else
+				{
+					if($arSite["URL"] !== $arSITE_ID[$arSite["SITE_ID"]])
+					{
+						$DB->Query("
+							UPDATE b_search_content_site
+							SET URL = '".$DB->ForSql($arSITE_ID[$arSite["SITE_ID"]], 2000)."'
+							WHERE SEARCH_CONTENT_ID = ".$ID."
+							AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
+						", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					}
+					unset($arSITE_ID[$arSite["SITE_ID"]]);
+				}
+			}
+
+			foreach($arSITE_ID as $site => $url)
+			{
+				$DB->Query("
+					INSERT INTO b_search_content_site(SEARCH_CONTENT_ID, SITE_ID, URL)
+					VALUES(".$ID.", '".$DB->ForSql($site, 2)."', '".$DB->ForSql($url, 2000)."')
+				", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+		}
+	}
+
+	
+	/**
+	* <p>Функция изменяет проиндексированную информацию данного модуля.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, проиндексированную информацию которого необходимо
+	* поменять.
+	*
+	*
+	*
+	* @param array $arFields  Массив новых значений для поискового индекса. Массив должен
+	* иметь следующую структуру: <ul> <li> <b>"DATE_CHANGE"</b> =&gt; дата изменения
+	* индексируемого элемента,</li> <li> <b>"URL"</b> =&gt; адрес индексируемого
+	* элемента,</li> <li> <b>"TITLE"</b> =&gt; заголовок индексируемого элемента,</li>
+	* <li> <b>"BODY"</b> =&gt; индексируемый текст,</li> <li> <b>"SEARCHABLE_CONTENT"</b> =&gt;
+	* индекс,</li> <li> <b>"PARAM1"</b> =&gt; первый параметр,</li> <li> <b>"PARAM2"</b> =&gt;
+	* второй параметр,</li> <li> <b>"PERMISSIONS"</b> =&gt; массив кодов групп, члены
+	* которых имеют право на чтение индексируемого элемента,</li> <li>
+	* <b>"SITE_ID"</b> =&gt; ассоциативный массив привязки к сайтам. Ключи -
+	* идентификаторы сайтов, а их значения пути к элементу. <br> </li> </ul>
+	* Атрибуты, значения которых не изменились, можно опустить.
+	*
+	*
+	*
+	* @param string $ITEM_ID = false Код элемента, индекс которого необходимо изменить. Если этот
+	* параметр равен false, то ограничение по коду элемента не
+	* устанавливается (изменяются индексы элементов с любыми кодами).
+	* Не обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
+	* проиндексированных элементов, индексы которых необходимо
+	* поменять. Если этот параметр равен false, то ограничение по первому
+	* параметру элемента не устанавливается. Не обязательный параметр,
+	* по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
+	* проиндексированных элементов, индексы которых необходимо
+	* поменять. Если этот параметр равен false, то ограничение по второму
+	* параметру элемента не устанавливается. Не обязательный параметр,
+	* по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
+	* элементов, индекс которых необходимо поменять. Если этот
+	* параметр равен false, то ограничение по сайту элемента не
+	* устанавливается. Необязательный параметр, по умолчанию равен false.
+	* <br><br> До версии 4.0.6 параметр назывался LID.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$new_title = "Новый заголовок темы";<br>$fid = 5;    // Код форума<br>$tid = 128;    // Код темы<br>CSearch::ChangeIndex("forum",<br>	array(<br>		"TITLE" =&gt; $new_title<br>	),<br>	false, $fid, $tid);<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changeindex.php
+	* @author Bitrix
+	*/
+	public static function ChangeIndex($MODULE_ID, $arFields, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$bIncSites = false;
+
+		$strSqlWhere = CSearch::__PrepareFilter(array(
+			"MODULE_ID" => $MODULE_ID,
+			"ITEM_ID" => $ITEM_ID,
+			"PARAM1" => $PARAM1,
+			"PARAM2" => $PARAM2,
+			"SITE_ID" => $SITE_ID,
+		), $bIncSites);
+		$strSql = "
+			SELECT sc.ID
+			FROM b_search_content sc
+			".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID": "")."
+			".(strlen($strSqlWhere)>0? "WHERE ".$strSqlWhere: "")."
+		";
+		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			CSearch::Update($ar["ID"], $arFields);
+		}
+	}
+
+	
+	/**
+	* <p>Функция изменяет привязку проиндексированной информации к сайтам.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
+	* поменять.
+	*
+	*
+	*
+	* @param array $arSite  Ассоциативный массив привязки к сайтам.Ключи - идентификаторы
+	* сайтов, а их значения пути к проиндексированной информации. <br>
+	*
+	*
+	*
+	* @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
+	* Если этот параметр равен false, то ограничение по коду элемента не
+	* устанавливается (изменяются права на доступ к элементу с любыми
+	* кодами). Не обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
+	* проиндексированных элементов, права на доступ к которым
+	* необходимо поменять. Если этот параметр равен false, то ограничение
+	* по первому параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
+	* проиндексированных элементов, права на доступ к которым
+	* необходимо поменять. Если этот параметр равен false, то ограничение
+	* по второму параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
+	* элементов, права на доступ к которым необходимо поменять. Если
+	* этот параметр равен false, то ограничение по сайту элемента не
+	* устанавливается. Необязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$IBLOCK_ID = 5;<br>CSearch::ChangeSite("iblock", array("s1" =&gt; "=/new/localation/#ID#/"), false, $IBLOCK_ID);<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changesite.php
+	* @author Bitrix
+	*/
+	public static function ChangeSite($MODULE_ID, $arSite, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$bIncSites = false;
+
+		$strSqlWhere = CSearch::__PrepareFilter(array(
+			"MODULE_ID" => $MODULE_ID,
+			"ITEM_ID" => $ITEM_ID,
+			"PARAM1" => $PARAM1,
+			"PARAM2" => $PARAM2,
+			"SITE_ID" => $SITE_ID,
+		), $bIncSites);
+
+		$strSql = "
+			SELECT sc.ID
+			FROM b_search_content sc
+			".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID": "")."
+			WHERE
+			".$strSqlWhere."
+		";
+
+		$r = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($arR = $r->Fetch())
+		{
+			CSearch::Update($arR["ID"], array("SITE_ID" => $arSite));
+		}
+	}
+
+	
+	/**
+	* <p>Функция изменяет права на доступ к проиндексированной информации данного модуля.</p>
+	*
+	*
+	*
+	*
+	* @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
+	* поменять.
+	*
+	*
+	*
+	* @param array $arGroups  Массив кодов групп, которые имеют право на чтение
+	* проиндексированной информации.
+	*
+	*
+	*
+	* @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
+	* Если этот параметр равен false, то ограничение по коду элемента не
+	* устанавливается (изменяются права на доступ к элементу с любыми
+	* кодами). Не обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
+	* проиндексированных элементов, права на доступ к которым
+	* необходимо поменять. Если этот параметр равен false, то ограничение
+	* по первому параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
+	* проиндексированных элементов, права на доступ к которым
+	* необходимо поменять. Если этот параметр равен false, то ограничение
+	* по второму параметру элемента не устанавливается. Не
+	* обязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
+	* элементов, права на доступ к которым необходимо поменять. Если
+	* этот параметр равен false, то ограничение по сайту элемента не
+	* устанавливается. Необязательный параметр, по умолчанию равен
+	* false.<br><br> До версии 4.0.6 параметр назывался LID.
+	*
+	*
+	*
+	* @param string $PARAMS = false Необязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $Forum_ID = 5;
+	* $arGroups = CForum::GetAccessPermissions($Forum_ID);
+	* $arGPerm = Array();
+	* for ($i=0; $i &lt; count($arGroups); $i++)
+	* {
+	* 	if ($arGroups[$i][1]&gt;="E")
+	* 	{
+	* 		$arGPerm[] = $arGroups[$i][0];
+	* 		if($arGroups[$i][0]==2)
+	* 			break;
+	* 	}
+	* }
+	* CSearch::ChangePermission("forum", $arGPerm, false, $Forum_ID);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changepermission.php
+	* @author Bitrix
+	*/
+	public static function ChangePermission($MODULE_ID, $arGroups, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false, $PARAMS=false)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$bIncSites = false;
+
+		$strSqlWhere = CSearch::__PrepareFilter(array(
+			"MODULE_ID"=>$MODULE_ID,
+			"ITEM_ID"=>$ITEM_ID,
+			"PARAM1"=>$PARAM1,
+			"PARAM2"=>$PARAM2,
+			"SITE_ID"=>$SITE_ID,
+			"PARAMS"=>$PARAMS,
+		), $bIncSites);
+
+		if($strSqlWhere)
+		{
+			$strSqlJoin1 = "INNER JOIN b_search_content sc ON sc.ID = b_search_content_right.SEARCH_CONTENT_ID";
+			$match = array();
+			//Copy first exists into inner join in hopeless try to defeat MySQL optimizer
+			if(preg_match('#^\\s*EXISTS (\\(SELECT \\* FROM b_search_content_param WHERE SEARCH_CONTENT_ID = sc.ID AND PARAM_NAME = \'[^\']+\' AND PARAM_VALUE  = \'[^\']+\'\\))#', $strSqlWhere, $match))
+			{
+				$subTable = str_replace("SEARCH_CONTENT_ID = sc.ID AND", "", $match[1]);
+				$strSqlJoin2 = "INNER JOIN ".$subTable." p1 ON p1.SEARCH_CONTENT_ID = sc.ID";
+			}
+			else
+			{
+				$strSqlJoin2 = "";
+			}
+		}
+		else
+		{
+			$strSqlJoin1 = "";
+			$strSqlJoin2 = "";
+		}
+
+		$rs = $DB->Query("
+			SELECT sc.ID
+			FROM b_search_content sc
+			".$strSqlJoin2."
+			".($strSqlWhere?
+				"WHERE ".$strSqlWhere:
+				""
+			)."
+		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while ($arR = $rs->fetch())
+		{
+			CSearch::Update($arR["ID"], array("PERMISSIONS" => $arGroups));
+		}
+	}
 }
 
 class CSearchSQLHelper
@@ -2822,7 +3387,8 @@ class CAllSearchQuery
 	var $rus_bool_lang;
 	var $no_bool_lang;
 	var $m_casematch;
-	var $error;
+	var $error = "";
+	var $errorno = 0;
 	var $bTagsSearch = false;
 	var $m_tags_words;
 	var $bStemming = false;
@@ -2890,6 +3456,7 @@ class CAllSearchQuery
 
 	public function CutKav($query)
 	{
+		$arQuotes = array();
 		if(preg_match_all("/([\"'])(.*?)(?<!\\\\)(\\1)/s", $query, $arQuotes))
 		{
 			foreach($arQuotes[2] as $i => $quoted)
@@ -3018,6 +3585,8 @@ class CAllSearchQuery
 	function StemWord($w)
 	{
 		static $preg_ru = false;
+		if (is_array($w))
+			$w = $w[0];
 		$wu = ToUpper($w);
 
 		if(!$this->no_bool_lang)
@@ -3050,7 +3619,7 @@ class CAllSearchQuery
 	public static function StemQuery($q, $lang="en")
 	{
 		$arStemInfo = stemming_init($lang);
-		return preg_replace("/([".$arStemInfo["pcre_letters"]."]+)/e".BX_UTF_PCRE_MODIFIER, "CAllSearchQuery::StemWord('\$1')", $q);
+		return preg_replace_callback("/([".$arStemInfo["pcre_letters"]."]+)/".BX_UTF_PCRE_MODIFIER, array("CAllSearchQuery", "StemWord"), $q);
 	}
 
 	public function PrepareQuery($q)

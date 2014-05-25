@@ -13,7 +13,7 @@ class CCatalogAdmin
 			$rsSections = CIBlockSection::GetList(
 				Array("left_margin"=>"ASC"),
 				Array(
-					"IBLOCK_ID" => $arIBlock["ID"],
+					"IBLOCK_ID" => $IBLOCK_ID,
 					"SECTION_ID" => $arSection["ID"],
 				),
 				false,
@@ -112,7 +112,7 @@ class CCatalogAdmin
 					"items" => array(),
 				);
 
-				if (array_key_exists($arSection["ID"], $arSectionsChain))
+				if (isset($arSectionsChain[$arSection["ID"]]))
 				{
 					$arSectionTmp["items"] = CCatalogAdmin::get_sections_menu($IBLOCK_TYPE_ID, $IBLOCK_ID, $DEPTH_LEVEL + 1, $arSection["ID"], $arSectionsChain);
 				}
@@ -134,8 +134,6 @@ class CCatalogAdmin
 
 	public static function OnBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
 	{
-		global $USER;
-
 		if (!CModule::IncludeModule("iblock"))
 			return;
 		//When UnRegisterModuleDependences is called from module uninstall
@@ -150,113 +148,129 @@ class CCatalogAdmin
 			"items" => array(),
 		);
 		$arCatalogs = array();
-		$rsCatalog = CCatalog::GetList(array(
-			"sort" => "asc",
-		));
+		$arCatalogSku = array();
+		$rsCatalog = CCatalog::GetList(
+			array(),
+			array(),
+			false,
+			false,
+			array('IBLOCK_ID', 'PRODUCT_IBLOCK_ID')
+		);
 		while ($ar = $rsCatalog->Fetch())
 		{
-			if ($ar["PRODUCT_IBLOCK_ID"])
+			$ar["PRODUCT_IBLOCK_ID"] = intval($ar["PRODUCT_IBLOCK_ID"]);
+			$ar["IBLOCK_ID"] = intval($ar["IBLOCK_ID"]);
+			if (0 < $ar["PRODUCT_IBLOCK_ID"])
+			{
 				$arCatalogs[$ar["PRODUCT_IBLOCK_ID"]] = 1;
+				$arCatalogSku[$ar["PRODUCT_IBLOCK_ID"]] = $ar["IBLOCK_ID"];
+			}
 			else
+			{
 				$arCatalogs[$ar["IBLOCK_ID"]] = 1;
+			}
 		}
 		$rsIBlocks = CIBlock::GetList(array(
 			"SORT" => "asc",
 			"NAME" => "ASC",
 		), array(
-			"MIN_PERMISSION" => "U",
+			'ID' => array_keys($arCatalogs),
+			"MIN_PERMISSION" => "S"
 		));
 		while ($arIBlock = $rsIBlocks->Fetch())
 		{
-			if (array_key_exists($arIBlock["ID"], $arCatalogs))
+			if (CIBlock::GetAdminListMode($arIBlock["ID"]) == 'C')
+				$url = "cat_product_list.php";
+			else
+				$url = "cat_product_admin.php";
+
+			$arItems = array(
+				array(
+					"text" => GetMessage("CAT_MENU_PRODUCT_LIST"),
+					"url" => $url."?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&type=".urlencode($arIBlock["IBLOCK_TYPE_ID"]).'&find_section_section=-1',
+					"more_url" => array(
+						"cat_product_admin.php?IBLOCK_ID=".$arIBlock["ID"],
+						"cat_product_list.php?IBLOCK_ID=".$arIBlock["ID"].'&find_section_section=-1',
+						"cat_product_edit.php?IBLOCK_ID=".$arIBlock["ID"],
+					),
+					"title" => "",
+					"page_icon" => "iblock_page_icon_elements",
+					"items_id" => "menu_catalog_goods_".$arIBlock["ID"],
+					"module_id" => "catalog",
+				),
+				array(
+					"text" => htmlspecialcharsex(CIBlock::GetArrayByID($arIBlock["ID"], "SECTIONS_NAME")),
+					"url" => "cat_section_admin.php?lang=".LANGUAGE_ID."&type=".$arIBlock["IBLOCK_TYPE_ID"]."&IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
+					"more_url" => array(
+						"cat_section_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
+						"cat_section_edit.php?IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
+					),
+					"title" => "",
+					"page_icon" => "iblock_page_icon_sections",
+					"items_id" => "menu_catalog_category_".$arIBlock["ID"],
+					"module_id" => "catalog",
+					"items" => CCatalogAdmin::get_sections_menu($arIBlock["IBLOCK_TYPE_ID"], $arIBlock["ID"], 1, 0),
+				),
+			);
+			if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
 			{
-				$arItems = array(
-					array(
-						"text" => GetMessage("CAT_MENU_PRODUCT_LIST"),
-						"url" => "cat_product_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&type=".urlencode($arIBlock["IBLOCK_TYPE_ID"]),
-						"more_url" => array(
-							"cat_product_admin.php?IBLOCK_ID=".$arIBlock["ID"],
-							"cat_product_edit.php?IBLOCK_ID=".$arIBlock["ID"],
-						),
-						"title" => "",
-						"page_icon" => "iblock_page_icon_elements",
-						"items_id" => "menu_catalog_goods_".$arIBlock["ID"],
-						"module_id" => "catalog",
+				$arItems[] = array(
+					"text" => GetMessage("CAT_MENU_PRODUCT_PROPERTIES"),
+					"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
+					"more_url" => array(
+						"iblock_property_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
+						"iblock_edit_property.php?IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
 					),
-					array(
-						"text" => htmlspecialcharsex(CIBlock::GetArrayByID($arIBlock["ID"], "SECTIONS_NAME")),
-						"url" => "cat_section_admin.php?lang=".LANGUAGE_ID."&type=".$arIBlock["IBLOCK_TYPE_ID"]."&IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
-						"more_url" => array(
-							"cat_section_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
-							"cat_section_edit.php?IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
-						),
-						"title" => "",
-						"page_icon" => "iblock_page_icon_sections",
-						"items_id" => "menu_catalog_category_".$arIBlock["ID"],
-						"module_id" => "catalog",
-						"items" => CCatalogAdmin::get_sections_menu($arIBlock["IBLOCK_TYPE_ID"], $arIBlock["ID"], 1, 0),
-					),
+					"title" => "",
+					"page_icon" => "iblock_page_icon_settings",
+					"items_id" => "menu_catalog_attributes_".$arIBlock["ID"],
+					"module_id" => "catalog",
 				);
-				if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
-				{
-					$arItems[] = array(
-						"text" => GetMessage("CAT_MENU_PRODUCT_PROPERTIES"),
-						"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
-						"more_url" => array(
-							"iblock_property_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
-							"iblock_edit_property.php?IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
-						),
-						"title" => "",
-						"page_icon" => "iblock_page_icon_settings",
-						"items_id" => "menu_catalog_attributes_".$arIBlock["ID"],
-						"module_id" => "catalog",
-					);
-				}
+			}
 
-				$arCatalog = false;
-				if (CModule::IncludeModule("catalog"))
-					$arCatalog = CCatalog::GetSkuInfoByProductID($arIBlock["ID"]);
-
-				if (is_array($arCatalog) && CIBlockRights::UserHasRightTo($arCatalog["IBLOCK_ID"], $arCatalog["IBLOCK_ID"], "iblock_edit"))
+			if (isset($arCatalogSku[$arIBlock["ID"]]))
+			{
+				$intOffersIBlockID = $arCatalogSku[$arIBlock["ID"]];
+				if (CIBlockRights::UserHasRightTo($intOffersIBlockID, $intOffersIBlockID, "iblock_edit"))
 				{
 					$arItems[] = array(
 						"text" => GetMessage("CAT_MENU_SKU_PROPERTIES"),
-						"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arCatalog["IBLOCK_ID"]."&admin=N",
+						"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$intOffersIBlockID."&admin=N",
 						"more_url" => array(
-							"iblock_property_admin.php?IBLOCK_ID=".$arCatalog["IBLOCK_ID"]."&admin=N",
-							"iblock_edit_property.php?IBLOCK_ID=".$arCatalog["IBLOCK_ID"]."&admin=N",
+							"iblock_property_admin.php?IBLOCK_ID=".$intOffersIBlockID."&admin=N",
+							"iblock_edit_property.php?IBLOCK_ID=".$intOffersIBlockID."&admin=N",
 						),
 						"title" => "",
 						"page_icon" => "iblock_page_icon_settings",
-						"items_id" => "menu_catalog_attributes_".$arCatalog["IBLOCK_ID"],
+						"items_id" => "menu_catalog_attributes_".$intOffersIBlockID,
 						"module_id" => "catalog",
 					);
 				}
+			}
 
-				if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
-				{
-					$arItems[] = array(
-						"text" => GetMessage("CAT_MENU_CATALOG_SETTINGS"),
-						"url" => "cat_catalog_edit.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"],
-						"more_url" => array(
-							"cat_catalog_edit.php?IBLOCK_ID=".$arIBlock["ID"],
-						),
-						"title" => "",
-						"page_icon" => "iblock_page_icon_settings",
-						"items_id" => "menu_catalog_edit_".$arIBlock["ID"],
-						"module_id" => "catalog",
-					);
-				}
-
-				$aMenu["items"][] = array(
-					"text" => htmlspecialcharsEx($arIBlock["NAME"]),
+			if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
+			{
+				$arItems[] = array(
+					"text" => GetMessage("CAT_MENU_CATALOG_SETTINGS"),
+					"url" => "cat_catalog_edit.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"],
+					"more_url" => array(
+						"cat_catalog_edit.php?IBLOCK_ID=".$arIBlock["ID"],
+					),
 					"title" => "",
-					"page_icon" => "iblock_page_icon_sections",
-					"items_id" => "menu_catalog_".$arIBlock["ID"],
+					"page_icon" => "iblock_page_icon_settings",
+					"items_id" => "menu_catalog_edit_".$arIBlock["ID"],
 					"module_id" => "catalog",
-					"items" => $arItems,
 				);
 			}
+
+			$aMenu["items"][] = array(
+				"text" => htmlspecialcharsEx($arIBlock["NAME"]),
+				"title" => "",
+				"page_icon" => "iblock_page_icon_sections",
+				"items_id" => "menu_catalog_".$arIBlock["ID"],
+				"module_id" => "catalog",
+				"items" => $arItems,
+			);
 		}
 		if (!empty($aMenu["items"]))
 		{
@@ -282,7 +296,7 @@ class CCatalogAdmin
 		if(!is_object($USER) || !$USER->CanDoOperation("clouds_upload"))
 			return;
 
-		foreach($obList->aRows as $row_num => $obRow)
+		foreach($obList->aRows as $obRow)
 		{
 			$obRow->aActions[] = array("SEPARATOR"=>true);
 			$tmpVar = CIBlock::ReplaceDetailUrl($obRow->arRes["SECTION_PAGE_URL"], $obRow->arRes, true, "S");
@@ -305,8 +319,6 @@ class CCatalogAdmin
 
 	public static function OnBuildSaleMenu(&$arGlobalMenu, &$arModuleMenu)
 	{
-		global $USER;
-
 		if (!CModule::IncludeModule("sale"))
 			return;
 		if (defined("BX_CATALOG_UNINSTALLED"))
@@ -361,7 +373,7 @@ class CCatalogAdmin
 	{
 		global $USER;
 
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+		if (!CCatalog::IsUserExists())
 			return;
 		if (!is_array($arItems))
 			return;
@@ -408,7 +420,7 @@ class CCatalogAdmin
 	{
 		global $USER;
 
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+		if (!CCatalog::IsUserExists())
 			return;
 		if (!is_array($arItems))
 			return;
@@ -431,7 +443,7 @@ class CCatalogAdmin
 	public static function OnBuildSaleSettingsMenu(&$arItems)
 	{
 		global $USER;
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+		if (!CCatalog::IsUserExists())
 			return;
 		if (!is_array($arItems))
 			return;
@@ -439,6 +451,7 @@ class CCatalogAdmin
 		$boolRead = $USER->CanDoOperation('catalog_read');
 		$boolGroup = $USER->CanDoOperation('catalog_group');
 		$boolPrice = $USER->CanDoOperation('catalog_price');
+		$boolMeasure = $USER->CanDoOperation('catalog_measure');
 		$boolExportEdit = $USER->CanDoOperation('catalog_export_edit');
 		$boolExportExec = $USER->CanDoOperation('catalog_export_exec');
 		$boolImportEdit = $USER->CanDoOperation('catalog_import_edit');
@@ -467,6 +480,17 @@ class CCatalogAdmin
 					"readonly" => !$boolPrice,
 				);
 			}
+		}
+
+		if ($boolRead || $boolMeasure)
+		{
+			$arItems[] = array(
+				"text" => GetMessage("MEASURE"),
+				"url" => "cat_measure_list.php?lang=".LANGUAGE_ID,
+				"more_url" => array("cat_measure_edit.php"),
+				"title" => GetMessage("MEASURE_ALT"),
+				"readonly" => !$boolMeasure,
+			);
 		}
 
 		if ($boolRead || $boolExportEdit || $boolExportExec)
@@ -503,7 +527,7 @@ class CCatalogAdmin
 	public static function OnBuildSaleStoreMenu(&$arItems)
 	{
 		global $USER;
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+		if (!CCatalog::IsUserExists())
 			return;
 		if (!is_array($arItems))
 			return;
@@ -550,9 +574,8 @@ class CCatalogAdmin
 
 		global $adminMenu;
 
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
-			return array();
-
+		if (!CCatalog::IsUserExists())
+			return;
 		if (empty($strItemID))
 			return array();
 
@@ -600,9 +623,8 @@ class CCatalogAdmin
 
 		global $adminMenu;
 
-		if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
-			return array();
-
+		if (!CCatalog::IsUserExists())
+			return;
 		if (empty($strItemID))
 			return array();
 

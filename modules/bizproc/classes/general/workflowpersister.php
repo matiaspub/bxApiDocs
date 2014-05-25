@@ -80,7 +80,7 @@ class CBPAllWorkflowPersister
 			throw new Exception("rootActivity");
 
 		$DB->Query(
-			"UPDATE b_bp_instance_state SET ".
+			"UPDATE b_bp_workflow_instance SET ".
 			"	OWNER_ID = NULL, ".
 			"	OWNED_UNTIL = NULL ".
 			"WHERE ID = '".$DB->ForSql($rootActivity->GetWorkflowInstanceId())."' ".

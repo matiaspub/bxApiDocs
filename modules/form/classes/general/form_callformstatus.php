@@ -19,7 +19,7 @@
  */
 class CAllFormStatus
 {
-	public static function err_mess()
+	fpublic static unction err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -27,83 +27,83 @@ class CAllFormStatus
 	}
 
 	// права на статус по группам
-	
+
 	/**
-	 * <p> Возвращает массивы групп пользователей, имеющих определённые <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">права</a> на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
-	 *
-	 *
-	 *
-	 * @param array &$can_view  Ссылка на массив для хранения ID групп пользователей, обладающих
-	 * правом на просмотр результата, находящемся в статусе <i>status_id</i>.
-	 *
-	 *
-	 *
-	 * @param array &$can_move  Ссылка на массив для хранения ID групп пользователей, обладающих
-	 * правом перевода результатов в статус <i>status_id</i>.
-	 *
-	 *
-	 *
-	 * @param array &$can_edit  Ссылка на массив для хранения ID групп пользователей, обладающих
-	 * правом редактирования результатов, находящихся в статусе
-	 * <i>status_id</i>.
-	 *
-	 *
-	 *
-	 * @param array &$can_delete  Ссылка на массив для хранения ID групп пользователей, обладающих
-	 * правом удаления результатов, находящихся в статусе <i>status_id</i>.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $STATUS_ID = 1;
-	 * 
-	 * // получим массив групп обладающих определёнными правами на статус #1
-	 * <b>CFormStatus::GetPermissionList</b>($STATUS_ID, $arVIEW, $arMOVE, $arEDIT, $arDELETE);
-	 * 
-	 * // выведем массив групп обладающих правом 
-	 * // просмотра результатов находящихся в статусе #1
-	 * echo "&lt;pre&gt;"; print_r($arVIEW); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем массив групп обладающих правом 
-	 * // перевода результатов в статус #1
-	 * echo "&lt;pre&gt;"; print_r($arMOVE); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем массив групп обладающих правом 
-	 * // редактирования результатов находящихся в статусе #1
-	 * echo "&lt;pre&gt;"; print_r($arEDIT); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем массив групп обладающих правом 
-	 * // удаления результатов находящихся в статусе #1
-	 * echo "&lt;pre&gt;"; print_r($arDELETE); echo "&lt;/pre&gt;";
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php
-	 * @author Bitrix
-	 */
-	public static function GetPermissionList($STATUS_ID, &$arPERMISSION_VIEW, &$arPERMISSION_MOVE, &$arPERMISSION_EDIT, &$arPERMISSION_DELETE)
+	* <p> Возвращает массивы групп пользователей, имеющих определённые <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">права</a> на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
+	*
+	*
+	*
+	* @param array &$can_view  Ссылка на массив для хранения ID групп пользователей, обладающих
+	* правом на просмотр результата, находящемся в статусе <i>status_id</i>.
+	*
+	*
+	*
+	* @param array &$can_move  Ссылка на массив для хранения ID групп пользователей, обладающих
+	* правом перевода результатов в статус <i>status_id</i>.
+	*
+	*
+	*
+	* @param array &$can_edit  Ссылка на массив для хранения ID групп пользователей, обладающих
+	* правом редактирования результатов, находящихся в статусе
+	* <i>status_id</i>.
+	*
+	*
+	*
+	* @param array &$can_delete  Ссылка на массив для хранения ID групп пользователей, обладающих
+	* правом удаления результатов, находящихся в статусе <i>status_id</i>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $STATUS_ID = 1;
+	* 
+	* // получим массив групп обладающих определёнными правами на статус #1
+	* <b>CFormStatus::GetPermissionList</b>($STATUS_ID, $arVIEW, $arMOVE, $arEDIT, $arDELETE);
+	* 
+	* // выведем массив групп обладающих правом 
+	* // просмотра результатов находящихся в статусе #1
+	* echo "&lt;pre&gt;"; print_r($arVIEW); echo "&lt;/pre&gt;";
+	* 
+	* // выведем массив групп обладающих правом 
+	* // перевода результатов в статус #1
+	* echo "&lt;pre&gt;"; print_r($arMOVE); echo "&lt;/pre&gt;";
+	* 
+	* // выведем массив групп обладающих правом 
+	* // редактирования результатов находящихся в статусе #1
+	* echo "&lt;pre&gt;"; print_r($arEDIT); echo "&lt;/pre&gt;";
+	* 
+	* // выведем массив групп обладающих правом 
+	* // удаления результатов находящихся в статусе #1
+	* echo "&lt;pre&gt;"; print_r($arDELETE); echo "&lt;/pre&gt;";
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	* </li> </ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php
+	* @author Bitrix
+	*/
+	public static 	function GetPermissionList($STATUS_ID, &$arPERMISSION_VIEW, &$arPERMISSION_MOVE, &$arPERMISSION_EDIT, &$arPERMISSION_DELETE)
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: GetPermissionList<br>Line: ";
 		global $DB, $strError;
@@ -130,63 +130,63 @@ class CAllFormStatus
 	}
 
 	// возвращает массив максимальных прав на результат
-	public static function GetMaxPermissions()
+public static 	function GetMaxPermissions()
 	{
 		return array("VIEW","MOVE","EDIT","DELETE");
 	}
 
 	// права на статус
-	
+
 	/**
-	 * <p> Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">прав</a> текущего пользователя на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. В качестве значений данного массива допустимы: </p> <ul> <li> <b>VIEW</b> - право на просмотр <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> в данном статусе; </li> <li> <b>MOVE</b> - право на перевод результатов в данный статус; </li> <li> <b>EDIT</b> - право на редактирование результатов в данном статусе; </li> <li> <b>DELETE</b> - право на удаление результатов в данном статусе. </li> </ul>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $STATUS_ID = 1;
-	 * 
-	 * // получим права текущего пользователя для указанного статуса
-	 * $arPerm = <b>CFormStatus::GetPermissions</b>($STATUS_ID);
-	 * 
-	 * if (in_array("VIEW", $arPerm)) 
-	 *     echo "У вас есть право на просмотр результатов в данном статусе";
-	 * 
-	 * if (in_array("EDIT", $arPerm)) 
-	 *     echo "У вас есть право на редактирование результатов в данном статусе";
-	 * 
-	 * if (in_array("MOVE", $arPerm)) 
-	 *     echo "У вас есть право на установку данного статуса результатам";
-	 * 
-	 * if (in_array("DELETE", $arPerm)) 
-	 *     echo "У вас есть право на удаление результатов в данном статусе";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php
-	 * @author Bitrix
-	 */
-	public static function GetPermissions($STATUS_ID)
+	* <p> Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">прав</a> текущего пользователя на указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. В качестве значений данного массива допустимы: </p> <ul> <li> <b>VIEW</b> - право на просмотр <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> в данном статусе; </li> <li> <b>MOVE</b> - право на перевод результатов в данный статус; </li> <li> <b>EDIT</b> - право на редактирование результатов в данном статусе; </li> <li> <b>DELETE</b> - право на удаление результатов в данном статусе. </li> </ul>
+	*
+	*
+	*
+	*
+	* @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $STATUS_ID = 1;
+	* 
+	* // получим права текущего пользователя для указанного статуса
+	* $arPerm = <b>CFormStatus::GetPermissions</b>($STATUS_ID);
+	* 
+	* if (in_array("VIEW", $arPerm)) 
+	*     echo "У вас есть право на просмотр результатов в данном статусе";
+	* 
+	* if (in_array("EDIT", $arPerm)) 
+	*     echo "У вас есть право на редактирование результатов в данном статусе";
+	* 
+	* if (in_array("MOVE", $arPerm)) 
+	*     echo "У вас есть право на установку данного статуса результатам";
+	* 
+	* if (in_array("DELETE", $arPerm)) 
+	*     echo "У вас есть право на удаление результатов в данном статусе";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php">CFormResult::GetPermissions</a>
+	* </li> </ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php
+	* @author Bitrix
+	*/
+	public static 	function GetPermissions($STATUS_ID)
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: GetPermissions<br>Line: ";
 
@@ -226,7 +226,7 @@ class CAllFormStatus
 		return $arReturn;
 	}
 
-	public static function GetNextSort($WEB_FORM_ID)
+public static 	function GetNextSort($WEB_FORM_ID)
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: GetNextSort<br>Line: ";
 		global $DB, $strError;
@@ -237,7 +237,7 @@ class CAllFormStatus
 		return intval($zr["MAX_SORT"])+100;
 	}
 
-	public static function GetDefault($WEB_FORM_ID)
+public static 	function GetDefault($WEB_FORM_ID)
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: GetDefault<br>Line: ";
 		global $DB, $USER, $strError;
@@ -249,7 +249,7 @@ class CAllFormStatus
 	}
 
 	// проверка статуса
-	public static function CheckFields($arFields, $STATUS_ID, $CHECK_RIGHTS="Y")
+public static 	function CheckFields($arFields, $STATUS_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: CheckFields<br>Line: ";
 		global $DB, $strError, $APPLICATION, $USER;
@@ -281,118 +281,118 @@ class CAllFormStatus
 	}
 
 	// добавление/обновление статуса
-	
+
 	/**
-	 * <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений, в качестве ключей массива допустимы: <ul> <li>
-	 * <b>FORM_ID</b><font color="red">*</font> - ID <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <b>TITLE</b><font
-	 * color="red">*</font> - заголовок <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>C_SORT</b> -
-	 * порядок сортировки; </li> <li> <b>ACTIVE</b> - флаг активности; допустимы
-	 * следующие значения: <ul> <li> <b>Y</b> - ответ активен; </li> <li> <b>N</b> - ответ
-	 * не активен (по умолчанию). </li> </ul> </li> <li> <b>DESCRIPTION</b> - описание <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>CSS</b> - имя CSS
-	 * класса для вывода заголовка <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>HANDLER_OUT</b> -
-	 * путь относительно корня к <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
-	 * при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
-	 * данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на какой
-	 * либо другой; </li> <li> <b>HANDLER_IN</b> - путь относительно корня к <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
-	 * при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
-	 * какого либо <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на
-	 * данный; </li> <li> <b>DEFAULT_VALUE</b> - флаг установки <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> по умолчанию,
-	 * допустимы следующие значения: <ul> <li> <b>Y</b> - статус будет
-	 * устанавливаться; </li> <li> <b>N</b> - статус не будет устанавливаться (по
-	 * умолчанию). </li> </ul> </li> <li> <b>arPERMISSION_VIEW</b>* - массив ID групп
-	 * пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Просмотр
-	 * результатов в данном статусе"; </li> <li> <b>arPERMISSION_MOVE</b>* - массив ID
-	 * групп пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Перевод
-	 * результатов в данный статус"; </li> <li> <b>arPERMISSION_EDIT</b>* - массив ID групп
-	 * пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Редактирование
-	 * результатов в данном статусе"; </li> <li> <b>arPERMISSION_DELETE</b>* - массив ID
-	 * групп пользователей, имеющих <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Удаление
-	 * результатов в данном статусе". </li> </ul> <br><font color="red">*</font> -
-	 * обязательно к заполнению. <br>* - в данных массивах может быть
-	 * элемент со значением "0", означающий создателя <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $status_id = false ID обновляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.<br>
-	 * Параметр необязательный. По умолчанию - "false" (добавление нового <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>).
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * обновления статуса, либо создания нового статуса необходимо
-	 * иметь право <b>[30] Полный доступ</b> на форму указанную в
-	 * <i>fields</i>["FORM_ID"].<br><br>Параметр необязательный. По умолчанию - "Y"
-	 * (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4; // ID веб-формы
-	 * 
-	 * $arFields = array(
-	 *     "FORM_ID"             =&gt; $FORM_ID,               // ID веб-формы
-	 *     "C_SORT"              =&gt; 100,                    // порядок сортировки
-	 *     "ACTIVE"              =&gt; "Y",                    // статус активен
-	 *     "TITLE"               =&gt; "Опубликовано",         // заголовок статуса
-	 *     "DESCRIPTION"         =&gt; "Окончательный статус", // описание статуса
-	 *     "CSS"                 =&gt; "statusgreen",          // CSS класс
-	 *     "HANDLER_OUT"         =&gt; "",                     // обработчик
-	 *     "HANDLER_IN"          =&gt; "",                     // обработчик
-	 *     "DEFAULT_VALUE"       =&gt; "N",                    // не по умолчанию
-	 *     "arPERMISSION_VIEW"   =&gt; array(2),               // право просмотра для всех
-	 *     "arPERMISSION_MOVE"   =&gt; array(),                // право перевода только админам
-	 *     "arPERMISSION_EDIT"   =&gt; array(),                // право редактирование для админам
-	 *     "arPERMISSION_DELETE" =&gt; array(),                // право удаления только админам
-	 * );
-	 * 
-	 * $NEW_ID = <b>CFormStatus::Set</b>($arFields);
-	 * if ($NEW_ID&gt;0) echo "Успешно добавлен ID=".$NEW_ID;
-	 * else // ошибка
-	 * {
-	 *     // выводим текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">Поля CFormStatus</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/set.php
-	 * @author Bitrix
-	 */
-	public static function Set($arFields, $STATUS_ID=false, $CHECK_RIGHTS="Y")
+	* <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив значений, в качестве ключей массива допустимы: <ul> <li>
+	* <b>FORM_ID</b><font color="red">*</font> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li> <li> <b>TITLE</b><font
+	* color="red">*</font> - заголовок <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>C_SORT</b> -
+	* порядок сортировки; </li> <li> <b>ACTIVE</b> - флаг активности; допустимы
+	* следующие значения: <ul> <li> <b>Y</b> - ответ активен; </li> <li> <b>N</b> - ответ
+	* не активен (по умолчанию). </li> </ul> </li> <li> <b>DESCRIPTION</b> - описание <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>CSS</b> - имя CSS
+	* класса для вывода заголовка <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>; </li> <li> <b>HANDLER_OUT</b> -
+	* путь относительно корня к <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
+	* при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
+	* данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на какой
+	* либо другой; </li> <li> <b>HANDLER_IN</b> - путь относительно корня к <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/status_processing.php">обработчику</a>, вызываемому
+	* при смене у <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
+	* какого либо <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> на
+	* данный; </li> <li> <b>DEFAULT_VALUE</b> - флаг установки <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> по умолчанию,
+	* допустимы следующие значения: <ul> <li> <b>Y</b> - статус будет
+	* устанавливаться; </li> <li> <b>N</b> - статус не будет устанавливаться (по
+	* умолчанию). </li> </ul> </li> <li> <b>arPERMISSION_VIEW</b>* - массив ID групп
+	* пользователей, имеющих <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Просмотр
+	* результатов в данном статусе"; </li> <li> <b>arPERMISSION_MOVE</b>* - массив ID
+	* групп пользователей, имеющих <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Перевод
+	* результатов в данный статус"; </li> <li> <b>arPERMISSION_EDIT</b>* - массив ID групп
+	* пользователей, имеющих <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Редактирование
+	* результатов в данном статусе"; </li> <li> <b>arPERMISSION_DELETE</b>* - массив ID
+	* групп пользователей, имеющих <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">право</a> "Удаление
+	* результатов в данном статусе". </li> </ul> <br><font color="red">*</font> -
+	* обязательно к заполнению. <br>* - в данных массивах может быть
+	* элемент со значением "0", означающий создателя <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param mixed $status_id = false ID обновляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.<br>
+	* Параметр необязательный. По умолчанию - "false" (добавление нового <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>).
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* обновления статуса, либо создания нового статуса необходимо
+	* иметь право <b>[30] Полный доступ</b> на форму указанную в
+	* <i>fields</i>["FORM_ID"].<br><br>Параметр необязательный. По умолчанию - "Y"
+	* (права необходимо проверить).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4; // ID веб-формы
+	* 
+	* $arFields = array(
+	*     "FORM_ID"             =&gt; $FORM_ID,               // ID веб-формы
+	*     "C_SORT"              =&gt; 100,                    // порядок сортировки
+	*     "ACTIVE"              =&gt; "Y",                    // статус активен
+	*     "TITLE"               =&gt; "Опубликовано",         // заголовок статуса
+	*     "DESCRIPTION"         =&gt; "Окончательный статус", // описание статуса
+	*     "CSS"                 =&gt; "statusgreen",          // CSS класс
+	*     "HANDLER_OUT"         =&gt; "",                     // обработчик
+	*     "HANDLER_IN"          =&gt; "",                     // обработчик
+	*     "DEFAULT_VALUE"       =&gt; "N",                    // не по умолчанию
+	*     "arPERMISSION_VIEW"   =&gt; array(2),               // право просмотра для всех
+	*     "arPERMISSION_MOVE"   =&gt; array(),                // право перевода только админам
+	*     "arPERMISSION_EDIT"   =&gt; array(),                // право редактирование для админам
+	*     "arPERMISSION_DELETE" =&gt; array(),                // право удаления только админам
+	* );
+	* 
+	* $NEW_ID = <b>CFormStatus::Set</b>($arFields);
+	* if ($NEW_ID&gt;0) echo "Успешно добавлен ID=".$NEW_ID;
+	* else // ошибка
+	* {
+	*     // выводим текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">Поля CFormStatus</a>
+	* </li></ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/set.php
+	* @author Bitrix
+	*/
+	public static 	function Set($arFields, $STATUS_ID=false, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: Set<br>Line: ";
 		global $DB, $USER, $strError, $APPLICATION;
@@ -552,64 +552,64 @@ class CAllFormStatus
 	}
 
 	// удаляет статус
-	
+
 	/**
-	 * <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p> <p class="note"><b>Примечание</b><br>Статусы, в которых находится хотя бы один <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a>, невозможно удалить.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $status_id  ID удаляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	 * </ul> Для успешного выполнения удаления необходимо иметь <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
-	 * доступ</b> на веб-форму, к которой принадлежит <i>status_id</i>. <br>Параметр
-	 * необязательный. По умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $status_id = 1; // ID статуса
-	 * // удалим статус
-	 * if (<b>CFormStatus::Delete</b>($status_id))
-	 * {
-	 *     echo "Статус #1 успешно удален.";
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php
-	 * @author Bitrix
-	 */
-	public static function Delete($ID, $CHECK_RIGHTS="Y")
+	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p> <p class="note"><b>Примечание</b><br>Статусы, в которых находится хотя бы один <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a>, невозможно удалить.</p>
+	*
+	*
+	*
+	*
+	* @param int $status_id  ID удаляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>. </htm
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
+	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
+	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> Для успешного выполнения удаления необходимо иметь <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	* доступ</b> на веб-форму, к которой принадлежит <i>status_id</i>. <br>Параметр
+	* необязательный. По умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $status_id = 1; // ID статуса
+	* // удалим статус
+	* if (<b>CFormStatus::Delete</b>($status_id))
+	* {
+	*     echo "Статус #1 успешно удален.";
+	* }
+	* else
+	* {
+	*     // выведем текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php">CFormResult::Delete</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php
+	* @author Bitrix
+	*/
+	public static 	function Delete($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $APPLICATION, $strError;
 		$ID = intval($ID);
@@ -646,75 +646,75 @@ class CAllFormStatus
 	}
 
 	// копирует статус
-	
+	f
 	/**
-	 * <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> который
-	 * необходимо скопировать.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	 * пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	 * необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	 * </ul> Для копирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>
-	 * необходимо обладать нижеследующими <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#module">правами</a>: <ol> <li> <b>[25]
-	 * просмотр параметров веб-формы</b> на ту веб-форму, из которой идет
-	 * копирование; </li> <li> <b>[30] полный доступ</b> на ту веб-форму, в которую
-	 * копируется. </li> </ol> Параметр необязательный. По умолчанию - "Y"
-	 * (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @param mixed $form_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в который
-	 * необходимо скопировать <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.<br> Необязательный
-	 * параметр. По умолчанию - "false" (текущая <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форма</a>).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $status_id = 1; // ID статуса
-	 * // скопируем статус
-	 * if ($NEW_STATUS_ID = <b>CFormStatus::Copy</b>($status_id))
-	 * {
-	 *     echo "Статус #1 успешно скопирован в новый статус #".$NEW_STATUS_ID;
-	 * }
-	 * else
-	 * {
-	 *     // выведем текст ошибки
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/copy.php">CForm::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php
-	 * @author Bitrix
-	 */
-	public static function Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
+	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> который
+	* необходимо скопировать.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
+	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
+	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> Для копирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>
+	* необходимо обладать нижеследующими <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#module">правами</a>: <ol> <li> <b>[25]
+	* просмотр параметров веб-формы</b> на ту веб-форму, из которой идет
+	* копирование; </li> <li> <b>[30] полный доступ</b> на ту веб-форму, в которую
+	* копируется. </li> </ol> Параметр необязательный. По умолчанию - "Y"
+	* (права необходимо проверить).
+	*
+	*
+	*
+	* @param mixed $form_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в который
+	* необходимо скопировать <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>.<br> Необязательный
+	* параметр. По умолчанию - "false" (текущая <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форма</a>).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $status_id = 1; // ID статуса
+	* // скопируем статус
+	* if ($NEW_STATUS_ID = <b>CFormStatus::Copy</b>($status_id))
+	* {
+	*     echo "Статус #1 успешно скопирован в новый статус #".$NEW_STATUS_ID;
+	* }
+	* else
+	* {
+	*     // выведем текст ошибки
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/copy.php">CForm::Copy</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php">CFormField::Copy</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/copy.php">CFormAnswer::Copy</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php
+	* @author Bitrix
+	*/
+	public static unction Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
 	{
 		global $DB, $APPLICATION, $strError;
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: Copy<br>Line: ";
@@ -774,7 +774,7 @@ class CAllFormStatus
 		return false;
 	}
 
-	public static function SetMailTemplate($WEB_FORM_ID, $STATUS_ID, $ADD_NEW_TEMPLATE="Y", $old_SID="", $bReturnFullInfo = false)
+public static 	function SetMailTemplate($WEB_FORM_ID, $STATUS_ID, $ADD_NEW_TEMPLATE="Y", $old_SID="", $bReturnFullInfo = false)
 	{
 		global $DB, $MESS, $strError;
 		$err_mess = (CAllForm::err_mess())."<br>Function: SetMailTemplate<br>Line: ";
@@ -885,7 +885,7 @@ class CAllFormStatus
 		return $arrReturn;
 	}
 
-	public static function GetMailTemplateArray($STATUS_ID)
+public static 	function GetMailTemplateArray($STATUS_ID)
 	{
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: GetMailTemplateArray<br>Line: ";
 
@@ -911,7 +911,7 @@ WHERE
 		return $arrRes;
 	}
 
-	public static function GetTemplateList($STATUS_ID)
+public static 	function GetTemplateList($STATUS_ID)
 	{
 		$err_mess = (CAllForm::err_mess())."<br>Function: GetTemplateList<br>Line: ";
 		global $DB, $strError;

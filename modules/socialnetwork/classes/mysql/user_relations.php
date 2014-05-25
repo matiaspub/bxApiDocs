@@ -21,30 +21,55 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	/***************************************/
 	
 	/**
-	 * <p>Метод создает новую связь между пользователями.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров связи. Может иметь ключи:<br> FIRST_USER_ID - код
-	 * первого пользователя,<br> SECOND_USER_ID - код второго пользователя,<br>
-	 * RELATION - тип связи: SONET_RELATIONS_FRIEND - пользователи являются друзьями,
-	 * SONET_RELATIONS_REQUEST - один из пользователей направил другому
-	 * предложение дружбы, SONET_RELATIONS_BAN - один из пользователей внес
-	 * другого в черный список,<br> DATE_CREATE - дата создания связи,<br> DATE_UPDATE -
-	 * дата последнего изменения связи,<br> MESSAGE - сообщение от инициатора
-	 * связи,<br> INITIATED_BY - флаг, кем инициирована связь: F - первым
-	 * пользователем, S - вторым.
-	 *
-	 *
-	 *
-	 * @return int <p>Код связи в случае успешного выполнения или false в случае
-	 * ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод создает новую связь между пользователями.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
+	* первого пользователя,<br><b>SECOND_USER_ID</b> - код второго
+	* пользователя,<br><b>RELATION</b> - тип связи: SONET_RELATIONS_FRIEND - пользователи
+	* являются друзьями, SONET_RELATIONS_REQUEST - один из пользователей направил
+	* другому предложение дружбы, SONET_RELATIONS_BAN - один из пользователей
+	* внес другого в черный список,<br><b>DATE_CREATE</b> - дата создания
+	* связи,<br><b>DATE_UPDATE</b> - дата последнего изменения связи,<br><b>MESSAGE</b> -
+	* сообщение от инициатора связи,<br><b>INITIATED_BY</b> - флаг, кем
+	* инициирована связь: F - первым пользователем, S - вторым.
+	*
+	*
+	*
+	* @return int <p>Код связи в случае успешного выполнения или false в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* В случае успеха возвращает ID пользователя в соцсети.
+	* 
+	* 
+	* &lt;?
+	* // Добавление связей
+	* $arFields = array(
+	*     "FIRST_USER_ID" =&gt; 11111,
+	*     "SECOND_USER_ID" =&gt; 22222,
+	*     "RELATION" =&gt; SONET_RELATIONS_FRIEND,
+	*     "DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*     "DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*     "MESSAGE" =&gt; 'Test',
+	*     "INITIATED_BY" =&gt; "S",
+	* );
+	* $userAdd = CSocNetUserRelations::Add($arFields);
+	* echo '=&lt;pre&gt;'; print_r($userAdd); echo '&lt;/pre&gt;=';
+	* ?&gt;
+	* 
+	* </ht
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -124,34 +149,34 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 
 	
 	/**
-	 * <p>Метод изменяет связь между пользователями.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код связи.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров связи. Может иметь ключи:<br> FIRST_USER_ID - код
-	 * первого пользователя,<br> SECOND_USER_ID - код второго пользователя,<br>
-	 * RELATION - тип связи: SONET_RELATIONS_FRIEND - пользователи являются друзьями,
-	 * SONET_RELATIONS_REQUEST - один из пользователей направил другому
-	 * предложение дружбы, SONET_RELATIONS_BAN - один из пользователей внес
-	 * другого в черный список,<br> DATE_CREATE - дата создания связи,<br> DATE_UPDATE -
-	 * дата последнего изменения связи,<br> MESSAGE - сообщение от инициатора
-	 * связи,<br> INITIATED_BY - флаг, кем инициирована связь: F - первым
-	 * пользователем, S - вторым.
-	 *
-	 *
-	 *
-	 * @return int <p>Код связи в случае успешного выполнения или false в случае
-	 * ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет связь между пользователями.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код связи.
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
+	* первого пользователя,<br><b>SECOND_USER_ID</b> - код второго
+	* пользователя,<br><b>RELATION</b> - тип связи: SONET_RELATIONS_FRIEND - пользователи
+	* являются друзьями, SONET_RELATIONS_REQUEST - один из пользователей направил
+	* другому предложение дружбы, SONET_RELATIONS_BAN - один из пользователей
+	* внес другого в черный список,<br><b>DATE_CREATE</b> - дата создания
+	* связи,<br><b>DATE_UPDATE</b> - дата последнего изменения связи,<br><b>MESSAGE</b> -
+	* сообщение от инициатора связи,<br><b>INITIATED_BY</b> - флаг, кем
+	* инициирована связь: F - первым пользователем, S - вторым.
+	*
+	*
+	*
+	* @return int <p>Код связи в случае успешного выполнения или false в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -233,58 +258,60 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает список связей между пользователями в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, FIRST_USER_ID, SECOND_USER_ID, RELATION, DATE_CREATE, DATE_UPDATE, MESSAGE, INITIATED_BY. В массиве
-	 * допустимы любые поля из списка полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает список связей между пользователями в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>FIRST_USER_ID</b>, <b>SECOND_USER_ID</b>, <b>RELATION</b>, <b>DATE_CREATE</b>,
+	* <b>DATE_UPDATE</b>, <b>MESSAGE</b>, <b>INITIATED_BY</b>. В массиве допустимы любые поля из
+	* списка полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -414,7 +441,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		return $dbRes;
 	}
 
-	public static function PrepareSection4Where($val, $key, $operation, $negative, $field, &$arField, &$arFilter)
+public static 	function PrepareSection4Where($val, $key, $operation, $negative, $field, &$arField, &$arFilter)
 	{
 		$val = IntVal($val);
 		if ($val <= 0)
@@ -423,37 +450,44 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		return (($negative == "Y") ? "NOT " : "")."(UR.FIRST_USER_ID ".$operation." ".$val." OR UR.SECOND_USER_ID ".$operation." ".$val.")";
 	}
 
-	
+
 	/**
-	 * <p>Метод возвращает список друзей, упорядоченный по дню рождения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, друзья которого выбираются.
-	 *
-	 *
-	 *
-	 * @param int $number = 5 Количество возвращаемых записей.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект типа CDBResult, содержащий записи с полями:<br> ID -
-	 * код пользователя,<br> NAME - имя пользователя,<br> LAST_NAME - фамилия
-	 * пользователя,<br> SECOND_NAME - отчество пользователя,<br> LOGIN - логин
-	 * пользователя,<br> EMAIL - E-Mail пользователя,<br> PERSONAL_PHOTO - код фотографии
-	 * пользователя,<br> PB - день рождения.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/GetListBirthday.php
-	 * @author Bitrix
-	 */
-	public static function GetListBirthday($userID, $number = 5, $online_interval = 120)
+	* <p>Метод возвращает список друзей, упорядоченный по дню рождения.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, друзья которого выбираются.
+	*
+	*
+	*
+	* @param int $number = 5 Количество возвращаемых записей.
+	*
+	*
+	*
+	* @param int $online_interval = 120 Параметр времени опроса сервера в сек. Необязательный параметр.
+	* По умолчанию равен 120.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект типа CDBResult, содержащий записи с
+	* полями:<br><b>ID</b> - код пользователя,<br><b>NAME</b> - имя
+	* пользователя,<br><b>LAST_NAME</b> - фамилия пользователя,<br><b>SECOND_NAME</b> -
+	* отчество пользователя,<br><b>LOGIN</b> - логин пользователя,<br><b>EMAIL</b> -
+	* E-Mail пользователя,<br><b>PERSONAL_PHOTO</b> - код фотографии
+	* пользователя,<br><b>PB</b> - день рождения.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getlistbirthday.php
+	* @author Bitrix
+	*/
+	public static 	function GetListBirthday($userID, $number = 5, $online_interval = 120)
 	{
 		global $DB;
 
@@ -486,7 +520,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		return $DB->Query($strSql);
 	}
 	
-	public static function GetRelationsTop($userID, $number = 100)
+public static 	function GetRelationsTop($userID, $number = 100)
 	{
 		global $DB;
 

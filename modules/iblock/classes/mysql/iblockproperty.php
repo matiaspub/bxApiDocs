@@ -227,4 +227,3 @@ class CIBlockProperty extends CAllIBlockProperty
 		return $rs;
 	}
 }
-?>

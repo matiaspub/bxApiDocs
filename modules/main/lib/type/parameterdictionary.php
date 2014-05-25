@@ -14,8 +14,8 @@ class ParameterDictionary
 	protected function setValuesNoDemand(array $values)
 	{
 		if ($this->arRawValues === null)
-			$this->arRawValues = $this->arValues;
-		$this->arValues = $values;
+			$this->arRawValues = $this->values;
+		$this->values = $values;
 	}
 
 	/**
@@ -28,8 +28,8 @@ class ParameterDictionary
 	{
 		if ($this->arRawValues === null)
 		{
-			if (isset($this->arValues[$name]) || array_key_exists($name, $this->arValues))
-				return $this->arValues[$name];
+			if (isset($this->values[$name]) || array_key_exists($name, $this->values))
+				return $this->values[$name];
 		}
 		else
 		{

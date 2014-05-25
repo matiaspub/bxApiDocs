@@ -32,7 +32,7 @@ class CIMHistory
 		}
 
 		$searchText = trim($searchText);
-		if (strlen($searchText) <= 0)
+		if (strlen($searchText) <= 3)
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_HISTORY_SEARCH_EMPTY"), "ERROR_SEARCH_EMPTY");
 			return false;
@@ -141,6 +141,7 @@ class CIMHistory
 					M.MESSAGE,
 					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
 					M.AUTHOR_ID,
+					M.NOTIFY_EVENT,
 					R1.USER_ID R1_USER_ID,
 					R2.USER_ID R2_USER_ID
 				FROM b_im_relation R1
@@ -179,6 +180,7 @@ class CIMHistory
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
 					'date' => $arRes['DATE_CREATE'],
+					'system' => $arRes['NOTIFY_EVENT'] == 'private'? 'N': 'Y',
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 				$arUsers[$convId][] = $arRes['ID'];
@@ -231,7 +233,7 @@ class CIMHistory
 				$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 			$obCache = new CPHPCache();
-			$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($this->user_id));
+			$obCache->CleanDir('/bx/imc/recent'.CIMMessenger::GetCachePath($this->user_id));
 		}
 
 		return true;
@@ -262,7 +264,7 @@ class CIMHistory
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$obCache = new CPHPCache();
-			$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($this->user_id));
+			$obCache->CleanDir('/bx/imc/recent'.CIMMessenger::GetCachePath($this->user_id));
 		}
 
 		return true;
@@ -377,6 +379,7 @@ class CIMHistory
 					'senderId' => $arRes['AUTHOR_ID'],
 					'recipientId' => $arRes['CHAT_ID'],
 					'date' => $arRes['DATE_CREATE'],
+					'system' => $arRes['AUTHOR_ID'] > 0? 'N': 'Y',
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 

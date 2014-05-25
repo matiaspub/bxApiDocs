@@ -209,6 +209,9 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 			'/bitrix/js/calendar/cal-planner.js'
 		);
 
+		// Drag & drop
+		$arJS[] = '/bitrix/js/main/dd.js';
+
 		for($i = 0, $l = count($arJS); $i < $l; $i++)
 		{
 			$APPLICATION->AddHeadScript($arJS[$i]);
@@ -450,7 +453,11 @@ function onPopupTaskDeleted(taskId){BX.onCustomEvent(window, 'onCalendarPopupTas
 			'CalDavConWait' => 'EC_CAL_DAV_CON_WAIT',
 			'Refresh' => 'EC_CAL_DAV_REFRESH',
 			'acc_status_absent' => 'EC_PRIVATE_ABSENT',
-			'acc_status_busy' => 'EC_ACCESSIBILITY_B'
+			'acc_status_busy' => 'EC_ACCESSIBILITY_B',
+			'denyRepeted' => 'EC_DD_DENY_REPEATED',
+			'ddDenyRepeted' => 'EC_DD_DENY_REPEATED',
+			'ddDenyTask' => 'EC_DD_DENY_TASK',
+			'ddDenyEvent' => 'EC_DD_DENY_EVENT'
 		);
 
 ?>
@@ -521,7 +528,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		$userId = CCalendar::GetCurUserId();
 
 		$arHost = CCalendar::GetUser($userId, true);
-		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost);
 		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
 		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
 		$Params['host'] = $arHost;
@@ -558,7 +565,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 				$userIds[] = $att["USER_ID"];
 				if ($userId == $att["USER_ID"])
 					$curUserStatus = $att['STATUS'];
-				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att);
 				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
 				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
 			}
@@ -884,7 +891,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		$event['FROM_MONTH_DAY'] = FormatDate('j', $event['DT_FROM_TS']);
 
 		$arHost = CCalendar::GetUser($event['MEETING_HOST'], true);
-		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost);
 		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
 		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
 		$curUserStatus = '';
@@ -928,7 +935,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 					$curUserStatus = $att['STATUS'];
 					$viewComments = true;
 				}
-				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att, array('AVATAR_SIZE' => $Params['AVATAR_SIZE']));
+				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att);
 				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
 				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
 			}
@@ -1338,7 +1345,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		<a href="javascript:void(0);" target="_blank" id="<?=$id?>_excal_link">&ndsp;</a>
 		<span id="<?=$id?>_excal_warning" class="bxec-export-warning"><?=GetMessage('EC_EDEV_EXP_WARN')?></span>
 	</div>
-	<span>
+	<span class="bxec-excal-notice-hide">
 		<a title="<?=GetMessage('EC_T_EXPORT_NOTICE_OUTLOOK_TITLE')?>" href="javascript:void(0);" id="<?=$id?>_excal_link_outlook"><?=GetMessage('EC_T_EXPORT_NOTICE_OUTLOOK_LINK')?></a>
 		<div class="bxec-excal-notice-outlook"><?=GetMessage('EC_T_EXPORT_NOTICE_OUTLOOK')?></div>
 	</span>
@@ -1810,7 +1817,9 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 				'jsObjName' => 'pLHEEvDesc',
 				'bInitByJS' => false,
 				'bRecreate' => true,
-				'bSaveOnBlur' => false
+				'bSaveOnBlur' => false,
+				'bUseFileDialogs' => false,
+				'bUseMedialib' => true
 			));
 			?>
 			<!-- Buttons-->

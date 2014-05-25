@@ -1,4 +1,10 @@
 <?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
 namespace Bitrix\Main;
 
 use Bitrix\Main\Diag;
@@ -9,19 +15,15 @@ class EventManager
 	/**
 	 * @var EventManager
 	 */
-	private static $instance;
+	protected static $instance;
 
-	private $handlers = array();
-	private $isHandlersLoaded = false;
+	protected $handlers = array();
+	protected $isHandlersLoaded = false;
 
-	//private $mailHandlers = array();
-	//private $componentHandlers = array();
+	protected static $cacheKey = "b_module_to_module";
 
-	static $cacheKey = "b_module_to_module";
-
-	private function __construct()
+	protected function __construct()
 	{
-		$this->isHandlersLoaded = false;
 	}
 
 	/**
@@ -39,7 +41,7 @@ class EventManager
 		return self::$instance;
 	}
 
-	private function addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, $version)
+	protected function addEventHandlerInternal($fromModuleId, $eventType, $callback, $includeFile, $sort, $version)
 	{
 		$arEvent = array(
 			"FROM_MODULE_ID" => $fromModuleId,
@@ -55,7 +57,9 @@ class EventManager
 		$eventType = strtoupper($eventType);
 
 		if (!isset($this->handlers[$fromModuleId]) || !is_array($this->handlers[$fromModuleId]))
+		{
 			$this->handlers[$fromModuleId] = array();
+		}
 
 		$arEvents = &$this->handlers[$fromModuleId];
 
@@ -71,7 +75,9 @@ class EventManager
 			foreach ($arEvents[$eventType] as $key => $value)
 			{
 				if ($value["SORT"] > $arEvent["SORT"])
+				{
 					$newEvents[$iEventHandlerKey] = $arEvent;
+				}
 
 				$newEvents[$key] = $value;
 			}
@@ -117,7 +123,7 @@ class EventManager
 		return false;
 	}
 
-	public static function unRegisterEventHandler($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $toPath = "", $toMethodArg = array())
+	public function unRegisterEventHandler($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $toPath = "", $toMethodArg = array())
 	{
 		$toMethodArg = ((!is_array($toMethodArg) || is_array($toMethodArg) && empty($toMethodArg)) ? "" : serialize($toMethodArg));
 
@@ -136,8 +142,7 @@ class EventManager
 
 		$con->queryExecute($strSql);
 
-		$managedCache = Application::getInstance()->getManagedCache();
-		$managedCache->clean(self::$cacheKey);
+		$this->clearLoadedHandlers();
 	}
 
 	public function registerEventHandler($fromModuleId, $eventType, $toModuleId, $toClass = "", $toMethod = "", $sort = 100, $toPath = "", $toMethodArg = array())
@@ -150,7 +155,7 @@ class EventManager
 		$this->registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, 1);
 	}
 
-	public static function registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, $version)
+	protected function registerEventHandlerInternal($fromModuleId, $eventType, $toModuleId, $toClass, $toMethod, $sort, $toPath, $toMethodArg, $version)
 	{
 		$toMethodArg = ((!is_array($toMethodArg) || is_array($toMethodArg) && empty($toMethodArg)) ? "" : serialize($toMethodArg));
 
@@ -188,33 +193,40 @@ class EventManager
 				"   '".$toClass."', '".$toMethod."', '".$toPath."', '".$toMethodArg."', ".$version.")"
 			);
 
-			$managedCache = Application::getInstance()->getManagedCache();
-			$managedCache->clean(self::$cacheKey);
+			$this->clearLoadedHandlers();
 		}
 	}
 
-	private function formatEventName($arEvent)
+	protected function formatEventName($arEvent)
 	{
 		$strName = '';
 		if (isset($arEvent["CALLBACK"]))
 		{
 			if (is_array($arEvent["CALLBACK"]))
+			{
 				$strName .= (is_object($arEvent["CALLBACK"][0]) ? get_class($arEvent["CALLBACK"][0]) : $arEvent["CALLBACK"][0]).'::'.$arEvent["CALLBACK"][1];
+			}
 			elseif (is_callable($arEvent["CALLBACK"]))
+			{
 				$strName .= "callable";
+			}
 			else
+			{
 				$strName .= $arEvent["CALLBACK"];
+			}
 		}
 		else
 		{
 			$strName .= $arEvent["TO_CLASS"].'::'.$arEvent["TO_METHOD"];
 		}
 		if (isset($arEvent['TO_MODULE_ID']) && !empty($arEvent['TO_MODULE_ID']))
+		{
 			$strName .= ' ('.$arEvent['TO_MODULE_ID'].')';
+		}
 		return $strName;
 	}
 
-	private function loadEventHandlers()
+	protected function loadEventHandlers()
 	{
 		$cache = Application::getInstance()->getManagedCache();
 		if ($cache->read(3600, self::$cacheKey))
@@ -245,9 +257,13 @@ class EventManager
 				$ar["~FROM_MODULE_ID"] = strtoupper($ar["FROM_MODULE_ID"]);
 				$ar["~MESSAGE_ID"] = strtoupper($ar["MESSAGE_ID"]);
 				if (strlen($ar["TO_METHOD_ARG"]) > 0)
+				{
 					$ar["TO_METHOD_ARG"] = unserialize($ar["TO_METHOD_ARG"]);
+				}
 				else
+				{
 					$ar["TO_METHOD_ARG"] = array();
+				}
 
 				$arEvents[] = $ar;
 			}
@@ -256,13 +272,16 @@ class EventManager
 		}
 
 		if (!is_array($arEvents))
+		{
 			$arEvents = array();
+		}
 
 		$handlers = $this->handlers;
-		$noHandlers = empty($this->handlers);
+		$hasHandlers = !empty($this->handlers);
 
 		// compatibility with former event manager
 		foreach ($arEvents as $ar)
+		{
 			$this->handlers[$ar["~FROM_MODULE_ID"]][$ar["~MESSAGE_ID"]][] = array(
 				"SORT" => $ar["SORT"],
 				"TO_MODULE_ID" => $ar["TO_MODULE_ID"],
@@ -272,58 +291,67 @@ class EventManager
 				"TO_METHOD_ARG" => $ar["TO_METHOD_ARG"],
 				"VERSION" => $ar["VERSION"],
 				"TO_NAME" => $ar["TO_NAME"],
+				"FROM_DB" => true,
 			);
+		}
 
-		if (!$noHandlers)
+		if ($hasHandlers)
 		{
 			// need to re-sort because of AddEventHandler() calls (before loadEventHandlers)
 			$funcSort = create_function('$a, $b', 'if ($a["SORT"] == $b["SORT"]) return 0; return ($a["SORT"] < $b["SORT"]) ? -1 : 1;');
 			foreach (array_keys($handlers) as $moduleId)
+			{
 				foreach (array_keys($handlers[$moduleId]) as $event)
+				{
 					uasort($this->handlers[$moduleId][$event], $funcSort);
+				}
+			}
 		}
 
 		$this->isHandlersLoaded = true;
 	}
 
-	/*
-	private function loadMailEventHandlers()
+	protected function clearLoadedHandlers()
 	{
-		$this->mailHandlers = array(
-			"OnEvent" => array(
-				"MODULE" => "main",
-				"EVENT" => "SomeMailEvent",
-			),
-		);
-	}
+		$managedCache = Application::getInstance()->getManagedCache();
+		$managedCache->clean(self::$cacheKey);
 
-	private function loadComponentEventHandlers()
-	{
-		$this->componentHandlers = array(
-			"OnEvent" => array(
-				array(
-					"COMPONENT" => "bitrix:lists.edit",
-					"METHOD" => "SomeHandler",
-				),
-			),
-		);
+		foreach($this->handlers as $module=>$types)
+		{
+			foreach($types as $type=>$events)
+			{
+				foreach($events as $i => $event)
+				{
+					if($event["FROM_DB"] == true)
+					{
+						unset($this->handlers[$module][$type][$i]);
+					}
+				}
+			}
+		}
+		$this->isHandlersLoaded = false;
 	}
-	*/
 
 	public function findEventHandlers($eventModuleId, $eventType, array $filter = null)
 	{
 		if (!$this->isHandlersLoaded)
+		{
 			$this->loadEventHandlers();
+		}
 
 		$eventModuleId = strtoupper($eventModuleId);
 		$eventType = strtoupper($eventType);
 
 		if (!isset($this->handlers[$eventModuleId]) || !isset($this->handlers[$eventModuleId][$eventType]))
+		{
 			return array();
+		}
 
 		$handlers = $this->handlers[$eventModuleId][$eventType];
 		if (!is_array($handlers))
+		{
 			return array();
+		}
 
 		if (is_array($filter) && !empty($filter))
 		{
@@ -332,91 +360,25 @@ class EventManager
 			foreach ($handlersTmp as $handler)
 			{
 				if (in_array($handler["TO_MODULE_ID"], $filter))
+				{
 					$handlers[] = $handler;
+				}
 			}
 		}
 
 		return $handlers;
 	}
-
-	/*
-	private function findMailEventHandlers($eventModuleId, $eventType, array $filter = null)
-	{
-		if (empty($this->mailHandlers))
-			$this->loadMailEventHandlers();
-
-		$eventModuleId = strtoupper($eventModuleId);
-		$eventType = strtoupper($eventType);
-
-		if (!isset($this->mailHandlers[$eventModuleId]) || !isset($this->mailHandlers[$eventModuleId][$eventType]))
-			return array();
-
-		$handlers = $this->mailHandlers[$eventModuleId][$eventType];
-		if (!is_array($handlers))
-			return array();
-
-		if (is_array($filter) && !empty($filter))
-		{
-			$handlersTmp = $handlers;
-			$handlers = array();
-			foreach ($handlersTmp as $handler)
-			{
-				if (in_array($handler, $filter))
-					$handlers[] = $handler;
-			}
-		}
-
-		return $handlers;
-	}
-
-	private function findComponentEventHandlers($eventModuleId, $eventType, array $filter = null)
-	{
-		if (empty($this->componentHandlers))
-			$this->loadComponentEventHandlers();
-
-		$eventModuleId = strtoupper($eventModuleId);
-		$eventType = strtoupper($eventType);
-
-		if (!isset($this->componentHandlers[$eventModuleId]) || !isset($this->componentHandlers[$eventModuleId][$eventType]))
-			return array();
-
-		$handlers = $this->componentHandlers[$eventModuleId][$eventType];
-		if (!is_array($handlers))
-			return array();
-
-		if (is_array($filter) && !empty($filter))
-		{
-			$handlersTmp = $handlers;
-			$handlers = array();
-			foreach ($handlersTmp as $handler)
-			{
-				if (in_array($handler["COMPONENT"], $filter))
-					$handlers[] = $handler;
-			}
-		}
-
-		return $handlers;
-	}
-	*/
 
 	public function send(Event $event)
 	{
 		$handlers = $this->findEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
 		foreach ($handlers as $handler)
+		{
 			$this->sendToEventHandler($handler, $event);
-
-		/*
-		$handlers = $this->findMailEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
-		foreach ($handlers as $handler)
-			$this->sendToMailEventHandler($handler, $event);
-
-		$handlers = $this->findComponentEventHandlers($event->getModuleId(), $event->getEventType(), $event->getFilter());
-		foreach ($handlers as $handler)
-			$this->sendToComponentEventHandler($handler, $event);
-		*/
+		}
 	}
 
-	private function sendToEventHandler(array $handler, Event $event)
+	protected function sendToEventHandler(array $handler, Event $event)
 	{
 		try
 		{
@@ -431,7 +393,9 @@ class EventManager
 			{
 				$path = ltrim($handler["TO_PATH"], "/");
 				if (($path = Loader::getLocal($path)) !== false)
+				{
 					$result = include_once($path);
+				}
 			}
 			elseif (isset($handler["FULL_PATH"]) && !empty($handler["FULL_PATH"]) && IO\File::isFileExists($handler["FULL_PATH"]))
 			{
@@ -441,52 +405,60 @@ class EventManager
 			$event->addDebugInfo($result);
 
 			if (isset($handler["TO_METHOD_ARG"]) && is_array($handler["TO_METHOD_ARG"]) && !empty($handler["TO_METHOD_ARG"]))
+			{
 				$args = $handler["TO_METHOD_ARG"];
+			}
 			else
+			{
 				$args = array();
+			}
 
 			if ($handler["VERSION"] > 1)
+			{
 				$args[] = $event;
+			}
 			else
+			{
 				$args = array_merge($args, array_values($event->getParameters()));
+			}
 
 			$callback = null;
 			if (isset($handler["CALLBACK"]))
+			{
 				$callback = $handler["CALLBACK"];
+			}
 			elseif (!empty($handler["TO_CLASS"]) && !empty($handler["TO_METHOD"]) && class_exists($handler["TO_CLASS"]))
+			{
 				$callback = array($handler["TO_CLASS"], $handler["TO_METHOD"]);
+			}
 
 			if ($callback != null)
+			{
 				$result = call_user_func_array($callback, $args);
+			}
 
 			if (($result != null) && !($result instanceof EventResult))
+			{
 				$result = new EventResult(EventResult::UNDEFINED, $result, $handler["TO_MODULE_ID"]);
+			}
 
 			$event->addDebugInfo($result);
 
 			if ($result != null)
+			{
 				$event->addResult($result);
+			}
 		}
 		catch (\Exception $ex)
 		{
 			if ($event->isDebugOn())
+			{
 				$event->addException($ex);
+			}
 			else
+			{
 				throw $ex;
+			}
 		}
 	}
-
-	/*
-	private function sendToMailEventHandler($handler, Event $event)
-	{
-		//$result = call_user_func_array(array($handler["CLASS"], $handler["METHOD"]), array($event));
-		$event->addResult(new EventResult(EventResult::SUCCESS));
-	}
-
-	private function sendToComponentEventHandler($handler, Event $event)
-	{
-		//$result = call_user_func_array(array($handler["CLASS"], $handler["METHOD"]), array($event));
-		$event->addResult(new EventResult(EventResult::SUCCESS));
-	}
-	*/
 }

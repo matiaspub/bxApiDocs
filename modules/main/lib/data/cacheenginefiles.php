@@ -2,7 +2,7 @@
 namespace Bitrix\Main\Data;
 
 use Bitrix\Main;
-use \Bitrix\Main\IO;
+use Bitrix\Main\IO;
 
 class CacheEngineFiles
 	implements ICacheEngine, ICacheEngineStat
@@ -84,10 +84,11 @@ class CacheEngineFiles
 
 	private static function randomizeFile($fileName)
 	{
+		$documentRoot = Main\Loader::getDocumentRoot();
 		for ($i = 0; $i < 99; $i++)
 		{
 			$suffix = rand(0, 999999);
-			if (!file_exists($_SERVER["DOCUMENT_ROOT"].$fileName.$suffix))
+			if (!file_exists($documentRoot.$fileName.$suffix))
 				return $fileName.$suffix;
 		}
 		return "";
@@ -243,7 +244,7 @@ class CacheEngineFiles
 
 			$this->written = fwrite($handle, $contents);
 			$this->path = $fn;
-			$len = Main\Text\String::strlenBytes($contents);
+			$len = Main\Text\String::getBinaryLength($contents);
 
 			fclose($handle);
 

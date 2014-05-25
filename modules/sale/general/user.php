@@ -105,22 +105,22 @@ class CAllSaleUserAccount
 
 	
 	/**
-	 * <p>Метод удаляет внутренний счет пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код удаляемого счета.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет внутренний счет пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код удаляемого счета.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
+	* случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -128,6 +128,15 @@ class CAllSaleUserAccount
 		$ID = IntVal($ID);
 		if ($ID <= 0)
 			return False;
+
+		$db_events = GetModuleEvents("sale", "OnBeforeUserAccountDelete");
+		while ($arEvent = $db_events->Fetch())
+		{
+			if (ExecuteModuleEventEx($arEvent, Array($ID))===false)
+			{
+				return false;
+			}
+		}
 
 		$arOldUserAccount = CSaleUserAccount::GetByID($ID);
 
@@ -138,7 +147,15 @@ class CAllSaleUserAccount
 		unset($GLOBALS["SALE_USER_ACCOUNT"]["SALE_USER_ACCOUNT_CACHE_".$ID]);
 		unset($GLOBALS["SALE_USER_ACCOUNT"]["SALE_USER_ACCOUNT_CACHE1_".$arOldUserAccount["USER_ID"]."_".$arOldUserAccount["CURRENCY"]]);
 
-		return $DB->Query("DELETE FROM b_sale_user_account WHERE ID = ".$ID." ", true);
+		$res = $DB->Query("DELETE FROM b_sale_user_account WHERE ID = ".$ID." ", true);
+
+		$dbEvents = GetModuleEvents("sale", "OnAfterUserAccountDelete");
+		while ($arEvent = $dbEvents->Fetch())
+		{
+			ExecuteModuleEventEx($arEvent, Array($ID));
+		}
+
+		return $res;
 	}
 
 
@@ -306,66 +323,66 @@ class CAllSaleUserAccount
 	// Return True if the necessary sum withdraw from an account or False in other way
 	
 	/**
-	 * <p>Метод снимает указанную сумму с внутреннего счета пользователя. Если на внутреннем счете не достаточно средств, то делается попытка снять дополнительные средства с пластиковой карточки пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param double $paySum  Снимаемая сумма.
-	 *
-	 *
-	 *
-	 * @param string $payCurrency  Валюта снимаемой суммы.
-	 *
-	 *
-	 *
-	 * @param  $int  Код заказа, если снятие денег относится к заказу.
-	 *
-	 *
-	 *
-	 * @param orderI $D = 0[ Если <i>true</i>, то система пробует снять деньги с пластиковой карты
-	 * пользователя при недостаточности средств на внутреннем счете.
-	 * Если <i>false</i>, то пластиковая карта пользователя не задействуется.
-	 *
-	 *
-	 *
-	 * @param bool $useCC = True]] 
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного снятия денег с
-	 * внутреннего счета пользователя и <i>false</i> в случае невозможности
-	 * снять указанную сумму.</p><h4> Примечание</h4><p>Деньги снимаются
-	 * только со счета той же валюты, которая передается параметром в
-	 * метод. Счета пользователя в другой валюте не затрагиваются.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Снимем с рублевого счета текущего пользователя 3 рубля в счет оплаты заказа номер 21
-	 * $bSuccessPayment = CSaleUserAccount::Pay(
-	 *         $USER-&gt;GetID(),
-	 *         3,
-	 *         "RUR",
-	 *         21,
-	 *         False
-	 *     );
-	 * if ($bSuccessPayment)
-	 *     echo "Сумма для оплаты счета успешно снята";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.pay.php
-	 * @author Bitrix
-	 */
+	* <p>Метод снимает указанную сумму с внутреннего счета пользователя. Если на внутреннем счете не достаточно средств, то делается попытка снять дополнительные средства с пластиковой карточки пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param double $paySum  Снимаемая сумма.
+	*
+	*
+	*
+	* @param string $payCurrency  Валюта снимаемой суммы.
+	*
+	*
+	*
+	* @param  $int  Код заказа, если снятие денег относится к заказу.
+	*
+	*
+	*
+	* @param orderI $D = 0[ Если <i>true</i>, то система пробует снять деньги с пластиковой карты
+	* пользователя при недостаточности средств на внутреннем счете.
+	* Если <i>false</i>, то пластиковая карта пользователя не задействуется.
+	*
+	*
+	*
+	* @param bool $useCC = True]] 
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного снятия денег с
+	* внутреннего счета пользователя и <i>false</i> в случае невозможности
+	* снять указанную сумму.</p> <h4> Примечание</h4> <p>Деньги снимаются
+	* только со счета той же валюты, которая передается параметром в
+	* метод. Счета пользователя в другой валюте не затрагиваются.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Снимем с рублевого счета текущего пользователя 3 рубля в счет оплаты заказа номер 21
+	* $bSuccessPayment = CSaleUserAccount::Pay(
+	*         $USER-&gt;GetID(),
+	*         3,
+	*         "RUR",
+	*         21,
+	*         False
+	*     );
+	* if ($bSuccessPayment)
+	*     echo "Сумма для оплаты счета успешно снята";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.pay.php
+	* @author Bitrix
+	*/
 	public static function Pay($userID, $paySum, $payCurrency, $orderID = 0, $useCC = True)
 	{
 		global $DB;
@@ -534,70 +551,70 @@ class CAllSaleUserAccount
 	// Return withdrawn sum or False
 	
 	/**
-	 * <p>Метод снимает указанную сумму с внутреннего счета пользователя. Если на внутреннем счете не достаточно средств, то снимается максимально доступная сумма (т.е. все доступные средства).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param double $paySum  Снимаемая сумма.
-	 *
-	 *
-	 *
-	 * @param string $payCurrency  Валюта снимаемой суммы.
-	 *
-	 *
-	 *
-	 * @param  $int  Код заказа, если снятие денег относится к заказу.
-	 *
-	 *
-	 *
-	 * @param orderI $D = 0] 
-	 *
-	 *
-	 *
-	 * @return double <p>Метод возвращает реально снятую со счета сумму или <i>false</i> в
-	 * случае ошибки.</p><h4> Замечание</h4><p>Деньги снимаются только со
-	 * счета той же валюты, которая передается параметром в метод. Счета
-	 * пользователя в другой валюте не затрагиваются.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Оплатим полностью или хотя бы частично заказ номер 21 со счета пользователя
-	 * 
-	 * $arOrder = CSaleOrder::GetByID(21);
-	 * 
-	 * $withdrawSum = CSaleUserAccount::Withdraw(
-	 *         $arOrder["USER_ID"],
-	 *         $arOrder["PRICE"],
-	 *         $arOrder["CURRENCY"],
-	 *         $arOrder["ID"]
-	 *     );
-	 * 
-	 * if ($withdrawSum &gt; 0)
-	 * {
-	 *     $arFields = array(
-	 *             "SUM_PAID" =&gt; $withdrawSum,
-	 *             "USER_ID" =&gt; $arOrder["USER_ID"]
-	 *         );
-	 *     CSaleOrder::Update($arOrder["ID"], $arFields);
-	 * 
-	 *     if ($withdrawSum == $arOrder["PRICE"])
-	 *         CSaleOrder::PayOrder($arOrder["ID"], "Y", False, False);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.withdraw.php
-	 * @author Bitrix
-	 */
+	* <p>Метод снимает указанную сумму с внутреннего счета пользователя. Если на внутреннем счете не достаточно средств, то снимается максимально доступная сумма (т.е. все доступные средства).</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param double $paySum  Снимаемая сумма.
+	*
+	*
+	*
+	* @param string $payCurrency  Валюта снимаемой суммы.
+	*
+	*
+	*
+	* @param  $int  Код заказа, если снятие денег относится к заказу.
+	*
+	*
+	*
+	* @param orderI $D = 0] 
+	*
+	*
+	*
+	* @return double <p>Метод возвращает реально снятую со счета сумму или <i>false</i> в
+	* случае ошибки.</p> <h4> Замечание</h4><p>Деньги снимаются только со
+	* счета той же валюты, которая передается параметром в метод. Счета
+	* пользователя в другой валюте не затрагиваются.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Оплатим полностью или хотя бы частично заказ номер 21 со счета пользователя
+	* 
+	* $arOrder = CSaleOrder::GetByID(21);
+	* 
+	* $withdrawSum = CSaleUserAccount::Withdraw(
+	*         $arOrder["USER_ID"],
+	*         $arOrder["PRICE"],
+	*         $arOrder["CURRENCY"],
+	*         $arOrder["ID"]
+	*     );
+	* 
+	* if ($withdrawSum &gt; 0)
+	* {
+	*     $arFields = array(
+	*             "SUM_PAID" =&gt; $withdrawSum,
+	*             "USER_ID" =&gt; $arOrder["USER_ID"]
+	*         );
+	*     CSaleOrder::Update($arOrder["ID"], $arFields);
+	* 
+	*     if ($withdrawSum == $arOrder["PRICE"])
+	*         CSaleOrder::PayOrder($arOrder["ID"], "Y", False, False);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.withdraw.php
+	* @author Bitrix
+	*/
 	public static function Withdraw($userID, $paySum, $payCurrency, $orderID = 0)
 	{
 		global $DB;
@@ -686,89 +703,92 @@ class CAllSaleUserAccount
 	// Return True on success or False in other way
 	
 	/**
-	 * <p>Метод изменяет сумму на счете пользователя с кодом userID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param double $sum  Величина изменения суммы на счете. Для увеличения суммы на счете
-	 * величина должна быть со знаком "+" или без знака, а для уменьшения -
-	 * со знаком "-". 
-	 *
-	 *
-	 *
-	 * @param string $currency  Валюта суммы.
-	 *
-	 *
-	 *
-	 * @param  $string  Описание причины изменения суммы.
-	 *
-	 *
-	 *
-	 * @param descriptio $n = ""[ Код заказа, если изменение суммы относится к заказу.
-	 *
-	 *
-	 *
-	 * @param int $orderID = 0[ Произвольное текстовое описание.
-	 *
-	 *
-	 *
-	 * @param string $notes = ""]]] 
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает код пользовательского счета или <i>false</i> в
-	 * случае ошибки.</p><h4> Замечание</h4><p>Деньги снимаются только со
-	 * счета той же валюты, которая передается параметром в метод. Счета
-	 * пользователя в другой валюте не затрагиваются.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Напишем функцию обратного вызова, которая будет вызываться при изменении
-	 * // флага "Доставка разрешена" заказа и добавлять (или снимать) 100 USD на счет
-	 * 
-	 * function MyDeliveryOrderCallback($productID, $userID, $bPaid, $orderID)
-	 * {
-	 *     global $DB;
-	 * 
-	 *     // Обработаем входные параметры
-	 *     $productID = IntVal($productID);    // Код заказанного товара
-	 *     $userID = IntVal($userID);  // Код пользователя-покупателя
-	 *     $bPaid = ($bPaid ? True : False);   // Устанавливается или снимается флаг доставки
-	 *     $orderID = IntVal($orderID);    // Код заказа
-	 * 
-	 *     if ($userID &lt;= 0)
-	 *         return False;
-	 * 
-	 *     if ($orderID &lt;= 0)
-	 *         return False;
-	 * 
-	 *     // Внесем (снимем) деньги на счет
-	 *     if (!CSaleUserAccount::UpdateAccount(
-	 *             $userID,
-	 *             ($bPaid ? 100 : -100),
-	 *             "USD",
-	 *             "MANUAL",
-	 *             $orderID
-	 *         ))
-	 *         return False;
-	 * 
-	 *     return True;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.updateaccount.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет сумму на счете пользователя с кодом userID.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param double $sum  Величина изменения суммы на счете. Для увеличения суммы на счете
+	* величина должна быть со знаком "+" или без знака, а для уменьшения -
+	* со знаком "-". 
+	*
+	*
+	*
+	* @param string $currency  Валюта суммы.
+	*
+	*
+	*
+	* @param  $string  Описание причины изменения суммы.
+	*
+	*
+	*
+	* @param descriptio $n = ""[ Код заказа, если изменение суммы относится к заказу.
+	*
+	*
+	*
+	* @param int $orderID = 0[ Произвольное текстовое описание.
+	*
+	*
+	*
+	* @param string $notes = ""]]] 
+	*
+	*
+	*
+	* @return int <p>Метод возвращает код пользовательского счета или <i>false</i> в
+	* случае ошибки.</p> <h4>Замечания</h4></bod<p>Деньги снимаются только со
+	* счета той же валюты, которая передается параметром в метод. Счета
+	* пользователя в другой валюте не затрагиваются.</p> <p>Если счета в
+	* данной валюте раньше у пользователя не было, то он автоматически
+	* создастся (и будет возвращен код созданного счета).</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Напишем функцию обратного вызова, которая будет вызываться при изменении
+	* // флага "Доставка разрешена" заказа и добавлять (или снимать) 100 USD на счет
+	* 
+	* function MyDeliveryOrderCallback($productID, $userID, $bPaid, $orderID)
+	* {
+	*     global $DB;
+	* 
+	*     // Обработаем входные параметры
+	*     $productID = IntVal($productID);    // Код заказанного товара
+	*     $userID = IntVal($userID);  // Код пользователя-покупателя
+	*     $bPaid = ($bPaid ? True : False);   // Устанавливается или снимается флаг доставки
+	*     $orderID = IntVal($orderID);    // Код заказа
+	* 
+	*     if ($userID &lt;= 0)
+	*         return False;
+	* 
+	*     if ($orderID &lt;= 0)
+	*         return False;
+	* 
+	*     // Внесем (снимем) деньги на счет
+	*     if (!CSaleUserAccount::UpdateAccount(
+	*             $userID,
+	*             ($bPaid ? 100 : -100),
+	*             "USD",
+	*             "MANUAL",
+	*             $orderID
+	*         ))
+	*         return False;
+	* 
+	*     return True;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleuseraccount/csaleuseraccount.updateaccount.php
+	* @author Bitrix
+	*/
 	public static function UpdateAccount($userID, $sum, $currency, $description = "", $orderID = 0, $notes = "")
 	{
 		global $DB;

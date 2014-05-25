@@ -66,42 +66,99 @@ class CSocNetLogRestService extends IRestService
 
 	public static function createGroup($arFields)
 	{
-		if (!is_set($arFields, "SITE_ID") || strlen($arFields["SITE_ID"]) <= 0)
-			$arFields["SITE_ID"] = array(SITE_ID);
+		if (!is_array($arFields))
+		{
+			throw new Exception('Incorrect input data');
+		}
 
-		if (!is_set($arFields, "SUBJECT_ID") || intval($arFields["SUBJECT_ID"]) <= 0)
+		foreach($arFields as $key => $value)
+		{
+			if (
+				substr($key, 0, 1) == "~"
+				|| substr($key, 0, 1) == "="
+			)
+			{
+				unset($arFields[$key]);
+			}
+		}
+
+		if (isset($arFields["IMAGE_ID"]))
+		{
+			unset($arFields["IMAGE_ID"]);
+		}
+
+		if (
+			!is_set($arFields, "SITE_ID") 
+			|| strlen($arFields["SITE_ID"]) <= 0
+		)
+		{
+			$arFields["SITE_ID"] = array(SITE_ID);
+		}
+
+		if (
+			!is_set($arFields, "SUBJECT_ID") 
+			|| intval($arFields["SUBJECT_ID"]) <= 0
+		)
 		{
 			$rsSubject = CSocNetGroupSubject::GetList(
 				array("SORT" => "ASC"),
-				array("SITE_ID" => SITE_ID),
+				array("SITE_ID" => $arFields["SITE_ID"]),
 				false,
 				false,
 				array("ID")
 			);
 			if ($arSubject = $rsSubject->Fetch())
+			{
 				$arFields["SUBJECT_ID"] = $arSubject["ID"];
+			}
 		}
 
 		$groupID = CSocNetGroup::CreateGroup($GLOBALS["USER"]->GetID(), $arFields, false);
 
 		if($groupID <= 0)
+		{
 			throw new Exception('Cannot create group');
+		}
 
 		return $groupID;
 	}
 
 	public static function updateGroup($arFields)
 	{
+		foreach($arFields as $key => $value)
+		{
+			if (
+				substr($key, 0, 1) == "~"
+				|| substr($key, 0, 1) == "="
+			)
+			{
+				unset($arFields[$key]);
+			}
+		}
+
+		if (isset($arFields["IMAGE_ID"]))
+		{
+			unset($arFields["IMAGE_ID"]);
+		}
+
 		$groupID = $arFields['GROUP_ID'];
 		unset($arFields['GROUP_ID']);
 
 		if(intval($groupID) <= 0)
+		{
 			throw new Exception('Wrong group ID');
+		}
 
-		$dbRes = CSocNetGroup::GetList(array(), array(
-			"ID" => $groupID,
-			"CHECK_PERMISSIONS" => "Y"
-		));
+		$arFilter = array(
+			"ID" => $groupID
+		);
+
+		if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
+		{
+			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+		}
+
+		$dbRes = CSocNetGroup::GetList(array(), $arFilter);
 		$arGroup = $dbRes->Fetch();
 		if(is_array($arGroup))
 		{
@@ -112,15 +169,21 @@ class CSocNetLogRestService extends IRestService
 			{
 				$res = CSocNetGroup::Update($arGroup["ID"], $arFields, false);
 				if(intval($res) <= 0)
+				{
 					throw new Exception('Cannot update group');
+				}
 			}
 			else
+			{
 				throw new Exception('User has no permissions to update group');
+			}
 
 			return $res;
 		}
 		else
+		{
 			throw new Exception('Socialnetwork group not found');
+		}
 
 		return false;
 	}
@@ -132,10 +195,16 @@ class CSocNetLogRestService extends IRestService
 		if(intval($groupID) <= 0)
 			throw new Exception('Wrong group ID');
 
-		$dbRes = CSocNetGroup::GetList(array(), array(
-			"ID" => $groupID,
-			"CHECK_PERMISSIONS" => "Y"
-		));
+		$arFilter = array(
+			"ID" => $groupID
+		);
+
+		if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
+		{
+			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+		}
+
+		$dbRes = CSocNetGroup::GetList(array(), $arFilter);
 		$arGroup = $dbRes->Fetch();
 		if(is_array($arGroup))
 		{
@@ -160,10 +229,23 @@ class CSocNetLogRestService extends IRestService
 	{
 		$arOrder = $arFields['ORDER'];
 		if(!is_array($arOrder))
+		{
 			$arOrder = array("ID" => "DESC");
+		}
+		
+		if ($arFields['IS_ADMIN'] == 'Y')
+		{
+			if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
+			{
+				unset($arFields['IS_ADMIN']);
+			}
+		}
 
 		$arFilter = self::checkGroupFilter($arFields['FILTER']);
-		$arFilter['CHECK_PERMISSIONS'] = 'Y';
+		if ($arFields['IS_ADMIN'] != 'Y')
+		{
+			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+		}
 
 		$result = array();
 		$dbRes = CSocNetGroup::GetList($arOrder, $arFilter, false, self::getNavData($n));
@@ -178,10 +260,27 @@ class CSocNetLogRestService extends IRestService
 				$arRes['IMAGE'] = self::getFile($arRes['IMAGE_ID']);
 			}
 
+			if (
+				CModule::IncludeModule("extranet")
+				&& ($extranet_site_id = CExtranet::GetExtranetSiteID())
+			)
+			{
+				$arRes["IS_EXTRANET"] = "N";
+				$rsGroupSite = CSocNetGroup::GetSite($arRes["ID"]);
+				while ($arGroupSite = $rsGroupSite->Fetch())
+				{
+					if ($arGroupSite["LID"] == $extranet_site_id)
+					{
+						$arRes["IS_EXTRANET"] = "Y";
+						break;
+					}
+				}
+			}
+
 			unset($arRes['INITIATE_PERMS']);
 			unset($arRes['SPAM_PERMS']);
 			unset($arRes['IMAGE_ID']);
-
+			
 			$result[] = $arRes;
 		}
 
@@ -194,10 +293,16 @@ class CSocNetLogRestService extends IRestService
 
 		if($GROUP_ID > 0)
 		{
-			$dbRes = CSocNetGroup::GetList(array(), array(
-				'ID' => $GROUP_ID,
-				'CHECK_PERMISSIONS' => 'Y'
-			));
+			$arFilter = array(
+				"ID" => $GROUP_ID
+			);
+
+			if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
+			{
+				$arFilter['CHECK_PERMISSIONS'] = 'Y';
+			}
+
+			$dbRes = CSocNetGroup::GetList(array(), $arFilter);
 			$arGroup = $dbRes->Fetch();
 			if(is_array($arGroup))
 			{

@@ -34,63 +34,64 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Конструктор класса CCoursePackage инициализирует экспортируемый курс.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $COURSE_ID  Идентификатор курса.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $package = new CCoursePackage($COURSE_ID);
-	 * 
-	 *         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
-	 *         {
-	 *             echo "Error: ".$package-&gt;LAST_ERROR;
-	 *         }
-	 *         else
-	 *         {
-	 *             $success = $package-&gt;CreatePackage($PACKAGE_DIR = "/upload/mypackage/");
-	 * 
-	 *             if (!$success)
-	 *                 echo "Error: ".$package-&gt;LAST_ERROR;
-	 *             else
-	 *                 echo "Ok!";
-	 *         }
-	 * 
-	 *     }
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php
-	 * @author Bitrix
-	 */
+	* <p>Конструктор класса CCoursePackage инициализирует экспортируемый курс.</p>
+	*
+	*
+	*
+	*
+	* @param int $COURSE_ID  Идентификатор курса.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $package = new CCoursePackage($COURSE_ID);
+	* 
+	*         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
+	*         {
+	*             echo "Error: ".$package-&gt;LAST_ERROR;
+	*         }
+	*         else
+	*         {
+	*             $success = $package-&gt;CreatePackage($PACKAGE_DIR = "/upload/mypackage/");
+	* 
+	*             if (!$success)
+	*                 echo "Error: ".$package-&gt;LAST_ERROR;
+	*             else
+	*                 echo "Ok!";
+	*         }
+	* 
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php
+	* @author Bitrix
+	*/
 	public function CCoursePackage($COURSE_ID)
 	{
 		global $DB;
@@ -165,65 +166,67 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Создает архив с учебным курсом.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $PACKAGE_DIR  5.1.2
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если создание архива прошло успешно.
-	 * При возникновении ошибки метод вернет false, а в свойстве объекта
-	 * LAST_ERROR будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $package = new CCoursePackage($COURSE_ID);
-	 * 
-	 *         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
-	 *         {
-	 *             echo "Error: ".$package-&gt;LAST_ERROR;
-	 *         }
-	 *         else
-	 *         {
-	 *             $success = $package-&gt;CreatePackage($PACKAGE_DIR = "/upload/mypackage/");
-	 * 
-	 *             if (!$success)
-	 *                 echo "Error: ".$package-&gt;LAST_ERROR;
-	 *             else
-	 *                 echo "Ok!";
-	 *         }
-	 * 
-	 *     }
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php
-	 * @author Bitrix
-	 */
+	* <p>Создает архив с учебным курсом.</p>
+	*
+	*
+	*
+	*
+	* @param int $PACKAGE_DIR  Путь (относительно корня сайта) к директории, куда будет
+	* скопирован архив курса.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если создание архива прошло успешно.
+	* При возникновении ошибки метод вернет false, а в свойстве объекта
+	* LAST_ERROR будет содержаться текст ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $package = new CCoursePackage($COURSE_ID);
+	* 
+	*         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
+	*         {
+	*             echo "Error: ".$package-&gt;LAST_ERROR;
+	*         }
+	*         else
+	*         {
+	*             $success = $package-&gt;CreatePackage($PACKAGE_DIR = "/upload/mypackage/");
+	* 
+	*             if (!$success)
+	*                 echo "Error: ".$package-&gt;LAST_ERROR;
+	*             else
+	*                 echo "Ok!";
+	*         }
+	* 
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php
+	* @author Bitrix
+	*/
 	public function CreatePackage($PACKAGE_DIR)
 	{
 		if (strlen($this->LAST_ERROR)>0)
@@ -283,55 +286,56 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает манифест (в xml-формате) архива учебного курса.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string <p>Метод возвращает строку - содержимое файла imsmanifest.xml архива
-	 * учебного курса.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $package = new CCoursePackage($COURSE_ID);
-	 * 
-	 *         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
-	 *         {
-	 *             echo "Error: ".$package-&gt;LAST_ERROR;
-	 *         }
-	 *         else
-	 *         {
-	 *             echo htmlspecialchars($package-&gt;CreateManifest());
-	 *         }
-	 * 
-	 *     }
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает манифест (в xml-формате) архива учебного курса.</p>
+	*
+	*
+	*
+	*
+	* @return string <p>Метод возвращает строку - содержимое файла imsmanifest.xml архива
+	* учебного курса.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $package = new CCoursePackage($COURSE_ID);
+	* 
+	*         if (strlen($package-&gt;LAST_ERROR) &gt; 0)
+	*         {
+	*             echo "Error: ".$package-&gt;LAST_ERROR;
+	*         }
+	*         else
+	*         {
+	*             echo htmlspecialchars($package-&gt;CreateManifest());
+	*         }
+	* 
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createpackage.php">CreatePackage</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php
+	* @author Bitrix
+	*/
 	public function CreateManifest()
 	{
 		if (strlen($this->LAST_ERROR)>0)

@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Main\Diag;
 
-use \Bitrix\Main;
+use Bitrix\Main;
 
 class ExceptionHandler
 {

@@ -218,10 +218,14 @@ class CBitrixCloudCDN
 		if (isset($_GET["nocdn"]))
 			return;
 
+		$appCache = \Bitrix\Main\Data\AppCacheManifest::getInstance();
+		if ($appCache->isEnabled())
+			return;
+
 		self::$proto = CMain::IsHTTPS() ? "https" : "http";
 		self::$config = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
 
-		//if (self::$config->isExpired()
+		if (self::$config->isExpired())
 		{
 			if(!self::updateConfig())
 				return;
@@ -235,7 +239,7 @@ class CBitrixCloudCDN
 		if (!isset($sites[$siteId]))
 			return;
 
-		self::$ajax = preg_match("/<head>/i", substr($content, 0, 512)) === 0;
+		self::$ajax = preg_match("/<head>/i", substr($content, 0, 1024)) === 0;
 
 		$arPrefixes = array_map(array(
 			"CBitrixCloudCDN",
@@ -257,8 +261,11 @@ class CBitrixCloudCDN
 					|src=
 					|BX\\.loadCSS\\(
 					|BX\\.loadScript\\(
+					|BX\\.getCDNPath\\(
 					|jsUtils\\.loadJSFile\\(
 					|background\\s*:\\s*url\\(
+					|image\\s*:\\s*url\\(
+					|'SRC':
 				))                                                   #attribute
 				(\"|')                                               #open_quote
 				(".$prefix_regex.")                                  #prefix

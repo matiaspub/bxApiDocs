@@ -133,16 +133,17 @@ class CSecurityRedirect
 					$url = htmlspecialcharsbx($url);
 					$html_url = '<nobr><a href="'.$url.'">'.$url.'</a></nobr>';
 					$html_mess = str_replace("#URL#", $html_url, $html_mess);
+					header('X-Frame-Options: DENY');
 		?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?echo $charset?>" />
 <meta http-equiv="Refresh" content="<?=$timeout?>; URL=<?=$url?>">
+<meta name="robots" content="none" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />
 </head>
 <body>
-<script>if(document.location!=top.location)top.location=document.location;</script>
 
 <div class="error-404">
 <table class="error-404" border="0" cellpadding="0" cellspacing="0" align="center">

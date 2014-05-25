@@ -143,6 +143,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 
 				if($obRequest->status == 204 || $obRequest->status == 200)
 				{
+					$arStorage = array();
 					if(preg_match("#^http://(.*?)(|:\d+)(/.*)\$#", $obRequest->headers["X-Storage-Url"], $arStorage))
 					{
 						$result = $obRequest->headers;
@@ -377,7 +378,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			'',
 			false,
 			array(
-				"X-Copy-From" => CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").$arFile["SUBDIR"]."/".$arFile["FILE_NAME"], "UTF-8"),
+				"X-Copy-From" => CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").($arFile["SUBDIR"]? $arFile["SUBDIR"]."/": "").$arFile["FILE_NAME"], "UTF-8"),
 			)
 		);
 
@@ -605,6 +606,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 	public function UploadPart($arBucket, &$NS, $data)
 	{
 		$filePath = $NS["fileTemp"]."/".sprintf("%06d", $NS["partsCount"]+1);
+		$filePath = CCloudUtil::URLEncode($filePath, "UTF-8");
 
 		$obRequest = $this->SendRequest(
 			$arBucket["SETTINGS"],
@@ -629,17 +631,18 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 	public function CompleteMultipartUpload($arBucket, &$NS)
 	{
 		global $APPLICATION;
+		$filePath = CCloudUtil::URLEncode($NS["fileTemp"], "UTF-8");
 
 		$obRequest = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			"PUT",
 			$arBucket["BUCKET"],
-			$NS["fileTemp"],
+			$filePath,
 			"",
 			false,
 			array(
 				"Content-Type" => $NS["Content-Type"],
-				"X-Object-Manifest" => $arBucket["BUCKET"].$NS["fileTemp"]."/",
+				"X-Object-Manifest" => $arBucket["BUCKET"].$filePath."/",
 			)
 		);
 
@@ -654,7 +657,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 				false,
 				array(
 					"Content-Type" => $NS["Content-Type"],
-					"X-Copy-From" => "/".$arBucket["BUCKET"].$NS["fileTemp"],
+					"X-Copy-From" => "/".$arBucket["BUCKET"].$filePath,
 				)
 			);
 

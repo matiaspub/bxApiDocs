@@ -401,9 +401,10 @@ class QueryChain
 
 		if ($with_alias)
 		{
-			global $DB;
+			$connection = \Bitrix\Main\Application::getConnection();
+			$helper = $connection->getSqlHelper();
 
-			$sql_def .= ' AS ' . $DB->escL . $this->getAlias() . $DB->escR;
+			$sql_def .= ' AS ' . $helper->quote($this->getAlias());
 		}
 
 		return $sql_def;

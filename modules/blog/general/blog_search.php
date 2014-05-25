@@ -1,5 +1,6 @@
 <?
-class CBlogSearch {
+class CBlogSearch 
+{
 	public static function OnSearchReindex($NS=Array(), $oCallback=NULL, $callback_method="")
 	{
 		global $DB;
@@ -424,8 +425,8 @@ class CBlogSearch {
 						if(empty($arF["SC_PERM"]))
 							$arF["SC_PERM"] = CBlogPost::GetSocNetPermsCode($ar["ID"]);
 						$Result["PERMISSIONS"] = $arF["SC_PERM"];
-						if(!in_array("U".$ar["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
-							$arSearchIndex["PERMISSIONS"][] = "U".$ar["AUTHOR_ID"];
+						if(!in_array("U".$ar["AUTHOR_ID"], $Result["PERMISSIONS"]))
+							$Result["PERMISSIONS"][] = "U".$ar["AUTHOR_ID"];
 
 						if(is_array($arF["SC_PERM"]))
 						{
@@ -464,7 +465,7 @@ class CBlogSearch {
 								"MODULE_ID" => "blog",
 								"CALLBACK_FUNC" => false,
 								"SOURCE_ID" => $ar["ID"],
-								"ENABLE_COMMENTS" => "N",
+								"ENABLE_COMMENTS" => "Y",
 								"ENTITY_TYPE" => SONET_ENTITY_USER,
 								"ENTITY_ID" => $ar["AUTHOR_ID"],
 								"USER_ID" => $ar["AUTHOR_ID"],

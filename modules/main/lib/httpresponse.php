@@ -1,16 +1,21 @@
 <?php
 namespace Bitrix\Main;
 
-use Bitrix\Main\Config\Configuration;
-use Bitrix\Main\Web\Cookie;
+use Bitrix\Main\Config;
+use Bitrix\Main\Web;
 
 class HttpResponse
 	extends Response
 {
+	/**
+	 * @var \Bitrix\Main\Web\Cookie[]
+	 */
 	private $cookies = array();
-	private $headers = array();
 
-	//private $contextType;
+	/**
+	 * @var array
+	 */
+	private $headers = array();
 
 	public function addHeader($name, $value = '')
 	{
@@ -28,7 +33,7 @@ class HttpResponse
 			$this->headers[] = array($name, $value);
 	}
 
-	public function addCookie(Cookie $cookie)
+	public function addCookie(Web\Cookie $cookie)
 	{
 		$this->cookies[] = $cookie;
 	}
@@ -45,7 +50,7 @@ class HttpResponse
 		foreach ($this->cookies as $cookie)
 		{
 			/** @var $cookie \Bitrix\Main\Web\Cookie */
-			if ($cookie->getSpread() & Cookie::SPREAD_SITES)
+			if ($cookie->getSpread() & Web\Cookie::SPREAD_SITES)
 				$storedCookies[$cookie->getName()] = array("V" => $cookie->getValue(), "T" => $cookie->getExpires(), "F" => $cookie->getPath(), "D" => $cookie->getDomain(), "S" => $cookie->getSecure(), "H" => $cookie->getHttpOnly());
 		}
 
@@ -93,9 +98,9 @@ class HttpResponse
 			header($header);
 	}
 
-	protected function setCookie(Cookie $cookie)
+	protected function setCookie(Web\Cookie $cookie)
 	{
-		if ($cookie->getSpread() & Cookie::SPREAD_DOMAIN)
+		if ($cookie->getSpread() & Web\Cookie::SPREAD_DOMAIN)
 		{
 			setcookie(
 				$cookie->getName(),
@@ -111,7 +116,7 @@ class HttpResponse
 
 	public function setStatus($status)
 	{
-		$httpStatus = Configuration::getValue("http_status");
+		$httpStatus = Config\Configuration::getValue("http_status");
 
 		$cgiMode = (stristr(php_sapi_name(), "cgi") !== false);
 		if ($cgiMode && (($httpStatus == null) || ($httpStatus == false)))

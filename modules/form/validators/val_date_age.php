@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorDateAge
@@ -16,7 +15,7 @@ class CFormValidatorDateAge
 			"HANDLER" => array("CFormValidatorDateAge", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -25,7 +24,7 @@ class CFormValidatorDateAge
 				"TYPE" => "TEXT",
 				"DEFAULT" => "18",
 			),
-			
+
 			"AGE_TO" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_VAL_DATE_AGE_SETTINGS_DATE_TO"),
 				"TYPE" => "TEXT",
@@ -33,12 +32,12 @@ class CFormValidatorDateAge
 			),
 		);
 	}
-	
+
 		public static function ToDB($arParams)
 	{
 		$arParams["AGE_FROM"] = intval($arParams["AGE_FROM"]);
 		$arParams["AGE_TO"] = intval($arParams["AGE_TO"]);
-		
+
 		if ($arParams["AGE_FROM"] > $arParams["AGE_TO"])
 		{
 			$tmp = $arParams["AGE_FROM"];
@@ -48,20 +47,20 @@ class CFormValidatorDateAge
 
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
+
 		foreach ($arValues as $value)
 		{
 			if (strlen($value) <= 0) continue;
-			
+
 			// prepare check numbers
 			$arValueCheck = ParseDateTime($value);
 			$valueCheckSum = $arValueCheck["YYYY"] + $arValueCheck["MM"]/12 + $arValueCheck["DD"]/365;
@@ -73,7 +72,7 @@ class CFormValidatorDateAge
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_DATE_AGE_ERROR_MORE"));
 				return false;
 			}
-			
+
 			// check minimum age
 			if (strlen($arParams["AGE_FROM"]) > 0 && $valueCheckSum > $currentCheckSum-$arParams["AGE_FROM"])
 			{
@@ -81,7 +80,7 @@ class CFormValidatorDateAge
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

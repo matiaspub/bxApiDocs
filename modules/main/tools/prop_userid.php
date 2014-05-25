@@ -6,13 +6,14 @@ class CIBlockPropertyUserID
 	public static function GetUserTypeDescription()
 	{
 		return array(
-			"PROPERTY_TYPE"		=>"S",
-			"USER_TYPE"		=>"UserID",
-			"DESCRIPTION"		=> GetMessage("IBLOCK_PROP_USERID_DESC"),
-			"GetAdminListViewHTML"	=>array("CIBlockPropertyUserID","GetAdminListViewHTML"),
-			"GetPropertyFieldHtml"	=>array("CIBlockPropertyUserID","GetPropertyFieldHtml"),
-			"ConvertToDB"		=>array("CIBlockPropertyUserID","ConvertToDB"),
-			"ConvertFromDB"		=>array("CIBlockPropertyUserID","ConvertFromDB"),
+			"PROPERTY_TYPE" => "S",
+			"USER_TYPE" => "UserID",
+			"DESCRIPTION" => GetMessage("IBLOCK_PROP_USERID_DESC"),
+			"GetAdminListViewHTML" => array("CIBlockPropertyUserID","GetAdminListViewHTML"),
+			"GetPropertyFieldHtml" => array("CIBlockPropertyUserID","GetPropertyFieldHtml"),
+			"ConvertToDB" => array("CIBlockPropertyUserID","ConvertToDB"),
+			"ConvertFromDB" => array("CIBlockPropertyUserID","ConvertFromDB"),
+			"GetSettingsHTML" => array("CIBlockPropertyUserID","GetSettingsHTML"),
 		);
 	}
 
@@ -106,7 +107,6 @@ class CIBlockPropertyUserID
 	//DB form of the value
 	public static function ConvertToDB($arProperty, $value)
 	{
-/*		?><pre><b>ConvertToDB:</b><?print_r($value)?></pre><?*/
 		$value["VALUE"] = intval($value["VALUE"]);
 		if($value["VALUE"] <= 0)
 			$value["VALUE"] = "";
@@ -115,11 +115,18 @@ class CIBlockPropertyUserID
 
 	public static function ConvertFromDB($arProperty, $value)
 	{
-/*		?><pre><b>ConvertFromDB:</b><?print_r($value)?></pre><?*/
 		$value["VALUE"] = intval($value["VALUE"]);
 		if($value["VALUE"] <= 0)
 			$value["VALUE"] = "";
 		return $value;
+	}
+
+	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	{
+		$arPropertyFields = array(
+			"HIDE" => array("WITH_DESCRIPTION"),
+		);
+		return '';
 	}
 }
 
@@ -147,7 +154,7 @@ function FindUserIDNew($tag_name, $tag_value, $user_name="", $form_name = "form1
 function Ch".$tag_name_x."()
 {
 	var DV_".$tag_name_x.";
-	DV_".$tag_name_x." = BX(\"div_".$tag_name_escaped."\");
+	DV_".$tag_name_x." = document.getElementById(\"div_".$tag_name_escaped."\");
 	if (!!DV_".$tag_name_x.")
 	{
 		if (

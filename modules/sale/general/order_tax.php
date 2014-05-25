@@ -79,33 +79,33 @@ class CAllSaleOrderTax
 
 	
 	/**
-	 * <p>Функция изменяет сумму налога с кодом ID на основании массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код суммы налога.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров записи, ключами в котором
-	 * являются названия параметров, а значениями - соответствующие
-	 * значения.<br> Допустимые ключи:<ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li>
-	 * <b>TAX_NAME</b> - название налога;</li> <li> <b>VALUE</b> - величина налога;</li> <li>
-	 * <b>VALUE_MONEY</b> - общая сумма этого налога;</li> <li> <b>APPLY_ORDER</b> - порядок
-	 * применения;</li> <li> <b>CODE</b> - мнемонический код налога;</li> <li>
-	 * <b>IS_PERCENT</b> - должно быть значение "Y";</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N)
-	 * входит ли налог уже в цену товара.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененной суммы налога или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__update.7e4a73a5.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет сумму налога с кодом ID на основании массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код суммы налога.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров записи, ключами в котором
+	* являются названия параметров, а значениями - соответствующие
+	* значения.<br> Допустимые ключи:<ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li>
+	* <b>TAX_NAME</b> - название налога;</li> <li> <b>VALUE</b> - величина налога;</li> <li>
+	* <b>VALUE_MONEY</b> - общая сумма этого налога;</li> <li> <b>APPLY_ORDER</b> - порядок
+	* применения;</li> <li> <b>CODE</b> - мнемонический код налога;</li> <li>
+	* <b>IS_PERCENT</b> - должно быть значение "Y";</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N)
+	* входит ли налог уже в цену товара.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененной суммы налога или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__update.7e4a73a5.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -124,22 +124,22 @@ class CAllSaleOrderTax
 
 	
 	/**
-	 * <p>Функция удаляет сумму налога с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код суммы налога.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__delete.ae826565.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет сумму налога с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код суммы налога.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__delete.ae826565.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -149,22 +149,22 @@ class CAllSaleOrderTax
 
 	
 	/**
-	 * <p>Функция удаляет все суммы налогов для заказа с кодом ORDER_ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ORDER_ID  Код заказа.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__deleteex.b5025ef6.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет все суммы налогов для заказа с кодом ORDER_ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ORDER_ID  Код заказа.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__deleteex.b5025ef6.php
+	* @author Bitrix
+	*/
 	public static function DeleteEx($ORDER_ID)
 	{
 		global $DB;
@@ -174,28 +174,28 @@ class CAllSaleOrderTax
 
 	
 	/**
-	 * <p>Функция возвращает параметры суммы налогов с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код суммы налогов.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код суммы
-	 * налогов.</td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>TAX_NAME</td>
-	 * <td>Название налога.</td> </tr> <tr> <td>VALUE</td> <td>Ставка налога.</td> </tr> <tr>
-	 * <td>VALUE_MONEY</td> <td>Сумма налога.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок
-	 * применения.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr>
-	 * <td>IS_IN_PRICE</td> <td>Флаг (Y/N) включен ли налог в цену товара.</td> </tr> <tr>
-	 * <td>IS_PERCENT</td> <td>Y</td> </tr> </table><p>  </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__getbyid.122460db.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры суммы налогов с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код суммы налогов. </ht
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код суммы
+	* налогов.</td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>TAX_NAME</td>
+	* <td>Название налога.</td> </tr> <tr> <td>VALUE</td> <td>Ставка налога.</td> </tr> <tr>
+	* <td>VALUE_MONEY</td> <td>Сумма налога.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок
+	* применения.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr>
+	* <td>IS_IN_PRICE</td> <td>Флаг (Y/N) включен ли налог в цену товара.</td> </tr> <tr>
+	* <td>IS_PERCENT</td> <td>Y</td> </tr> </table> <p>  </p
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__getbyid.122460db.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -219,66 +219,66 @@ class CAllSaleOrderTax
 	// the second argument ($ arTaxList [] ["TAX_VAL"]) returns the value of the tax for that price
 	
 	/**
-	 * <p>Функция вычисляет общую сумму налогов на товар стоимостью Price. Налоги задаются в массиве arTaxList.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param float $Price  Стоимость товара.
-	 *
-	 *
-	 *
-	 * @param array &$arTaxList  Массив налогов, представляет собой массив ассоциативных
-	 * массивов вида: <pre class="syntax"> array("APPLY_ORDER"=&gt;порядок_применения,
-	 * "VALUE"=&gt;величина_налога_в_процентах,
-	 * "IS_IN_PRICE"=&gt;"налог_входит_в_цену_Y/N")</pre>
-	 *
-	 *
-	 *
-	 * @param string $DefCurrency  Базовая валюта для заказа.
-	 *
-	 *
-	 *
-	 * @return float <p>Возвращается общая сумма налогов на товар. Кроме того в массиве
-	 * arTaxList создаётся дополнительный ключ TAX_VAL, который содержит
-	 * величину данного налога на товар. </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Заполним массив активных налогов для текущего сайта, типа плательщика с кодом 2 и местоположения для начисления налогов с кодом 48
-	 * $arTaxList = array();
-	 * 
-	 * $arTaxFilter = array(
-	 *    "LID" =&gt; SITE_ID,
-	 *    "PERSON_TYPE_ID" =&gt; 2,
-	 *    "ACTIVE" =&gt; "Y",
-	 *    "LOCATION" =&gt; 48
-	 * );
-	 * $db_tax_rate_tmp = CSaleTaxRate::GetList(array("APPLY_ORDER"=&gt;"ASC"), $arTaxFilter);
-	 * while ($ar_tax_rate_tmp = $db_tax_rate_tmp-&gt;Fetch())
-	 * {
-	 *    $arTaxList[] = $ar_tax_rate_tmp;
-	 * }
-	 * 
-	 * // Вычислим величину налогов на товар стоимостью 38.95
-	 * $TAX_PRICE_tmp = CSaleOrderTax::CountTaxes(38.95, $arTaxList, "RUR");
-	 * 
-	 * echo "Общая величина налогов: ".$TAX_PRICE_tmp."&lt;br&gt;";
-	 * echo "в том числе ";
-	 * for ($i = 0; $i&lt;count($arTaxList); $i++)
-	 * {
-	 *    echo $arTaxList[$di]["NAME"]." - ".$arTaxList[$di]["TAX_VAL"]."&lt;br&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__counttaxes.29643259.php
-	 * @author Bitrix
-	 */
+	* <p>Функция вычисляет общую сумму налогов на товар стоимостью Price. Налоги задаются в массиве arTaxList.</p>
+	*
+	*
+	*
+	*
+	* @param float $Price  Стоимость товара. </htm
+	*
+	*
+	*
+	* @param array &$arTaxList  Массив налогов, представляет собой массив ассоциативных
+	* массивов вида: <pre class="syntax"> array("APPLY_ORDER"=&gt;порядок_применения,
+	* "VALUE"=&gt;величина_налога_в_процентах,
+	* "IS_IN_PRICE"=&gt;"налог_входит_в_цену_Y/N")</pre>
+	*
+	*
+	*
+	* @param string $DefCurrency  Базовая валюта для заказа.
+	*
+	*
+	*
+	* @return float <p>Возвращается общая сумма налогов на товар. Кроме того в массиве
+	* arTaxList создаётся дополнительный ключ TAX_VAL, который содержит
+	* величину данного налога на товар. </p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Заполним массив активных налогов для текущего сайта, типа плательщика с кодом 2 и местоположения для начисления налогов с кодом 48
+	* $arTaxList = array();
+	* 
+	* $arTaxFilter = array(
+	*    "LID" =&gt; SITE_ID,
+	*    "PERSON_TYPE_ID" =&gt; 2,
+	*    "ACTIVE" =&gt; "Y",
+	*    "LOCATION" =&gt; 48
+	* );
+	* $db_tax_rate_tmp = CSaleTaxRate::GetList(array("APPLY_ORDER"=&gt;"ASC"), $arTaxFilter);
+	* while ($ar_tax_rate_tmp = $db_tax_rate_tmp-&gt;Fetch())
+	* {
+	*    $arTaxList[] = $ar_tax_rate_tmp;
+	* }
+	* 
+	* // Вычислим величину налогов на товар стоимостью 38.95
+	* $TAX_PRICE_tmp = CSaleOrderTax::CountTaxes(38.95, $arTaxList, "RUR");
+	* 
+	* echo "Общая величина налогов: ".$TAX_PRICE_tmp."&lt;br&gt;";
+	* echo "в том числе ";
+	* for ($i = 0; $i&lt;count($arTaxList); $i++)
+	* {
+	*    echo $arTaxList[$di]["NAME"]." - ".$arTaxList[$di]["TAX_VAL"]."&lt;br&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleordertax/csaleordertax__counttaxes.29643259.php
+	* @author Bitrix
+	*/
 	public static function CountTaxes($Price, &$arTaxList, $DefCurrency)
 	{
 		//1. Untwist stack tax included in the price for the determination of the initial price

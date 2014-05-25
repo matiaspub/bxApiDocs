@@ -35,7 +35,7 @@ function GetVoteDiagramList()
  *
  *
  *
- * @param int $VOTE_ID  ID опроса.
+ * @param int $VOTE_ID  ID опроса.</bo
  *
  *
  *
@@ -153,6 +153,8 @@ function GetVoteDiagramList()
  * 	}
  * }
  * ?&gt;
+ * 
+ * 
  * 
  * &lt;?
  * // получаем данные по опросу
@@ -318,7 +320,8 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
  *
  *
  *
- * @param  $lid  ID сайта. По умолчанию - текущий - константа "LANG".
+ * @param  $lid  ID сайта. По умолчанию - текущий - константа "LANG". Необязательный
+ * параметр.
  *
  *
  *
@@ -326,8 +329,9 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
  * пользователя:<li>0 - доступ закрыт</li> <li>1 - право на просмотр
  * результатов опроса</li> <li>2 - право на участие в опросе<br>По
  * умолчанию access = 1, т.е. для того чтобы функция GetCurrentVote возвратила ID
- * текущего опроса группы у пользователя на данную группу должно
- * быть, как минимум, право на просмотр результатов.</li>
+ * текущего опроса группы, у пользователя на данную группу должно
+ * быть, как минимум, право на просмотр результатов. Необязательный
+ * параметр.</li>
  *
  *
  *
@@ -379,11 +383,12 @@ function GetCurrentVote($GROUP_SID, $site_id=SITE_ID, $access=1)
  *
  *
  * @param  $level  Уровень предыдущего опроса (1 - предыдущий, 2 - пред- предыдущий и
- * т.д.). По умолчанию - 1.
+ * т.д.). По умолчанию - 1. Необязательный параметр.
  *
  *
  *
- * @param  $lid  ID сайта. По умолчанию - текущий.
+ * @param  $lid  ID сайта. По умолчанию - текущий (константа LANG). Необязательный
+ * параметр.
  *
  *
  *
@@ -440,12 +445,12 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  *
  *
  * @param  $GROUP_SYMBOLIC_NAME  Символическое имя группы опросов (по умолчанию функция вернет
- * выборку опросов из всех групп).
+ * выборку опросов из всех групп). Необязательный параметр.
  *
  *
  *
- * @param  $strSqlOrder  SQL код содержащий параметры сортировки для выборки. По умолчанию:
- * "ORDER BY C.C_SORT, C.ID, V.DATE_START desc"
+ * @param  $strSqlOrder  SQL код, содержащий параметры сортировки для выборки.
+ * Необязательный параметр. По умолчанию: "ORDER BY C.C_SORT, C.ID, V.DATE_START desc"
  *
  *
  *
@@ -469,6 +474,94 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  * }
  * require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog.php");
  * ?&gt;
+ * 
+ * 
+ * 
+ * &lt;?
+ * 
+ * // вывод всех активных опросов на текущем сайте, отсортированных в следующем порядке: по индексу сортировки канала, ID канала, индексу сортировки опроса, времени начала опроса. Активный опрос в
+ * // данном контексте - это опрос, у которого атрибут ACTIVE установлен в Y, а время начала голосования меньше текущего.
+ * 
+ * require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+ * $APPLICATION-&gt;SetTitle("Результаты опроса");
+ * $APPLICATION-&gt;AddChainItem("Архив опросов", "vote_list.php");
+ * require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_after.php");
+ * 
+ * if (CModule::IncludeModule("vote"))
+ * {
+ *    $db_res = GetVoteList("");
+ *    if (!!$db_res)
+ *    {
+ *       if (!empty($arResult["NAV_STRING"]))
+ *       {
+ *          ?&gt;;&lt;div class="vote-navigation-box vote-navigation-top"&gt;
+ *             &lt;div class="vote-page-navigation"&gt;
+ *                &lt;?=$arResult["NAV_STRING"]?&gt;
+ *             &lt;/div&gt;&lt;div class="vote-clear-float"&gt;&lt;/div&gt;
+ *          &lt;/div&gt;&lt;?
+ *       }
+ * 
+ *       ?&gt;&lt;ol class="vote-items-list voting-list-box"&gt;&lt;?
+ *       while ($arVote = $db_res-&gt;Fetch()) {
+ *       ?&gt;&lt;li class="vote-item-vote &lt;?
+ *          ?&gt;&lt;?=($arVote["LAMP"]=="green" ? "vote-item-vote-active " : ($arVote["LAMP"]=="red" ? "vote-item-vote-disable " : ""))?&gt;"&gt;
+ *          &lt;div class="vote-item-header"&gt;&lt;?
+ *             if (!empty($arVote["TITLE"])) { ?&gt;&lt;span class="vote-item-title"&gt;&lt;?=$arVote["TITLE"];?&gt;&lt;/span&gt;&lt;? }?&gt;
+ *             &lt;div class="vote-clear-float"&gt;&lt;/div&gt;
+ *          &lt;/div&gt;
+ *          &lt;?
+ *          $arDateBlocks = array();
+ *          if (!!$arVote["DATE_START"])
+ *             $arDateBlocks[] = '&lt;span class="vote-item-date-start"&gt;'.FormatDate($DB-&gt;DateFormatToPHP(CSite::GetDateFormat('FULL')), MakeTimeStamp($arVote["DATE_START"])).'&lt;/span&gt;';
+ *          if (!!$arVote["DATE_END"] &amp;&amp; $arVote["DATE_END"] != "31.12.2030 23:59:59")
+ *             $arDateBlocks[] = '&lt;span class="vote-item-date-end"&gt;'.FormatDate($DB-&gt;DateFormatToPHP(CSite::GetDateFormat('FULL')), MakeTimeStamp($arVote["DATE_END"])).'&lt;/span&gt;';
+ *          if (!empty($arDateBlocks)) {
+ *             ?&gt;&lt;div class="vote-item-date"&gt;=implode('vspan class="vote-item-date-sep"&gt; - &lt;/span&gt;', $arDateBlocks)?&gt;&lt;/div&gt;&lt;?
+ *          }
+ *          if ($arVote["COUNTER"] &gt; 0){
+ *             ?&amp;qt;&lt;div class="vote-item-counter"&gt;&lt;span&gt;Голосов:&lt;/span&gt; &lt;?=$arVote["COUNTER"]?&gt;&lt;/div&gt;&lt;?
+ *          }
+ * 
+ *          if (!empty($arVote["IMAGE"]) || !empty($arVote["DESCRIPTION"])):
+ *          ?&gt;
+ *          &lt;div class="vote-item-footer"&gt;
+ *             &lt;?if (!empty($arVote["IMAGE"])):?&gt;
+ *             &lt;div class="vote-item-image"&gt;
+ *                &lt;img src="=$arVote["IMAGE"]["SRC"]?&gt;" width="&lt;?=$arVote["IMAGE"]["WIDTH"]?&gt;" height="&lt;?=$arVote["IMAGE"]["HEIGHT"]?&gt;" border="0" /&gt;
+ *             &lt;/div&gt;
+ *             &lt;?endif;
+ *             if (!empty($arVote["DESCRIPTION"])):?&gt;
+ *             &lt;div class="vote-item-description"&gt;&lt;?=$arVote["DESCRIPTION"];?&gt;&lt;/div&gt;
+ *             &lt;?endif?&gt;
+ *             &lt;div class="vote-clear-float"&gt;&lt;/div&gt;
+ *          &lt;/div&gt;
+ *          &lt;?
+ *          endif;
+ *          ?&gt;
+ *       
+ *       &lt;?
+ *       }
+ *    ?&gt;&lt;?
+ *    }
+ * 
+ * }
+ * ?&gt;&lt;style&gt;
+ *    ol.vote-items-list, ol.vote-items-list li {
+ *       margin: 0; padding: 0; border: none; font-size: 100%; list-style-type: none;}
+ *    ol.vote-items-list li {
+ *       padding: 0.55em;
+ *       border: 1px solid #ccc;
+ *       border-top: none;}
+ *    ol.vote-items-list li:first-child { border-top: 1px solid #ccc; }
+ *    .vote-item-title { font-weight:bold; }
+ *    div.vote-item-date { font-style: italic; }
+ *    div.vote-item-header { margin-bottom: 0.5em; }
+ *    div.vote-item-footer { margin-top: 0.5em; }
+ *    div.vote-item-image { float:left; padding-right:0.55em; }
+ *    div.vote-clear-float { clear: both; }
+ * &lt;/style&gt;&lt;?
+ * require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog.php");
+ * ?&gt;
  * </pre>
  *
  *
@@ -476,24 +569,27 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  * @link http://dev.1c-bitrix.ru/api_help/vote/function/getvotelist.php
  * @author Bitrix
  */
-function GetVoteList($GROUP_SID = "", $strSqlOrder = "ORDER BY C.C_SORT, C.ID, V.C_SORT, V.DATE_START desc", $site_id = SITE_ID)
+function GetVoteList($GROUP_SID = "", $params = array(), $site_id = SITE_ID)
 {
-	$arFilter["SITE"] = $site_id;
-	if (is_array($GROUP_SID) && !empty($GROUP_SID)):
+	$strSqlOrder = (is_string($params) ? $params : "ORDER BY C.C_SORT, C.ID, V.C_SORT, V.DATE_START desc");
+	$params = (is_array($params) ? $params : array());
+	if (array_key_exists("order", $params))
+		$strSqlOrder = $params["order"];
+	$arFilter["SITE"] = (array_key_exists("SITE_ID", $params)  ? $params["SITE_ID"] : $site_id);
+
+	if (is_array($GROUP_SID) && !empty($GROUP_SID))
+	{
 		$arr = array();
-		foreach ($GROUP_SID as $v):
-			$v = trim($v);
-			if (strlen($v) > 0):
+		foreach ($GROUP_SID as $v) {
+			if (!empty($v))
 				$arr[] = $v;
-			endif;
-		endforeach;
-		if (!empty($arr)):
+		}
+		if (!empty($arr))
 			$arFilter["CHANNEL"] = $arr;
-		endif;
-	elseif (strlen($GROUP_SID) > 0):
+	} elseif (!empty($GROUP_SID)) {
 		$arFilter["CHANNEL"] = $GROUP_SID;
-	endif;
-	$z = CVote::GetPublicList($arFilter, $strSqlOrder);
+	}
+	$z = CVote::GetPublicList($arFilter, $strSqlOrder, $params);
 	return $z;
 }
 
@@ -524,7 +620,8 @@ function IsUserVoted($PUBLIC_VOTE_ID)
  *
  *
  *
- * @param li $d  Сайт группы опросов.
+ * @param li $d  Сайт группы опросов. По умолчанию - текущий (константа LANG).
+ * Необязательный параметр.
  *
  *
  *
@@ -637,9 +734,10 @@ function GetTemplateList($type="SV", $path="xxx")
 
 function arrAnswersSort(&$arr, $order="desc")
 {
-	for ($key1=0; $key1<count($arr); $key1++)
+	$count = count($arr);
+	for ($key1=0; $key1<$count; $key1++)
 	{
-		for ($key2=0; $key2<count($arr); $key2++)
+		for ($key2=0; $key2<$count; $key2++)
 		{
 			$sort1 = intval($arr[$key1]["COUNTER"]);
 			$sort2 = intval($arr[$key2]["COUNTER"]);
@@ -677,7 +775,8 @@ function arrAnswersSort(&$arr, $order="desc")
  *
  *
  *
- * @param  $lid  ID сайта. По умолчанию - текущий.
+ * @param  $lid  ID сайта. Необязательный параметр. По умолчанию - текущий
+ * (константа LANG).
  *
  *
  *
@@ -740,12 +839,13 @@ function ShowCurrentVoteResults($GROUP_SID, $site_id=SITE_ID)
  *
  *
  *
- * @param VOTE_I $D  ID опроса.
+ * @param VOTE_I $D  ID опроса.</bo
  *
  *
  *
  * @param  $template  Имя файла - шаблона для показа опроса. По умолчанию будет
- * использован шаблон заданный в параметрах опроса.
+ * использован шаблон, заданный в параметрах опроса. Необязательный
+ * параметр.
  *
  *
  *
@@ -850,12 +950,13 @@ function ShowVote($VOTE_ID, $template1="")
  *
  *
  *
- * @param VOTE_I $D  ID опроса.
+ * @param VOTE_I $D  ID опроса.</bo
  *
  *
  *
  * @param  $template  Имя файла - шаблона для показа результатов опроса. По умолчанию
- * будет использован шаблон заданный в параметрах опроса.
+ * будет использован шаблон, заданный в параметрах опроса.
+ * Необязательный параметр.
  *
  *
  *

@@ -133,7 +133,13 @@ class CSocNetForumComments
 				$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
 
 			$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
-			CSocNetLog::CounterIncrement($comment_id, false, false, "LC");
+			CSocNetLog::CounterIncrement(
+				$comment_id, 
+				false, 
+				false, 
+				"LC",
+				CSocNetLogRights::CheckForUserAll($log_id)
+			);
 		}
 
 		foreach (GetModuleEvents("socialnetwork", "onAfterCommentAddAfter", true) as $arModuleEvent)
@@ -271,7 +277,13 @@ class CSocNetForumComments
 								$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
 
 							$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
-							CSocNetLog::CounterIncrement($comment_id, false, false, "LC");
+							CSocNetLog::CounterIncrement(
+								$comment_id, 
+								false, 
+								false, 
+								"LC",
+								CSocNetLogRights::CheckForUserAll($log_id)
+							);
 						}
 					}
 				}

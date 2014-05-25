@@ -273,45 +273,47 @@ class CWikiSecurity
 
 	
 	/**
-	 * <p>Метод обрабатывает содержимое Wiki-страницы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string &$str  Содержимое Wiki-страницы
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>
-	 * $IBLOCK_ID = 2;
-	 * $NAME = 'Тестовая страница';
-	 * $arFilter = array(
-	 * 	'ACTIVE' =&gt; 'Y',
-	 * 	'CHECK_PERMISSIONS' =&gt; 'N',
-	 * 	'IBLOCK_ID' =&gt; $IBLOCK_ID
-	 * );
-	 * $arElement = CWiki::GetElementByName($NAME, $arFilter);
-	 * 
-	 * $CWikiSecurity = new CWikiSecurity ();
-	 * $CWikiSecurity-&gt;clear($arElement['~DETAIL_TEXT']);
-	 * echo $arElement['~DETAIL_TEXT'];<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/Parse.php">CWikiParser::Parse</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php
-	 * @author Bitrix
-	 */
+	* <p>Метод обрабатывает содержимое Wiki-страницы.</p>
+	*
+	*
+	*
+	*
+	* @param string &$str  Содержимое Wiki-страницы
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>
+	* $IBLOCK_ID = 2;
+	* $NAME = 'Тестовая страница';
+	* $arFilter = array(
+	* 	'ACTIVE' =&gt; 'Y',
+	* 	'CHECK_PERMISSIONS' =&gt; 'N',
+	* 	'IBLOCK_ID' =&gt; $IBLOCK_ID
+	* );
+	* $arElement = CWiki::GetElementByName($NAME, $arFilter);
+	* 
+	* $CWikiSecurity = new CWikiSecurity ();
+	* $CWikiSecurity-&gt;clear($arElement['~DETAIL_TEXT']);
+	* echo $arElement['~DETAIL_TEXT'];<br>?&gt;
+	* </htm
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php">CWikiParser::Parse</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php
+	* @author Bitrix
+	*/
 	public function clear(&$str)
 	{
 	    return $this->_dostr($str);

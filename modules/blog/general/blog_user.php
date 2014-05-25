@@ -260,8 +260,6 @@ class CAllBlogUser
 
 		if ($bSuccess)
 		{
-			$DB->StartTransaction();
-
 			if ($action == BLOG_CHANGE)
 				$DB->Query(
 					"DELETE FROM b_blog_user2user_group ".
@@ -302,8 +300,6 @@ class CAllBlogUser
 					}
 				}
 			}
-
-			$DB->Commit();
 
 			unset($GLOBALS["BLOG_USER"]["BLOG_USER2GROUP_CACHE_".$arUser["ID"]]);
 			unset($GLOBALS["BLOG_USER"]["BLOG_USER2GROUP1_CACHE_".$arUser["USER_ID"]]);
@@ -454,7 +450,7 @@ class CAllBlogUser
 		else
 		{
 			$arGroups = array(1);
-			if (isset($GLOBALS["USER"]) && $GLOBALS["USER"]->IsAuthorized())
+			if (isset($GLOBALS["USER"]) && is_object($GLOBALS["USER"]) && $GLOBALS["USER"]->IsAuthorized())
 				$arGroups[] = 2;
 
 			if ($ID > 0 && strlen($blogID) > 0)

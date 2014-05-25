@@ -29,10 +29,22 @@ class String
 		return htmlspecialchars_decode($string, $flags);
 	}
 
-	public static function strlenBytes($str)
+	public static function getBinaryLength($str)
 	{
 		return function_exists('mb_strlen') ? mb_strlen($str, 'latin1') : strlen($str);
 	}
 
-
+	public static function getBinarySubstring($str, $start)
+	{
+		if(function_exists('mb_substr'))
+		{
+			$length = (func_num_args() > 2? func_get_arg(2) : self::getBinaryLength($str));
+			return mb_substr($str, $start, $length, 'latin1');
+		}
+		if(func_num_args() > 2)
+		{
+			return substr($str, $start, func_get_arg(2));
+		}
+		return substr($str, $start);
+	}
 }

@@ -31,6 +31,24 @@ class CCatalogDocs
 		if(!$res)
 			return false;
 		$lastId = intval($DB->LastID());
+		if(isset($arFields["ELEMENT"]) && is_array($arFields["ELEMENT"]))
+		{
+			foreach($arFields["ELEMENT"] as $arElement)
+			{
+				$lastDocElementId = 0;
+				if(isset($arElement["ID"]))
+					unset($arElement["ID"]);
+				$arElement["DOC_ID"] = $lastId;
+				if(is_array($arElement))
+					$lastDocElementId = CCatalogStoreDocsElement::add($arElement);
+				if(isset($arElement["BARCODE"]) && $lastDocElementId)
+				{
+					if(is_array($arElement["BARCODE"]))
+						foreach($arElement["BARCODE"] as $barcode)
+							CCatalogStoreDocsBarcode::add(array("DOC_ELEMENT_ID" => $lastDocElementId, "BARCODE" => $barcode));
+				}
+			}
+		}
 		return $lastId;
 	}
 
@@ -38,7 +56,7 @@ class CCatalogDocs
 	{
 		global $DB;
 		if (empty($arSelectFields))
-			$arSelectFields = array("ID", "DOC_TYPE", "SITE_ID", "CONTRACTOR_ID", "CURRENCY", "STATUS", "DATE_DOCUMENT", "TOTAL", "DATE_STATUS");
+			$arSelectFields = array("ID", "DOC_TYPE", "SITE_ID", "CONTRACTOR_ID", "CURRENCY", "STATUS", "DATE_DOCUMENT", "TOTAL", "DATE_STATUS", "COMMENTARY");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "CD.ID", "TYPE" => "int"),
@@ -55,6 +73,7 @@ class CCatalogDocs
 			"STATUS_BY" => array("FIELD" => "CD.STATUS_BY", "TYPE" => "int"),
 			"STATUS" => array("FIELD" => "CD.STATUS", "TYPE" => "string"),
 			"TOTAL" => array("FIELD" => "CD.TOTAL", "TYPE" => "double"),
+			"COMMENTARY" => array("FIELD" => "CD.COMMENTARY", "TYPE" => "string"),
 
 			"PRODUCTS_ID" => array("FIELD" => "DE.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_docs_element DE ON (CD.ID = DE.DOC_ID)"),
 			"PRODUCTS_DOC_ID" => array("FIELD" => "DE.DOC_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_docs_element DE ON (CD.ID = DE.DOC_ID)"),

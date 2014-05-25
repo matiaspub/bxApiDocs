@@ -15,14 +15,14 @@ class CSocNetLogRights
 		{
 			$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetLogRightsAdd");
 			while ($arEvent = $db_events->Fetch())
-				if (ExecuteModuleEventEx($arEvent, array($LOG_ID, &$GROUP_CODE))===false)
+				if (ExecuteModuleEventEx($arEvent, array($LOG_ID, $GROUP_CODE))===false)
 					return false;
 
 			$NEW_RIGHT_ID = $DB->Add("b_sonet_log_right", array(
 				"LOG_ID" => $LOG_ID,
 				"GROUP_CODE" => $GROUP_CODE,
 			));
-			
+
 			if (preg_match('/^U(\d+)$/', $GROUP_CODE, $matches))
 				CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
 
@@ -72,6 +72,12 @@ class CSocNetLogRights
 
 		$LOG_ID = intval($LOG_ID);
 		$DB->Query("DELETE FROM b_sonet_log_right WHERE LOG_ID = ".$LOG_ID);
+
+		$db_events = GetModuleEvents("socialnetwork", "OnSocNetLogRightsDelete");
+		while ($arEvent = $db_events->Fetch())
+		{
+			ExecuteModuleEventEx($arEvent, array($LOG_ID));
+		}
 	}
 
 	public static function GetList($aSort=array(), $aFilter=array())
@@ -242,8 +248,8 @@ class CSocNetLogRights
 //			(CSocNetUser::IsUserModuleAdmin($userID, $siteID) ? " OR SLR.GROUP_CODE = 'SA'" : "").
 			(intval($userID) > 0 ? " OR (SLR.GROUP_CODE = 'AU')" : "").
 			" OR (SLR.GROUP_CODE = 'G2')".
-			(intval($userID) > 0 ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".$userID.")" : "")."
-			WHERE SLR.LOG_ID = ".$logID;
+			(intval($userID) > 0 ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).")" : "")."
+			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
@@ -255,8 +261,12 @@ class CSocNetLogRights
 	public static function CheckForUserAll($logID)
 	{
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
-			INNER JOIN b_user_access UA ON 0=1 OR (SLR.GROUP_CODE = 'AU') OR (SLR.GROUP_CODE = 'G2') 
-			WHERE SLR.LOG_ID = ".$logID;
+			WHERE 
+			SLR.LOG_ID = ".intval($logID)." 
+			AND (
+				(SLR.GROUP_CODE = 'AU') 
+				OR (SLR.GROUP_CODE = 'G2')
+			)";
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
@@ -274,7 +284,7 @@ class CSocNetLogRights
 			return false;
 
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
-			INNER JOIN b_user_access UA ON 0=1 OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".$userID.") 
+			INNER JOIN b_user_access UA ON 0=1 OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).") 
 			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);

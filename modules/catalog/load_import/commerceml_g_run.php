@@ -2,26 +2,26 @@
 //<title>CommerceML MySql Fast - BETA VERS</title>
 set_time_limit(0);
 
-// define("CML_DEBUG", False);
-// define("CML_MEMORY_DEBUG", False);
+// define("CML_DEBUG", false);
+// define("CML_MEMORY_DEBUG", false);
 // define("CML_DEBUG_FILE_NAME", "/__cml_time_mark.dat");
 
 // define("CML_GROUP_OPERATION_CNT", 100);
-// define("CML_CLEAR_TEMP_TABLES", False);
-// define("CML_DELETE_COMMENTS", False);
+// define("CML_CLEAR_TEMP_TABLES", false);
+// define("CML_DELETE_COMMENTS", false);
 
-// define("CML_KEEP_EXISTING_PROPERTIES", True);
-// define("CML_KEEP_EXISTING_DATA", False);
-// define("CML_ACTIVATE_FILE_DATA", True);
+// define("CML_KEEP_EXISTING_PROPERTIES", true);
+// define("CML_KEEP_EXISTING_DATA", false);
+// define("CML_ACTIVATE_FILE_DATA", true);
 
-//// define("CML_USE_SYSTEM_DELETE", False);
+//// define("CML_USE_SYSTEM_DELETE", false);
 
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/import_setup_templ.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/import_setup_templ.php');
 $startImportExecTime = getmicrotime();
 
 global $USER, $DB, $APPLICATION;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -90,33 +90,45 @@ function cmlStartElement($parser, $name, $attrs)
 			if (in_array($nameUTF["Description"], array_keys($attrs)))
 				$currentCatalog["Description"] = $attrs[$nameUTF["Description"]];
 
+			$boolVersion = true;
 			$dbIBlockList = CIBlock::GetList(
 					array(),
 					array("=TYPE" => $IBLOCK_TYPE_ID, "=XML_ID" => $currentCatalog["ID"], 'MIN_PERMISSION' => 'W')
 				);
 			if ($arIBlock = $dbIBlockList->Fetch())
 			{
-				$bUpdate = True;
-				$currentCatalog["BID"] = $arIBlock["ID"];
-				$res = $oIBlock->Update(
+				$arIBlock['VERSION'] = intval($arIBlock['VERSION']);
+				if (1 != $arIBlock['VERSION'])
+				{
+					$bUpdate = true;
+					$boolVersion = false;
+					$res = false;
+				}
+				else
+				{
+					$bUpdate = true;
+					$currentCatalog["BID"] = $arIBlock["ID"];
+					$res = $oIBlock->Update(
 						$currentCatalog["BID"],
 						array(
-								"NAME" => $currentCatalog["Name"],
-								"DESCRIPTION" => $currentCatalog["Description"]
-							)
+							"NAME" => $currentCatalog["Name"],
+							"DESCRIPTION" => $currentCatalog["Description"]
+						)
 					);
+				}
 			}
 			elseif ($USER->IsAdmin())
 			{
-				$bUpdate = False;
+				$bUpdate = false;
 				$arFields = Array(
-						"ACTIVE" => "Y",
-						"NAME" => $currentCatalog["Name"],
-						"XML_ID" => $currentCatalog["ID"],
-						"IBLOCK_TYPE_ID" => $IBLOCK_TYPE_ID,
-						"LID" => $SITE_ID,
-						"WORKFLOW" => "N",
-					);
+					"ACTIVE" => "Y",
+					"NAME" => $currentCatalog["Name"],
+					"XML_ID" => $currentCatalog["ID"],
+					"IBLOCK_TYPE_ID" => $IBLOCK_TYPE_ID,
+					"LID" => $SITE_ID,
+					"WORKFLOW" => "N",
+					"VERSION" => 1
+				);
 				if ('Y' == $USE_TRANSLIT && 'Y' == $ADD_TRANSLIT)
 				{
 					$arFields['FIELDS'] = array(
@@ -142,7 +154,15 @@ function cmlStartElement($parser, $name, $attrs)
 
 			if (!$res)
 			{
-				$strImportErrorMessage .= str_replace("#ERROR#", $oIBlock->LAST_ERROR, str_replace("#NAME#", "[".$currentCatalog["BID"]."] \"".$currentCatalog["Name"]."\" (".$currentCatalog["ID"].")", str_replace("#ACT#", ($bUpdate ? GetMessage("CML_R_EDIT") : GetMessage("CML_R_ADD")), GetMessage("CML_R_IBLOCK")))).".<br>";
+				$strImportErrorMessage .= str_replace(
+					"#ERROR#",
+					($boolVersion ? $oIBlock->LAST_ERROR : GetMessage('CML_R_VERSION')),
+					str_replace(
+						"#NAME#",
+						"[".$currentCatalog["BID"]."] \"".$currentCatalog["Name"]."\" (".$currentCatalog["ID"].")",
+						str_replace("#ACT#", ($bUpdate ? GetMessage("CML_R_EDIT") : GetMessage("CML_R_ADD")), GetMessage("CML_R_IBLOCK"))
+					)
+				).".<br>";
 				$currentCatalog = false;
 			}
 			else
@@ -406,9 +426,22 @@ function cmlStartElement($parser, $name, $attrs)
 
 			break;
 
+		case $nameUTF['CommerceInfo']:
+			if (isset($attrs[$nameUTF['CommerceInfoVersion']]))
+			{
+				$strVersion = (string)$attrs[$nameUTF['CommerceInfoVersion']];
+				if (version_compare($strVersion, '2.0') >= 0)
+				{
+					$strImportErrorMessage .= GetMessage("CICML_INVALID_VERSION")."<br>";
+				}
+				$currentCatalog = false;
+				return false;
+			}
+			break;
 		default:
 			break;
 	}
+	return true;
 }
 
 function cmlEndElement($parser, $name)
@@ -719,29 +752,29 @@ if (strlen($strImportErrorMessage) <= 0)
 
 	if ($keepExistingProperties != "Y" && $keepExistingProperties != "N")
 		$keepExistingProperties = COption::GetOptionString("catalog", "keep_existing_properties", (CML_KEEP_EXISTING_PROPERTIES ? "Y" : "N"));
-	$bKeepExistingProperties = (($keepExistingProperties == "Y") ? True : False);
+	$bKeepExistingProperties = (($keepExistingProperties == "Y") ? true : false);
 
 	if ($keepExistingData != "Y" && $keepExistingData != "N")
 		$keepExistingData = COption::GetOptionString("catalog", "keep_existing_data", (CML_KEEP_EXISTING_DATA ? "Y" : "N"));
-//	$bKeepExistingData = (($keepExistingData == "Y") ? True : False);
+//	$bKeepExistingData = (($keepExistingData == "Y") ? true : false);
 
 	if ($activateFileData != "Y" && $activateFileData != "N")
 		$activateFileData = COption::GetOptionString("catalog", "activate_file_data", (CML_ACTIVATE_FILE_DATA ? "Y" : "N"));
-	$bActivateFileData = (($activateFileData == "Y") ? True : False);
+	$bActivateFileData = (($activateFileData == "Y") ? true : false);
 
 	if ($deleteComments != "Y" && $deleteComments != "N")
 		$deleteComments = (CML_DELETE_COMMENTS ? "Y" : "N");
-	$bDeleteComments = (($deleteComments == "Y") ? True : False);
+	$bDeleteComments = (($deleteComments == "Y") ? true : false);
 
 	global $bCmlDebug;
 	if ($cmlDebug != "Y" && $cmlDebug != "N")
 		$cmlDebug = (CML_DEBUG ? "Y" : "N");
-	$bCmlDebug = (($cmlDebug == "Y") ? True : False);
+	$bCmlDebug = (($cmlDebug == "Y") ? true : false);
 
 	global $bCmlMemoryDebug;
 	if ($cmlMemoryDebug != "Y" && $cmlMemoryDebug != "N")
 		$cmlMemoryDebug = (CML_MEMORY_DEBUG ? "Y" : "N");
-	$bCmlMemoryDebug = (($cmlMemoryDebug == "Y") ? True : False);
+	$bCmlMemoryDebug = (($cmlMemoryDebug == "Y") ? true : false);
 
 	global $arCMLCurrencies;
 	$arCMLCurrencies = array();
@@ -876,10 +909,11 @@ if (strlen($strImportErrorMessage) <= 0)
 				$bAmp = false;
 
 			preg_match_all("/(\\S+)\\s*=\\s*[\"](.*?)[\"]/s".BX_UTF_PCRE_MODIFIER, $at, $attrs_tmp);
-			$attrs = Array();
-			for ($i=0; $i<count($attrs_tmp[1]); $i++)
+			$attrs = array();
+			for ($i=0, $intCount = count($attrs_tmp[1]); $i<$intCount; $i++)
 				$attrs[$attrs_tmp[1][$i]] = ($bAmp ? preg_replace($search, $replace, $attrs_tmp[2][$i]) : $attrs_tmp[2][$i]);
-			cmlStartElement(false, $name, $attrs);
+			if (!cmlStartElement(false, $name, $attrs))
+				break;
 			if(substr($tag_cont, -1) === "/")
 				cmlEndElement(false, $name);
 		}
@@ -887,17 +921,17 @@ if (strlen($strImportErrorMessage) <= 0)
 
 	$xmlData = "";
 	__SetTimeMark("Parse");
+}
 
-
+if (strlen($strImportErrorMessage) <= 0)
+{
 	// If there are catalogs in CommerceML data file
 	if ($iBlockIDString != "0")
 	{
 		/***************************** PROPERTIES *******************************************/
 		// Collect properties temp table
-		$strSql =
-			"INSERT INTO b_catalog_cml_tmp(ID, XML_ID, CATALOG_ID) ".
-			"SELECT IF(P.ID IS NULL, 0, P.ID), X.XML_ID, X.CATALOG_ID ".
-			"FROM b_catalog_cml_property X ".
+		$strSql = "INSERT INTO b_catalog_cml_tmp(ID, XML_ID, CATALOG_ID) ".
+			"SELECT IF(P.ID IS NULL, 0, P.ID), X.XML_ID, X.CATALOG_ID  FROM b_catalog_cml_property X ".
 			"	LEFT JOIN b_iblock_property P ON (P.XML_ID = X.XML_ID AND P.IBLOCK_ID = X.CATALOG_ID) ";
 		$DB->Query($strSql);
 
@@ -986,8 +1020,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		// Collect sections temp table
 		$strSql =
 			"INSERT INTO b_catalog_cml_tmp(ID, XML_ID, CATALOG_ID) ".
-			"SELECT IF(S.ID IS NULL, 0, S.ID), X.XML_ID, X.CATALOG_ID ".
-			"FROM b_catalog_cml_section X ".
+			"SELECT IF(S.ID IS NULL, 0, S.ID), X.XML_ID, X.CATALOG_ID FROM b_catalog_cml_section X ".
 			"	LEFT JOIN b_iblock_section S ON (S.XML_ID = X.XML_ID AND X.CATALOG_ID = S.IBLOCK_ID) ";
 		$DB->Query($strSql);
 
@@ -999,12 +1032,10 @@ if (strlen($strImportErrorMessage) <= 0)
 			$arPropsCache = array();
 
 			$strSql =
-				"SELECT S.ID, S.IBLOCK_ID ".
-				"FROM b_iblock_section S1 ".
+				"SELECT S.ID, S.IBLOCK_ID FROM b_iblock_section S1 ".
 				"	INNER JOIN b_iblock_section S ON (S1.IBLOCK_ID = S.IBLOCK_ID AND S.LEFT_MARGIN >= S1.LEFT_MARGIN AND S.RIGHT_MARGIN <= S1.RIGHT_MARGIN) ".
 				"	LEFT JOIN b_catalog_cml_tmp T ON (S1.ID = T.ID) ".
-				"WHERE S1.IBLOCK_ID IN (".$iBlockIDString.") ".
-				"	AND T.ID IS NULL ";
+				"WHERE S1.IBLOCK_ID IN (".$iBlockIDString.") AND T.ID IS NULL";
 			$dbRes = $DB->Query($strSql);
 			while ($arRes = $dbRes->Fetch())
 			{
@@ -1015,10 +1046,7 @@ if (strlen($strImportErrorMessage) <= 0)
 				{
 					$arPropsCache[$arRes["IBLOCK_ID"]] = "0";
 					$strSql =
-						"SELECT ID ".
-						"FROM b_iblock_property ".
-						"WHERE LINK_IBLOCK_ID = ".$arRes["IBLOCK_ID"]." ".
-						"	AND PROPERTY_TYPE = 'G' ";
+						"SELECT ID FROM b_iblock_property WHERE LINK_IBLOCK_ID = ".$arRes["IBLOCK_ID"]." AND PROPERTY_TYPE = 'G'";
 					$dbRes1 = $DB->Query($strSql);
 					while ($arRes1 = $dbRes1->Fetch())
 					{
@@ -1028,31 +1056,19 @@ if (strlen($strImportErrorMessage) <= 0)
 
 				if ($num > CML_GROUP_OPERATION_CNT)
 				{
-					$strSql =
-						"DELETE FROM b_catalog_discount2section ".
-						"WHERE SECTION_ID IN (".$sectionIDs.") ";
+					$strSql = "DELETE FROM b_catalog_discount2section WHERE SECTION_ID IN (".$sectionIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"UPDATE b_iblock_element SET ".
-						"	IBLOCK_SECTION_ID = NULL ".
-						"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+					$strSql = "UPDATE b_iblock_element SET IBLOCK_SECTION_ID = NULL WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_iblock_section_element ".
-						"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+					$strSql = "DELETE FROM b_iblock_section_element WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"UPDATE b_iblock_section SET ".
-						"	IBLOCK_SECTION_ID = NULL ".
-						"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+					$strSql = "UPDATE b_iblock_section SET IBLOCK_SECTION_ID = NULL WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_iblock_section ".
-						"WHERE ID IN (".$sectionIDs.") ";
+					$strSql = "DELETE FROM b_iblock_section WHERE ID IN (".$sectionIDs.")";
 					$DB->Query($strSql);
 
 					$num = 0;
@@ -1061,46 +1077,29 @@ if (strlen($strImportErrorMessage) <= 0)
 
 				if ($arPropsCache[$arRes["IBLOCK_ID"]] != "0")
 				{
-					$strSql =
-						"DELETE FROM b_iblock_element_property ".
-						"WHERE VALUE_NUM  = ".$arRes["ID"]." ".
-						"	AND IBLOCK_PROPERTY_ID IN (".$arPropsCache[$arRes["IBLOCK_ID"]].") ";
+					$strSql = "DELETE FROM b_iblock_element_property WHERE VALUE_NUM  = ".$arRes["ID"]." AND IBLOCK_PROPERTY_ID IN (".$arPropsCache[$arRes["IBLOCK_ID"]].")";
 					$DB->Query($strSql);
 				}
 			}
 
 			if ($num > 0)
 			{
-				$strSql =
-					"DELETE FROM b_catalog_discount2section ".
-					"WHERE SECTION_ID IN (".$sectionIDs.") ";
+				$strSql = "DELETE FROM b_catalog_discount2section WHERE SECTION_ID IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"UPDATE b_iblock_element SET ".
-					"	IBLOCK_SECTION_ID = NULL ".
-					"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+				$strSql = "UPDATE b_iblock_element SET IBLOCK_SECTION_ID = NULL WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_iblock_section_element ".
-					"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+				$strSql = "DELETE FROM b_iblock_section_element WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"UPDATE b_iblock_section SET ".
-					"	IBLOCK_SECTION_ID = NULL ".
-					"WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.") ";
+				$strSql = "UPDATE b_iblock_section SET IBLOCK_SECTION_ID = NULL WHERE IBLOCK_SECTION_ID IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_iblock_section ".
-					"WHERE ID IN (".$sectionIDs.") ";
+				$strSql = "DELETE FROM b_iblock_section WHERE ID IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_iblock_element_property ".
-					"WHERE VALUE_NUM IN (".$sectionIDs.") ";
+				$strSql = "DELETE FROM b_iblock_element_property WHERE VALUE_NUM IN (".$sectionIDs.")";
 				$DB->Query($strSql);
 			}
 		}
@@ -1110,9 +1109,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		}
 
 		// Update sections
-		$strSql =
-			"SELECT T.ID, X.NAME, X.PARENT_XML_ID, X.CODE ".
-			"FROM b_catalog_cml_tmp T ".
+		$strSql = "SELECT T.ID, X.NAME, X.PARENT_XML_ID, X.CODE FROM b_catalog_cml_tmp T ".
 			"	INNER JOIN b_catalog_cml_section X ON (T.XML_ID = X.XML_ID AND T.CATALOG_ID = X.CATALOG_ID) ".
 			"WHERE T.ID > 0 ";
 		$dbRes = $DB->Query($strSql);
@@ -1193,11 +1190,11 @@ if (strlen($strImportErrorMessage) <= 0)
 		}
 
 		$arIBlockIDString = explode(",", $iBlockIDString);
-		if (count($arIBlockIDString) > 0)
+		if (!empty($arIBlockIDString))
 		{
-			for ($i = 0; $i < count($arIBlockIDString); $i++)
+			for ($i = 0, $intIBCount = count($arIBlockIDString); $i < $intIBCount; $i++)
 			{
-				if (IntVal($arIBlockIDString[$i]) == 0)
+				if (intval($arIBlockIDString[$i]) == 0)
 					continue;
 
 				ReSort($arIBlockIDString[$i]);
@@ -1221,7 +1218,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			"	LEFT JOIN b_iblock_element P USE INDEX (ix_iblock_element_4) ON (P.XML_ID = X.XML_ID AND X.CATALOG_ID = P.IBLOCK_ID AND P.WF_PARENT_ELEMENT_ID IS NULL) ";
 		$DB->Query($strSql);
 
-		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", True);
+		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", true);
 
 		__SetTimeMark("Process products - temp table");
 
@@ -1231,13 +1228,8 @@ if (strlen($strImportErrorMessage) <= 0)
 			$num = 0;
 			$productIDs = "0";
 
-			$strSql =
-				"SELECT P.ID, P.IBLOCK_ID ".
-				"FROM b_iblock_element P ".
-				"	LEFT JOIN b_catalog_cml_tmp T ON (P.ID = T.ID) ".
-				"WHERE P.IBLOCK_ID IN (".$iBlockIDString.") ".
-				"	AND T.ID IS NULL ".
-				"	AND P.WF_PARENT_ELEMENT_ID IS NULL";
+			$strSql = "SELECT P.ID, P.IBLOCK_ID FROM b_iblock_element P LEFT JOIN b_catalog_cml_tmp T ON (P.ID = T.ID) ".
+				"WHERE P.IBLOCK_ID IN (".$iBlockIDString.") AND T.ID IS NULL AND P.WF_PARENT_ELEMENT_ID IS NULL";
 			$dbRes = $DB->Query($strSql);
 			while ($arRes = $dbRes->Fetch())
 			{
@@ -1246,44 +1238,28 @@ if (strlen($strImportErrorMessage) <= 0)
 
 				if ($num > CML_GROUP_OPERATION_CNT)
 				{
-					$strSql =
-						"DELETE FROM b_catalog_discount2product ".
-						"WHERE PRODUCT_ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_catalog_discount2product WHERE PRODUCT_ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_catalog_price ".
-						"WHERE PRODUCT_ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_catalog_price WHERE PRODUCT_ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_catalog_product2group ".
-						"WHERE PRODUCT_ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_catalog_product2group WHERE PRODUCT_ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_catalog_product ".
-						"WHERE ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_catalog_product WHERE ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_iblock_element_property ".
-						"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_iblock_element_property WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_iblock_section_element ".
-						"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_iblock_section_element WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
-					$strSql =
-						"DELETE FROM b_workflow_move ".
-						"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
-					$DB->Query($strSql, True);
+					$strSql = "DELETE FROM b_workflow_move WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
+					$DB->Query($strSql, true);
 
-					$strSql =
-						"DELETE FROM b_iblock_element ".
-						"WHERE ID IN (".$productIDs.") ";
+					$strSql = "DELETE FROM b_iblock_element WHERE ID IN (".$productIDs.")";
 					$DB->Query($strSql);
 
 					$num = 0;
@@ -1293,44 +1269,28 @@ if (strlen($strImportErrorMessage) <= 0)
 
 			if ($num > 0)
 			{
-				$strSql =
-					"DELETE FROM b_catalog_discount2product ".
-					"WHERE PRODUCT_ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_catalog_discount2product WHERE PRODUCT_ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_catalog_price ".
-					"WHERE PRODUCT_ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_catalog_price WHERE PRODUCT_ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_catalog_product2group ".
-					"WHERE PRODUCT_ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_catalog_product2group WHERE PRODUCT_ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_catalog_product ".
-					"WHERE ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_catalog_product WHERE ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_iblock_element_property ".
-					"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_iblock_element_property WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_iblock_section_element ".
-					"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_iblock_section_element WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 
-				$strSql =
-					"DELETE FROM b_workflow_move ".
-					"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
-				$DB->Query($strSql, True);
+				$strSql = "DELETE FROM b_workflow_move WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.")";
+				$DB->Query($strSql, true);
 
-				$strSql =
-					"DELETE FROM b_iblock_element ".
-					"WHERE ID IN (".$productIDs.") ";
+				$strSql = "DELETE FROM b_iblock_element WHERE ID IN (".$productIDs.")";
 				$DB->Query($strSql);
 			}
 
@@ -1386,7 +1346,7 @@ if (strlen($strImportErrorMessage) <= 0)
 					$strSql =
 						"DELETE FROM b_workflow_move ".
 						"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
-					$DB->Query($strSql, True);
+					$DB->Query($strSql, true);
 
 					$strSql =
 						"DELETE FROM b_iblock_element ".
@@ -1433,7 +1393,7 @@ if (strlen($strImportErrorMessage) <= 0)
 				$strSql =
 					"DELETE FROM b_workflow_move ".
 					"WHERE IBLOCK_ELEMENT_ID IN (".$productIDs.") ";
-				$DB->Query($strSql, True);
+				$DB->Query($strSql, true);
 
 				$strSql =
 					"DELETE FROM b_iblock_element ".
@@ -1631,7 +1591,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			"	LEFT JOIN b_catalog_product CP ON (P.ID = CP.ID) ";
 		$DB->Query($strSql);
 
-		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", True);
+		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", true);
 
 		__SetTimeMark("Process offers - temp table");
 
@@ -1769,7 +1729,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			"	LEFT JOIN b_catalog_product CP ON (P.ID = CP.ID) ";
 		$DB->Query($strSql);
 
-		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", True);
+		$DB->Query("REPAIR TABLE b_catalog_cml_tmp QUICK", true);
 
 		__SetTimeMark("Process offers - temp table");
 

@@ -1,6 +1,8 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main\Type;
+
 class MysqlResult extends Result
 {
 	private $resultFields = array();
@@ -16,10 +18,16 @@ class MysqlResult extends Result
 		{
 			case 'timestamp':
 			case 'datetime':
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "Y-m-d H:i:s");
+				if($value !== null)
+				{
+					$value = new Type\DateTime($value, "Y-m-d H:i:s");
+				}
 				break;
 			case 'date':
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "Y-m-d");
+				if($value !== null)
+				{
+					$value = new Type\Date($value, "Y-m-d");
+				}
 				break;
 			default:
 				break;

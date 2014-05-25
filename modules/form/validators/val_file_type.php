@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorFileType
@@ -16,7 +15,7 @@ class CFormValidatorFileType
 			"HANDLER" => array("CFormValidatorFileType", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -31,7 +30,7 @@ class CFormValidatorFileType
 				),
 				"DEFAULT" => "",
 			),
-			
+
 			"EXT_CUSTOM" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_FILE_TYPE_SETTINGS_EXT_CUSTOM"),
 				"TYPE" => "TEXT",
@@ -39,36 +38,37 @@ class CFormValidatorFileType
 			),
 		);
 	}
-	
+
 	public static function ToDB($arParams)
 	{
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
-		if (count($arValues) > 0)
+
+		if (!empty($arValues))
 		{
 			$arExt = array();
 			if (strlen($arParams["EXT"]) > 0)
-				$arExt = array_merge($arExt, explode(",", $arParams["EXT"]));
-				
-			if (strlen($arParams["EXT_CUSTOM"]) > 0)
-				$arExt = array_merge($arExt, explode(",", $arParams["EXT_CUSTOM"]));
+				$arExt = array_merge($arExt, explode(",", strtolower($arParams["EXT"])));
 
-			if (count($arExt) > 0)
+			if (strlen($arParams["EXT_CUSTOM"]) > 0)
+				$arExt = array_merge($arExt, explode(",", strtolower($arParams["EXT_CUSTOM"])));
+
+			if (!empty($arExt))
 			{
 				foreach ($arExt as $key => $value) $arExt[$key] = trim($value);
 				$arExt = array_unique($arExt);
+				$arExtKeys = array_fill_keys($arExt, true);
 				$res = true;
-				
+
 				foreach ($arValues as $arFile)
 				{
 					if (strlen($arFile["tmp_name"]) > 0 && $arFile["error"] == "0")
@@ -79,16 +79,16 @@ class CFormValidatorFileType
 							$res = false;
 							break;
 						}
-					
-						$ext = substr($arFile["name"], $point_pos + 1);
-						if (!in_array($ext, $arExt))
+
+						$ext = strtolower(substr($arFile["name"], $point_pos + 1));
+						if (!isset($arExtKeys[$ext]))
 						{
 							$res = false;
 							break;
 						}
 					}
 				}
-				
+
 				if (!$res)
 				{
 					$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_FILE_TYPE_ERROR"));
@@ -96,7 +96,7 @@ class CFormValidatorFileType
 				}
 			}
 		}
-		
+
 		return true;
 
 	}

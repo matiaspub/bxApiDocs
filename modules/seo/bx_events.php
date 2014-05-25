@@ -6,41 +6,26 @@
  */
 class _CEventsSeo {
 	/**
-	 * <p>Событие предназначено для назначения собственных проверок и вывода собственных рекомендаций в инструменте <b>Страница</b> модуля <b>Поисковая оптимизация</b>.</p> <a name="examples"></a>
+	 * <p>Событие предназначено для назначения собственных проверок и вывода собственных рекомендаций в инструменте <b>Страница</b> модуля <b>Поисковая оптимизация</b>.</p> <br><br>
 	 *
 	 *
 	 *
 	 *
-	 * @param array $MandatoryParam1  
-	 *
-	 *
-	 *
-	 * @param array $OptionalParam2 = default 
-	 *
-	 *
-	 *
-	 * @param valu $e  
-	 *
-	 *
-	 *
-	 * @return result_type 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>Пару строчек примера<br>желательно имеющего не только академическую ценность<br>?&gt;
-	 * </pre>
-	 *
+	 * @return mixed 
 	 *
 	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/seo/events/onpagecheck.php
 	 * @author Bitrix
 	 */
-	public static function onPageCheck($MandatoryParam1, $OptionalParam2="default", $e){}
+	public static function onPageCheck(){}
 
 	/**
-	 * 
-	 * <p>Событие предназначено для подключения собственного программного счетчика.</p>
+	 * <p>Событие <b>OnSeoCountersGetList</b> предназначено для подключения собственного программного счетчика.</p> <a name="examples"></a>
+	 *
+	 *
+	 *
+	 *
+	 * @return mixed 
 	 *
 	 *
 	 * <h4>Example</h4> 
@@ -54,6 +39,7 @@ class _CEventsSeo {
 	 * } 
 	 *  
 	 * addEventHandler('seo', 'OnSeoCountersGetList', 'MyOnSeoCountersGetList');
+	 * </ht
 	 * </pre>
 	 *
 	 *
@@ -64,4 +50,5 @@ class _CEventsSeo {
 	public static function OnSeoCountersGetList(){}
 
 
-}?>
+}
+?>

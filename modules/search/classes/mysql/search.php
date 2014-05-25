@@ -16,6 +16,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/s
  */
 class CSearch extends CAllSearch
 {
+	/*
 	var $arForumTopics = array();
 
 	public function DBNavStart()
@@ -55,11 +56,18 @@ class CSearch extends CAllSearch
 					&& array_key_exists($res["PARAM2"], $this->arForumTopics)
 				)
 					$this->NavRecordCount--; //eat forum topic duplicates
+				elseif(
+					$res["module"] == "forum"
+					&& array_key_exists($res["param2"], $this->arForumTopics)
+				)
+					$this->NavRecordCount--; //eat forum topic duplicates
 				else
 					$NavFirstRecordShow--;
 
 				if($res["MODULE_ID"] == "forum")
 					$this->arForumTopics[$res["PARAM2"]] = true;
+				elseif($res["module"] == "forum")
+					$this->arForumTopics[$res["param2"]] = true;
 			}
 			else
 			{
@@ -77,6 +85,11 @@ class CSearch extends CAllSearch
 					&& array_key_exists($res["PARAM2"], $this->arForumTopics)
 				)
 					$this->NavRecordCount--; //eat forum topic duplicates
+				elseif(
+					$res["module"] == "forum"
+					&& array_key_exists($res["param2"], $this->arForumTopics)
+				)
+					$this->NavRecordCount--; //eat forum topic duplicates
 				else
 				{
 					if($this->arUserMultyFields)
@@ -89,6 +102,8 @@ class CSearch extends CAllSearch
 
 				if($res["MODULE_ID"] == "forum")
 					$this->arForumTopics[$res["PARAM2"]] = true;
+				elseif($res["module"] == "forum")
+					$this->arForumTopics[$res["param2"]] = true;
 			}
 			else
 			{
@@ -113,7 +128,7 @@ class CSearch extends CAllSearch
 		$this->nSelectedCount = $this->NavRecordCount;
 		$this->arResult = $temp_arrray;
 	}
-
+	*/
 	public function MakeSQL($query, $strSqlWhere, $strSort, $bIncSites, $bStem)
 	{
 		global $USER;
@@ -191,7 +206,7 @@ class CSearch extends CAllSearch
 
 			if(!preg_match("/(sc|sct)./", $query))
 			{
-				$strSqlWhere = preg_replace('# AND st.TF >= [0-9\.,]+#i', "", $strSqlWhere);
+				$strSqlWhere = preg_replace('#AND\\(st.TF >= [0-9\.,]+\\)#i', "", $strSqlWhere);
 
 				if(count($this->Query->m_stemmed_words) > 1)
 					$arSelect["RANK"] = "stt.RANK as RANK";
@@ -449,10 +464,12 @@ class CSearch extends CAllSearch
 		if($bStem && count($this->Query->m_stemmed_words)>1)
 		{//We have to make some magic in case quotes was used in query
 		//We have to move (sc.searchable_content LIKE '%".ToUpper($word)."%') from $query to $strSqlWhere
+			$arMatches = array();
 			while(preg_match("/(AND\s+\([sct]+.searchable_content LIKE \'\%.+?\%\'\))/", $query, $arMatches))
 			{
 				$strSqlWhere .= $arMatches[0];
 				$query = str_replace($arMatches[0], "", $query);
+				$arMatches = array();
 			}
 		}
 
@@ -507,6 +524,15 @@ class CSearch extends CAllSearch
 			";
 		elseif($bIncSites && !$bStem)
 		{
+			//Copy first exists into inner join in hopeless try to defeat MySQL optimizer
+			$strSqlJoin2 = "";
+			$match = array();
+			if($strSqlWhere && preg_match('#\\s*EXISTS (\\(SELECT \\* FROM b_search_content_param WHERE SEARCH_CONTENT_ID = sc\\.ID AND PARAM_NAME = \'[^\']+\' AND PARAM_VALUE(\\s*= \'[^\']+\'|\\s+in \\(\'[^\']+\'\\))\\))#', $strSqlWhere, $match))
+			{
+				$subTable = str_replace("SEARCH_CONTENT_ID = sc.ID AND", "", $match[1]);
+				$strSqlJoin2 = "INNER JOIN ".$subTable." p1 ON p1.SEARCH_CONTENT_ID = sc.ID";
+			}
+
 			if($query == "1=1")
 			{
 				$strSql = "
@@ -520,6 +546,7 @@ class CSearch extends CAllSearch
 						INNER JOIN b_search_content sc ON (stags2.SEARCH_CONTENT_ID=sc.ID)
 						".($this->Query->bText? "INNER JOIN b_search_content_text sct ON sct.SEARCH_CONTENT_ID = sc.ID": "")."
 						INNER JOIN b_search_content_site scsite ON (sc.ID=scsite.SEARCH_CONTENT_ID AND stags2.SITE_ID=scsite.SITE_ID)
+						".$strSqlJoin2."
 					WHERE
 						".CSearch::CheckPermissions("sc.ID")."
 						AND ".($this->Query->bTagsSearch? (
@@ -547,6 +574,7 @@ class CSearch extends CAllSearch
 						INNER JOIN b_search_content sc ON (stags.SEARCH_CONTENT_ID=sc.ID)
 						".($this->Query->bText? "INNER JOIN b_search_content_text sct ON sct.SEARCH_CONTENT_ID = sc.ID": "")."
 						INNER JOIN b_search_content_site scsite ON (sc.ID=scsite.SEARCH_CONTENT_ID AND stags.SITE_ID=scsite.SITE_ID)
+						".$strSqlJoin2."
 					WHERE
 						".CSearch::CheckPermissions("sc.ID")."
 						AND ".($this->Query->bTagsSearch? (
@@ -643,83 +671,6 @@ class CSearch extends CAllSearch
 		//do not lock for mysql database
 	}
 
-	public static function DeleteOld($SESS_ID, $MODULE_ID="", $SITE_ID="")
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		$strFilter = "";
-		if($MODULE_ID!="")
-			$strFilter.=" AND MODULE_ID = '".$DB->ForSql($MODULE_ID)."' ";
-
-		$strJoin = "";
-		if($SITE_ID!="")
-		{
-			$strFilter.=" AND scsite.SITE_ID = '".$DB->ForSql($SITE_ID)."' ";
-			$strJoin.=" INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID ";
-		}
-
-		if(!is_array($SESS_ID))
-			$SESS_ID = array($SESS_ID);
-
-		$strSql = "
-			SELECT ID
-			FROM b_search_content sc
-			".$strJoin."
-			WHERE (UPD not in ('".implode("', '", $SESS_ID)."') OR UPD IS NULL)
-			".$strFilter."
-		";
-
-		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
-
-		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while($ar = $rs->Fetch())
-		{
-			foreach($arEvents as $arEvent)
-				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
-
-			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if(BX_SEARCH_VERSION > 1)
-				$DB->Query("DELETE FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		CSearchTags::CleanCache();
-	}
-
-	public static function DeleteForReindex($MODULE_ID)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		$MODULE_ID = $DB->ForSql($MODULE_ID);
-		$strSql = "SELECT ID FROM b_search_content WHERE MODULE_ID = '".$MODULE_ID."'";
-
-		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
-
-		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while($ar = $rs->Fetch())
-		{
-			foreach($arEvents as $arEvent)
-				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
-
-			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if(BX_SEARCH_VERSION > 1)
-				$DB->Query("DELETE FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		CSearchTags::CleanCache();
-	}
-
 	public static function OnLangDelete($lang)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
@@ -727,355 +678,6 @@ class CSearch extends CAllSearch
 			DELETE FROM b_search_content_site
 			WHERE SITE_ID='".$DB->ForSql($lang)."'
 		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		CSearchTags::CleanCache();
-	}
-
-	
-	/**
-	 * <p>Функция изменяет права на доступ к проиндексированной информации данного модуля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
-	 * поменять.
-	 *
-	 *
-	 *
-	 * @param array $arGroups  Массив кодов групп, которые имеют право на чтение
-	 * проиндексированной информации.
-	 *
-	 *
-	 *
-	 * @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
-	 * Если этот параметр равен false, то ограничение по коду элемента не
-	 * устанавливается (изменяются права на доступ к элементу с любыми
-	 * кодами). Не обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, права на доступ к которым
-	 * необходимо поменять. Если этот параметр равен false, то ограничение
-	 * по первому параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, права на доступ к которым
-	 * необходимо поменять. Если этот параметр равен false, то ограничение
-	 * по второму параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
-	 * элементов, права на доступ к которым необходимо поменять. Если
-	 * этот параметр равен false, то ограничение по сайту элемента не
-	 * устанавливается. Необязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $Forum_ID = 5;
-	 * $arGroups = CForum::GetAccessPermissions($Forum_ID);
-	 * $arGPerm = Array();
-	 * for ($i=0; $i &lt; count($arGroups); $i++)
-	 * {
-	 * 	if ($arGroups[$i][1]&gt;="E")
-	 * 	{
-	 * 		$arGPerm[] = $arGroups[$i][0];
-	 * 		if($arGroups[$i][0]==2)
-	 * 			break;
-	 * 	}
-	 * }
-	 * CSearch::ChangePermission("forum", $arGPerm, false, $Forum_ID);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changepermission.php
-	 * @author Bitrix
-	 */
-	public static function ChangePermission($MODULE_ID, $arGroups, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false, $PARAMS=false)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		$arNewGroups = array();
-		foreach($arGroups as $group_id)
-		{
-			if(is_numeric($group_id))
-				$arNewGroups[$group_id] = "G".intval($group_id);
-			else
-				$arNewGroups[$group_id] = $group_id;
-		}
-
-		$strSqlWhere = CSearch::__PrepareFilter(array(
-			"MODULE_ID"=>$MODULE_ID,
-			"ITEM_ID"=>$ITEM_ID,
-			"PARAM1"=>$PARAM1,
-			"PARAM2"=>$PARAM2,
-			"SITE_ID"=>$SITE_ID,
-			"PARAMS"=>$PARAMS,
-		), $bIncSites);
-
-		if($strSqlWhere)
-		{
-			$strSqlJoin1 = "INNER JOIN b_search_content sc ON sc.ID = b_search_content_right.SEARCH_CONTENT_ID";
-			//Copy first exists into inner join in hopeless try to defeat MySQL optimizer
-			if(preg_match('#^\\s*EXISTS (\\(SELECT \\* FROM b_search_content_param WHERE SEARCH_CONTENT_ID = sc.ID AND PARAM_NAME = \'[^\']+\' AND PARAM_VALUE  = \'[^\']+\'\\))#', $strSqlWhere, $match))
-			{
-				$subTable = str_replace("SEARCH_CONTENT_ID = sc.ID AND", "", $match[1]);
-				$strSqlJoin2 = "INNER JOIN ".$subTable." p1 ON p1.SEARCH_CONTENT_ID = sc.ID";
-			}
-			else
-			{
-				$strSqlJoin2 = "";
-			}
-		}
-		else
-		{
-			$strSqlJoin1 = "";
-			$strSqlJoin2 = "";
-		}
-
-		$DB->Query("
-			DELETE b_search_content_right
-			FROM b_search_content_right
-			".$strSqlJoin1."
-			".$strSqlJoin2."
-			".($strSqlWhere
-				?"WHERE ".$strSqlWhere
-				:""
-			)
-		, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		foreach($arNewGroups as $group_code)
-		{
-			$DB->Query("
-				INSERT INTO b_search_content_right (SEARCH_CONTENT_ID, GROUP_CODE)
-				SELECT sc.ID, '".$DB->ForSQL($group_code, 100)."'
-				FROM b_search_content sc
-				".$strSqlJoin2."
-				".($strSqlWhere?
-					"WHERE ".$strSqlWhere:
-					""
-				)."
-			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-	}
-
-	
-	/**
-	 * <p>Функция изменяет привязку проиндексированной информации к сайтам.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
-	 * поменять.
-	 *
-	 *
-	 *
-	 * @param array $arSite  Ассоциативный массив привязки к сайтам.Ключи - идентификаторы
-	 * сайтов, а их значения пути к проиндексированной информации. <br>
-	 *
-	 *
-	 *
-	 * @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
-	 * Если этот параметр равен false, то ограничение по коду элемента не
-	 * устанавливается (изменяются права на доступ к элементу с любыми
-	 * кодами). Не обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, права на доступ к которым
-	 * необходимо поменять. Если этот параметр равен false, то ограничение
-	 * по первому параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, права на доступ к которым
-	 * необходимо поменять. Если этот параметр равен false, то ограничение
-	 * по второму параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
-	 * элементов, права на доступ к которым необходимо поменять. Если
-	 * этот параметр равен false, то ограничение по сайту элемента не
-	 * устанавливается. Необязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$IBLOCK_ID = 5;<br>CSearch::ChangeSite("iblock", array("s1" =&gt; "=/new/localation/#ID#/"), false, $IBLOCK_ID);<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changesite.php
-	 * @author Bitrix
-	 */
-	public static function ChangeSite($MODULE_ID, $arSite, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		$strSqlWhere = CSearch::__PrepareFilter(Array("MODULE_ID"=>$MODULE_ID, "ITEM_ID"=>$ITEM_ID, "PARAM1"=>$PARAM1, "PARAM2"=>$PARAM2, "SITE_ID"=>$SITE_ID), $bIncSites);
-
-		$strSql = "
-			SELECT sc.ID
-			FROM b_search_content sc
-			".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID": "")."
-			WHERE
-			".$strSqlWhere."
-		";
-
-		$r = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while($arR = $r->Fetch())
-		{
-			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$arR["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$bFirst = true;
-			foreach($arSite as $site => $url)
-			{
-				if($bFirst)
-				{
-					if(BX_SEARCH_VERSION > 1)
-						$strSql = "
-							UPDATE b_search_content
-							SET URL = '".$DB->ForSql($url, 2000)."'
-							WHERE ID = ".$arR["ID"]."
-						";
-					else
-						$strSql = "
-							UPDATE b_search_content
-							SET LID = '".$DB->ForSql($site, 2)."',
-							URL = '".$DB->ForSql($url, 2000)."'
-							WHERE ID = ".$arR["ID"]."
-						";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					$bFirst = false;
-				}
-				$strSql = "
-					INSERT INTO b_search_content_site(SEARCH_CONTENT_ID, SITE_ID, URL)
-					VALUES(".$arR["ID"].", '".$DB->ForSql($site, 2)."', '".$DB->ForSql($url, 2000)."')";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-		}
-	}
-
-	
-	/**
-	 * <p>Функция удаляет из индекса поиска указанную информацию.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, индексацию информации которого необходимо удалить .
-	 *
-	 *
-	 *
-	 * @param string $ITEM_ID = false Код элемента, индексацию информации которого необходимо удалить.
-	 * Если этот параметр равен false, то ограничение по коду элемента не
-	 * устанавливается (удаляется индексация информации с любыми
-	 * кодами). Не обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, индексацию информации которых
-	 * необходимо удалить. Если этот параметр равен false, то ограничение
-	 * по первому параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, индексацию информации которых
-	 * необходимо удалить. Если этот параметр равен false, то ограничение
-	 * по второму параметру элемента не устанавливается. Не
-	 * обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
-	 * элементов, индексацию информации которых необходимо удалить.
-	 * Если этот параметр равен false, то ограничение по сайту элемента не
-	 * устанавливается. Необязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $path = "/ru/my_files/file.php";
-	 * if (unlink($_SERVER["DOCUMENT_ROOT"].$path))
-	 * {
-	 * 	if (CModule::IncludeModule("search"))
-	 * 		CSearch::DeleteIndex("main", $path);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/deleteindex.php
-	 * @author Bitrix
-	 */
-	public static function DeleteIndex($MODULE_ID, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		if($PARAM1 !== false && $PARAM2 !== false)
-			$strSqlWhere = CSearch::__PrepareFilter(Array("MODULE_ID"=>$MODULE_ID, "ITEM_ID"=>$ITEM_ID, array("=PARAM1"=>$PARAM1, "PARAM2"=>$PARAM2), "SITE_ID"=>$SITE_ID), $bIncSites);
-		else
-			$strSqlWhere = CSearch::__PrepareFilter(Array("MODULE_ID"=>$MODULE_ID, "ITEM_ID"=>$ITEM_ID, "PARAM1"=>$PARAM1, "PARAM2"=>$PARAM2, "SITE_ID"=>$SITE_ID), $bIncSites);
-
-		$strSql = "
-			SELECT sc.ID
-			FROM b_search_content sc
-				".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID" :"")."
-			WHERE
-			".$strSqlWhere."
-		";
-
-		$arEvents = GetModuleEvents("search", "OnBeforeIndexDelete", true);
-
-		$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		while($ar = $rs->Fetch())
-		{
-			foreach($arEvents as $arEvent)
-				ExecuteModuleEventEx($arEvent, array("SEARCH_CONTENT_ID = ".$ar["ID"]));
-
-			$DB->Query("DELETE FROM b_search_content_param WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_right WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_site WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_title WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content_stem WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if(BX_SEARCH_VERSION > 1)
-				$DB->Query("DELETE FROM b_search_content_text WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_tags WHERE SEARCH_CONTENT_ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$DB->Query("DELETE FROM b_search_content WHERE ID = ".$ar["ID"], false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
 		CSearchTags::CleanCache();
 	}
 
@@ -1087,35 +689,6 @@ class CSearch extends CAllSearch
 	public static function FormatLimit($strSql, $limit)
 	{
 		return str_replace("/*TOP*/", "", $strSql)."LIMIT ".intval($limit);
-	}
-
-	public static function Update($ID, $arFields)
-	{
-		$DB = CDatabase::GetModuleConnection('search');
-
-		if(array_key_exists("~DATE_CHANGE", $arFields))
-		{
-			$arFields["DATE_CHANGE"] = $arFields["~DATE_CHANGE"];
-			unset($arFields["~DATE_CHANGE"]);
-		}
-		elseif(array_key_exists("LAST_MODIFIED", $arFields))
-		{
-			$arFields["DATE_CHANGE"] = $arFields["LAST_MODIFIED"];
-			unset($arFields["LAST_MODIFIED"]);
-		}
-		elseif(array_key_exists("DATE_CHANGE", $arFields))
-		{
-			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH.MI.SS", CLang::GetDateFormat());
-		}
-
-		if(BX_SEARCH_VERSION > 1)
-			unset($arFields["SEARCHABLE_CONTENT"]);
-
-		$strUpdate = $DB->PrepareUpdate("b_search_content", $arFields);
-		if(strlen($strUpdate) > 0)
-		{
-			$DB->Query("UPDATE b_search_content SET ".$strUpdate." WHERE ID=".intval($ID), false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
 	}
 
 	public static function CleanFreqCache($ID)
@@ -1399,109 +972,55 @@ class CSearch extends CAllSearch
 		}
 	}
 
-	
-	/**
-	 * <p>Функция изменяет проиндексированную информацию данного модуля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $MODULE_ID  Код модуля, проиндексированную информацию которого необходимо
-	 * поменять.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив новых значений для поискового индекса. Массив должен
-	 * иметь следующую структуру: <ul> <li> <b>"DATE_CHANGE"</b> =&gt; дата изменения
-	 * индексируемого элемента,</li> <li> <b>"URL"</b> =&gt; адрес индексируемого
-	 * элемента,</li> <li> <b>"TITLE"</b> =&gt; заголовок индексируемого элемента,</li>
-	 * <li> <b>"BODY"</b> =&gt; индексируемый текст,</li> <li> <b>"SEARCHABLE_CONTENT"</b> =&gt;
-	 * индекс,</li> <li> <b>"PARAM1"</b> =&gt; первый параметр,</li> <li> <b>"PARAM2"</b> =&gt;
-	 * второй параметр,</li> <li> <b>"PERMISSIONS"</b> =&gt; массив кодов групп, члены
-	 * которых имеют право на чтение индексируемого элемента,</li> <li>
-	 * <b>"SITE_ID"</b> =&gt; ассоциативный массив привязки к сайтам. Ключи -
-	 * идентификаторы сайтов, а их значения пути к элементу. <br> </li> </ul>
-	 * Атрибуты, значения которых не изменились, можно опустить.
-	 *
-	 *
-	 *
-	 * @param string $ITEM_ID = false Код элемента, индекс которого необходимо изменить. Если этот
-	 * параметр равен false, то ограничение по коду элемента не
-	 * устанавливается (изменяются индексы элементов с любыми кодами).
-	 * Не обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, индексы которых необходимо
-	 * поменять. Если этот параметр равен false, то ограничение по первому
-	 * параметру элемента не устанавливается. Не обязательный параметр,
-	 * по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
-	 * проиндексированных элементов, индексы которых необходимо
-	 * поменять. Если этот параметр равен false, то ограничение по второму
-	 * параметру элемента не устанавливается. Не обязательный параметр,
-	 * по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
-	 * элементов, индекс которых необходимо поменять. Если этот
-	 * параметр равен false, то ограничение по сайту элемента не
-	 * устанавливается. Необязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$new_title = "Новый заголовок темы";<br>$fid = 5;    // Код форума<br>$tid = 128;    // Код темы<br>CSearch::ChangeIndex("forum",<br>	array(<br>		"TITLE" =&gt; $new_title<br>	),<br>	false, $fid, $tid);<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearch/changeindex.php
-	 * @author Bitrix
-	 */
-	public static function ChangeIndex($MODULE_ID, $arFields, $ITEM_ID=false, $PARAM1=false, $PARAM2=false, $SITE_ID=false)
+	public static function UpdateSite($ID, $arSITE_ID)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
-
-		if(array_key_exists("TITLE", $arFields))
-			$arFields["TITLE"] = Trim($arFields["TITLE"]);
-
-		if(array_key_exists("BODY", $arFields))
-			$arFields["BODY"] = Trim($arFields["BODY"]);
-
-		if(array_key_exists("PERMISSIONS", $arFields) && is_array($arFields["PERMISSIONS"]))
-			CSearch::ChangePermission($MODULE_ID, $arFields["PERMISSIONS"], $ITEM_ID, $PARAM1, $PARAM2, $SITE_ID);
-
-		if(array_key_exists("SITE_ID", $arFields) && is_array($arFields["SITE_ID"]))
-			CSearch::ChangeSite($MODULE_ID, $arFields["SITE_ID"], $ITEM_ID, $PARAM1, $PARAM2, $SITE_ID);
-
-		$strUpdate = $DB->PrepareUpdate("b_search_content", $arFields);
-		if(strlen($strUpdate) > 0)
+		$ID = intval($ID);
+		if (!is_array($arSITE_ID))
 		{
-			$strSqlWhere = CSearch::__PrepareFilter(Array("MODULE_ID"=>$MODULE_ID, "ITEM_ID"=>$ITEM_ID, "PARAM1"=>$PARAM1, "PARAM2"=>$PARAM2, "SITE_ID"=>$SITE_ID), $bIncSites);
-			$strSql = "
-				SELECT sc.ID
-				FROM b_search_content sc
-				".($bIncSites? "INNER JOIN b_search_content_site scsite ON sc.ID=scsite.SEARCH_CONTENT_ID": "")."
-				".(strlen($strSqlWhere)>0? "WHERE ".$strSqlWhere: "")."
-			";
-			$rs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			while($ar = $rs->Fetch())
+			$DB->Query("
+				DELETE FROM b_search_content_site
+				WHERE SEARCH_CONTENT_ID = ".$ID."
+			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		else
+		{
+			$rsSite = $DB->Query("
+				SELECT SITE_ID, URL
+				FROM b_search_content_site
+				WHERE SEARCH_CONTENT_ID = ".$ID."
+			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			while($arSite = $rsSite->Fetch())
 			{
-				$strSql = "UPDATE b_search_content SET ".$strUpdate." WHERE ID=".$ar["ID"];
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if(!array_key_exists($arSite["SITE_ID"], $arSITE_ID))
+				{
+					$DB->Query("
+						DELETE FROM b_search_content_site
+						WHERE SEARCH_CONTENT_ID = ".$ID."
+						AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
+					", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				}
+				else
+				{
+					if($arSite["URL"] !== $arSITE_ID[$arSite["SITE_ID"]])
+					{
+						$DB->Query("
+							UPDATE b_search_content_site
+							SET URL = '".$DB->ForSql($arSITE_ID[$arSite["SITE_ID"]], 2000)."'
+							WHERE SEARCH_CONTENT_ID = ".$ID."
+							AND SITE_ID = '".$DB->ForSql($arSite["SITE_ID"])."'
+						", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					}
+					unset($arSITE_ID[$arSite["SITE_ID"]]);
+				}
+			}
 
-				if(array_key_exists("PARAMS", $arFields))
-					CSearch::SetContentItemParams($ar["ID"], $arFields["PARAMS"]);
+			foreach($arSITE_ID as $site => $url)
+			{
+				$DB->Query("
+					REPLACE INTO b_search_content_site(SEARCH_CONTENT_ID, SITE_ID, URL)
+					VALUES(".$ID.", '".$DB->ForSql($site, 2)."', '".$DB->ForSql($url, 2000)."')
+				", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
 	}

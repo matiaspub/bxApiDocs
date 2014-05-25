@@ -3,43 +3,43 @@ class CFile extends CAllFile
 {
 	
 	/**
-	 * <p>Функция удаляет файл из таблицы зарегистрированных файлов (b_file) и с диска.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Цифровой идентификатор файла.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // удаляем изображение формы
-	 * $arFilter = array("ID" =&gt; 1, "ID_EXACT_MATCH" =&gt; "Y");
-	 * $rsForm = CForm::GetList($by, $order, $arFilter, $is_filtered);
-	 * if ($arForm = $rsForm-&gt;Fetch())
-	 * {
-	 *     if (intval($arForm["IMAGE_ID"])&gt;0) <b>CFile::Delete</b>($arForm["IMAGE_ID"]);	
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет файл из таблицы зарегистрированных файлов (b_file) и с диска.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Цифровой идентификатор файла.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // удаляем изображение формы
+	* $arFilter = array("ID" =&gt; 1, "ID_EXACT_MATCH" =&gt; "Y");
+	* $rsForm = CForm::GetList($by, $order, $arFilter, $is_filtered);
+	* if ($arForm = $rsForm-&gt;Fetch())
+	* {
+	*     if (intval($arForm["IMAGE_ID"])&gt;0) <b>CFile::Delete</b>($arForm["IMAGE_ID"]);	
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfiles.php">DeleteDirFiles</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/deletedirfilesex.php">DeleteDirFilesEx</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;

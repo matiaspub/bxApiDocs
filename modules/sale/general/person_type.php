@@ -42,39 +42,40 @@ class CAllSalePersonType
 
 	
 	/**
-	 * <p>Функция возвращает параметры типа плательщика с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код типа плательщика.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров типа плательщика
-	 * с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код типа плательщика.</td> </tr> <tr> <td>LID</td> <td>Код
-	 * сайта.</td> </tr> <tr> <td>NAME</td> <td>Название типа плательщика.</td> </tr> <tr>
-	 * <td>SORT</td> <td>Индекс сортировки.</td> </tr> </table><p>  </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($arPersType = CSalePersonType::GetByID($PERSON_TYPE_ID))
-	 * {
-	 *    echo "&lt;pre&gt;";
-	 *    print_r($arPersType);
-	 *    echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__getbyid.3b883192.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры типа плательщика с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код типа плательщика.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров типа плательщика
+	* с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код типа плательщика.</td> </tr> <tr> <td>LID</td> <td>Код
+	* сайта.</td> </tr> <tr> <td>NAME</td> <td>Название типа плательщика.</td> </tr> <tr>
+	* <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг активности
+	* пользователя [Y|N]..</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($arPersType = CSalePersonType::GetByID($PERSON_TYPE_ID))
+	* {
+	*    echo "&lt;pre&gt;";
+	*    print_r($arPersType);
+	*    echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__getbyid.3b883192.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -141,30 +142,32 @@ class CAllSalePersonType
 
 	
 	/**
-	 * <p>Функцияобновляет параметры типа плательщика с кодом ID</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код типа плательщика.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров типа плательщиков,
-	 * ключами в котором являются названия параметров, а значениями -
-	 * соответствующие значения.<br><br> Допустимые ключи:<ul> <li> <b>LID</b> - код
-	 * сайта, к которому привязан тип плательщика;</li> <li> <b>NAME</b> - название
-	 * типа плательщика;</li> <li> <b>SORT</b> - индекс сортировки.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код обновленного типа плательщика или <i>false</i> - в
-	 * случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__update.c02002e6.php
-	 * @author Bitrix
-	 */
+	* <p>Функцияобновляет параметры типа плательщика с кодом ID</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код типа плательщика.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров типа плательщиков,
+	* ключами в котором являются названия параметров, а значениями -
+	* соответствующие значения.<br><br> Допустимые ключи:<ul> <li> <b>LID</b> - код
+	* сайта, к которому привязан тип плательщика (Может быть массивом
+	* сайтов);</li> <li> <b>NAME</b> - название типа плательщика;</li> <li> <b>SORT</b> -
+	* индекс сортировки.</li> <li> <b>ACTIVE</b> - флаг активности пользователя
+	* [Y|N] .</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код обновленного типа плательщика или <i>false</i> - в
+	* случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__update.c02002e6.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -200,11 +203,11 @@ class CAllSalePersonType
 					unset($arLID[$k]);
 			}
 		}
-				
+
 		$strUpdate = $DB->PrepareUpdate("b_sale_person_type", $arFields);
 		$strSql = "UPDATE b_sale_person_type SET ".$strUpdate." WHERE ID = ".$ID."";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		
+
 		if(count($arLID)>0)
 		{
 			$strSql = "DELETE FROM b_sale_person_type_site WHERE PERSON_TYPE_ID=".$ID;
@@ -215,7 +218,7 @@ class CAllSalePersonType
 				"SELECT ".$ID.", LID ".
 				"FROM b_lang ".
 				"WHERE LID IN (".$str_LID.") ";
-			
+
 			$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		}
 
@@ -231,22 +234,22 @@ class CAllSalePersonType
 
 	
 	/**
-	 * <p>Функция удаляет тип плательщика с кодом ID. Так же удаляются все связанные данные. Если есть заказы, привязанные к этому типу плательщика, то тип плательщика не может быть удален. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код типа плательщика.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__delete.c2566ed3.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет тип плательщика с кодом ID. Так же удаляются все связанные данные. Если есть заказы, привязанные к этому типу плательщика, то тип плательщика не может быть удален. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код типа плательщика.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalepersontype/csalepersontype__delete.c2566ed3.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -284,6 +287,7 @@ class CAllSalePersonType
 		{
 			$DB->Query("DELETE FROM b_sale_order_props_variant WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("DELETE FROM b_sale_order_props_value WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
+			$DB->Query("DELETE FROM b_sale_order_props_relation WHERE PROPERTY_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("DELETE FROM b_sale_user_props_value WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 		}
 		$DB->Query("DELETE FROM b_sale_order_props WHERE PERSON_TYPE_ID = ".$ID."", true);
@@ -332,7 +336,7 @@ class CAllSalePersonType
 			$found = (IntVal($res["ID"]) == IntVal($sValue));
 			$s1 .= '<option value="'.$res["ID"].'"'.($found ? ' selected':'').'>'.(($bFullName)?("[".$res["ID"]."] ".htmlspecialcharsbx($res["NAME"])." (".htmlspecialcharsbx($res["LID"]).")"):(htmlspecialcharsbx($res["NAME"]))).'</option>'."\n";
 		}
-		if (strlen($sDefaultValue)>0) 
+		if (strlen($sDefaultValue)>0)
 			$s .= "<option value='' ".($found ? "" : "selected").">".htmlspecialcharsbx($sDefaultValue)."</option>";
 		return $s.$s1.'</select>';
 	}

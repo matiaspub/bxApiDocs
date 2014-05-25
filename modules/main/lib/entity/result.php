@@ -10,8 +10,12 @@ namespace Bitrix\Main\Entity;
 
 class Result
 {
+	/** @var bool */
 	protected $isSuccess;
+	/** @var  array */
+	protected $data;
 
+	/** @var bool  */
 	protected $wereErrorsChecked = false;
 
 	/** @var EntityError[] */
@@ -100,5 +104,19 @@ class Result
 			// make a warning (usually it should be written in log)
 			trigger_error(join('; ', $this->getErrorMessages()), E_USER_WARNING);
 		}
+	}
+
+	public function setData(array $data)
+	{
+		$this->data = $data;
+	}
+
+	/**
+	 * Returns data array saved into the record
+	 * @return array
+	 */
+	public function getData()
+	{
+		return $this->data;
 	}
 }

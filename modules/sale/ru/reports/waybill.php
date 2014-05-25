@@ -158,7 +158,7 @@ border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 	$db_user = CUser::GetByID($arOrder["USER_ID"]);
 	$arUser = $db_user->Fetch();
 	echo htmlspecialcharsbx($arUser["NAME"])." ".htmlspecialcharsbx($arUser["LAST_NAME"]).", ";
-	
+
 	if (strlen($arOrderProps["F_INDEX"])>0) echo $arOrderProps["F_INDEX"].",";
 
 	$arVal = CSaleLocation::GetByID($arOrderProps["F_LOCATION"], "ru");
@@ -168,7 +168,7 @@ border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 		echo htmlspecialcharsbx($arVal["COUNTRY_NAME"].$arVal["CITY_NAME"]);
 
 	if (strlen($arOrderProps["F_CITY"])>0) echo ", Рі. ".$arOrderProps["F_CITY"];
-	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0) 
+	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0)
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
 		echo $arOrderProps["F_ADDRESS"];
@@ -179,7 +179,7 @@ else
 		echo $arParams["BUYER_COMPANY_NAME"];
 	else
 		echo $arParams["BUYER_LAST_NAME"]." ".$arParams["BUYER_FIRST_NAME"]." ".$arParams["BUYER_SECOND_NAME"];
-		
+
 	if (strlen($arParams["BUYER_INN"])>0) echo " Р?РќРќ/РљРџРџ: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
 
 	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", Рі. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", СЂ/СЃ ".$arParams["BUYER_RSCH"]." РІ ".$arParams["BUYER_RSCH_BANK"]." Рі. ".$arParams["BUYER_RSCH_CITY"].", Рє/СЃ ".$arParams["BUYER_KSCH"].", Р‘Р?Рљ ".$arParams["BUYER_BIK"];
@@ -240,9 +240,9 @@ if(empty($arParams))
 	$db_user = CUser::GetByID($arOrder["USER_ID"]);
 	$arUser = $db_user->Fetch();
 	echo htmlspecialcharsbx($arUser["NAME"])." ".htmlspecialcharsbx($arUser["LAST_NAME"]).", ";
-	
+
 	if (strlen($arOrderProps["F_INN"])>0) echo "Р?РќРќ: ".$arOrderProps["F_INN"];
-	
+
 	if (strlen($arOrderProps["F_INDEX"])>0) echo $arOrderProps["F_INDEX"].",";
 
 	$arVal = CSaleLocation::GetByID($arOrderProps["F_LOCATION"], "ru");
@@ -252,7 +252,7 @@ if(empty($arParams))
 		echo htmlspecialcharsbx($arVal["COUNTRY_NAME"].$arVal["CITY_NAME"]);
 
 	if (strlen($arOrderProps["F_CITY"])>0) echo ", Рі. ".$arOrderProps["F_CITY"];
-	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0) 
+	if (strlen($arOrderProps["F_ADDRESS"])>0 && strlen($arOrderProps["F_CITY"])>0)
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
 		echo $arOrderProps["F_ADDRESS"];
@@ -396,7 +396,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:10.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
-line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ33></a><?echo $ORDER_ID;?></p>
+line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ33></a><?echo $arOrder["ACCOUNT_NUMBER"];?></p>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
 margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:normal'>&nbsp;</p>
@@ -694,7 +694,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 $priceTotal = 0;
 $bUseVat = false;
 $arBasketOrder = array();
-for ($i = 0; $i < count($arBasketIDs); $i++)
+for ($i = 0, $max = count($arBasketIDs); $i < $max; $i++)
 {
 	$arBasketTmp = CSaleBasket::GetByID($arBasketIDs[$i]);
 
@@ -720,6 +720,12 @@ for ($i = 0; $i < count($arBasketIDs); $i++)
 	$arBasketOrder[] = $arBasketTmp;
 }
 
+if (is_array($arBasketOrder) && !empty($arBasketOrder))
+{
+	$arBasketOrder = getMeasures($arBasketOrder);
+}
+
+
 //СЂР°Р·Р±СЂР°СЃС‹РІР°РµРј СЃРєРёРґРєСѓ РЅР° Р·Р°РєР°Р· РїРѕ С‚РѕРІР°СЂР°Рј
 if (floatval($arOrder["DISCOUNT_VALUE"]) > 0)
 {
@@ -736,7 +742,7 @@ while ($ar_tax_list = $db_tax_list->Fetch())
 {
 	$arTaxList[$i] = $ar_tax_list;
 	// РѕРїСЂРµРґРµР»СЏРµРј, РєР°РєРѕР№ РёР· РЅР°Р»РѕРіРѕРІ - РќР”РЎ
-	// РќР”РЎ РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ РєРѕРґ NDS, Р»РёР±Рѕ РЅРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµРЅРµСЃС‚Рё СЌС‚РѕС‚ С€Р°Р±Р»РѕРЅ 
+	// РќР”РЎ РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ РєРѕРґ NDS, Р»РёР±Рѕ РЅРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµРЅРµСЃС‚Рё СЌС‚РѕС‚ С€Р°Р±Р»РѕРЅ
 	// РІ РєР°С‚Р°Р»РѕРі РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… С€Р°Р±Р»РѕРЅРѕРІ Рё РёСЃРїСЂР°РІРёС‚СЊ
 	if ($arTaxList[$i]["CODE"] == "NDS")
 		$iNds = $i;
@@ -759,9 +765,9 @@ foreach ($arBasketOrder as $arBasket):
 
 	$nds_val = 0;
 	$taxRate = 0;
-	
+
 	$b_AMOUNT = DoubleVal($arBasket["PRICE"]);
-	
+
 	//РѕРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»СЊРЅСѓСЋ С†РµРЅСѓ
 	$item_price = $b_AMOUNT;
 	if(DoubleVal($arBasket["VAT_RATE"]) > 0)
@@ -772,13 +778,13 @@ foreach ($arBasketOrder as $arBasket):
 		$bVat = true;
 	}
 	elseif(!$bUseVat)
-	{						
+	{
 		$basket_tax = CSaleOrderTax::CountTaxes($b_AMOUNT*$arQuantities[$mi], $arTaxList, $arOrder["CURRENCY"]);
-		for ($i = 0; $i < count($arTaxList); $i++)
+		for ($i = 0, $max = count($arTaxList); $i < $max; $i++)
 		{
 			if ($arTaxList[$i]["IS_IN_PRICE"] == "Y")
 				$item_price -= $arTaxList[$i]["TAX_VAL"];
-			
+
 			$nds_val += DoubleVal($arTaxList[$i]["TAX_VAL"]);
 			$taxRate += ($arTaxList[$i]["VALUE"]);
 		}
@@ -821,7 +827,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
 padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
-text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ43></a>С€С‚.</p>
+text-align:center;line-height:normal'><a name=РўРµРєСЃС‚РѕРІРѕРµРџРѕР»Рµ43></a><?=$arBasket['MEASURE_TEXT']?></p>
 <p class=Normal align=center style='margin:0cm;margin-bottom:.0001pt;
 text-align:center;line-height:normal'>&nbsp;</p>
 </td>
@@ -914,6 +920,7 @@ text-align:center;line-height:normal'>&nbsp;</p>
 </tr>
 <?
 $mi++;
+$n++;
 endforeach;
 ?>
 <?
@@ -921,7 +928,7 @@ if (DoubleVal($arOrder["PRICE_DELIVERY"])>0)
 {
 	$nds_val = 0.00;
 	$nds_pr = 0;
-	
+
 	if(DoubleVal($arTaxList[0]["VALUE_MONEY"]) == DoubleVal($total_nds))
 	{
 		$item_price = DoubleVal($arOrder["PRICE_DELIVERY"]);
@@ -933,14 +940,14 @@ if (DoubleVal($arOrder["PRICE_DELIVERY"])>0)
 		$basket_tax = CSaleOrderTax::CountTaxes(DoubleVal($arOrder["PRICE_DELIVERY"]), $arTaxList, $arOrder["CURRENCY"]);
 		//РѕРїСЂРµРґРµР»СЏРµРј РЅР°С‡Р°Р»СЊРЅСѓСЋ С†РµРЅСѓ
 		$item_price = DoubleVal($arOrder["PRICE_DELIVERY"]);
-		for ($i = 0; $i < count($arTaxList); $i++)
+		for ($i = 0, $max = count($arTaxList); $i < $max; $i++)
 		{
 			if ($arTaxList[$i]["IS_IN_PRICE"] == "Y")
 				$item_price -= $arTaxList[$i]["TAX_VAL"];
-			
+
 			$nds_val += $arTaxList[$i]["TAX_VAL"];
 			$nds_pr += $arTaxList[$i]["VALUE"];
-		//	
+		//
 		//$nds_val = 0.00;
 		//$nds_pr = 0;
 
@@ -1159,7 +1166,7 @@ margin-bottom:0cm;margin-left:0cm;margin-bottom:.0001pt;text-align:center;
 line-height:133%'>Р’СЃРµРіРѕ РїРѕ РЅР°РєР»Р°РґРЅРѕР№: </p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
 margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
-</td> 
+</td>
 <td valign=top style='width:40.0pt;border:solid windowtext 1.0pt;
 border-left:none;padding:0cm 2.0pt 0cm 2.0pt;height:11.0pt'>
 <p class=Normal align=center style='margin-top:1.0pt;margin-right:0cm;
@@ -1523,6 +1530,4 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 
 </div>
 
-</body>
 
-</html>

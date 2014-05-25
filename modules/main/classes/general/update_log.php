@@ -4,7 +4,7 @@
 /**    MODIFICATION OF THIS FILE WILL ENTAIL SITE FAILURE            **/
 /**********************************************************************/
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
-// define("HELP_FILE", "updates/update_system.php");
+// define("HELP_FILE", "marketplace/sysupdate.php");
 
 if (!function_exists('htmlspecialcharsbx'))
 {
@@ -120,17 +120,11 @@ while($rec = $rsData->Fetch())
 	$n++;
 }
 
-$lAdmin->AddFooter(
-	array(
-		array("title"=>GetMessage("MAIN_ADMIN_LIST_SELECTED"), "value"=>count($arLogRecs)),
-	)
-);
-
 $aMenu = array(
 	array(
 		"TEXT"=>GetMessage("update_log_index"),
 		"TITLE"=>GetMessage("update_log_index_title"),
-		"LINK"=>"sysupdate.php?lang=".LANGUAGE_ID,
+		"LINK"=>"update_system.php?lang=".LANGUAGE_ID,
 		"ICON"=>"btn_update",
 	),
 );

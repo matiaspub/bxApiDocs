@@ -90,43 +90,42 @@ class CSaleMobileOrderUtils
 	//								"sale", "CSaleMobileOrderUtils", "buildSaleAdminMobileMenu");
 	public static function buildSaleAdminMobileMenu()
 	{
+		$items = array(
+			array(
+				"text" => GetMessage("SMOB_ALL_ORDERS"),
+				"data-url" => "/bitrix/admin/mobile/sale_orders_list.php",
+				"data-pageid" => "orders_list",
+				"default" => true,
+				"push-param" => "sl"
+			),
+			array(
+				"text" => GetMessage("SMOB_WAITING_FOR_PAY"),
+				"data-url" => "/bitrix/admin/mobile/sale_orders_list.php?action=get_filtered&filter_name=waiting_for_pay",
+				"data-pageid" => "orders_waiting_for_pay",
+			),
+			array(
+				"text" => GetMessage("SMOB_WAITING_FOR_DELIVERY"),
+				"data-url" => "/bitrix/admin/mobile/sale_orders_list.php?action=get_filtered&filter_name=waiting_for_delivery",
+				"data-pageid" => "orders_waiting_for_delivery",
+			)
+		);
+
+		if (\Bitrix\Main\ModuleManager::isModuleInstalled("pull"))
+		{
+			$items[] = array(
+				"text" => GetMessage("SMOB_PUSH_SETTINGS"),
+				"data-url" => "/bitrix/admin/mobile/sale_orders_push.php",
+				"data-pageid" => "orders_push"
+			);
+		}
+
+
 		$arMenu = array(
 			array(
 				"text" => GetMessage("SMOB_ORDERS_MANAGEMENT"),
 				"type" => "section",
-				"items" => array(
-				array(
-					"text" => GetMessage("SMOB_ALL_ORDERS"),
-					"data-url" => "/bitrix/admin/mobile/sale_orders_list.php",
-					"data-pageid" => "orders_list",
-					"default" => true
-					),
-				array(
-					"text" => GetMessage("SMOB_WAITING_FOR_PAY"),
-					"data-url" => "/bitrix/admin/mobile/sale_orders_list.php?action=get_filtered&filter_name=waiting_for_pay",
-					"data-pageid" => "orders_waiting_for_pay",
-					),
-				array(
-					"text" => GetMessage("SMOB_WAITING_FOR_DELIVERY"),
-					"data-url" => "/bitrix/admin/mobile/sale_orders_list.php?action=get_filtered&filter_name=waiting_for_delivery",
-					"data-pageid" => "orders_waiting_for_delivery",
-					),
-				/*array(
-					"text" => GetMessage("SMOB_ORDERS_FILTER"),
-					"data-url" => "/bitrix/admin/mobile/sale_orders_list.php?action=set_filter",
-					//"data-pageid" => "orders_filter",
-					)*/
-				))
-			/*
-			array(
-				"text" => GetMessage("SMOB_PRIVATE_OFFICE"),
-				"type" => "separator",
-				"items" => array(
-				),
-				array(
-					"text" => GetMessage("SMOB_PUSH_SETTINGS"),
-					"type" => "item",
-					))),*/
+				"items" => $items
+			)
 		);
 
 		$arRepMenu = self::getMobileReports();
@@ -186,9 +185,11 @@ class CSaleMobileOrderUtils
 						array("TITLE" => GetMessage("SMOB_PAYER_TYPE").":", "VALUE" => $arOrder['PERSON_TYPE_NAME']),
 						array("TITLE" => GetMessage("SMOB_FIO").":", "VALUE" => $arOrder['CUSTOMER_FIO']),
 						array("TITLE" => GetMessage("SMOB_EMAIL").":",
-								"VALUE" => '<a href="mailto:'.$arOrder['CUSTOMER_EMAIL'].'">'.
-								$arOrder['CUSTOMER_EMAIL'].'</a>'),
-						array("TITLE" => GetMessage("SMOB_PHONE").":", "VALUE" => $arOrder['CUSTOMER_PHONE']),
+							"VALUE" => '<a href="mailto:'.$arOrder['CUSTOMER_EMAIL'].'">'.
+							$arOrder['CUSTOMER_EMAIL'].'</a>'),
+						array("TITLE" => GetMessage("SMOB_PHONE").":",
+							"VALUE" => '<a href="tel:'.$arOrder['CUSTOMER_PHONE'].'">'.
+							$arOrder['CUSTOMER_PHONE'].'</a>'),
 						array("TITLE" => GetMessage("SMOB_ZIP").":", "VALUE" => $arOrder['CUSTOMER_ZIP']),
 						array("TITLE" => GetMessage("SMOB_LOCATION").":", "VALUE" => $arOrder['CUSTOMER_LOCATION'])
 						),
@@ -268,6 +269,51 @@ class CSaleMobileOrderUtils
 
 		$mad->addSection($arSection);
 
+		if($arOrder['MARKED'] == 'Y')
+		{
+			$arSection = array(
+						"TITLE" => GetMessage("SMOB_MARK"),
+						"OPEN" => true,
+						);
+
+			$reason = strlen($arOrder["REASON_MARKED"]) > 0 ? $arOrder["REASON_MARKED"] : GetMessage("SMOB_MARK_NO_DESCRIPTION");
+
+			if(strlen($arOrder['DATE_MARKED']) > 0)
+				$reason .= '<br>'.self::getDateTime($arOrder['DATE_MARKED']);
+
+			if(intval($arOrder['EMP_MARKED_ID']) > 0)
+				$reason .= " (".self::GetFormatedUserName($arOrder["EMP_MARKED_ID"]).")";
+
+			$arSection["BOTTOM"] = array(
+				"STYLE" => "red",
+				"VALUE" => $reason
+			);
+
+			$mad->addSection($arSection);
+		}
+
+		$arSection =array(
+					"TITLE" => GetMessage("SMOB_DEDUCT"),
+					);
+
+		if($arOrder['DEDUCTED'] == 'Y')
+			$arSection["BOTTOM"] = array("STYLE" => "green", "VALUE" => GetMessage("SMOB_ORDER_DEDUCTED"));
+		elseif($arOrder['DEDUCTED'] == 'N' && strlen($arOrder["DATE_DEDUCTED"]) > 0 )
+			$arSection["BOTTOM"] = array("STYLE" => "red", "VALUE" => GetMessage("SMOB_ORDER_DEDUCTED_UNDO"));
+		else
+			$arSection["ROWS"][] = array("TITLE" => GetMessage("SMOB_ORDER_NOT_DEDUCTED"), "VALUE" => "");
+
+		if(strlen($arOrder["REASON_UNDO_DEDUCTED"]) > 0)
+			$arSection["BOTTOM"]["VALUE"] .= '<br>'.$arOrder["REASON_UNDO_DEDUCTED"];
+
+		if(strlen($arOrder["DATE_DEDUCTED"]) > 0)
+			$arSection["BOTTOM"]["VALUE"] .= '<br>'.self::getDateTime($arOrder["DATE_DEDUCTED"]);
+
+		if(intval($arOrder['EMP_DEDUCTED_ID']) > 0)
+			$arSection["BOTTOM"]["VALUE"] .= " (".self::GetFormatedUserName($arOrder["EMP_DEDUCTED_ID"]).")";
+
+		$mad->addSection($arSection);
+
 		ob_start();
 		$productListReturn = $GLOBALS["APPLICATION"]->IncludeComponent(
 			'bitrix:sale.mobile.product.list',
@@ -314,7 +360,7 @@ class CSaleMobileOrderUtils
 
 		$arSection["ROWS"][] = 	array(
 							"TITLE" => GetMessage("SMOB_WEIGHT").":",
-							"VALUE" => roundEx(DoubleVal($productListReturn['WEIGHT']/$WEIGHT_KOEF), SALE_VALUE_PRECISION)." ".$WEIGHT_UNIT);
+							"VALUE" => roundEx(DoubleVal($productListReturn['WEIGHT']/$WEIGHT_KOEF), SALE_WEIGHT_PRECISION)." ".$WEIGHT_UNIT);
 
 		$arSection["ROWS"][] = array(
 			"TITLE" => GetMessage("SMOB_TOTALLY").":",
@@ -425,6 +471,38 @@ class CSaleMobileOrderUtils
 		return $arOrder;
 	}
 
+	public static function getCurrenciesNames($arCurIds = array())
+	{
+		if (!CModule::IncludeModule('catalog') || !CModule::IncludeModule('currency'))
+			return array();
+
+		static $arCurrCache = false;
+
+		if($arCurrCache === false)
+		{
+			$arCurrCache = array();
+			$dbCurr = CCurrency::GetList(($by="sort"), ($order="asc"));
+
+			while($arCurr = $dbCurr->Fetch())
+				$arCurrCache[$arCurr["CURRENCY"]] = $arCurr["FULL_NAME"];
+		}
+
+		$arRetSite = array();
+
+		if(!empty($arCurIds))
+		{
+			foreach ($arCurIds as $currId)
+				if(isset($arCurrCache[$currId]))
+					$arRetCur[$currId] = $arCurrCache[$currId];
+		}
+		else
+		{
+			$arRetCur = $arCurrCache;
+		}
+
+		return $arRetCur;
+	}
+
 	public static function getDeliveriesInfo($arDeliveryIds)
 	{
 		if(!is_array($arDeliveryIds))
@@ -472,6 +550,35 @@ class CSaleMobileOrderUtils
 		return $arDeliveries;
 	}
 
+	public static function getSitesNames($arSitesIds = array())
+	{
+		static $arSiteCache = false;
+
+		if($arSiteCache === false)
+		{
+			$arSiteCache = array();
+			$dbSite = CSite::GetList($by = "sort", $order = "asc", Array());
+
+			while($arSite = $dbSite->Fetch())
+				$arSiteCache[$arSite["LID"]] = $arSite["NAME"];
+		}
+
+		$arRetSite = array();
+
+		if(!empty($arSitesIds))
+		{
+			foreach ($arSitesIds as $siteId)
+				if(isset($arSiteCache[$siteId]))
+					$arRetSite[$siteId] = $arSiteCache[$siteId];
+		}
+		else
+		{
+			$arRetSite = $arSiteCache;
+		}
+
+		return $arRetSite;
+	}
+
 	public static function getPaySystemsNames($arPaySystemsIds)
 	{
 		$arPaySystemsNames = array();
@@ -496,13 +603,17 @@ class CSaleMobileOrderUtils
 		return $arPersonTypes;
 	}
 
-	public static function getStatusesNames($arStatusIds)
+	public static function getStatusesNames($arStatusIds = false)
 	{
 		$arStatusNames = array();
+		$arFilter = array("LID" => LANGUAGE_ID);
+
+		if(is_array($arStatusIds))
+			$arFilter["ID"] = $arStatusIds;
 
 		$dbStat = CSaleStatus::GetList(
 										array(),
-										array("ID" =>$arStatusIds, "LID" => LANGUAGE_ID),
+										$arFilter,
 										false,
 										false,
 										array("ID", "NAME")
@@ -593,6 +704,399 @@ class CSaleMobileOrderPull
 									'params' => Array("id" => $orderId)
 								)
 		);
+	}
+}
+
+class CSaleMobileOrderFilter
+{
+	static public function adaptFields($arFields)
+	{
+		foreach ($arFields as $fieldId => $fieldValue)
+		{
+			if($fieldId == "DATE_TO")
+				$arFields["DATE_TO"] = self::addLastTimeToDate($fieldValue);
+			elseif($fieldId == "DATE_UPDATE_TO")
+				$arFields["DATE_UPDATE_TO"] = self::addLastTimeToDate($fieldValue);
+			elseif($fieldId == "DATE_STATUS_TO")
+				$arFields["DATE_STATUS_TO"] = self::addLastTimeToDate($fieldValue);
+			elseif($fieldId == "DATE_PAYED_TO")
+				$arFields["DATE_PAYED_TO"] = self::addLastTimeToDate($fieldValue);
+			elseif($fieldId == "DATE_ALLOW_DELIVERY_TO")
+			{
+				$arFields["<=DATE_ALLOW_DELIVERY"] = self::addLastTimeToDate($fieldValue);
+				unset($arFields["DATE_ALLOW_DELIVERY_TO"]);
+			}
+			elseif($fieldId == "DATE_ALLOW_DELIVERY_FROM")
+			{
+				$arFields[">=DATE_ALLOW_DELIVERY"] = $arFields["DATE_ALLOW_DELIVERY_FROM"];
+				unset($arFields["DATE_ALLOW_DELIVERY_FROM"]);
+			}
+
+			elseif($fieldId == "ORDER_ID")
+			{
+				$arCommaEnums = explode(",", $arFields["ORDER_ID"]);
+				$commaCount = count($arCommaEnums);
+
+				if($commaCount > 1)
+					$arFields["ID"] = $arCommaEnums;
+				elseif($commaCount == 1)
+				{
+					$arHypEnum = explode("-", $arFields["ORDER_ID"]);
+
+					if(count($arHypEnum) == 2)
+					{
+						$arFields[">=ID"] =$arHypEnum[0];
+						$arFields["<=ID"] =$arHypEnum[1];
+					}
+					else
+					{
+						$arFields["ID"] = $arHypEnum;
+					}
+				}
+
+				unset($arFields["ORDER_ID"]);
+			}
+			elseif($fieldId == "PRICE_FROM")
+			{
+				$arFields[">=PRICE"] = $fieldValue;
+				unset($arFields["PRICE_FROM"]);
+			}
+			elseif($fieldId == "PRICE_TO")
+			{
+				$arFields["<PRICE"] = $fieldValue;
+				unset($arFields["PRICE_TO"]);
+			}
+		}
+
+		return $arFields;
+	}
+
+	private function parseOrderId($strOrderId)
+	{
+		return $arResult;
+	}
+
+	static public function addLastTimeToDate($strDate)
+	{
+		$retStrDateTime = '';
+
+		if (strlen($strDate) <= 0)
+			return $retStrDateTime;
+
+		if ($arDate = ParseDateTime($strDate, CSite::GetDateFormat("FULL", SITE_ID)))
+		{
+			if (StrLen($strDate) < 11)
+			{
+				$arDate["HH"] = 23;
+				$arDate["MI"] = 59;
+				$arDate["SS"] = 59;
+			}
+
+			$retStrDateTime = date($GLOBALS["DB"]->DateFormatToPHP(CSite::GetDateFormat("FULL", SITE_ID)), mktime($arDate["HH"], $arDate["MI"], $arDate["SS"], $arDate["MM"], $arDate["DD"], $arDate["YYYY"]));
+		}
+
+		return $retStrDateTime;
+	}
+
+	static public function setFieldsValues($arFields, $customFilter)
+	{
+		if(!is_array($arFields) || !is_array($customFilter))
+			return false;
+
+		foreach ($arFields as $fieldId => $arField)
+			$arFields[$fieldId]["VALUE"] = isset($customFilter[$fieldId]) ? $customFilter[$fieldId] : '';
+
+		return $arFields;
+	}
+
+	static public function buildFieldsParams()
+	{
+		return array(
+			"ORDER_ID" => array(
+				"NAME" => GetMessage("SMOB_FILTER_ORDER_ID"),
+				"TYPE" => "TEXT"
+			),
+			"USER_ID" => array(
+				"NAME" => GetMessage("SMOB_FILTER_USER_ID"),
+				"TYPE" => "TEXT"
+			),
+			"DATE_FROM" => array(
+				"NAME" => GetMessage("SMOB_FILTER_DATE_ORDER_FROM"),
+				"TYPE" => "DATE"
+			),
+			"DATE_TO" => array(
+				"NAME" => GetMessage("SMOB_FILTER_DATE_ORDER_TO"),
+				"TYPE" => "DATE"
+			),
+			"LID" => array(
+				"NAME" => GetMessage("SMOB_FILTER_SITE"),
+				"TYPE" => "ONE_SELECT",
+				"ADD_ALL_SELECT" => "Y",
+				"OPTIONS" => CSaleMobileOrderUtils::getSitesNames()
+			),
+			"CURRENCY" => array(
+				"NAME" => GetMessage("SMOB_FILTER_CURRENCY"),
+				"TYPE" => "ONE_SELECT",
+				"OPTIONS" => CSaleMobileOrderUtils::getCurrenciesNames()
+			),
+			"PRICE_FROM" => array(
+				"NAME" => GetMessage("SMOB_FILTER_PRICE_FROM"),
+				"TYPE" => "TEXT"
+			),
+			"PRICE_TO" => array(
+				"NAME" => GetMessage("SMOB_FILTER_PRICE_TO"),
+				"TYPE" => "TEXT"
+			),
+			"STATUS_ID" => array(
+				"NAME" => GetMessage("SMOB_FILTER_STATUS_ID"),
+				"TYPE" => "MULTI_SELECT",
+				"OPTIONS" => CSaleMobileOrderUtils::getStatusesNames()
+			),
+			"PAYED" => array(
+				"NAME" => GetMessage("SMOB_FILTER_PAYED"),
+				"TYPE" => "ONE_SELECT",
+				"ADD_ALL_SELECT" => "Y",
+				"OPTIONS" => array(
+					"Y" => GetMessage("SMOB_FILTER_PAYED_Y"),
+					"N" => GetMessage("SMOB_FILTER_PAYED_N")
+				),
+			),
+			"ALLOW_DELIVERY" => array(
+				"NAME" => GetMessage("SMOB_FILTER_ALLOW_DELIVERY"),
+				"TYPE" => "ONE_SELECT",
+				"ADD_ALL_SELECT" => "Y",
+				"OPTIONS" => array(
+					"Y" => GetMessage("SMOB_FILTER_ALLOW_DELIVERY_Y"),
+					"N" => GetMessage("SMOB_FILTER_ALLOW_DELIVERY_N")
+				),
+			),
+			"DEDUCTED" => array(
+				"NAME" => GetMessage("SMOB_FILTER_DEDUCTED"),
+				"TYPE" => "ONE_SELECT",
+				"ADD_ALL_SELECT" => "Y",
+				"OPTIONS" => array(
+					"Y" => GetMessage("SMOB_FILTER_DEDUCTED_Y"),
+					"N" => GetMessage("SMOB_FILTER_DEDUCTED_N")
+				),
+			),
+			"MARKED" => array(
+				"NAME" => GetMessage("SMOB_FILTER_MARKED"),
+				"TYPE" => "ONE_SELECT",
+				"ADD_ALL_SELECT" => "Y",
+				"OPTIONS" => array(
+					"Y" => GetMessage("SMOB_FILTER_MARKED_Y"),
+					"N" => GetMessage("SMOB_FILTER_MARKED_N")
+				),
+			),
+		);
+	}
+}
+
+class CSaleMobileOrderPush
+{
+	private static $arEvents = array(
+		"ORDER_STATUS_CHANGED",
+		"ORDER_DELIVERY_ALLOWED",
+		"ORDER_PAYED",
+		"ORDER_COMPLETED",
+		"ORDER_DEDUCTED",
+		"ORDER_CANCELED",
+		"ORDER_CREATED",
+		"ORDER_MARKED"
+	);
+
+	private static $arSubscriptions = array();
+
+	public static function getEvents()
+	{
+		return self::$arEvents;
+	}
+
+	private static function &getData()
+	{
+		if(empty(self::$arSubscriptions))
+			self::$arSubscriptions = unserialize(COption::GetOptionString("sale", "pushEventsSubscriptions", ""));
+
+		return self::$arSubscriptions;
+	}
+
+	private static function saveData()
+	{
+		return COption::SetOptionString("sale", "pushEventsSubscriptions", serialize(self::$arSubscriptions));
+	}
+
+	public static function getSubscribers($eventId, $arParams)
+	{
+		$arResult = array();
+
+		$arSubscriptions = self::getData();
+
+		if(is_array($arSubscriptions))
+			foreach ($arSubscriptions as $subsId => $arSubscription)
+				if(
+					$arSubscription["E"] == self::$arEvents[$eventId]
+					&&
+					$arSubscription["V"] == "Y"
+					)
+					$arResult[] = $arSubscription["U"];
+
+		return $arResult;
+	}
+
+	public static function updateSubscriptions($userId, $arSubs)
+	{
+		$arOldSubs = &self::getData();
+		$arTmpSubs = array();
+
+		foreach ($arOldSubs as $subId => $subItem)
+			if($subItem["U"] == $userId)
+				$arTmpSubs[$subId] = &$arOldSubs[$subId];
+
+		foreach ($arTmpSubs as $subId => &$subItem)
+		{
+			if(isset($arSubs[self::$arEvents[$subItem["E"]]]))
+			{
+				$subItem["V"] = $arSubs[self::$arEvents[$subItem["E"]]];
+				unset($arSubs[self::$arEvents[$subItem["E"]]]);
+			}
+
+			unset($arTmpSubs[$subId]);
+		}
+
+		if(!empty($arSubs))
+			foreach ($arSubs as $eventId => $value)
+				self::addSubscription($userId, $eventId, $value);
+
+		self::saveData();
+
+		return true;
+	}
+
+	public static function addSubscription($userId, $eventId, $value)
+	{
+		$result = false;
+		$evtKey = array_search($eventId, self::$arEvents);
+
+		if($evtKey !== false)
+		{
+			$arSubscriptions = &self::getData();
+			$arSubscriptions[] = array(
+				"U" => $userId,
+				"E" => $evtKey,
+				"V" => $value
+			);
+
+			$result = true;
+		}
+
+		return $result;
+	}
+
+	private static function checkRights($userId, $eventId, $arParams)
+	{
+		global $USER;
+
+		$orderId = $arParams["ORDER_ID"];
+		$arUserGroups = $USER->GetUserGroupArray();
+
+		return CSaleOrder::CanUserViewOrder($orderId, $arUserGroups, $userId);
+	}
+
+	public static function getSubscriptions($userId)
+	{
+		$arResult = array();
+		$userId = intval($userId);
+
+		$arSubscriptions = self::getData();
+
+		if(is_array($arSubscriptions))
+			foreach ($arSubscriptions as $arSubscription)
+				if(intval($arSubscription["U"]) == $userId)
+					$arResult[self::$arEvents[$arSubscription["E"]]] = $arSubscription["V"];
+
+		return $arResult;
+	}
+
+	private static function makeMessage($eventId, $arParams)
+	{
+		global $DB;
+		$strResult = "";
+
+		if(HasMessage('SMOB_PUSH_MES_'.$eventId))
+			$strResult = GetMessage('SMOB_PUSH_MES_'.$eventId, array(
+				"#ACCOUNT_NUMBER#" => $arParams["ORDER"]["ACCOUNT_NUMBER"],
+				"#DATE_INSERT#" => FormatDate($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")), strtotime($arParams["ORDER"]["DATE_INSERT"])),
+				"#PRICE#" => $arParams["ORDER"]["PRICE"],
+				"#CURRENCY#" => $arParams["ORDER"]["CURRENCY"]
+			));
+		if($eventId == "ORDER_STATUS_CHANGED")
+		{
+			$arFilter = array(
+				"LID" => LANGUAGE_ID,
+				"ID" => $arParams["ORDER"]["STATUS_ID"]
+			);
+
+			$dbStatusListTmp = CSaleStatus::GetList(
+				array("SORT" => "ASC"),
+				$arFilter,
+				false,
+				false,
+				array("NAME")
+			);
+
+			if($arStatus = $dbStatusListTmp->GetNext())
+				$strResult = str_replace("#STATUS_NAME#", $arStatus["NAME"], $strResult);
+		}
+
+		return $strResult;
+	}
+
+	private static function makeTitle($eventId, $arParams)
+	{
+		return "";
+	}
+
+	public static function send($eventId, $arParams)
+	{
+		$result = false;
+
+		if(!isset($arParams["ORDER"]) && isset($arParams["ORDER_ID"]))
+			$arParams["ORDER"] = CSaleOrder::GetById($arParams["ORDER_ID"]);
+
+		if(
+			in_array($eventId, self::$arEvents)
+			&& isset($arParams["ORDER"])
+			&& CModule::IncludeModule("pull")
+			)
+		{
+			$arUsers = self::getSubscribers($eventId, $arParams);
+
+			if(!empty($arUsers))
+			{
+				$text = self::makeMessage($eventId, $arParams);
+				$title = self::makeTitle($eventId, $arParams);
+				$arMessages = array();
+
+				foreach ($arUsers as $userId)
+				{
+					if(!self::checkRights($userId, $eventId, array("ORDER_ID" => $arParams["ORDER"]["ID"])))
+						continue;
+
+					$arMessages[] = array(
+						"USER_ID" => $userId,
+						"TITLE" => $title,
+						"APP_ID"=>"BitrixAdmin",
+						"MESSAGE" => $text,
+						"PARAMS" =>"sl_".$arParams["ORDER"]["ID"]
+					);
+				}
+
+				$pushMe = new CPushManager();
+				$result = $pushMe->SendMessage($arMessages);
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

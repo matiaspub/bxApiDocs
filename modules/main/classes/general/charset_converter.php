@@ -93,7 +93,7 @@ class CharsetConverter
 				if (!$res)
 					$errorMessage .= "Libiconv reported failure while converting string to requested character encoding. ";
 
- 				return $res;
+				return $res;
 			}
 		}
 
@@ -212,7 +212,7 @@ class CharsetConverter
 		if($charsetFrom == "ucs-2")
 		{
 			$arConvertTable = $this->BuildConvertTable($charsetTo);
-			for($i = 0; $i < strlen($sourceString); $i+=2)
+			for($i = 0, $n = strlen($sourceString); $i < $n; $i+=2)
 			{
 				$hexChar = strtoupper(dechex(ord($sourceString[$i])).dechex(ord($sourceString[$i+1])));
 				$hexChar = str_pad($hexChar, 4, "0", STR_PAD_LEFT);
@@ -228,7 +228,7 @@ class CharsetConverter
 		elseif($charsetFrom == "utf-16")
 		{
 			$arConvertTable = $this->BuildConvertTable($charsetTo);
-			for($i = 0; $i < strlen($sourceString); $i+=2)
+			for($i = 0, $n = strlen($sourceString); $i < $n; $i+=2)
 			{
 				$hexChar = sprintf("%02X%02X", ord($sourceString[$i+1]), ord($sourceString[$i]));
 				if($arConvertTable[$charsetTo][$hexChar])
@@ -269,29 +269,27 @@ class CharsetConverter
 					if(in_array($hexChar, $arConvertTable[$charsetFrom]))
 					{
 						$unicodeHexChar = array_search($hexChar, $arConvertTable[$charsetFrom]);
-						$arUnicodeHexChar = explode("+", $unicodeHexChar);
-						for ($j = 0; $j < count($arUnicodeHexChar); $j++)
+						foreach (explode("+", $unicodeHexChar) as $char)
 						{
-							if (array_key_exists($arUnicodeHexChar[$j], $arConvertTable[$charsetTo]))
-								$resultString .= chr(hexdec($arConvertTable[$charsetTo][$arUnicodeHexChar[$j]]));
+							if (array_key_exists($char, $arConvertTable[$charsetTo]))
+								$resultString .= chr(hexdec($arConvertTable[$charsetTo][$char]));
 							else
-								$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in destination encoding table."));
+								$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in destination encoding table."));
 						}
 					}
 					else
-						$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in source encoding table."));
+						$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
 				}
 				else
 				{
 					if(in_array("$hexChar", $arConvertTable[$charsetFrom]))
 					{
 						$unicodeHexChar = array_search($hexChar, $arConvertTable[$charsetFrom]);
-						$arUnicodeHexChar = explode("+", $unicodeHexChar);
-						for ($j = 0; $j < count($arUnicodeHexChar); $j++)
-							$resultString .= $this->HexToUtf($arUnicodeHexChar[$j]);
+						foreach (explode("+", $unicodeHexChar) as $char)
+							$resultString .= $this->HexToUtf($char);
 					}
 					else
-						$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in source encoding table."));
+						$this->AddError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
 				}
 			}
 		}

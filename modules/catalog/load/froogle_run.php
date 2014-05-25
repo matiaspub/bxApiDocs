@@ -1,10 +1,10 @@
 <?
 //<title>Froogle</title>
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/data_export.php');
 
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/data_export.php"));
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -47,7 +47,7 @@ if (CModule::IncludeModule("iblock") && CModule::IncludeModule("catalog"))
 	{
 		$bAllSections = False;
 		$arSections = array();
-		if (is_array($V))
+		if (!empty($V) && is_array($V))
 		{
 			foreach ($V as $key => $value)
 			{
@@ -56,14 +56,14 @@ if (CModule::IncludeModule("iblock") && CModule::IncludeModule("catalog"))
 					$bAllSections = True;
 					break;
 				}
-				if (IntVal($value)>0)
+				if (intval($value)>0)
 				{
 					$arSections[] = IntVal($value);
 				}
 			}
 		}
 
-		if (!$bAllSections && count($arSections)<=0)
+		if (!$bAllSections && empty($arSections))
 			$strExportErrorMessage .= "Section list is not set.\n";
 	}
 
@@ -167,7 +167,7 @@ if (CModule::IncludeModule("iblock") && CModule::IncludeModule("catalog"))
 			}
 
 			$minPrice = 0;
-			for ($i = 0; $i < count($arPTypes); $i++)
+			for ($i = 0, $intPCount = count($arPTypes); $i < $intPCount; $i++)
 			{
 				if (strlen($ar_elems["CATALOG_CURRENCY_".$arPTypes[$i]])<=0) continue;
 				$tmpPrice = Round(CCurrencyRates::ConvertCurrency($ar_elems["CATALOG_PRICE_".$arPTypes[$i]], $ar_elems["CATALOG_CURRENCY_".$arPTypes[$i]], "USD"), 2);

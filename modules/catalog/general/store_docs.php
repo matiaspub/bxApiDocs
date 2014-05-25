@@ -14,23 +14,7 @@ class CAllCatalogDocs
 
 	/**
 	 * @param $id
-	 * @param $arFields = array(
-	*       "DOC_TYPE" => "a",
-	 *      "..." => "",
-	 *      "PRODUCTS" => array(
-				array(
-				"ID" => 12,
-				 *              "" =>,
-	 *                  "BARCODE" => array("sdfedf", "erger")
-				 *          ),
-				array(
-				"ID" => null,
-				 *              "" =>,
-				 *          ),
-	 *
-	 * )
-	 * ),
-	 * )
+	 * @param $arFields
 	 * @return bool
 	 */
 	public static function update($id, $arFields)
@@ -50,7 +34,7 @@ class CAllCatalogDocs
 
 		$arFields['~DATE_MODIFY'] = $DB->GetNowFunction();
 
-		if($id <= 0 || !self::CheckFields('UPDATE',$arFields))
+		if($id <= 0 || !self::CheckFields('UPDATE', $arFields))
 			return false;
 		$strUpdate = $DB->PrepareUpdate("b_catalog_store_docs", $arFields);
 
@@ -59,19 +43,16 @@ class CAllCatalogDocs
 			$strSql = "UPDATE b_catalog_store_docs SET ".$strUpdate." WHERE ID = ".$id." ";
 			if(!$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__))
 				return false;
-			/*if(isset($arFields["PRODUCTS"]))
+
+			if(isset($arFields["ELEMENT"]))
 			{
-
-				foreach($arFields["PRODUCTS"] as $f)
+				foreach($arFields["ELEMENT"] as $arElement)
 				{
-				if ()
-				Prod::uPDATE($f["ID"], $f);
+					if(is_array($arElement))
+						CCatalogStoreDocsElement::update($arElement["ID"], $arElement);
 				}
-
-
-			}*/
+			}
 		}
-
 		return true;
 	}
 
@@ -85,7 +66,7 @@ class CAllCatalogDocs
 		$id = intval($id);
 		if($id > 0)
 		{
-			$dbDocument = CCatalogDocs::getList(array(), array("ID" => $id));
+			$dbDocument = CCatalogDocs::getList(array(), array("ID" => $id), false, false, array('ID', 'STATUS'));
 			if($arDocument = $dbDocument->Fetch())
 			{
 				if($arDocument["STATUS"] == "Y")
@@ -98,7 +79,7 @@ class CAllCatalogDocs
 			foreach(GetModuleEvents("catalog", "OnBeforeDocumentDelete", true) as $event)
 				ExecuteModuleEventEx($event, array($id));
 
-			$DB->Query("DELETE FROM b_catalog_store_docs WHERE ID = ".$id." ", true);
+			$DB->Query("DELETE FROM b_catalog_store_docs WHERE ID = ".$id, true);
 			return true;
 		}
 		return false;
@@ -112,14 +93,21 @@ class CAllCatalogDocs
 	protected function checkFields($action, &$arFields)
 	{
 		global $DB;
-		if ((($action == 'ADD') || isset($arFields["DOC_TYPE"])) && strlen($arFields["DOC_TYPE"]) <= 0 && !isset(self::$types[$arFields["DOC_TYPE"]]))
+		global $APPLICATION;
+
+		if((($action == 'ADD') || isset($arFields["DOC_TYPE"])) && strlen($arFields["DOC_TYPE"]) <= 0 && !isset(self::$types[$arFields["DOC_TYPE"]]))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CAT_DOC_WRONG_TYPE"));
+			$APPLICATION->ThrowException(GetMessage("CAT_DOC_WRONG_TYPE"));
 			return false;
 		}
-		if ((($action == 'ADD') || isset($arFields["SITE_ID"])) && strlen($arFields["SITE_ID"]) <=0 )
+		if((($action == 'ADD') || isset($arFields["SITE_ID"])) && strlen($arFields["SITE_ID"]) <=0 )
 		{
+			$APPLICATION->ThrowException(GetMessage("CAT_DOC_WRONG_SITE_ID"));
 			return false;
+		}
+		if ($action == 'ADD' || array_key_exists('STATUS', $arFields))
+		{
+			$arFields['STATUS'] = ('Y' == $arFields['STATUS'] ? 'Y' : 'N');
 		}
 		if(isset($arFields["STATUS"]))
 		{
@@ -141,30 +129,45 @@ class CAllCatalogDocs
 	 */
 	public static function conductDocument($documentId, $userId = 0)
 	{
+		global $APPLICATION;
+
 		$documentId = intval($documentId);
 		$userId = intval($userId);
 		$currency = null;
 		$contractorId = 0;
 		$result = false;
-		$dbDocType = CCatalogDocs::getList(array(), array("ID" => $documentId));
+		$dbDocType = CCatalogDocs::getList(
+			array(),
+			array("ID" => $documentId),
+			false,
+			false,
+			array('ID', 'DOC_TYPE', 'CURRENCY', 'CONTRACTOR_ID', 'STATUS')
+		);
 		if($arDocType = $dbDocType->Fetch())
 		{
-			$documentClass = self::$types[$arDocType["DOC_TYPE"]];
-			if(strlen($arDocType["CURRENCY"]) > 0)
-				$currency = $arDocType["CURRENCY"];
-			if(strlen($arDocType["CONTRACTOR_ID"]) > 0)
-				$contractorId = $arDocType["CONTRACTOR_ID"];
-
-			$result = $documentClass::conductDocument($documentId, $userId, $currency, $contractorId);
-			if($result !== false)
+			if ('Y' != $arDocType['STATUS'])
 			{
-				$arDocFields = array("STATUS" => "Y");
-				if($userId > 0)
+				$documentClass = self::$types[$arDocType["DOC_TYPE"]];
+				if(strlen($arDocType["CURRENCY"]) > 0)
+					$currency = $arDocType["CURRENCY"];
+				if(strlen($arDocType["CONTRACTOR_ID"]) > 0)
+					$contractorId = $arDocType["CONTRACTOR_ID"];
+
+				$result = $documentClass::conductDocument($documentId, $userId, $currency, $contractorId);
+				if($result !== false)
 				{
-					$arDocFields["STATUS_BY"] = $arDocFields["MODIFIED_BY"] = $userId;
+					$arDocFields = array("STATUS" => "Y");
+					if($userId > 0)
+					{
+						$arDocFields["STATUS_BY"] = $arDocFields["MODIFIED_BY"] = $userId;
+					}
+					if(!self::Update($documentId, $arDocFields))
+						return false;
 				}
-				if(!self::Update($documentId, $arDocFields))
-					return false;
+			}
+			else
+			{
+				$APPLICATION->ThrowException(GetMessage("CAT_DOC_STATUS_ALREADY_YES"));
 			}
 		}
 		return $result;
@@ -179,7 +182,13 @@ class CAllCatalogDocs
 	{
 		$result = '';
 		$documentId = intval($documentId);
-		$dbDocType = CCatalogDocs::getList(array(), array("ID" => $documentId));
+		$dbDocType = CCatalogDocs::getList(
+			array(),
+			array("ID" => $documentId),
+			false,
+			false,
+			array('ID', 'DOC_TYPE', 'STATUS')
+		);
 		if($arDocType = $dbDocType->Fetch())
 		{
 			if($arDocType["STATUS"] !== "Y")
@@ -207,8 +216,13 @@ class CAllCatalogDocs
 	{
 		global $DB;
 		$productID = IntVal($productID);
-		if ($productID > 0)
+		if($productID > 0)
 		{
+			$dbDeleteElements = CCatalogStoreDocsElement::getList(array(), array("ELEMENT_ID" => $productID), false, false, array('ID'));
+			while($arDeleteElements = $dbDeleteElements->fetch())
+			{
+				CCatalogStoreDocsElement::delete($arDeleteElements["ID"]);
+			}
 			return $DB->Query("DELETE FROM b_catalog_store_barcode WHERE PRODUCT_ID = ".$productID." ", true);
 		}
 	}
@@ -223,4 +237,18 @@ class CAllCatalogDocs
 		}
 	}
 
+	public static function OnBeforeIBlockElementDelete($productID)
+	{
+		$productID = IntVal($productID);
+		if($productID > 0)
+		{
+			$dbStoreDocs = CCatalogDocs::getList(array(), array("PRODUCTS_ELEMENT_ID" => $productID, "STATUS" => "Y"), false, false, array('ID'));
+			if($arStoreDocs = $dbStoreDocs->fetch())
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CAT_DOC_ERROR_ELEMENT_IN_DOCUMENT"));
+				return false;
+			}
+		}
+		return true;
+	}
 }

@@ -28,54 +28,54 @@ class CAllSaleAuxiliary
 	//********** CHECK **************//
 	
 	/**
-	 * <p>Метод проверяет, может ли посетитель с кодом userID получить доступ к ресурсу с идентифицирующей строкой itemMD5. Период, в течение которого пользователь имеет доступ к ресурсу, задается длиной periodLength и типом periodType.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param string $itemMD5  Строка, однозначно идентифицирующая ресурс (идентификатор
-	 * ресурса).
-	 *
-	 *
-	 *
-	 * @param int $periodLength  Длина периода, в течение которого пользователь имеет доступ к
-	 * ресурсу.
-	 *
-	 *
-	 *
-	 * @param string $periodType  Тип длины периода, в течение которого пользователь имеет доступ к
-	 * ресурсу. Допустимые значения: I - минута, H - час, D - сутки, W - неделя, M
-	 * - месяц, Q - квартал, S - полугодие, Y - год.
-	 *
-	 *
-	 *
-	 * @return bool <p><i>true</i>, если пользователь может получить доступ к данному
-	 * ресурсу, и <i>false</i> - в противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CSaleAuxiliary::CheckAccess($USER-&gt;GetID(), "pict.jpg", 2, "D"))
-	 * {
-	 *     echo '&lt;a href="'.pict.jpg.'"&gt;Файл доступен для скачивания&lt;/a&gt;';
-	 * }
-	 * else
-	 * {
-	 *     echo "Файл не доступен для скачивания";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.checkaccess.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, может ли посетитель с кодом userID получить доступ к ресурсу с идентифицирующей строкой itemMD5. Период, в течение которого пользователь имеет доступ к ресурсу, задается длиной periodLength и типом periodType.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param string $itemMD5  Строка, однозначно идентифицирующая ресурс (идентификатор
+	* ресурса).
+	*
+	*
+	*
+	* @param int $periodLength  Длина периода, в течение которого пользователь имеет доступ к
+	* ресурсу.
+	*
+	*
+	*
+	* @param string $periodType  Тип длины периода, в течение которого пользователь имеет доступ к
+	* ресурсу. Допустимые значения: I - минута, H - час, D - сутки, W - неделя, M
+	* - месяц, Q - квартал, S - полугодие, Y - год.
+	*
+	*
+	*
+	* @return bool <p><i>true</i>, если пользователь может получить доступ к данному
+	* ресурсу, и <i>false</i> - в противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CSaleAuxiliary::CheckAccess($USER-&gt;GetID(), "pict.jpg", 2, "D"))
+	* {
+	*     echo '&lt;a href="'.pict.jpg.'"&gt;Файл доступен для скачивания&lt;/a&gt;';
+	* }
+	* else
+	* {
+	*     echo "Файл не доступен для скачивания";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.checkaccess.php
+	* @author Bitrix
+	*/
 	public static function CheckAccess($userID, $itemMD5, $periodLength, $periodType)
 	{
 		global $DB;
@@ -177,22 +177,22 @@ class CAllSaleAuxiliary
 
 	
 	/**
-	 * <p>Метод удаляет информацию о временном доступе с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи.
-	 *
-	 *
-	 *
-	 * @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	 * случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет информацию о временном доступе с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи.
+	*
+	*
+	*
+	* @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -206,22 +206,22 @@ class CAllSaleAuxiliary
 
 	
 	/**
-	 * <p>Метод удаляет всю информацию о временном доступе пользователя с кодом userID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	 * случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.deletebyuserid.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет всю информацию о временном доступе пользователя с кодом userID.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.deletebyuserid.php
+	* @author Bitrix
+	*/
 	public static function DeleteByUserID($userID)
 	{
 		global $DB;

@@ -66,55 +66,19 @@ class CUserTypeManager extends CAllUserTypeManager
 	public static function DateTimeToChar($FIELD_NAME)
 	{
 		global $DB;
-		return "IF(EXTRACT(HOUR_SECOND FROM ".$FIELD_NAME.")>0, ".$DB->DateToCharFunction($FIELD_NAME, "FULL").", ".$DB->DateToCharFunction($FIELD_NAME, "SHORT").")";
+		return "IF(DATE(".$FIELD_NAME.")<>".$FIELD_NAME.", ".$DB->DateToCharFunction($FIELD_NAME, "FULL").", ".$DB->DateToCharFunction($FIELD_NAME, "SHORT").")";
 	}
 }
 
 class CSQLWhere extends CAllSQLWhere
 {
-	public static function _Upper($field)
-	{
-		return "UPPER(".$field.")";
-	}
-
 	public static function _Empty($field)
 	{
 		return "(".$field." IS NULL OR ".$field." = '')";
 	}
-
 	public static function _NotEmpty($field)
 	{
 		return "(".$field." IS NOT NULL AND LENGTH(".$field.") > 0)";
-	}
-
-	public static function _StringEQ($field, $sql_value)
-	{
-		return $field." = '".$sql_value."'";
-	}
-
-	public static function _StringNotEQ($field, $sql_value)
-	{
-		return "(".$field." IS NULL OR ".$field." <> '".$sql_value."')";
-	}
-
-	public static function _StringIN($field, $sql_values)
-	{
-		return $field." in ('".implode("', '", $sql_values)."')";
-	}
-
-	public static function _StringNotIN($field, $sql_values)
-	{
-		return "(".$field." IS NULL OR ".$field." not in ('".implode("', '", $sql_values)."'))";
-	}
-
-	public static function _ExprEQ($field, CSQLWhereExpression $val)
-	{
-		return $field." = ".$val->compile();
-	}
-
-	public static function _ExprNotEQ($field, CSQLWhereExpression $val)
-	{
-		return "(".$field." IS NULL OR ".$field." <> ".$val->compile().")";
 	}
 }
 

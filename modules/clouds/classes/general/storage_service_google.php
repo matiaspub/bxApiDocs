@@ -305,7 +305,7 @@ class CCloudStorageService_GoogleStorage extends CCloudStorageService
 			'',
 			array(
 				"x-goog-acl"=>"public-read",
-				"x-goog-copy-source"=>CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").$arFile["SUBDIR"]."/".$arFile["FILE_NAME"], "UTF-8"),
+				"x-goog-copy-source"=>CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").($arFile["SUBDIR"]? $arFile["SUBDIR"]."/": "").$arFile["FILE_NAME"], "UTF-8"),
 				"Content-Type"=>$arFile["CONTENT_TYPE"]
 			)
 		);

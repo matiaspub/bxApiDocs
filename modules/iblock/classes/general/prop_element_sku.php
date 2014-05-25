@@ -1,7 +1,6 @@
 <?
-IncludeModuleLangFile(__FILE__);
-//IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT.'/modules/iblock/admin/iblock_element_admin.php');
-//IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/admin_lib.php");
+use Bitrix\Main\Localization\Loc as Loc;
+Loc::loadMessages(__FILE__);
 
 // define('BT_UT_SKU_CODE','SKU');
 
@@ -12,7 +11,7 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		return array(
 			"PROPERTY_TYPE" => "E",
 			"USER_TYPE" => BT_UT_SKU_CODE,
-			"DESCRIPTION" => GetMessage('BT_UT_SKU_DESCR'),
+			"DESCRIPTION" => Loc::getMessage('BT_UT_SKU_DESCR'),
 			"GetPropertyFieldHtml" => array(__CLASS__, "GetPropertyFieldHtml"),
 			"GetPropertyFieldHtmlMulty" => array(__CLASS__, "GetPropertyFieldHtml"),
 			"GetPublicViewHTML" => array(__CLASS__, "GetPublicViewHTML"),
@@ -66,35 +65,35 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		$arPropertyFields = array(
 			"HIDE" => array("ROW_COUNT", "COL_COUNT", "MULTIPLE_CNT", "MULTIPLE"),
 			"SET" => array("MULTIPLE" => "N"),
-			'USER_TYPE_SETTINGS_TITLE' => GetMessage('BT_UT_SKU_SETTING_TITLE'),
+			'USER_TYPE_SETTINGS_TITLE' => Loc::getMessage('BT_UT_SKU_SETTING_TITLE'),
 		);
 
 		$arSettings = self::PrepareSettings($arFields);
-		if (array_key_exists('USER_TYPE_SETTINGS', $arSettings))
+		if (isset($arSettings['USER_TYPE_SETTINGS']))
 			$arSettings = $arSettings['USER_TYPE_SETTINGS'];
 
 		$strResult = '<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_VIEW').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_VIEW').'</td>
 		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[VIEW]',self::GetPropertyViewsList(true),htmlspecialcharsbx($arSettings['VIEW'])).'</td>
 		</tr>
 		<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_MAX_WIDTH').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_WIDTH]" value="'.intval($arSettings['MAX_WIDTH']).'">&nbsp;'.GetMessage('BT_UT_SKU_SETTING_COMMENT_MAX_WIDTH').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_MAX_WIDTH').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_WIDTH]" value="'.intval($arSettings['MAX_WIDTH']).'">&nbsp;'.Loc::getMessage('BT_UT_SKU_SETTING_COMMENT_MAX_WIDTH').'</td>
 		</tr>
 		<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_MIN_HEIGHT').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MIN_HEIGHT]" value="'.intval($arSettings['MIN_HEIGHT']).'">&nbsp;'.GetMessage('BT_UT_SKU_SETTING_COMMENT_MIN_HEIGHT').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_MIN_HEIGHT').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MIN_HEIGHT]" value="'.intval($arSettings['MIN_HEIGHT']).'">&nbsp;'.Loc::getMessage('BT_UT_SKU_SETTING_COMMENT_MIN_HEIGHT').'</td>
 		</tr>
 		<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_MAX_HEIGHT').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_HEIGHT]" value="'.intval($arSettings['MAX_HEIGHT']).'">&nbsp;'.GetMessage('BT_UT_SKU_SETTING_COMMENT_MAX_HEIGHT').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_MAX_HEIGHT').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_HEIGHT]" value="'.intval($arSettings['MAX_HEIGHT']).'">&nbsp;'.Loc::getMessage('BT_UT_SKU_SETTING_COMMENT_MAX_HEIGHT').'</td>
 		</tr>
 		<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_BAN_SYMBOLS').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_BAN_SYMBOLS').'</td>
 		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[BAN_SYM]" value="'.htmlspecialcharsbx($arSettings['BAN_SYM']).'"></td>
 		</tr>
 		<tr>
-		<td>'.GetMessage('BT_UT_SKU_SETTING_REP_SYMBOL').'</td>
+		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_REP_SYMBOL').'</td>
 		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[REP_SYM]',parent::GetReplaceSymList(true),htmlspecialcharsbx($arSettings['REP_SYM'])).'&nbsp;<input type="text" name="'.$strHTMLControlName["NAME"].'[OTHER_REP_SYM]" size="1" maxlength="1" value="'.$arSettings['OTHER_REP_SYM'].'"></td>
 		</tr>';
 

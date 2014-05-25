@@ -55,21 +55,64 @@ class CBitrixCloudMonitoring
 		if (is_object($xml))
 		{
 			$result = array();
-			foreach($xml->children() as $domainXml)
+			$children = $xml->children();
+			if (is_array($children))
 			{
-				$name = $domainXml->getAttribute("name");
-				$emails = $domainXml->elementsByName("emails");
-				$tests = $domainXml->elementsByName("tests");
-				$result[] = array(
-					"DOMAIN" => $name,
-					"IS_HTTPS" => ($domainXml->getAttribute("https") === "true"? "Y": "N"),
-					"LANG" => $domainXml->getAttribute("lang"),
-					"EMAILS" => (is_array($emails)? explode(",", $emails[0]->textContent()): array()),
-					"TESTS" => (is_array($tests)? explode(",", $tests[0]->textContent()): array()),
-				);
+				foreach($children as $domainXml)
+				{
+					$name = $domainXml->getAttribute("name");
+					$emails = $domainXml->elementsByName("emails");
+					$tests = $domainXml->elementsByName("tests");
+					$result[] = array(
+						"DOMAIN" => $name,
+						"IS_HTTPS" => ($domainXml->getAttribute("https") === "true"? "Y": "N"),
+						"LANG" => $domainXml->getAttribute("lang"),
+						"EMAILS" => (is_array($emails)? explode(",", $emails[0]->textContent()): array()),
+						"TESTS" => (is_array($tests)? explode(",", $tests[0]->textContent()): array()),
+					);
+				}
 			}
 			return $result;
 		}
+	}
+	static public function addDevice($domain, $deviceId)
+	{
+		if ($deviceId != "")
+		{
+			$option = CBitrixCloudOption::getOption('monitoring_devices');
+			$devices = $option->getArrayValue();
+			$devices[] = $domain."|".$deviceId;
+			$option->setArrayValue($devices);
+		}
+	}
+	static public function deleteDevice($domain, $deviceId)
+	{
+		if ($deviceId != "")
+		{
+			$option = CBitrixCloudOption::getOption('monitoring_devices');
+			$devices = $option->getArrayValue();
+			$index = array_search($domain."|".$deviceId, $devices);
+			if ($index !== false)
+			{
+				unset($devices[$index]);
+				$option->setArrayValue($devices);
+			}
+		}
+	}
+	static public function getDevices($domain)
+	{
+		$result = array();
+		$option = CBitrixCloudOption::getOption('monitoring_devices');
+		$devices = $option->getArrayValue();
+		foreach($devices as $domain_device)
+		{
+			if (list ($myDomain, $myDevice) = explode("|", $domain_device, 2))
+			{
+				if ($myDomain === $domain)
+					$result[] = $myDevice;
+			}
+		}
+		return $result;
 	}
 	/*
 	 * Registers new monitoring job with the remote service.

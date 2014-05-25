@@ -512,7 +512,7 @@ class CBlogPost extends CAllBlogPost
 
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $USER;
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("BLOG_POST", "P.ID");
@@ -596,6 +596,9 @@ class CBlogPost extends CAllBlogPost
 			"HAS_TAGS" => array("FIELD" => "P.HAS_TAGS", "TYPE" => "string"),
 			"HAS_COMMENT_IMAGES" => array("FIELD" => "P.HAS_COMMENT_IMAGES", "TYPE" => "string"),
 			"HAS_SOCNET_ALL" => array("FIELD" => "P.HAS_SOCNET_ALL", "TYPE" => "string"),
+			"SEO_TITLE" => array("FIELD" => "P.SEO_TITLE", "TYPE" => "string"),
+			"SEO_TAGS" => array("FIELD" => "P.SEO_TAGS", "TYPE" => "string"),
+			"SEO_DESCRIPTION" => array("FIELD" => "P.SEO_DESCRIPTION", "TYPE" => "string"),
 
 			"PERMS" => array(),
 
@@ -721,9 +724,13 @@ class CBlogPost extends CAllBlogPost
 		$blogModulePermissions = $GLOBALS["APPLICATION"]->GetGroupRight("blog");
 		if ($blogModulePermissions < "W")
 		{
-			if(!CBlog::IsBlogOwner($arFilter["BLOG_ID"], $GLOBALS["USER"]->GetID()))
+			$user_id = 0;
+			if(isset($USER) && is_object($USER) && $USER->IsAuthorized())
+				$user_id = $GLOBALS["USER"]->GetID();
+
+			if(!CBlog::IsBlogOwner($arFilter["BLOG_ID"], $user_id))
 			{
-				$arUserGroups = CBlogUser::GetUserGroups(($GLOBALS["USER"]->IsAuthorized() ? $GLOBALS["USER"]->GetID() : 0), IntVal($arFilter["BLOG_ID"]), "Y", BLOG_BY_USER_ID);
+				$arUserGroups = CBlogUser::GetUserGroups($user_id, IntVal($arFilter["BLOG_ID"]), "Y", BLOG_BY_USER_ID);
 				$strUserGroups = "0";
 				foreach($arUserGroups as $v)
 					$strUserGroups .= ",".IntVal($v);

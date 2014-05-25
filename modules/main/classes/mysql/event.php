@@ -11,6 +11,25 @@ require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/event.p
 
 class CEvent extends CAllEvent
 {
+	
+	/**
+	* <p>Собирает неотправленные почтовые события и отправляет их в виде E-Mail сообщений с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a>. Функция автоматически вызывается при загрузке каждой страницы и не требует ручного вызова.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a> </li> </ul> </h<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cevent/checkevents.php
+	* @author Bitrix
+	*/
 	public static function CheckEvents()
 	{
 		if((defined("DisableEventsCheck") && DisableEventsCheck===true) || (defined("BX_CRONTAB_SUPPORT") && BX_CRONTAB_SUPPORT===true && BX_CRONTAB!==true))
@@ -98,7 +117,7 @@ class CEvent extends CAllEvent
 		$DB->Query("SELECT RELEASE_LOCK('".$uniq."_event')");
 	}
 
-	public static function CleanUpAgent()
+public static 	function CleanUpAgent()
 	{
 		global $DB;
 		$period = abs(intval(COption::GetOptionString("main", "mail_event_period", 14)));
@@ -114,92 +133,92 @@ class CEvent extends CAllEvent
 
 class CEventMessage extends CAllEventMessage
 {
-	
+
 	/**
-	 * <p>Возвращает список почтовых шаблонов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string &$by = "id" Ссылка на переменную с полем для сортировки, может принимать
-	 * значения: <ul> <li> <b>site_id</b> - идентификатор сайта;</li> <li> <b>subject</b> -
-	 * тема;</li> <li> <b>timestamp_x</b> - дата изменения;</li> <li> <b>event_name</b> - тип
-	 * события;</li> <li> <b>id</b> - ID шаблона;</li> <li> <b>active</b> - активность;</li> </ul>
-	 *
-	 *
-	 *
-	 * @param string &$order = "desc" Ссылка на переменную с порядком сортировки, может принимать
-	 * значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
-	 * убыванию;</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $filter  Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]), может
-	 * принимать значения: <ul> <li> <b>ID</b> - ID шаблона;</li> <li> <b>TYPE</b> - код и
-	 * заголовок типа события (допустима <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>TYPE_ID</b> -
-	 * код типа события (допустима <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li>
-	 * <b>TIMESTAMP_1</b> - левая часть интервала ("c") для поиска по дате
-	 * изменения;</li> <li> <b>TIMESTAMP_2</b> - правая часть интервала ("по") для
-	 * поиска по дате изменения;</li> <li> <b>SITE_ID</b> - идентификатор сайта
-	 * (допустимо задание массива для поиска по логике "или", либо
-	 * допустимо использование <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложной логики</a>);</li> <li> <b>ACTIVE</b> -
-	 * флаг активности (Y|N);</li> <li> <b>FROM</b> - поле "От кого" (допустима <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>TO</b> -
-	 * поле "Кому" (допустима <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
-	 * логика</a>);</li> <li> <b>BCC</b> - поле "Скрытая копия" (допустима <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>SUBJECT</b> -
-	 * по теме сообщения (допустима <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>BODY_TYPE</b>
-	 * - по типу тела сообщения (text|html);</li> <li> <b>BODY</b> - по телу сообщения
-	 * (допустима <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
-	 * логика</a>);</li> </ul>
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFilter = Array(
-	 *     "ID"            =&gt; "12 | 134",
-	 *     "TYPE"          =&gt; "контракт &amp; рекл",
-	 *     "TYPE_ID"       =&gt; "ADV_BANNER | ADV_CONTRACT",
-	 *     "TIMESTAMP_1"   =&gt; "12.11.2001",
-	 *     "TIMESTAMP_2"   =&gt; "12.11.2005",
-	 *     "SITE_ID"       =&gt; "ru | en",
-	 *     "ACTIVE"        =&gt; "Y",
-	 *     "FROM"          =&gt; "bitrixsoft.ru",
-	 *     "TO"            =&gt; "#TO#",
-	 *     "BCC"           =&gt; "admin",
-	 *     "SUBJECT"       =&gt; "конктракт",
-	 *     "BODY_TYPE"     =&gt; "text",
-	 *     "BODY"          =&gt; "auto"
-	 *     );
-	 * $rsMess = <b>CEventMessage::GetList</b>($by="site_id", $order="desc", $arFilter);
-	 * $is_filtered = $rsMess-&gt;is_filtered;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
-	 * почтового сообщения</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getbyid.php">CEventMessage::GetByID</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getlist.php
-	 * @author Bitrix
-	 */
-	public static function GetList(&$by, &$order, $arFilter=Array())
+	* <p>Возвращает список почтовых шаблонов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string &$by = "id" Ссылка на переменную с полем для сортировки, может принимать
+	* значения: <ul> <li> <b>site_id</b> - идентификатор сайта;</li> <li> <b>subject</b> -
+	* тема;</li> <li> <b>timestamp_x</b> - дата изменения;</li> <li> <b>event_name</b> - тип
+	* события;</li> <li> <b>id</b> - ID шаблона;</li> <li> <b>active</b> - активность;</li> </ul>
+	*
+	*
+	*
+	* @param string &$order = "desc" Ссылка на переменную с порядком сортировки, может принимать
+	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
+	* убыванию;</li> </ul>
+	*
+	*
+	*
+	* @param array $filter  Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]), может
+	* принимать значения: <ul> <li> <b>ID</b> - ID шаблона;</li> <li> <b>TYPE</b> - код и
+	* заголовок типа события (допустима <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>TYPE_ID</b> -
+	* код типа события (допустима <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li>
+	* <b>TIMESTAMP_1</b> - левая часть интервала ("c") для поиска по дате
+	* изменения;</li> <li> <b>TIMESTAMP_2</b> - правая часть интервала ("по") для
+	* поиска по дате изменения;</li> <li> <b>SITE_ID</b> - идентификатор сайта
+	* (допустимо задание массива для поиска по логике "или", либо
+	* допустимо использование <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложной логики</a>);</li> <li> <b>ACTIVE</b> -
+	* флаг активности (Y|N);</li> <li> <b>FROM</b> - поле "От кого" (допустима <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>TO</b> -
+	* поле "Кому" (допустима <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
+	* логика</a>);</li> <li> <b>BCC</b> - поле "Скрытая копия" (допустима <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>SUBJECT</b> -
+	* по теме сообщения (допустима <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);</li> <li> <b>BODY_TYPE</b>
+	* - по типу тела сообщения (text|html);</li> <li> <b>BODY</b> - по телу сообщения
+	* (допустима <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
+	* логика</a>);</li> </ul>
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFilter = Array(
+	*     "ID"            =&gt; "12 | 134",
+	*     "TYPE"          =&gt; "контракт &amp; рекл",
+	*     "TYPE_ID"       =&gt; "ADV_BANNER | ADV_CONTRACT",
+	*     "TIMESTAMP_1"   =&gt; "12.11.2001",
+	*     "TIMESTAMP_2"   =&gt; "12.11.2005",
+	*     "SITE_ID"       =&gt; "ru | en",
+	*     "ACTIVE"        =&gt; "Y",
+	*     "FROM"          =&gt; "bitrixsoft.ru",
+	*     "TO"            =&gt; "#TO#",
+	*     "BCC"           =&gt; "admin",
+	*     "SUBJECT"       =&gt; "конктракт",
+	*     "BODY_TYPE"     =&gt; "text",
+	*     "BODY"          =&gt; "auto"
+	*     );
+	* $rsMess = <b>CEventMessage::GetList</b>($by="site_id", $order="desc", $arFilter);
+	* $is_filtered = $rsMess-&gt;is_filtered;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/index.php">Поля шаблона
+	* почтового сообщения</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getbyid.php">CEventMessage::GetByID</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/getlist.php
+	* @author Bitrix
+	*/
+	public static 	function GetList(&$by, &$order, $arFilter=Array())
 	{
 		$err_mess = "<br>Class: CEventMessage<br>File: ".__FILE__."<br>Function: GetList<br>Line: ";
 		global $DB, $USER;

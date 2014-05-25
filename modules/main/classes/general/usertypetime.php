@@ -67,7 +67,7 @@ class CUserTypeDateTime
 			<td>
 				<label><input type="radio" name="'.$arHtmlControl["NAME"].'[DEFAULT_VALUE][TYPE]" value="NONE" '.("NONE"==$type? 'checked="checked"': '').'>'.GetMessage("USER_TYPE_DT_NONE").'</label><br>
 				<label><input type="radio" name="'.$arHtmlControl["NAME"].'[DEFAULT_VALUE][TYPE]" value="NOW" '.("NOW"==$type? 'checked="checked"': '').'>'.GetMessage("USER_TYPE_DT_NOW").'</label><br>
-				<label><input type="radio" name="'.$arHtmlControl["NAME"].'[DEFAULT_VALUE][TYPE]" value="FIXED" '.("FIXED"==$type? 'checked="checked"': '').'>'.CAdminCalendar::CalendarDate($arHtmlControl["NAME"].'[DEFAULT_VALUE][VALUE]', $value, 20).'</label><br>
+				<label><input type="radio" name="'.$arHtmlControl["NAME"].'[DEFAULT_VALUE][TYPE]" value="FIXED" '.("FIXED"==$type? 'checked="checked"': '').'>'.CAdminCalendar::CalendarDate($arHtmlControl["NAME"].'[DEFAULT_VALUE][VALUE]', $value, 20, true).'</label><br>
 			</td>
 		</tr>
 		';
@@ -86,7 +86,7 @@ class CUserTypeDateTime
 				else
 					$arHtmlControl["VALUE"] = str_replace(" 00:00:00", "", CDatabase::FormatDate($arUserField["SETTINGS"]["DEFAULT_VALUE"]["VALUE"], "YYYY-MM-DD HH:MI:SS", CLang::GetDateFormat("FULL")));
 			}
-			return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20);
+			return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20, true);
 		}
 		elseif(strlen($arHtmlControl["VALUE"])>0)
 			return $arHtmlControl["VALUE"];
@@ -96,7 +96,7 @@ class CUserTypeDateTime
 
 	public static function GetFilterHTML($arUserField, $arHtmlControl)
 	{
-		return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20);
+		return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20, true);
 	}
 
 	public static function GetAdminListViewHTML($arUserField, $arHtmlControl)
@@ -110,7 +110,7 @@ class CUserTypeDateTime
 	public static function GetAdminListEditHTML($arUserField, $arHtmlControl)
 	{
 		if($arUserField["EDIT_IN_LIST"]=="Y")
-			return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20);
+			return CAdminCalendar::CalendarDate($arHtmlControl["NAME"], $arHtmlControl["VALUE"], 20, true);
 		elseif(strlen($arHtmlControl["VALUE"])>0)
 			return $arHtmlControl["VALUE"];
 		else
@@ -126,7 +126,7 @@ class CUserTypeDateTime
 				"id" => $arUserField["FIELD_NAME"],
 				"text" => GetMessage("USER_TYPE_DT_ERROR",
 					array(
-						"#FIELD_NAME#"=>$arUserField["EDIT_FORM_LABEL"],
+						"#FIELD_NAME#"=>($arUserField["EDIT_FORM_LABEL"] <> ''? $arUserField["EDIT_FORM_LABEL"] : $arUserField["FIELD_NAME"]),
 					)
 				),
 			);

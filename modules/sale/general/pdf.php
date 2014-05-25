@@ -71,11 +71,51 @@ class CSaleTfpdf extends tFPDF
 
 	static public function Output($name = '', $dest = '')
 	{
-		// invalid symbols: "%*/:<>?\| and \x00-\x1F\x7F and \x80-\xFF
-		return parent::Output(
-			preg_replace('/[\x00-\x1F\x22\x25\x2A\x2F\x3A\x3C\x3E\x3F\x5C\x7C\x7F-\xFF]+/', '', $name),
-			$dest
-		);
+		// invalid symbols: "%*:<>?| and \x00-\x1F\x7F and \x80-\xFF
+		$name = preg_replace('/[\x00-\x1F\x22\x25\x2A\x3A\x3C\x3E\x3F\x7C\x7F-\xFF]+/', '', $name);
+		$name = str_replace('\\', '/', $name);
+
+		if (in_array($dest, array('I', 'D')))
+			$name = basename($name);
+
+		return parent::Output($name, $dest);
+	}
+
+	public function _parsebmp($file)
+	{
+		// Extract info from a BMP file (via PNG conversion)
+		if(!function_exists('imagepng'))
+			$this->Error('GD extension is required for BMP support');
+		$im = CFile::ImageCreateFromBMP($file);
+		if(!$im)
+			$this->Error('Missing or incorrect image file: '.$file);
+		imageinterlace($im,0);
+		$f = @fopen('php://temp','rb+');
+		if($f)
+		{
+			// Perform conversion in memory
+			ob_start();
+			imagepng($im);
+			$data = ob_get_clean();
+			imagedestroy($im);
+			fwrite($f,$data);
+			rewind($f);
+			$info = $this->_parsepngstream($f,$file);
+			fclose($f);
+		}
+		else
+		{
+			// Use temporary file
+			$tmp = tempnam('.','gif');
+			if(!$tmp)
+				$this->Error('Unable to create a temporary file');
+			if(!imagepng($im,$tmp))
+				$this->Error('Error while saving to temporary file');
+			imagedestroy($im);
+			$info = $this->_parsepng($tmp);
+			unlink($tmp);
+		}
+		return $info;
 	}
 
 }
@@ -100,9 +140,33 @@ class CSalePdf
 	{
 		$string = htmlspecialcharsback($string);
 		$string = CharsetConverter::ConvertCharset($string, SITE_CHARSET, 'UTF-8');
-		$string = html_entity_decode($string, ENT_NOQUOTES, 'UTF-8');
+		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		return $string;
+	}
+
+	public function splitString($text, $width)
+	{
+		if ($this->generator->GetStringWidth($text) <= $width)
+		{
+			return array($text, '');
+		}
+		else
+		{
+			$string = $text;
+			while ($this->generator->GetStringWidth($string) > $width)
+			{
+				$l = floor(mb_strlen($string, 'UTF-8') * $width/$this->generator->GetStringWidth($string));
+				$p = mb_strrpos($string, ' ', $l-mb_strlen($string, 'UTF-8'), 'UTF-8') ?: $l;
+
+				$string = mb_substr($string, 0, $p, 'UTF-8');
+			}
+
+			return array(
+				$string,
+				mb_substr($text, $p+1, mb_strlen($text, 'UTF-8'), 'UTF-8')
+			);
+		}
 	}
 
 	public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4')

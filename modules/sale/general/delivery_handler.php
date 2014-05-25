@@ -16,6 +16,11 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllSaleDeliveryHandler
 {
+	public static $actions = array(
+		"REQUEST_SELF" => 0, // Request to delivery company to wait a cargo
+		"REQUEST_TAKE" => 1  // Request to delivery company to take a cargo
+	);
+
 	// public: Initialize
 	// includes all delivery_*.php files in /php_interface/include/sale_delivery/ and /modules/sale/delivery/
 	// double files with the same name are ignored
@@ -71,7 +76,7 @@ class CAllSaleDeliveryHandler
 		}
 
 		$query = "
-SELECT HID AS SID, LID, ACTIVE, NAME, SORT, DESCRIPTION, HANDLER, SETTINGS, PROFILES, TAX_RATE, LOGOTIP
+SELECT HID AS SID, LID, ACTIVE, NAME, SORT, DESCRIPTION, HANDLER, SETTINGS, PROFILES, TAX_RATE, LOGOTIP, BASE_CURRENCY
 FROM b_sale_delivery_handler
 WHERE HID IN (".$strKeys.")";
 
@@ -85,16 +90,18 @@ WHERE HID IN (".$strKeys.")";
 
 		while ($arRes = $dbRes->Fetch())
 		{
-			$arRes["LID"] = trim($arRes["LID"]);
-
 			$arHandler = $arFullHandlersList[$arHandlersMap[$arRes['SID']]];
-
+			$arRes["LID"] = trim($arRes["LID"]);
 			$arHandler["LID"] = $arRes["LID"];
 			$arHandler["ACTIVE"] = $arRes["ACTIVE"];
 			$arHandler["SORT"] = $arRes["SORT"];
 			$arHandler["NAME"] = $arRes["NAME"];
 			$arHandler["DESCRIPTION"] = $arRes["DESCRIPTION"];
 			$arHandler["TAX_RATE"] = doubleval($arRes["TAX_RATE"]);
+
+			if(strlen($arRes["BASE_CURRENCY"]) > 0)
+				$arHandler["BASE_CURRENCY"] = $arRes["BASE_CURRENCY"];
+
 			$arHandler["INSTALLED"] = "Y";
 
 			if (intval($arRes["LOGOTIP"]) > 0)
@@ -104,7 +111,7 @@ WHERE HID IN (".$strKeys.")";
 
 			if (is_callable($arHandler["GETCONFIG"]))
 			{
-				$arHandler["CONFIG"] = call_user_func($arHandler["GETCONFIG"]);
+				$arHandler["CONFIG"] = call_user_func($arHandler["GETCONFIG"], $SITE_ID);
 
 				if (strlen($arRes["SETTINGS"]) > 0 && is_callable($arHandler["DBGETSETTINGS"]))
 				{
@@ -155,26 +162,43 @@ WHERE HID IN (".$strKeys.")";
 		{
 			if (array_key_exists($arHandler["SID"], $arInstalledHandlersMap)) continue;
 
-			$arHandler["INSTALLED"] = "N";
-			$arHandler["LID"] = '';
-			$arHandler['ACTIVE'] = "N";
-			$arHandler["SORT"] = '';
-			$arHandler["TAX_RATE"] = 0;
-			$arHandler["PROFILE_USE_DEFAULT"] = "Y";
+			$siteList = array();
 
-			if (is_callable($arHandler["GETCONFIG"]))
+			if(strlen($SITE_ID) <= 0 && isset($arHandler["MULTISITE_CONFIG"]) && $arHandler["MULTISITE_CONFIG"] == "Y")
 			{
-				$arHandler["CONFIG"] = call_user_func($arHandler["GETCONFIG"]);
+				$rsSites = CSite::GetList($by = "sort", $order = "asc", Array());
+
+				while($arRes = $rsSites->Fetch())
+					$siteList[] = $arRes['ID'];
 			}
 			else
 			{
-				$arHandler["CONFIG"] = array(
-					"CONFIG_GROUPS" => array(),
-					"CONFIG" => array(),
-				);
+				$siteList[] = $SITE_ID;
 			}
 
-			$arHandlersList[] = $arHandler;
+			foreach($siteList as $siteId)
+			{
+				$arHandler["INSTALLED"] = "N";
+				$arHandler["LID"] = trim($siteId);
+				$arHandler['ACTIVE'] = "N";
+				$arHandler["SORT"] = '';
+				$arHandler["TAX_RATE"] = 0;
+				$arHandler["PROFILE_USE_DEFAULT"] = "Y";
+
+				if (is_callable($arHandler["GETCONFIG"]))
+				{
+					$arHandler["CONFIG"] = call_user_func($arHandler["GETCONFIG"], $siteId);
+				}
+				else
+				{
+					$arHandler["CONFIG"] = array(
+						"CONFIG_GROUPS" => array(),
+						"CONFIG" => array(),
+					);
+				}
+
+				$arHandlersList[] = $arHandler;
+			}
 		}
 
 		foreach ($arHandlersList as $key => $arHandler)
@@ -183,6 +207,9 @@ WHERE HID IN (".$strKeys.")";
 			$handler_path = str_replace("\\", "/", $handler_path);
 			$handler_path = str_replace(strtolower($_SERVER["DOCUMENT_ROOT"]), '', $handler_path);
 
+			if (strlen($arHandler["BASE_CURRENCY"]) <=0 || !CCurrency::GetByID($arHandler["BASE_CURRENCY"]))
+				$arHandlersList[$key]["BASE_CURRENCY"] = COption::GetOptionString('sale', 'default_currency', 'RUB');
+
 			$arHandlersList[$key]['HANDLER'] = $handler_path;
 		}
 
@@ -190,12 +217,15 @@ WHERE HID IN (".$strKeys.")";
 	}
 
 	// private: get all handlers
-	public static function __getRegisteredHandlers()
+	function __getRegisteredHandlers()
 	{
-		$arHandlersList = array();
-		foreach(GetModuleEvents("sale", "onSaleDeliveryHandlersBuildList", true) as $arHandler)
-			$arHandlersList[] = ExecuteModuleEventEx($arHandler);
-
+		static $arHandlersList = null;
+		if (!isset($arHandlersList))
+		{
+			$arHandlersList = array();
+			foreach(GetModuleEvents("sale", "onSaleDeliveryHandlersBuildList", true) as $arHandler)
+				$arHandlersList[] = ExecuteModuleEventEx($arHandler);
+		}
 		return $arHandlersList;
 	}
 
@@ -228,59 +258,59 @@ WHERE HID IN (".$strKeys.")";
 	// get full list based on FS
 	
 	/**
-	 * <p>Функция возвращает список всех имеющихся обработчиков. Список обработчиков строится на основе события onSaleDeliveryHandlersBuildList.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarSort = array("SORT" => "ASC") Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array("<i>параметр_сортировки</i>"
-	 * =&gt; "<i>направление_сортировки</i>" [, ...])</pre> <p>В качестве параметра
-	 * сортировки может выступать одно из следующих значений:</p> <ul> <li>
-	 * <b>SORT</b> - параметр "сортировка"; </li> <li> <b>NAME</b> - наименования службы
-	 * доставки; </li> <li> <b>SID</b> - строковой идентификатор службы доставки;
-	 * </li> <li> <b>HANDLER</b> - путь к обработчику службы доставки; </li> <li> <b>ACTIVE</b> -
-	 * флаг активности службы доставки. </li> </ul> <p>В качестве
-	 * "направление_сортировки" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию).</p> Значение по умолчанию -
-	 * массив array("SORT" =&gt; "ASC") - означает, что результат будет отсортирован
-	 * по возрастанию.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий записи со
-	 * структурой, аналогичной <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandlers::GetList()</a>
-	 * с единственным изменением:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>INSTALLED</td> <td>Флаг,
-	 * показывающий, есть ли в БД конфигурация для данного обработчика
-	 * (Y|N).</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CModule::IncludeModule('sale');
-	 * 
-	 * $dbResult = CSaleDeliveryHandler::GetAdminList(
-	 *   array(
-	 *     'SORT' =&gt; 'ASC', 
-	 *     'NAME' =&gt; 'ASC'
-	 *   ) 
-	 * );
-	 * echo '&lt;ul&gt;';
-	 * while ($arResult = $dbResult-&gt;GetNext())
-	 * {
-	 *   echo '&lt;li&gt;('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
-	 *   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;/li&gt;';
-	 * }
-	 * echo '&lt;/ul&gt;';
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает список всех имеющихся обработчиков. Список обработчиков строится на основе события onSaleDeliveryHandlersBuildList.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarSort = array("SORT" => "ASC") Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array("<i>параметр_сортировки</i>"
+	* =&gt; "<i>направление_сортировки</i>" [, ...])</pre> <p>В качестве параметра
+	* сортировки может выступать одно из следующих значений:</p> <ul> <li>
+	* <b>SORT</b> - параметр "сортировка"; </li> <li> <b>NAME</b> - наименования службы
+	* доставки; </li> <li> <b>SID</b> - строковой идентификатор службы доставки;
+	* </li> <li> <b>HANDLER</b> - путь к обработчику службы доставки; </li> <li> <b>ACTIVE</b> -
+	* флаг активности службы доставки. </li> </ul> <p>В качестве
+	* "направление_сортировки" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию).</p> Значение по умолчанию -
+	* массив array("SORT" =&gt; "ASC") - означает, что результат будет отсортирован
+	* по возрастанию.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий записи со
+	* структурой, аналогичной <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandlers::GetList()</a>
+	* с единственным изменением:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>INSTALLED</td> <td>Флаг,
+	* показывающий, есть ли в БД конфигурация для данного обработчика
+	* (Y|N).</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CModule::IncludeModule('sale');
+	* 
+	* $dbResult = CSaleDeliveryHandler::GetAdminList(
+	*   array(
+	*     'SORT' =&gt; 'ASC', 
+	*     'NAME' =&gt; 'ASC'
+	*   ) 
+	* );
+	* echo '&lt;ul&gt;';
+	* while ($arResult = $dbResult-&gt;GetNext())
+	* {
+	*   echo '&lt;li&gt;('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
+	*   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;/li&gt;';
+	* }
+	* echo '&lt;/ul&gt;';
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php
+	* @author Bitrix
+	*/
 	public static function GetAdminList($arSort = array("SORT" => "ASC"))
 	{
 		if (!defined('SALE_DH_INITIALIZED'))
@@ -323,113 +353,113 @@ WHERE HID IN (".$strKeys.")";
 	// get handlers list based on DB data
 	
 	/**
-	 * <p>Функция возвращает список обработчиков автоматизированных служб доставки, для которых установлены настройки в БД.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarSort = array("SORT" => "ASC") Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array("<i>параметр_сортировки</i>"
-	 * =&gt; "<i>направление_сортировки</i>" [, ...])</pre> <p>В качестве параметра
-	 * сортировки может выступать одно из следующих значений:</p> <ul> <li>
-	 * <b>SORT</b> - параметр "сортировка"; </li> <li> <b>NAME</b> - наименования службы
-	 * доставки; </li> <li> <b>SID</b> - строковой идентификатор службы доставки;
-	 * </li> <li> <b>HANDLER</b> - путь к обработчику службы доставки; </li> <li> <b>ACTIVE</b> -
-	 * флаг активности службы доставки. </li> </ul> <p>В качестве
-	 * "направление_сортировки" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию).</p> Значение по умолчанию -
-	 * массив array("SORT" =&gt; "ASC") - означает, что результат будет отсортирован
-	 * по возрастанию.
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = array() Массив, в соответствии с которым фильтруются записи службы
-	 * доставки.<br>Массив имеет вид: <pre
-	 * class="syntax">array("<i>фильтруемое_поле</i>"=&gt;"<i>значения_фильтра</i>" [,
-	 * ...])</pre>"<i>фильтруемое_поле</i>" может принимать значения: <ul> <li>
-	 * <b>ACTIVE</b> - фильтр по активности (Y|N); передача значения
-	 * <code>"ACTIVE"=&gt;"ALL"</code> выводит все элементы без учета их состояния;
-	 * <br>по умолчанию выводятся только активные элементы; </li> <li> <b>SITE_ID</b>
-	 * - по сайту; ; передача значения <code>"SITE_ID"=&gt;"ALL"</code> выводит
-	 * настройки для всех сайтов; <br>по умолчанию получаются настройки
-	 * службы доставки только для текущего сайта; </li> <li> <b>SID</b> - по
-	 * строковому идентификатору обработчика; </li> <li> <b>HANDLER</b> - фильтр по
-	 * части пути к файлу обработчика. </li> <li> <b>COMPABILITY</b> - проверка
-	 * совместимости обработчика с параметрами заказа; <br>значение
-	 * должно быть массивом данных по заказу следующей структуры: <ul> <li>
-	 * <b>WEIGHT</b> - суммарный вес заказа; </li> <li> <b>PRICE</b> - суммарная стоимость
-	 * заказа; </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина
-	 * (устанавливается в настройках модуля); </li> <li> <b>LOCATION_TO</b> - ID
-	 * местоположения, указанному при оформлении заказа. </li> </ul> </li>
-	 * </ul>Значение по умолчанию - пустой массив array() - означает, что
-	 * результат отфильтрован не будет.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий записи следующей
-	 * структуры:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>SID</td> <td>Строковой идентификатор обработчика доставки.</td>
-	 * </tr> <tr> <td>NAME</td> <td>Наименование службы доставки.</td> </tr> <tr>
-	 * <td>DESCRIPTION</td> <td>Описание службы доставки.</td> </tr> <tr> <td>DESCRIPTION_INNER</td>
-	 * <td>"Внутреннее" описание функционала обработчика службы
-	 * доставки.</td> </tr> <tr> <td>LID</td> <td>Идентификатор сайта, для которого
-	 * установлены настройки.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг активности
-	 * службы доставки.</td> </tr> <tr> <td>SORT</td> <td>Значение параметра
-	 * сортировки для данной службы доставки.</td> </tr> <tr> <td>BASE_CURRENCY</td>
-	 * <td>Идентификатор валюты, в которой работает обработчик службы
-	 * доставки.</td> </tr> <tr> <td>TAX_RATE</td> <td>Значение наценки, автоматически
-	 * добавляемой к стоимости доставки (%).</td> </tr> <tr> <td>HANDLER</td> <td>Путь к
-	 * файлу обработчика доставки.</td> </tr> <tr> <td>DBSETSETTINGS</td> <td>callback к методу
-	 * обработчика, обеспечивающему сохранение массива настроек в
-	 * БД.</td> </tr> <tr> <td>DBGETSETTINGS</td> <td>callback к методу обработчика,
-	 * обеспечивающему получение массива настроек из БД.</td> </tr> <tr>
-	 * <td>GETCONFIG</td> <td>callback к методу обработчика, возвращающему список
-	 * настроек обработчика.</td> </tr> <tr> <td>COMPATIBILITY</td> <td>callback к методу
-	 * обработчика, осуществляющему проверку применимости обработчика
-	 * к заказу.</td> </tr> <tr> <td>CALCULATE</td> <td>callback к методу обработчика,
-	 * осуществляющему расчёт стоимости доставки.</td> </tr> <tr> <td>PROFILES</td>
-	 * <td>Массив профилей обработки доставки. Представляет собой
-	 * ассоциативный массив вида: <pre class="syntax">Array (
-	 * "<i>строковый_идентификатор_профиля</i>" =&gt; Array ( "TITLE" =&gt;
-	 * "<i>название_профиля</i>", "DESCRIPTION" =&gt; "<i>описание_профиля</i>",
-	 * "RESTRICTIONS_WEIGHT" =&gt; Array ( //< ограничения обработчика по весу >// ),
-	 * "RESTRICTIONS_SUM" =&gt; Array ( //< ограничения обработчика по стоимости >// ),
-	 * "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre> </td>
-	 * </tr> <tr> <td>CONFIG</td> <td>Массив настроек обработчика доставки со
-	 * значениями. Подробнее см. <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/delivery.php">Руководство по созданию
-	 * автоматизированных обработчиков доставки</a>.</td> </tr> <tr>
-	 * <td>PROFILE_USE_DEFAULT</td> <td>Значение флага "используются параметры
-	 * профилей по умолчанию" (Y|N).</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CModule::IncludeModule('sale');
-	 * 
-	 * $dbResult = CSaleDeliveryHandler::GetList(
-	 *   array(
-	 *     'SORT' =&gt; 'ASC', 
-	 *     'NAME' =&gt; 'ASC'
-	 *   ), 
-	 *   array(
-	 *     'ACTIVE' =&gt; 'Y'
-	 *   )
-	 * );
-	 * echo '&lt;ul&gt;';
-	 * while ($arResult = $dbResult-&gt;GetNext())
-	 * {
-	 *   echo '&lt;li&gt;('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
-	 *   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;/li&gt;';
-	 * }
-	 * echo '&lt;/ul&gt;';
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает список обработчиков автоматизированных служб доставки, для которых установлены настройки в БД.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarSort = array("SORT" => "ASC") Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array("<i>параметр_сортировки</i>"
+	* =&gt; "<i>направление_сортировки</i>" [, ...])</pre> <p>В качестве параметра
+	* сортировки может выступать одно из следующих значений:</p> <ul> <li>
+	* <b>SORT</b> - параметр "сортировка"; </li> <li> <b>NAME</b> - наименования службы
+	* доставки; </li> <li> <b>SID</b> - строковой идентификатор службы доставки;
+	* </li> <li> <b>HANDLER</b> - путь к обработчику службы доставки; </li> <li> <b>ACTIVE</b> -
+	* флаг активности службы доставки. </li> </ul> <p>В качестве
+	* "направление_сортировки" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию).</p> Значение по умолчанию -
+	* массив array("SORT" =&gt; "ASC") - означает, что результат будет отсортирован
+	* по возрастанию.
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() Массив, в соответствии с которым фильтруются записи службы
+	* доставки.<br>Массив имеет вид: <pre
+	* class="syntax">array("<i>фильтруемое_поле</i>"=&gt;"<i>значения_фильтра</i>" [,
+	* ...])</pre>"<i>фильтруемое_поле</i>" может принимать значения: <ul> <li>
+	* <b>ACTIVE</b> - фильтр по активности (Y|N); передача значения
+	* <code>"ACTIVE"=&gt;"ALL"</code> выводит все элементы без учета их состояния;
+	* <br>по умолчанию выводятся только активные элементы; </li> <li> <b>SITE_ID</b>
+	* - по сайту; ; передача значения <code>"SITE_ID"=&gt;"ALL"</code> выводит
+	* настройки для всех сайтов; <br>по умолчанию получаются настройки
+	* службы доставки только для текущего сайта; </li> <li> <b>SID</b> - по
+	* строковому идентификатору обработчика; </li> <li> <b>HANDLER</b> - фильтр по
+	* части пути к файлу обработчика. </li> <li> <b>COMPABILITY</b> - проверка
+	* совместимости обработчика с параметрами заказа; <br>значение
+	* должно быть массивом данных по заказу следующей структуры: <ul> <li>
+	* <b>WEIGHT</b> - суммарный вес заказа; </li> <li> <b>PRICE</b> - суммарная стоимость
+	* заказа; </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина
+	* (устанавливается в настройках модуля); </li> <li> <b>LOCATION_TO</b> - ID
+	* местоположения, указанному при оформлении заказа. </li> </ul> </li>
+	* </ul>Значение по умолчанию - пустой массив array() - означает, что
+	* результат отфильтрован не будет.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий записи следующей
+	* структуры:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
+	* <th>Описание</th> </tr> <tr> <td>SID</td> <td>Строковой идентификатор
+	* обработчика доставки.</td> </tr> <tr> <td>NAME</td> <td>Наименование службы
+	* доставки.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание службы доставки.</td> </tr>
+	* <tr> <td>DESCRIPTION_INNER</td> <td>"Внутреннее" описание функционала
+	* обработчика службы доставки.</td> </tr> <tr> <td>LID</td> <td>Идентификатор
+	* сайта, для которого установлены настройки.</td> </tr> <tr> <td>ACTIVE</td>
+	* <td>Флаг активности службы доставки.</td> </tr> <tr> <td>SORT</td> <td>Значение
+	* параметра сортировки для данной службы доставки.</td> </tr> <tr>
+	* <td>BASE_CURRENCY</td> <td>Идентификатор валюты, в которой работает
+	* обработчик службы доставки.</td> </tr> <tr> <td>TAX_RATE</td> <td>Значение
+	* наценки, автоматически добавляемой к стоимости доставки (%).</td> </tr>
+	* <tr> <td>HANDLER</td> <td>Путь к файлу обработчика доставки.</td> </tr> <tr>
+	* <td>DBSETSETTINGS</td> <td>callback к методу обработчика, обеспечивающему
+	* сохранение массива настроек в БД.</td> </tr> <tr> <td>DBGETSETTINGS</td> <td>callback к
+	* методу обработчика, обеспечивающему получение массива настроек
+	* из БД.</td> </tr> <tr> <td>GETCONFIG</td> <td>callback к методу обработчика,
+	* возвращающему список настроек обработчика.</td> </tr> <tr> <td>COMPATIBILITY</td>
+	* <td>callback к методу обработчика, осуществляющему проверку
+	* применимости обработчика к заказу.</td> </tr> <tr> <td>CALCULATE</td> <td>callback к
+	* методу обработчика, осуществляющему расчёт стоимости
+	* доставки.</td> </tr> <tr> <td>PROFILES</td> <td>Массив профилей обработки
+	* доставки. Представляет собой ассоциативный массив вида: <pre
+	* class="syntax">Array ( "<i>строковый_идентификатор_профиля</i>" =&gt; Array ( "TITLE" =&gt;
+	* "<i>название_профиля</i>", "DESCRIPTION" =&gt; "<i>описание_профиля</i>",
+	* "RESTRICTIONS_WEIGHT" =&gt; Array ( //< ограничения обработчика по весу >// ),
+	* "RESTRICTIONS_SUM" =&gt; Array ( //< ограничения обработчика по стоимости >// ),
+	* "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre> </td>
+	* </tr> <tr> <td>CONFIG</td> <td>Массив настроек обработчика доставки со
+	* значениями. Подробнее см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/delivery.php">Руководство по созданию
+	* автоматизированных обработчиков доставки</a>.</td> </tr> <tr>
+	* <td>PROFILE_USE_DEFAULT</td> <td>Значение флага "используются параметры
+	* профилей по умолчанию" (Y|N).</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CModule::IncludeModule('sale');
+	* 
+	* $dbResult = CSaleDeliveryHandler::GetList(
+	*   array(
+	*     'SORT' =&gt; 'ASC', 
+	*     'NAME' =&gt; 'ASC'
+	*   ), 
+	*   array(
+	*     'ACTIVE' =&gt; 'Y'
+	*   )
+	* );
+	* echo '&lt;ul&gt;';
+	* while ($arResult = $dbResult-&gt;GetNext())
+	* {
+	*   echo '&lt;li&gt;('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
+	*   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;/li&gt;';
+	* }
+	* echo '&lt;/ul&gt;';
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arSort = array("SORT" => "ASC"), $arFilter = array())
 	{
 	/*
@@ -505,7 +535,24 @@ WHERE HID IN (".$strKeys.")";
 				// SITE_ID is unavailable for extended sorting! only direct selection; It's needed for after-select filtration.
 				case "SITE_ID":
 					if (strlen($value) > 0) //$arWhere[] = GetFilterQuery("LID", $value, $match);
-						$arWhere[] = "LID='".$DB->ForSql($value)."' OR LID='' OR LID IS NULL";
+					{
+						$siteVal = "";
+						if (strpos($value, ",") !== false)
+						{
+							$arValues = explode(",", $value);
+
+							foreach ($arValues as $val)
+								$siteVal .= "'".$DB->ForSql(trim($val))."'";
+
+							$siteVal = str_replace("''", "','", $siteVal);
+						}
+						else
+						{
+							$siteVal = "'".$DB->ForSql($value)."'";
+						}
+
+						$arWhere[] = "LID IN (".$siteVal.") OR LID='' OR LID IS NULL";
+					}
 					break;
 				case "ACTIVE":
 					if (strlen($value) > 0)
@@ -576,9 +623,26 @@ WHERE
 			{
 				foreach ($arHandlersList as $key => $arHandler)
 				{
-					if (strlen($arHandler['LID']) > 0 && $arHandler['LID'] != $arFilter["SITE_ID"])
+					if (strlen($arHandler['LID']) > 0)
 					{
-						unset($arHandlersList[$key]);
+						$bValidSite = false;
+						if (strpos($arFilter["SITE_ID"], ",") !== false)
+						{
+							$arSites = explode(",", $arFilter["SITE_ID"]);
+							foreach ($arSites as $siteID)
+							{
+								if ($arHandler['LID'] == trim($siteID))
+									$bValidSite = true;
+							}
+						}
+						else
+						{
+							if ($arHandler['LID'] == $arFilter["SITE_ID"])
+								$bValidSite = true;
+						}
+
+						if (!$bValidSite)
+							unset($arHandlersList[$key]);
 					}
 				}
 			}
@@ -623,54 +687,55 @@ WHERE
 	// get handler compability. result - list of delivery profiles;
 	
 	/**
-	 * <p>Функция возвращает список профилей обработчика, подходящих данному заказу. Осуществляется проверка по весу и стоимости, а также вызывается метод COMPABILITY обработчика.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив заказа. Представляет собой ассоциативный массив с
-	 * ключами: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li> <li>
-	 * <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина; </li>
-	 * <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
-	 * настройках модуля "Интернет-магазин"; </li> <li> <b>LOCATION_TO</b> - ID
-	 * местоположения, указываемого клиентом при оформлении заказа. </li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param array $arHandler  Описательный массив обработчика, возвращаемый методами <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php">CSaleDeliveryHandler::GetBySID()</a>,
-	 * <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>,
-	 * <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php">CSaleDeliveryHandler::GetAdminList()</a>,
-	 *
-	 *
-	 *
-	 * @param mixed $SITE_ID = SITE_ID Идентификатор сайта. По умолчанию используется текущий.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Метод возвращает массив профилей доставки, подходящих для
-	 * данного заказа, либо false в случае, если ни один из профилей не
-	 * подходит. Массив возвращается в том формате, в котором он указан в
-	 * элементе "PROFILES" описательного массива обработчика, т.е.</p><pre
-	 * class="syntax">Array ( "<i>строковый_идентификатор_профиля</i>" =&gt; Array ( "TITLE" =&gt;
-	 * "<i>название_профиля</i>", "DESCRIPTION" =&gt; "<i>описание_профиля</i>",
-	 * "RESTRICTIONS_WEIGHT" =&gt; Array ( //< ограничения обработчика по весу >// ),
-	 * "RESTRICTIONS_SUM" =&gt; Array ( //< ограничения обработчика по стоимости >// ),
-	 * "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_gethandlercompability.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает список профилей обработчика, подходящих данному заказу. Осуществляется проверка по весу и стоимости, а также вызывается метод COMPABILITY обработчика.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder  Массив заказа. Представляет собой ассоциативный массив с
+	* ключами: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li> <li>
+	* <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина; </li>
+	* <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
+	* настройках модуля "Интернет-магазин"; </li> <li> <b>LOCATION_TO</b> - ID
+	* местоположения, указываемого клиентом при оформлении заказа. </li>
+	* </ul>
+	*
+	*
+	*
+	* @param array $arHandler  Описательный массив обработчика, возвращаемый методами <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php">CSaleDeliveryHandler::GetBySID()</a>,
+	* <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>,
+	* <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getadminlist.php">CSaleDeliveryHandler::GetAdminList()</a>,
+	*
+	*
+	*
+	* @param mixed $SITE_ID = SITE_ID Идентификатор сайта. По умолчанию используется текущий.
+	*
+	*
+	*
+	* @return mixed <p>Метод возвращает массив профилей доставки, подходящих для
+	* данного заказа, либо false в случае, если ни один из профилей не
+	* подходит. Массив возвращается в том формате, в котором он указан в
+	* элементе "PROFILES" описательного массива обработчика, т.е.</p> <pre
+	* class="syntax">Array ( "<i>строковый_идентификатор_профиля</i>" =&gt; Array ( "TITLE" =&gt;
+	* "<i>название_профиля</i>", "DESCRIPTION" =&gt; "<i>описание_профиля</i>",
+	* "RESTRICTIONS_WEIGHT" =&gt; Array ( //< ограничения обработчика по весу >// ),
+	* "RESTRICTIONS_SUM" =&gt; Array ( //< ограничения обработчика по стоимости >// ),
+	* "ACTIVE" =&gt; "<i>флаг_активности_профиля</i>", ), //< ................... >// ) </pre> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_gethandlercompability.php
+	* @author Bitrix
+	*/
 	public static function GetHandlerCompability($arOrder, $arHandler, $SITE_ID = SITE_ID)
 	{
 		if (!defined('SALE_DH_INITIALIZED'))
 			CSaleDeliveryHandler::Initialize();
 
 		$currency = CSaleLang::GetLangCurrency($SITE_ID);
+
 		if ($currency != $arHandler["BASE_CURRENCY"])
 			$arOrder["PRICE"] = CCurrencyRates::ConvertCurrency($arOrder["PRICE"], $currency, $arHandler["BASE_CURRENCY"]);
 
@@ -679,45 +744,78 @@ WHERE
 			$arProfilesList = $arHandler["PROFILES"];
 			foreach ($arProfilesList as $profile_id => $arProfile)
 			{
-				if (is_array($arProfile["RESTRICTIONS_WEIGHT"]))
+				if (is_array($arProfile["RESTRICTIONS_WEIGHT"]) && count($arProfile["RESTRICTIONS_WEIGHT"]) > 0)
 				{
-					if (is_array($arProfile["RESTRICTIONS_WEIGHT"]) && count($arProfile["RESTRICTIONS_WEIGHT"]) > 0)
+
+					$arOrder["WEIGHT"] = doubleval($arOrder["WEIGHT"]);
+
+					if ($arOrder["WEIGHT"] < $arProfile["RESTRICTIONS_WEIGHT"][0])
 					{
-						$arOrder["WEIGHT"] = doubleval($arOrder["WEIGHT"]);
+						unset($arProfilesList[$profile_id]);
+						continue;
+					}
+					else
+					{
 						if (
-							$arOrder["WEIGHT"] < $arProfile["RESTRICTIONS_WEIGHT"][0]
-							||
-							(
 								is_set($arProfile["RESTRICTIONS_WEIGHT"], 1)
 								&&
 								Doubleval($arProfile["RESTRICTIONS_WEIGHT"][1]) > 0
 								&&
 								$arOrder["WEIGHT"] > $arProfile["RESTRICTIONS_WEIGHT"][1]
-							)
 						)
 						{
 							unset($arProfilesList[$profile_id]);
 							continue;
 						}
-					}
 
-					if (is_array($arProfile["RESTRICTIONS_SUM"]) && count($arProfile["RESTRICTIONS_SUM"]) > 0)
-					{
-						if (
-							$arOrder["PRICE"] < $arProfile["RESTRICTIONS_SUM"][0]
-							||
-							(
-								is_set($arProfile["RESTRICTIONS_SUM"], 1)
-								&&
-								Doubleval($arProfile["RESTRICTIONS_SUM"][1]) > 0
-								&&
-								$arOrder["PRICE"] > $arProfile["RESTRICTIONS_SUM"][1]
-							)
+					}
+				}
+
+
+				if (is_array($arProfile["RESTRICTIONS_SUM"]) && count($arProfile["RESTRICTIONS_SUM"]) > 0)
+				{
+					if (
+						$arOrder["PRICE"] < $arProfile["RESTRICTIONS_SUM"][0]
+						||
+						(
+							is_set($arProfile["RESTRICTIONS_SUM"], 1)
+							&&
+							Doubleval($arProfile["RESTRICTIONS_SUM"][1]) > 0
+							&&
+							$arOrder["PRICE"] > $arProfile["RESTRICTIONS_SUM"][1]
 						)
-						{
-							unset($arProfilesList[$profile_id]);
-							continue;
-						}
+					)
+					{
+						unset($arProfilesList[$profile_id]);
+						continue;
+					}
+				}
+
+				if (is_array($arProfile["RESTRICTIONS_DIMENSIONS"]) && count($arProfile["RESTRICTIONS_DIMENSIONS"]) > 0)
+				{
+					if (!self::checkDimensions($arOrder["MAX_DIMENSIONS"], $arProfile["RESTRICTIONS_DIMENSIONS"]))
+					{
+
+						unset($arProfilesList[$profile_id]);
+						continue;
+					}
+				}
+
+				if (intval($arProfile["RESTRICTIONS_DIMENSIONS_SUM"]) > 0)
+				{
+					if (!self::checkDimensionsSum($arOrder["ITEMS"], intval($arProfile["RESTRICTIONS_DIMENSIONS_SUM"])))
+					{
+						unset($arProfilesList[$profile_id]);
+						continue;
+					}
+				}
+
+				if (intval($arProfile["RESTRICTIONS_MAX_SIZE"]) > 0)
+				{
+					if (!self::checkMaxSize($arOrder["ITEMS"], intval($arProfile["RESTRICTIONS_MAX_SIZE"])))
+					{
+						unset($arProfilesList[$profile_id]);
+						continue;
 					}
 				}
 			}
@@ -738,95 +836,213 @@ WHERE
 					return array();
 			}
 
+
 			return $arProfilesList;
 		}
 		else
 			return false;
 	}
 
-	// get handler data by DB sID
-	
-	/**
-	 * <p>Данная функция служит для получения информации по конкретному обработчику по его строковому идентификатору.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $SID  Строковый идентификатор обработчика.
-	 *
-	 *
-	 *
-	 * @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий запись со
-	 * структурой, аналогичной <a
-	 * href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CModule::IncludeModule('sale');
-	 * 
-	 * $dbResult = CSaleDeliveryHandler::GetBySID('cpcr');
-	 * 
-	 * if ($arResult = $dbResult-&gt;GetNext())
-	 * {
-	 *   echo '('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
-	 *   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;ul&gt;';
-	 *   foreach ($arResult['PROFILES'] as $profile_id =&gt; $arProfile)
-	 *   {
-	 *     echo '&lt;li&gt;('.$profile_id.') '.$arProfile['TITLE'].'&lt;/li&gt;';
-	 *   }
-	 *   echo '&lt;/ul&gt;';
-	 * }
-	 * else
-	 * {
-	 *   echo 'Обработчик не найден';
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php
-	 * @author Bitrix
-	 */
-	public static function GetBySID($SID, $SITE_ID = false)
+	public static function GetHandlerExtraParams($SID, $profileId, $arOrder, $siteId = false)
 	{
-		global $DB;
+		$result = array();
+		if (!defined('SALE_DH_INITIALIZED'))
+			CSaleDeliveryHandler::Initialize();
+
+		if (!$siteId)
+			$siteId = SITE_ID;
+
+		$rsDeliveryHandler = CSaleDeliveryHandler::GetBySID($SID, $siteId);
+		if ($arHandler = $rsDeliveryHandler->Fetch())
+		{
+			if (isset($arHandler["GETEXTRAINFOPARAMS"]) && is_callable($arHandler["GETEXTRAINFOPARAMS"]))
+			{
+				$result = call_user_func($arHandler["GETEXTRAINFOPARAMS"], $arOrder, $arHandler["CONFIG"]["CONFIG"], $profileId, $siteId);
+			}
+		}
+
+		return $result;
+	}
+
+	public static function getActionsList($deliveryId)
+	{
+		$result = array();
 
 		if (!defined('SALE_DH_INITIALIZED'))
 			CSaleDeliveryHandler::Initialize();
 
-		$arHandlersList = CSaleDeliveryHandler::__getRegisteredHandlers();
+		$arDId = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryId);
+		$rsDeliveryHandler = CSaleDeliveryHandler::GetBySID($arDId["SID"]);
 
-		$cnt = count($arHandlersList);
-		$arResult = array();
-		for ($i = 0; $i < $cnt; $i++)
+		if ($arHandler = $rsDeliveryHandler->Fetch())
 		{
-			if ($arHandlersList[$i]["SID"] == $SID)
+			if (isset($arHandler["GETORDERSACTIONSLIST"]) && is_callable($arHandler["GETORDERSACTIONSLIST"]))
 			{
-				$arResult[] = $arHandlersList[$i];
-				break;
+				$result = call_user_func($arHandler["GETORDERSACTIONSLIST"]);
 			}
 		}
 
-		if (count($arResult) > 0)
+		return $result;
+	}
+
+	public static function executeAction($deliveryId, $actionId, $arOrder)
+	{
+		$result = array();
+		$arDId = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryId);
+
+		if (!defined('SALE_DH_INITIALIZED'))
+			CSaleDeliveryHandler::Initialize();
+
+		$rsDeliveryHandler = CSaleDeliveryHandler::GetBySID($arDId["SID"]);
+
+		if ($arHandler = $rsDeliveryHandler->Fetch())
 		{
-			$arResult = CSaleDeliveryHandler::__getHandlersData($arResult, $SITE_ID);
+			if (isset($arHandler["EXECUTEACTION"]) && is_callable($arHandler["EXECUTEACTION"]))
+			{
+				$result = call_user_func($arHandler["EXECUTEACTION"], $actionId, $arDId["PROFILE"], $arOrder, $arHandler["CONFIG"]["CONFIG"]);
+			}
+		}
+
+		return $result;
+	}
+
+		// get handler data by DB sID
+	
+	/**
+	* <p>Данная функция служит для получения информации по конкретному обработчику по его строковому идентификатору.</p>
+	*
+	*
+	*
+	*
+	* @param string $SID  Строковый идентификатор обработчика.
+	*
+	*
+	*
+	* @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий запись со
+	* структурой, аналогичной <a
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getlist.php">CSaleDeliveryHandler::GetList()</a>.</p>
+	* <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CModule::IncludeModule('sale');
+	* 
+	* $dbResult = CSaleDeliveryHandler::GetBySID('cpcr');
+	* 
+	* if ($arResult = $dbResult-&gt;GetNext())
+	* {
+	*   echo '('.$arResult['SID'].') &lt;b&gt;'.$arResult['NAME'].'&lt;/b&gt;&lt;br /&gt;'; 
+	*   echo '&lt;small&gt;'.$arResult['DESCRIPTION'].'&lt;/small&gt;&lt;ul&gt;';
+	*   foreach ($arResult['PROFILES'] as $profile_id =&gt; $arProfile)
+	*   {
+	*     echo '&lt;li&gt;('.$profile_id.') '.$arProfile['TITLE'].'&lt;/li&gt;';
+	*   }
+	*   echo '&lt;/ul&gt;';
+	* }
+	* else
+	* {
+	*   echo 'Обработчик не найден';
+	* }
+	* 
+	* </htm
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_getbysid.php
+	* @author Bitrix
+	*/
+	public static function GetBySID($SID, $SITE_ID = false)
+	{
+		if (!defined('SALE_DH_INITIALIZED'))
+			CSaleDeliveryHandler::Initialize();
+
+		static $cache = array();
+
+		if (!isset($cache[$SITE_ID]))
+			$cache[$SITE_ID] = array();
+
+		if (!isset($cache[$SITE_ID][$SID]))
+		{
+			$cache[$SITE_ID][$SID] = array();
+
+			$arHandlersList = CSaleDeliveryHandler::__getRegisteredHandlers();
+			foreach ($arHandlersList as $handler)
+			{
+				if ($handler["SID"] == $SID)
+				{
+					$cache[$SITE_ID][$SID][] = $handler;
+					break;
+				}
+			}
+
+			if ($cache[$SITE_ID][$SID])
+			{
+				$cache[$SITE_ID][$SID] = CSaleDeliveryHandler::__getHandlersData($cache[$SITE_ID][$SID], $SITE_ID);
+			}
 		}
 
 		$dbResult = new CDBResult();
-		reset($arResult);
-		$dbResult->InitFromArray($arResult);
+		$dbResult->InitFromArray($cache[$SITE_ID][$SID]);
 
 		return $dbResult;
 	}
 
+	public static function CheckFields($arData)
+	{
+		global $APPLICATION;
+
+		$numberFieldsProf = array("RESTRICTIONS_WEIGHT", "RESTRICTIONS_SUM", "TAX_RATE", "RESTRICTIONS_MAX_SIZE", "RESTRICTIONS_DIMENSIONS_SUM");
+
+		if(isset($arData["PROFILES"]) && is_array($arData["PROFILES"]))
+		{
+			foreach ($arData["PROFILES"] as $profileId => $arProfile)
+			{
+				foreach ($numberFieldsProf as $fName)
+				{
+					if (isset($arProfile[$fName]))
+					{
+						if(!is_array($arProfile[$fName]))
+							$arProfile[$fName] = array($arProfile[$fName]);
+
+						foreach ($arProfile[$fName] as $fValue)
+						{
+							if($result = CSaleDeliveryHelper::getFormatError($fValue, 'NUMBER', GetMessage("SALE_DH_CF_ERROR_P_".$fName)))
+							{
+								$APPLICATION->ThrowException($result, $fName);
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if(isset($arData['TAX_RATE']) && $result = CSaleDeliveryHelper::getFormatError($arData['TAX_RATE'], 'NUMBER', GetMessage('SALE_DH_CF_ERROR_TAX_RATE')))
+		{
+			$APPLICATION->ThrowException($result, 'TAX_RATE');
+			return false;
+		}
+
+		if(isset($arData['SORT']) && $result = CSaleDeliveryHelper::getFormatError($arData['SORT'], 'NUMBER', GetMessage('SALE_DH_CF_ERROR_SORT')))
+		{
+			$APPLICATION->ThrowException($result, 'SORT');
+			return false;
+		}
+
+		return true;
+	}
+
 	public static function Set($SID, $arData, $SITE_ID = false)
 	{
+		if(!self::CheckFields($arData))
+			return false;
+
 		if ($SITE_ID == 'ALL')
 			$SITE_ID = false;
 
@@ -885,6 +1101,11 @@ WHERE
 			elseif (!$bInstalled)
 				$arQueryFields["TAX_RATE"] = 0;
 
+			if (is_set($arData, "BASE_CURRENCY"))
+				$arQueryFields["BASE_CURRENCY"] = "'".$DB->ForSql($arData["BASE_CURRENCY"])."'";
+			elseif (!$bInstalled)
+				$arQueryFields["BASE_CURRENCY"] = '';
+
 			//save logotip
 			if (!$bInstalled && (!isset($arData["LOGOTIP"]) || count($arData["LOGOTIP"]) <= 1))
 			{
@@ -899,7 +1120,7 @@ WHERE
 
 				if (file_exists($arPath["dirname"]."/".$SID."_logo.png"))
 					$logo = $arPath["dirname"]."/".$SID."_logo.png";
-				elseif (file_exists($arPath["dirname"]."/".$SID."_/logo.jpg"))
+				elseif (file_exists($arPath["dirname"]."/".$SID."_logo.jpg"))
 					$logo = $arPath["dirname"]."/".$SID."_logo.jpg";
 				elseif (file_exists($arPath["dirname"]."/".$SID."_logo.gif"))
 					$logo = $arPath["dirname"]."/".$SID."_logo.gif";
@@ -937,19 +1158,19 @@ WHERE
 				{
 					$strSettings = serialize($arData["CONFIG"]);
 				}
-
 				$arQueryFields["SETTINGS"] = "'".$DB->ForSql($strSettings)."'";
 			}
-
+			/*
 			if (is_set($arData, "PROFILE_USE_DEFAULT") && $arData["PROFILE_USE_DEFAULT"] == 'Y')
 				$arQueryFields["PROFILES"] = "''";
 			else
-			{
+			{*/
 				if (is_array($arData["PROFILES"]) && count($arData["PROFILES"]) > 0)
 					$arQueryFields["PROFILES"] = "'".$DB->ForSql(serialize($arData["PROFILES"]))."'";
 				elseif (!$bInstalled)
 					$arQueryFields["PROFILES"] = "''";
-			}
+			/*}*/
+
 
 			if ($bInstalled)
 			{
@@ -1028,104 +1249,104 @@ WHERE
 
 	
 	/**
-	 * <p>Вызов полного цикла расчёта. В случае, если обработчик службы доставки осуществляет расчёт за один шаг, метод аналогичен <a href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php">CSaleDeliveryHandler::Calculate()</a>. В противном случае метод автоматически выполнит переход на следующий шаг расчёта.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $SID  Строковый идентификатор обработчика.
-	 *
-	 *
-	 *
-	 * @param string $profile  Идентификатор профиля обработчика.
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив заказа: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li>
-	 * <li> <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина;
-	 * </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
-	 * настройках модуля "Интернет-магазин"; </li> <li> <b>LOCATION_TO</b> - ID
-	 * местоположения, указываемого клиентом при оформлении заказа. </li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param string $currency  Идентификатор валюты.
-	 *
-	 *
-	 *
-	 * @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив следующей структуры:</p><table
-	 * class="tnormal" width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th width="85%">Описание</th> </tr> <tr>
-	 * <td><b>RESULT</b></td> <td>Идентификатор ответа. Возможные значения: <ul>
-	 * <li>"<b>OK</b>" - стоимость доставки успешно рассчитана; </li> <li>"<b>ERROR</b>" - в
-	 * процессе расчёта произошла ошибка.</li> </ul> </td> </tr> <tr> <td><b>VALUE</b></td>
-	 * <td>Значение стоимости доставки в валюте, задаваемой в параметрах
-	 * метода - currency. (<code>RESULT = 'OK'</code>).</td> </tr> <tr> <td><b>TRANSIT</b></td>
-	 * <td>Длительность доставки в днях (<code>RESULT = 'OK'</code>). Если обработчик
-	 * доставки не возвращает длительность, то этот параметр
-	 * отсутствует.</td> </tr> <tr> <td><b>TEXT</b></td> <td>Текст ошибки (<code>RESULT =
-	 * 'ERROR'</code>).</td> </tr> </tbody></table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $arOrder = array(
-	 *   "WEIGHT" =&gt; "10", // вес заказа в граммах
-	 *   "PRICE" =&gt; "100", // стоимость заказа в базовой валюте магазина
-	 *   "LOCATION_FROM" =&gt; COption::GetOptionInt('sale', 'location'), // местоположение магазина
-	 *   "LOCATION_TO" =&gt; 55892, // местоположение доставки
-	 * );
-	 * 
-	 * $currency = CSaleLang::GetLangCurrency(SITE_ID);
-	 * 
-	 * $dbHandler = CSaleDeliveryHandler::GetBySID('simple');
-	 * if ($arHandler = $dbHandler-&gt;Fetch())
-	 * {
-	 *   $arProfiles = CSaleDeliveryHandler::GetHandlerCompability($arOrder, $arHandler);
-	 *   if (is_array($arProfiles) &amp;&amp; count($arProfiles) &gt; 0)
-	 *   {
-	 *     $arProfiles = array_keys($arProfiles);
-	 *     $arReturn = CSaleDeliveryHandler::CalculateFull(
-	 *       'simple', // идентификатор службы доставки
-	 *       $arProfiles[0], // идентификатор профиля доставки
-	 *       $arOrder, // заказ
-	 *       $currency // валюта, в которой требуется вернуть стоимость
-	 *     );
-	 * 
-	 *     if ($arReturn["RESULT"] == "OK")
-	 *     {
-	 *       ShowNote('Стоимость доставки успешно рассчитана!');
-	 *       echo 'Стоимость доставки: '.CurrencyFormat($arReturn["VALUE"], $currency).'&lt;br /&gt;';
-	 *       if (is_set($arReturn['TRANSIT']) &amp;&amp; $arReturn['TRANSIT'] &gt; 0)
-	 *       {
-	 *         echo 'Длительность доставки: '.$arReturn['TRANSIT'].' дней.&lt;br /&gt;';
-	 *       }
-	 *     }
-	 *     else
-	 *     {
-	 *       ShowError('Не удалось рассчитать стоимость доставки! '.$arResult['ERROR']);
-	 *     }
-	 *   }
-	 *   else
-	 *   {
-	 *     ShowError('Невозможно доставить заказ!');
-	 *   }
-	 * }
-	 * else
-	 * {
-	 *   ShowError('Обработчик не найден!');
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculatefull.php
-	 * @author Bitrix
-	 */
+	* <p>Вызов полного цикла расчёта. В случае, если обработчик службы доставки осуществляет расчёт за один шаг, метод аналогичен <a href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php">CSaleDeliveryHandler::Calculate()</a>. В противном случае метод автоматически выполнит переход на следующий шаг расчёта.</p>
+	*
+	*
+	*
+	*
+	* @param string $SID  Строковый идентификатор обработчика.
+	*
+	*
+	*
+	* @param string $profile  Идентификатор профиля обработчика.
+	*
+	*
+	*
+	* @param array $arOrder  Массив заказа: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li>
+	* <li> <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина;
+	* </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
+	* настройках модуля "Интернет-магазин"; </li> <li> <b>LOCATION_TO</b> - ID
+	* местоположения, указываемого клиентом при оформлении заказа. </li>
+	* </ul>
+	*
+	*
+	*
+	* @param string $currency  Идентификатор валюты.
+	*
+	*
+	*
+	* @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив следующей структуры:</p> <table
+	* class="tnormal" width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th width="85%">Описание</th> </tr> <tr>
+	* <td><b>RESULT</b></td> <td>Идентификатор ответа. Возможные значения: <ul>
+	* <li>"<b>OK</b>" - стоимость доставки успешно рассчитана; </li> <li>"<b>ERROR</b>" - в
+	* процессе расчёта произошла ошибка.</li> </ul> </td> </tr> <tr> <td><b>VALUE</b></td>
+	* <td>Значение стоимости доставки в валюте, задаваемой в параметрах
+	* метода - currency. (<code>RESULT = 'OK'</code>).</td> </tr> <tr> <td><b>TRANSIT</b></td>
+	* <td>Длительность доставки в днях (<code>RESULT = 'OK'</code>). Если обработчик
+	* доставки не возвращает длительность, то этот параметр
+	* отсутствует.</td> </tr> <tr> <td><b>TEXT</b></td> <td>Текст ошибки (<code>RESULT =
+	* 'ERROR'</code>).</td> </tr> </tbody></table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arOrder = array(
+	*   "WEIGHT" =&gt; "10", // вес заказа в граммах
+	*   "PRICE" =&gt; "100", // стоимость заказа в базовой валюте магазина
+	*   "LOCATION_FROM" =&gt; COption::GetOptionInt('sale', 'location'), // местоположение магазина
+	*   "LOCATION_TO" =&gt; 55892, // местоположение доставки
+	* );
+	* 
+	* $currency = CSaleLang::GetLangCurrency(SITE_ID);
+	* 
+	* $dbHandler = CSaleDeliveryHandler::GetBySID('simple');
+	* if ($arHandler = $dbHandler-&gt;Fetch())
+	* {
+	*   $arProfiles = CSaleDeliveryHandler::GetHandlerCompability($arOrder, $arHandler);
+	*   if (is_array($arProfiles) &amp;&amp; count($arProfiles) &gt; 0)
+	*   {
+	*     $arProfiles = array_keys($arProfiles);
+	*     $arReturn = CSaleDeliveryHandler::CalculateFull(
+	*       'simple', // идентификатор службы доставки
+	*       $arProfiles[0], // идентификатор профиля доставки
+	*       $arOrder, // заказ
+	*       $currency // валюта, в которой требуется вернуть стоимость
+	*     );
+	* 
+	*     if ($arReturn["RESULT"] == "OK")
+	*     {
+	*       ShowNote('Стоимость доставки успешно рассчитана!');
+	*       echo 'Стоимость доставки: '.CurrencyFormat($arReturn["VALUE"], $currency).'&lt;br /&gt;';
+	*       if (is_set($arReturn['TRANSIT']) &amp;&amp; $arReturn['TRANSIT'] &gt; 0)
+	*       {
+	*         echo 'Длительность доставки: '.$arReturn['TRANSIT'].' дней.&lt;br /&gt;';
+	*       }
+	*     }
+	*     else
+	*     {
+	*       ShowError('Не удалось рассчитать стоимость доставки! '.$arResult['ERROR']);
+	*     }
+	*   }
+	*   else
+	*   {
+	*     ShowError('Невозможно доставить заказ!');
+	*   }
+	* }
+	* else
+	* {
+	*   ShowError('Обработчик не найден!');
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculatefull.php
+	* @author Bitrix
+	*/
 	public static function CalculateFull($SID, $profile, $arOrder, $currency, $SITE_ID = false)
 	{
 		$bFinish = false;
@@ -1146,64 +1367,64 @@ WHERE
 
 	
 	/**
-	 * <p>Вызов одного шага расчёта стоимости доставки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $STEP  Текущий шаг расчёта.
-	 *
-	 *
-	 *
-	 * @param string $SID  Строковый идентификатор обработчика.
-	 *
-	 *
-	 *
-	 * @param string $profile  Идентификатор профиля обработчика.
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив заказа: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li>
-	 * <li> <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина;
-	 * </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
-	 * настройках модуля "Интернет-магазин";</li> <li> <b>LOCATION_TO</b> - ID
-	 * местоположения, указываемого клиентом при оформлении заказа.</li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param string $currency  Идентификатор валюты.
-	 *
-	 *
-	 *
-	 * @param mixed $TMP = false Временные данные с предыдущего шага.
-	 *
-	 *
-	 *
-	 * @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив следующей структуры:</p><table
-	 * class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th width="85%">Описание</th> </tr> <tr>
-	 * <td><b>RESULT</b></td> <td>Идентификатор ответа. Возможные значения: <ul>
-	 * <li>"<b>OK</b>" - стоимость доставки успешно рассчитана; </li> <li>"<b>ERROR</b>" - в
-	 * процессе расчёта произошла ошибка; </li> <li>"<b>NEXT_STEP</b>" - необходимо
-	 * перейти на следующий шаг для продолжения расчёта. </li> </ul> </td> </tr> <tr>
-	 * <td><b>VALUE</b></td> <td>Значение стоимости доставки в валюте, задаваемой в
-	 * параметрах метода - currency. (<code>RESULT = 'OK'</code>)</td> </tr> <tr> <td><b>TRANSIT</b></td>
-	 * <td>Длительность доставки в днях (<code>RESULT = 'OK'</code>). Если обработчик
-	 * доставки не возвращает длительность, то этот параметр
-	 * отсутствует.</td> </tr> <tr> <td><b>TEXT</b></td> <td>Текст ошибки или текст,
-	 * сопровождающий переход на следующий шаг (<code>RESULT =
-	 * {'ERROR'|'NEXT_STEP'}</code>).</td> </tr> <tr> <td><b>TEMP</b></td> <td>Строка, содержащая
-	 * промежуточные данные, которые нужно передать следующему шагу
-	 * (<code>RESULT = 'NEXT_STEP'</code>).</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php
-	 * @author Bitrix
-	 */
+	* <p>Вызов одного шага расчёта стоимости доставки.</p>
+	*
+	*
+	*
+	*
+	* @param int $STEP  Текущий шаг расчёта. </htm
+	*
+	*
+	*
+	* @param string $SID  Строковый идентификатор обработчика.
+	*
+	*
+	*
+	* @param string $profile  Идентификатор профиля обработчика.
+	*
+	*
+	*
+	* @param array $arOrder  Массив заказа: <ul> <li> <b>WEIGHT</b> - суммарный вес заказа в граммах; </li>
+	* <li> <b>PRICE</b> - суммарная стоимость заказа в базовой валюте магазина;
+	* </li> <li> <b>LOCATION_FROM</b> - ID местоположения магазина, настраиваемого в
+	* настройках модуля "Интернет-магазин";</li> <li> <b>LOCATION_TO</b> - ID
+	* местоположения, указываемого клиентом при оформлении заказа.</li>
+	* </ul>
+	*
+	*
+	*
+	* @param string $currency  Идентификатор валюты.
+	*
+	*
+	*
+	* @param mixed $TMP = false Временные данные с предыдущего шага.
+	*
+	*
+	*
+	* @param mixed $SITE_ID = false Идентификатор сайта. По умолчанию используется текущий.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив следующей структуры:</p> <table
+	* class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th width="85%">Описание</th> </tr> <tr>
+	* <td><b>RESULT</b></td> <td>Идентификатор ответа. Возможные значения: <ul>
+	* <li>"<b>OK</b>" - стоимость доставки успешно рассчитана; </li> <li>"<b>ERROR</b>" - в
+	* процессе расчёта произошла ошибка; </li> <li>"<b>NEXT_STEP</b>" - необходимо
+	* перейти на следующий шаг для продолжения расчёта. </li> </ul> </td> </tr> <tr>
+	* <td><b>VALUE</b></td> <td>Значение стоимости доставки в валюте, задаваемой в
+	* параметрах метода - currency. (<code>RESULT = 'OK'</code>)</td> </tr> <tr> <td><b>TRANSIT</b></td>
+	* <td>Длительность доставки в днях (<code>RESULT = 'OK'</code>). Если обработчик
+	* доставки не возвращает длительность, то этот параметр
+	* отсутствует.</td> </tr> <tr> <td><b>TEXT</b></td> <td>Текст ошибки или текст,
+	* сопровождающий переход на следующий шаг (<code>RESULT =
+	* {'ERROR'|'NEXT_STEP'}</code>).</td> </tr> <tr> <td><b>TEMP</b></td> <td>Строка, содержащая
+	* промежуточные данные, которые нужно передать следующему шагу
+	* (<code>RESULT = 'NEXT_STEP'</code>).</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaledeliveryhandler/csaledeliveryh_calculate.php
+	* @author Bitrix
+	*/
 	public static function Calculate($STEP, $SID, $profile, $arOrder, $currency, $TMP = false, $SITE_ID = false)
 	{
 		global $APPLICATION;
@@ -1275,6 +1496,9 @@ WHERE
 
 			$arReturn["VALUE"] *= 1 + ($arHandler["TAX_RATE"]/100);
 
+			if(isset($arHandler['PROFILES'][$profile]['TAX_RATE']))
+				$arReturn["VALUE"] *= 1 + (floatval($arHandler['PROFILES'][$profile]['TAX_RATE'])/100);
+
 			$arReturn = CSaleDeliveryHandler::__executeCalculateEvents($SID, $profile, $arOrder, $arReturn);
 
 			return $arReturn;
@@ -1286,6 +1510,124 @@ WHERE
 				"TEXT" => GetMessage("SALE_DH_ERROR_WRONG_HANDLER_FILE")
 			);
 		}
+	}
+
+	static public function checkDimensions($arOrderDimensions, $arRestrictDimensions)
+	{
+		$dimCount = 3;
+		if(
+			!is_array($arOrderDimensions)
+			||
+			!is_array($arRestrictDimensions)
+			||
+			empty($arOrderDimensions)
+			||
+			empty($arRestrictDimensions)
+			||
+			count($arOrderDimensions) != $dimCount
+			||
+			count($arRestrictDimensions) != $dimCount
+		)
+			return true;
+
+		$result = true;
+
+		rsort($arOrderDimensions, SORT_NUMERIC);
+		rsort($arRestrictDimensions, SORT_NUMERIC);
+
+		for ($i=0; $i < $dimCount; $i++)
+		{
+			if(
+				floatval($arRestrictDimensions[$i]) <= 0
+				||
+				$arOrderDimensions[$i] <=0
+			)
+			{
+				break;
+			}
+
+			if($arOrderDimensions[$i] > $arRestrictDimensions[$i])
+			{
+				$result = false;
+				break;
+			}
+		}
+
+		return $result;
+	}
+
+	static public function checkDimensionsSum($arItems, $maxDimensionSum)
+	{
+		$result = true;
+		$maxDimensionSum = floatval($maxDimensionSum);
+
+		if(is_array($arItems) && $maxDimensionSum > 0)
+		{
+			foreach ($arItems as $arItem)
+			{
+				if(!self::isDimensionsExist($arItem))
+					continue;
+
+				$itemDimSumm = floatval($arItem["WIDTH"])+floatval($arItem["HEIGHT"])+floatval($arItem["LENGTH"]);
+
+				if($itemDimSumm > $maxDimensionSum)
+				{
+					$result = false;
+					break;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	static public function checkMaxSize($arItems, $maxSize)
+	{
+		$result = true;
+		$maxSize = floatval($maxSize);
+
+		if(is_array($arItems) && $maxSize > 0)
+		{
+
+			foreach ($arItems as $arItem)
+			{
+				if(!self::isDimensionsExist($arItem))
+					continue;
+
+				if(
+					floatval($arItem["WIDTH"]) > $maxSize
+					||
+					floatval($arItem["HEIGHT"]) > $maxSize
+					||
+					floatval($arItem["LENGTH"]) > $maxSize
+					)
+				{
+					$result = false;
+					break;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	private function isDimensionsExist($arItem)
+	{
+		return (
+				isset($arItem["WIDTH"]) && floatval($arItem["WIDTH"]) > 0
+				&&
+				isset($arItem["HEIGHT"]) && floatval($arItem["HEIGHT"]) > 0
+				&&
+				isset($arItem["LENGTH"]) && floatval($arItem["LENGTH"]) > 0
+				);
+	}
+
+	static public function getActionsNames()
+	{
+		return array(
+			"REQUEST_SELF" => GetMessage("SALE_DH_ACTION_REQUEST_SELF"),
+			"REQUEST_TAKE" => GetMessage("SALE_DH_ACTION_REQUEST_TAKE")
+		);
 	}
 }
 

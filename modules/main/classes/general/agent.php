@@ -12,151 +12,158 @@ class CAllAgent
 {
 	
 	/**
-	 * <p>Функция регистрирует новую функцию-агент.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $name  PHP строка для запуска функции-агента.
-	 *
-	 *
-	 *
-	 * @param string $module = "" Идентификатор модуля. Необходим для подключения файлов
-	 * модуля.<br>Необязательный. По умолчанию пустой.
-	 *
-	 *
-	 *
-	 * @param string $period = "N" <p>Если значение - "Y", то очередная дата запуска агента (<i>next_exec</i>)
-	 * будет рассчитываться как:</p> <pre><i>next_exec</i> = <i>next_exec</i> + <i>interval</i></pre>
-	 * Т.е. при очередном запуске, если прошло уже больше времени чем
-	 * указано в параметре <i>interval</i>, агент сначала будет запускаться
-	 * ровно столько раз сколько он должен был запуститься (т.е. столько
-	 * раз сколько он "пропустил"), а затем, когда <i>next_exec</i> достигнет либо
-	 * превысит текущую дату, он будет в дальнейшем запускаться с
-	 * периодичностью указанной в параметре <i>interval</i>. Как правило,
-	 * подобное используется в агентах которые должны гарантированно
-	 * запуститься определённое количество раз. <p>Если значение - "N", то
-	 * очередная дата запуска агента (<i>next_exec</i>) будет рассчитываться
-	 * как:</p> <pre><i>next_exec</i> = дата последнего запуска + <i>interval</i></pre>Т.е.
-	 * агент после первого запуска будет в дальнейшем запускаться с
-	 * периодичностью указанной в параметре <i>interval</i>. Параметр
-	 * необязательный, по умолчанию - "N".
-	 *
-	 *
-	 *
-	 * @param int $interval = 86400 Интервал (в секундах), с какой периодичностью запускать агента.<br>
-	 * Необязательный. По умолчанию - 86400 (1 сутки).
-	 *
-	 *
-	 *
-	 * @param string $datecheck = "" Дата первой проверки "не пора ли запустить агент" в формате
-	 * текущего языка.<br> Необязательный. По умолчанию - текущее время.
-	 *
-	 *
-	 *
-	 * @param string $active = "Y" Активность агента (Y|N).<br> Необязательный. По умолчанию - "Y"
-	 * (активен).
-	 *
-	 *
-	 *
-	 * @param string $next_exec = "" Дата первого запуска агента в формате текущего
-	 * языка.<br>Необязательный. По умолчанию - текущее время.
-	 *
-	 *
-	 *
-	 * @param int $sort = 100 Индекс сортировки позволяющий указать порядок запуска данного
-	 * агента относительно других агентов для которых подошло время
-	 * запуска.<br>Необязательный. По умолчанию - 100.
-	 *
-	 *
-	 *
-	 * @return mixed <p>При успешном выполнении, возвращает ID вновь добавленного
-	 * агента, иначе - false.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // добавим агент модуля "Статистика"
-	 * <b>CAgent::AddAgent</b>(
-	 *     "CStatistic::CleanUpStatistics_2();", // имя функции
-	 *     "statistic",                          // идентификатор модуля
-	 *     "N",                                  // агент не критичен к кол-ву запусков
-	 *     86400,                                // интервал запуска - 1 сутки
-	 *     "07.04.2005 20:03:26",                // дата первой проверки на запуск
-	 *     "Y",                                  // агент активен
-	 *     "07.04.2005 20:03:26",                // дата первого запуска
-	 *     30);
-	 * ?&gt;
-	 * &lt;?
-	 * // добавим агент модуля "Техподдержка"
-	 * <b>CAgent::AddAgent</b>(
-	 *     "CTicket::AutoClose();",  // имя функции
-	 *     "support",                // идентификатор модуля
-	 *     "N",                      // агент не критичен к кол-ву запусков
-	 *     86400,                    // интервал запуска - 1 сутки
-	 *     "",                       // дата первой проверки - текущее
-	 *     "Y",                      // агент активен
-	 *     "",                       // дата первого запуска - текущее
-	 *     30);
-	 * ?&gt;
-	 * &lt;?
-	 * // добавим произвольный агент не принадлежащий ни одному модулю
-	 * <b>CAgent::AddAgent</b>("My_Agent_Function();");
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * // файл /bitrix/php_interface/init.php
-	 * 
-	 * function My_Agent_Function()
-	 * {
-	 *    // выполняем какие-либо действия
-	 *    return "My_Agent_Function();";
-	 * }
-	 * ?&gt;
-	 * &lt;?
-	 * // добавим произвольный агент принадлежащий модулю
-	 * // с идентификатором my_module
-	 * 
-	 * <b>CAgent::AddAgent</b>(
-	 *    "CMyModule::Agent007(1)", 
-	 *    "my_module", 
-	 *    "Y", 
-	 *     86400);
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * // данный агент будет запущен ровно 7 раз с периодичностью раз в сутки, 
-	 * // после чего будет удален из таблицы агентов.
-	 * 
-	 * Class CMyModule
-	 * {
-	 *    function Agent007($cnt=1)
-	 *    {
-	 *       echo "Hello!";
-	 *       if($cnt&gt;=7)
-	 *          return "";
-	 *       return "CMyModule::Agent007(".($cnt+1).")";
-	 *    }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
-	 * </li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li>
-	 * <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	 * <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2823" >Структура
-	 * файлов</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/addagent.php
-	 * @author Bitrix
-	 */
+	* <p>Функция регистрирует новую функцию-агент.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param string $name  PHP строка для запуска функции-агента.
+	*
+	*
+	*
+	* @param string $module = "" Идентификатор модуля. Необходим для подключения файлов
+	* модуля.<br>Необязательный. По умолчанию пустой.
+	*
+	*
+	*
+	* @param string $period = "N" <p>Если значение - "Y", то очередная дата запуска агента (<i>next_exec</i>)
+	* будет рассчитываться как:</p> <pre><i>next_exec</i> = <i>next_exec</i> + <i>interval</i></pre>
+	* Т.е. при очередном запуске, если прошло уже больше времени чем
+	* указано в параметре <i>interval</i>, агент сначала будет запускаться
+	* ровно столько раз сколько он должен был запуститься (т.е. столько
+	* раз сколько он "пропустил"), а затем, когда <i>next_exec</i> достигнет либо
+	* превысит текущую дату, он будет в дальнейшем запускаться с
+	* периодичностью указанной в параметре <i>interval</i>. Как правило,
+	* подобное используется в агентах которые должны гарантированно
+	* запуститься определённое количество раз. <p>Если значение - "N", то
+	* очередная дата запуска агента (<i>next_exec</i>) будет рассчитываться
+	* как:</p> <pre><i>next_exec</i> = дата последнего запуска + <i>interval</i></pre>Т.е.
+	* агент после первого запуска будет в дальнейшем запускаться с
+	* периодичностью указанной в параметре <i>interval</i>. Параметр
+	* необязательный, по умолчанию - "N".
+	*
+	*
+	*
+	* @param int $interval = 86400 Интервал (в секундах), с какой периодичностью запускать агента.<br>
+	* Необязательный. По умолчанию - 86400 (1 сутки).
+	*
+	*
+	*
+	* @param string $datecheck = "" Дата первой проверки "не пора ли запустить агент" в формате
+	* текущего языка.<br> Необязательный. По умолчанию - текущее время.
+	*
+	*
+	*
+	* @param string $active = "Y" Активность агента (Y|N).<br> Необязательный. По умолчанию - "Y"
+	* (активен).
+	*
+	*
+	*
+	* @param string $next_exec = "" Дата первого запуска агента в формате текущего
+	* языка.<br>Необязательный. По умолчанию - текущее время.
+	*
+	*
+	*
+	* @param int $sort = 100 Индекс сортировки позволяющий указать порядок запуска данного
+	* агента относительно других агентов для которых подошло время
+	* запуска.<br>Необязательный. По умолчанию - 100.
+	*
+	*
+	*
+	* @return mixed <p>При успешном выполнении, возвращает ID вновь добавленного
+	* агента, иначе - <i>false</i>. Если агент ничего не возвращает, он
+	* удаляется. Как правило он должен вернуть вызов самого себя.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // добавим агент модуля "Статистика"
+	* <b>CAgent::AddAgent</b>(
+	*     "CStatistic::CleanUpStatistics_2();", // имя функции
+	*     "statistic",                          // идентификатор модуля
+	*     "N",                                  // агент не критичен к кол-ву запусков
+	*     86400,                                // интервал запуска - 1 сутки
+	*     "07.04.2005 20:03:26",                // дата первой проверки на запуск
+	*     "Y",                                  // агент активен
+	*     "07.04.2005 20:03:26",                // дата первого запуска
+	*     30);
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // добавим агент модуля "Техподдержка"
+	* <b>CAgent::AddAgent</b>(
+	*     "CTicket::AutoClose();",  // имя функции
+	*     "support",                // идентификатор модуля
+	*     "N",                      // агент не критичен к кол-ву запусков
+	*     86400,                    // интервал запуска - 1 сутки
+	*     "",                       // дата первой проверки - текущее
+	*     "Y",                      // агент активен
+	*     "",                       // дата первого запуска - текущее
+	*     30);
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // добавим произвольный агент не принадлежащий ни одному модулю
+	* <b>CAgent::AddAgent</b>("My_Agent_Function();");
+	* ?&gt;
+	* 
+	* &lt;?
+	* // файл /bitrix/php_interface/init.php
+	* 
+	* function My_Agent_Function()
+	* {
+	*    // выполняем какие-либо действия
+	*    return "My_Agent_Function();";
+	* }
+	* ?&gt;
+	* 
+	* 
+	* &lt;?
+	* // добавим произвольный агент принадлежащий модулю
+	* // с идентификатором my_module
+	* 
+	* <b>CAgent::AddAgent</b>(
+	*    "CMyModule::Agent007(1)", 
+	*    "my_module", 
+	*    "Y", 
+	*     86400);
+	* ?&gt;
+	* 
+	* &lt;?
+	* // данный агент будет запущен ровно 7 раз с периодичностью раз в сутки, 
+	* // после чего будет удален из таблицы агентов.
+	* 
+	* Class CMyModule
+	* {
+	*    function Agent007($cnt=1)
+	*    {
+	*       echo "Hello!";
+	*       if($cnt&gt;=7)
+	*          return "";
+	*       return "CMyModule::Agent007(".($cnt+1).")";
+	*    }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
+	* </li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	* <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2823" >Структура
+	* файлов</a></li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/addagent.php
+	* @author Bitrix
+	*/
 	public static function AddAgent(
 		$name, // PHP function name
 		$module = "", // module
@@ -232,48 +239,52 @@ class CAllAgent
 
 	
 	/**
-	 * <p>Удаляет функцию-агента из таблицы зарегистрированных агентов. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $name  Функция-агент.
-	 *
-	 *
-	 *
-	 * @param string $module = "" Идентификатор модуля. Необязательный. По умолчанию - главный
-	 * модуль ("main").
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * <b>CAgent::RemoveAgent</b>("CCatalog::PreGenerateXML(\"yandex\");", "catalog");
-	 * if ($bNeedAgent)
-	 * {
-	 *     CAgent::AddAgent("CCatalog::PreGenerateXML(\"yandex\");", "catalog", "N", 24*60*60, "", "Y");
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
-	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет функцию-агента из таблицы зарегистрированных агентов. </p>
+	*
+	*
+	*
+	*
+	* @param string $name  Функция-агент.
+	*
+	*
+	*
+	* @param string $module = "" Идентификатор модуля. Необязательный. По умолчанию - главный
+	* модуль ("main").
+	*
+	*
+	*
+	* @param string $user_id = false Идентификатор пользователя. Необязательный.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* <b>CAgent::RemoveAgent</b>("CCatalog::PreGenerateXML(\"yandex\");", "catalog");
+	* if ($bNeedAgent)
+	* {
+	*     CAgent::AddAgent("CCatalog::PreGenerateXML(\"yandex\");", "catalog", "N", 24*60*60, "", "Y");
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
+	* >Агенты</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php
+	* @author Bitrix
+	*/
 	public static function RemoveAgent($name, $module = "", $user_id = false)
 	{
 		global $DB;
@@ -294,39 +305,39 @@ class CAllAgent
 
 	
 	/**
-	 * <p>Удаляет функцию-агент из таблицы зарегистрированных агентов.</p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID функции-агента.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (<b>CAgent::Delete</b>(34)) echo "Агент #34 успешно удален.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
-	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет функцию-агент из таблицы зарегистрированных агентов.</p> <p> </p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID функции-агента.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (<b>CAgent::Delete</b>(34)) echo "Агент #34 успешно удален.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
+	* >Агенты</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($id)
 	{
 		global $DB;
@@ -342,39 +353,39 @@ class CAllAgent
 
 	
 	/**
-	 * <p>Удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $module  Идентификатор модуля.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * <b>CAgent::RemoveModuleAgents</b>("statistic");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
-	 * >Агенты</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. </p>
+	*
+	*
+	*
+	*
+	* @param string $module  Идентификатор модуля.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* <b>CAgent::RemoveModuleAgents</b>("statistic");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
+	* >Агенты</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php
+	* @author Bitrix
+	*/
 	public static function RemoveModuleAgents($module)
 	{
 		global $DB;
@@ -468,7 +479,7 @@ class CAllAgent
 						$arSqlSearch[] = "A.IS_PERIOD='".$t_val."'";
 					break;
 				case "NAME":
-					$arSqlSearch[] = "A.NAME LIKE '".$DB->ForSQL($val)."'";
+					$arSqlSearch[] = "A.NAME LIKE '".$DB->ForSQLLike($val)."'";
 					break;
 				case "MODULE_ID":
 					$arSqlSearch[] = "A.MODULE_ID = '".$DB->ForSQL($val)."'";

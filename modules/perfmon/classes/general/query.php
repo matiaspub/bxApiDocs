@@ -10,6 +10,7 @@ class CPerfQueryJoin
 
 	public static function _parse($sql, &$table, &$column, &$const)
 	{
+		$match = array();
 		if(preg_match("/^([a-zA-Z0-9_]+)\\.(.+)\$/", $sql, $match))
 		{
 			$table = $match[1];
@@ -64,17 +65,16 @@ class CPerfQueryWhere
 
 		//Replace IN with no more than 5 values to equal
 		$sql = preg_replace("/ IN[ ]*\\([ ]*([0-9]+|'[^']*')([ ]*,[ ]*([0-9]+|'[^']*')[ ]*){0,5}[ ]*\\)/i", " = \\1 ", $sql);
-//echo "<pre>_replace_in:",htmlspecialcharsbx($sql),"</pre>";
 
 		//Remove complex inner syntax
 		while(preg_match("/\\([^()]*\\)/", $sql))
 			$sql = preg_replace("/\\([^()]*\\)/", "", $sql);
 
-//echo "<pre>simplified_sql:",htmlspecialcharsbx($sql),"</pre>";
 		$this->simplified_sql = $sql;
 
 		foreach(preg_split("/ and /i", $sql) as $str)
 		{
+			$match = array();
 			if(preg_match("/(".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+) = (".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+)/", $str, $match))
 			{
 				$join = new CPerfQueryJoin;
@@ -112,7 +112,7 @@ class CPerfQueryWhere
 				if($new_sql === $sql)
 					break;
 			}
-//echo "<pre>_remove_braces:",htmlspecialcharsbx($new_sql),"</pre>";
+
 			$sql = trim($new_sql);
 		}
 		return $sql;
@@ -121,12 +121,14 @@ class CPerfQueryWhere
 	public function _or2in($or_match)
 	{
 		$sql = $or_match[0];
+
+		$match = array();
 		if(preg_match_all("/(".$this->table_aliases_regex."\\.[a-zA-Z0-9_]+|[0-9]+|'[^']*') (?:=) ([0-9]+|'[^']*')/", $or_match[1], $match))
 		{
 			if(count(array_unique($match[1])) == 1)
 				$sql = $match[1][0]." IN ( ".implode(", ", $match[2])." )";
 		}
-//echo "<pre>_or2in:",htmlspecialcharsbx($sql),"</pre>";
+
 		return $sql;
 	}
 }
@@ -142,6 +144,7 @@ class CPerfQueryTable
 	{
 		$sql = CPerfQuery::removeSpaces($sql);
 
+		$match = array();
 		if(preg_match("/^([a-z0-9_]+) ([a-z0-9_]+) on (.+)\$/i", $sql, $match))
 		{
 			$this->name = $match[1];
@@ -178,6 +181,7 @@ class CPerfQueryFrom
 	{
 		$sql = CPerfQuery::removeSpaces($sql);
 
+		$match = array();
 		if(preg_match("/^select(.*) from (.*?) (where|group|having|order)/is", $sql, $match))
 			$this->sql = $match[2];
 		elseif(preg_match("/^select(.*) from (.*?)\$/is", $sql, $match))
@@ -187,7 +191,7 @@ class CPerfQueryFrom
 
 		if($this->sql)
 		{
-			$arJoinTables = preg_split("/(,|inner\\s+join|left\\s+join)(?= [a-z0-9_]+)/is", $this->sql);
+			$arJoinTables = preg_split("/(,|inner\\s+join|left\\s+join)(?=\\s+[a-z0-9_]+)/is", $this->sql);
 			foreach($arJoinTables as $str)
 			{
 				$table = new CPerfQueryTable;
@@ -234,6 +238,7 @@ class CPerfQuery
 
 	public static function transform2select($sql)
 	{
+		$match = array();
 		if(preg_match("#^\\s*insert\\s+into\\s+(.+?)(\\(|)\\s*(\\s*select.*)\\s*\\2\\s*(\$|ON\\s+DUPLICATE\\s+KEY\\s+UPDATE)#is", $sql, $match))
 			$result = $match[3];
 		elseif(preg_match("#^\\s*DELETE\\s+#i", $sql))
@@ -256,7 +261,7 @@ class CPerfQuery
 		$this->sql = preg_replace("/([()=])/", " \\1 ", $sql);
 		$this->sql = CPerfQuery::removeSpaces($this->sql);
 
-		//if(preg_match("/^(select|update|delete|insert) /i", $this->sql, $match))
+		$match = array();
 		if(preg_match("/^(select) /i", $this->sql, $match))
 			$this->type = strtolower($match[1]);
 		else
@@ -418,7 +423,6 @@ class CPerfQuery
 		$arTableJoins = $this->table_joins($table_alias);
 
 		//Next read indexes already have
-//echo "<pre>",htmlspecialcharsbx(print_r($arTableJoins,1)),"</pre>";
 		$arSuggest = array();
 		if(!empty($arTableJoins))
 		{
@@ -428,7 +432,7 @@ class CPerfQuery
 			$arIndexes = CPerfomanceTable::GetIndexes($suggest_table->name);
 			foreach($arIndexes as $index_name => $arColumns)
 				$arIndexes[$index_name] = implode(",", $arColumns);
-//echo "<pre>",htmlspecialcharsbx(print_r($arIndexes,1)),"</pre>";
+
 			//Test our suggestion against existing indexes
 			foreach($arTableJoins as $i => $arColumns)
 			{
@@ -436,7 +440,7 @@ class CPerfQuery
 				$arColumns = $this->_adjust_columns($arColumns);
 				//Take all possible combinations of columns
 				$arCombosToTest = $this->array_power_set($arColumns);
-//echo "<pre>",htmlspecialcharsbx(print_r($arCombosToTest,1)),"</pre>";
+
 				foreach($arCombosToTest as $arComboColumns)
 				{
 					if(!empty($arComboColumns))

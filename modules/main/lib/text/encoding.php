@@ -97,6 +97,33 @@ class Encoding
 		return $res;
 	}
 
+	public static function convertEncodingArray($arData, $charsetFrom, $charsetTo, &$errorMessage = "")
+	{
+		if (!is_array($arData))
+		{
+			if (is_string($arData))
+			{
+				$arData = self::convertEncoding($arData, $charsetFrom, $charsetTo, $errorMessage);
+			}
+		}
+		else
+		{
+			foreach ($arData as $key => $value)
+			{
+				$s = '';
+
+				$arData[$key] = self::convertEncodingArray($value, $charsetFrom, $charsetTo, $s);
+
+				if($s!=='')
+				{
+					$errorMessage .= ($errorMessage == "" ? "" : "\n").$s;
+				}
+			}
+		}
+
+		return $arData;
+	}
+
 	public static function convertEncodingToCurrent($string)
 	{
 		$isUtf8String = self::detectUtf8($string);
@@ -355,11 +382,11 @@ class Encoding
 							if (array_key_exists($arUnicodeHexChar[$j], $arConvertTable[$charsetTo]))
 								$resultString .= chr(hexdec($arConvertTable[$charsetTo][$arUnicodeHexChar[$j]]));
 							else
-								$this->addError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in destination encoding table."));
+								$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in destination encoding table."));
 						}
 					}
 					else
-						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in source encoding table."));
+						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
 				}
 				else
 				{
@@ -372,7 +399,7 @@ class Encoding
 							$resultString .= $this->hexToUtf($arUnicodeHexChar[$j]);
 					}
 					else
-						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Can not find matching char \"#CHAR#\" in source encoding table."));
+						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
 				}
 			}
 		}

@@ -15,6 +15,11 @@ abstract class Result
 	/** @var \Closure */
 	protected $fetchDataModifier = null;
 
+	/**
+	 * @param resource $result Database-specific query result
+	 * @param Connection $dbConnection Connection object
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery
+	 */
 	public function __construct($result, Connection $dbConnection = null, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		$this->resource = $result;
@@ -42,6 +47,12 @@ abstract class Result
 		$this->fetchDataModifier = $fetchDataModifier;
 	}
 
+	/**
+	 * Fetches one row of the query result and returns it in the associative array or false on empty data
+	 *
+	 * @param \Bitrix\Main\Text\Converter $converter Optional converter to encode data on fetching
+	 * @return array|bool
+	 */
 	public function fetch(\Bitrix\Main\Text\Converter $converter = null)
 	{
 		if ($this->trackerQuery != null)
@@ -106,6 +117,12 @@ abstract class Result
 		return $data;
 	}
 
+	/**
+	 * Fetches all the rows of the query result and returns it in the array of associative arrays
+
+	 * @param \Bitrix\Main\Text\Converter $converter Optional converter to encode data on fetching
+	 * @return array
+	 */
 	public function fetchAll(\Bitrix\Main\Text\Converter $converter = null)
 	{
 		$res = array();

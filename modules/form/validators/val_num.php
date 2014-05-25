@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorNumber
@@ -13,7 +12,7 @@ class CFormValidatorNumber
 			"HANDLER" => array("CFormValidatorNumber", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
@@ -27,7 +26,7 @@ class CFormValidatorNumber
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

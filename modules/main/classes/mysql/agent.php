@@ -12,23 +12,23 @@ class CAgent extends CAllAgent
 {
 	
 	/**
-	 * <p>Выполняет функцию-агента, время запуска которой наступило. Функция автоматически вызывается вначале каждой страницы и не требует ручного запуска. </p> <p> </p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
-	 * </li></ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/checkagents.php
-	 * @author Bitrix
-	 */
+	* <p>Выполняет функцию-агента, время запуска которой наступило. Функция автоматически вызывается вначале каждой страницы и не требует ручного запуска. </p> <p> </p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
+	* </li></ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/checkagents.php
+	* @author Bitrix
+	*/
 	public static function CheckAgents()
 	{
 		global $CACHE_MANAGER;
@@ -59,7 +59,7 @@ class CAgent extends CAllAgent
 
 	public static function ExecuteAgents($str_crontab)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER, $pPERIOD;
 
 		if(defined("BX_FORK_AGENTS_AND_EVENTS_FUNCTION"))
 		{
@@ -157,10 +157,13 @@ class CAgent extends CAllAgent
 		}
 
 		$DB->Query("SELECT RELEASE_LOCK('".$uniq."_agent')");
+		$logFunction = defined("BX_AGENTS_LOG_FUNCTION") && function_exists(BX_AGENTS_LOG_FUNCTION)? BX_AGENTS_LOG_FUNCTION: false;
 
 		for($i = 0, $n = count($agents_array); $i < $n; $i++)
 		{
 			$arAgent = $agents_array[$i];
+			if ($logFunction)
+				$logFunction($arAgent, "start");
 
 			@set_time_limit(0);
 
@@ -180,7 +183,11 @@ class CAgent extends CAllAgent
 			$eval_result = "";
 			eval("\$eval_result=".$arAgent["NAME"]);
 			unset($USER);
+
 			CTimeZone::Enable();
+
+			if ($logFunction)
+				$logFunction($arAgent, "finish", $eval_result);
 
 			if(strlen($eval_result)<=0)
 			{

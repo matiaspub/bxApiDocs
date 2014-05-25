@@ -7,43 +7,41 @@ class CAllRatings
 	// get specified rating record
 	
 	/**
-	 * <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рейтинга
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ID = 4;
-	 * $rsRating = CRatings::GetByID($ID);
-	 * $arRating = $rsRating-&gt;Fetch();
-	 * echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рейтинга
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ID = 4;
+	* $rsRating = CRatings::GetByID($ID);
+	* $arRating = $rsRating-&gt;Fetch();
+	* echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -69,41 +67,39 @@ class CAllRatings
 
 	
 	/**
-	 * <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор рейтинга
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ID = 4;
-	 * $arRating = CRatings::GetArrayByID($ID);
-	 * echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор рейтинга
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ID = 4;
+	* $arRating = CRatings::GetArrayByID($ID);
+	* echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php
+	* @author Bitrix
+	*/
 	public static function GetArrayByID($ID)
 	{
 		global $DB;
@@ -158,64 +154,62 @@ class CAllRatings
 	// get rating record list
 	
 	/**
-	 * <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param  $array  Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, NAME,
-	 * CREATED, LAST_MODIFIED, LAST_CALCILATED, ACTIVE, STATUS, CALCULATED, CALCULATION_METHOD, ENTITY_ID.
-	 *
-	 *
-	 *
-	 * @param arSor $t  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимые
-	 * поля: ID, ACTIVE, CALCULATED, NAME, ENTITY_ID
-	 *
-	 *
-	 *
-	 * @param  $array  
-	 *
-	 *
-	 *
-	 * @param arFilte $r  
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arRatings = array(); 
-	 * $rsRatings = CRatings::GetList( 
-	 *    array("ID" =&gt; "DESC"), 
-	 *    array("ACTIVE" =&gt; "Y")
-	 * ); 
-	 * while ($arRatingsTmp = $rsRatings-&gt;GetNext())
-	 *    $arRatings[$arRatingsTmp["ID"]] = $arRatingsTmp; 
-	 * echo '&lt;pre&gt;'.print_r($arRatings, true).'&lt;/pre&gt;';
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинги"</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param  $array  Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, NAME,
+	* CREATED, LAST_MODIFIED, LAST_CALCILATED, ACTIVE, STATUS, CALCULATED, CALCULATION_METHOD, ENTITY_ID.
+	*
+	*
+	*
+	* @param arSor $t  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимые
+	* поля: ID, ACTIVE, CALCULATED, NAME, ENTITY_ID
+	*
+	*
+	*
+	* @param  $array  
+	*
+	*
+	*
+	* @param arFilte $r  
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arRatings = array(); 
+	* $rsRatings = CRatings::GetList( 
+	*    array("ID" =&gt; "DESC"), 
+	*    array("ACTIVE" =&gt; "Y")
+	* ); 
+	* while ($arRatingsTmp = $rsRatings-&gt;GetNext())
+	*    $arRatings[$arRatingsTmp["ID"]] = $arRatingsTmp; 
+	* echo '&lt;pre&gt;'.print_r($arRatings, true).'&lt;/pre&gt;';
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arSort=array(), $arFilter=Array())
 	{
 		global $DB;
@@ -324,103 +318,101 @@ class CAllRatings
 	//Addition rating
 	
 	/**
-	 * <p>Метод добавляет новый рейтинг.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	 * допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
-	 * <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
-	 * объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
-	 * рейтинга (SUM -суммирование критериев, AVG – средние значение
-	 * критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
-	 * рейтингования.</li> </ul> Все поля являются обязательными.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // создадим рейтинг с критериями рейтингования от модуля форум и блог
-	 * // учитывать будем только рейтинговые голосования, активность учитывать не будем
-	 * $arConfig = array();
-	 * $arConfig['FORUM'] = array(
-	 * 	'VOTE' =&gt; array(
-	 * 		'TOPIC' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'Y',
-	 * 			'COEFFICIENT' =&gt; '1',
-	 * 		),
-	 * 		'POST' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'Y',
-	 * 			'COEFFICIENT' =&gt; '1',
-	 * 		),
-	 * 	),
-	 * 	'RATING' =&gt; array(
-	 * 		'ACTIVITY' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'N',
-	 * 			'TODAY_TOPIC_COEF' =&gt; '20',
-	 * 			'WEEK_TOPIC_COEF' =&gt; '10',
-	 * 			'MONTH_TOPIC_COEF' =&gt; '5',
-	 * 			'TODAY_POST_COEF' =&gt; '0.4',
-	 * 			'WEEK_POST_COEF' =&gt; '0.2',
-	 * 			'MONTH_POST_COEF' =&gt; '0.1',
-	 * 		),
-	 * 	),
-	 * );
-	 * $arConfig['BLOG'] = array(
-	 * 'VOTE' =&gt; array(
-	 * 		'POST' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'Y',
-	 * 			'COEFFICIENT' =&gt; '1',
-	 * 		),
-	 * 		'COMMENT' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'Y',
-	 * 			'COEFFICIENT' =&gt; '1',
-	 * 		),
-	 * 	),
-	 * 	'RATING' =&gt; array(
-	 * 		'ACTIVITY' =&gt; array(
-	 * 			'ACTIVE' =&gt; 'N',
-	 * 			'TODAY_POST_COEF' =&gt; '20',
-	 * 			'WEEK_POST_COEF' =&gt; '10',
-	 * 			'MONTH_POST_COEF' =&gt; '5',
-	 * 			'TODAY_COMMENT_COEF' =&gt; '0.4',
-	 * 			'WEEK_COMMENT_COEF' =&gt; '0.2',
-	 * 			'MONTH_COMMENT_COEF' =&gt; '0.1',
-	 * 		),
-	 * 	),
-	 * );
-	 * 
-	 * $arAddRating = array(
-	 * 	'ACTIVE' =&gt; 'Y',
-	 * 	'NAME' =&gt; 'Рейтинг созданный через API',
-	 * 	'ENTITY_ID' =&gt; 'USER',
-	 * 	'CALCULATION_METHOD' =&gt; 'SUM',
-	 * 	'CONFIGS' =&gt; $arConfig
-	 * );
-	 * $ratingId = CRatings::Add($arAddRating);
-	 * if (intval($ratingId) &gt; 0)
-	 *     echo "Рейтинг успешно добавлен.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинг"</a></li> <li>Метод <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php">CRating::Update</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новый рейтинг.</p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
+	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
+	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
+	* объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
+	* рейтинга (SUM -суммирование критериев, AVG – средние значение
+	* критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
+	* рейтингования.</li> </ul> Все поля являются обязательными.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // создадим рейтинг с критериями рейтингования от модуля форум и блог
+	* // учитывать будем только рейтинговые голосования, активность учитывать не будем
+	* $arConfig = array();
+	* $arConfig['FORUM'] = array(
+	* 	'VOTE' =&gt; array(
+	* 		'TOPIC' =&gt; array(
+	* 			'ACTIVE' =&gt; 'Y',
+	* 			'COEFFICIENT' =&gt; '1',
+	* 		),
+	* 		'POST' =&gt; array(
+	* 			'ACTIVE' =&gt; 'Y',
+	* 			'COEFFICIENT' =&gt; '1',
+	* 		),
+	* 	),
+	* 	'RATING' =&gt; array(
+	* 		'ACTIVITY' =&gt; array(
+	* 			'ACTIVE' =&gt; 'N',
+	* 			'TODAY_TOPIC_COEF' =&gt; '20',
+	* 			'WEEK_TOPIC_COEF' =&gt; '10',
+	* 			'MONTH_TOPIC_COEF' =&gt; '5',
+	* 			'TODAY_POST_COEF' =&gt; '0.4',
+	* 			'WEEK_POST_COEF' =&gt; '0.2',
+	* 			'MONTH_POST_COEF' =&gt; '0.1',
+	* 		),
+	* 	),
+	* );
+	* $arConfig['BLOG'] = array(
+	* 'VOTE' =&gt; array(
+	* 		'POST' =&gt; array(
+	* 			'ACTIVE' =&gt; 'Y',
+	* 			'COEFFICIENT' =&gt; '1',
+	* 		),
+	* 		'COMMENT' =&gt; array(
+	* 			'ACTIVE' =&gt; 'Y',
+	* 			'COEFFICIENT' =&gt; '1',
+	* 		),
+	* 	),
+	* 	'RATING' =&gt; array(
+	* 		'ACTIVITY' =&gt; array(
+	* 			'ACTIVE' =&gt; 'N',
+	* 			'TODAY_POST_COEF' =&gt; '20',
+	* 			'WEEK_POST_COEF' =&gt; '10',
+	* 			'MONTH_POST_COEF' =&gt; '5',
+	* 			'TODAY_COMMENT_COEF' =&gt; '0.4',
+	* 			'WEEK_COMMENT_COEF' =&gt; '0.2',
+	* 			'MONTH_COMMENT_COEF' =&gt; '0.1',
+	* 		),
+	* 	),
+	* );
+	* 
+	* $arAddRating = array(
+	* 	'ACTIVE' =&gt; 'Y',
+	* 	'NAME' =&gt; 'Рейтинг созданный через API',
+	* 	'ENTITY_ID' =&gt; 'USER',
+	* 	'CALCULATION_METHOD' =&gt; 'SUM',
+	* 	'CONFIGS' =&gt; $arConfig
+	* );
+	* $ratingId = CRatings::Add($arAddRating);
+	* if (intval($ratingId) &gt; 0)
+	*     echo "Рейтинг успешно добавлен.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>Метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php">CRating::Update</a>
+	* </li> </ul></bo<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB, $stackCacheManager;
@@ -468,56 +460,54 @@ class CAllRatings
 	//Update rating
 	
 	/**
-	 * <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Идентификатор рейтинга.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	 * допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
-	 * <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
-	 * объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
-	 * рейтинга (SUM-суммирование критериев, AVG – средние значение
-	 * критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
-	 * рейтингования</li> <li> <b>NEW_CALC</b> – обнуляет предыдущее значение
-	 * рейтинга</li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // изменим название рейтинга и сделаем его не активным
-	 * $arUpdateRating = array(
-	 * 	'ACTIVE' =&gt; 'N',
-	 * 	'NAME' =&gt; 'Рейтинг, измененный через API',
-	 * );
-	 * $result = CRatings::Update(1, $arUpdateRating);
-	 * if ($result)
-	 *     echo "Рейтинг успешно обновлен.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинг"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/add.php">CRating::Add</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Идентификатор рейтинга.
+	*
+	*
+	*
+	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
+	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
+	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
+	* объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
+	* рейтинга (SUM-суммирование критериев, AVG – средние значение
+	* критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
+	* рейтингования</li> <li> <b>NEW_CALC</b> – обнуляет предыдущее значение
+	* рейтинга</li> </ul>
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // изменим название рейтинга и сделаем его не активным
+	* $arUpdateRating = array(
+	* 	'ACTIVE' =&gt; 'N',
+	* 	'NAME' =&gt; 'Рейтинг, измененный через API',
+	* );
+	* $result = CRatings::Update(1, $arUpdateRating);
+	* if ($result)
+	*     echo "Рейтинг успешно обновлен.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/add.php">CRating::Add</a></li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB, $stackCacheManager;
@@ -586,40 +576,34 @@ class CAllRatings
 	// delete rating
 	
 	/**
-	 * <p>Метод удаляет рейтинг с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Идентификатор рейтинга
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // удаление рейтинга
-	 * $ID = 1;
-	 * $result = CRatings::Delete($ID);
-	 * if ($result)
-	 *     echo "Рейтинг успешно удален.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating">Структура
-	 * таблицы "Рейтинг"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/Delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет рейтинг с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Идентификатор рейтинга
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // удаление рейтинга
+	* $ID = 1;
+	* $result = CRatings::Delete($ID);
+	* if ($result)
+	*     echo "Рейтинг успешно удален.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/Delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $stackCacheManager;
@@ -646,45 +630,39 @@ class CAllRatings
 	// start calculation rating-component
 	
 	/**
-	 * <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Идентификатор рейтинга
-	 *
-	 *
-	 *
-	 * @param bool $forceRecalc  Принудительный пересчет. Если данный параметр установлен в
-	 * <b>true</b>, то критерии рейтинга будут пересчитаны без учета времени
-	 * следующего запуска.
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // принудительно пересчитаем все критерии рейтинга
-	 * $ID = 4;
-	 * $bforceRecalc = true;
-	 * CRatings::Calculate($ID, $bforceRecalc);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_results">Структура
-	 * таблицы "Результаты рейтинга"</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/calculate.php
-	 * @author Bitrix
-	 */
+	* <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Идентификатор рейтинга
+	*
+	*
+	*
+	* @param bool $forceRecalc  Принудительный пересчет. Если данный параметр установлен в
+	* <b>true</b>, то критерии рейтинга будут пересчитаны без учета времени
+	* следующего запуска.
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // принудительно пересчитаем все критерии рейтинга
+	* $ID = 4;
+	* $bforceRecalc = true;
+	* CRatings::Calculate($ID, $bforceRecalc);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/calculate.php
+	* @author Bitrix
+	*/
 	public static function Calculate($ID, $bForceRecalc = false)
 	{
 		global $DB;
@@ -739,27 +717,27 @@ class CAllRatings
 	// queries modules and get all the available objects
 	
 	/**
-	 * <p>Метод возвращает все доступные объекты рейтинговая.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arObjects = CRatings:: GetRatingObjects();
-	 * echo "&lt;pre&gt;"; print_r($arObjects); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingobjects.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает все доступные объекты рейтинговая.</p>
+	*
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arObjects = CRatings:: GetRatingObjects();
+	* echo "&lt;pre&gt;"; print_r($arObjects); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingobjects.php
+	* @author Bitrix
+	*/
 	public static function GetRatingObjects()
 	{
 		$arObjects = array();
@@ -808,36 +786,36 @@ class CAllRatings
 	// queries modules and assemble an array of settings
 	
 	/**
-	 * <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $objectType  Имя оцениваемого объекта.
-	 *
-	 *
-	 *
-	 * @param bool $withRatingType  Учитывать тип рейтингования.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $objectType = 'USER';
-	 * $arRatinConfigs = CRatings::GetRatingConfigs($objectType);
-	 * echo "&lt;pre&gt;"; print_r($arRatinConfigs); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingconfigs.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта.</p>
+	*
+	*
+	*
+	*
+	* @param int $objectType  Имя оцениваемого объекта.
+	*
+	*
+	*
+	* @param bool $withRatingType  Учитывать тип рейтингования.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $objectType = 'USER';
+	* $arRatinConfigs = CRatings::GetRatingConfigs($objectType);
+	* echo "&lt;pre&gt;"; print_r($arRatinConfigs); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingconfigs.php
+	* @author Bitrix
+	*/
 	public static function GetRatingConfigs($objectType = null, $withRatingType = true)
 	{
 		$arConfigs = array();
@@ -881,54 +859,56 @@ class CAllRatings
 
 	
 	/**
-	 * <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $entityTypeId  Название сущности голосования.
-	 *
-	 *
-	 *
-	 * @param mixed $entityId  Идентификатор сущности голосования (можно выбрать несколько
-	 * результатов, указав в этом параметре массив идентификаторов)
-	 *
-	 *
-	 *
-	 * @param int $userId  Идентификатор пользователя (если не указывать, подставляется
-	 * текущий пользователь)
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $entityTypeId = 'FORUM_TOPIC';
-	 * $entityId = 38;
-	 * $arVoteResult = CRatings::GetRatingVoteResult($entityTypeId, $entityId);
-	 * if(!empty($arVoteResult))
-	 *     echo '&lt;pre&gt;'.print_r($arVoteResult, true).'&lt;/pre&gt;';
-	 * else
-	 *     echo "Форум: за выбранную тему ещё не голосовали"; 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_votting">Структура
-	 * таблицы "Результаты рейтингового голосования"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingresult.php">CRatings::GetRatingResult</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingvoteresult.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $entityTypeId  Название сущности голосования. Например: FORUM_TOPIC для тем форума,
+	* FORUM_POST для сообщений форума, BLOG_POST для постов в блоге, BLOG_COMMENT для
+	* комментариев в блоге. Сам список кодов не регламентирован, можно
+	* использовать любой удобный.
+	*
+	*
+	*
+	* @param mixed $entityId  Идентификатор сущности голосования (можно выбрать несколько
+	* результатов, указав в этом параметре массив идентификаторов)
+	*
+	*
+	*
+	* @param int $user_Id  Идентификатор пользователя (если не указывать, подставляется
+	* текущий пользователь)
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $entityTypeId = 'FORUM_TOPIC';
+	* $entityId = 38;
+	* $arVoteResult = CRatings::GetRatingVoteResult($entityTypeId, $entityId);
+	* if(!empty($arVoteResult))
+	*     echo '&lt;pre&gt;'.print_r($arVoteResult, true).'&lt;/pre&gt;';
+	* else
+	*     echo "Форум: за выбранную тему ещё не голосовали"; 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingresult.php">CRatings::GetRatingResult</a></li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingvoteresult.php
+	* @author Bitrix
+	*/
 	public static function GetRatingVoteResult($entityTypeId, $entityId, $user_id = false)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -1030,49 +1010,48 @@ class CAllRatings
 
 	
 	/**
-	 * <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ratingId  идентификатор рейтинга
-	 *
-	 *
-	 *
-	 * @param mixed $entityId  идентификатор оцениваемого объекта (можно выбрать несколько
-	 * результатов, указав в этом параметре массив идентификаторов)
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ratingId = 4;
-	 * $entityId = 1;
-	 * $arRatingResult = CRatings::GetRatingResult($ratingId, $entityId);
-	 * if(!empty($arRatingResult ))
-	 *     echo '&lt;pre&gt;'.print_r($arRatingResult , true).'&lt;/pre&gt;';
-	 * else
-	 *     echo "Указанный идентификатор не участвует в рейтинге";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_results">Структура
-	 * таблицы "Результаты рейтинга"</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingvoteresult.php">CRatings::GetRatingVoteResult</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingresult.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $Id  идентификатор рейтинга
+	*
+	*
+	*
+	* @param mixed $entityId  идентификатор оцениваемого объекта (можно выбрать несколько
+	* результатов, указав в этом параметре массив идентификаторов)
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ratingId = 4;
+	* $entityId = 1;
+	* $arRatingResult = CRatings::GetRatingResult($ratingId, $entityId);
+	* if(!empty($arRatingResult ))
+	*     echo '&lt;pre&gt;'.print_r($arRatingResult , true).'&lt;/pre&gt;';
+	* else
+	*     echo "Указанный идентификатор не участвует в рейтинге";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingvoteresult.php">CRatings::GetRatingVoteResult</a></li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getratingresult.php
+	* @author Bitrix
+	*/
 	public static function GetRatingResult($ID, $entityId)
 	{
 		global $DB;
@@ -1157,50 +1136,46 @@ class CAllRatings
 
 	
 	/**
-	 * <p>Метод добавляет голос к рейтинговому голосованию.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	 * допустимо использовать: <ul> <li> <b>ENTITY_TYPE_ID</b> – объект
-	 * голосования</li> <li> <b>ENTITY_ID</b> – идентификатор объекта
-	 * голосования</li> <li> <b>VALUE</b> – выставленная оценка</li> <li> <b>USER_ID</b> –
-	 * идентификатор пользователя</li> <li> <b>USER_IP</b> – IP-адрес
-	 * пользователя</li> </ul> Все поля являются обязательными.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // добавляем теме отрицательную оценку.
-	 * $arAddVote = array(
-	 * 	"ENTITY_TYPE_ID"  =&gt;  "FORUM_TOPIC",
-	 * 	"ENTITY_ID"       =&gt;  38,
-	 * 	"VALUE"           =&gt;  -1,
-	 * 	"USER_ID"         =&gt;  1, 
-	 *  	"USER_IP"         =&gt;  '127.0.0.1',
-	 * );
-	 * CRatings::AddRatingVote($arAddVote);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/api_help/main/general/ratings/fields.php#rating_vote">Структура
-	 * таблицы "Рейтинговое голосование (голос пользователя)"</a></li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/addratingvote.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет голос к рейтинговому голосованию.</p>
+	*
+	*
+	*
+	*
+	* @param array $Param  Массив значений параметров. В качестве ключей данного массива
+	* допустимо использовать: <ul> <li> <b>ENTITY_TYPE_ID</b> – объект голосования.
+	* Например: FORUM_TOPIC для тем форума, FORUM_POST для сообщений форума, BLOG_POST
+	* для постов в блоге, BLOG_COMMENT для комментариев в блоге. Сам список
+	* кодов не регламентирован, можно использовать любой удобный.</li> <li>
+	* <b>ENTITY_ID</b> – идентификатор объекта голосования</li> <li> <b>VALUE</b> –
+	* выставленная оценка</li> <li> <b>USER_ID</b> – идентификатор
+	* пользователя</li> <li> <b>USER_IP</b> – IP-адрес пользователя</li> </ul> Все поля
+	* являются обязательными.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // добавляем теме отрицательную оценку.
+	* $arAddVote = array(
+	* 	"ENTITY_TYPE_ID"  =&gt;  "FORUM_TOPIC",
+	* 	"ENTITY_ID"       =&gt;  38,
+	* 	"VALUE"           =&gt;  -1,
+	* 	"USER_ID"         =&gt;  1, 
+	*  	"USER_IP"         =&gt;  '127.0.0.1',
+	* );
+	* CRatings::AddRatingVote($arAddVote);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/addratingvote.php
+	* @author Bitrix
+	*/
 	public static function AddRatingVote($arParam)
 	{
 		global $DB, $CACHE_MANAGER;

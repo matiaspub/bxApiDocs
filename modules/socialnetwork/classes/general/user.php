@@ -98,10 +98,14 @@ class CAllSocNetUser
 	public static function OnUserInitialize($user_id, $arFields = array())
 	{
 		if (intval($user_id) <= 0)
+		{
 			return false;
+		}
 
 		if (CModule::IncludeModule("im"))
+		{
 			$bIM = true;
+		}
 
 		$dbRelation = CSocNetUserToGroup::GetList(
 			array(), 
@@ -115,33 +119,39 @@ class CAllSocNetUser
 			array("ID", "GROUP_ID")
 		);
 		while ($arRelation = $dbRelation->Fetch())
-			if (CSocNetUserToGroup::UserConfirmRequestToBeMember($user_id, $arRelation["ID"], false) && defined("BX_COMP_MANAGED_CACHE"))
+		{
+			if (
+				CSocNetUserToGroup::UserConfirmRequestToBeMember($user_id, $arRelation["ID"], false) 
+				&& defined("BX_COMP_MANAGED_CACHE")
+			)
 			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arRelation["GROUP_ID"]);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$user_id);
 				if ($bIM)
+				{
 					CIMNotify::DeleteByTag("SOCNET|INVITE_GROUP|".$user_id."|".intval($arRelation["ID"]));
+				}
 			}
-			
+		}
 	}
 
 	
 	/**
-	 * <p>Метод проверяет, находится ли сейчас пользователь на сайте. Пользователь находится на сайте, если он совершал на сайте какие-либо действия за последние 2 минуты.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если пользователь сейчас на сайте. Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsOnLine.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, находится ли сейчас пользователь на сайте. Пользователь находится на сайте, если он совершал на сайте какие-либо действия за последние 2 минуты.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @return bool <p>True, если пользователь сейчас на сайте. Иначе - false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsOnLine.php
+	* @author Bitrix
+	*/
 	public static function IsOnLine($userID)
 	{
 		$userID = IntVal($userID);
@@ -153,53 +163,70 @@ class CAllSocNetUser
 
 	
 	/**
-	 * <p>Проверяет, разрешен ли функционал друзей.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если функционал друзей включен на сайте. Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsFriendsAllowed.php
-	 * @author Bitrix
-	 */
-	public static function IsFriendsAllowed()
+	* <p>Проверяет, разрешен ли функционал друзей.</p>
+	*
+	*
+	*
+	*
+	* @return bool <p>True, если функционал друзей включен на сайте. Иначе - false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/isfriendsallowed.php
+	* @author Bitrix
+	*/
+	function IsFriendsAllowed()
 	{
-		if (array_key_exists("SONET_ALLOW_FRIENDS_CACHE", $GLOBALS) && !array_key_exists("SONET_ALLOW_FRIENDS_CACHE", $_REQUEST))
-			return $GLOBALS["SONET_ALLOW_FRIENDS_CACHE"];
+		static $strOptionValue;
 
-		$GLOBALS["SONET_ALLOW_FRIENDS_CACHE"] = (COption::GetOptionString("socialnetwork", "allow_frields", "Y") == "Y");
-		return $GLOBALS["SONET_ALLOW_FRIENDS_CACHE"];
+		if (!$strOptionValue)
+		{
+			$strOptionValue = COption::GetOptionString("socialnetwork", "allow_frields", "Y");
+		}
+
+		return ($strOptionValue == "Y");
 	}
 
 	
 	/**
-	 * <p>Метод проверяет, есть ли у текущего пользователя административные права на доступ к модулю социальной сети.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool <p>Если пользователь является администратором или имеет права
-	 * записи на модуль социальной сети, то метод возвращает true, иначе -
-	 * false.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CSocNetUser::IsCurrentUserModuleAdmin())
-	 * {
-	 *    // Текущему пользователю можно все
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsCurrentUserModuleAdmin.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, есть ли у текущего пользователя административные права на доступ к модулю социальной сети.</p>
+	*
+	*
+	*
+	*
+	* @param ) $;  Идентификатор сайта, необязательный параметр. По умолчанию
+	* подставляется текущий сайт.
+	*
+	*
+	*
+	* @param string $site_id = SITE_ID Параметр, указывающий использовать текущую сессию авторизации
+	* пользователя. Необязательный параметр. По умолчанию равен true.
+	*
+	*
+	*
+	* @param bool $bUseSession = true 
+	*
+	*
+	*
+	* @return bool <p>Если пользователь является администратором или имеет права
+	* записи на модуль социальной сети, то метод возвращает true, иначе -
+	* false.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CSocNetUser::IsCurrentUserModuleAdmin())
+	* {
+	*    // Текущему пользователю можно все
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/iscurrentusermoduleadmin.php
+	* @author Bitrix
+	*/
 	public static function IsCurrentUserModuleAdmin($site_id = SITE_ID, $bUseSession = true)
 	{
 		if (!is_object($GLOBALS["USER"]) || !$GLOBALS["USER"]->IsAuthorized())
@@ -292,30 +319,30 @@ class CAllSocNetUser
 			
 	
 	/**
-	 * <p>Метод подготавливает имя пользователя для вывода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $name  Имя пользователя.
-	 *
-	 *
-	 *
-	 * @param string $lastName  Фамилия пользователя.
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращается строка, содержащая отформатированное имя
-	 * пользователя.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/FormatName.php
-	 * @author Bitrix
-	 */
+	* <p>Метод подготавливает имя пользователя для вывода.</p>
+	*
+	*
+	*
+	*
+	* @param string $name  Имя пользователя.
+	*
+	*
+	*
+	* @param string $lastName  Фамилия пользователя.
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @return string <p>Возвращается строка, содержащая отформатированное имя
+	* пользователя.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/formatname.php
+	* @author Bitrix
+	*/
 	public static function FormatName($name, $lastName, $login)
 	{
 		$name = Trim($name);
@@ -334,42 +361,42 @@ class CAllSocNetUser
 
 	
 	/**
-	 * <p>Метод подготавливает имя пользователя для вывода в расширенном виде.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $name  Имя пользователя.
-	 *
-	 *
-	 *
-	 * @param string $secondName  Отчество пользователя.
-	 *
-	 *
-	 *
-	 * @param string $lastName  Фамилия пользователя.
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя
-	 *
-	 *
-	 *
-	 * @param string $email  E-Mail пользователя.
-	 *
-	 *
-	 *
-	 * @param string $id  Код пользователя.
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращается строка, содержащая отформатированное имя
-	 * пользователя.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/FormatNameEx.php
-	 * @author Bitrix
-	 */
+	* <p>Метод подготавливает имя пользователя для вывода в расширенном виде.</p>
+	*
+	*
+	*
+	*
+	* @param string $name  Имя пользователя.
+	*
+	*
+	*
+	* @param string $secondName  Отчество пользователя.
+	*
+	*
+	*
+	* @param string $lastName  Фамилия пользователя.
+	*
+	*
+	*
+	* @param string $login  Логин пользователя </ht
+	*
+	*
+	*
+	* @param string $email  E-Mail пользователя.
+	*
+	*
+	*
+	* @param string $id  Код пользователя. </h
+	*
+	*
+	*
+	* @return string <p>Возвращается строка, содержащая отформатированное имя
+	* пользователя.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/formatnameex.php
+	* @author Bitrix
+	*/
 	public static function FormatNameEx($name, $secondName, $lastName, $login, $email, $id)
 	{
 		$name = Trim($name);
@@ -398,30 +425,30 @@ class CAllSocNetUser
 
 	
 	/**
-	 * <p>Метод ищет пользователя по его имени или коду.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $user  Имя или код пользователя. Если параметр является числом или
-	 * строкой, в которой содержится число в квадратных скобках, то это
-	 * число рассматривается как код пользователя. В противном случае
-	 * параметр рассматривается как строка, содержащая ФИО
-	 * пользователя.
-	 *
-	 *
-	 *
-	 * @param bool $bIntranet = false Флаг, определяющий, осуществляется ли работа в рамках решения
-	 * интранет.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив пользователей, удовлетворяющих условию поиска.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/SearchUser.php
-	 * @author Bitrix
-	 */
+	* <p>Метод ищет пользователя по его имени или коду.</p>
+	*
+	*
+	*
+	*
+	* @param string $user  Имя или код пользователя. Если параметр является числом или
+	* строкой, в которой содержится число в квадратных скобках, то это
+	* число рассматривается как код пользователя. В противном случае
+	* параметр рассматривается как строка, содержащая ФИО
+	* пользователя.
+	*
+	*
+	*
+	* @param bool $bIntranet = false Флаг, определяющий, осуществляется ли работа в рамках решения
+	* интранет. Необязательный параметр. По умолчанию равен false.
+	*
+	*
+	*
+	* @return array <p>Массив пользователей, удовлетворяющих условию поиска.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/searchuser.php
+	* @author Bitrix
+	*/
 	public static function SearchUser($user, $bIntranet = false)
 	{
 		$user = Trim($user);

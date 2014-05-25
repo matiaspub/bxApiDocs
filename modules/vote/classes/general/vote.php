@@ -206,8 +206,7 @@ class CAllVote
 		if (!CVote::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeVoteAdd ***************************/
-		$events = GetModuleEvents("vote", "onBeforeVoteAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onBeforeVoteAdd", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
 /***************** /Event ******************************************/
@@ -233,8 +232,7 @@ class CAllVote
 		$ID = $DB->Add("b_vote", $arFields, $arBinds);
 
 /***************** Event onAfterVoteAdd ****************************/
-		$events = GetModuleEvents("vote", "onAfterVoteAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -251,8 +249,7 @@ class CAllVote
 			return false;
 
 /***************** Event onBeforeVoteUpdate ************************/
-		$events = GetModuleEvents("vote", "onBeforeVoteUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onBeforeVoteUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields)) === false)
 				return false;
 /***************** /Event ******************************************/
@@ -282,8 +279,7 @@ class CAllVote
 			$DB->QueryBind($strSql, $arBinds);
 		endif;
 /***************** Event onAfterVoteUpdate *************************/
-		$events = GetModuleEvents("vote", "onAfterVoteUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -299,8 +295,7 @@ class CAllVote
 		endif;
 
 		/***************** Event onBeforeVoteDelete *************************/
-		$events = GetModuleEvents("vote", "onBeforeVoteDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onBeforeVoteDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$ID)) === false)
 				return false;
 		/***************** /Event ******************************************/
@@ -321,8 +316,7 @@ class CAllVote
 		$res = $DB->Query("DELETE FROM b_vote WHERE ID='$ID'", false, $err_mess.__LINE__);
 		$DB->Commit();
 		/***************** Event onAfterVoteDelete *************************/
-		$events = GetModuleEvents("vote", "onAfterVoteDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 		/***************** /Event ******************************************/
 		return $res;
@@ -344,10 +338,10 @@ class CAllVote
 		unset($GLOBALS["VOTE_CACHE_VOTING"][$ID]);
 		$DB->Update("b_vote", array("COUNTER"=>"0"), "WHERE ID=".$ID, $err_mess.__LINE__);
 		/***************** Event OnVoteReset *******************************/
-		$events = GetModuleEvents("vote", "onVoteReset");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onVoteReset", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 		/***************** /Event ******************************************/
+		return true;
 	}
 
 	public static function Copy($ID)
@@ -738,8 +732,7 @@ class CAllVote
 						"VALID"				=> "'Y'");
 
 					/***************** Event onBeforeVoting ****************************/
-					$events = GetModuleEvents("vote", "onBeforeVoting");
-					while ($arEvent = $events->Fetch()) {
+					foreach (GetModuleEvents("vote", "onBeforeVoting", true) as $arEvent) {
 						if (ExecuteModuleEventEx($arEvent, array(&$arFields, &$arSqlAnswers)) === false)
 							return false;
 					}
@@ -835,6 +828,16 @@ class CAllVote
 									$arVote["TITLE"] = $arQuestion["QUESTION"]; }
 								if ($arVote["NOTIFY"] == "I" && CModule::IncludeModule("im"))
 								{
+									$arVote["TOTAL_URL"] = "";
+									if (!empty($arVote["URL"]))
+									{
+										if (defined('SITE_SERVER_NAME'))
+											$arVote["TOTAL_URL"] = SITE_SERVER_NAME;
+										$arVote["TOTAL_URL"] = (!empty($arVote["TOTAL_URL"]) ? $arVote["TOTAL_URL"] : COption::GetOptionString("main", "server_name", $GLOBALS["SERVER_NAME"]));
+										if (!empty($arVote["TOTAL_URL"]))
+											$arVote["TOTAL_URL"] = (CMain::IsHTTPS() ? "https" : "http")."://".$arVote["TOTAL_URL"].$arVote["URL"];
+									}
+
 									// send notification
 									$arMessageFields = array(
 										"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
@@ -846,8 +849,12 @@ class CAllVote
 										"NOTIFY_TAG" => "VOTING|".$VOTE_ID,
 										"NOTIFY_MESSAGE" => (!empty($arVote["URL"]) ?
 											GetMessage("V_NOTIFY_MESSAGE_HREF", array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["URL"])) :
+											GetMessage("V_NOTIFY_MESSAGE", array("#VOTE_TITLE#" => $arVote["TITLE"]))),
+										"NOTIFY_MESSAGE_OUT" => (!empty($arVote["TOTAL_URL"]) ?
+											GetMessage("V_NOTIFY_MESSAGE_OUT_HREF", array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["TOTAL_URL"])) :
 											GetMessage("V_NOTIFY_MESSAGE", array("#VOTE_TITLE#" => $arVote["TITLE"])))
 									);
+
 									CIMNotify::Add($arMessageFields);
 								}
 								else if ($arVote["NOTIFY"] == "Y" && $arVote["AUTHOR_ID"] != $USER->GetID())
@@ -879,7 +886,14 @@ class CAllVote
 										$text = array();
 										foreach ($arSqlAnswersID as $aID => $qID) {
 											$text[$qID] = (is_array($text[$qID]) ? $text[$qID] : array());
-											$text[$qID][] = $arQuestions[$qID]["ANSWERS"][$aID]["MESSAGE"];}
+											if ($arQuestions[$qID]["ANSWERS"][$aID]["FIELD_TYPE"] == 4 ||
+												$arQuestions[$qID]["ANSWERS"][$aID]["FIELD_TYPE"] == 5) {
+												if (!empty($arSqlAnswers[$qID][$aID]["MESSAGE"]))
+													$text[$qID][] = $arSqlAnswers[$qID][$aID]["MESSAGE"];
+											} else {
+												$text[$qID][] = $arQuestions[$qID]["ANSWERS"][$aID]["MESSAGE"];
+											}
+										}
 										foreach ($text as $qID => $txt) {
 											$text[$qID] = " - ".$arQuestions[$qID]["QUESTION"]."\n - ".implode(", ", $text[$qID]);
 										}

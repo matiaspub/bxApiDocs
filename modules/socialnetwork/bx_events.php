@@ -6,287 +6,764 @@
  */
 class _CEventsSocialnetwork {
 	/**
-	 * Событие вызывается при инициализации модуля социальной сети после заполнения массива дополнительного функционала.
-	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetLogComments::Add<br><br>
 	 */
-	public static function OnFillSocNetFeaturesList(){}
+	public static function OnAfterSocNetLogCommentAdd(){}
 
 	/**
-	 * Вызывается перед удалением рабочей группы.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается при инициализации модуля социальной сети после заполнения массива дополнительного функционала. Оно может быть использовано для изменения массива дополнительного функционала.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arSocNetFeaturesSettings  Массив с описанием дополнительного функционала.
+	 *
+	 *
+	 *
+	 * @return bool 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnFillSocNetFeaturesList.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetGroupDelete(){}
+	public static function OnFillSocNetFeaturesList(&$arSocNetFeaturesSettings){}
 
 	/**
-	 * Вызывается в момент удаления рабочей группы.
-	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 *   <br><br>
 	 */
-	public static function OnSocNetGroupDelete(){}
+	public static function OnFillSocNetLogEvents(){}
 
 	/**
-	 * Вызывается перед удалением дополнительного функционала.
-	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetLogTools::ShowSourceType<br><br>
 	 */
-	public static function OnBeforeSocNetFeatures(){}
+	public static function OnShowSocNetSourceType(){}
 
 	/**
-	 * Вызывается в момент удаления дополнительного функционала.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается перед удалением рабочей группы.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID рабочей группы.
+	 *
+	 *
+	 *
+	 * @return bool <p>Обработчик должен вернуть false в случае если необходимо отменить
+	 * удаление рабочей группы.</p> <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeatures(){}
+	public static function OnBeforeSocNetGroupDelete($ID){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров дополнительного функционала до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается в момент удаления рабочей группы.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID рабочей группы.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetFeaturesUpdate(){}
+	public static function OnSocNetGroupDelete($ID){}
+
+	/**
+	 * <p>Вызывается перед удалением дополнительного функционала.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID записи.</bo
+	 *
+	 *
+	 *
+	 * @return bool <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeatures.php
+	 * @author Bitrix
+	 */
+	public static function OnBeforeSocNetFeatures($ID){}
+
+	/**
+	 * <p>Вызывается в момент удаления дополнительного функционала.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID записи.</bo
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeatures.php
+	 * @author Bitrix
+	 */
+	public static function OnSocNetFeatures($ID){}
+
+	/**
+	 * Событие вызывается в методе изменения параметров дополнительного функционала до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeaturesUpdate.php
+	 * @author Bitrix
+	 */
+	public static function OnBeforeSocNetFeaturesUpdate(&$arParams){}
 
 	/**
 	 * Событие вызывается после изменения записи дополнительного функционала.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeaturesUpdate(){}
+	public static function OnSocNetFeaturesUpdate(&$arFields){}
 
 	/**
-	 * Вызывается перед удалением прав на дополнительный функционал.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается перед удалением прав на дополнительный функционал.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID записи.</bo
+	 *
+	 *
+	 *
+	 * @return bool <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeaturesPermsDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetFeaturesPermsDelete(){}
+	public static function OnBeforeSocNetFeaturesPermsDelete($ID){}
 
 	/**
-	 * Вызывается в момент удаления права на дополнительный функционал.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается в момент удаления права на дополнительный функционал.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID записи.</bo
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesPermsDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeaturesPermsDelete(){}
+	public static function OnSocNetFeaturesPermsDelete($ID){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров права на доступ к дополнительному функционалу до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе изменения параметров права на доступ к дополнительному функционалу до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeaturesPermsUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetFeaturesPermsUpdate(){}
+	public static function OnBeforeSocNetFeaturesPermsUpdate(&$arParams){}
 
 	/**
-	 * Событие вызывается после изменения права на дополнительный функционал.
+	 * после изменения права на дополнительный функционал.
+	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetFeaturesPerms::Update<br><br>
+	 * 
+	 * 
+	 * @param array $arFields Массив полей измененной записи.
+	 * 
+	 * 
+	 * 
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesPermsUpdate.php
 	 */
 	public static function OnSocNetFeaturesPermsUpdate(){}
 
 	/**
-	 * Вызывается перед удалением сообщения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается перед удалением сообщения.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID сообщения.
+	 *
+	 *
+	 *
+	 * @return bool <p>Обработчик должен вернуть false в случае если необходимо отменить
+	 * удаление сообщения.</p> <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetMessagesDelete(){}
+	public static function OnBeforeSocNetMessagesDelete($ID){}
 
 	/**
-	 * Вызывается в момент удаления сообщения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается в момент удаления сообщения.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID сообщения.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetMessagesDelete(){}
+	public static function OnSocNetMessagesDelete($ID){}
 
 	/**
-	 * Вызывается перед удалением связи между пользователем и рабочей группой.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается перед удалением связи между пользователем и рабочей группой.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID записи.</bo
+	 *
+	 *
+	 *
+	 * @return bool <p>Обработчик должен вернуть false в случае если необходимо отменить
+	 * удаление связи.</p> <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserToGroupDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetUserToGroupDelete(){}
+	public static function OnBeforeSocNetUserToGroupDelete($ID){}
 
 	/**
-	 * Вызывается в момент удаления связи между пользователем и рабочей группой.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается в момент удаления связи между пользователем и рабочей группой.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID связи.</bod
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserToGroupDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserToGroupDelete(){}
+	public static function OnSocNetUserToGroupDelete($ID){}
 
 	/**
-	 * Вызывается перед удалением связи между пользователями.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается перед удалением связи между пользователями.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID связи.</bod
+	 *
+	 *
+	 *
+	 * @return bool <p>Обработчик должен вернуть false в случае если необходимо отменить
+	 * удаление связи.</p> <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserRelationsDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetUserRelationsDelete(){}
+	public static function OnBeforeSocNetUserRelationsDelete($ID){}
 
 	/**
-	 * Вызывается в момент удаления связи между пользователями.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * <p>Вызывается в момент удаления связи между пользователями.</p>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  ID связи.</bod
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserRelationsDelete.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserRelationsDelete(){}
+	public static function OnSocNetUserRelationsDelete($ID){}
 
 	/**
-	 * Событие вызывается в методе создания новой рабочей группы до вставки.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе создания новой рабочей группы до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой рабочей группы.
+	 *
+	 *
+	 *
+	 * @return bool <p>Для отмены добавления и прекращении выполнения метода создания
+	 * рабочей группы необходимо в функции-обработчике вернуть <i>false</i>.
+	 * </p> <br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetGroupAdd(){}
+	public static function OnBeforeSocNetGroupAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления новой рабочей группы.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив из двух параметров - <i>$ID</i> и <i>$arFields</i>, причем второй - по
+	 * ссылке.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetGroupAdd(){}
+	public static function OnSocNetGroupAdd(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров рабочей группы до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе изменения параметров рабочей группы до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetGroupUpdate(){}
+	public static function OnBeforeSocNetGroupUpdate(&$arParams){}
+
+	/**
+	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetLogComments::Add<br><br>
+	 */
+	public static function OnBeforeSocNetLogCommentAdd(){}
 
 	/**
 	 * Событие вызывается после изменения рабочей группы.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetGroupUpdate(){}
+	public static function OnSocNetGroupUpdate(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе создания новой записи дополнительного функционала до вставки.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе создания новой записи дополнительного функционала до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeaturesAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetFeaturesAdd(){}
+	public static function OnBeforeSocNetFeaturesAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления нового дополнительного функционала.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeaturesAdd(){}
+	public static function OnSocNetFeaturesAdd(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе создания записи права на дополнительный функционал до вставки.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе создания записи права на дополнительный функционал до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetFeaturesPermsAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetFeaturesPermsAdd(){}
+	public static function OnBeforeSocNetFeaturesPermsAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления новой записи права на дополнительный функционал.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesPermsAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeaturesPermsAdd(){}
+	public static function OnSocNetFeaturesPermsAdd(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе создания сообщения до вставки.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе создания сообщения до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetMessagesAdd(){}
+	public static function OnBeforeSocNetMessagesAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления нового сообщения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param int $ID  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @param array &$arFields  
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetMessagesAdd(){}
+	public static function OnSocNetMessagesAdd($ID, &$arFields){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров сообщения до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе изменения параметров сообщения до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetMessagesUpdate(){}
+	public static function OnBeforeSocNetMessagesUpdate(&$arParams){}
 
 	/**
 	 * Событие вызывается после изменения сообщения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetMessagesUpdate(){}
+	public static function OnSocNetMessagesUpdate(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе создания связи между пользователем и рабочей группой до вставки.
+	 * при отправке запроса на вступление в группу соцсети
+	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetUserToGroup::SendRequestToJoinGroup<br><br>
 	 */
-	public static function OnBeforeSocNetUserToGroupAdd(){}
+	public static function OnSocNetSendRequestToJoinGroup(){}
+
+	/**
+	 * при получении подтверждения запроса о членстве в группе соцсети
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetUserToGroup::UserConfirmRequestToBeMember<br><br>
+	 */
+	public static function OnSocNetUserConfirmRequestToBeMember(){}
+
+	/**
+	 * при получении отклонении запроса о членстве в группе соцсети
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetUserToGroup::UserRejectRequestToBeMember<br><br>
+	 */
+	public static function OnSocNetUserRejectRequestToBeMember(){}
+
+	/**
+	 * Событие вызывается в методе создания связи между пользователем и рабочей группой до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserToGroupAdd.php
+	 * @author Bitrix
+	 */
+	public static function OnBeforeSocNetUserToGroupAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления новой связи между пользователем и рабочей группой.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserToGroupAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserToGroupAdd(){}
+	public static function OnSocNetUserToGroupAdd(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров связи между пользователем и рабочей группой до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе изменения параметров связи между пользователем и рабочей группой до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserToGroupUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetUserToGroupUpdate(){}
+	public static function OnBeforeSocNetUserToGroupUpdate(&$arParams){}
+
+	/**
+	 * <i>Вызывается в методе:</i><br>
+	 * <br><br>
+	 */
+	public static function OnFillSocNetAllowedSubscribeEntityTypes(){}
 
 	/**
 	 * Событие вызывается после изменения связи между пользователем и рабочей группой.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserToGroupUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserToGroupUpdate(){}
+	public static function OnSocNetUserToGroupUpdate(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе создания связи между пользователями до вставки.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе создания связи между пользователями до вставки, и может быть использовано для отмены вставки или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserRelationsAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetUserRelationsAdd(){}
+	public static function OnBeforeSocNetUserRelationsAdd(&$arParams){}
 
 	/**
 	 * Событие вызывается после добавления новой связи между пользователями.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей новой записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserRelationsAdd.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserRelationsAdd(){}
+	public static function OnSocNetUserRelationsAdd(&$arFields){}
 
 	/**
-	 * Событие вызывается в методе изменения параметров связи между пользователями до изменения.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 * Событие вызывается в методе изменения параметров связи между пользователями до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arParams  Массив полей изменяемой записи.
+	 *
+	 *
+	 *
+	 * @return bool <i>false</i><br><br><br>
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetUserRelationsUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnBeforeSocNetUserRelationsUpdate(){}
+	public static function OnBeforeSocNetUserRelationsUpdate(&$arParams){}
 
 	/**
 	 * Событие вызывается после изменения связи между пользователями.
-	 * 
-	 * <i>Вызывается в методе:</i><br>
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
+	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetUserRelationsUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetUserRelationsUpdate(){}
+	public static function OnSocNetUserRelationsUpdate(&$arFields){}
 
 	/**
-	 * Событие вызывается при добавлении прав на запись Живой ленты.
+	 * при добавлении прав на запись Живой ленты.
+	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetLogRights::Add<br><br>
 	 */
 	public static function OnBeforeSocNetLogRightsAdd(){}
 
 	/**
-	 * Событие вызывается при изменении прав на запись Живой ленты.
+	 * при изменении прав на запись Живой ленты.
+	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 * CSocNetLogRights::Update<br><br>
 	 */
 	public static function OnBeforeSocNetLogRightsUpdate(){}
 
 	/**
-	 * Событие вызывается при включенной поддержке ЧПУ компонента социальной сети в самом начале работы компонента. Позволяет подключить свои пути для ЧПУ в комплексном компоненте соцсети.
+	 * при включенной поддержке ЧПУ компонента социальной сети в самом начале работы компонента. Позволяет подключить свои пути для ЧПУ в комплексном компоненте соцсети.
 	 * <pre class="syntax">OnParseSocNetComponentPathHandler (&amp;$arDefaultUrlTemplates404, &amp;$arCustomPagesPath, $arParams) {
 	 * } </pre>
-	 * 
-	 * 
+	 *
 	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
+	 *  <br><br>
 	 */
 	public static function OnParseSocNetComponentPath(){}
 

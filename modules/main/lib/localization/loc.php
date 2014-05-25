@@ -19,25 +19,38 @@ final class Loc
 	 * @param string $code
 	 * @param array $replace e.g. array("#NUM#"=>5)
 	 * @param string $language
-	 * @throws \Bitrix\Main\ArgumentNullException
 	 * @return string
 	 */
 	public static function getMessage($code, $replace = null, $language = null)
 	{
-		if($code == '')
-			throw new Main\ArgumentNullException("code");
+		static $currentLang = null;
 
 		if($language === null)
-			$language = self::getCurrentLang();
+		{
+			if($currentLang === null)
+			{
+				$language = $currentLang = self::getCurrentLang();
+			}
+			else
+			{
+				$language = $currentLang;
+			}
+		}
 
 		if(!isset(self::$messages[$language][$code]))
+		{
 			self::loadLazy($code, $language);
+		}
 
 		$s = self::$messages[$language][$code];
 
 		if($replace !== null && is_array($replace))
+		{
 			foreach($replace as $search => $repl)
+			{
 				$s = str_replace($search, $repl, $s);
+			}
+		}
 
 		return $s;
 	}
@@ -49,6 +62,12 @@ final class Loc
 	 */
 	public static function loadMessages($file)
 	{
+		if(($realPath = realpath($file)) !== false)
+		{
+			$file = $realPath;
+		}
+		$file = Path::normalize($file);
+
 		self::$lazyLoadFiles[$file] = $file;
 	}
 
@@ -79,25 +98,30 @@ final class Loc
 		if(self::$customMessages === null)
 			self::$customMessages = self::loadCustomMessages($language);
 
-		$file = Path::normalize($file);
+		$path = Path::getDirectory($file);
 
-		static $dirCache = array();
+		static $langDirCache = array();
 
-		//let's find language folder
-		$langDir = $fileName = "";
-		$filePath = $file;
-		while(($slashPos = strrpos($filePath, "/")) !== false)
+		if(isset($langDirCache[$path]))
 		{
-			$filePath = substr($filePath, 0, $slashPos);
-			if(!isset($dirCache[$filePath]))
-				$dirCache[$filePath] = $isDir = is_dir($filePath."/lang");
-			else
-				$isDir = $dirCache[$filePath];
-			if($isDir)
+			$langDir = $langDirCache[$path];
+			$fileName = substr($file, (strlen($langDir)-5));
+		}
+		else
+		{
+			//let's find language folder
+			$langDir = $fileName = "";
+			$filePath = $file;
+			while(($slashPos = strrpos($filePath, "/")) !== false)
 			{
-				$langDir = $filePath."/lang";
-				$fileName = substr($file, $slashPos);
-				break;
+				$filePath = substr($filePath, 0, $slashPos);
+				if(is_dir($filePath."/lang"))
+				{
+					$langDir = $filePath."/lang";
+					$fileName = substr($file, $slashPos);
+					$langDirCache[$path] = $langDir;
+					break;
+				}
 			}
 		}
 
@@ -110,16 +134,22 @@ final class Loc
 			{
 				$langFile = $langDir."/".$defaultLang.$fileName;
 				if(file_exists($langFile))
+				{
 					$mess = self::includeFile($langFile);
+				}
 			}
 
 			//then load messages for specified lang
 			$langFile = $langDir."/".$language.$fileName;
 			if(file_exists($langFile))
+			{
 				$mess = array_merge($mess, self::includeFile($langFile));
+			}
 
 			foreach($mess as $key => $val)
+			{
 				self::$messages[$language][$key] = $val;
+			}
 		}
 
 		return $mess;
@@ -127,31 +157,54 @@ final class Loc
 
 	private static function loadLazy($code, $language)
 	{
+		if($code == '')
+		{
+			return;
+		}
+
 		$trace = Main\Diag\Helper::getBackTrace(4, DEBUG_BACKTRACE_IGNORE_ARGS);
 
-		$file = null;
+		$currentFile = null;
 		for($i = 3; $i >= 1; $i--)
 		{
 			if(stripos($trace[$i]["function"], "GetMessage") === 0)
 			{
-				$file = $trace[$i]["file"];
+				$currentFile = Path::normalize($trace[$i]["file"]);
 				break;
 			}
 		}
 
-		if($file !== null && isset(self::$lazyLoadFiles[$file]))
+		if($currentFile !== null && isset(self::$lazyLoadFiles[$currentFile]))
 		{
-			self::loadLanguageFile($file, $language);
-			unset(self::$lazyLoadFiles[$file]);
+			//in most cases we know the file containing the "code" - load it directly
+			self::loadLanguageFile($currentFile, $language);
+			unset(self::$lazyLoadFiles[$currentFile]);
 		}
-		else
+
+		if(!isset(self::$messages[$language][$code]))
 		{
-			foreach(self::$lazyLoadFiles as $file)
+			//we still don't know which file contains the "code" - go through the files in the reverse order
+			$unset = array();
+			if(($file = end(self::$lazyLoadFiles)) !== false)
 			{
-				self::loadLanguageFile($file, $language);
+				do
+				{
+					self::loadLanguageFile($file, $language);
+					$unset[] = $file;
+					if(isset(self::$messages[$language][$code]))
+					{
+						if(defined("BX_MESS_LOG") && $currentFile !== null)
+						{
+							file_put_contents(BX_MESS_LOG, 'CTranslateUtils::CopyMessage("'.$code.'", "'.$file.'", "'.$currentFile.'");'."\n", FILE_APPEND);
+						}
+						break;
+					}
+				}
+				while(($file = prev(self::$lazyLoadFiles)) !== false);
+			}
+			foreach($unset as $file)
+			{
 				unset(self::$lazyLoadFiles[$file]);
-				if(isset(self::$messages[$language][$code]))
-					break;
 			}
 		}
 	}
@@ -206,33 +259,14 @@ final class Loc
 	 */
 	public static function getDefaultLang($lang)
 	{
-		static $subst = array('ua'=>'ru', 'kz'=>'ru', 'ru'=>'ru', 'de'=>'de');
+		static $subst = array('ua'=>'ru', 'kz'=>'ru', 'ru'=>'ru');
 		if(isset($subst[$lang]))
 			return $subst[$lang];
 		return 'en';
 	}
 
-	public static function date($date, Context\Culture $culture = null)
+	public static function getIncludedFiles()
 	{
-		if ($culture == null)
-			$culture = Context::getCurrent()->getCulture();
-
-		return $date;
-	}
-
-	public static function datetime($datetime, Context\Culture $culture = null)
-	{
-		if ($culture == null)
-			$culture = Context::getCurrent()->getCulture();
-
-		return $datetime;
-	}
-
-	public static function money($money, Context\Culture $culture = null)
-	{
-		if ($culture == null)
-			$culture = Context::getCurrent()->getCulture();
-
-		return $money;
+		return self::$includedFiles;
 	}
 }

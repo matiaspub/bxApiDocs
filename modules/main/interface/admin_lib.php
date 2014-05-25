@@ -23,28 +23,17 @@ class CAdminPage
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/init.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed <a name="examples"></a>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/init.php
+	* @author Bitrix
+	*/
 	public function Init()
 	{
 		if($this->bInit)
@@ -58,28 +47,17 @@ class CAdminPage
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showpopupcss.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed <a name="examples"></a>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showpopupcss.php
+	* @author Bitrix
+	*/
 	public function ShowPopupCSS()
 	{
 		/** @global CMain $APPLICATION */
@@ -105,28 +83,17 @@ class CAdminPage
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showcss.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed <a name="examples"></a>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showcss.php
+	* @author Bitrix
+	*/
 	public function ShowCSS()
 	{
 		/** @global CMain $APPLICATION */
@@ -213,29 +180,17 @@ class CAdminPage
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showscript.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed <a name="examples"></a>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showscript.php
+	* @author Bitrix
+	*/
 	public static function ShowScript()
 	{
 		/** @global CMain $APPLICATION */
@@ -286,40 +241,43 @@ var phpVars = {
 
 	
 	/**
-	 * <p>Функция выводит страницу админки со списком подразделов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $menu_i $d  ID пункта меню, подразделы которого будут в списке (т.е. то, что
-	 * указано в items_id)
-	 *
-	 *
-	 *
-	 * @param $module_i $d = false ID модуля, для которого строится список
-	 *
-	 *
-	 *
-	 * @param $mod $e = false Режим: <ul> <li> <b>icon</b> - значки,</li> <li> <b>list</b> - список,</li> <li> <b>table</b> -
-	 * таблица</li> </ul> Если не указан режим, отображаются значки или то,
-	 * что было выбрано пользователем при предыдущем открытии страницы.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");define("HELP_FILE", "subscribe/index.php");IncludeModuleLangFile(__FILE__);$POST_RIGHT = $APPLICATION-&gt;GetGroupRight("subscribe");if($POST_RIGHTAuthForm(GetMessage("ACCESS_DENIED"));$APPLICATION-&gt;SetTitle(GetMessage("subscr_index_title"));if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");$adminPage-&gt;ShowSectionIndex("menu_subscribe", "subscribe");if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");?&gt;
-	<b>Примечание</b> В приведённом примере указаны страницы, которых нет в админке с версии 12.0.
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsectionindex.php
-	 * @author Bitrix
-	 */
-	public function ShowSectionIndex($menu_id, $module_id=false, $mode=false)
+	* <p>Функция выводит страницу админки со списком подразделов.</p>
+	*
+	*
+	*
+	*
+	* @param $menu_i $d  ID пункта меню, подразделы которого будут в списке (т.е. то, что
+	* указано в items_id)
+	*
+	*
+	*
+	* @param $module_i $d = false ID модуля, для которого строится список. С версии 5.0.3 -
+	* необязательный
+	*
+	*
+	*
+	* @param $mod $e = false Режим: <ul> <li> <b>icon</b> - значки,</li> <li> <b>list</b> - список,</li> <li> <b>table</b> -
+	* таблица</li> </ul> Если не указан режим, отображаются значки или то,
+	* что было выбрано пользователем при предыдущем открытии страницы.
+	* Необязательный.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");define("HELP_FILE", "subscribe/index.php");IncludeModuleLangFile(__FILE__);$POST_RIGHT = $APPLICATION-&gt;GetGroupRight("subscribe");if($POST_RIGHTAuthForm(GetMessage("ACCESS_DENIED"));$APPLICATION-&gt;SetTitle(GetMessage("subscr_index_title"));if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");$adminPage-&gt;ShowSectionIndex("menu_subscribe", "subscribe");if($_REQUEST["mode"] == "list")    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin_js.php");else    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");?&gt;
+	* <b>Примечание</b> В приведённом примере указаны страницы, которых нет в админке с версии 12.0.
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsectionindex.php
+	* @author Bitrix
+	*/
+	public function ShowSectionIndex($menu_id, $module_id=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -356,29 +314,17 @@ var phpVars = {
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsound.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @return mixed <a name="examples"></a>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminpage/showsound.php
+	* @author Bitrix
+	*/
 	public static function ShowSound()
 	{
 		/** @global CMain $APPLICATION */
@@ -456,10 +402,10 @@ class CAdminMenu
 				$module = _normalizePath($module);
 
 				//trying to include file menu.php in the /admin/ folder of the current module
-				$fname = $_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$module."/admin/menu.php";
-				if(file_exists($fname))
+				$fname = getLocalPath("modules/".$module."/admin/menu.php");
+				if($fname !== false)
 				{
-					$menu = CAdminMenu::_IncludeMenu($fname);
+					$menu = CAdminMenu::_IncludeMenu($_SERVER["DOCUMENT_ROOT"].$fname);
 					if(is_array($menu) && !empty($menu))
 					{
 						if(isset($menu["parent_menu"]) && $menu["parent_menu"] <> "")
@@ -664,7 +610,7 @@ class CAdminMenu
 			{
 				unset($this->aGlobalMenu[$key]);
 			}
-			else
+			elseif(is_array($this->aGlobalMenu[$key]["items"]))
 			{
 				usort($this->aGlobalMenu[$key]["items"], $sort_func);
 			}
@@ -902,6 +848,8 @@ class CAdminMenu
 				?><a class="adm-submenu-item-name-link<?=(isset($aMenu["readonly"]) && $aMenu["readonly"] == true? ' menutext-readonly':'')?>"<?=$level > 0 ? ' style="padding-left:'.$this->_get_menu_item_padding($level).'px;"' : ''?> href="javascript:void(0)" onclick="BX.adminMenu.toggleDynSection(<?=$this->_get_menu_item_width($level)?>, this.parentNode.parentNode, '<?=htmlspecialcharsbx(CUtil::JSEscape($aMenu["module_id"]))?>', '<?=htmlspecialcharsbx(CUtil::JSEscape($aMenu["items_id"]))?>', '<?=$level+1?>')"><?=$icon?><span class="adm-submenu-item-name-link-text"><?=$aMenu["text"]?></span></a><?
 			elseif(!$aMenu["dynamic"] || !$bSectionActive || $aMenu['dynamic'] && $bSectionActive && isset($aMenu["items"]) && count($aMenu["items"]) > 0):
 				?><a class="adm-submenu-item-name-link<?=(isset($aMenu["readonly"]) && $aMenu["readonly"] == true? ' menutext-readonly':'')?>"<?=$level > 0 ? ' style="padding-left:'.$this->_get_menu_item_padding($level).'px;"' : ''?> href="javascript:void(0)" onclick="BX.adminMenu.toggleSection(this.parentNode.parentNode, '<?=htmlspecialcharsbx(CUtil::JSEscape($aMenu["items_id"]))?>', '<?=$level+1?>')"><?=$icon?><span class="adm-submenu-item-name-link-text"><?=$aMenu["text"]?></span></a><?
+			else:
+				?><span class="adm-submenu-item-name-link<?=(isset($aMenu["readonly"]) && $aMenu["readonly"] == true? ' menutext-readonly':'')?>"<?=$level > 0 ? ' style="padding-left:'.$this->_get_menu_item_padding($level).'px"' : ''?>><?=$icon?><span class="adm-submenu-item-name-link-text"><?=$aMenu["text"]?></span></span><?
 			endif;
 		else:
 			?><span class="adm-submenu-item-name-link<?=(isset($aMenu["readonly"]) && $aMenu["readonly"] == true? ' menutext-readonly':'')?>"<?=$level > 0 ? ' style="padding-left:'.$this->_get_menu_item_padding($level).'px"' : ''?>><?=$icon?><span class="adm-submenu-item-name-link-text"><?=$aMenu["text"]?></span></span><?
@@ -991,16 +939,6 @@ class CAdminMenu
 			$row->AddField("DESCRIPTION", $submenu["title"]);
 			$n++;
 		}
-
-		// List footer
-		$lAdmin->AddFooter(
-			array(
-				array(
-					"title" => GetMessage("MAIN_ADMIN_LIST_SELECTED"),
-					"value" => $n
-				)
-			)
-		);
 
 		$lAdmin->Display();
 
@@ -1239,7 +1177,7 @@ window.'.$this->name.' = new PopupMenu("'.$this->id.'"'.
 						(isset($action["DEFAULT"]) && $action["DEFAULT"] == true? "'DEFAULT':true,":"").
 						($action["TEXT"]<>""? "'TEXT':'".CUtil::JSEscape($action["TEXT"])."',":"").
 						(isset($action["TITLE"]) && $action["TITLE"]<>""? "'TITLE':'".CUtil::JSEscape($action["TITLE"])."',":"").
-						(isset($action["SHOW_TITLE"]) && $action["SHOW_TITLE"] == true ? "'SHOW_TITLE':true'":"").
+						(isset($action["SHOW_TITLE"]) && $action["SHOW_TITLE"] == true ? "'SHOW_TITLE':true,":"").
 						($action["ACTION"]<>""? "'ONCLICK':'".CUtil::JSEscape(htmlspecialcharsback($action["ACTION"]))."',":"").
 						(isset($action["ONMENUPOPUP"]) && $action["ONMENUPOPUP"]<>""? "'ONMENUPOPUP':'".CUtil::JSEscape($action["ONMENUPOPUP"])."',":"").
 						(isset($action["MENU"]) && is_array($action["MENU"])? "'MENU':".CAdminPopup::PhpToJavaScript($action["MENU"]).",":"").
@@ -1881,13 +1819,13 @@ class CAdminFilter
 			if(isset($aParams['report']) && $aParams['report'])
 			{
 				echo '
-						<input type="submit" class="adm-btn" id="'.$this->id.'set_filter" name="set_filter" title="'.GetMessage("admin_lib_filter_set_rep_title").$hkInst->GetTitle("set_filter").'" onclick="'.htmlspecialcharsbx($this->id.'.OnSet(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this); return false;').'" value="'.GetMessage("admin_lib_filter_set_rep").'">
-						<input type="submit" class="adm-btn" id="'.$this->id.'del_filter" name="del_filter" title="'.GetMessage("admin_lib_filter_clear_butt_title").$hkInst->GetTitle("del_filter").'" onclick="'.htmlspecialcharsbx($this->id.'.OnClear(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this); return false;').'" value="'.GetMessage("admin_lib_filter_clear_butt").'">';
+						<input type="submit" class="adm-btn" id="'.$this->id.'set_filter" name="set_filter" title="'.GetMessage("admin_lib_filter_set_rep_title").$hkInst->GetTitle("set_filter").'" onclick="return '.htmlspecialcharsbx($this->id.'.OnSet(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this);').'" value="'.GetMessage("admin_lib_filter_set_rep").'">
+						<input type="submit" class="adm-btn" id="'.$this->id.'del_filter" name="del_filter" title="'.GetMessage("admin_lib_filter_clear_butt_title").$hkInst->GetTitle("del_filter").'" onclick="return '.htmlspecialcharsbx($this->id.'.OnClear(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this);').'" value="'.GetMessage("admin_lib_filter_clear_butt").'">';
 			}
 			else
 				echo '
-						<input type="submit" class="adm-btn" id="'.$this->id.'set_filter" name="set_filter" title="'.GetMessage("admin_lib_filter_set_butt").$hkInst->GetTitle("set_filter").'" onclick="'.htmlspecialcharsbx($this->id.'.OnSet(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this); return false;').'" value="'.GetMessage("admin_lib_filter_set_butt").'">
-						<input type="submit" class="adm-btn" id="'.$this->id.'del_filter" name="del_filter" title="'.GetMessage("admin_lib_filter_clear_butt").$hkInst->GetTitle("del_filter").'" onclick="'.htmlspecialcharsbx($this->id.'.OnClear(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this); return false;').'" value="'.GetMessage("admin_lib_filter_clear_butt").'">';
+						<input type="submit" class="adm-btn" id="'.$this->id.'set_filter" name="set_filter" title="'.GetMessage("admin_lib_filter_set_butt").$hkInst->GetTitle("set_filter").'" onclick="return '.htmlspecialcharsbx($this->id.'.OnSet(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this);').'" value="'.GetMessage("admin_lib_filter_set_butt").'">
+						<input type="submit" class="adm-btn" id="'.$this->id.'del_filter" name="del_filter" title="'.GetMessage("admin_lib_filter_clear_butt").$hkInst->GetTitle("del_filter").'" onclick="return '.htmlspecialcharsbx($this->id.'.OnClear(\''.CUtil::AddSlashes($aParams["table_id"]).'\', \''.CUtil::AddSlashes($url).'\', this);').'" value="'.GetMessage("admin_lib_filter_clear_butt").'">';
 
 		}
 		if($this->popup)
@@ -2224,7 +2162,7 @@ BX.Fix(right_bar, {type: 'right', limit_node: BX.previousSibling(right_bar)});
 		return '';
 	}
 
-	function GetActiveClassByID($icon_id)
+	function GetActiveClassByID()
 	{
 		return 'adm-btn-active';
 	}
@@ -2485,7 +2423,7 @@ class CAdminResult extends CDBResult
 class CAdminTabControl
 {
 	var $name, $unique_name;
-	var $tabs;
+	var $tabs = array();
 	var $selectedTab;
 	var $tabIndex = 0;
 	var $bButtons = false;
@@ -2508,7 +2446,10 @@ class CAdminTabControl
 		global $APPLICATION;
 
 		//array(array("DIV"=>"", "TAB"=>"", "ICON"=>, "TITLE"=>"", "ONSELECT"=>"javascript"), ...)
-		$this->tabs = $tabs;
+		if(is_array($tabs))
+		{
+			$this->tabs = $tabs;
+		}
 		$this->name = $name;
 		$this->unique_name = $name."_".md5($APPLICATION->GetCurPage());
 
@@ -2579,7 +2520,7 @@ class CAdminTabControl
 		$this->selectedTab = $this->tabs[0]["DIV"];
 		if(isset($_REQUEST[$this->name."_active_tab"]))
 		{
-			foreach($this->tabs as $i => $tab)
+			foreach($this->tabs as $tab)
 			{
 				if($tab["DIV"] == $_REQUEST[$this->name."_active_tab"])
 				{
@@ -3086,6 +3027,13 @@ class CAdminList
 	var $onLoadScript;
 	var $arEditedRows;
 
+	private $filter;
+
+	public function getFilter()
+	{
+		return $this->filter;
+	}
+
 	public function CAdminList($table_id, $sort=false)
 	{
 		$this->table_id = $table_id;
@@ -3373,7 +3321,7 @@ class CAdminList
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
-		return $this->table_id.".GetAdminList('".CUtil::AddSlashes($APPLICATION->GetCurPage())."?ID=".CUtil::AddSlashes($id)."&action=".CUtil::AddSlashes($action_id)."&lang=".LANGUAGE_ID."&".bitrix_sessid_get().($add_params<>""?"&".CUtil::AddSlashes($add_params):"")."');";
+		return $this->table_id.".GetAdminList('".CUtil::AddSlashes($APPLICATION->GetCurPage())."?ID=".CUtil::AddSlashes($id)."&action_button=".CUtil::AddSlashes($action_id)."&lang=".LANGUAGE_ID."&".bitrix_sessid_get().($add_params<>""?"&".CUtil::AddSlashes($add_params):"")."');";
 	}
 
 	public function InitFilter($arFilterFields)
@@ -3393,6 +3341,25 @@ class CAdminList
 		}
 		else
 			InitFilterEx($arFilterFields, $sTableID, "get");
+
+		foreach ($arFilterFields as $f)
+		{
+			$fperiod = $f."_FILTER_PERIOD";
+			$fdirection = $f."_FILTER_DIRECTION";
+			$fbdays = $f."_DAYS_TO_BACK";
+
+			global $$f, $$fperiod, $$fdirection, $$fbdays;
+			if (isset($$f))
+				$this->filter[$f] = $$f;
+			if (isset($$fperiod))
+				$this->filter[$fperiod] = $$fperiod;
+			if (isset($$fdirection))
+				$this->filter[$fdirection] = $$fdirection;
+			if (isset($$fbdays))
+				$this->filter[$fbdays] = $$fbdays;
+		}
+
+		return $this->filter;
 	}
 
 	public function IsDefaultFilter()
@@ -3556,21 +3523,6 @@ class CAdminList
 	</tbody>
 </table>
 <?
-/*		if(!empty($this->aFooter))
-		{
-			echo '
-<table cellpadding="0" cellspacing="0" border="0" class="listfooter">
-	<tr>
-';
-			$n = count($this->aFooter);
-			for($i=0; $i<$n; $i++)
-				echo '<td'.($i==0? ' class="left"':'').'>'.$this->aFooter[$i]["title"].' <span'.($this->aFooter[$i]["counter"]===true? ' id="'.$this->table_id.'_selected_span"':'').'>'.$this->aFooter[$i]["value"].'</span></td>';
-			echo '
-		<td class="right">&nbsp;</td>
-	</tr>
-</table>
-';
-		}*/
 		$this->ShowActionTable();
 
 // close form and div.adm-list-table-wrap
@@ -3657,18 +3609,6 @@ class CAdminList
 		}
 
 		echo "</table>";
-
-		if(!empty($this->aFooter))
-		{
-			echo '<table border="1"><tr>';
-
-			$n = count($this->aFooter);
-			for($i=0; $i<$n; $i++)
-				echo '<td>'.$this->aFooter[$i]["title"].' '.$this->aFooter[$i]["value"].'</td>';
-
-			echo '</tr></table>';
-		}
-
 		echo '</body></html>';
 	}
 
@@ -3936,7 +3876,8 @@ top.bxcompajaxframeonload = function() {
 <?
 				endif;
 ?>
-}
+};
+top.BX.ajax.UpdatePageData({});
 </script></body></html>
 <?
 			}
@@ -4318,7 +4259,7 @@ class CAdminMessage
 
 	public function Show()
 	{
-		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
+		if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1 && $this->message["TYPE"] != "PROGRESS")
 		{
 			ob_end_clean();
 			echo '<script>top.BX.WindowManager.Get().ShowError(\''.CUtil::JSEscape(str_replace(array('<br>', '<br />', '<BR>', '<BR />'), "\r\n", htmlspecialcharsback($this->message['DETAILS']? $this->message['DETAILS'] : $this->message['MESSAGE']))).'\');</script>';
@@ -4980,9 +4921,6 @@ class CJSPopup
 
 	public static function InitScripts()
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-
 		CJSCore::Init(array('admin_interface'));
 	}
 
@@ -5004,7 +4942,6 @@ class CJSPopup
 	public function SetSuffix($suffix)
 	{
 		$this->suffix = '_'.trim($suffix);
-		//$this->jsPopup .= $this->suffix;
 		$this->__form_name .= $this->suffix;
 	}
 
@@ -5019,7 +4956,7 @@ class CJSPopup
 <?
 	}
 
-	public function StartDescription($icon = false, $additional = '')
+	public function StartDescription($icon = false)
 	{
 		$this->InitSystem();
 
@@ -5092,14 +5029,14 @@ class CJSPopup
 
 			if (!defined('BX_PUBLIC_MODE') || BX_PUBLIC_MODE == false)
 			{
-?><script type="text/javascript">BX.adminFormTools.modifyFormElements(<?=$this->jsPopup?>.DIV);</script><?
+?><script type="text/javascript"><?echo "BX.adminFormTools.modifyFormElements(".$this->jsPopup.".DIV);"?></script><?
 			}
 
 			$this->bContentStarted = false;
 		}
 	}
 
-	function StartButtons($additional = '')
+	function StartButtons()
 	{
 		$this->InitSystem();
 
@@ -5142,7 +5079,10 @@ class CJSPopup
 		$arButtons = array_values($arButtons);
 
 ?>
-<script type="text/javascript"><?=$this->jsPopup?>.SetButtons([<?foreach ($arButtons as $key => $btn) {echo ($key ? ',' : '').$arSB[$btn];}?>]);</script><?
+<script type="text/javascript"><?=$this->jsPopup?>.SetButtons([<?
+	foreach ($arButtons as $key => $btn)
+		echo ($key ? ',' : '').$arSB[$btn];
+?>]);</script><?
 	}
 
 	function ShowValidationError($errortext)
@@ -5153,36 +5093,35 @@ class CJSPopup
 
 
 	/**
-	 * <p>Выводит сообщение об ошибке.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $message  Строка сообщения.
-	 *
-	 *
-	 *
-	 * @param string $css_class = "errortext" Название CSS класса для оформления сообщения.<br>Необязательный
-	 * параметр, по умолчанию равен "errortext" (как правило <font
-	 * color="red">красного цвета</font>).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * <b>ShowError</b>("Ошибка!");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/functions/other/showerror.php
-	 * @author Bitrix
-	 */
+	* <p>Выводит сообщение об ошибке.</p>
+	*
+	*
+	*
+	*
+	* @param string $message  Строка сообщения. </h
+	*
+	*
+	*
+	* @param string $css_class  Название CSS класса для оформления сообщения.<br>Необязательный
+	* параметр, как правило <font color="red">красного цвета</font>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* <b>ShowError</b>("Ошибка!");
+	* ?&gt;</bod
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/functions/other/showerror.php
+	* @author Bitrix
+	*/
 	function ShowError($errortext, $title = '')
 	{
 		$this->ShowTitlebar($title != "" ? $title : $this->title);
@@ -5238,7 +5177,6 @@ class CAdminFormSettings
 
 				$arCustomFields = explode("--,--", $customFields);
 				$arCustomTabID = "";
-				$arCustomTabName = "";
 				foreach($arCustomFields as $customField)
 				{
 					if($arCustomTabID == "")
@@ -5282,7 +5220,7 @@ class CAdminFormSettings
 				$option .= '--;--';
 			}
 		}
-		$customTabs = CUserOptions::SetOption("form", $formId, array("tabs" => $option), $common, $userID);
+		CUserOptions::SetOption("form", $formId, array("tabs" => $option), $common, $userID);
 	}
 }
 
@@ -5291,6 +5229,7 @@ class CAdminForm extends CAdminTabControl
 {
 	var $arParams = array();
 	var $arFields = array();
+	var $arForbiddenFields = array();
 	var $group = "";
 	var $group_ajax = false;
 	var $arFieldValues = array();
@@ -5302,6 +5241,7 @@ class CAdminForm extends CAdminTabControl
 	var $arSavedTabs = array();
 	var $arSystemTabs = array();
 	var $arSystemFields = array();
+	var $arReqiredTabs = array();
 
 	var $arCustomLabels = array();
 	var $bCustomFields = false;
@@ -5319,7 +5259,7 @@ class CAdminForm extends CAdminTabControl
 
 		//Parse customized labels
 		$this->arCustomLabels = array();
-		foreach (CAdminFormSettings::getTabsArray($this->name) as $tab_id => $arTab)
+		foreach (CAdminFormSettings::getTabsArray($this->name) as $arTab)
 		{
 			foreach ($arTab["FIELDS"] as $customID => $customName)
 			{
@@ -5329,6 +5269,28 @@ class CAdminForm extends CAdminTabControl
 		ob_start();
 	}
 
+	public function SetSelectedTab()
+	{
+		parent::SetSelectedTab();
+
+		$arDisabled = CUserOptions::GetOption("form", $this->name."_disabled", "N");
+		if(!is_array($arDisabled) || $arDisabled["disabled"] !== "Y")
+		{
+			if(isset($_REQUEST[$this->name."_active_tab"]))
+			{
+				$arCustomTabs = CAdminFormSettings::getTabsArray($this->name);
+				foreach($arCustomTabs as $tab_id => $arTab)
+				{
+					if($tab_id == $_REQUEST[$this->name."_active_tab"])
+					{
+						$this->selectedTab = $_REQUEST[$this->name."_active_tab"];
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	public function SetShowSettings($v)
 	{
 		$this->bShowSettings = $v;
@@ -5336,6 +5298,7 @@ class CAdminForm extends CAdminTabControl
 
 	public static function ShowSettings()
 	{
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
 
@@ -5490,12 +5453,21 @@ class CAdminForm extends CAdminTabControl
 		//Save form defined tabs
 		$this->arSavedTabs = $this->tabs;
 		$this->arSystemTabs = array();
+		$this->arReqiredTabs = array();
 		foreach($this->tabs as $arTab)
 		{
 			$this->arSystemTabs[$arTab["DIV"]] = $arTab;
+
 			if(is_array($arTab["FIELDS"]))
+			{
 				foreach($arTab["FIELDS"] as $arField)
 					$this->arFields[$arField["id"]] = $arField;
+			}
+
+			if ($arTab["required"] && is_array($arTab["FIELDS"]))
+			{
+				$this->arReqiredTabs[$arTab["DIV"]] = $arTab;
+			}
 		}
 		//Save form defined fields
 		$this->arSystemFields = $this->arFields;
@@ -5524,12 +5496,18 @@ class CAdminForm extends CAdminTabControl
 					);
 				}
 
+				$bHasFields = false;
 				foreach($arTab["FIELDS"] as $field_id => $content)
 				{
 					if(array_key_exists($field_id, $this->arSystemFields))
 					{
 						$arNewField = $this->arSystemFields[$field_id];
 						$arNewField["content"] = $content;
+						$bHasFields = true;
+					}
+					elseif(array_key_exists($field_id, $this->arForbiddenFields))
+					{
+						$arNewField = false;
 					}
 					elseif(strlen($content) > 0)
 					{
@@ -5549,10 +5527,31 @@ class CAdminForm extends CAdminTabControl
 					{
 						$this->arFields[$field_id] = $arNewField;
 						$arNewTab["FIELDS"][] = $arNewField;
+						foreach ($this->arReqiredTabs as $tab_id => $arReqTab)
+						{
+							foreach ($arReqTab["FIELDS"] as $i => $arReqTabField)
+							{
+								if ($arReqTabField["id"] == $field_id)
+									unset($this->arReqiredTabs[$tab_id]["FIELDS"][$i]);
+							}
+						}
 					}
 				}
 
-				$this->tabs[] = $arNewTab;
+				if ($bHasFields)
+					$this->tabs[] = $arNewTab;
+			}
+
+			foreach ($this->arReqiredTabs as $arReqTab)
+			{
+				if (!empty($arReqTab["FIELDS"]))
+				{
+					$this->tabs[] = $arReqTab;
+					foreach ($arReqTab["FIELDS"] as $arReqTabField)
+					{
+						$this->arFields[$arReqTabField["id"]] = $arReqTabField;
+					}
+				}
 			}
 		}
 
@@ -5593,7 +5592,7 @@ class CAdminForm extends CAdminTabControl
 			$action = htmlspecialcharsbx($this->arParams["FORM_ACTION"]);
 		else
 			$action = htmlspecialcharsbx($APPLICATION->GetCurPage());
-		echo '<form method="POST" Action="'.$action.'"  ENCTYPE="multipart/form-data" id="'.$this->name.'_form" name="'.$this->name.'_form"'.($this->arParams["FORM_ATTRIBUTES"] <> ''? ' '.$this->arParams["FORM_ATTRIBUTES"]:'').'>';
+		echo '<form method="POST" action="'.$action.'"  enctype="multipart/form-data" id="'.$this->name.'_form" name="'.$this->name.'_form"'.($this->arParams["FORM_ATTRIBUTES"] <> ''? ' '.$this->arParams["FORM_ATTRIBUTES"]:'').'>';
 
 		$htmlGroup = "";
 		if($this->group)
@@ -5647,9 +5646,10 @@ class CAdminForm extends CAdminTabControl
 							{
 								if($this->arFields[$p]["custom_html"])
 									echo preg_replace("/^\\s*<tr/is", "<tr class=\"bx-in-group\"", $this->arFields[$p]["custom_html"]);
-								elseif($this->arFields[$p]["html"])
+								elseif($this->arFields[$p]["html"] && !$this->arFields[$p]["delimiter"])
 									echo '<tr class="bx-in-group" '.($this->arFields[$p]["valign"] <> ''? ' valign="'.$this->arFields[$p]["valign"].'"':'').' id="tr_'.$p.'">', $this->arFields[$p]["html"], "</tr>\n";
 								unset($arHiddens[$this->arFields[$p]["id"]]);
+								$this->arFields[$p] = array();
 							}
 						}
 					}
@@ -5818,6 +5818,11 @@ class CAdminForm extends CAdminTabControl
 			"group" => $arFields,
 			"html" => '<td colspan="2">'.$this->GetCustomLabelHTML($id, $content).'</td>',
 		);
+	}
+
+	public function HideField($id)
+	{
+		$this->arForbiddenFields[$id] = true;
 	}
 
 	public function AddSection($id, $content, $required = false)
@@ -6126,6 +6131,29 @@ class CAdminUtil
 	}
 }
 
+
+/**
+ * <p>Подсказка. Выводит иконку-вопросик, при наведении на которую всплывает текст $text.</p>
+ *
+ *
+ *
+ *
+ * @param string $text  Выводимый текст </ht
+ *
+ *
+ *
+ * @param array $Params = false Параметры вывода. Если передать вторым параметром <code>array('return' =&gt;
+ * true)</code>, то вместо вывода на экран, будет возвращен html-код
+ * подсказки.
+ *
+ *
+ *
+ * @return result_type 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/functions/html/showjshint.php
+ * @author Bitrix
+ */
 function ShowJSHint($text, $arParams=false)
 {
 	if (strlen($text) <= 0)

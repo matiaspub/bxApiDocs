@@ -26,7 +26,7 @@ class CIMContactList extends CAllIMContactList
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		$obCache = new CPHPCache();
-		$obCache->CleanDir('/bx/imc/rec'.CIMMessenger::GetCachePath($userId));
+		$obCache->CleanDir('/bx/imc/recent'.CIMMessenger::GetCachePath($userId));
 
 		if ($isChat)
 			CIMMessenger::SpeedFileDelete($userId, IM_SPEED_GROUP);

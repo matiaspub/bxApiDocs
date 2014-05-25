@@ -1,10 +1,10 @@
 <?
 // define("STOP_STATISTICS", true);
 // define("BX_SECURITY_SHOW_MESSAGE", true);
+// define('NO_AGENT_CHECK', true);
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
-
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/export_yandex.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/export_yandex.php');
 
 if ('GET' == $_SERVER['REQUEST_METHOD'])
 {
@@ -27,8 +27,6 @@ if (!check_bitrix_sessid())
 
 $APPLICATION->SetTitle(GetMessage('YANDEX_DETAIL_TITLE'));
 
-CModule::IncludeModule('iblock');
-CModule::IncludeModule('currency');
 CModule::IncludeModule('catalog');
 
 if (!$USER->CanDoOperation('catalog_export_edit'))

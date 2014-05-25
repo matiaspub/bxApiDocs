@@ -18,67 +18,67 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 {
 	
 	/**
-	 * <p>Функция возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = Array("NAME"=>"ASC") Ассоциативный массив для указания сортировки результирующего
-	 * набора групп. Каждая пара ключ-значение массива применяется
-	 * последовательно. Ключами являются названия полей для сортировки,
-	 * а значениями - направления сортировки.<br><br> Допустимые ключи: <ul>
-	 * <li> <b>ID</b> - код группы местоположений;</li> <li> <b>NAME</b> - название
-	 * группы;</li> <li> <b>SORT</b> - индекс сортировки.</li> </ul> Допустимые
-	 * значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
-	 * убыванию.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
-	 * ключами являются названия параметров группы, а значениями -
-	 * условия на значения<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код группы
-	 * местоположения.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
-	 * текущему языку.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	 * <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код группы местоположений.</td> </tr> <tr>
-	 * <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>NAME</td> <td>Название
-	 * группы.</td> </tr> <tr> <td>LID</td> <td>Язык названия.</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;select name="LOCATION2" size="5" multiple&gt;
-	 *    &lt;?
-	 *    $db_vars = CSaleLocationGroup::GetList(Array("NAME"=&gt;"ASC"), array(), LANGUAGE_ID);
-	 *    while ($vars = $db_vars-&gt;Fetch()):
-	 *       ?&gt;
-	 *       &lt;option value="&lt;?= $vars["ID"]?&gt;"&gt;&lt;?= htmlspecialchars($vars["NAME"])?&gt;&lt;/option&gt;
-	 *       &lt;?
-	 *    endwhile;
-	 *    ?&gt;
-	 * &lt;/select&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getlist.27441ea3.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("NAME"=>"ASC") Ассоциативный массив для указания сортировки результирующего
+	* набора групп. Каждая пара ключ-значение массива применяется
+	* последовательно. Ключами являются названия полей для сортировки,
+	* а значениями - направления сортировки.<br><br> Допустимые ключи: <ul>
+	* <li> <b>ID</b> - код группы местоположений;</li> <li> <b>NAME</b> - название
+	* группы;</li> <li> <b>SORT</b> - индекс сортировки.</li> </ul> Допустимые
+	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
+	* убыванию.</li> </ul>
+	*
+	*
+	*
+	* @param array $arFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
+	* ключами являются названия параметров группы, а значениями -
+	* условия на значения<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код группы
+	* местоположения.</li> </ul>
+	*
+	*
+	*
+	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
+	* текущему языку.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
+	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код группы местоположений.</td> </tr> <tr>
+	* <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>NAME</td> <td>Название
+	* группы.</td> </tr> <tr> <td>LID</td> <td>Язык названия.</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;select name="LOCATION2" size="5" multiple&gt;
+	*    &lt;?
+	*    $db_vars = CSaleLocationGroup::GetList(Array("NAME"=&gt;"ASC"), array(), LANGUAGE_ID);
+	*    while ($vars = $db_vars-&gt;Fetch()):
+	*       ?&gt;
+	*       &lt;option value="&lt;?= $vars["ID"]?&gt;"&gt;&lt;?= htmlspecialchars($vars["NAME"])?&gt;&lt;/option&gt;
+	*       &lt;?
+	*    endwhile;
+	*    ?&gt;
+	* &lt;/select&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getlist.27441ea3.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("NAME"=>"ASC"), $arFilter=Array(), $strLang = LANGUAGE_ID)
 	{
 		global $DB;
 		$arSqlSearch = Array();
 		$arSqlSearchFrom = array();
 
-		if(!is_array($arFilter)) 
+		if(!is_array($arFilter))
 			$filter_keys = Array();
 		else
 			$filter_keys = array_keys($arFilter);
@@ -124,8 +124,8 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 		{
 			$strSqlSearchFrom .= " ".$arSqlSearchFrom[$i]." ";
 		}
-		
-		$strSql = 
+
+		$strSql =
 			"SELECT DISTINCT LG.ID, LG.SORT, LGL.NAME, LGL.LID ".
 			"FROM (b_sale_location_group LG ".
 			"	".$strSqlSearchFrom.") ".
@@ -169,30 +169,30 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	 * <p>Функция возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы местоположений.
-	 *
-	 *
-	 *
-	 * @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
-	 * текущему языку.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * группы местоположений.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td>
-	 * </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>LID</td> <td>Язык
-	 * названия.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getbyid.33dc4ad9.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы местоположений.
+	*
+	*
+	*
+	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
+	* текущему языку.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* группы местоположений.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td>
+	* </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>LID</td> <td>Язык
+	* названия.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getbyid.33dc4ad9.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID, $strLang = LANGUAGE_ID)
 	{
 		global $DB;
@@ -214,46 +214,46 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	 * <p>Функция добавляет новую группу местоположений с параметрами из массива arFields. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив значений параметров группы местоположений, ключами в
-	 * котором являются имена параметров.<br><br> Допустимые ключи: <ul> <li>
-	 * <b>SORT</b> - индекс сортировки;</li> <li> <b>LOCATION_ID</b> - массив кодов
-	 * местоположений, которые входят в эту группу;</li> <li> <b>LANG</b> - массив
-	 * языкозависимых параметров группы, каждый элемент которого имеет
-	 * вид <pre class="syntax"> array("LID"=&gt;"язык параметров", "NAME"=&gt;"Название
-	 * группы")</pre> </li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array(
-	 *    "SORT" =&gt; 150,
-	 *    "LOCATION_ID" =&gt; array(12, 34, 35, 36, 37),
-	 *    "LANG" =&gt; array(
-	 *       array("LID" =&gt; "ru", "NAME" =&gt; "Группа 1"),
-	 *       array("LID" =&gt; "en", "NAME" =&gt; "Group 1")
-	 *    )
-	 * );<br>
-	 * $ID = CSaleLocationGroup::Add($arFields);
-	 * if (IntVal($ID)&lt;=0)
-	 *    echo "Ошибка добавления группы";<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__add.3520254b.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новую группу местоположений с параметрами из массива arFields. </p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив значений параметров группы местоположений, ключами в
+	* котором являются имена параметров.<br><br> Допустимые ключи: <ul> <li>
+	* <b>SORT</b> - индекс сортировки;</li> <li> <b>LOCATION_ID</b> - массив кодов
+	* местоположений, которые входят в эту группу;</li> <li> <b>LANG</b> - массив
+	* языкозависимых параметров группы, каждый элемент которого имеет
+	* вид <pre class="syntax"> array("LID"=&gt;"язык параметров", "NAME"=&gt;"Название
+	* группы")</pre> </li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array(
+	*    "SORT" =&gt; 150,
+	*    "LOCATION_ID" =&gt; array(12, 34, 35, 36, 37),
+	*    "LANG" =&gt; array(
+	*       array("LID" =&gt; "ru", "NAME" =&gt; "Группа 1"),
+	*       array("LID" =&gt; "en", "NAME" =&gt; "Group 1")
+	*    )
+	* );<br>
+	* $ID = CSaleLocationGroup::Add($arFields);
+	* if (IntVal($ID)&lt;=0)
+	*    echo "Ошибка добавления группы";<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__add.3520254b.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -270,6 +270,7 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 		$strSql =
 			"INSERT INTO b_sale_location_group(".$arInsert[0].") ".
 			"VALUES(".$arInsert[1].")";
+
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$ID = IntVal($DB->LastID());
@@ -281,17 +282,45 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 			$strSql =
 				"INSERT INTO b_sale_location_group_lang(LOCATION_GROUP_ID, ".$arInsert[0].") ".
 				"VALUES(".$ID.", ".$arInsert[1].")";
+
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
+		$strSqlHead ="INSERT INTO b_sale_location2location_group (LOCATION_ID, LOCATION_GROUP_ID) VALUES ";
+		$strSqlHeadLength = strlen($strSqlHead);
+
+		$res = $DB->Query('SHOW VARIABLES LIKE \'max_allowed_packet\'');
+		$maxPack = $res->Fetch();
+
+		if(isset($maxPack["Value"]))
+			$max_allowed_packet = $maxPack["Value"]-$strSqlHeadLength-100;
+		else
+			$max_allowed_packet = 0;
+
+		$tmpSql = '';
+		$strSql = '';
 		$countFieldLoc = count($arFields["LOCATION_ID"]);
 		for ($i = 0; $i < $countFieldLoc; $i++)
 		{
-			$strSql =
-				"INSERT INTO b_sale_location2location_group(LOCATION_ID, LOCATION_GROUP_ID) ".
-				"VALUES(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$tmpSql ="(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
+			$strSqlLen = strlen($strSql);
+
+			if($strSqlHeadLength + $strSqlLen + strlen($tmpSql) < $max_allowed_packet || $max_allowed_packet <= 0)
+			{
+				if($strSqlLen > 0)
+					$strSql .=",";
+
+				$strSql .= $tmpSql;
+			}
+			else
+			{
+				$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$strSql = $tmpSql;
+			}
 		}
+
+		if(strlen($strSql) > 0)
+			$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$events = GetModuleEvents("sale", "OnLocationGroupAdd");
 		while ($arEvent = $events->Fetch())

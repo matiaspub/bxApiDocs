@@ -198,7 +198,7 @@ class CLightHTMLEditor // LHE
 		$editorCellHeight = ($heightUnit == "px" && $height > 50 ? "height:".($height - 27 - ($this->bResizable ? 3 : 0))."px" : "");
 		?>
 		<?/* <img src="/bitrix/images/1.gif" width="300" height="1" id="bxlhe_ww_<?=$this->Id?>" />*/?>
-<div class="bxlhe-frame" id="bxlhe_frame_<?=$this->Id?>" style="width:<?=$width.$widthUnit?>; height:<?=$height.$heightUnit?>;"><table class="bxlhe-frame-table" cellspacing="0" style="height:<?=$height.$heightUnit?>;">
+<div class="bxlhe-frame" id="bxlhe_frame_<?=$this->Id?>" style="width:<?=$width.$widthUnit?>; height:<?=$height.$heightUnit?>;"><table class="bxlhe-frame-table" cellspacing="0" style="height:<?=$height.$heightUnit?>; width: 100%;">
 		<tr class="bxlhe-editor-toolbar-row"><td class="bxlhe-editor-buttons" style="height:27px;"><div class="lhe-stat-toolbar-cont lhe-stat-toolbar-cont-preload"></div></td></tr>
 		<tr><td class="bxlhe-editor-cell" style="<?=$editorCellHeight?>"></td></tr>
 		<?if ($this->bResizable):?>

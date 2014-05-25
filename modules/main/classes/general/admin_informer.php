@@ -248,18 +248,22 @@ class CAdminInformer
 							</script>";
 							
 							$arParams = array(
-									'TITLE' => GetMessage("top_panel_ai_marketplace"),
-									'COLOR' => 'green',
-									'FOOTER' => "<a href=\"javascript:void(0)\" onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\" style=\"float: right !important; font-size: 0.8em !important;\">".GetMessage("top_panel_ai_marketplace_hide")."</a><a href=\"http://marketplace.1c-bitrix.".LANGUAGE_ID."/solutions/#ID#/#comments\" target=\"_blank\" onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\">".GetMessage("top_panel_ai_marketplace_add")."</a>",
-									GetMessage("top_panel_ai_marketplace_link", array("#ID#" => $module["ID"], "#ADIT#" => "")),
-									'ALERT' => true,
-									'HTML' => GetMessage("top_panel_ai_marketplace_descr", array("#NAME#" => $module["NAME"], "#ID#" => $module["ID"])).$script,
-								);
+								'TITLE' => GetMessage("top_panel_ai_marketplace"),
+								'COLOR' => 'green',
+								'FOOTER' => "<a href=\"javascript:void(0)\" onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\" ".
+									"style=\"float: right !important; font-size: 0.8em !important;\">".GetMessage("top_panel_ai_marketplace_hide")."</a>".
+									"<a href=\"http://marketplace.1c-bitrix.".LANGUAGE_ID."/solutions/".$module["ID"]."/#comments\" target=\"_blank\" ".
+									"onclick=\"hideMpAnswer(this, '".CUtil::JSEscape($module["ID"])."')\">".GetMessage("top_panel_ai_marketplace_add")."</a>",
+								'ALERT' => true,
+								'HTML' => GetMessage("top_panel_ai_marketplace_descr", array("#NAME#" => $module["NAME"], "#ID#" => $module["ID"])).$script,
+							);
 							self::AddItem($arParams);
 						}
 					}
 					else
+					{
 						unset($arModules[$id]);
+					}
 				}
 				if($mCnt != count($arModules))
 				{
@@ -275,4 +279,3 @@ class CAdminInformer
 		return count(self::$items);
 	}
 }
-?>

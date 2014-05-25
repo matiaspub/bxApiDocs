@@ -18,204 +18,204 @@ class CSaleOrderPropsVariant extends CAllSaleOrderPropsVariant
 {
 	
 	/**
-	 * <p>Функция возвращает набор вариантов значений свойств заказа, удовлетворяющих фильтру arFilter. Результирующий набор отсортирован по полю by в направлении order. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
-	 * "направление_сортировки1", "название_поля2" =&gt;
-	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	 * может стоять любое поле вариантов значений свойств, а в качестве
-	 * "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
-	 * имеет несколько элементов, то результирующий набор сортируется
-	 * последовательно по каждому элементу (т.е. сначала сортируется по
-	 * первому элементу, потом результат сортируется по второму и
-	 * т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что результат отсортирован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи вариантов
-	 * значений свойств. Массив имеет вид: <pre class="syntax">array(
-	 * "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
-	 * "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
-	 * Удовлетворяющие фильтру записи возвращаются в результате, а
-	 * записи, которые не удовлетворяют условиям фильтра,
-	 * отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
-	 * <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
-	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
-	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
-	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
-	 * значение поля меньше или равно передаваемой в фильтр величины;</li>
-	 * <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
-	 * величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
-	 * фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
-	 * поля проверяется на соответствие передаваемому в фильтр
-	 * шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
-	 * передаваемой в фильтр строке в соответствии с языком запросов.</li>
-	 * </ul> В качестве "название_поляX" может стоять любое поле
-	 * заказов.<br><br> Пример фильтра: <pre class="syntax">array("~VALUE" =&gt; "SH*")</pre> Этот
-	 * фильтр означает "выбрать все записи, в которых значение в поле VALUE
-	 * (значение) начинается с SH".<br><br> Значение по умолчанию - пустой
-	 * массив array() - означает, что результат отфильтрован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив полей, по которым группируются записи вариантов значений
-	 * свойств. Массив имеет вид: <pre class="syntax"> array("название_поля1",
-	 * "группирующая_функция2" =&gt; "название_поля2", ...)</pre> В качестве
-	 * "название_поля<i>N</i>" может стоять любое поле значений свойств. В
-	 * качестве группирующей функции могут стоять: <ul> <li> <b> COUNT</b> -
-	 * подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
-	 * <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
-	 * вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	 * суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
-	 * удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
-	 * означает, что результат группироваться не будет.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	 * <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
-	 * ограничено сверху значением этого ключа;</li> <li> любой ключ,
-	 * принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	 * параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
-	 * параметров выборки нет.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
-	 * указать только те поля, которые необходимы. Если в массиве
-	 * присутствует значение "*", то будут возвращены все доступные
-	 * поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что будут возвращены все поля основной таблицы запроса.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы параметров с ключами:</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Код</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код варианта значения
-	 * свойства заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td>
-	 * </tr> <tr> <td>NAME</td> <td>Название варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение
-	 * варианта.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr>
-	 * <td>DESCRIPTION</td> <td>Описание варианта значения свойства заказа.</td> </tr>
-	 * </table><p>Если в качестве параметра arGroupBy передается пустой массив,
-	 * то функция вернет число записей, удовлетворяющих фильтру.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выведем форму для ввода свойств заказа для группы свойств с кодом 5, которые 
-	 * // входят в профиль покупателя, для типа плательщика с кодом 2
-	 * $db_props = CSaleOrderProps::GetList(
-	 *         array("SORT" =&gt; "ASC"),
-	 *         array(
-	 *                 "PERSON_TYPE_ID" =&gt; 2,
-	 *                 "PROPS_GROUP_ID" =&gt; 5,
-	 *                 "USER_PROPS" =&gt; "Y"
-	 *             )
-	 *     );
-	 * if ($props = $db_props-&gt;Fetch())
-	 * {
-	 *    echo "Заполните параметры заказа:&lt;br&gt;";
-	 *    do
-	 *    {
-	 *       echo $props["NAME"];
-	 *       if ($props["REQUIED"]=="Y" || $props["IS_EMAIL"]=="Y" || 
-	 *           $props["IS_PROFILE_NAME"]=="Y" || $props["IS_LOCATION"]=="Y" || 
-	 *           $props["IS_LOCATION4TAX"]=="Y" || $props["IS_PAYER"]=="Y")
-	 *       {
-	 *          echo "*";
-	 *       }
-	 *       echo ": ";
-	 * 
-	 *       if ($props["TYPE"]=="CHECKBOX")
-	 *       {
-	 *          echo '&lt;input type="checkbox" class="inputcheckbox" name="ORDER_PROP_'.$props["ID"].'" value="Y"'.(($props["DEFAULT_VALUE"]=="Y")?" checked":"").'&gt;';
-	 *       }
-	 *       elseif ($props["TYPE"]=="TEXT")
-	 *       {
-	 *          echo '&lt;input type="text" class="inputtext" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:30).'" maxlength="250" value="'.htmlspecialchars($props["DEFAULT_VALUE"]).'" name="ORDER_PROP_'.$props["ID"].'"&gt;";
-	 *       }
-	 *       elseif ($props["TYPE"]=="SELECT")
-	 *       {
-	 *          echo '&lt;select name="ORDER_PROP_'.$props["ID"].'" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:1).'"&gt;';
-	 *          $db_vars = CSaleOrderPropsVariant::GetList(
-	 *                 array("SORT" =&gt; "ASC"),
-	 *                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
-	 *             );
-	 *          while ($vars = $db_vars-&gt;Fetch())
-	 *          {
-	 *             echo '&lt;option value="'.$vars["VALUE"].'"'.(($vars["VALUE"]==$props["DEFAULT_VALUE"])?" selected":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;/option&gt;';
-	 *          }
-	 *          echo '&lt;/select&gt;';
-	 *       }
-	 *       elseif ($props["TYPE"]=="MULTISELECT")
-	 *       {
-	 *          echo '&lt;select multiple name="ORDER_PROP_'.$props["ID"].'[]" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:5).'"&gt;';
-	 *          $arDefVal = Split(",", $props["DEFAULT_VALUE"]);
-	 *          for ($i = 0; $i&lt;count($arDefVal); $i++)
-	 *             $arDefVal[$i] = Trim($arDefVal[$i]);
-	 * 
-	 *          $db_vars = CSaleOrderPropsVariant::GetList(
-	 *                 array("SORT" =&gt; "ASC"),
-	 *                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
-	 *             );
-	 *          while ($vars = $db_vars-&gt;Fetch())
-	 *          {
-	 *             echo '&lt;option value="'.$vars["VALUE"].'"'.(in_array($vars["VALUE"], $arDefVal)?" selected":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;/option&gt;';
-	 *          }
-	 *          echo '&lt;/select&gt;';
-	 *       }
-	 *       elseif ($props["TYPE"]=="TEXTAREA")
-	 *       {
-	 *          echo '&lt;textarea rows="'.((IntVal($props["SIZE2"])&gt;0)?$props["SIZE2"]:4).'" cols="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:40).'" name="ORDER_PROP_'.$props["ID"].'"&gt;'.htmlspecialchars($props["DEFAULT_VALUE"]).'&lt;/textarea&gt;';
-	 *       }
-	 *       elseif ($props["TYPE"]=="LOCATION")
-	 *       {
-	 *          echo '&lt;select name="ORDER_PROP_'.$props["ID"].'" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:1).'"&gt;';
-	 *          $db_vars = CSaleLocation::GetList(Array("SORT"=&gt;"ASC", "COUNTRY_NAME_LANG"=&gt;"ASC", "CITY_NAME_LANG"=&gt;"ASC"), array("LID" =&gt; LANGUAGE_ID));
-	 *          while ($vars = $db_vars-&gt;Fetch())
-	 *          {
-	 *             echo '&lt;option value="'.$vars["ID"].'"".((IntVal($vars["ID"])==IntVal($props["DEFAULT_VALUE"]))?" selected":"").'&gt;'.htmlspecialchars($vars["COUNTRY_NAME"]." - ".$vars["CITY_NAME"]).'&lt;/option&gt;';
-	 *          }
-	 *          echo '&lt;/select&gt;';
-	 *       }
-	 *       elseif ($props["TYPE"]=="RADIO")
-	 *       {
-	 *          $db_vars = CSaleOrderPropsVariant::GetList(
-	 *                 array("SORT" =&gt; "ASC"),
-	 *                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
-	 *             );
-	 *          while ($vars = $db_vars-&gt;Fetch())
-	 *          {
-	 *             echo '&lt;input type="radio" name="ORDER_PROP_'.$props["ID"].'" value="'.$vars["VALUE"].'"'.(($vars["VALUE"]==$props["DEFAULT_VALUE"])?" checked":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;br&gt;';
-	 *          }
-	 *       }
-	 * 
-	 *       if (strlen($props["DESCRIPTION"])&gt;0)
-	 *       {
-	 *          echo "&lt;br&gt;&lt;small&gt;".$props["DESCRIPTION"]."&lt;/small&gt;";
-	 *       }
-	 * 
-	 *       echo "&lt;br&gt;";
-	 *    }
-	 *    while ($props = $db_props-&gt;Fetch());
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getlist.d436238c.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор вариантов значений свойств заказа, удовлетворяющих фильтру arFilter. Результирующий набор отсортирован по полю by в направлении order. </p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* "направление_сортировки1", "название_поля2" =&gt;
+	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	* может стоять любое поле вариантов значений свойств, а в качестве
+	* "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
+	* имеет несколько элементов, то результирующий набор сортируется
+	* последовательно по каждому элементу (т.е. сначала сортируется по
+	* первому элементу, потом результат сортируется по второму и
+	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
+	* что результат отсортирован не будет.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи вариантов
+	* значений свойств. Массив имеет вид: <pre class="syntax">array(
+	* "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
+	* "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
+	* Удовлетворяющие фильтру записи возвращаются в результате, а
+	* записи, которые не удовлетворяют условиям фильтра,
+	* отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
+	* <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
+	* так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
+	* являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
+	* или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
+	* поля строго больше передаваемой в фильтр величины;</li> <li> <b>&gt;=</b> -
+	* значение поля меньше или равно передаваемой в фильтр величины;</li>
+	* <li> <b>&gt;=</b> - значение поля строго меньше передаваемой в фильтр
+	* величины;</li> <li> <b>@</b> - значение поля находится в передаваемом в
+	* фильтр разделенном запятой списке значений;</li> <li> <b>~</b> - значение
+	* поля проверяется на соответствие передаваемому в фильтр
+	* шаблону;</li> <li> <b>%</b> - значение поля проверяется на соответствие
+	* передаваемой в фильтр строке в соответствии с языком запросов.</li>
+	* </ul> В качестве "название_поляX" может стоять любое поле
+	* заказов.<br><br> Пример фильтра: <pre class="syntax">array("~VALUE" =&gt; "SH*")</pre> Этот
+	* фильтр означает "выбрать все записи, в которых значение в поле VALUE
+	* (значение) начинается с SH".<br><br> Значение по умолчанию - пустой
+	* массив array() - означает, что результат отфильтрован не будет.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив полей, по которым группируются записи вариантов значений
+	* свойств. Массив имеет вид: <pre class="syntax"> array("название_поля1",
+	* "группирующая_функция2" =&gt; "название_поля2", ...)</pre> В качестве
+	* "название_поля<i>N</i>" может стоять любое поле значений свойств. В
+	* качестве группирующей функции могут стоять: <ul> <li> <b> COUNT</b> -
+	* подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
+	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
+	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
+	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
+	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
+	* означает, что результат группироваться не будет.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
+	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
+	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
+	* параметров выборки нет.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* указать только те поля, которые необходимы. Если в массиве
+	* присутствует значение "*", то будут возвращены все доступные
+	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
+	* что будут возвращены все поля основной таблицы запроса.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы параметров с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Код</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код варианта значения
+	* свойства заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код свойства заказа.</td>
+	* </tr> <tr> <td>NAME</td> <td>Название варианта.</td> </tr> <tr> <td>VALUE</td> <td>Значение
+	* варианта.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr>
+	* <td>DESCRIPTION</td> <td>Описание варианта значения свойства заказа.</td> </tr>
+	* </table> <p>Если в качестве параметра arGroupBy передается пустой массив,
+	* то функция вернет число записей, удовлетворяющих фильтру.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выведем форму для ввода свойств заказа для группы свойств с кодом 5, которые 
+	* // входят в профиль покупателя, для типа плательщика с кодом 2
+	* $db_props = CSaleOrderProps::GetList(
+	*         array("SORT" =&gt; "ASC"),
+	*         array(
+	*                 "PERSON_TYPE_ID" =&gt; 2,
+	*                 "PROPS_GROUP_ID" =&gt; 5,
+	*                 "USER_PROPS" =&gt; "Y"
+	*             )
+	*     );
+	* if ($props = $db_props-&gt;Fetch())
+	* {
+	*    echo "Заполните параметры заказа:&lt;br&gt;";
+	*    do
+	*    {
+	*       echo $props["NAME"];
+	*       if ($props["REQUIED"]=="Y" || $props["IS_EMAIL"]=="Y" || 
+	*           $props["IS_PROFILE_NAME"]=="Y" || $props["IS_LOCATION"]=="Y" || 
+	*           $props["IS_LOCATION4TAX"]=="Y" || $props["IS_PAYER"]=="Y")
+	*       {
+	*          echo "*";
+	*       }
+	*       echo ": ";
+	* 
+	*       if ($props["TYPE"]=="CHECKBOX")
+	*       {
+	*          echo '&lt;input type="checkbox" class="inputcheckbox" name="ORDER_PROP_'.$props["ID"].'" value="Y"'.(($props["DEFAULT_VALUE"]=="Y")?" checked":"").'&gt;';
+	*       }
+	*       elseif ($props["TYPE"]=="TEXT")
+	*       {
+	*          echo '&lt;input type="text" class="inputtext" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:30).'" maxlength="250" value="'.htmlspecialchars($props["DEFAULT_VALUE"]).'" name="ORDER_PROP_'.$props["ID"].'"&gt;";
+	*       }
+	*       elseif ($props["TYPE"]=="SELECT")
+	*       {
+	*          echo '&lt;select name="ORDER_PROP_'.$props["ID"].'" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:1).'"&gt;';
+	*          $db_vars = CSaleOrderPropsVariant::GetList(
+	*                 array("SORT" =&gt; "ASC"),
+	*                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
+	*             );
+	*          while ($vars = $db_vars-&gt;Fetch())
+	*          {
+	*             echo '&lt;option value="'.$vars["VALUE"].'"'.(($vars["VALUE"]==$props["DEFAULT_VALUE"])?" selected":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;/option&gt;';
+	*          }
+	*          echo '&lt;/select&gt;';
+	*       }
+	*       elseif ($props["TYPE"]=="MULTISELECT")
+	*       {
+	*          echo '&lt;select multiple name="ORDER_PROP_'.$props["ID"].'[]" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:5).'"&gt;';
+	*          $arDefVal = Split(",", $props["DEFAULT_VALUE"]);
+	*          for ($i = 0; $i&lt;count($arDefVal); $i++)
+	*             $arDefVal[$i] = Trim($arDefVal[$i]);
+	* 
+	*          $db_vars = CSaleOrderPropsVariant::GetList(
+	*                 array("SORT" =&gt; "ASC"),
+	*                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
+	*             );
+	*          while ($vars = $db_vars-&gt;Fetch())
+	*          {
+	*             echo '&lt;option value="'.$vars["VALUE"].'"'.(in_array($vars["VALUE"], $arDefVal)?" selected":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;/option&gt;';
+	*          }
+	*          echo '&lt;/select&gt;';
+	*       }
+	*       elseif ($props["TYPE"]=="TEXTAREA")
+	*       {
+	*          echo '&lt;textarea rows="'.((IntVal($props["SIZE2"])&gt;0)?$props["SIZE2"]:4).'" cols="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:40).'" name="ORDER_PROP_'.$props["ID"].'"&gt;'.htmlspecialchars($props["DEFAULT_VALUE"]).'&lt;/textarea&gt;';
+	*       }
+	*       elseif ($props["TYPE"]=="LOCATION")
+	*       {
+	*          echo '&lt;select name="ORDER_PROP_'.$props["ID"].'" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:1).'"&gt;';
+	*          $db_vars = CSaleLocation::GetList(Array("SORT"=&gt;"ASC", "COUNTRY_NAME_LANG"=&gt;"ASC", "CITY_NAME_LANG"=&gt;"ASC"), array("LID" =&gt; LANGUAGE_ID));
+	*          while ($vars = $db_vars-&gt;Fetch())
+	*          {
+	*             echo '&lt;option value="'.$vars["ID"].'"".((IntVal($vars["ID"])==IntVal($props["DEFAULT_VALUE"]))?" selected":"").'&gt;'.htmlspecialchars($vars["COUNTRY_NAME"]." - ".$vars["CITY_NAME"]).'&lt;/option&gt;';
+	*          }
+	*          echo '&lt;/select&gt;';
+	*       }
+	*       elseif ($props["TYPE"]=="RADIO")
+	*       {
+	*          $db_vars = CSaleOrderPropsVariant::GetList(
+	*                 array("SORT" =&gt; "ASC"),
+	*                 array("ORDER_PROPS_ID" =&gt; $props["ID"])
+	*             );
+	*          while ($vars = $db_vars-&gt;Fetch())
+	*          {
+	*             echo '&lt;input type="radio" name="ORDER_PROP_'.$props["ID"].'" value="'.$vars["VALUE"].'"'.(($vars["VALUE"]==$props["DEFAULT_VALUE"])?" checked":"").'&gt;'.htmlspecialchars($vars["NAME"]).'&lt;br&gt;';
+	*          }
+	*       }
+	* 
+	*       if (strlen($props["DESCRIPTION"])&gt;0)
+	*       {
+	*          echo "&lt;br&gt;&lt;small&gt;".$props["DESCRIPTION"]."&lt;/small&gt;";
+	*       }
+	* 
+	*       echo "&lt;br&gt;";
+	*    }
+	*    while ($props = $db_props-&gt;Fetch());
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__getlist.d436238c.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -329,45 +329,45 @@ class CSaleOrderPropsVariant extends CAllSaleOrderPropsVariant
 
 	
 	/**
-	 * <p>Функция добавляет новый вариант для выбора значения в свойствах типа переключатель (RADIO) и списки (SELECT, MULTISELECT) </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров нового варианта значения
-	 * свойства заказа, ключами в котором являются названия
-	 * параметров.<br> Допустимые ключи:<ul> <li> <b>ORDER_PROPS_ID</b> - код свойства
-	 * заказа;</li> <li> <b>NAME</b> - название варианта;</li> <li> <b>VALUE</b> - значение
-	 * варианта;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>DESCRIPTION</b> -
-	 * описание варианта.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленного варианта значения или <i>false</i> в
-	 * случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFieldsV = array(
-	 *    "ORDER_PROPS_ID" =&gt; 12,
-	 *    "VALUE" =&gt; "F",
-	 *    "NAME" =&gt; "В полной комплектации",
-	 *    "SORT" =&gt; 100,
-	 *    "DESCRIPTION" =&gt; "Доставка начинается после полного формирования заказа"
-	 * );
-	 * 
-	 * if (!CSaleOrderPropsVariant::Add($arFieldsV))
-	 *    echo "Ошибка добавления варианта значения";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__add.0b68743c.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новый вариант для выбора значения в свойствах типа переключатель (RADIO) и списки (SELECT, MULTISELECT) </p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров нового варианта значения
+	* свойства заказа, ключами в котором являются названия
+	* параметров.<br> Допустимые ключи:<ul> <li> <b>ORDER_PROPS_ID</b> - код свойства
+	* заказа;</li> <li> <b>NAME</b> - название варианта;</li> <li> <b>VALUE</b> - значение
+	* варианта;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>DESCRIPTION</b> -
+	* описание варианта.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленного варианта значения или <i>false</i> в
+	* случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFieldsV = array(
+	*    "ORDER_PROPS_ID" =&gt; 12,
+	*    "VALUE" =&gt; "F",
+	*    "NAME" =&gt; "В полной комплектации",
+	*    "SORT" =&gt; 100,
+	*    "DESCRIPTION" =&gt; "Доставка начинается после полного формирования заказа"
+	* );
+	* 
+	* if (!CSaleOrderPropsVariant::Add($arFieldsV))
+	*    echo "Ошибка добавления варианта значения";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvariant/csaleorderpropsvariant__add.0b68743c.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;

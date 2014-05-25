@@ -18,34 +18,34 @@ class CSaleTaxRate extends CAllSaleTaxRate
 {
 	
 	/**
-	 * <p>Функция добавляет новую ставку налога с параметрами из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров новой ставки налога. Ключами
-	 * являются названия параметров ставки, а значениями -
-	 * соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>TAX_ID</b> - код
-	 * налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li> <b>VALUE</b> - величина
-	 * налога (в процентах);</li> <li> <b>CURRENCY</b> - валюта;</li> <li> <b>IS_PERCENT</b> -
-	 * всегда значение "Y";</li> <li> <b>IS_IN_PRICE</b> - налог уже включен в цену
-	 * товара;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ACTIVE</b> - флаг
-	 * (Y/N) активности налога;</li> <li> <b>TAX_LOCATION</b> - массив для указания
-	 * местоположений и групп местоположений, для которых действует эта
-	 * ставка. Каждый элемент массива представляет собой ассоциативный
-	 * массив с ключами: <ul> <li> <b>LOCATION_ID</b> - код местоположения или группы
-	 * местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
-	 * группы местоположений.</li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленной ставки налога или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__add.40a40d86.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новую ставку налога с параметрами из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров новой ставки налога. Ключами
+	* являются названия параметров ставки, а значениями -
+	* соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>TAX_ID</b> - код
+	* налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li> <b>VALUE</b> - величина
+	* налога (в процентах);</li> <li> <b>CURRENCY</b> - валюта;</li> <li> <b>IS_PERCENT</b> -
+	* всегда значение "Y";</li> <li> <b>IS_IN_PRICE</b> - налог уже включен в цену
+	* товара;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ACTIVE</b> - флаг
+	* (Y/N) активности налога;</li> <li> <b>TAX_LOCATION</b> - массив для указания
+	* местоположений и групп местоположений, для которых действует эта
+	* ставка. Каждый элемент массива представляет собой ассоциативный
+	* массив с ключами: <ul> <li> <b>LOCATION_ID</b> - код местоположения или группы
+	* местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
+	* группы местоположений.</li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленной ставки налога или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__add.40a40d86.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -70,82 +70,82 @@ class CSaleTaxRate extends CAllSaleTaxRate
 
 	
 	/**
-	 * <p>Функция возвращает набор ставок налога, удовлетворяющих фильтру arFilter. Набор упорядочен в соответствии с массивом arOrder. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = Array("APPLY_ORDER"=>"ASC") Ассоциативный массив для сортировки результирующего набора
-	 * ставок налогов. Набор сортируется последовательно по каждой паре
-	 * ключ-значение массива. Ключами массива являются названия
-	 * параметров ставки налога, по значениям которых осуществляется
-	 * сортировка. Значениями являются направления сортировки.<br><br>
-	 * Допустимые ключи: <ul> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ID</b>
-	 * - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li> <li> <b>CODE</b> -
-	 * мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
-	 * изменения параметров ставки;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
-	 * ставки;</li> <li> <b>NAME</b> - название налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип
-	 * плательщика ставки;</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли ставка
-	 * налога в цену</li> </ul> Допустимые значения: <ul> <li>ASC - по
-	 * возрастанию;</li> <li>DESC - по убыванию.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Ассоциативный массив условий для отбора (фильтрации) ставок
-	 * налогов. Ключами являются названия фильтруемых параметров
-	 * ставки налога, а значениями - условия на значения.<br><br> Допустимые
-	 * ключи: <ul> <li> <b>ID</b> - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li>
-	 * <li> <b>CODE</b> - мнемонический код налога;</li> <li> <b>TAX_ID</b> - код налога;</li>
-	 * <li> <b>PERSON_TYPE_ID</b> - тип плательщика ставки налога; </li> <li> <b>IS_IN_PRICE</b> -
-	 * флаг (Y/N) входит ли налог в цену;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
-	 * ставки налога;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>LOCATION</b>
-	 * - код местоположения, в котором действует ставка.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы параметров ставок налогов с ключами:</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * ставки налога.</td> </tr> <tr> <td>TAX_ID</td> <td>Код налога.</td> </tr> <tr>
-	 * <td>PERSON_TYPE_ID</td> <td>Тип плательщика.</td> </tr> <tr> <td>VALUE</td> <td>Величина
-	 * налога (в процентах) </td> </tr> <tr> <td>CURRENCY</td> <td>Валюта.</td> </tr> <tr>
-	 * <td>IS_PERCENT</td> <td>Y</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) входит ли уже налог в
-	 * цену.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr>
-	 * <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> <tr> <td>LID</td>
-	 * <td>Сайт налога.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
-	 * <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
-	 * <td>Описание налога.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности
-	 * ставки.</td> </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Заполним массив активных ставок налогов на текущем сайте для типа плательщика 
-	 * // с кодом $PERSON_TYPE и местоположением плательщика с кодом $TAX_LOCATION
-	 * 
-	 * $arTaxList = array();
-	 * 
-	 * $arTaxFilter = array(
-	 *    "LID" =&gt; SITE_ID,
-	 *    "PERSON_TYPE_ID" =&gt; $PERSON_TYPE,
-	 *    "ACTIVE" =&gt; "Y",
-	 *    "LOCATION" =&gt; $TAX_LOCATION
-	 * );
-	 * 
-	 * $db_tax_rate_tmp = CSaleTaxRate::GetList(array("APPLY_ORDER"=&gt;"ASC"), $arTaxFilter);
-	 * while ($ar_tax_rate_tmp = $db_tax_rate_tmp-&gt;Fetch())
-	 * {
-	 *    $arTaxList[] = $ar_tax_rate_tmp;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__getlist.63346fa6.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает набор ставок налога, удовлетворяющих фильтру arFilter. Набор упорядочен в соответствии с массивом arOrder. </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = array("APPLY_ORDER"=>"ASC") Ассоциативный массив для сортировки результирующего набора
+	* ставок налогов. Набор сортируется последовательно по каждой паре
+	* ключ-значение массива. Ключами массива являются названия
+	* параметров ставки налога, по значениям которых осуществляется
+	* сортировка. Значениями являются направления сортировки.<br><br>
+	* Допустимые ключи: <ul> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ID</b>
+	* - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li> <li> <b>CODE</b> -
+	* мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
+	* изменения параметров ставки;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
+	* ставки;</li> <li> <b>NAME</b> - название налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип
+	* плательщика ставки;</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли ставка
+	* налога в цену</li> </ul> Допустимые значения: <ul> <li>ASC - по
+	* возрастанию;</li> <li>DESC - по убыванию.</li> </ul>
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() Ассоциативный массив условий для отбора (фильтрации) ставок
+	* налогов. Ключами являются названия фильтруемых параметров
+	* ставки налога, а значениями - условия на значения.<br><br> Допустимые
+	* ключи: <ul> <li> <b>ID</b> - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li>
+	* <li> <b>CODE</b> - мнемонический код налога;</li> <li> <b>TAX_ID</b> - код налога;</li>
+	* <li> <b>PERSON_TYPE_ID</b> - тип плательщика ставки налога; </li> <li> <b>IS_IN_PRICE</b> -
+	* флаг (Y/N) входит ли налог в цену;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
+	* ставки налога;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>LOCATION</b>
+	* - код местоположения, в котором действует ставка.</li> </ul>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы параметров ставок налогов с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* ставки налога.</td> </tr> <tr> <td>TAX_ID</td> <td>Код налога.</td> </tr> <tr>
+	* <td>PERSON_TYPE_ID</td> <td>Тип плательщика.</td> </tr> <tr> <td>VALUE</td> <td>Величина
+	* налога (в процентах) </td> </tr> <tr> <td>CURRENCY</td> <td>Валюта.</td> </tr> <tr>
+	* <td>IS_PERCENT</td> <td>Y</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) входит ли уже налог в
+	* цену.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr>
+	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> <tr> <td>LID</td>
+	* <td>Сайт налога.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
+	* <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
+	* <td>Описание налога.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности
+	* ставки.</td> </tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Заполним массив активных ставок налогов на текущем сайте для типа плательщика 
+	* // с кодом $PERSON_TYPE и местоположением плательщика с кодом $TAX_LOCATION
+	* 
+	* $arTaxList = array();
+	* 
+	* $arTaxFilter = array(
+	*    "LID" =&gt; SITE_ID,
+	*    "PERSON_TYPE_ID" =&gt; $PERSON_TYPE,
+	*    "ACTIVE" =&gt; "Y",
+	*    "LOCATION" =&gt; $TAX_LOCATION
+	* );
+	* 
+	* $db_tax_rate_tmp = CSaleTaxRate::GetList(array("APPLY_ORDER"=&gt;"ASC"), $arTaxFilter);
+	* while ($ar_tax_rate_tmp = $db_tax_rate_tmp-&gt;Fetch())
+	* {
+	*    $arTaxList[] = $ar_tax_rate_tmp;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__getlist.63346fa6.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("APPLY_ORDER"=>"ASC"), $arFilter = array())
 	{
 		global $DB;

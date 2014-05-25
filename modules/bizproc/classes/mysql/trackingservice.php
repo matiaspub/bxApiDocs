@@ -4,9 +4,12 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPTrackingService
 	extends CBPAllTrackingService
 {
-	static public function Write($workflowId, $type, $actionName, $executionStatus, $executionResult, $actionTitle = "", $actionNote = "", $modifiedBy = 0)
+	public function Write($workflowId, $type, $actionName, $executionStatus, $executionResult, $actionTitle = "", $actionNote = "", $modifiedBy = 0)
 	{
 		global $DB;
+
+		if (in_array($type, $this->skipTypes))
+			return;
 
 		$workflowId = trim($workflowId);
 		if (strlen($workflowId) <= 0)
@@ -31,7 +34,7 @@ class CBPTrackingService
 
 	public static function GetList($arOrder = array("ID" => "DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
- 		global $DB;
+		global $DB;
 
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "WORKFLOW_ID", "TYPE", "MODIFIED", "ACTION_NAME", "ACTION_TITLE", "EXECUTION_STATUS", "EXECUTION_RESULT", "ACTION_NOTE", "MODIFIED_BY");
@@ -129,7 +132,7 @@ class CBPTrackingService
 		return $dbRes;
 	}
 
-	public static function ClearOld($days = 0)
+public static 	function ClearOld($days = 0)
 	{
 		global $DB;
 
@@ -141,7 +144,7 @@ class CBPTrackingService
 			"FROM b_bp_tracking t ".
 			"   LEFT JOIN b_bp_workflow_instance i ON (t.WORKFLOW_ID = i.ID) ".
 			"WHERE i.ID IS NULL ".
-			 "  AND t.MODIFIED < DATE_SUB(NOW(), INTERVAL ".$days." DAY) ".
+			"  AND t.MODIFIED < DATE_SUB(NOW(), INTERVAL ".$days." DAY) ".
 			"   AND t.TYPE <> 6";
 		$bSuccess = $DB->Query($strSql, true);
 

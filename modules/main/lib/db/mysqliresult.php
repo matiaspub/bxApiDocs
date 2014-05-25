@@ -1,6 +1,8 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main\Type;
+
 class MysqliResult extends Result
 {
 	private $resultFields = array();
@@ -14,12 +16,18 @@ class MysqliResult extends Result
 	{
 		switch ($fieldType)
 		{
-			case 12:
-			case 7:
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "Y-m-d H:i:s");
+			case MYSQLI_TYPE_DATETIME:
+			case MYSQLI_TYPE_TIMESTAMP:
+				if($value !== null)
+				{
+					$value = new Type\DateTime($value, "Y-m-d H:i:s");
+				}
 				break;
-			case 10:
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "Y-m-d");
+			case MYSQLI_TYPE_DATE:
+				if($value !== null)
+				{
+					$value = new Type\Date($value, "Y-m-d");
+				}
 				break;
 			default:
 				break;

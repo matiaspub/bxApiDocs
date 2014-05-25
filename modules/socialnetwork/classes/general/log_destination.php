@@ -277,6 +277,7 @@ class CSocNetLogDestination
 		global $USER;
 
 		$userId = intval($USER->GetID());
+		$bExtranet = false;
 
 		$arFilter = Array('ACTIVE' => 'Y');
 		$arExtParams = Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"));
@@ -302,13 +303,23 @@ class CSocNetLogDestination
 			if (is_array($arParams['deportament_id']))
 				$arFilter['UF_DEPARTMENT'] = $arParams['deportament_id'];
 			else
-				$arFilter['UF_DEPARTMENT'] = intval($arParams['deportament_id']);
+			{
+				if ($arParams['deportament_id'] == 'EX')
+				{
+					$bExtranet = true;
+				}
+				else
+				{
+					$arFilter['UF_DEPARTMENT'] = intval($arParams['deportament_id']);
+				}
+				
+			}
 
 			$arExtParams['SELECT'] = array('UF_DEPARTMENT');
 		}
 
 		$cacheTtl = 3153600;
-		$cacheId = 'socnet_destination_getusers_'.md5(serialize($arFilter)).$bSelf;
+		$cacheId = 'socnet_destination_getusers_'.md5(serialize($arFilter)).$bSelf.($bExtranet ? '_ex' : '');
 		$cacheDir = '/socnet/dest/'.(
 			isset($arParams['id']) 
 			? 'user' 
@@ -330,38 +341,76 @@ class CSocNetLogDestination
 			if(defined("BX_COMP_MANAGED_CACHE"))
 				$GLOBALS["CACHE_MANAGER"]->StartTagCache($cacheDir);
 
-			$arUsers = Array();
-			$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc', 'IS_ONLINE'=>'desc')), ($dummy=''), $arFilter, $arExtParams);
-			while ($arUser = $dbUsers->GetNext())
+			if (
+				$bExtranet
+				&& CModule::IncludeModule("extranet")
+			)
 			{
-				if (
-					!$bSelf
-					&& is_object($USER)
-					&& $userId == $arUser["ID"]
-				)
-					continue;
+				$arUsers = Array();
+				$arExtranetUsers = CExtranet::GetMyGroupsUsersFull(CExtranet::GetExtranetSiteID(), $bSelf);
+				foreach($arExtranetUsers as $arUserTmp)
+				{
+					$sName = trim(CUser::FormatName(empty($arParams["NAME_TEMPLATE"]) ? CSite::GetNameFormat(false) : $arParams["NAME_TEMPLATE"], $arUserTmp, true, false));
+					if (empty($sName))
+					{
+						$sName = $arUserTmp["~LOGIN"];
+					}
 
-				$sName = trim(CUser::FormatName(empty($arParams["NAME_TEMPLATE"]) ? CSite::GetNameFormat(false) : $arParams["NAME_TEMPLATE"], $arUser, true, false));
+					$arFileTmp = CFile::ResizeImageGet(
+						$arUserTmp["PERSONAL_PHOTO"],
+						array('width' => 32, 'height' => 32),
+						BX_RESIZE_IMAGE_EXACT,
+						false
+					);
 
-				if (empty($sName))
-					$sName = $arUser["~LOGIN"];
+					$arUsers['U'.$arUserTmp["ID"]] = Array(
+						'id' => 'U'.$arUserTmp["ID"],
+						'entityId' => $arUserTmp["ID"],
+						'name' => $sName,
+						'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
+						'desc' => $arUserTmp['WORK_POSITION'] ? $arUserTmp['WORK_POSITION'] : ($arUserTmp['PERSONAL_PROFESSION'] ? $arUserTmp['PERSONAL_PROFESSION'] : '&nbsp;'),
+					);
+					if (defined("BX_COMP_MANAGED_CACHE"))
+					{
+						$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".IntVal($arUserTmp["ID"]));
+					}
+				}
+			}
+			else
+			{
+				$arUsers = Array();
+				$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc', 'IS_ONLINE'=>'desc')), ($dummy=''), $arFilter, $arExtParams);
+				while ($arUser = $dbUsers->GetNext())
+				{
+					if (
+						!$bSelf
+						&& is_object($USER)
+						&& $userId == $arUser["ID"]
+					)
+						continue;
 
-				$arFileTmp = CFile::ResizeImageGet(
-					$arUser["PERSONAL_PHOTO"],
-					array('width' => 32, 'height' => 32),
-					BX_RESIZE_IMAGE_EXACT,
-					false
-				);
+					$sName = trim(CUser::FormatName(empty($arParams["NAME_TEMPLATE"]) ? CSite::GetNameFormat(false) : $arParams["NAME_TEMPLATE"], $arUser, true, false));
 
-				$arUsers['U'.$arUser["ID"]] = Array(
-					'id' => 'U'.$arUser["ID"],
-					'entityId' => $arUser["ID"],
-					'name' => $sName,
-					'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
-					'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION'] ? $arUser['PERSONAL_PROFESSION'] : '&nbsp;'),
-				);
-				if (defined("BX_COMP_MANAGED_CACHE"))
-					$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".IntVal($arUser["ID"]));
+					if (empty($sName))
+						$sName = $arUser["~LOGIN"];
+
+					$arFileTmp = CFile::ResizeImageGet(
+						$arUser["PERSONAL_PHOTO"],
+						array('width' => 32, 'height' => 32),
+						BX_RESIZE_IMAGE_EXACT,
+						false
+					);
+
+					$arUsers['U'.$arUser["ID"]] = Array(
+						'id' => 'U'.$arUser["ID"],
+						'entityId' => $arUser["ID"],
+						'name' => $sName,
+						'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
+						'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION'] ? $arUser['PERSONAL_PROFESSION'] : '&nbsp;'),
+					);
+					if (defined("BX_COMP_MANAGED_CACHE"))
+						$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".IntVal($arUser["ID"]));
+				}
 			}
 
 			if (defined("BX_COMP_MANAGED_CACHE"))
@@ -450,7 +499,7 @@ class CSocNetLogDestination
 		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$userId];
 	}
 
-	public static function SearchUsers($search, $nameTemplate = "", $bSelf = true, $bEmployeesOnly = false)
+	public static function SearchUsers($search, $nameTemplate = "", $bSelf = true, $bEmployeesOnly = false, $bExtranetOnly = false)
 	{
 		CUtil::JSPostUnescape();
 
@@ -467,7 +516,9 @@ class CSocNetLogDestination
 			strlen($search) <= 0
 			|| !GetFilterQuery("TEST", $search)
 		)
+		{
 			return $arUsers;
+		}
 
 		$arFilter = array(
 			"ACTIVE" => "Y",
@@ -478,32 +529,47 @@ class CSocNetLogDestination
 			$bEmployeesOnly
 			|| ($bBitrix24Enable && !$bExtranetEnable)
 		)
+		{
 			$arFilter["!UF_DEPARTMENT"] = false;
+		}
+		elseif ($bExtranetOnly)
+		{
+			$arFilter["UF_DEPARTMENT"] = false;
+		}
 
 		$arExtParams = Array(
 			"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"),
 			"NAV_PARAMS" => Array("nTopCount" => 20)
 		);
 		if ($bIntranetEnable)
+		{
 			$arExtParams['SELECT'] = array('UF_DEPARTMENT');
+		}
 		$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc', 'IS_ONLINE'=>'desc')), ($dummy=''), $arFilter, $arExtParams);
-		while ($arUser = $dbUsers->Fetch())
+		while ($arUser = $dbUsers->GetNext())
 		{
 			if (
 				!$bSelf
 				&& is_object($GLOBALS["USER"])
 				&& $GLOBALS["USER"]->GetID() == $arUser['ID']
 			)
+			{
 				continue;
+			}
 
 			$arTmpUsers[$arUser["ID"]] = $arUser;
 			if(
 				$bIntranetEnable
 				&& $bExtranetEnable
-				&& (!is_array($arUser["UF_DEPARTMENT"])
-				|| empty($arUser["UF_DEPARTMENT"]))
+				&& !$bEmployeesOnly
+				&& (
+					!is_array($arUser["UF_DEPARTMENT"])
+					|| empty($arUser["UF_DEPARTMENT"])
+				)
 			)
+			{
 				$arExtranetTestUsers[$arUser["ID"]] = $arUser["ID"];
+			}
 		}
 
 		if (
@@ -528,7 +594,9 @@ class CSocNetLogDestination
 				array("ID", "GROUP_ID")
 			);
 			while($arGroup = $rsGroups->Fetch())
+			{
 				$arUserSocNetGroups[] = $arGroup["GROUP_ID"];
+			}
 
 			if (count($arUserSocNetGroups) > 0)
 			{
@@ -544,18 +612,24 @@ class CSocNetLogDestination
 					array("ID", "USER_ID", "GROUP_ID")
 				);
 				while ($ar = $dbUsersInGroup->GetNext(true, false))
+				{
 					$arSelect[$ar["USER_ID"]] = $ar["USER_ID"];
+				}
 
 				foreach ($arExtranetTestUsers as $userId)
 				{
 					if (!isset($arSelect[$userId]))
+					{
 						unset($arTmpUsers[$userId]);
+					}
 				}
 			}
 			else
 			{
 				foreach ($arExtranetTestUsers as $userId)
+				{
 					unset($arTmpUsers[$userId]);
+				}
 			}
 		}
 
@@ -597,6 +671,18 @@ class CSocNetLogDestination
 				foreach ($arParams['id'] as $value)
 					$arSelect[] = intval($value);
 		}
+		
+		if (
+			isset($arParams['site_id'])
+			&& strlen($arParams['site_id']) > 0
+		)
+		{
+			$siteId = $arParams['site_id'];
+		}
+		else
+		{
+			$siteId = SITE_ID;		
+		}
 
 		$arSocnetGroupsTmp = array();
 		$rsGroups = CSocNetUserToGroup::GetList(
@@ -605,7 +691,7 @@ class CSocNetLogDestination
 				"USER_ID" => $userId,
 				"ID" => $arSelect,
 				"<=ROLE" => SONET_ROLES_USER,
-				"GROUP_SITE_ID" => SITE_ID,
+				"GROUP_SITE_ID" => $siteId,
 				"GROUP_ACTIVE" => "Y"
 			),
 			false,

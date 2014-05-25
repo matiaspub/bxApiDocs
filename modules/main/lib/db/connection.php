@@ -46,11 +46,26 @@ abstract class Connection
 		$this->dbName = $configuration['database'];
 		$this->dbLogin = $configuration['login'];
 		$this->dbPassword = $configuration['password'];
-		$this->dbInitCommand = $configuration['initCommand'];
+		$this->dbInitCommand = isset($configuration['initCommand']) ? $configuration['initCommand'] : "";
 
 		$this->dbOptions = intval($configuration['options']);
 		if ($this->dbOptions < 0)
 			$this->dbOptions = self::PERSISTENT | self::DEFERRED;
+	}
+
+	public function getDbHost()
+	{
+		return $this->dbHost;
+	}
+
+	public function getDbLogin()
+	{
+		return $this->dbLogin;
+	}
+
+	public function getDbName()
+	{
+		return $this->dbName;
 	}
 
 	public function setConnectionResourceNoDemand(&$dbCon)
@@ -373,6 +388,13 @@ abstract class Connection
 		$tableFields = $this->getTableFields($tableName);
 
 		return isset($tableFields[$columnName]) ? $tableFields[$columnName] : null;
+	}
+
+	abstract public function renameTable($currentName, $newName);
+
+	public function dropColumn($tableName, $columnName)
+	{
+		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP COLUMN '.$this->getSqlHelper()->quote($columnName));
 	}
 
 	/*********************************************************

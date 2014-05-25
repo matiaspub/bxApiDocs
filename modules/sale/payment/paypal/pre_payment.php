@@ -14,6 +14,9 @@ class CSalePaySystemPrePayment
 	var $payerId = "";
 	var $encoding = "";
 	var $version = "";
+	var $notifyUrl = "";
+	var $taxAmount = "";
+	var $deliveryAmount = "";
 
 	public function init()
 	{
@@ -22,6 +25,11 @@ class CSalePaySystemPrePayment
 		$this->signature = CSalePaySystemAction::GetParamValue("SIGNATURE");
 		$this->currency = CSalePaySystemAction::GetParamValue("CURRENCY");
 		$this->testMode = (CSalePaySystemAction::GetParamValue("TEST") == "Y");
+		$this->notifyUrl = CSalePaySystemAction::GetParamValue("NOTIFY_URL");
+
+		if(strlen($this->currency) <= 0)
+			$this->currency =CSaleLang::GetLangCurrency(SITE_ID);
+
 		if($this->testMode)
 			$this->domain = "sandbox.";
 		if(strlen($_REQUEST["token"]) > 0)
@@ -53,17 +61,24 @@ class CSalePaySystemPrePayment
 	
 	public static function BasketButtonShow()
 	{
+		if(LANGUAGE_ID == "ru")
+			$imgSrc = "//www.1c-bitrix.ru/download/sale/paypal.jpg";
+		elseif(LANGUAGE_ID == "de")
+			$imgSrc = "//www.paypal.com/de_DE/i/btn/btn_xpressCheckout.gif";
+		else
+			$imgSrc = "//www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif";
 		return "
 		<form action=\"".POST_FORM_ACTION_URI."\" method=\"post\" name=\"paypal\">
 			<input type=\"hidden\" name=\"paypal\" value=\"Y\">
-			<input type=\"image\" name=\"paypalbutton\" value=\"".GetMessage("PPL_BUTTON")."\" src=\"https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif\">
+			<input style=\"padding-top:7px;\" type=\"image\" name=\"paypalbutton\" value=\"".GetMessage("PPL_BUTTON")."\" src=\"".$imgSrc."\">
 		</form>";
 	}
 
 	public function BasketButtonAction($orderData = array())
 	{
 		global $APPLICATION;
-		if($_POST["paypal"] == "Y")
+
+		if(strlen($_POST["paypalbutton"]) > 0 || $_POST["paypal"] == "Y")
 		{
 			$url = "https://api-3t.".$this->domain."paypal.com/nvp";
 
@@ -73,17 +88,31 @@ class CSalePaySystemPrePayment
 					"USER" => $this->username,
 					"PWD" => $this->pwd,
 					"SIGNATURE" => $this->signature,
-					"AMT" => $orderData["AMOUNT"],
-					"CURRENCYCODE" => $this->currency,
+					"PAYMENTREQUEST_0_AMT" => number_format($orderData["AMOUNT"], 2, ".", ""),
+					"PAYMENTREQUEST_0_CURRENCYCODE" => $this->currency,
 					"RETURNURL" => $this->serverName.$orderData["PATH_TO_ORDER"],
 					"CANCELURL" => $this->serverName.$APPLICATION->GetCurPageParam("paypal=Y&paypal_error=Y", array("paypal", "paypal_error")),
-					"PAYMENTACTION" => "Authorization",
+					"PAYMENTREQUEST_0_PAYMENTACTION" => "Authorization",
+					"PAYMENTREQUEST_0_DESC" => "Order payment for ".$this->serverName,
+					"LOCALECODE" => ToUpper(LANGUAGE_ID),
+					"buttonsource" => "Bitrix_Cart",
 				);
+
+			if(!empty($orderData["BASKET_ITEMS"]))
+			{
+				$arFields["PAYMENTREQUEST_0_ITEMAMT"] = number_format($orderData["AMOUNT"], 2, ".", "");
+				foreach($orderData["BASKET_ITEMS"] as $k => $val)	
+				{
+					$arFields["L_PAYMENTREQUEST_0_NAME".$k] = $APPLICATION->ConvertCharset($val["NAME"], SITE_CHARSET, "utf-8");
+					$arFields["L_PAYMENTREQUEST_0_AMT".$k] = number_format($val["PRICE"], 2, ".", "");
+					$arFields["L_PAYMENTREQUEST_0_QTY".$k] = $val["QUANTITY"];
+				}
+			}
 
 			$arFields["RETURNURL"] .= ((strpos($arFields["RETURNURL"], "?") === false) ? "?" : "&")."paypal=Y";
 
-			$ht = new CHTTP();
-			if($res = $ht->Post($url, $arFields))
+			$ht = new \Bitrix\Main\Web\HttpClient(array("version" => "1.1"));
+			if($res = $ht->post($url, $arFields))
 			{
 				$result = $this->parseResult($res);
 
@@ -107,11 +136,15 @@ class CSalePaySystemPrePayment
 
 	public function getHiddenInputs()
 	{
-		return "
+		$result = "
 			<input type=\"hidden\" name=\"paypal\" value=\"Y\">
 			<input type=\"hidden\" name=\"token\" value=\"".htmlspecialcharsbx($this->token)."\">
 			<input type=\"hidden\" name=\"PayerID\" value=\"".htmlspecialcharsbx($this->payerId)."\">
 		";
+
+		if(strlen($this->token) > 0)
+			$result .= "<span style='color: green'>".GetMessage("PPL_PREAUTH_TEXT")."<br /><br /></span>";
+		return $result;
 	}
 
 	public function isAction()
@@ -149,14 +182,14 @@ class CSalePaySystemPrePayment
 					"USER" => $this->username,
 					"PWD" => $this->pwd,
 					"SIGNATURE" => $this->signature,
-					"TOKEN" => $this->token,				
+					"TOKEN" => $this->token,
+					"buttonsource" => "Bitrix_Cart",
 				);
 
-			$ht = new CHTTP();
-			if($res = $ht->Post($url, $arFields))
+			$ht = new \Bitrix\Main\Web\HttpClient(array("version" => "1.1"));
+			if($res = $ht->post($url, $arFields))
 			{
 				$result = $this->parseResult($res);
-
 				if($result["ACK"] == "Success")
 				{
 					$arResult = array(
@@ -168,6 +201,7 @@ class CSalePaySystemPrePayment
 						"STATE" => $result["SHIPTOSTATE"],
 						"CITY" => $result["SHIPTOCITY"],
 						"LOCATION" => $result["SHIPTOCITY"],
+						"PP_SOURCE" => $result,
 						);
 					return $arResult;
 				}
@@ -175,10 +209,11 @@ class CSalePaySystemPrePayment
 		}
 	}
 
-	public function payOrder()
+	public function payOrder($orderData = array())
 	{
 		if(strlen($this->token) > 0)
 		{
+			global $APPLICATION;
 			$url = "https://api-3t.".$this->domain."paypal.com/nvp";
 			$arFields = array(
 					"METHOD" => "GetExpressCheckoutDetails",
@@ -186,28 +221,62 @@ class CSalePaySystemPrePayment
 					"USER" => $this->username,
 					"PWD" => $this->pwd,
 					"SIGNATURE" => $this->signature,
-					"TOKEN" => $this->token,				
+					"TOKEN" => $this->token,
+					"buttonsource" => "Bitrix_Cart",
 				);
 
-			$ht = new CHTTP();
-			if($res = $ht->Post($url, $arFields))
+			$ht = new \Bitrix\Main\Web\HttpClient(array("version" => "1.1"));
+			if($res = $ht->post($url, $arFields))
 			{
 				$result = $this->parseResult($res);
-
 				if($result["ACK"] == "Success" && in_array($result["CHECKOUTSTATUS"], array("PaymentActionNotInitiated")))
 				{
 					$arFields["METHOD"] = "DoExpressCheckoutPayment";
 					$arFields["PAYERID"] = $this->payerId;
 					$arFields["PAYMENTACTION"] = "Sale";
-					$arFields["AMT"] = $this->orderAmount;
-					$arFields["CURRENCYCODE"] = $this->currency;
-					$arFields["DESC"] = "Order #".$this->orderId;
+					$arFields["PAYMENTREQUEST_0_AMT"] = number_format($this->orderAmount, 2, ".", "");
+					$arFields["PAYMENTREQUEST_0_CURRENCYCODE"] = $this->currency;
+					$arFields["PAYMENTREQUEST_0_DESC"] = "Order #".$this->orderId;
+					$arFields["PAYMENTREQUEST_0_NOTETEX"] = "Order #".$this->orderId;
+					$arFields["PAYMENTREQUEST_0_INVNUM"] = $this->orderId;
+
+					if(DoubleVal($this->deliveryAmount) > 0)
+					{
+						$arFields["PAYMENTREQUEST_0_SHIPPINGAMT"] = number_format($this->deliveryAmount, 2, ".", "");
+					}
+					$orderProps = $this->getProps();
+
+					if(!empty($orderProps))
+					{
+						$arFields["PAYMENTREQUEST_0_SHIPTONAME"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTONAME"], SITE_CHARSET, "utf-8");
+						$arFields["PAYMENTREQUEST_0_SHIPTOSTREET"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOSTREET"], SITE_CHARSET, "utf-8");
+						$arFields["PAYMENTREQUEST_0_SHIPTOSTREET2"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOSTREET2"], SITE_CHARSET, "utf-8");
+						$arFields["PAYMENTREQUEST_0_SHIPTOCITY"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOCITY"], SITE_CHARSET, "utf-8");
+						$arFields["PAYMENTREQUEST_0_SHIPTOSTATE"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOSTATE"], SITE_CHARSET, "utf-8");
+						$arFields["PAYMENTREQUEST_0_SHIPTOZIP"] = $orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOZIP"];
+						$arFields["PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE"] = $APPLICATION->ConvertCharset($orderProps["PP_SOURCE"]["PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE"], SITE_CHARSET, "utf-8");
+					}
+
+					if(!empty($orderData["BASKET_ITEMS"]))
+					{
+						$arFields["PAYMENTREQUEST_0_ITEMAMT"] = number_format($this->orderAmount-$this->deliveryAmount, 2, ".", "");
+						foreach($orderData["BASKET_ITEMS"] as $k => $val)	
+						{
+							$arFields["L_PAYMENTREQUEST_0_NAME".$k] = $APPLICATION->ConvertCharset($val["NAME"], SITE_CHARSET, "utf-8");
+							$arFields["L_PAYMENTREQUEST_0_AMT".$k] = number_format($val["PRICE"], 2, ".", "");
+							$arFields["L_PAYMENTREQUEST_0_QTY".$k] = $val["QUANTITY"];
+							$arFields["L_PAYMENTREQUEST_0_NUMBER".$k] = $val["PRODUCT_ID"];
+						}
+					}
+
+					if(strlen($this->notifyUrl) > 0)
+						$arFields["PAYMENTREQUEST_0_NOTIFYURL"] = $this->notifyUrl;
 
 					if($res2 = $ht->Post($url, $arFields))
 					{
 						$result2 = $this->parseResult($res2);
 
-						if($result2["ACK"] == "Success" && $result2["PAYMENTSTATUS"] == "Completed")
+						if($result2["ACK"] == "Success" && in_array($result2["PAYMENTINFO_0_PAYMENTSTATUS"], array("Completed")))
 						{
 							CSaleOrder::PayOrder($this->orderId, "Y");
 							$strPS_STATUS_MESSAGE = "";
@@ -215,19 +284,19 @@ class CSalePaySystemPrePayment
 							$strPS_STATUS_MESSAGE .= "Email: ".$result["EMAIL"]."; ";
 							
 							$strPS_STATUS_DESCRIPTION = "";
-							$strPS_STATUS_DESCRIPTION .= "Payment status: ".$result2["PAYMENTSTATUS"]."; ";
-							$strPS_STATUS_DESCRIPTION .= "Payment sate: ".$result2["ORDERTIME"]."; ";
+							$strPS_STATUS_DESCRIPTION .= "Payment status: ".$result2["PAYMENTINFO_0_PAYMENTSTATUS"]."; ";
+							$strPS_STATUS_DESCRIPTION .= "Payment sate: ".$result2["PAYMENTINFO_0_ORDERTIME"]."; ";
 
 							$arOrderFields = array(
 									"PS_STATUS" => "Y",
 									"PS_STATUS_CODE" => "-",
 									"PS_STATUS_DESCRIPTION" => $strPS_STATUS_DESCRIPTION,
 									"PS_STATUS_MESSAGE" => $strPS_STATUS_MESSAGE,
-									"PS_SUM" => $result2["AMT"],
-									"PS_CURRENCY" => $result2["CURRENCYCODE"],
-									"PS_RESPONSE_DATE" => Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
-									"PAY_VOUCHER_NUM" => $result2["TRANSACTIONID"],
-									"PAY_VOUCHER_DATE" => Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
+									"PS_SUM" => $result2["PAYMENTINFO_0_AMT"],
+									"PS_CURRENCY" => $result2["PAYMENTINFO_0_CURRENCYCODE"],
+									"PS_RESPONSE_DATE" => ConvertTimeStamp(false, "FULL"),
+									"PAY_VOUCHER_NUM" => $result2["PAYMENTINFO_0_TRANSACTIONID"],
+									"PAY_VOUCHER_DATE" => ConvertTimeStamp(false, "FULL"),
 								);
 						}
 						else
@@ -237,20 +306,20 @@ class CSalePaySystemPrePayment
 							$strPS_STATUS_MESSAGE .= "Email: ".$result["EMAIL"]."; ";
 							
 							$strPS_STATUS_DESCRIPTION = "";
-							$strPS_STATUS_DESCRIPTION .= "Payment status: ".$result2["PAYMENTSTATUS"]."; ";
-							$strPS_STATUS_DESCRIPTION .= "Pending reason: ".$result2["PENDINGREASON"]."; ";
-							$strPS_STATUS_DESCRIPTION .= "Payment sate: ".$result2["ORDERTIME"]."; ";
+							$strPS_STATUS_DESCRIPTION .= "Payment status: ".$result2["PAYMENTINFO_0_PAYMENTSTATUS"]."; ";
+							$strPS_STATUS_DESCRIPTION .= "Pending reason: ".$result2["PAYMENTINFO_0_PENDINGREASON"]."; ";
+							$strPS_STATUS_DESCRIPTION .= "Payment sate: ".$result2["PAYMENTINFO_0_ORDERTIME"]."; ";
 
 							$arOrderFields = array(
 									"PS_STATUS" => "N",
-									"PS_STATUS_CODE" => $result2["PAYMENTSTATUS"],
+									"PS_STATUS_CODE" => $result2["PAYMENTINFO_0_PAYMENTSTATUS"],
 									"PS_STATUS_DESCRIPTION" => $strPS_STATUS_DESCRIPTION,
 									"PS_STATUS_MESSAGE" => $strPS_STATUS_MESSAGE,
-									"PS_SUM" => $result2["AMT"],
-									"PS_CURRENCY" => $result2["CURRENCYCODE"],
-									"PS_RESPONSE_DATE" => Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
-									"PAY_VOUCHER_NUM" => $result2["TRANSACTIONID"],
-									"PAY_VOUCHER_DATE" => Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
+									"PS_SUM" => $result2["PAYMENTINFO_0_AMT"],
+									"PS_CURRENCY" => $result2["PAYMENTINFO_0_CURRENCYCODE"],
+									"PS_RESPONSE_DATE" => ConvertTimeStamp(false, "FULL"),
+									"PAY_VOUCHER_NUM" => $result2["PAYMENTINFO_0_TRANSACTIONID"],
+									"PAY_VOUCHER_DATE" => ConvertTimeStamp(false, "FULL"),
 								);
 						}
 						CSaleOrder::Update($this->orderId, $arOrderFields);

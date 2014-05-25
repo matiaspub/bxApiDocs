@@ -69,9 +69,10 @@ class CVoteEvent extends CAllVoteEvent
 						$str = ($strNegative=="Y"?" ".$key." IS NULL OR NOT ":"")."(".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$val = array_map("intval", $val);
-							$str = ($strNegative=="Y"?" NOT ":"")."(".$key." IN (".implode(",", $val)."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -138,12 +139,12 @@ class CVoteEvent extends CAllVoteEvent
 					"INNER JOIN b_vote_event_question VEQ ON (VEQ.EVENT_ID = VE.ID) \n\t".
 					"INNER JOIN b_vote_event_answer VEA ON (VEA.EVENT_QUESTION_ID = VEQ.ID) \n\t".
 					"LEFT JOIN b_vote_user VU ON (VU.ID = VE.VOTE_USER_ID)\n\t".
-					"LEFT JOIN b_rating_user RV ON (RV.ENTITY_ID = VU.AUTH_USER_ID)\n".
+					"LEFT JOIN b_rating_user RV ON (RV.ENTITY_ID = VU.AUTH_USER_ID AND RV.RATING_ID = ".intval(CRatings::GetAuthorityRating()).")\n".
 					($arFilter["bGetVoters"] > 0 ?
 						"\tLEFT JOIN b_rating_vote RV0 ON (RV0.USER_ID = ".$arFilter["bGetVoters"]." AND RV0.OWNER_ID = VU.AUTH_USER_ID) \n" : "").
 				" WHERE 1=1 ".$strSqlSearch."\n".
 				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID".$strSqlGroup."\n".
-				" ORDER BY ".(IsModuleInstalled("intranet") ? "RV.VOTE_WEIGHT DESC, RANK DESC" : "RANK DESC, RV.VOTE_WEIGHT DESC");
+				" ORDER BY ".(IsModuleInstalled("intranet") ? "RV.VOTE_WEIGHT DESC, RANK DESC" : "RANK DESC, RV.VOTE_WEIGHT DESC").", VU.AUTH_USER_ID ASC";
 				$db_res = new CDBResult();
 				$db_res->NavQuery($strSql, $res["CNT"], $arParams);
 			}

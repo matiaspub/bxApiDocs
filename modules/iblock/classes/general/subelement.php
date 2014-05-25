@@ -106,8 +106,7 @@ class CAdminSubList extends CAdminList
 		}
 
 		CJSCore::RegisterExt('subelement', $arJSDescr);
-
-		CUtil::InitJSCore(array("subelement"));
+		CJSCore::Init(array("subelement"));
 
 		$this->strListUrlParams = '';
 		$this->arListUrlParams = array();
@@ -292,7 +291,7 @@ class CAdminSubList extends CAdminList
 
 	public function AddVisibleHeaderColumn($id)
 	{
-		if (!in_array($id, $this->arVisibleColumns) && !in_array($strID,$this->arHideHeaders))
+		if (!in_array($id, $this->arVisibleColumns) && !in_array($id,$this->arHideHeaders))
 			$this->arVisibleColumns[] = $id;
 	}
 
@@ -902,6 +901,14 @@ class CAdminSubListRow extends CAdminListRow
 						echo '<span style="white-space:nowrap;"><input type="text" '.$this->__AttrGen($field["edit"]["attributes"]).' name="FIELDS['.htmlspecialcharsbx($this->id).']['.htmlspecialcharsbx($id).']" value="'.htmlspecialcharsbx($val).'">';
 						echo CAdminCalendar::Calendar('FIELDS['.htmlspecialcharsbx($this->id).']['.htmlspecialcharsbx($id).']').'</span>';
 						break;
+					case "file":
+						echo CFileInput::Show(
+							'FIELDS['.htmlspecialcharsbx($this->id).']['.htmlspecialcharsbx($id).']',
+							$val,
+							$field["edit"]["showInfo"],
+							$field["edit"]["inputs"]
+						);
+						break;
 					default:
 						echo $field["edit"]['value'];
 				}
@@ -913,28 +920,52 @@ class CAdminSubListRow extends CAdminListRow
 					$val = trim($this->arRes[$id]);
 				else
 					$val = $this->arRes[$id];
-				switch($field["view"]["type"])
+								if(isset($field["view"]))
 				{
-					case "checkbox":
-						if($val=='Y')
-							$val = GetMessage("admin_lib_list_yes");
-						else
-							$val = GetMessage("admin_lib_list_no");
-						break;
-					case "select":
-						if($field["edit"]["values"][$val])
-							$val = $field["edit"]["values"][$val];
-						break;
+					switch($field["view"]["type"])
+					{
+						case "checkbox":
+							if($val=='Y')
+								$val = htmlspecialcharsex(GetMessage("admin_lib_list_yes"));
+							else
+								$val = htmlspecialcharsex(GetMessage("admin_lib_list_no"));
+							break;
+						case "select":
+							if($field["edit"]["values"][$val])
+								$val = htmlspecialcharsex($field["edit"]["values"][$val]);
+							break;
+						case "file":
+							if ($val > 0)
+								$val = CFileInput::Show(
+									'NO_FIELDS['.htmlspecialcharsbx($this->id).']['.htmlspecialcharsbx($id).']',
+									$val,
+									$field["view"]["showInfo"],
+									$field["view"]["inputs"]
+								);
+							else
+								$val = '';
+							break;
+						case "html":
+							$val = $field["view"]['value'];
+							break;
+						default:
+							$val = htmlspecialcharsex($val);
+							break;
+					}
 				}
-				if($field["view"]['type']=='html')
-					$val = $field["view"]['value'];
 				else
+				{
 					$val = htmlspecialcharsex($val);
+				}
 
-				echo '<td class="adm-list-table-cell'.($header_props['align']?' align-'.$header_props['align']:'').' '.($header_props['valign']?' valign-'.$header_props['valign']:'').'">';
-				echo ((string)$val <> ""? $val:'&nbsp;');
-				if($field["edit"]["type"] == "calendar")
-					echo CAdminCalendar::ShowScript();
+				echo '<td class="adm-list-table-cell',
+					(isset($header_props['align']) && $header_props['align']? ' align-'.$header_props['align']: ''),
+					(isset($header_props['valign']) && $header_props['valign']? ' valign-'.$header_props['valign']: ''),
+					($id === $last_id? ' adm-list-table-cell-last': ''),
+				'">';
+				echo ((string)$val <> ""? $val: '&nbsp;');
+				if(isset($field["edit"]) && $field["edit"]["type"] == "calendar")
+					CAdminCalendar::ShowScript();
 				echo '</td>';
 			}
 		}
@@ -1319,7 +1350,7 @@ class CAdminSubForm extends CAdminForm
 					);
 				}
 			}
-			$s .= '<div class="adm-detail-subsettings-cont">';
+			$s .= '<span class="adm-detail-subsettings-cont">';
 			if (count($aAdditionalMenu) > 1)
 			{
 				$sMenuUrl = "BX.adminShowMenu(this, ".htmlspecialcharsbx(CAdminPopupEx::PhpToJavaScript($aAdditionalMenu)).", {active_class: 'bx-settings-btn-active'});";
@@ -1331,7 +1362,7 @@ class CAdminSubForm extends CAdminForm
 			{
 				$s .= '<a class="adm-detail-subsettings" href="javascript:void(0)" onclick="'.$aAdditionalMenu[0]['ONCLICK'].';"></a>';
 			}
-			$s .= '</div>';
+			$s .= '</span>';
 		}
 
 		return $s.CAdminTabControl::ShowTabButtons();

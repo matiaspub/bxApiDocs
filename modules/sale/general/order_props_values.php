@@ -69,27 +69,27 @@ class CAllSaleOrderPropsValue
 
 	
 	/**
-	 * <p>Функция возвращает параметры значения с кодом ID свойства заказа.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код значения свойства заказа.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров значения
-	 * свойства с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	 * <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код значения свойства заказа.</td> </tr>
-	 * <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код
-	 * свойства.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
-	 * <td>Значение свойства.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	 * свойства.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__getbyid.54043fd5.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры значения с кодом ID свойства заказа.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код значения свойства заказа.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров значения
+	* свойства с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
+	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код значения свойства заказа.</td> </tr>
+	* <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код
+	* свойства.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
+	* <td>Значение свойства.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
+	* свойства.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__getbyid.54043fd5.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -110,38 +110,38 @@ class CAllSaleOrderPropsValue
 
 	
 	/**
-	 * <p>Функция обновляет параметры значения с кодом ID свойства заказа на параметры из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код значения свойства заказа.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров значения свойства, ключами в
-	 * котором являются названия параметров значения свойства, а
-	 * значениями - соответствующие новые значения. <br><br> Допустимые
-	 * ключи: <ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li> <b>ORDER_PROPS_ID</b> - код
-	 * свойства;</li> <li> <b>NAME</b> - название свойства;</li> <li> <b>VALUE</b> - значение
-	 * свойства;</li> <li> <b>CODE</b> - мнемонический код свойства.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Функция возвращает код обновленного значения свойства или
-	 * <i>false</i> в случае ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>CSaleOrderPropsValue::Update(8, array("CODE"=&gt;"ADDRESS"));<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__update.4d3a46b6.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры значения с кодом ID свойства заказа на параметры из массива arFields.</p> <p><b>Примечание:</b> если при оформлении заказа не были заполнены какие-то свойства, то эти свойства обновить потом не получится, т.к. их нет в базе данных (незаполненные свойства не имеют пустых значений в базе). Поэтому, если нужно заполнить такое свойство, то сперва нужно создать его через <a href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__add.af505780.php">CSaleOrderPropsValue::Add</a> и только затем значение этого свойства будет доступно для <b>CSaleOrderPropsValue::Update</b> и <a href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__getlist.52da0d54.php">CSaleOrderPropsValue::Getlist</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код значения свойства заказа.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров значения свойства, ключами в
+	* котором являются названия параметров значения свойства, а
+	* значениями - соответствующие новые значения. <br><br> Допустимые
+	* ключи: <ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li> <b>ORDER_PROPS_ID</b> - код
+	* свойства;</li> <li> <b>NAME</b> - название свойства;</li> <li> <b>VALUE</b> - значение
+	* свойства;</li> <li> <b>CODE</b> - мнемонический код свойства.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Функция возвращает код обновленного значения свойства или
+	* <i>false</i> в случае ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>CSaleOrderPropsValue::Update(8, array("CODE"=&gt;"ADDRESS"));<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/csaleorderpropsvalue__update.4d3a46b6.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;

@@ -19,72 +19,85 @@ class CIBlock extends CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Возвращает список информационных блоков по фильтру <i>arFilter</i> отсортированный в порядке <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки результата. Содержит пары "<i>поле
-	 * сортировки</i>"=&gt;"<i>направление сортировки</i>". Поле для сортировки
-	 * может принимать значения: <ul> <li> <b>id </b> - код раздела;</li> <li> <b>iblock_type
-	 * </b> - тип раздела;</li> <li> <b>name </b> - название раздела;</li> <li> <b>active </b> -
-	 * активность;</li> <li> <b>code</b> - символьный код;</li> <li> <b>sort </b> - индекс
-	 * сортировки;</li> <li> <b>element_cnt </b> - количество элементов (только если
-	 * <i>bIncCnt</i> = true);</li> <li> <b>timestamp_x </b> - дата последнего изменения.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	 * Фильтруемое поле может принимать значения: <ul> <li> <i>ACTIVE</i> - фильтр
-	 * по активности (Y|N);</li> <li> <i>NAME</i> - по названию (можно искать по
-	 * шаблону [%_]);</li> <li> <i>EXTERNAL_ID</i>, <i>XML_ID </i> - по внешнему коду;</li> <li>
-	 * <i>SITE_ID</i> - по сайту;</li> <li> <i>TYPE</i> - по типу раздела;</li> <li> <i>CODE</i> - по
-	 * мнемоническому коду;</li> <li> <i>ID</i> - по коду;</li> <li> <i>VERSION</i> - по флагу
-	 * хранения значений свойств элементов инфоблока;</li> <li> <i>CNT_ACTIVE</i> -
-	 * только если <i>bIncCnt</i> = true. Если значение Y, то при подсчете
-	 * элементов будут учитываться только активные элементы, при любом
-	 * другом значении все элементы;</li> <li> <i>CNT_ALL</i> - только если <i>bIncCnt</i> =
-	 * true. Если значение Y, то при подсчете элементов будут учитываться и
-	 * те элементы, которые ещё не были опубликованы. При любом другом
-	 * значении все элементы;</li> <li> <i>MIN_PERMISSION</i> - фильтр по правам
-	 * доступа, по умолчанию принимает <i>R</i> (уровень доступа
-	 * <i>Чтение</i>).</li> <li> <i>CHECK_PERMISSIONS</i> - если "N", то права на доступ не
-	 * проверяются.</li> </ul> Перед названием фильтруемого поля можно
-	 * указать тип фильтрации: <ul> <li>"!" - не равно</li> <li>"&lt;" - меньше</li>
-	 * <li>"&lt;=" - меньше либо равно</li> <li>"&gt;" - больше</li> <li>"&gt;=" - больше либо
-	 * равно</li> </ul> Все фильтруемые поля кроме (CHECK_PERMISSIONS, MIN_PERMISSION, CNT_ALL и
-	 * CNT_ACTIVE) могут содержать перед названием <a
-	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
-	 * фильтра</a>. <br> "<i>значения фильтра</i>" - одиночное значение или
-	 * массив. <br><br> Необязательное. По умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @param bool $bIncCnt = false Возвращать ли количество элементов в информационном блоке в поле
-	 * <i>ELEMENT_CNT</i>. Не обязательный параметр, по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>// выберем все активные информационные блоки для текущего сайта типа catalog<br>// у которых мнемонический код не my_products, со счетчиком активных элементов.<br>$res = CIBlock::GetList(<br>	Array(), <br>	Array(<br>		'TYPE'=&gt;'catalog', <br>		'SITE_ID'=&gt;SITE_ID, <br>		'ACTIVE'=&gt;'Y', <br>		"CNT_ACTIVE"=&gt;"Y", <br>		"!CODE"=&gt;'my_products'<br>	), true<br>);<br>while($ar_res = $res-&gt;Fetch())<br>{<br>	echo $ar_res['NAME'].': '.$ar_res['ELEMENT_CNT'];<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля CIBlock</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список информационных блоков по фильтру <i>arFilter</i> отсортированный в порядке <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки результата. Содержит пары "<i>поле
+	* сортировки</i>"=&gt;"<i>направление сортировки</i>". Поле для сортировки
+	* может принимать значения: <ul> <li> <b>id </b> - код инфоблока;</li> <li>
+	* <b>iblock_type </b> - тип инфоблоков;</li> <li> <b>name </b> - название инфоблока;</li>
+	* <li> <b>active </b> - активность;</li> <li> <b>code</b> - символьный код;</li> <li> <b>sort </b>
+	* - индекс сортировки;</li> <li> <b>element_cnt </b> - количество элементов
+	* (только если <i>bIncCnt</i> = true);</li> <li> <b>timestamp_x </b> - дата последнего
+	* изменения.</li> </ul>
+	*
+	*
+	*
+	* @param array $arFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	* Фильтруемое поле может принимать значения: <ul> <li> <i>ACTIVE</i> - фильтр
+	* по активности (Y|N);</li> <li> <i>NAME</i> - по названию (можно искать по
+	* шаблону [%_]);</li> <li> <i>EXTERNAL_ID</i>, <i>XML_ID </i> - по внешнему коду;</li> <li>
+	* <i>SITE_ID</i> - по сайту;</li> <li> <i>TYPE</i> - по типу инфоблоков;</li> <li> <i>CODE</i> -
+	* по мнемоническому коду;</li> <li> <i>ID</i> - по коду;</li> <li> <i>VERSION</i> - по
+	* флагу хранения значений свойств элементов инфоблока;</li> <li>
+	* <i>CNT_ACTIVE</i> - только если <i>bIncCnt</i> = true. Если значение Y, то при
+	* подсчете элементов будут учитываться только активные элементы,
+	* при любом другом значении все элементы;</li> <li> <i>CNT_ALL</i> - только
+	* если <i>bIncCnt</i> = true. Если значение Y, то при подсчете элементов будут
+	* учитываться и те элементы, которые ещё не были опубликованы. При
+	* любом другом значении все элементы;</li> <li> <i>INDEX_ELEMENT</i> - по флагу
+	* "Индексировать элементы для модуля поиска".<br><br><b>Примечание:</b>
+	* интуитивная фильтрация по этому полю не работает: <pre class="syntax"> $dbIb =
+	* CIBlock::GetList( Array("SORT"=&gt;"ASC"), Array("ACTIVE" =&gt; "Y", "INDEX_ELEMENT" =&gt; "Y"), false ); </pre>
+	* Следует отсекать неиндексируемые инфоблоки при переборе
+	* массива, возвращаемого методом GetList.<br><br> </li> <li> <i>MIN_PERMISSION</i> -
+	* фильтр по правам доступа, по умолчанию принимает <i>R</i> (уровень
+	* доступа <i>Чтение</i>).</li> <li> <i>CHECK_PERMISSIONS</i> - если "N", то права на
+	* доступ не проверяются. <br><br> Если проверка прав не нужна, то для
+	* ускорения запроса следует указывать значение "N". Кроме того, если
+	* не указать данный параметр в фильтре или при создании инфоблока
+	* не изменить параметр по умолчанию "нет доступа", то результат
+	* выдачи обычному пользователю будет пустым.</li> </ul> Перед названием
+	* фильтруемого поля можно указать тип фильтрации: <ul> <li>"!" - не
+	* равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше либо равно</li> <li>"&gt;" -
+	* больше</li> <li>"&gt;=" - больше либо равно</li> </ul> Все фильтруемые поля
+	* кроме (CHECK_PERMISSIONS, MIN_PERMISSION, CNT_ALL и CNT_ACTIVE) могут содержать перед
+	* названием <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип
+	* проверки фильтра</a>. <br> "<i>значения фильтра</i>" - одиночное значение
+	* или массив. <br><br> Необязательное. По умолчанию записи не
+	* фильтруются.
+	*
+	*
+	*
+	* @param bool $bIncCnt = false Возвращать ли количество элементов в информационном блоке в поле
+	* <i>ELEMENT_CNT</i>. Необязательный параметр, по умолчанию равен false.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <b>Примечание:</b> при копировании кода в свой проект рекомендуется убрать необязательный параметр bIncCnt (если он не используется), чтобы избежать проблем с производительностью.
+	* 
+	* &lt;?<br>// выберем все активные информационные блоки для текущего сайта типа catalog<br>// у которых мнемонический код не my_products, со счетчиком активных элементов.<br>$res = CIBlock::GetList(<br>	Array(), <br>	Array(<br>		'TYPE'=&gt;'catalog', <br>		'SITE_ID'=&gt;SITE_ID, <br>		'ACTIVE'=&gt;'Y', <br>		"CNT_ACTIVE"=&gt;"Y", <br>		"!CODE"=&gt;'my_products'<br>	), true<br>);<br>while($ar_res = $res-&gt;Fetch())<br>{<br>	echo $ar_res['NAME'].': '.$ar_res['ELEMENT_CNT'];<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля CIBlock</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $bIncCnt = false)
 	{
 		global $DB, $USER;
@@ -165,6 +178,8 @@ class CIBlock extends CAllIBlock
 			if($min_permission >= "X")
 				$operation = "'iblock_edit'";
 			elseif($min_permission >= "U")
+				$operation = "'element_edit'";
+			elseif($min_permission >= "S")
 				$operation = "'iblock_admin_display'";
 			else
 				$operation = "'section_read', 'element_read', 'section_element_bind', 'section_section_bind'";

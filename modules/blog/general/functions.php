@@ -41,7 +41,8 @@ class blogTextParser extends CTextParser
 				}
 			}
 
-			public function sortlen($a, $b) {
+			public function sortlen($a, $b) 
+			{
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
 
@@ -188,7 +189,7 @@ class blogTextParser extends CTextParser
 	public function convert_userfields($matches)
 	{
 		$id = intval($matches[1]);
-		if ($id > 0 && in_array($id, $this->userField["VALUE"]))
+		if (is_array($this->userField["VALUE"]) && $id > 0 && in_array($id, $this->userField["VALUE"]))
 		{
 			$this->userField["PARSED"][] = $id;
 			return call_user_func_array(array($this->userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"), array($this->userField, $id, $matches[2]));
@@ -243,7 +244,7 @@ class blogTextParser extends CTextParser
 		$arPattern[] = "/\[s\](.+?)\[\/s\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "_\\1_";
 
-		$arPattern[] = "/\[(\/?)(color|font|size)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER;
+		$arPattern[] = "/\[(\/?)(color|font|size|left|right|center)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "";
 
 		$arPattern[] = "/\[url\](\S+?)\[\/url\]/is".BX_UTF_PCRE_MODIFIER;
@@ -267,6 +268,13 @@ class blogTextParser extends CTextParser
 		$arReplace[] = "\\1\n";
 		$arPattern[] = "/\[td\](.*?)\[\/td\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "\\1\t";
+
+		$arPattern[] = "/\[user([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "\\2";
+
+		$arPattern[] = "/\[DOCUMENT([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "";
+		
 
 		$text = preg_replace($arPattern, $arReplace, $text);
 		$text = str_replace("&shy;", "", $text);
@@ -509,13 +517,16 @@ class blogTextParser extends CTextParser
 		$text = preg_replace(
 			array(
 				"/\<(\/)(quote|code)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
-				"/\[(\/)(code|quote|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
+				"/\[(\/)(code|quote|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+				"/\[(\/?)(\*)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+				),
 			" ",
 			$text);
 		$text = preg_replace(
 			array(
 				"/\<(\/?)(quote|code|font|color|video)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
-				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
+				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|td|tr|table|file|document|user|left|right|center|justify)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER
+				),
 			"",
 			$text);
 		return $text;

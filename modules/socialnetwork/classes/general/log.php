@@ -16,7 +16,7 @@ class CAllSocNetLog
 		{
 			$rsSite = CSite::GetList($by="sort", $order="desc", Array("ACTIVE" => "Y"));
 			while($arSite = $rsSite->Fetch())
-				$arSiteWorkgroupsPage[$arSite["ID"]] = COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]);
+				$arSiteWorkgroupsPage[$arSite["ID"]] = COption::GetOptionString("socialnetwork", "workgroups_page", $arSite["DIR"]."workgroups/", $arSite["ID"]);
 		}
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
@@ -281,13 +281,21 @@ class CAllSocNetLog
 	public static function SendEvent($ID, $mailTemplate = "SONET_NEW_EVENT", $tmp_id = false, $bAgent = false, $bTransport = false)
 	{
 		$ID = IntVal($ID);
-		if ($ID <= 0)
-			return false;
+		$tmp_id = IntVal($tmp_id);
 
-		if (intval($tmp_id) > 0)
+		if ($ID <= 0)
+		{
+			return false;
+		}
+
+		if ($tmp_id > 0)
+		{
 			$arFilter = array("ID" => $tmp_id);
+		}
 		else
+		{
 			$arFilter = array("ID" => $ID);
+		}
 
 		$dbLog = CSocNetLog::GetList(
 			array(),
@@ -303,7 +311,7 @@ class CAllSocNetLog
 
 		if (MakeTimeStamp($arLog["LOG_DATE"]) > (time() + CTimeZone::GetOffset()))
 		{
-			$agent = "CSocNetLog::SendEventAgent(".$ID.", '".$mailTemplate."', ".($tmp_id ? $tmp_id : 'false').");";
+			$agent = "CSocNetLog::SendEventAgent(".$ID.", '".CUtil::addslashes($mailTemplate)."', ".($tmp_id ? $tmp_id : 'false').");";
 			$rsAgents = CAgent::GetList(array("ID"=>"DESC"), array("NAME" => $agent));
 			if(!$rsAgents->Fetch())
 			{
@@ -598,25 +606,63 @@ class CAllSocNetLog
 		return true;
 	}
 
-	public static function CounterIncrement($log_id, $event_id = false, $arOfEntities = false, $type = "L")
+	public static function CounterIncrement($log_id, $event_id = false, $arOfEntities = false, $type = "L", $bForAllAccess = false)
 	{
 		if (intval($log_id) <= 0)
 			return false;
 
 		CUserCounter::IncrementWithSelect(
-			CSocNetLogCounter::GetSubSelect(
-				$log_id, false, false, false, false,
-				$arOfEntities, false, false, "Y", $type
+			CSocNetLogCounter::GetSubSelect2(
+				$log_id, 
+				array(
+					"TYPE" => $type,
+					"FOR_ALL_ACCESS" => $bForAllAccess
+				)
 			)
 		);
 
 		if ($event_id == "blog_post_important")
 		{
 			CUserCounter::IncrementWithSelect(
-				CSocNetLogCounter::GetSubSelect(
-					$log_id, false, false, false, false,
-					$arOfEntities, false, false, "Y", "L",
-					array("CODE" => "'BLOG_POST_IMPORTANT'")
+				CSocNetLogCounter::GetSubSelect2(
+					$log_id, 
+					array(
+						"TYPE" => "L", 
+						"CODE" => "'BLOG_POST_IMPORTANT'",
+						"FOR_ALL_ACCESS" => $bForAllAccess
+					)
+				)
+			);
+		}
+	}
+
+	public static function CounterDecrement($log_id, $event_id = false, $type = "L", $bForAllAccess = false)
+	{
+		if (intval($log_id) <= 0)
+			return false;
+
+		CUserCounter::IncrementWithSelect(
+			CSocNetLogCounter::GetSubSelect2(
+				$log_id, 
+				array(
+					"TYPE" => $type,
+					"DECREMENT" => true,
+					"FOR_ALL_ACCESS" => $bForAllAccess
+				)
+			)
+		);
+
+		if ($event_id == "blog_post_important")
+		{
+			CUserCounter::IncrementWithSelect(
+				CSocNetLogCounter::GetSubSelect2(
+					$log_id, 
+					array(
+						"TYPE" => "L",
+						"CODE" => "'BLOG_POST_IMPORTANT'",
+						"DECREMENT" => true,
+						"FOR_ALL_ACCESS" => $bForAllAccess
+					)
 				)
 			);
 		}

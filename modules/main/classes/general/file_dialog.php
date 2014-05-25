@@ -14,54 +14,54 @@ class CAdminFileDialog
 {
 	
 	/**
-	 * <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param Array $arConfig  Строка, содержащая имя Javascript-функции, которая вызывает файловый
-	 * диалог. Функция должна быть задана в глобальной области
-	 * видимости.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <buttononclick>
-	 * CAdminFileDialog::ShowScript(Array
-	 * 	(
-	 * 		"event" =&gt; "OpenImage",
-	 * 		"arResultDest" =&gt; Array("FUNCTION_NAME" =&gt; "SetImageUrl"),
-	 * 		"arPath" =&gt; Array(),
-	 * 		"select" =&gt; 'F',
-	 * 		"operation" =&gt; 'O',
-	 * 		"showUploadTab" =&gt; true,
-	 * 		"showAddToMenuTab" =&gt; false,
-	 * 		"fileFilter" =&gt; 'image',
-	 * 		"allowAllFiles" =&gt; true,
-	 * 		"saveConfig" =&gt; true
-	 * 	)
-	 * );
-	 * 
-	 * &lt;script&gt;
-	 * document.getElementById("open_dialog_button").onclick = OpenImage;
-	 * var SetImageUrl = function(filename,path,site)
-	 * {
-	 * 	// Обработка результата
-	 * 	alert("filename = "+filename+"; /n path = "+path+"; /n site = "+site);
-	 * }
-	 * &lt;/script&gt;
-	 * </buttononclick>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminfiledialog/showscript.php
-	 * @author Bitrix
-	 */
+	* <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога.</p>
+	*
+	*
+	*
+	*
+	* @param Array $arConfig  Строка, содержащая имя Javascript-функции, которая вызывает файловый
+	* диалог. Функция должна быть задана в глобальной области
+	* видимости.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <buttononclick>
+	* CAdminFileDialog::ShowScript(Array
+	* 	(
+	* 		"event" =&gt; "OpenImage",
+	* 		"arResultDest" =&gt; Array("FUNCTION_NAME" =&gt; "SetImageUrl"),
+	* 		"arPath" =&gt; Array(),
+	* 		"select" =&gt; 'F',
+	* 		"operation" =&gt; 'O',
+	* 		"showUploadTab" =&gt; true,
+	* 		"showAddToMenuTab" =&gt; false,
+	* 		"fileFilter" =&gt; 'image',
+	* 		"allowAllFiles" =&gt; true,
+	* 		"saveConfig" =&gt; true
+	* 	)
+	* );
+	* 
+	* &lt;script&gt;
+	* document.getElementById("open_dialog_button").onclick = OpenImage;
+	* var SetImageUrl = function(filename,path,site)
+	* {
+	* 	// Обработка результата
+	* 	alert("filename = "+filename+"; /n path = "+path+"; /n site = "+site);
+	* }
+	* &lt;/script&gt;
+	* </buttononclick>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminfiledialog/showscript.php
+	* @author Bitrix
+	*/
 	public static function ShowScript($arConfig)
 	{
 		global $USER;

@@ -18,91 +18,96 @@ class CSaleOrder extends CAllSaleOrder
 {
 	
 	/**
-	 * <p>Функция добавляет новый заказ с параметрами из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderAdd модуля магазина, а после добавления - обработчики события OnOrderAdd модуля магазина.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
-	 * являются названия параметров заказа, а значениями - новые
-	 * значения.<br> Допустимые ключи: <ul> <li> <b>LID</b> - код сайта, на котором
-	 * сделан заказ;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика, к которому
-	 * принадлежит посетитель, сделавший заказ (заказчик);</li> <li> <b>PAYED</b> -
-	 * флаг (Y/N) оплачен ли заказ;</li> <li> <b>DATE_PAYED</b> - дата оплаты заказа;</li>
-	 * <li> <b>EMP_PAYED_ID</b> - код пользователя (сотрудника магазина), который
-	 * установил флаг оплаченности;</li> <li> <b>CANCELED</b> - флаг (Y/N) отменён ли
-	 * заказ;</li> <li> <b>DATE_CANCELED</b> - дата отмены заказа;</li> <li> <b>EMP_CANCELED_ID</b> -
-	 * код пользователя, который установил флаг отмены заказа;</li> <li>
-	 * <b>REASON_CANCELED</b> - текстовое описание причины отмены заказа;</li> <li>
-	 * <b>STATUS_ID</b> - код статуса заказа;</li> <li> <b>EMP_STATUS_ID</b> - код пользователя
-	 * (сотрудника магазина), который установил текущий статус
-	 * заказа;</li> <li> <b>PRICE_DELIVERY</b> - стоимость доставки заказа;</li> <li>
-	 * <b>ALLOW_DELIVERY</b> - флаг (Y/N) разрешена ли доставка (отгрузка) заказа;</li>
-	 * <li> <b>DATE_ALLOW_DELIVERY</b> - дата, когда была разрешена доставка заказа;</li>
-	 * <li> <b>EMP_ALLOW_DELIVERY_ID</b> - код пользователя (сотрудника магазина),
-	 * который разрешил доставку заказа; </li> <li> <b>PRICE</b> - общая стоимость
-	 * заказа;</li> <li> <b>CURRENCY</b> - валюта стоимости заказа;</li> <li> <b>DISCOUNT_VALUE</b>
-	 * - общая величина скидки;</li> <li> <b>USER_ID</b> - код пользователя
-	 * заказчика;</li> <li> <b>PAY_SYSTEM_ID</b> - платежная система, которой (будет)
-	 * оплачен заказа;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
-	 * заказа;</li> <li> <b>USER_DESCRIPTION</b> - описание заказа заказчиком;</li> <li>
-	 * <b>ADDITIONAL_INFO</b> - дополнительная информация по заказу;</li> <li> <b>COMMENTS</b>
-	 * - произвольные комментарии;</li> <li> <b>TAX_VALUE</b> - общая сумма
-	 * налогов;</li> <li> <b>STAT_GID</b> - параметр события в статистике; </li> <li>
-	 * <b>PS_STATUS</b> - флаг (Y/N) статуса платежной системы - успешно ли оплачен
-	 * заказ (для платежных систем, которые позволяют автоматически
-	 * получать данные по проведенным через них заказам);</li> <li>
-	 * <b>PS_STATUS_CODE</b> - код статуса платежной системы (значение зависит от
-	 * системы);</li> <li> <b>PS_STATUS_DESCRIPTION</b> - описание результата работы
-	 * платежной системы;</li> <li> <b>PS_STATUS_MESSAGE</b> - сообщение от платежной
-	 * системы;</li> <li> <b>PS_SUM</b> - сумма, которая была реально оплачена через
-	 * платежную систему;</li> <li> <b>PS_CURRENCY</b> - валюта суммы;</li> <li>
-	 * <b>PS_RESPONSE_DATE</b> - дата получения статуса платежной системы;</li> <li>
-	 * <b>SUM_PAID </b> - сумма, которая уже была оплачена покупателем по
-	 * данному счету (например, с внутреннего счета);</li> <li> <b>PAY_VOUCHER_NUM </b> -
-	 * номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
-	 * поручения.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array(
-	 *    "LID" =&gt; "en",
-	 *    "PERSON_TYPE_ID" =&gt; 1,
-	 *    "PAYED" =&gt; "N",
-	 *    "CANCELED" =&gt; "N",
-	 *    "STATUS_ID" =&gt; "N",
-	 *    "PRICE" =&gt; 279.32,
-	 *    "CURRENCY" =&gt; "USD",
-	 *    "USER_ID" =&gt; IntVal($USER-&gt;GetID()),
-	 *    "PAY_SYSTEM_ID" =&gt; 3,
-	 *    "PRICE_DELIVERY" =&gt; 11.37,
-	 *    "DELIVERY_ID" =&gt; 2,
-	 *    "DISCOUNT_VALUE" =&gt; 1.5,
-	 *    "TAX_VALUE" =&gt; 0.0,
-	 *    "USER_DESCRIPTION" =&gt; ""
-	 * );
-	 * 
-	 * // add Guest ID
-	 * if (CModule::IncludeModule("statistic"))
-	 *    $arFields["STAT_GID"] = CStatistic::GetEventParam();
-	 * 
-	 * $ORDER_ID = CSaleOrder::Add($arFields);
-	 * $ORDER_ID = IntVal($ORDER_ID);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__add.5a463c02.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новый заказ с параметрами из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderAdd модуля магазина, а после добавления - обработчики события OnOrderAdd модуля магазина.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
+	* являются названия параметров заказа, а значениями - новые
+	* значения.<br> Допустимые ключи: <ul> <li> <b>LID</b> - код сайта, на котором
+	* сделан заказ;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика, к которому
+	* принадлежит посетитель, сделавший заказ (заказчик);</li> <li> <b>PAYED</b> -
+	* флаг (Y/N) оплачен ли заказ;</li> <li> <b>DATE_PAYED</b> - дата оплаты заказа;</li>
+	* <li> <b>EMP_PAYED_ID</b> - код пользователя (сотрудника магазина), который
+	* установил флаг оплаченности;</li> <li> <b>CANCELED</b> - флаг (Y/N) отменён ли
+	* заказ;</li> <li> <b>DATE_CANCELED</b> - дата отмены заказа;</li> <li> <b>EMP_CANCELED_ID</b> -
+	* код пользователя, который установил флаг отмены заказа;</li> <li>
+	* <b>REASON_CANCELED</b> - текстовое описание причины отмены заказа;</li> <li>
+	* <b>STATUS_ID</b> - код статуса заказа;</li> <li> <b>EMP_STATUS_ID</b> - код пользователя
+	* (сотрудника магазина), который установил текущий статус
+	* заказа;</li> <li> <b>PRICE_DELIVERY</b> - стоимость доставки заказа;</li> <li>
+	* <b>ALLOW_DELIVERY</b> - флаг (Y/N) разрешена ли доставка (отгрузка) заказа;</li>
+	* <li> <b>DATE_ALLOW_DELIVERY</b> - дата, когда была разрешена доставка заказа;</li>
+	* <li> <b>EMP_ALLOW_DELIVERY_ID</b> - код пользователя (сотрудника магазина),
+	* который разрешил доставку заказа; </li> <li> <b>PRICE</b> - общая стоимость
+	* заказа;</li> <li> <b>CURRENCY</b> - валюта стоимости заказа;</li> <li> <b>DISCOUNT_VALUE</b>
+	* - общая величина скидки;</li> <li> <b>USER_ID</b> - код пользователя
+	* заказчика;</li> <li> <b>PAY_SYSTEM_ID</b> - платежная система, которой (будет)
+	* оплачен заказа;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
+	* заказа;</li> <li> <b>USER_DESCRIPTION</b> - описание заказа заказчиком;</li> <li>
+	* <b>ADDITIONAL_INFO</b> - дополнительная информация по заказу;</li> <li> <b>COMMENTS</b>
+	* - произвольные комментарии;</li> <li> <b>TAX_VALUE</b> - общая сумма
+	* налогов;</li> <li> <b>AFFILIATE_ID</b> - код аффилиата, через которого пришел
+	* посетитель;</li> <li> <b>STAT_GID</b> - параметр события в статистике; </li> <li>
+	* <b>PS_STATUS</b> - флаг (Y/N) статуса платежной системы - успешно ли оплачен
+	* заказ (для платежных систем, которые позволяют автоматически
+	* получать данные по проведенным через них заказам);</li> <li>
+	* <b>PS_STATUS_CODE</b> - код статуса платежной системы (значение зависит от
+	* системы);</li> <li> <b>PS_STATUS_DESCRIPTION</b> - описание результата работы
+	* платежной системы;</li> <li> <b>PS_STATUS_MESSAGE</b> - сообщение от платежной
+	* системы;</li> <li> <b>PS_SUM</b> - сумма, которая была реально оплачена через
+	* платежную систему;</li> <li> <b>PS_CURRENCY</b> - валюта суммы;</li> <li>
+	* <b>PS_RESPONSE_DATE</b> - дата получения статуса платежной системы;</li> <li>
+	* <b>SUM_PAID </b> - сумма, которая уже была оплачена покупателем по
+	* данному счету (например, с внутреннего счета);</li> <li> <b>PAY_VOUCHER_NUM </b> -
+	* номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
+	* поручения.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array(
+	*    "LID" =&gt; "en",
+	*    "PERSON_TYPE_ID" =&gt; 1,
+	*    "PAYED" =&gt; "N",
+	*    "CANCELED" =&gt; "N",
+	*    "STATUS_ID" =&gt; "N",
+	*    "PRICE" =&gt; 279.32,
+	*    "CURRENCY" =&gt; "USD",
+	*    "USER_ID" =&gt; IntVal($USER-&gt;GetID()),
+	*    "PAY_SYSTEM_ID" =&gt; 3,
+	*    "PRICE_DELIVERY" =&gt; 11.37,
+	*    "DELIVERY_ID" =&gt; 2,
+	*    "DISCOUNT_VALUE" =&gt; 1.5,
+	*    "TAX_VALUE" =&gt; 0.0,
+	*    "USER_DESCRIPTION" =&gt; ""
+	* );
+	* 
+	* // add Guest ID
+	* if (CModule::IncludeModule("statistic"))
+	*    $arFields["STAT_GID"] = CStatistic::GetEventParam();
+	* 
+	* $ORDER_ID = CSaleOrder::Add($arFields);
+	* $ORDER_ID = IntVal($ORDER_ID);
+	* ?&gt;
+	* 
+	* //добавляем в заказ аффилиата, если он есть
+	* $arFields['AFFILIATE_ID'] = $APPLICATION-&gt;get_cookie("SALE_AFFILIATE");
+	* $ORDER_ID = CSaleOrder::Add($arFields);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__add.5a463c02.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -174,91 +179,91 @@ class CSaleOrder extends CAllSaleOrder
 
 	
 	/**
-	 * <p>Функция изменяет параметры заказа с кодом ID на новые параметры из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderUpdate модуля магазина, а после добавления - обработчики события OnOrderUpdate модуля магазина. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код заказа.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
-	 * являются названия параметров заказа, а значениями - новые
-	 * значения.<br> Допустимые ключи: <ul> <li> <b>LID</b> - код сайта, на котором
-	 * сделан заказ;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика, к которому
-	 * принадлежит посетитель, сделавший заказ (заказчик);</li> <li> <b>PAYED</b> -
-	 * флаг (Y/N) оплачен ли заказ;</li> <li> <b>DATE_PAYED</b> - дата оплаты заказа;</li>
-	 * <li> <b>EMP_PAYED_ID</b> - код пользователя (сотрудника магазина), который
-	 * установил флаг оплаты;</li> <li> <b>CANCELED</b> - флаг (Y/N) отменён ли
-	 * заказ;</li> <li> <b>DATE_CANCELED</b> - дата отмены заказа;</li> <li> <b>EMP_CANCELED_ID</b> -
-	 * код пользователя, который установил флаг отмены заказа;</li> <li>
-	 * <b>REASON_CANCELED</b> - текстовое описание причины отмены заказа;</li> <li>
-	 * <b>STATUS_ID</b> - код статуса заказа;</li> <li> <b>EMP_STATUS_ID</b> - код пользователя
-	 * (сотрудника магазина), который установил текущий статус
-	 * заказа;</li> <li> <b>PRICE_DELIVERY</b> - стоимость доставки заказа;</li> <li>
-	 * <b>ALLOW_DELIVERY</b> - флаг (Y/N) разрешена ли доставка (отгрузка) заказа;</li>
-	 * <li> <b>DATE_ALLOW_DELIVERY</b> - дата, когда была разрешена доставка заказа;</li>
-	 * <li> <b>EMP_ALLOW_DELIVERY_ID</b> - код пользователя (сотрудника магазина),
-	 * который разрешил доставку заказа; </li> <li> <b>PRICE</b> - общая стоимость
-	 * заказа;</li> <li> <b>CURRENCY</b> - валюта стоимости заказа;</li> <li> <b>DISCOUNT_VALUE</b>
-	 * - общая величина скидки;</li> <li> <b>USER_ID</b> - код пользователя
-	 * заказчика;</li> <li> <b>PAY_SYSTEM_ID</b> - платежная система, которой (будет)
-	 * оплачен заказа;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
-	 * заказа;</li> <li> <b>USER_DESCRIPTION</b> - описание заказа заказчиком;</li> <li>
-	 * <b>ADDITIONAL_INFO</b> - дополнительная информация по заказу;</li> <li> <b>COMMENTS</b>
-	 * - произвольные комментарии;</li> <li> <b>TAX_VALUE</b> - общая сумма
-	 * налогов;</li> <li> <b>STAT_GID</b> - параметр события в статистике; </li> <li>
-	 * <b>PS_STATUS</b> - флаг (Y/N) статуса платежной системы - успешно ли оплачен
-	 * заказ (для платежных систем, которые позволяют автоматически
-	 * получать данные по проведенным через них заказам);</li> <li>
-	 * <b>PS_STATUS_CODE</b> - код статуса платежной системы (значение зависит от
-	 * системы);</li> <li> <b>PS_STATUS_DESCRIPTION</b> - описание результата работы
-	 * платежной системы;</li> <li> <b>PS_STATUS_MESSAGE</b> - сообщение от платежной
-	 * системы;</li> <li> <b>PS_SUM</b> - сумма, которая была реально оплачена через
-	 * платежную систему;</li> <li> <b>PS_CURRENCY</b> - валюта суммы;</li> <li>
-	 * <b>PS_RESPONSE_DATE</b> - дата получения статуса платежной системы;</li> <li>
-	 * <b>SUM_PAID </b> - сумма, которая уже была оплачена покупателем по
-	 * данному счету (например, с внутреннего счета);</li> <li> <b>PAY_VOUCHER_NUM </b> -
-	 * номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
-	 * поручения.</li> <li> <b>DATE_INSERT</b> - дата создания заказа.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param bDateUpdat $e  Обновление даты изменения заказа. Значения <i>true/false</i>
-	 * (по-умолчанию <i>true</i>).
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arOrder = CSaleOrder::GetByID($ID);
-	 * if ($arOrder)
-	 * {
-	 *    $arFields = array(
-	 *       "PAYED" =&gt; "Y",
-	 *       "DATE_PAYED" =&gt; Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
-	 *       "USER_ID" =&gt; $arOrder["USER_ID"],
-	 *       "EMP_PAYED_ID" =&gt; $USER-&gt;GetID()
-	 *    );
-	 *    CSaleOrder::Update($ID, $arFields);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__update.a8be5ffa.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры заказа с кодом ID на новые параметры из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderUpdate модуля магазина, а после добавления - обработчики события OnOrderUpdate модуля магазина. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код заказа.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
+	* являются названия параметров заказа, а значениями - новые
+	* значения.<br> Допустимые ключи: <ul> <li> <b>LID</b> - код сайта, на котором
+	* сделан заказ;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика, к которому
+	* принадлежит посетитель, сделавший заказ (заказчик);</li> <li> <b>PAYED</b> -
+	* флаг (Y/N) оплачен ли заказ;</li> <li> <b>DATE_PAYED</b> - дата оплаты заказа;</li>
+	* <li> <b>EMP_PAYED_ID</b> - код пользователя (сотрудника магазина), который
+	* установил флаг оплаты;</li> <li> <b>CANCELED</b> - флаг (Y/N) отменён ли
+	* заказ;</li> <li> <b>DATE_CANCELED</b> - дата отмены заказа;</li> <li> <b>EMP_CANCELED_ID</b> -
+	* код пользователя, который установил флаг отмены заказа;</li> <li>
+	* <b>REASON_CANCELED</b> - текстовое описание причины отмены заказа;</li> <li>
+	* <b>STATUS_ID</b> - код статуса заказа;</li> <li> <b>EMP_STATUS_ID</b> - код пользователя
+	* (сотрудника магазина), который установил текущий статус
+	* заказа;</li> <li> <b>PRICE_DELIVERY</b> - стоимость доставки заказа;</li> <li>
+	* <b>ALLOW_DELIVERY</b> - флаг (Y/N) разрешена ли доставка (отгрузка) заказа;</li>
+	* <li> <b>DATE_ALLOW_DELIVERY</b> - дата, когда была разрешена доставка заказа;</li>
+	* <li> <b>EMP_ALLOW_DELIVERY_ID</b> - код пользователя (сотрудника магазина),
+	* который разрешил доставку заказа; </li> <li> <b>PRICE</b> - общая стоимость
+	* заказа;</li> <li> <b>CURRENCY</b> - валюта стоимости заказа;</li> <li> <b>DISCOUNT_VALUE</b>
+	* - общая величина скидки;</li> <li> <b>USER_ID</b> - код пользователя
+	* заказчика;</li> <li> <b>PAY_SYSTEM_ID</b> - платежная система, которой (будет)
+	* оплачен заказа;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
+	* заказа;</li> <li> <b>USER_DESCRIPTION</b> - описание заказа заказчиком;</li> <li>
+	* <b>ADDITIONAL_INFO</b> - дополнительная информация по заказу;</li> <li> <b>COMMENTS</b>
+	* - произвольные комментарии;</li> <li> <b>TAX_VALUE</b> - общая сумма
+	* налогов;</li> <li> <b>STAT_GID</b> - параметр события в статистике; </li> <li>
+	* <b>PS_STATUS</b> - флаг (Y/N) статуса платежной системы - успешно ли оплачен
+	* заказ (для платежных систем, которые позволяют автоматически
+	* получать данные по проведенным через них заказам);</li> <li>
+	* <b>PS_STATUS_CODE</b> - код статуса платежной системы (значение зависит от
+	* системы);</li> <li> <b>PS_STATUS_DESCRIPTION</b> - описание результата работы
+	* платежной системы;</li> <li> <b>PS_STATUS_MESSAGE</b> - сообщение от платежной
+	* системы;</li> <li> <b>PS_SUM</b> - сумма, которая была реально оплачена через
+	* платежную систему;</li> <li> <b>PS_CURRENCY</b> - валюта суммы;</li> <li>
+	* <b>PS_RESPONSE_DATE</b> - дата получения статуса платежной системы;</li> <li>
+	* <b>SUM_PAID </b> - сумма, которая уже была оплачена покупателем по
+	* данному счету (например, с внутреннего счета);</li> <li> <b>PAY_VOUCHER_NUM </b> -
+	* номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
+	* поручения.</li> <li> <b>DATE_INSERT</b> - дата создания заказа.</li> </ul>
+	*
+	*
+	*
+	* @param bDateUpdat $e  Обновление даты изменения заказа. Значения <i>true/false</i>
+	* (по-умолчанию <i>true</i>).
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arOrder = CSaleOrder::GetByID($ID);
+	* if ($arOrder)
+	* {
+	*    $arFields = array(
+	*       "PAYED" =&gt; "Y",
+	*       "DATE_PAYED" =&gt; Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
+	*       "USER_ID" =&gt; $arOrder["USER_ID"],
+	*       "EMP_PAYED_ID" =&gt; $USER-&gt;GetID()
+	*    );
+	*    CSaleOrder::Update($ID, $arFields);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__update.a8be5ffa.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $bDateUpdate = true)
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
 
 		$ID = IntVal($ID);
 
@@ -312,6 +317,47 @@ class CSaleOrder extends CAllSaleOrder
 		foreach(GetModuleEvents("sale", "OnOrderUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
 
+		if (isset($arFields["TRACKING_NUMBER"]))
+		{
+			foreach(GetModuleEvents("sale", "OnTrackingNumberChange", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($ID, $arFields["TRACKING_NUMBER"]));
+
+			if (strlen($arFields["TRACKING_NUMBER"]) > 0 && $arOrderOldFields["TRACKING_NUMBER"] != $arFields["TRACKING_NUMBER"])
+			{
+				$accountNumber = (isset($arFields["ACCOUNT_NUMBER"])) ? $arFields["ACCOUNT_NUMBER"] : $arOrderOldFields["ACCOUNT_NUMBER"];
+				$userId =  (isset($arFields["USER_ID"])) ? $arFields["USER_ID"] : $arOrderOldFields["USER_ID"];
+
+				$payerName = "";
+				$dbUser = CUser::GetByID($userId);
+				if ($arUser = $dbUser->Fetch())
+				{
+					if (strlen($payerName) <= 0)
+						$payerName = $arUser["NAME"].((strlen($arUser["NAME"])<=0 || strlen($arUser["LAST_NAME"])<=0) ? "" : " ").$arUser["LAST_NAME"];
+					if (strlen($payerEMail) <= 0)
+						$payerEMail = $arUser["EMAIL"];
+				}
+
+				$arEmailFields = Array(
+					"ORDER_ID" => $accountNumber,
+					"ORDER_DATE" => Date($DB->DateFormatToPHP(CLang::GetDateFormat("SHORT", $arOrder["LID"]))),
+					"ORDER_USER" => $payerName,
+					"ORDER_TRACKING_NUMBER" => $arFields["TRACKING_NUMBER"],
+					"BCC" => COption::GetOptionString("sale", "order_email", "order@".$SERVER_NAME),
+					"EMAIL" => $payerEMail,
+					"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$SERVER_NAME)
+				);
+
+				$event = new CEvent;
+				$event->Send("SALE_ORDER_TRACKING_NUMBER", $arOrderOldFields["LID"], $arEmailFields, "N");
+			}
+		}
+
+		if(defined("CACHED_b_sale_order") && $bDateUpdate && $arFields["UPDATED_1C"] != "Y")
+		{
+			$CACHE_MANAGER->Read(CACHED_b_sale_order, "sale_orders");
+			$CACHE_MANAGER->SetImmediate("sale_orders", true);
+		}
+
 		return $ID;
 	}
 
@@ -348,128 +394,177 @@ class CSaleOrder extends CAllSaleOrder
 
 	
 	/**
-	 * <p>Функция возвращает результат выборки записей из заказов в соответствии со своими параметрами.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
-	 * "направление_сортировки1", "название_поля2" =&gt;
-	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	 * может стоять любое поле местоположения, а в качестве
-	 * "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
-	 * имеет несколько элементов, то результирующий набор сортируется
-	 * последовательно по каждому элементу (т.е. сначала сортируется по
-	 * первому элементу, потом результат сортируется по второму и
-	 * т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что результат отсортирован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи заказов.
-	 * Массив имеет вид: <pre class="syntax">array(
-	 * "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
-	 * "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
-	 * Удовлетворяющие фильтру записи возвращаются в результате, а
-	 * записи, которые не удовлетворяют условиям фильтра,
-	 * отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
-	 * <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
-	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
-	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
-	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
-	 * значение поля меньше или равно передаваемой в фильтр
-	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
-	 * фильтр величины;</b></li> <li> <b>~</b> - значение поля проверяется на
-	 * соответствие передаваемому в фильтр шаблону;</li> <li> <b>%</b> -
-	 * значение поля проверяется на соответствие передаваемой в фильтр
-	 * строке в соответствии с языком запросов.</li> </ul> В качестве
-	 * "название_поляX" может стоять любое поле заказов.<br><br> Пример
-	 * фильтра: <pre class="syntax">array("CANCELED" =&gt; "Y")</pre> Этот фильтр означает
-	 * "выбрать все записи, в которых значение в поле CANCELED (отменён) равно
-	 * Y".<br><br> Значение по умолчанию - пустой массив array() - означает, что
-	 * результат отфильтрован не будет. <p>Чтобы задать временной
-	 * интервал при получении заказов, можно использовать в фильтре
-	 * ключи DATE_FROM, DATE_TO для фильтрации по дате изменения и DATE_INSERT_FROM,
-	 * DATE_INSERT_TO для даты добавления.</p>
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив полей, по которым группируются записи заказов. Массив
-	 * имеет вид: <pre class="syntax"> array("название_поля1", "группирующая_функция2"
-	 * =&gt; "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
-	 * стоять любое поле заказов. В качестве группирующей функции могут
-	 * стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
-	 * среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
-	 * значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	 * <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
-	 * вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
-	 * умолчанию - <i>false</i> - означает, что результат группироваться не
-	 * будет.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	 * <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
-	 * ограничено сверху значением этого ключа;</li> <li> любой ключ,
-	 * принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	 * параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
-	 * параметров выборки нет.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
-	 * указать только те поля, которые необходимы. Если в массиве
-	 * присутствует значение "*", то будут возвращены все доступные
-	 * поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что будут возвращены все поля основной таблицы запроса.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	 * массивы с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	 * <th>Описание</th> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления заказа в
-	 * формате текущего сайта.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего
-	 * изменения заказа в формате текущего сайта.</td> </tr> <tr> <td>DATE_STATUS</td>
-	 * <td>Дата изменения статуса заказа в формате текущего сайта.</td> </tr>
-	 * <tr> <td>DATE_CANCELED</td> <td>Дата изменения флага отмены заказа в формате
-	 * текущего сайта.</td> </tr> <tr> <td>DATE_PAYED</td> <td>Дата изменения флага оплаты
-	 * заказа в формате текущего сайта.</td> </tr> <tr> <td>PS_RESPONSE_DATE</td> <td>Дата
-	 * получения статуса платежной системы в формате текущего сайта.</td>
-	 * </tr> <tr> <td>DATE_ALLOW_DELIVERY</td> <td>Дата изменения флага разрешения доставки
-	 * заказа в формате текущего сайта.</td> </tr> <tr> <td>SUM_PAID</td> <td>Сумма,
-	 * которая уже была оплачена покупателем по данному счету (например,
-	 * с внутреннего счета).</td> </tr> <tr> <td>PAY_VOUCHER_NUM</td> <td>Номер платежного
-	 * поручения.</td> </tr> <tr> <td>PAY_VOUCHER_DATE</td> <td>Дата платежного поручения.</td>
-	 * </tr> </table><p>Если в качестве параметра arGroupBy передается пустой
-	 * массив, то функция вернет число записей, удовлетворяющих
-	 * фильтру.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выведем даты всех заказов текущего пользователя за текущий месяц, отсортированные по дате заказа
-	 * $arFilter = Array(
-	 *    "USER_ID" =&gt; $USER-&gt;GetID(),
-	 *    "&gt;=DATE_INSERT" =&gt; date($DB-&gt;DateFormatToPHP(CSite::GetDateFormat("SHORT")), mktime(0, 0, 0, date("n"), 1, date("Y")))
-	 *    );
-	 * 
-	 * $db_sales = CSaleOrder::GetList(array("DATE_INSERT" =&gt; "ASC"), $arFilter);
-	 * while ($ar_sales = $db_sales-&gt;Fetch())
-	 * {
-	 *    echo $ar_sales["DATE_INSERT_FORMAT"]."&lt;br&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__getlist.41061294.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает результат выборки записей из заказов в соответствии со своими параметрами.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("ID"=>"DESC") Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* "направление_сортировки1", "название_поля2" =&gt;
+	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	* может стоять любое поле заказа, а в качестве
+	* "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
+	* имеет несколько элементов, то результирующий набор сортируется
+	* последовательно по каждому элементу (т.е. сначала сортируется по
+	* первому элементу, потом результат сортируется по второму и т.д.).
+	*
+	*
+	*
+	* @param array $arFilter = Аrray() Массив, в соответствии с которым фильтруются записи заказов.
+	* Массив имеет вид: <pre class="syntax">array(
+	* "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
+	* "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
+	* Удовлетворяющие фильтру записи возвращаются в результате, а
+	* записи, которые не удовлетворяют условиям фильтра,
+	* отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
+	* <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
+	* так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
+	* являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
+	* или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
+	* поля строго больше передаваемой в фильтр величины;</li> <li><b> -
+	* значение поля меньше или равно передаваемой в фильтр
+	* величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
+	* фильтр величины;</b></li> <li> <b>~</b> - значение поля проверяется на
+	* соответствие передаваемому в фильтр шаблону;</li> <li> <b>@</b> -
+	* модификатор может использоваться при передаче набора значений
+	* (массива); </li> <li> <b>%</b> - значение поля проверяется на соответствие
+	* передаваемой в фильтр строке в соответствии с языком запросов.</li>
+	* </ul> В качестве "название_поляX" может стоять любое поле
+	* заказов.<br><br> Для фильтрации заказов по свойствам возможны
+	* следующие варианты: <ul> <li> <b>PROPERTY_ID</b> - идентификатор значения
+	* свойства заказа по идентификатору свойства заказа; </li> <li>
+	* <b>PROPERTY_ORDER_PROPS_ID</b> - идентификатор свойства заказа по
+	* идентификатору свойства заказа; </li> <li> <b>PROPERTY_NAME</b> - название
+	* свойства по идентификатору свойства заказа; </li> <li> <b>PROPERTY_VALUE</b> -
+	* значение свойства заказа по идентификатору свойства заказа; </li>
+	* <li> <b>PROPERTY_CODE</b> - код свойства заказа по идентификатору свойства
+	* заказа; </li> <li> <b>PROPERTY_VAL_BY_CODE</b> - значение свойства заказа по коду
+	* свойства. </li> </ul> <br> Для фильтрации по свойствам типа "чекбокс" в
+	* значение фильтра надо ставить Y.<br><br> Пример фильтра: <pre
+	* class="syntax">array("CANCELED" =&gt; "Y")</pre> Этот фильтр означает "выбрать все
+	* записи, в которых значение в поле CANCELED (отменён) равно Y".<br><br>
+	* Значение по умолчанию - пустой массив array() - означает, что
+	* результат отфильтрован не будет. <p>Чтобы задать временной
+	* интервал при получении заказов, можно использовать в фильтре
+	* ключи DATE_FROM, DATE_TO для фильтрации по дате изменения и DATE_INSERT_FROM,
+	* DATE_INSERT_TO для даты добавления.</p>
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив полей, по которым группируются записи заказов. Массив
+	* имеет вид: <pre class="syntax"> array("название_поля1", "группирующая_функция2"
+	* =&gt; "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
+	* стоять любое поле заказов. В качестве группирующей функции могут
+	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
+	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
+	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
+	* умолчанию - <i>false</i> - означает, что результат группироваться не
+	* будет.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
+	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
+	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
+	* параметров выборки нет.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* указать только те поля, которые необходимы. Если в массиве
+	* присутствует значение "*", то будут возвращены все доступные
+	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
+	* что будут возвращены все поля основной таблицы запроса.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
+	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
+	* <th>Описание</th> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления заказа в
+	* формате текущего сайта.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего
+	* изменения заказа в формате текущего сайта.</td> </tr> <tr> <td>DATE_STATUS</td>
+	* <td>Дата изменения статуса заказа в формате текущего сайта.</td> </tr>
+	* <tr> <td>DATE_CANCELED</td> <td>Дата изменения флага отмены заказа в формате
+	* текущего сайта.</td> </tr> <tr> <td>DATE_PAYED</td> <td>Дата изменения флага оплаты
+	* заказа в формате текущего сайта.</td> </tr> <tr> <td>PS_RESPONSE_DATE</td> <td>Дата
+	* получения статуса платежной системы в формате текущего сайта.</td>
+	* </tr> <tr> <td>DATE_ALLOW_DELIVERY</td> <td>Дата изменения флага разрешения доставки
+	* заказа в формате текущего сайта.</td> </tr> <tr> <td>SUM_PAID</td> <td>Сумма,
+	* которая уже была оплачена покупателем по данному счету (например,
+	* с внутреннего счета).</td> </tr> <tr> <td>PAY_VOUCHER_NUM</td> <td>Номер платежного
+	* поручения.</td> </tr> <tr> <td>PAY_VOUCHER_DATE</td> <td>Дата платежного поручения.</td>
+	* </tr> </table> <p>Если в качестве параметра arGroupBy передается пустой
+	* массив, то функция вернет число записей, удовлетворяющих
+	* фильтру.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выведем даты всех заказов текущего пользователя за текущий месяц, отсортированные по дате заказа
+	* $arFilter = Array(
+	*    "USER_ID" =&gt; $USER-&gt;GetID(),
+	*    "&gt;=DATE_INSERT" =&gt; date($DB-&gt;DateFormatToPHP(CSite::GetDateFormat("SHORT")), mktime(0, 0, 0, date("n"), 1, date("Y")))
+	*    );
+	* 
+	* $db_sales = CSaleOrder::GetList(array("DATE_INSERT" =&gt; "ASC"), $arFilter);
+	* while ($ar_sales = $db_sales-&gt;Fetch())
+	* {
+	*    echo $ar_sales["DATE_INSERT_FORMAT"]."&lt;br&gt;";
+	* }
+	* ?&gt;
+	* 
+	* 
+	* //список всех заказов, при оформлении которых был использован тот или иной купон получения скидки 
+	* &lt;?
+	* if (CModule::IncludeModule("sale")):
+	* 
+	*    $arFilter = Array(
+	*       "BASKET_DISCOUNT_COUPON" =&gt; "КОД_КУПОНА_ЗДЕСЬ",
+	*       );
+	*    $rsSales = CSaleOrder::GetList(array("DATE_INSERT" =&gt; "ASC"), $arFilter);
+	*    while ($arSales = $rsSales-&gt;Fetch())
+	*    {
+	*       echo "&lt;pre&gt;";
+	*       print_r($arSales);
+	*       echo "&lt;/pre&gt;";
+	*    }
+	* endif;
+	* ?&gt;
+	* 
+	* //можно использовать и массив купонов для поиска: 
+	* CSaleOrder::GetList(array(), array('BASKET_DISCOUNT_COUPON' =&gt; array('TEST1', 'TEST2')));
+	* 
+	* 
+	* 
+	* //пример использования arGroupBy
+	* $arFilter = array('PAYED' =&gt; 'Y', 'PROPERTY_VAL_BY_CODE_F_COURIER' =&gt; $f_VALUE);
+	* $rsOrders = CSaleOrder::GetList(array('ID' =&gt; 'DESC'), $arFilter, array('PAYED', 'SUM' =&gt; 'PRICE'));
+	* 
+	* //поле PAYED в arGroupBy передано, чтобы вернулся CNT (количество таких заказов). Если не передавать, вернется просто сумма.
+	* 
+	* 
+	* 
+	* //получить заказ с определенным товаром
+	* $rsOrder = CSaleOrder::GetList(array('ID' =&gt; 'DESC'), array('BASKET_PRODUCT_ID' =&gt; 174474));
+	* 
+	* 
+	* 
+	* //фильтрация по нескольким вариантам статуса: 
+	* $arFilter = Array("USER_ID" =&gt; $USER-&gt;GetID(), "@STATUS_ID" =&gt; array("R", "I", "P", "O"));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__getlist.41061294.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID"=>"DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arOptions = array())
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -601,6 +696,15 @@ class CSaleOrder extends CAllSaleOrder
 			unset($arFilter["DATE_PAY_BEFORE_TO"]);
 			$arFilter["<=DATE_PAY_BEFORE"] = $val;
 		}
+		if (array_key_exists("DELIVERY_REQUEST_SENT", $arFilter))
+		{
+			if($arFilter["DELIVERY_REQUEST_SENT"] == "Y")
+				$arFilter["!DELIVERY_DATE_REQUEST"] = "";
+			else
+				$arFilter["+DELIVERY_DATE_REQUEST"] = "";
+
+			unset($arFilter["DELIVERY_REQUEST_SENT"]);
+		}
 
 		$callback = false;
 		if (array_key_exists("CUSTOM_SUBQUERY", $arFilter))
@@ -670,6 +774,7 @@ class CSaleOrder extends CAllSaleOrder
 				"USER_EMAIL",
 				"DELIVERY_DOC_NUM",
 				"DELIVERY_DOC_DATE",
+				"DELIVERY_DATE_REQUEST",
 				"STORE_ID",
 				"ORDER_TOPIC",
 				"RESPONSIBLE_ID",
@@ -684,7 +789,8 @@ class CSaleOrder extends CAllSaleOrder
 				"DATE_PAY_BEFORE",
 				"DATE_BILL",
 				"ACCOUNT_NUMBER",
-				"TRACKING_NUMBER"
+				"TRACKING_NUMBER",
+				"XML_ID"
 			);
 		}
 		elseif (in_array("*", $arSelectFields))
@@ -748,6 +854,7 @@ class CSaleOrder extends CAllSaleOrder
 				"USER_EMAIL",
 				"DELIVERY_DOC_NUM",
 				"DELIVERY_DOC_DATE",
+				"DELIVERY_DATE_REQUEST",
 				"STORE_ID",
 				"ORDER_TOPIC",
 				"RESPONSIBLE_ID",
@@ -762,7 +869,8 @@ class CSaleOrder extends CAllSaleOrder
 				"DATE_PAY_BEFORE",
 				"DATE_BILL",
 				"ACCOUNT_NUMBER",
-				"TRACKING_NUMBER"
+				"TRACKING_NUMBER",
+				"XML_ID"
 			);
 		}
 
@@ -841,6 +949,11 @@ class CSaleOrder extends CAllSaleOrder
 			"DATE_BILL" => array("FIELD" => "O.DATE_BILL", "TYPE" => "datetime"),
 			"ACCOUNT_NUMBER" => array("FIELD" => "O.ACCOUNT_NUMBER", "TYPE" => "string"),
 			"TRACKING_NUMBER" => array("FIELD" => "O.TRACKING_NUMBER", "TYPE" => "string"),
+			"XML_ID" => array("FIELD" => "O.XML_ID", "TYPE" => "string"),
+			"ID_1C" => array("FIELD" => "O.ID_1C", "TYPE" => "string"),
+			"VERSION_1C" => array("FIELD" => "O.VERSION_1C", "TYPE" => "string"),
+			"VERSION" => array("FIELD" => "O.VERSION", "TYPE" => "int"),
+			"EXTERNAL_ORDER" => array("FIELD" => "O.EXTERNAL_ORDER", "TYPE" => "string"),
 
 			"NAME_SEARCH" => array("FIELD" => "U.NAME, U.LAST_NAME, U.SECOND_NAME, U.EMAIL, U.LOGIN, U.ID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
 			"USER_LOGIN" => array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (O.USER_ID = U.ID)"),
@@ -870,6 +983,7 @@ class CSaleOrder extends CAllSaleOrder
 			"BASKET_DISCOUNT_NAME" => array("FIELD" => "B.DISCOUNT_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 			"BASKET_DISCOUNT_VALUE" => array("FIELD" => "B.DISCOUNT_VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 			"BASKET_DISCOUNT_COUPON" => array("FIELD" => "B.DISCOUNT_COUPON", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
+			"BASKET_VAT_RATE" => array("FIELD" => "B.VAT_RATE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 
 			"STATUS_PERMS_GROUP_ID" => array("FIELD" => "SS2G.GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
 			"STATUS_PERMS_PERM_VIEW" => array("FIELD" => "SS2G.PERM_VIEW", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
@@ -889,6 +1003,9 @@ class CSaleOrder extends CAllSaleOrder
 			"PROPERTY_VALUE" => array("FIELD" => "SP.VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
 			"PROPERTY_CODE" => array("FIELD" => "SP.CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
 			"PROPERTY_VAL_BY_CODE" => array("FIELD" => "SP.VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
+
+			"COMPLETE_ORDERS" => array("WHERE" => array(self, "ProcessCompleteOrdersParam")),
+			"DELIVERY_DATE_REQUEST" => array("FIELD" => "OD.DATE_REQUEST", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order_delivery OD ON (O.ID = OD.ORDER_ID)")
 		);
 		// <-- FIELDS
 

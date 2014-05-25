@@ -16,7 +16,7 @@ namespace Bitrix\Main\Entity;
 class BooleanField extends ScalarField
 {
 	/**
-	 * Value (true, false) equivalent map
+	 * Value (false, true) equivalent map
 	 * @var array
 	 */
 	protected $values;
@@ -83,5 +83,10 @@ class BooleanField extends ScalarField
 	public function getValues()
 	{
 		return $this->values;
+	}
+
+	static public function isValueEmpty($value)
+	{
+		return (strval($value) === '' && $value !== false);
 	}
 }

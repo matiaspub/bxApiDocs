@@ -99,8 +99,7 @@ class CEventForum
 	public static function GetAuditTypes()
 	{
 		AddEventHandler("main", "GetAuditTypesForum", array("CForumEventLog", "GetAuditTypes"));
-		$db_events = GetModuleEvents("main", "GetAuditTypesForum");
-		while($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("main", "GetAuditTypesForum", true) as $arEvent)
 		{
 			$AuditTypes = ExecuteModuleEventEx($arEvent);
 		}
@@ -120,10 +119,10 @@ class CEventForum
 				$TID = $DESCRIPTION['TOPIC_ID'];
 				$FID = $DESCRIPTION['FORUM_ID'];
 				if ($arMessage = CForumMessage::GetByID($MID))
-					$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_MESSAGE_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "MESSAGE_ID" => $MID, "SITE_ID" => $site_id));
+					$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_MESSAGE_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "TITLE_SEO" => $TID, "MESSAGE_ID" => $MID, "SITE_ID" => $site_id));
 				else
 					if ($arTopic = CForumTopic::GetByID($TID))
-						$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_TOPIC_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "SITE_ID" => $site_id));
+						$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_TOPIC_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "TITLE_SEO" => $TID, "SITE_ID" => $site_id));
 
 				switch($row['AUDIT_TYPE_ID'])
 				{
@@ -150,7 +149,7 @@ class CEventForum
 				$TID = $row["ITEM_ID"];
 				$FID = $DESCRIPTION['FORUM_ID'];
 				if ($arTopic = CForumTopic::GetByID($TID))
-					$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_TOPIC_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "SITE_ID" => $site_id));
+					$sPath = SITE_DIR.CComponentEngine::MakePathFromTemplate($arParams['FORUM_TOPIC_PATH'], array("FORUM_ID" => $FID, "TOPIC_ID" => $TID, "TITLE_SEO" => $TID, "SITE_ID" => $site_id));
 
 				switch($row['AUDIT_TYPE_ID'])
 				{

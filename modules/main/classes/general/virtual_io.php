@@ -71,44 +71,45 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Объединяет части пути в единый путь. Параметров может быть произвольное число. После объединения путь приводится к нормальной форме.</p> <a name="examples"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path1  
-	 *
-	 *
-	 *
-	 * @param  $string  
-	 *
-	 *
-	 *
-	 * @param $path $2  
-	 *
-	 *
-	 *
-	 * @param  $string  
-	 *
-	 *
-	 *
-	 * @param $path $3  
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;CombinePath("/", "index.php");  // вернет /index.php
-	 * echo $io-&gt;CombinePath("/", "/path1/", "\\path2/", "path3\\. ./path4/");  // вернет /path1/path2/path4
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/combinepath.php
-	 * @author Bitrix
-	 */
+	* <p>Объединяет части пути в единый путь. Параметров может быть произвольное число. После объединения путь приводится к нормальной форме.</p> <a name="examples"></a>
+	*
+	*
+	*
+	*
+	* @param string $path1  
+	*
+	*
+	*
+	* @param  $string  
+	*
+	*
+	*
+	* @param $path $2  
+	*
+	*
+	*
+	* @param  $string  
+	*
+	*
+	*
+	* @param $path $3  
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;CombinePath("/", "index.php");  // вернет /index.php
+	* echo $io-&gt;CombinePath("/", "/path1/", "\\path2/", "path3\\. ./path4/");  // вернет /path1/path2/path4
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/combinepath.php
+	* @author Bitrix
+	*/
 	public function CombinePath()
 	{
 		$numArgs = func_num_args();
@@ -148,31 +149,32 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Приводит путь относительно корня продукта к абсолютному пути. Путь приводится к нормальной форме.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $string  Относительный путь
-	 *
-	 *
-	 *
-	 * @param $relativePat $h  
-	 *
-	 *
-	 *
-	 * @return result_type 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;RelativeToAbsolutePath("/path1/index.php");  // вернет c:/Projects/site1/path1/index.php
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/relativetoabsolutepath.php
-	 * @author Bitrix
-	 */
+	* <p>Приводит путь относительно корня продукта к абсолютному пути. Путь приводится к нормальной форме.</p>
+	*
+	*
+	*
+	*
+	* @param array $string  Относительный путь
+	*
+	*
+	*
+	* @param $relativePat $h  
+	*
+	*
+	*
+	* @return result_type 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;RelativeToAbsolutePath("/path1/index.php");  // вернет c:/Projects/site1/path1/index.php </bo
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/relativetoabsolutepath.php
+	* @author Bitrix
+	*/
 	public function RelativeToAbsolutePath($relativePath)
 	{
 		return $this->io->RelativeToAbsolutePath($relativePath);
@@ -180,31 +182,32 @@ class CBXVirtualIo
 
 	
 	/**
-	 * <p>Приводит путь относительно корня указанного сайта к абсолютному пути. Путь приводится к нормальной форме.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $relativePath  Относительный путь
-	 *
-	 *
-	 *
-	 * @param string $site = null домен сайта
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;SiteRelativeToAbsolutePath("/path1/index.php", "s1");  // вернет c:/Projects/site1/s1/path1/index.php
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/siterelativetoabsolutepath.php
-	 * @author Bitrix
-	 */
+	* <p>Приводит путь относительно корня указанного сайта к абсолютному пути. Путь приводится к нормальной форме.</p>
+	*
+	*
+	*
+	*
+	* @param string $relativePath  Относительный путь
+	*
+	*
+	*
+	* @param string $site = null домен сайта
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;SiteRelativeToAbsolutePath("/path1/index.php", "s1");  // вернет c:/Projects/site1/s1/path1/index.php</bo
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/siterelativetoabsolutepath.php
+	* @author Bitrix
+	*/
 	public function SiteRelativeToAbsolutePath($relativePath, $site = null)
 	{
 		return $this->io->SiteRelativeToAbsolutePath($relativePath, $site);
@@ -234,27 +237,28 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Возвращает имя файла или папки принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;ExtractNameFromPath("/path1/index.php");   // вернет index.php
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractnamefrompath.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает имя файла или папки принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;ExtractNameFromPath("/path1/index.php");   // вернет index.php </bo
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractnamefrompath.php
+	* @author Bitrix
+	*/
 	public function ExtractNameFromPath($path)
 	{
 		return $this->io->ExtractNameFromPath($path);
@@ -268,27 +272,28 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Возвращает путь к файлу или папке принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме.</p> <p><b>Примечание</b>: возможное примечание.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return result_type 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;ExtractPathFromPath("/path1/index.php");   // вернет /path1
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractpathfrompath.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает путь к файлу или папке принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return result_type 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;ExtractPathFromPath("/path1/index.php");   // вернет /path1</bo
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/extractpathfrompath.php
+	* @author Bitrix
+	*/
 	public function ExtractPathFromPath($path)
 	{
 		return $this->io->ExtractPathFromPath($path);
@@ -300,28 +305,29 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Проверяет, является ли путь корректным.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;ValidatePathString("/path1/путь2/файл.php");  // вернет 1
-	 * echo $io-&gt;ValidatePathString("/path1/пу*ть2/файл.php?"); // вернет 0
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/validatepathstring.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, является ли путь корректным.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;ValidatePathString("/path1/путь2/файл.php");  // вернет 1
+	* echo $io-&gt;ValidatePathString("/path1/пу*ть2/файл.php?"); // вернет 0
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/validatepathstring.php
+	* @author Bitrix
+	*/
 	public function ValidatePathString($path)
 	{
 		return $this->io->ValidatePathString($path);
@@ -353,27 +359,28 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Проверяет, существует ли указанная папка. На вход принимает абсолютный путь</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;DirectoryExists($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/directoryexists.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, существует ли указанная папка. На вход принимает абсолютный путь</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;DirectoryExists($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/directoryexists.php
+	* @author Bitrix
+	*/
 	public function DirectoryExists($path)
 	{
 		return $this->io->DirectoryExists($path);
@@ -387,27 +394,28 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Проверяет, существует ли указанный файл. На вход принимает абсолютный путь..</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $io-&gt;FileExists($io-&gt;RelativeToAbsolutePath("папка1/файл.php"));
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/fileexists.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, существует ли указанный файл. На вход принимает абсолютный путь..</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $io-&gt;FileExists($io-&gt;RelativeToAbsolutePath("папка1/файл.php"));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/fileexists.php
+	* @author Bitrix
+	*/
 	public function FileExists($path)
 	{
 		return $this->io->FileExists($path);
@@ -421,33 +429,34 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Возвращает объект класса папки для указанного пути. На вход принимает абсолютный путь. При этом существование папки не проверяется.</p> <p><b>Примечание</b>: возможное примечание.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return CBXVirtualDirectory 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $dir = $io-&gt;GetDirectory($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
-	 * $arChildren = $dir-&gt;GetChildren();
-	 * foreach ($arChildren as $child)
-	 * {
-	 *  if (!$child-&gt;IsDirectory() &amp;&amp; $child-&gt;GetName() != ".access.php")
-	 *   die("Error");
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getdirectory.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает объект класса папки для указанного пути. На вход принимает абсолютный путь. При этом существование папки не проверяется.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return CBXVirtualDirectory 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $dir = $io-&gt;GetDirectory($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
+	* $arChildren = $dir-&gt;GetChildren();
+	* foreach ($arChildren as $child)
+	* {
+	*  if (!$child-&gt;IsDirectory() &amp;&amp; $child-&gt;GetName() != ".access.php")
+	*   die("Error");
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getdirectory.php
+	* @author Bitrix
+	*/
 	public function GetDirectory($path)
 	{
 		return $this->io->GetDirectory($path);
@@ -461,30 +470,31 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Возвращает объект класса файла для указанного пути. На вход принимает абсолютный путь. При этом существование файла не проверяется.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return CBXVirtualFile 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $fp = $io-&gt;RelativeToAbsolutePath("/папка1/.access.php");
-	 * $f = $io-&gt;GetFile($fp);
-	 * $f-&gt;MarkWritable();
-	 * $io-&gt;Delete($fp);
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getfile.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает объект класса файла для указанного пути. На вход принимает абсолютный путь. При этом существование файла не проверяется.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return CBXVirtualFile 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $fp = $io-&gt;RelativeToAbsolutePath("/папка1/.access.php");
+	* $f = $io-&gt;GetFile($fp);
+	* $f-&gt;MarkWritable();
+	* $io-&gt;Delete($fp);</bo
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/getfile.php
+	* @author Bitrix
+	*/
 	public function GetFile($path)
 	{
 		return $this->io->GetFile($path);
@@ -510,34 +520,35 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Удаляет файл или папку.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $path = $io-&gt;RelativeToAbsolutePath($path);
-	 * $flTmp = $io-&gt;GetFile($path);
-	 * $flSzTmp = $flTmp-&gt;GetFileSize();
-	 * if ($io-&gt;Delete($path))
-	 * {
-	 *  if (COption::GetOptionInt("main", "disk_space") &gt; 0)
-	 *   CDiskQuota::updateDiskQuota("file", $flSzTmp, "delete");
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет файл или папку.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $path = $io-&gt;RelativeToAbsolutePath($path);
+	* $flTmp = $io-&gt;GetFile($path);
+	* $flSzTmp = $flTmp-&gt;GetFileSize();
+	* if ($io-&gt;Delete($path))
+	* {
+	*  if (COption::GetOptionInt("main", "disk_space") &gt; 0)
+	*   CDiskQuota::updateDiskQuota("file", $flSzTmp, "delete");
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/delete.php
+	* @author Bitrix
+	*/
 	public function Delete($path)
 	{
 		return $this->io->Delete($path);
@@ -553,28 +564,29 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Копирует файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $source  Путь к источнику.
-	 *
-	 *
-	 *
-	 * @param string $target  Путь к целевой папке.
-	 *
-	 *
-	 *
-	 * @param bool $bRewrite = true] Если файл существует переписывать или нет? По умолчанию <i>true</i>.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/copy.php
-	 * @author Bitrix
-	 */
+	* <p>Копирует файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь</p>
+	*
+	*
+	*
+	*
+	* @param string $source  Путь к источнику.
+	*
+	*
+	*
+	* @param string $target  Путь к целевой папке. </htm
+	*
+	*
+	*
+	* @param bool $bRewrite = true] Если файл существует переписывать или нет? По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @return bool 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/copy.php
+	* @author Bitrix
+	*/
 	public function Copy($source, $target, $bRewrite = true)
 	{
 		return $this->io->Copy($source, $target, $bRewrite);
@@ -590,28 +602,29 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Перемещает файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $source  Исходное местоположение.
-	 *
-	 *
-	 *
-	 * @param string $target  Конечное местоположение.
-	 *
-	 *
-	 *
-	 * @param bool $bRewrite = true] Если файл существует переписывать или нет? По умолчанию <i>true</i>.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/move.php
-	 * @author Bitrix
-	 */
+	* <p>Перемещает файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь</p>
+	*
+	*
+	*
+	*
+	* @param string $source  Исходное местоположение.
+	*
+	*
+	*
+	* @param string $target  Конечное местоположение.
+	*
+	*
+	*
+	* @param bool $bRewrite = true] Если файл существует переписывать или нет? По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @return bool 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/move.php
+	* @author Bitrix
+	*/
 	public function Move($source, $target, $bRewrite = true)
 	{
 		return $this->io->Move($source, $target, $bRewrite);
@@ -640,28 +653,29 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	 * <p>Создает указанную папку, если ее нет. Возвращает объект созданной или существующей папки или null в случае ошибки. На вход принимает абсолютный путь.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $path  Путь
-	 *
-	 *
-	 *
-	 * @return CBXVirtualDirectory 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * if (!$io-&gt;CreateDirectory($io-&gt;RelativeToAbsolutePath($path)))
-	 *  die();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/createdirectory.php
-	 * @author Bitrix
-	 */
+	* <p>Создает указанную папку, если ее нет. Возвращает объект созданной или существующей папки или null в случае ошибки. На вход принимает абсолютный путь.</p>
+	*
+	*
+	*
+	*
+	* @param string $path  Путь</bo
+	*
+	*
+	*
+	* @return CBXVirtualDirectory 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if (!$io-&gt;CreateDirectory($io-&gt;RelativeToAbsolutePath($path)))
+	*  die();
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/createdirectory.php
+	* @author Bitrix
+	*/
 	public function CreateDirectory($path)
 	{
 		return $this->io->CreateDirectory($path);

@@ -4,13 +4,7 @@ if(!defined("CACHED_b_sec_filter_mask")) // define("CACHED_b_sec_filter_mask", 3
 if(!defined("CACHED_b_sec_frame_mask")) // define("CACHED_b_sec_frame_mask", 36000);
 if(!defined("CACHED_b_sec_redirect_url")) // define("CACHED_b_sec_redirect_url", 36000);
 
-global $DB, $DBSQLServerType;
-
-if($DBSQLServerType == "NATIVE")
-	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/classes/".strtolower($DB->type)."/database_ms.php");
-else
-	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/classes/".strtolower($DB->type)."/database.php");
-
+global $DB;
 CModule::AddAutoloadClasses(
 	"security",
 	array(
@@ -24,6 +18,7 @@ CModule::AddAutoloadClasses(
 		"CSecuritySessionDB" => "classes/general/session_db.php",
 		"CSecuritySessionMC" => "classes/general/session_mc.php",
 		"CSecuritySession" => "classes/general/session.php",
+		"CSecurityDB" => "classes/".strtolower($DB->type)."/database.php",
 		"CSecurityUser" => "classes/general/user.php",
 		"CSecurityRedirect" => "classes/general/redirect.php",
 		"CSecurityAntiVirus" => "classes/general/antivirus.php",
@@ -44,7 +39,9 @@ CModule::AddAutoloadClasses(
 		"CSecurityPhpConfigurationTest" => "classes/general/tests/php_configuration.php",
 		"CSecuritySiteConfigurationTest" => "classes/general/tests/site_configuration.php",
 		"CSecurityTaintCheckingTest" => "classes/general/tests/taint_checking.php",
-		"CSecurityRequirementsException" => "classes/general/requirements_exception.php"
+		"CSecurityUserTest" => "classes/general/tests/user.php",
+		"CSecurityRequirementsException" => "classes/general/requirements_exception.php",
+		"CSecurityJsonHelper" => "classes/general/json.php",
 	)
 );
 

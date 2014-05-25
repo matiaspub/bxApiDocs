@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorNumSelected
@@ -16,7 +15,7 @@ class CFormValidatorNumSelected
 			"HANDLER" => array("CFormValidatorNumSelected", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -25,7 +24,7 @@ class CFormValidatorNumSelected
 				"TYPE" => "TEXT",
 				"DEFAULT" => "0",
 			),
-			
+
 			"NUMBER_TO" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_VAL_NUM_SELECTED_SETTINGS_NUMBER_TO"),
 				"TYPE" => "TEXT",
@@ -33,38 +32,38 @@ class CFormValidatorNumSelected
 			),
 		);
 	}
-	
+
 	public static function ToDB($arParams)
 	{
 		$arParams["NUMBER_FROM"] = intval($arParams["NUMBER_FROM"]);
 		$arParams["NUMBER_TO"] = intval($arParams["NUMBER_TO"]);
-		
+
 		if ($arParams["NUMBER_FROM"] < 0) $arParams["NUMBER_FROM"] = 0;
 		if ($arParams["NUMBER_TO"] < 0) $arParams["NUMBER_TO"] = 0;
-		
+
 		if ($arParams["NUMBER_FROM"] > $arParams["NUMBER_TO"])
 		{
 			$tmp = $arParams["NUMBER_FROM"];
 			$arParams["NUMBER_FROM"] = $arParams["NUMBER_TO"];
 			$arParams["NUMBER_TO"] = $tmp;
 		}
-		
+
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
+
 		if (strlen($arParams["NUMBER_FROM"]) > 0 && count($arValues) < $arParams["NUMBER_FROM"])
 		{
 			$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_SELECTED_ERROR_LESS"));
-			return false;		
+			return false;
 		}
 
 		if (strlen($arParams["NUMBER_TO"]) > 0 && count($arValues) > $arParams["NUMBER_TO"])
@@ -72,7 +71,7 @@ class CFormValidatorNumSelected
 			$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_SELECTED_ERROR_MORE"));
 			return false;
 		}
-		
+
 		return true;
 	}
 }

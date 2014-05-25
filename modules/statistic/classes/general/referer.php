@@ -16,128 +16,128 @@ class CReferer
 {
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов (страниц)</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string &$by = "s_id" Поле для сортировки. В зависимости от группировки списка, набор
-	 * доступных значений данной переменной может быть различным. <ul>
-	 * <li>при группировке по ссылающейся странице (<i>filter</i>["<b>GROUP</b>"]="U"): <ul>
-	 * <li> <b>s_url_from</b> - ссылающаяся страница; </li> <li> <b>s_quantity</b> - количество
-	 * заходов с ссылающейся страницы; </li> <li> <b>s_average_hits</b> - среднее
-	 * количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>,
-	 * производимое посетителями заходящими с той или ссылающейся
-	 * страницы. </li> </ul> </li> <li>при группировке по ссылающемуся домену
-	 * (<i>filter</i>["<b>GROUP</b>"]="S"): <ul> <li> <b>s_url_from</b> - ссылающийся домен; </li> <li>
-	 * <b>s_quantity</b> - количество заходов с ссылающегося домена; </li> <li>
-	 * <b>s_average_hits</b> - среднее количество хитов, производимое
-	 * посетителями. </li> </ul> </li> <li>когда группировка не установлена: <ul> <li>
-	 * <b>s_id</b> - ID записи; </li> <li> <b>s_site_id</b> - ID сайта, на который пришли; </li> <li>
-	 * <b>s_url_from</b> - ссылающаяся страница (с которой пришли); </li> <li> <b>s_url_to</b>
-	 * - страница на которую пришли; </li> <li> <b>s_date_hit</b> - дата; </li> <li>
-	 * <b>s_session_id</b> - ID сессии. </li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	 * возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	 * допустимы следующие ключи: <ul> <li> <b>ID</b> - ID записи; </li> <li>
-	 * <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	 * будет искаться вхождение; </li> <li> <b>SESSION_ID</b> - ID сессии; </li> <li>
-	 * <b>SESSION_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	 * <b>SESSION_ID</b> будет искаться вхождение; </li> <li> <b>DATE1</b> - начальное
-	 * значение интервала для поля "дата"; </li> <li> <b>DATE2</b> - конечное
-	 * значение интервала для поля "дата"; </li> <li> <b>FROM_PROTOCOL</b> - протокол
-	 * ссылающейся страницы; </li> <li> <b>FROM_PROTOCOL_EXACT_MATCH</b> - если значение
-	 * равно "Y", то при фильтрации по <b>FROM_PROTOCOL</b> будет искаться точное
-	 * совпадение; </li> <li> <b>FROM_DOMAIN</b> - домен ссылающейся страницы; </li> <li>
-	 * <b>FROM_DOMAIN_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	 * <b>FROM_DOMAIN</b> будет искаться точное совпадение; </li> <li> <b>FROM_PAGE</b> -
-	 * ссылающаяся страница; </li> <li> <b>FROM_PAGE_EXACT_MATCH</b> - если значение равно
-	 * "Y", то при фильтрации по <b>FROM_PAGE</b> будет искаться точное
-	 * совпадение; </li> <li> <b>FROM</b> - протокол + домен + ссылающаяся страница;
-	 * </li> <li> <b>FROM_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	 * <b>FROM</b> будет искаться точное совпадение; </li> <li> <b>TO</b>* - страница на
-	 * которую пришли; </li> <li> <b>TO_EXACT_MATCH</b> - если значение равно "Y", то при
-	 * фильтрации по <b>TO</b> будет искаться точное совпадение; </li> <li>
-	 * <b>TO_404</b> - была ли <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a>
-	 * на странице, на которую пришли, возможные значения: <ul> <li> <b>Y</b> -
-	 * была; </li> <li> <b>N</b> - не была. </li> </ul> </li> <li> <b>SITE_ID</b> - ID сайта на который
-	 * пришли; </li> <li> <b>GROUP</b> - группировка результирующего списка;
-	 * возможные значения: <ul> <li> <b>S</b> - группировка по ссылающемуся
-	 * домену (сайту); </li> <li> <b>U</b> - группировка по ссылающейся странице.
-	 * </li> </ul> </li> </ul> * - допускается <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
-	 *
-	 *
-	 *
-	 * @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
-	 * равно "true", то список был отфильтрован.
-	 *
-	 *
-	 *
-	 * @param int &$total  Суммарные количество заходов с ссылающихся страниц.
-	 *
-	 *
-	 *
-	 * @param string &$group_by  Группировка результирующего списка. Возможные значения: <ul> <li>
-	 * <b>U</b> - группировка по ссылающейся странице; </li> <li> <b>S</b> -
-	 * группировка по ссылающемуся домену. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param int &$max  Количество заходов с самой популярной ссылающейся страницы.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // отфильтруем только заходы с доменов "google"
-	 * // сгруппировав по ссылающемуся домену
-	 * $arFilter = array(
-	 *     "FROM_DOMAIN"  =&gt; "google",
-	 *     "GROUP"        =&gt; "S"
-	 *     );
-	 * 
-	 * // получим список записей
-	 * $rs = <b>CReferer::GetList</b>(
-	 *     ($by = "s_url_from"), 
-	 *     ($order = "desc"), 
-	 *     $arFilter, 
-	 *     $is_filtered,
-	 *     $total,
-	 *     $group_by,
-	 *     $max
-	 *     );
-	 * 
-	 * // выведем все записи
-	 * while ($ar = $rs-&gt;Fetch())
-	 * {
-	 *     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">Термин "Ссылающийся
-	 * сайт (страница)"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/creferer/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов (страниц)</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string &$by = "s_id" Поле для сортировки. В зависимости от группировки списка, набор
+	* доступных значений данной переменной может быть различным. <ul>
+	* <li>при группировке по ссылающейся странице (<i>filter</i>["<b>GROUP</b>"]="U"): <ul>
+	* <li> <b>s_url_from</b> - ссылающаяся страница; </li> <li> <b>s_quantity</b> - количество
+	* заходов с ссылающейся страницы; </li> <li> <b>s_average_hits</b> - среднее
+	* количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>,
+	* производимое посетителями заходящими с той или ссылающейся
+	* страницы. </li> </ul> </li> <li>при группировке по ссылающемуся домену
+	* (<i>filter</i>["<b>GROUP</b>"]="S"): <ul> <li> <b>s_url_from</b> - ссылающийся домен; </li> <li>
+	* <b>s_quantity</b> - количество заходов с ссылающегося домена; </li> <li>
+	* <b>s_average_hits</b> - среднее количество хитов, производимое
+	* посетителями. </li> </ul> </li> <li>когда группировка не установлена: <ul> <li>
+	* <b>s_id</b> - ID записи; </li> <li> <b>s_site_id</b> - ID сайта, на который пришли; </li> <li>
+	* <b>s_url_from</b> - ссылающаяся страница (с которой пришли); </li> <li> <b>s_url_to</b>
+	* - страница на которую пришли; </li> <li> <b>s_date_hit</b> - дата; </li> <li>
+	* <b>s_session_id</b> - ID сессии. </li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
+	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	*
+	*
+	*
+	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
+	* допустимы следующие ключи: <ul> <li> <b>ID</b> - ID записи; </li> <li>
+	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
+	* будет искаться вхождение; </li> <li> <b>SESSION_ID</b> - ID сессии; </li> <li>
+	* <b>SESSION_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>SESSION_ID</b> будет искаться вхождение; </li> <li> <b>DATE1</b> - начальное
+	* значение интервала для поля "дата"; </li> <li> <b>DATE2</b> - конечное
+	* значение интервала для поля "дата"; </li> <li> <b>FROM_PROTOCOL</b> - протокол
+	* ссылающейся страницы; </li> <li> <b>FROM_PROTOCOL_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>FROM_PROTOCOL</b> будет искаться точное
+	* совпадение; </li> <li> <b>FROM_DOMAIN</b> - домен ссылающейся страницы; </li> <li>
+	* <b>FROM_DOMAIN_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>FROM_DOMAIN</b> будет искаться точное совпадение; </li> <li> <b>FROM_PAGE</b> -
+	* ссылающаяся страница; </li> <li> <b>FROM_PAGE_EXACT_MATCH</b> - если значение равно
+	* "Y", то при фильтрации по <b>FROM_PAGE</b> будет искаться точное
+	* совпадение; </li> <li> <b>FROM</b> - протокол + домен + ссылающаяся страница;
+	* </li> <li> <b>FROM_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>FROM</b> будет искаться точное совпадение; </li> <li> <b>TO</b>* - страница на
+	* которую пришли; </li> <li> <b>TO_EXACT_MATCH</b> - если значение равно "Y", то при
+	* фильтрации по <b>TO</b> будет искаться точное совпадение; </li> <li>
+	* <b>TO_404</b> - была ли <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a>
+	* на странице, на которую пришли, возможные значения: <ul> <li> <b>Y</b> -
+	* была; </li> <li> <b>N</b> - не была. </li> </ul> </li> <li> <b>SITE_ID</b> - ID сайта на который
+	* пришли; </li> <li> <b>GROUP</b> - группировка результирующего списка;
+	* возможные значения: <ul> <li> <b>S</b> - группировка по ссылающемуся
+	* домену (сайту); </li> <li> <b>U</b> - группировка по ссылающейся странице.
+	* </li> </ul> </li> </ul> * - допускается <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
+	*
+	*
+	*
+	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
+	* равно "true", то список был отфильтрован.
+	*
+	*
+	*
+	* @param int &$total  Суммарные количество заходов с ссылающихся страниц.
+	*
+	*
+	*
+	* @param string &$group_by  Группировка результирующего списка. Возможные значения: <ul> <li>
+	* <b>U</b> - группировка по ссылающейся странице; </li> <li> <b>S</b> -
+	* группировка по ссылающемуся домену. </li> </ul>
+	*
+	*
+	*
+	* @param int &$max  Количество заходов с самой популярной ссылающейся страницы.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // отфильтруем только заходы с доменов "google"
+	* // сгруппировав по ссылающемуся домену
+	* $arFilter = array(
+	*     "FROM_DOMAIN"  =&gt; "google",
+	*     "GROUP"        =&gt; "S"
+	*     );
+	* 
+	* // получим список записей
+	* $rs = <b>CReferer::GetList</b>(
+	*     ($by = "s_url_from"), 
+	*     ($order = "desc"), 
+	*     $arFilter, 
+	*     $is_filtered,
+	*     $total,
+	*     $group_by,
+	*     $max
+	*     );
+	* 
+	* // выведем все записи
+	* while ($ar = $rs-&gt;Fetch())
+	* {
+	*     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">Термин "Ссылающийся
+	* сайт (страница)"</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/creferer/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered, &$total, &$grby, &$max)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";

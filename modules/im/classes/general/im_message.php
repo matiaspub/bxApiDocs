@@ -366,12 +366,14 @@ class CIMMessage
 			$ar = CIMContactList::GetUserData(array(
 					'ID' => Array($fromUserId, $toUserId),
 					'DEPARTMENT' => ($bDepartment? 'Y': 'N'),
-					'USE_CACHE' => 'N'
+					'USE_CACHE' => 'N',
+					'PHONES' => IsModuleInstalled('voximplant')? 'Y': 'N'
 				)
 			);
 			$arResult['users'] = $ar['users'];
 			$arResult['userInGroup']  = $ar['userInGroup'];
 			$arResult['woUserInGroup']  = $ar['woUserInGroup'];
+			$arResult['phones']  = $ar['phones'];
 		}
 
 		return $arResult;
@@ -618,11 +620,10 @@ class CIMMessage
 			return false;
 
 		$ssqlLastId = "STATUS = ".IM_STATUS_READ;
-		$ssqlWhereLastId = "";
 		if (!is_null($lastId) && intval($lastId) > 0)
 		{
-			$ssqlLastId = "LAST_ID = ".intval($lastId).", LAST_SEND_ID = ".intval($lastId);
-			$ssqlWhereLastId = "AND LAST_ID < ".intval($lastId);
+			$ssqlLastId = "LAST_ID = (case when LAST_ID > ".intval($lastId)." then LAST_ID else ".intval($lastId)." end),";
+			$ssqlLastId .= "LAST_SEND_ID = (case when LAST_SEND_ID > ".intval($lastId)." then LAST_SEND_ID else ".intval($lastId)." end)";
 
 			$strSql = "
 				SELECT COUNT(ID) CNT
@@ -639,7 +640,7 @@ class CIMMessage
 		$strSql = "
 			UPDATE b_im_relation
 			SET ".$ssqlLastId.", LAST_READ = ".$DB->CurrentTimeFunction()."
-			WHERE CHAT_ID = ".intval($chatId)." AND USER_ID = ".intval($userId)." ".$ssqlWhereLastId;
+			WHERE CHAT_ID = ".intval($chatId)." AND USER_ID = ".intval($userId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
@@ -652,8 +653,11 @@ class CIMMessage
 		if (intval($chatId) <= 0 || intval($userId) <= 0 || intval($lastSendId) <= 0)
 			return false;
 
-		$strSql = "UPDATE b_im_relation SET LAST_SEND_ID = ".intval($lastSendId).", STATUS = ".IM_STATUS_NOTIFY." WHERE CHAT_ID = ".intval($chatId)." AND USER_ID = ".intval($userId);
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$strSql = "UPDATE b_im_relation
+					SET LAST_SEND_ID = (case when LAST_SEND_ID > ".intval($lastSendId)." then LAST_SEND_ID else ".intval($lastSendId)." end),
+						STATUS = ".IM_STATUS_NOTIFY."
+					WHERE CHAT_ID = ".intval($chatId)." AND USER_ID = ".intval($userId);
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
 	}

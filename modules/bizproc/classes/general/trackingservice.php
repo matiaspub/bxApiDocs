@@ -4,6 +4,17 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPAllTrackingService
 	extends CBPRuntimeService
 {
+	protected $skipTypes = array();
+
+	public function Start(CBPRuntime $runtime = null)
+	{
+		parent::Start($runtime);
+
+		$skipTypes = \Bitrix\Main\Config\Option::get("bizproc", "log_skip_types", CBPTrackingType::ExecuteActivity.','.CBPTrackingType::CloseActivity);
+		if ($skipTypes !== '')
+			$this->skipTypes = explode(',', $skipTypes);
+	}
+
 	static public function DeleteAllWorkflowTracking($workflowId)
 	{
 		self::DeleteByWorkflow($workflowId);

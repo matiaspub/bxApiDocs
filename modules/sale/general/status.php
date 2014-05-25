@@ -92,33 +92,33 @@ class CAllSaleStatus
 
 	
 	/**
-	 * <p>Функция добавляет новый статус заказа с параметрами из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров нового статуса. Ключами в
-	 * массиве являются названия параметров статуса, а значениями -
-	 * соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>ID</b> - код
-	 * статуса (обязательный), состоит из одной буквы;</li> <li> <b>SORT</b> -
-	 * индекс сортировки;</li> <li> <b>LANG</b> - массив ассоциативных массивов
-	 * языкозависимых параметров статуса с ключами: <ul> <li> <b>LID</b> -
-	 * язык;</li> <li> <b>NAME</b> - название статуса на этом языке;</li> <li> <b>DESCRIPTION</b>
-	 * - описание статуса;</li> </ul> </li> <li> <b>PERMS</b> - массив ассоциативных
-	 * массивов прав на доступ к изменению заказа в данном статусе с
-	 * ключами: <ul> <li> <b>GROUP_ID</b> - группа пользователей;</li> <li> <b>PERM_TYPE</b> - тип
-	 * доступа (S - разрешен перевод заказа в данный статус, M - разрешено
-	 * изменение заказа в данном статусе).</li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращается код добавленного статуса или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/csalestatus__add.c7ce74b1.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новый статус заказа с параметрами из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров нового статуса. Ключами в
+	* массиве являются названия параметров статуса, а значениями -
+	* соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>ID</b> - код
+	* статуса (обязательный), состоит из одной буквы;</li> <li> <b>SORT</b> -
+	* индекс сортировки;</li> <li> <b>LANG</b> - массив ассоциативных массивов
+	* языкозависимых параметров статуса с ключами: <ul> <li> <b>LID</b> -
+	* язык;</li> <li> <b>NAME</b> - название статуса на этом языке;</li> <li> <b>DESCRIPTION</b>
+	* - описание статуса;</li> </ul> </li> <li> <b>PERMS</b> - массив ассоциативных
+	* массивов прав на доступ к изменению заказа в данном статусе с
+	* ключами: <ul> <li> <b>GROUP_ID</b> - группа пользователей;</li> <li> <b>PERM_TYPE</b> - тип
+	* доступа (S - разрешен перевод заказа в данный статус, M - разрешено
+	* изменение заказа в данном статусе).</li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @return string <p>Возвращается код добавленного статуса или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/csalestatus__add.c7ce74b1.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -169,112 +169,22 @@ class CAllSaleStatus
 
 	
 	/**
-	 * <p>Функция изменяет параметры статуса заказа с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $ID  Код статуса.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров статуса. Ключами в массиве
-	 * являются названия параметров статуса, а значениями -
-	 * соответствующие значения.<br> Допустимые ключи: <ul> <li> <b>ID</b> - код
-	 * статуса (обязательный);</li> <li> <b>SORT</b> - индекс сортировки;</li> <li>
-	 * <b>LANG</b> - массив ассоциативных массивов языкозависимых параметров
-	 * статуса с ключами: <ul> <li> <b>LID</b> - язык;</li> <li> <b>NAME</b> - название
-	 * статуса на этом языке;</li> <li> <b>DESCRIPTION</b> - описание статуса;</li> </ul>
-	 * </li> <li> <b>PERMS</b> - массив ассоциативных массивов прав на доступ к
-	 * изменению заказа в данном статусе с ключами: <ul> <li> <b>GROUP_ID</b> -
-	 * группа пользователей;</li> <li> <b>PERM_TYPE</b> - тип доступа (S - разрешен
-	 * перевод заказа в данный статус, M - разрешено изменение заказа в
-	 * данном статусе).</li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращается код добавленного статуса или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/csalestatus__update.145077bd.php
-	 * @author Bitrix
-	 */
-	public static function Update($ID, $arFields)
-	{
-		global $DB;
-
-		$ID = $DB->ForSql($ID, 1);
-		if (!CSaleStatus::CheckFields("UPDATE", $arFields, $ID))
-			return false;
-
-		foreach (GetModuleEvents("sale", "OnBeforeStatusUpdate", true) as $arEvent)
-		{
-			if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields))===false)
-				return false;
-		}
-
-		$strUpdate = $DB->PrepareUpdate("b_sale_status", $arFields);
-		if (!empty($strUpdate))
-		{
-			$strSql = "UPDATE b_sale_status SET ".$strUpdate." WHERE ID = '".$ID."' ";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		if (array_key_exists('LANG', $arFields) && is_array($arFields['LANG']))
-		{
-			$DB->Query("DELETE FROM b_sale_status_lang WHERE STATUS_ID = '".$ID."'");
-
-			foreach ($arFields['LANG'] as &$arOneLang)
-			{
-				$arInsert = $DB->PrepareInsert("b_sale_status_lang", $arOneLang);
-				$strSql = "INSERT INTO b_sale_status_lang(STATUS_ID, ".$arInsert[0].") VALUES('".$ID."', ".$arInsert[1].")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-			if (isset($arOneLang))
-				unset($arOneLang);
-		}
-
-		if (array_key_exists('PERMS', $arFields) && is_array($arFields["PERMS"]))
-		{
-			$DB->Query("DELETE FROM b_sale_status2group WHERE STATUS_ID = '".$ID."'");
-
-			foreach ($arFields["PERMS"] as &$arOnePerm)
-			{
-				$arInsert = $DB->PrepareInsert("b_sale_status2group", $arOnePerm);
-				$strSql = "INSERT INTO b_sale_status2group(STATUS_ID, ".$arInsert[0].") VALUES('".$ID."', ".$arInsert[1].")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-			if (isset($arOnePerm))
-				unset($arOnePerm);
-		}
-
-		foreach (GetModuleEvents("sale", "OnStatusUpdate", true) as $arEvent)
-		{
-			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
-		}
-
-		return $ID;
-	}
-
-	
-	/**
-	 * <p>Функция удаляет статус заказа с кодом ID. Если в базе есть заказы, находящиеся в этом статусе, то этот статус удалить нельзя. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $ID  Код статуса заказа.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/csalestatus__delete.11104aab.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет статус заказа с кодом ID. Если в базе есть заказы, находящиеся в этом статусе, то этот статус удалить нельзя. </p>
+	*
+	*
+	*
+	*
+	* @param string $ID  Код статуса заказа. </htm
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/csalestatus__delete.11104aab.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $APPLICATION;

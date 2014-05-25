@@ -29,7 +29,7 @@ class CAllForumNew
 	{
 		$FID = intVal($FID);
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
-		if ($ExternalPermission === false && (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")):
+		if ($ExternalPermission === false && CForumUser::IsAdmin($arUserGroups)):
 			return true;
 		endif;
 		$strPerms = ($ExternalPermission == false ? CForumNew::GetUserPermission($FID, $arUserGroups) : $ExternalPermission);
@@ -44,96 +44,100 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новый форум.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новый форум.</p>
+	*
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php
+	* @author Bitrix
+	*/
 	public static function CanUserAddForum($arUserGroups, $iUserID = 0)
 	{
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
-		if (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")
-			return true;
-		return false;
+		return CForumUser::IsAdmin($arUserGroups);
 	}
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить форум с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума, который пользователь хочет изменить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CForumNew::CanUserUpdateForum($ID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	 * {
-	 * 	echo "You can modify this forum!";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить форум с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $FID  Код форума, который пользователь хочет изменить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
+	* проверяются права самого форума, а идет доверие только этому
+	* параметру. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CForumNew::CanUserUpdateForum($FID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
+	* {
+	* 	echo "You can modify this forum!";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php
+	* @author Bitrix
+	*/
 	public static function CanUserUpdateForum($FID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$FID = intVal($FID);
-		if ($ExternalPermission === false && (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")):
+		if ($ExternalPermission === false && CForumUser::IsAdmin($arUserGroups)):
 			return true;
 		elseif (!CForumUser::IsLocked($iUserID)):
 			$strPerms = ($ExternalPermission == false ? CForumNew::GetUserPermission($FID, $arUserGroups) : $ExternalPermission);
@@ -145,45 +149,51 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить форум с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума, который пользователь хочет удалить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить форум с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $FID  Код форума, который пользователь хочет удалить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	*
+	*
+	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
+	* проверяются права самого форума, а идет доверие только этому
+	* параметру. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
+	* </li> </ul>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php
+	* @author Bitrix
+	*/
 	public static function CanUserDeleteForum($FID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$FID = intVal($FID);
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
-		if ($ExternalPermission === false && (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")):
+		if ($ExternalPermission === false && CForumUser::IsAdmin($arUserGroups)):
 			return true;
 		elseif (!CForumUser::IsLocked($iUserID)):
 			$strPerms = ($ExternalPermission == false ? CForumNew::GetUserPermission($FID, $arUserGroups) : $ExternalPermission);
@@ -197,7 +207,7 @@ class CAllForumNew
 	{
 		$FID = intVal($FID);
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
-		if ($ExternalPermission === false && (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")):
+		if ($ExternalPermission === false && CForumUser::IsAdmin($arUserGroups)):
 			return true;
 		elseif (!CForumUser::IsLocked($iUserID)):
 			$strPerms = ($ExternalPermission == false ? CForumNew::GetUserPermission($FID, $arUserGroups) : $ExternalPermission);
@@ -219,7 +229,7 @@ class CAllForumNew
 	{
 		$FID = intVal($FID);
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
-		if ($ExternalPermission === false && (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")):
+		if ($ExternalPermission === false && CForumUser::IsAdmin($arUserGroups)):
 			return true;
 		elseif (!CForumUser::IsLocked($iUserID)):
 			$strPerms = ($ExternalPermission == false ? CForumNew::GetUserPermission($FID, $arUserGroups) : $ExternalPermission);
@@ -300,34 +310,35 @@ class CAllForumNew
 			return false;
 		}
 
-		if (is_set($arFields, "SORT") || $ACTION=="ADD") {$arFields["SORT"] = intVal(intVal($arFields["SORT"]) <= 0 ? 100 : $arFields["SORT"]);}
-		if (is_set($arFields, "FORUM_GROUP_ID") || $ACTION=="ADD") {$arFields["FORUM_GROUP_ID"] = (intVal($arFields["FORUM_GROUP_ID"]) <= 0 ? false : intVal($arFields["FORUM_GROUP_ID"]));}
+		if (is_set($arFields, "SORT") || $ACTION=="ADD") $arFields["SORT"] = intVal(intVal($arFields["SORT"]) <= 0 ? 100 : $arFields["SORT"]);
+		if (is_set($arFields, "FORUM_GROUP_ID") || $ACTION=="ADD") $arFields["FORUM_GROUP_ID"] = (intVal($arFields["FORUM_GROUP_ID"]) <= 0 ? false : intVal($arFields["FORUM_GROUP_ID"]));
 
-		if (is_set($arFields, "ACTIVE") || $ACTION=="ADD") {$arFields["ACTIVE"] = ($arFields["ACTIVE"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "INDEXATION") || $ACTION=="ADD") {$arFields["INDEXATION"] = ($arFields["INDEXATION"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "DEDUPLICATION") || $ACTION=="ADD") {$arFields["DEDUPLICATION"] = ($arFields["DEDUPLICATION"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "MODERATION") || $ACTION=="ADD") {$arFields["MODERATION"] = ($arFields["MODERATION"] == "Y" ? "Y" : "N");}
+		if (is_set($arFields, "ACTIVE") || $ACTION=="ADD") $arFields["ACTIVE"] = ($arFields["ACTIVE"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "INDEXATION") || $ACTION=="ADD") $arFields["INDEXATION"] = ($arFields["INDEXATION"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "DEDUPLICATION") || $ACTION=="ADD") $arFields["DEDUPLICATION"] = ($arFields["DEDUPLICATION"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "MODERATION") || $ACTION=="ADD") $arFields["MODERATION"] = ($arFields["MODERATION"] == "Y" ? "Y" : "N");
 
-		if (is_set($arFields, "ALLOW_HTML") || $ACTION=="ADD") {$arFields["ALLOW_HTML"] = ($arFields["ALLOW_HTML"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "ALLOW_ANCHOR") || $ACTION=="ADD") {$arFields["ALLOW_ANCHOR"] = ($arFields["ALLOW_ANCHOR"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_BIU") || $ACTION=="ADD") {$arFields["ALLOW_BIU"] = ($arFields["ALLOW_BIU"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_IMG") || $ACTION=="ADD") {$arFields["ALLOW_IMG"] = ($arFields["ALLOW_IMG"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_VIDEO") || $ACTION=="ADD") {$arFields["ALLOW_VIDEO"] = ($arFields["ALLOW_VIDEO"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_LIST") || $ACTION=="ADD") {$arFields["ALLOW_LIST"] = ($arFields["ALLOW_LIST"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_QUOTE") || $ACTION=="ADD") {$arFields["ALLOW_QUOTE"] = ($arFields["ALLOW_QUOTE"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_CODE") || $ACTION=="ADD") {$arFields["ALLOW_CODE"] = ($arFields["ALLOW_CODE"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_FONT") || $ACTION=="ADD") {$arFields["ALLOW_FONT"] = ($arFields["ALLOW_FONT"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_TABLE") || $ACTION=="ADD") {$arFields["ALLOW_TABLE"] = ($arFields["ALLOW_TABLE"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_ALIGN") || $ACTION=="ADD") {$arFields["ALLOW_ALIGN"] = ($arFields["ALLOW_ALIGN"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_SMILES") || $ACTION=="ADD") {$arFields["ALLOW_SMILES"] = ($arFields["ALLOW_SMILES"] == "N" ? "N" : "Y");}
-		if (is_set($arFields, "ALLOW_UPLOAD") || $ACTION=="ADD") {$arFields["ALLOW_UPLOAD"] = (in_array($arFields["ALLOW_UPLOAD"], array("Y", "F", "A")) ? $arFields["ALLOW_UPLOAD"] : "N");}
-		if (is_set($arFields, "ALLOW_NL2BR") || $ACTION=="ADD") {$arFields["ALLOW_NL2BR"] = ($arFields["ALLOW_NL2BR"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "ALLOW_KEEP_AMP") || $ACTION=="ADD") {$arFields["ALLOW_KEEP_AMP"] = ($arFields["ALLOW_KEEP_AMP"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "ALLOW_TOPIC_TITLED") || $ACTION=="ADD") {$arFields["ALLOW_TOPIC_TITLED"] = ($arFields["ALLOW_TOPIC_TITLED"] == "Y" ? "Y" : "N");}
+		if (is_set($arFields, "ALLOW_HTML") || $ACTION=="ADD") $arFields["ALLOW_HTML"] = ($arFields["ALLOW_HTML"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "ALLOW_ANCHOR") || $ACTION=="ADD") $arFields["ALLOW_ANCHOR"] = ($arFields["ALLOW_ANCHOR"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_BIU") || $ACTION=="ADD") $arFields["ALLOW_BIU"] = ($arFields["ALLOW_BIU"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_IMG") || $ACTION=="ADD") $arFields["ALLOW_IMG"] = ($arFields["ALLOW_IMG"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_VIDEO") || $ACTION=="ADD") $arFields["ALLOW_VIDEO"] = ($arFields["ALLOW_VIDEO"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_LIST") || $ACTION=="ADD") $arFields["ALLOW_LIST"] = ($arFields["ALLOW_LIST"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_QUOTE") || $ACTION=="ADD") $arFields["ALLOW_QUOTE"] = ($arFields["ALLOW_QUOTE"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_CODE") || $ACTION=="ADD") $arFields["ALLOW_CODE"] = ($arFields["ALLOW_CODE"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_FONT") || $ACTION=="ADD") $arFields["ALLOW_FONT"] = ($arFields["ALLOW_FONT"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_TABLE") || $ACTION=="ADD") $arFields["ALLOW_TABLE"] = ($arFields["ALLOW_TABLE"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_ALIGN") || $ACTION=="ADD") $arFields["ALLOW_ALIGN"] = ($arFields["ALLOW_ALIGN"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_SMILES") || $ACTION=="ADD") $arFields["ALLOW_SMILES"] = ($arFields["ALLOW_SMILES"] == "N" ? "N" : "Y");
+		if (is_set($arFields, "ALLOW_UPLOAD") || $ACTION=="ADD") $arFields["ALLOW_UPLOAD"] = (in_array($arFields["ALLOW_UPLOAD"], array("Y", "F", "A")) ? $arFields["ALLOW_UPLOAD"] : "N");
+		if (is_set($arFields, "ALLOW_NL2BR") || $ACTION=="ADD") $arFields["ALLOW_NL2BR"] = ($arFields["ALLOW_NL2BR"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "ALLOW_TOPIC_TITLED") || $ACTION=="ADD") $arFields["ALLOW_TOPIC_TITLED"] = ($arFields["ALLOW_TOPIC_TITLED"] == "Y" ? "Y" : "N");
 
-		if (is_set($arFields, "ALLOW_MOVE_TOPIC") || $ACTION=="ADD") {$arFields["ALLOW_MOVE_TOPIC"] = ($arFields["ALLOW_MOVE_TOPIC"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "ASK_GUEST_EMAIL") || $ACTION=="ADD") {$arFields["ASK_GUEST_EMAIL"] = ($arFields["ASK_GUEST_EMAIL"] == "Y" ? "Y" : "N");}
-		if (is_set($arFields, "ASK_GUEST_EMAIL") || $ACTION=="ADD") {$arFields["ASK_GUEST_EMAIL"] = ($arFields["ASK_GUEST_EMAIL"] == "Y" ? "Y" : "N");}
+		if (is_set($arFields, "ALLOW_MOVE_TOPIC") || $ACTION=="ADD") $arFields["ALLOW_MOVE_TOPIC"] = ($arFields["ALLOW_MOVE_TOPIC"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "ALLOW_SIGNATURE") || $ACTION=="ADD") $arFields["ALLOW_SIGNATURE"] = ($arFields["ALLOW_SIGNATURE"] == "Y" ? "Y" : "N");
+
+		if (is_set($arFields, "ASK_GUEST_EMAIL") || $ACTION=="ADD") $arFields["ASK_GUEST_EMAIL"] = ($arFields["ASK_GUEST_EMAIL"] == "Y" ? "Y" : "N");
+		if (is_set($arFields, "ASK_GUEST_EMAIL") || $ACTION=="ADD") $arFields["ASK_GUEST_EMAIL"] = ($arFields["ASK_GUEST_EMAIL"] == "Y" ? "Y" : "N");
 
 		if (is_set($arFields, "LAST_POSTER_NAME") && COption::GetOptionString("forum", "FILTER", "Y") == "Y")
 		{
@@ -340,37 +351,55 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Изменяет параметры существующего форума с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого форума.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума, параметры которого необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
-	 * форума</a>.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
-	 * <li>Перед изменением форума следует проверить возможность
-	 * изменения методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующего форума с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого форума.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код форума, параметры которого необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
+	* форума</a>.
+	*
+	*
+	*
+	* @param bool $bReindex = true Необязательный. По умолчанию равен True.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Этот код привязывает сайт с кодом $site_code к форуму $FORUM_ID и прописывает "Шаблон пути к сообщению на сайте" в виде $FORUM_PATH
+	* 
+	* $arFields = array("ACTIVE" =&gt; "Y", "SITES" =&gt; CForumNew::GetSites($FORUM_ID));
+	* $arFields["SITES"][$site_code] = str_replace("#SITE_PATH#", $site_path, $FORUM_PATH);
+	* CForumNew::Update($FORUM_ID, $arFields);
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
+	* <li>Перед изменением форума следует проверить возможность
+	* изменения методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
+	* </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $bReindex = true)
 	{
 		global $DB;
@@ -384,8 +413,7 @@ class CAllForumNew
 		if ($arFields["ACTIVE"] == "N")
 			$arForum_prev = CForumNew::GetByID($ID);
 /***************** Event onBeforeForumUpdate ***********************/
-		$events = GetModuleEvents("forum", "onBeforeForumUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onBeforeForumUpdate", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields)) === false)
 				return false;
@@ -419,8 +447,7 @@ class CAllForumNew
 		if (is_set($arFields, "GROUP_ID") && is_array($arFields["GROUP_ID"]))
 			CForumNew::SetAccessPermissions($ID, $arFields["GROUP_ID"]);
 /***************** Event onAfterForumUpdate ************************/
-		$events = GetModuleEvents("forum", "onAfterForumUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "onAfterForumUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 
@@ -452,12 +479,12 @@ class CAllForumNew
 			{
 				$arGroups = CForumNew::GetAccessPermissions($ID);
 				$arGPerm = Array();
-				for ($i=0; $i<count($arGroups); $i++)
+				foreach ($arGroups as $i => $group)
 				{
-					if ($arGroups[$i][1] >= "E")
+					if ($group[1] >= "E")
 					{
-						$arGPerm[] = $arGroups[$i][0];
-						if ($arGroups[$i][0] == 2)
+						$arGPerm[] = $group[0];
+						if ($group[0] == 2)
 							break;
 					}
 				}
@@ -469,37 +496,36 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Удаляет форум с кодом <i>ID</i>. Перед удалением проверяет обработчики события OnBeforeForumDelete модуля forum. Если один из обработчиков вернет false, то форум удален не будет.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума, который необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li>Перед удалением форума следует проверить возможность
-	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет форум с кодом <i>ID</i>. Перед удалением проверяет обработчики события OnBeforeForumDelete модуля forum. Если один из обработчиков вернет false, то форум удален не будет.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код форума, который необходимо удалить.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li>Перед удалением форума следует проверить возможность
+	* удаления методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	* </li></ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
 		$ID = intVal($ID);
 		$bCanDelete = true;
 /***************** Event OnBeforeForumDelete ***********************/
-		$events = GetModuleEvents("forum", "OnBeforeForumDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "OnBeforeForumDelete", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array(&$ID)) === false)
 			{
@@ -511,8 +537,7 @@ class CAllForumNew
 		if (!$bCanDelete)
 			return false;
 /***************** Event OnForumDelete *****************************/
-		$events = GetModuleEvents("forum", "OnForumDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "OnForumDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$ID));
 /***************** /Event ******************************************/
 /***************** Cleaning cache **********************************/
@@ -585,15 +610,12 @@ class CAllForumNew
 		}
 
 		// Update USER statistic
-		for ($i = 0; $i < count($arProcAuth); $i++)
-		{
-			CForumUser::SetStat($arProcAuth[$i]);
-		}
+		foreach($arProcAuth as $i => $procAuth)
+			CForumUser::SetStat($procAuth);
 
 		$DB->Commit();
 /***************** Event OnAfterForumDelete ************************/
-		$events = GetModuleEvents("forum", "OnAfterForumDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("forum", "OnAfterForumDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 /***************** /Event ******************************************/
 		return true;
@@ -602,41 +624,41 @@ class CAllForumNew
 	//---------------> Array of sites (langs) where forum is available
 	
 	/**
-	 * <p>Функция возвращает ассоциативный массив, в котором ключами являются сайты, к которым привязан форум с кодом ID, а значениями - шаблоны пути к сообщению форума в соответствующем сайте. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // Для форума с кодом $FID получим массив реальных путей к сообщению
-	 * // с кодом $MID из темы с кодом $TID
-	 * 
-	 * $arForumPaths = CForumNew::GetSites($FID);
-	 * $arForumPathsCodes = array_keys($arForumPaths);
-	 * for ($i = 0; $i &lt; count($arForumPathsCodes); $i++)
-	 * {
-	 *     $arForumPaths[$arForumPathsCodes[$i]] = 
-	 *         CForumNew::PreparePath2Message($arForumPaths[$arForumPathsCodes[$i]],
-	 *                                        array("FORUM_ID"=&gt;$FID,
-	 *                                              "TOPIC_ID"=&gt;$TID,
-	 *                                              "MESSAGE_ID"=&gt;$MID)
-	 *                                        );
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getsites.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает ассоциативный массив, в котором ключами являются сайты, к которым привязан форум с кодом ID, а значениями - шаблоны пути к сообщению форума в соответствующем сайте. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код форума.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // Для форума с кодом $FID получим массив реальных путей к сообщению
+	* // с кодом $MID из темы с кодом $TID
+	* 
+	* $arForumPaths = CForumNew::GetSites($FID);
+	* $arForumPathsCodes = array_keys($arForumPaths);
+	* for ($i = 0; $i &lt; count($arForumPathsCodes); $i++)
+	* {
+	*     $arForumPaths[$arForumPathsCodes[$i]] = 
+	*         CForumNew::PreparePath2Message($arForumPaths[$arForumPathsCodes[$i]],
+	*                                        array("FORUM_ID"=&gt;$FID,
+	*                                              "TOPIC_ID"=&gt;$TID,
+	*                                              "MESSAGE_ID"=&gt;$MID)
+	*                                        );
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getsites.php
+	* @author Bitrix
+	*/
 	public static function GetSites($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -689,31 +711,6 @@ class CAllForumNew
 			return "A";
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getaccesspermissions.php
-	 * @author Bitrix
-	 */
 	public static function GetAccessPermissions($ID, $TYPE = "ONE")
 	{
 		global $CACHE_MANAGER;
@@ -820,31 +817,6 @@ class CAllForumNew
 		return $db_res;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed <p></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <p></p><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/setaccesspermissions.php
-	 * @author Bitrix
-	 */
 	public static function SetAccessPermissions($ID, $arGROUP_ID)
 	{
 		global $DB, $CACHE_MANAGER, $aForumPermissions;
@@ -886,31 +858,6 @@ class CAllForumNew
 		return true;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getuserpermission.php
-	 * @author Bitrix
-	 */
 	public static function GetUserPermission($ID, $arUserGroups)
 	{
 		global $DB, $CACHE_MANAGER, $aForumPermissions;
@@ -921,7 +868,7 @@ class CAllForumNew
 		$cache_id = "b_forum_perms".$key;
 		if ($ID <= 0 || empty($arUserGroups)):
 			return $aForumPermissions["reference_id"][0];
-		elseif (in_array(1, $arUserGroups)):
+		elseif (CForumUser::IsAdmin(false, $arUserGroups)):
 			return $aForumPermissions["reference_id"][count($aForumPermissions["reference_id"])-1];
 		elseif (!is_array($GLOBALS["FORUM_CACHE"]["FORUM"][$ID])):
 			$GLOBALS["FORUM_CACHE"]["FORUM"][$ID] = array("PERMISSION" => array());
@@ -1053,6 +1000,7 @@ class CAllForumNew
 			$arAddParams["sPrefix"]."ALLOW_SMILES" => $arAddParams["sTablePrefix"]."ALLOW_SMILES",
 			$arAddParams["sPrefix"]."ALLOW_UPLOAD" => $arAddParams["sTablePrefix"]."ALLOW_UPLOAD",
 			$arAddParams["sPrefix"]."ALLOW_TOPIC_TITLED" => $arAddParams["sTablePrefix"]."ALLOW_TOPIC_TITLED",
+			$arAddParams["sPrefix"]."ALLOW_SIGNATURE" => $arAddParams["sTablePrefix"]."ALLOW_SIGNATURE",
 			$arAddParams["sPrefix"]."EVENT1" => $arAddParams["sTablePrefix"]."EVENT1",
 			$arAddParams["sPrefix"]."EVENT2" => $arAddParams["sTablePrefix"]."EVENT2",
 			$arAddParams["sPrefix"]."EVENT3" => $arAddParams["sTablePrefix"]."EVENT3",
@@ -1078,78 +1026,83 @@ class CAllForumNew
 	//---------------> Forum list
 	
 	/**
-	 * <p>Возвращает список форумов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID форума;<br>     <i>LID</i> - язык форума;<br>     <i>NAME</i> -
-	 * название форума;<br>     <i>ACTIVE</i> - активность;<br>     <i>MODERATION</i> -
-	 * модерируемость форума;<br>     <i>FORUM_GROUP_ID</i> - ID группы форума;<br>
-	 *     <i>TOPICS</i> - количество тем в форуме;<br>     <i>POSTS</i> - количество
-	 * сообщений в форуме;<br>     <i>LAST_POST_DATE</i> - дата последнего
-	 * сообщения;<br>     <i>SORT</i> - индекс сортировки;<br><br><i>order</i> - порядок
-	 * сортировки, может принимать значения<br>     <i>ASC</i> - по
-	 * возрастанию;<br>     <i>DESC</i> - по убыванию;<br><br> Необязательный. По
-	 * умолчанию равен Array("SORT"=&gt;"ASC")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения<br>     <i>LID</i> - язык
-	 * форума;<br>     <i>ACTIVE</i> - активность форума;<br>     <i>ID</i> - ID
-	 * форума;<br>     <i>FORUM_GROUP_ID</i> - ID группы форума;<br>     <i>TOPICS</i> -
-	 * количество тем в форуме;<br>     <i>POSTS</i> - количество сообщений в
-	 * форуме;<br>     <i>TEXT</i> - подстрока в названии или описании форума;<br>
-	 *     <i>PERMS</i> - права на доступ к форуму (массив из двух элементов,
-	 * первый из которых - это список кодов групп, в которые входит
-	 * пользователь, а второй - это код права на доступ);<br><br> фильтруемое
-	 * поле может иметь содержать перед названием тип проверки
-	 * фильтра<br> "!" - не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br>
-	 * "&gt;" - больше<br> "&gt;=" - больше либо равно<br><br> Необязательное. По
-	 * умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // выведем список форумов, к которым текущий посетитель 
-	 * // имеет доступ по крайней мере на чтение, 
-	 * // отсортируем список сначала по индексу сортировки, а потом 
-	 * // по названию форума
-	 * $arFilter = array();
-	 * if (!$USER-&gt;IsAdmin())
-	 * {
-	 *   $arFilter["PERMS"] = array($USER-&gt;GetGroups(), 'A');
-	 *   $arFilter["ACTIVE"] = "Y";
-	 * }
-	 * $arOrder = array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC");
-	 * $db_Forum = CForumNew::GetList($arOrder, $arFilter);
-	 * while ($ar_Forum = $db_Forum-&gt;Fetch())
-	 * {
-	 *   echo $ar_Forum["NAME"]."&lt;br&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список форумов по фильтру <i>arFilter</i>, отсортированный в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <b>ID</b> - ID форума;<br>     <b>LID</b> - язык форума;<br>     <b>NAME</b> -
+	* название форума;<br>     <b>ACTIVE</b> - активность;<br>     <b>MODERATION</b> -
+	* модерируемость форума;<br>     <b>FORUM_GROUP_ID</b> - ID группы форума;<br>
+	*     <b>TOPICS</b> - количество тем в форуме;<br>     <b>POSTS</b> - количество
+	* сообщений в форуме;<br>     <b>LAST_POST_DATE</b> - дата последнего
+	* сообщения;<br>     <b>SORT</b> - индекс сортировки;<br><br><i>order</i> - порядок
+	* сортировки, может принимать значения<br>     <b>ASC</b> - по
+	* возрастанию;<br>     <b>DESC</b> - по убыванию;<br><br> Необязательный. По
+	* умолчанию равен Array("SORT"=&gt;"ASC")
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения<br>     <b>LID</b> - язык
+	* форума;<br>     <b>ACTIVE</b> - активность форума;<br>     <b>ID</b> - ID
+	* форума;<br>     <b>FORUM_GROUP_ID</b> - ID группы форума;<br>     <b>TOPICS</b> -
+	* количество тем в форуме;<br>     <b>POSTS</b> - количество сообщений в
+	* форуме;<br>     <b>TEXT</b> - подстрока в названии или описании форума;<br>
+	*     <b>PERMS</b> - права на доступ к форуму (массив из двух элементов,
+	* первый из которых - это список кодов групп, в которые входит
+	* пользователь, а второй - это код права на доступ);<br><br> фильтруемое
+	* поле может иметь содержать перед названием тип проверки
+	* фильтра<br> "!" - не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br>
+	* "&gt;" - больше<br> "&gt;=" - больше либо равно<br><br> Необязательное. По
+	* умолчанию записи не фильтруются.
+	*
+	*
+	*
+	* @param array $arrayarAddParams = Array() Массив параметров. Необязательное. По умолчанию записи не
+	* фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // выведем список форумов, к которым текущий посетитель 
+	* // имеет доступ по крайней мере на чтение, 
+	* // отсортируем список сначала по индексу сортировки, а потом 
+	* // по названию форума
+	* $arFilter = array();
+	* if (!$USER-&gt;IsAdmin())
+	* {
+	*   $arFilter["PERMS"] = array($USER-&gt;GetGroups(), 'A');
+	*   $arFilter["ACTIVE"] = "Y";
+	* }
+	* $arOrder = array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC");
+	* $db_Forum = CForumNew::GetList($arOrder, $arFilter);
+	* while ($ar_Forum = $db_Forum-&gt;Fetch())
+	* {
+	*   echo $ar_Forum["NAME"]."&lt;br&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("SORT"=>"ASC"), $arFilter = Array(), $arAddParams = array())
 	{
 		global $DB;
@@ -1273,6 +1226,7 @@ class CAllForumNew
 				F.ALLOW_IMG, F.ALLOW_VIDEO, F.ALLOW_TABLE, F.ALLOW_LIST, F.ALLOW_QUOTE, F.ALLOW_CODE,
 				F.ALLOW_ALIGN, F.ALLOW_FONT, F.ALLOW_SMILES, F.ALLOW_UPLOAD, F.EVENT1, F.EVENT2,
 				F.EVENT3, F.ALLOW_NL2BR, '' as PATH2FORUM_MESSAGE, F.ALLOW_UPLOAD_EXT, F.ALLOW_TOPIC_TITLED,
+				F.ALLOW_SIGNATURE,
 				F.FORUM_GROUP_ID, F.ASK_GUEST_EMAIL, F.USE_CAPTCHA, F.XML_ID
 			FROM
 			(
@@ -1290,81 +1244,99 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Возвращает список форумов (включая связаные данные) по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID форума;<br>     <i>LID</i> - язык форума;<br>     <i>NAME</i> -
-	 * название форума;<br>     <i>ACTIVE</i> - активность;<br>     <i>MODERATION</i> -
-	 * модерируемость форума;<br>     <i>FORUM_GROUP_ID</i> - ID группы форума;<br>
-	 *     <i>TOPICS</i> - количество тем в форуме;<br>     <i>POSTS</i> - количество
-	 * сообщений в форуме;<br>     <i>LAST_POST_DATE</i> - дата последнего
-	 * сообщения;<br>     <i>FORUM_GROUP_SORT</i> - индекс сортировки группы, которой
-	 * принадлежит форум;<br>     <i>SORT</i> - индекс сортировки;<br><br><i>order</i> -
-	 * порядок сортировки, может принимать значения<br>     <i>ASC</i> - по
-	 * возрастанию;<br>     <i>DESC</i> - по убыванию;<br><br> Необязательный. По
-	 * умолчанию равен Array("SORT"=&gt;"ASC")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]).<br>
-	 * Подробное описание параметра смотрите в описании функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlist.php">CForumNew::GetList</a>.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // выведем список форумов, к которым текущий посетитель 
-	 * // имеет доступ по крайней мере на чтение, 
-	 * // сгруппируем список по группам форумов,
-	 * // отсортируем список сначала по индексу сортировки, а потом 
-	 * // по названию форума
-	 * $arFilter = array();
-	 * if (!$USER-&gt;IsAdmin())
-	 * {
-	 *   $arFilter["PERMS"] = array($USER-&gt;GetGroups(), 'A');
-	 *   $arFilter["ACTIVE"] = "Y";
-	 * }
-	 * $arOrder = array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC");
-	 * $db_Forum = CForumNew::GetListEx($arOrder, $arFilter);
-	 * $currentGroupID = -1;
-	 * while ($db_Forum-&gt;NavNext(true, "f_", false)):
-	 *   if ($currentGroupID != IntVal($f_FORUM_GROUP_ID))
-	 *   {
-	 *     if (IntVal($f_FORUM_GROUP_ID)&gt;0)
-	 *     {
-	 *       $arCurForumGroup = CForumGroup::GetLangByID($f_FORUM_GROUP_ID, LANG);
-	 *       echo "&lt;b&gt;";
-	 *       echo htmlspecialcharsex($arCurForumGroup["NAME"]);
-	 *       echo "&lt;b&gt;&lt;br&gt;";
-	 *     }
-	 *     $currentGroupID = IntVal($f_FORUM_GROUP_ID);
-	 *   }
-	 *   echo $f_NAME."&lt;br&gt;";
-	 * endwhile;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlistex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список форумов (включая связанные данные) по фильтру <i>arFilter</i>, отсортированный в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <b>ID</b> - ID форума;<br>     <b>LID</b> - язык форума;<br>     <b>NAME</b> -
+	* название форума;<br>     <b>ACTIVE</b> - активность;<br>     <b>MODERATION</b> -
+	* модерируемость форума;<br>     <b>FORUM_GROUP_ID</b> - ID группы форума;<br>
+	*     <b>TOPICS</b> - количество тем в форуме;<br>     <b>POSTS</b> - количество
+	* сообщений в форуме;<br>     <b>LAST_POST_DATE</b> - дата последнего
+	* сообщения;<br>     <b>FORUM_GROUP_SORT</b> - индекс сортировки группы, которой
+	* принадлежит форум;<br>     <b>SORT</b> - индекс сортировки;<br><br><i>order</i> -
+	* порядок сортировки, может принимать значения<br>     <b>ASC</b> - по
+	* возрастанию;<br>     <b>DESC</b> - по убыванию;<br><br> Необязательный. По
+	* умолчанию равен Array("SORT"=&gt;"ASC")
+	*
+	*
+	*
+	* @param array $arFilter = Array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]).<br>
+	* Подробное описание параметра смотрите в описании функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlist.php">CForumNew::GetList</a>.
+	*
+	*
+	*
+	* @param boolbCoun $t = false Если параметр равен True, то возвращается только количество
+	* форумов, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @param intiNu $m = 0 Ограничение числа возвращаемых записей. Если параметр iNum отличен
+	* от нуля, то возвращается не более iNum записей. Поддерживается не
+	* для всех баз данных. Если параметр не поддерживается, то его
+	* установки игнорируются. Необязательный. По умолчанию равен 0.
+	*
+	*
+	*
+	* @param array $arAddParams = Array() Массив параметров. Необязательное. По умолчанию записи не
+	* фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // выведем список форумов, к которым текущий посетитель 
+	* // имеет доступ по крайней мере на чтение, 
+	* // сгруппируем список по группам форумов,
+	* // отсортируем список сначала по индексу сортировки, а потом 
+	* // по названию форума
+	* $arFilter = array();
+	* if (!$USER-&gt;IsAdmin())
+	* {
+	*   $arFilter["PERMS"] = array($USER-&gt;GetGroups(), 'A');
+	*   $arFilter["ACTIVE"] = "Y";
+	* }
+	* $arOrder = array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC");
+	* $db_Forum = CForumNew::GetListEx($arOrder, $arFilter);
+	* $currentGroupID = -1;
+	* while ($db_Forum-&gt;NavNext(true, "f_", false)):
+	*   if ($currentGroupID != IntVal($f_FORUM_GROUP_ID))
+	*   {
+	*     if (IntVal($f_FORUM_GROUP_ID)&gt;0)
+	*     {
+	*       $arCurForumGroup = CForumGroup::GetLangByID($f_FORUM_GROUP_ID, LANG);
+	*       echo "&lt;b&gt;";
+	*       echo htmlspecialcharsex($arCurForumGroup["NAME"]);
+	*       echo "&lt;b&gt;&lt;br&gt;";
+	*     }
+	*     $currentGroupID = IntVal($f_FORUM_GROUP_ID);
+	*   }
+	*   echo $f_NAME."&lt;br&gt;";
+	* endwhile;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getlistex.php
+	* @author Bitrix
+	*/
 	public static function GetListEx($arOrder = Array("SORT"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
 	{
 		global $DB;
@@ -1372,11 +1344,13 @@ class CAllForumNew
 		$orSqlSearch = array();
 		$arSqlSelect = array();
 		$arSqlFrom = array();
+		$arSqlGroup = array();
 		$arSqlOrder = array();
 		$strSqlSearch = "";
 		$strSqlSelect = "";
 		$strSqlSearchOR = "";
 		$strSqlFrom = "";
+		$strSqlGroup = "";
 		$strSqlOrder = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
 
@@ -1394,6 +1368,8 @@ class CAllForumNew
 					if (strLen($val) <= 0):
 						continue;
 					endif;
+					$arSqlSelect["PATH2FORUM_MESSAGE"] = "F2S.PATH2FORUM_MESSAGE";
+					$arSqlGroup["PATH2FORUM_MESSAGE"] = "F2S.PATH2FORUM_MESSAGE";
 					$arSqlFrom["F2S"] = "
 					INNER JOIN b_forum2site F2S ON (F2S.FORUM_ID=F.ID)";
 					$arSqlSearch[] = ($strNegative=="Y"?" NOT ":"")."(F2S.SITE_ID ".$strOperation." '".$DB->ForSql($val)."')";
@@ -1403,6 +1379,7 @@ class CAllForumNew
 				case "ACTIVE":
 				case "XML_ID":
 				case "ALLOW_MOVE_TOPIC":
+				case "ALLOW_SIGNATURE":
 					if (strLen($val)<=0)
 						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(F.".$key." IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(F.".$key.") <= 0)";
 					else
@@ -1574,6 +1551,8 @@ class CAllForumNew
 			$strSqlSelect = ", ".implode(", ", $arSqlSelect);
 		if (count($arSqlFrom) > 0)
 			$strSqlFrom = " ".implode(" ", $arSqlFrom);
+		if (count($arSqlGroup) > 0)
+			$strSqlGroup = ",".implode(",", $arSqlGroup);
 		foreach ($arOrder as $by=>$order)
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
@@ -1640,10 +1619,9 @@ class CAllForumNew
 						"LEFT JOIN b_forum_group FG ON F.FORUM_GROUP_ID = FG.ID ".
 					"WHERE (1=1 ".$strSqlSearch.") ".
 						$strSqlSearchOR." ".
-					"GROUP BY F.ID, FG.SORT) F_FORUM ".
+					"GROUP BY F.ID, FG.SORT".$strSqlGroup. ") F_FORUM ".
 				"INNER JOIN b_forum F ON (F_FORUM.ID = F.ID) ".
 				str_replace("FG.SORT", "F_FORUM.SORT", $strSqlOrder);
-
 				$db_res = new CDBResult();
 				$db_res->NavQuery($strSubSql, $iCnt, $arAddParams);
 					return $db_res;
@@ -1691,8 +1669,8 @@ class CAllForumNew
 				F.ALLOW_HTML, F.ALLOW_ANCHOR, F.ALLOW_BIU, F.ALLOW_IMG, F.ALLOW_VIDEO,
 				F.ALLOW_LIST, F.ALLOW_QUOTE, F.ALLOW_CODE, F.ALLOW_FONT, F.ALLOW_SMILES,
 				F.ALLOW_ALIGN, F.ALLOW_UPLOAD, F.ALLOW_UPLOAD_EXT, F.ALLOW_MOVE_TOPIC,
-				F.ALLOW_NL2BR, F.ALLOW_TABLE,  F.ALLOW_TOPIC_TITLED, F.ALLOW_KEEP_AMP,
-				'' as PATH2FORUM_MESSAGE,
+				F.ALLOW_NL2BR, F.ALLOW_TABLE,  F.ALLOW_TOPIC_TITLED, F.ALLOW_SIGNATURE,
+				".(strpos($strSqlSelect, "PATH2FORUM_MESSAGE") === false ? "'' as PATH2FORUM_MESSAGE," : "")."
 				F.ASK_GUEST_EMAIL, F.USE_CAPTCHA, F.MODERATION, F.INDEXATION, F.DEDUPLICATION,
 				F.ORDER_BY, F.ORDER_DIRECTION,
 				'' as LID, '' as DIR,
@@ -1704,8 +1682,13 @@ class CAllForumNew
 				".$DB->DateToCharFunction("F.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE,
 				F.ABS_LAST_MESSAGE_ID, FM_ABS.TOPIC_ID as ABS_TID,
 				F.EVENT1, F.EVENT2, F.EVENT3,
-				FT.TITLE, FT_ABS.TITLE as ABS_TITLE,
-				F.HTML, FT.HTML AS TOPIC_HTML, FT_ABS.HTML AS ABS_TOPIC_HTML".$arSQL["select"]."
+				FT.TITLE, FT.SOCNET_GROUP_ID, FT.OWNER_ID,
+				".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." AS TITLE_SEO,
+				FT.HTML AS TOPIC_HTML, FM.PARAM1, FM.PARAM2,
+				FT_ABS.TITLE as ABS_TITLE, FT_ABS.SOCNET_GROUP_ID as ABS_SOCNET_GROUP_ID, FT_ABS.OWNER_ID as ABS_OWNER_ID,
+				".CForumNew::Concat("-", array("FT_ABS.ID", "FT_ABS.TITLE_SEO"))." AS ABS_TITLE_SEO,
+				FT_ABS.HTML AS ABS_TOPIC_HTML, FM_ABS.PARAM1 as ABS_PARAM1, FM_ABS.PARAM2 as ABS_PARAM2,
+				F.HTML".$arSQL["select"]."
 			FROM
 			(
 				SELECT F.ID ".$strSqlSelect."
@@ -1713,7 +1696,7 @@ class CAllForumNew
 					".$strSqlFrom."
 				WHERE ".$strSqlSearch."
 					".$strSqlSearchOR."
-				GROUP BY F.ID
+				GROUP BY F.ID".$strSqlGroup."
 			) F_FORUM
 			INNER JOIN b_forum F ON (F_FORUM.ID = F.ID)".
 			$arSQL["join"]."
@@ -1839,40 +1822,40 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Возвращает массив параметров форума по его коду <i>ID</i>. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же форума не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров форума).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arForum = CForumNew::GetByID($FID);
-	 * if ($arForum)
-	 * {
-	 *   echo $arForum["NAME"]."&lt;br&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров форума по его коду <i>ID</i>. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же форума не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров форума).</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код форума.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arForum = CForumNew::GetByID($FID);
+	* if ($arForum)
+	* {
+	*   echo $arForum["NAME"]."&lt;br&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -1903,7 +1886,7 @@ class CAllForumNew
 						F.ORDER_DIRECTION, F.ALLOW_HTML, F.ALLOW_ANCHOR, F.ALLOW_BIU, F.ALLOW_TOPIC_TITLED,
 						F.ALLOW_IMG, F.ALLOW_VIDEO, F.ALLOW_LIST, F.ALLOW_QUOTE, F.ALLOW_CODE, F.ALLOW_TABLE,
 						F.ALLOW_ALIGN, F.ALLOW_FONT, F.ALLOW_SMILES, F.ALLOW_UPLOAD, F.EVENT1, F.EVENT2,
-						F.EVENT3, F.ALLOW_NL2BR, '' as PATH2FORUM_MESSAGE, F.ALLOW_UPLOAD_EXT,
+						F.EVENT3, F.ALLOW_NL2BR, '' as PATH2FORUM_MESSAGE, F.ALLOW_UPLOAD_EXT, F.ALLOW_SIGNATURE,
 						F.FORUM_GROUP_ID, F.ASK_GUEST_EMAIL, F.USE_CAPTCHA, F.XML_ID
 					FROM b_forum F
 					WHERE F.ID = ".$ID;
@@ -1919,43 +1902,51 @@ class CAllForumNew
 
 	
 	/**
-	 * <p>Возвращает массив параметров форума, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код форума.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Распечатаем на экран все возвращаемые параметры форума
-	 * $arForum = CForumNew::GetByIDEx($FID);
-	 * if ($arForum)
-	 * {
-	 *   echo "&lt;pre&gt;";
-	 *   print_r($arForum);
-	 *   echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getbyidex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров форума, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код форума.
+	*
+	*
+	*
+	* @param bool $SITE_ID = false Код сайта. Необязательный. По умолчанию равен False.
+	*
+	*
+	*
+	* @param array $arAddParams  Массив параметров. </h
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Распечатаем на экран все возвращаемые параметры форума
+	* $arForum = CForumNew::GetByIDEx($FID);
+	* if ($arForum)
+	* {
+	*   echo "&lt;pre&gt;";
+	*   print_r($arForum);
+	*   echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li></ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $SITE_ID = false, $arAddParams = array())
 	{
 		global $DB, $CACHE_MANAGER;
@@ -2003,7 +1994,7 @@ class CAllForumNew
 						F.POSTS_UNAPPROVED, F.ABS_LAST_POSTER_ID, F.ABS_LAST_POSTER_NAME,
 						".$DB->DateToCharFunction("F.ABS_LAST_POST_DATE", "FULL")." as ABS_LAST_POST_DATE,
 						F.ABS_LAST_MESSAGE_ID, FT.TITLE, F.SORT, '' as DIR, F.ORDER_BY, F.ORDER_DIRECTION,
-						F.ALLOW_HTML, F.ALLOW_ANCHOR, F.ALLOW_BIU, F.ALLOW_TABLE, F.ALLOW_ALIGN,
+						F.ALLOW_HTML, F.ALLOW_ANCHOR, F.ALLOW_BIU, F.ALLOW_TABLE, F.ALLOW_ALIGN, F.ALLOW_SIGNATURE,
 						F.ALLOW_IMG, F.ALLOW_VIDEO, F.ALLOW_LIST, F.ALLOW_QUOTE, F.ALLOW_CODE, F.ALLOW_TOPIC_TITLED,
 						F.ALLOW_FONT, F.ALLOW_SMILES, F.ALLOW_UPLOAD, F.EVENT1, F.EVENT2,
 						F.EVENT3, F.ALLOW_NL2BR, ".(!$SITE_ID ? "''" : "FS.PATH2FORUM_MESSAGE")." as PATH2FORUM_MESSAGE, F.ALLOW_UPLOAD_EXT,
@@ -2299,13 +2290,25 @@ class CAllForumNew
 
 	public static function PreparePath2Message($strPath, $arVals = array())
 	{
-		if (strlen($strPath)<=0)
+		$pattern = array(
+			"#MESSAGE_ID#" => $arVals["MESSAGE_ID"],
+			"#MID#" => $arVals["MESSAGE_ID"],
+			"#TOPIC_ID#" => $arVals["TOPIC_ID"],
+			"#TID#" => $arVals["TOPIC_ID"],
+			"#TITLE_SEO#" => $arVals["TITLE_SEO"],
+			"#FORUM_ID#" => $arVals["FORUM_ID"],
+			"#FID#" => $arVals["FORUM_ID"],
+			"#PARAM1#" => $arVals["PARAM1"],
+			"#PARAM2#" => $arVals["PARAM2"],
+			"#SOCNET_GROUP_ID#" => $arVals["SOCNET_GROUP_ID"],
+			"#OWNER_ID#" => $arVals["OWNER_ID"]
+		);
+		if ($strPath === NULL)
+			return array_keys($pattern);
+		else if (strlen($strPath)<=0)
 			return "";
-		$pattern = array("//", "#MESSAGE_ID#", "#MID#", "#TOPIC_ID#", "#TID#", "#FORUM_ID#", "#FID#", "#PARAM1#", "#PARAM2#",
-			"SOCNET_GROUP_ID", "OWNER_ID");
-		$replace = array("/", $arVals["MESSAGE_ID"], $arVals["MESSAGE_ID"], $arVals["TOPIC_ID"], $arVals["TOPIC_ID"],
-			$arVals["FORUM_ID"], $arVals["FORUM_ID"], $arVals["PARAM1"], $arVals["PARAM2"], $arVals["SOCNET_GROUP_ID"], $arVals["OWNER_ID"]);
-		return str_replace($pattern, $replace, $strPath);
+		$pattern["//"] = "/";
+		return str_replace(array_keys($pattern), array_values($pattern), $strPath);
 	}
 
 	//---------------> Forum actions
@@ -2399,23 +2402,17 @@ class CAllForumGroup
 	//---------------> User insert, update, delete
 	public static function CanUserAddGroup($arUserGroups)
 	{
-		if (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")
-			return true;
-		return false;
+		return CForumUser::IsAdmin($arUserGroups);
 	}
 
 	public static function CanUserUpdateGroup($ID, $arUserGroups)
 	{
-		if (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")
-			return true;
-		return false;
+		return CForumUser::IsAdmin($arUserGroups);
 	}
 
 	public static function CanUserDeleteGroup($ID, $arUserGroups)
 	{
-		if (in_array(1, $arUserGroups) || $GLOBALS["APPLICATION"]->GetGroupRight("forum", $arUserGroups) >= "W")
-			return true;
-		return false;
+		return CForumUser::IsAdmin($arUserGroups);
 	}
 
 	public static function CheckFields($ACTION, &$arFields, $ID = false)
@@ -2452,7 +2449,7 @@ class CAllForumGroup
 		}
 
 		if ((is_set($arFields, "SORT") || $ACTION=="ADD") && intVal($arFields["SORT"])<=0) $arFields["SORT"] = 150;
-		if ((is_set($arFields, "PARENT_ID") || $ACTION=="ADD")) {$arFields["PARENT_ID"] = intVal($arFields["PARENT_ID"]) > 0 ? intVal($arFields["PARENT_ID"]) : false;}
+		if ((is_set($arFields, "PARENT_ID") || $ACTION=="ADD")) $arFields["PARENT_ID"] = (intVal($arFields["PARENT_ID"]) > 0 ? intVal($arFields["PARENT_ID"]) : false);
 		if ($arFields["PARENT_ID"])
 		{
 			if ($ACTION != "ADD" && $ID == $arFields["PARENT_ID"])
@@ -2491,21 +2488,21 @@ class CAllForumGroup
 
 	
 	/**
-	 * <p>Удаляет группу с кодом <i>ID</i>. Если к данной группе привязаны форумы, то она удалена не будет.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет группу с кодом <i>ID</i>. Если к данной группе привязаны форумы, то она удалена не будет.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы, которую необходимо удалить.
+	*
+	*
+	*
+	* @return bool <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -2542,42 +2539,43 @@ class CAllForumGroup
 
 	
 	/**
-	 * <p>Возвращает список групп по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID группы;<br>     <i>SORT</i> - индекс сортировки;<br><br><i>order</i> -
-	 * порядок сортировки, может принимать значения<br>     <i>ASC</i> - по
-	 * возрастанию;<br>     <i>DESC</i> - по убыванию;<br><br> Необязательный. По
-	 * умолчанию равен Array("sort"=&gt;"asc")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения<br>     <i>ID</i> - по
-	 * коду;<br>     <i>SORT</i> - индекс сортировки;<br><br> фильтруемое поле
-	 * может иметь содержать перед названием тип проверки фильтра<br> "!" -
-	 * не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
-	 * "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
-	 * не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля элементов</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список групп по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <i>ID</i> - ID группы;<br>     <i>SORT</i> - индекс сортировки;<br><br><i>order</i> -
+	* порядок сортировки, может принимать значения<br>     <i>ASC</i> - по
+	* возрастанию;<br>     <i>DESC</i> - по убыванию;<br><br> Необязательный. По
+	* умолчанию равен Array("sort"=&gt;"asc")
+	*
+	*
+	*
+	* @param array $arFilter  Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения<br>     <i>ID</i> - по
+	* коду;<br>     <i>SORT</i> - индекс сортировки;<br><br> фильтруемое поле
+	* может иметь содержать перед названием тип проверки фильтра<br> "!" -
+	* не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
+	* "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
+	* не фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля элементов</a> </li> </ul>
+	* </h<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("SORT"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -2712,26 +2710,27 @@ class CAllForumGroup
 
 	
 	/**
-	 * <p>Возвращает массив не зависящих от языка параметров группы по ее коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив не зависящих от языка параметров группы форума по ее коду <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы форума. </htm
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a>
+	* </li></ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -2749,30 +2748,31 @@ class CAllForumGroup
 
 	
 	/**
-	 * <p>Возвращает массив всех параметров группы по ее коду <i>ID</i> и языку <i>LANG</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы.
-	 *
-	 *
-	 *
-	 * @param char(2) $LANG  Сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getbyidex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив всех параметров группы по ее коду <i>ID</i> и языку <i>LANGUAGE_ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы.
+	*
+	*
+	*
+	* @param char(2) $LANGUAGE_ID  Язык. <br><br> До версии 8.0.0 параметр назывался strLang.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a>
+	* </li></ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $LANGUAGE_ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -2810,30 +2810,31 @@ class CAllForumGroup
 
 	
 	/**
-	 * <p>Возвращает массив языковых параметров группы по ее коду <i>GROUP_ID</i> и языку <i>LANG</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $GROUP_ID  Код группы.
-	 *
-	 *
-	 *
-	 * @param char(2) $LANG  Язык
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getlangbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив языковых параметров группы по ее коду <i>GROUP_ID</i> и языку <i>LANG</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $FORUM_GROUP_ID  Код группы.
+	*
+	*
+	*
+	* @param char(2) $strLang  Язык</bod
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a>
+	* </li></ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/getlangbyid.php
+	* @author Bitrix
+	*/
 	public static function GetLangByID($FORUM_GROUP_ID, $strLang)
 	{
 		global $DB;
@@ -3028,35 +3029,36 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Изменяет параметры существующего смайла с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого смайла.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код смайла, параметры которого необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">списке
-	 * полей смайла</a>. В специальное поле "LANG" заносится массив массивов
-	 * полей языковых параметров звания, которые имеют аналогичную
-	 * структуру.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующего смайла с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого смайла.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код смайла, параметры которого необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">списке
+	* полей смайла</a>. В специальное поле "LANG" заносится массив массивов
+	* полей языковых параметров звания, которые имеют аналогичную
+	* структуру.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -3093,21 +3095,21 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Удаляет смайл с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код смайла, который необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет смайл с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код смайла, который необходимо удалить.
+	*
+	*
+	*
+	* @return bool <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -3126,42 +3128,42 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Возвращает список смайлов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	 *     <i>ID</i> - ID смайла;<br>     <i>SORT</i> - индекс сортировки;<br><br><i>order</i> -
-	 * порядок сортировки, может принимать значения<br>     <i>ASC</i> - по
-	 * возрастанию;<br>     <i>DESC</i> - по убыванию;<br><br> Необязательный. По
-	 * умолчанию равен Array("SORT"=&gt;"ASC")
-	 *
-	 *
-	 *
-	 * @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения<br>     <i>ID</i> - ID
-	 * смайла;<br>     <i>SORT</i> - индекс сортировки;<br><br> фильтруемое поле
-	 * может иметь содержать перед названием тип проверки фильтра<br> "!" -
-	 * не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
-	 * "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
-	 * не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список смайлов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*     <b>ID</b> - ID смайла;<br>     <b>SORT</b> - индекс сортировки;<br><br><i>order</i> -
+	* порядок сортировки, может принимать значения<br>     <b>ASC</b> - по
+	* возрастанию;<br>     <b>DESC</b> - по убыванию;<br><br> Необязательный. По
+	* умолчанию равен Array("SORT"=&gt;"ASC")
+	*
+	*
+	*
+	* @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения<br>     <b>ID</b> - ID
+	* смайла;<br>     <b>SORT</b> - индекс сортировки;<br><br> фильтруемое поле
+	* может иметь содержать перед названием тип проверки фильтра<br> "!" -
+	* не равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
+	* "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
+	* не фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li> </ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("SORT"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -3297,26 +3299,27 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Возвращает массив параметров смайла, которые не зависят от языка, по его коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код смайла.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров смайла, которые не зависят от языка, по его коду <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код смайла.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -3337,31 +3340,31 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Возвращает массив всех параметров смайла по его коду <i>ID</i> и языку <i>LANG</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код смайла.
-	 *
-	 *
-	 *
-	 * @param char(2) $LANG  Язык сайта
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a>
-	 * </li></ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getbyidex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив всех параметров смайла по его коду <i>ID</i> и языку <i>LANG</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код смайла.
+	*
+	*
+	*
+	* @param char(2) $strLang  Язык сайта.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $strLang)
 	{
 		global $DB;
@@ -3383,31 +3386,31 @@ class CAllForumSmile
 
 	
 	/**
-	 * <p>Возвращает массив языковых параметров смайла по его коду <i>RANK_ID</i> и языку <i>LANG</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $RANK_ID  Код смайла.
-	 *
-	 *
-	 *
-	 * @param char(2) $LANG  Сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmilelang">Поля смайла</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getlangbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив языковых параметров смайла по его коду <i>RANK_ID</i> и языку <i>LANG</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $SMILE_ID  Код смайла.
+	*
+	*
+	*
+	* @param char(2) $strLang  Язык сайта.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmilelang">Поля смайла</a>
+	* </li></ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/getlangbyid.php
+	* @author Bitrix
+	*/
 	public static function GetLangByID($SMILE_ID, $strLang)
 	{
 		global $DB;

@@ -650,6 +650,7 @@ class CCalendarEvent
 			if ($rrule['FREQ'] == 'WEEKLY')
 			{
 				$weekDay = CCalendar::WeekDayByInd(date("w", $fromTS));
+
 				if ($rrule['BYDAY'][$weekDay])
 				{
 					if (($preciseLimits && $fromTS > $limitFromTSReal) || (!$preciseLimits && $fromTS > $limitFromTS - $h24))
@@ -890,6 +891,9 @@ class CCalendarEvent
 		if ($res['FREQ'] == 'WEEKLY' && (!isset($res['BYDAY']) || !is_array($res['BYDAY']) || count($res['BYDAY']) == 0))
 			$res['BYDAY'] = array('MO' => 'MO');
 
+		if ($res['FREQ'] != 'WEEKLY' && isset($res['BYDAY']))
+			unset($res['BYDAY']);
+
 		$res['INTERVAL'] = intVal($res['INTERVAL']);
 		if ($res['INTERVAL'] <= 1)
 			$res['INTERVAL'] = 1;
@@ -907,6 +911,13 @@ class CCalendarEvent
 		}
 		$strRes = trim($strRes, ', ');
 		return $strRes;
+	}
+
+	public static function CheckRRULE($RRule = array())
+	{
+		if ($RRule['FREQ'] != 'WEEKLY' && isset($RRule['BYDAY']))
+			unset($RRule['BYDAY']);
+		return $RRule;
 	}
 
 	public static function ParseText($text = "", $eventId = 0, $arUFWDValue = array())
@@ -981,8 +992,8 @@ class CCalendarEvent
 			else
 			{
 				$arFields['DT_LENGTH'] = intVal($toTs - $fromTs);
-				//if ($arFields['DT_LENGTH'] % $h24 == 0)
-				if (date('H:i', $fromTs) == '00:00' || date('H:i', $toTs) == '00:00') // We have dates without times
+
+				if ($arFields['DT_SKIP_TIME'] == "Y") // We have dates without times
 					$arFields['DT_LENGTH'] += $h24;
 			}
 		}
@@ -2261,6 +2272,9 @@ class CCalendarEvent
 	public static function GetAbsent($users = false, $Params = array())
 	{
 		global $DB;
+		// Can be called from agent... So we have to create $USER if it is not exists
+		$tempUser = CCalendar::TempUser(false, true);
+
 		$curUserId = isset($Params['userId']) ? intVal($Params['userId']) : CCalendar::GetCurUserId();
 		$arUsers = array();
 		if ($users !== false && is_array($users))
@@ -2422,6 +2436,7 @@ class CCalendarEvent
 		// Sort by DT_FROM_TS
 		usort($result, array('CCalendar', '_NearestSort'));
 
+		CCalendar::TempUser($tempUser, false);
 		return $result;
 	}
 

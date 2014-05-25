@@ -1,7 +1,8 @@
 <?php
 namespace Bitrix\Main\IO;
 
-use \Bitrix\Main\Text as Text;
+use Bitrix\Main;
+use Bitrix\Main\Text;
 
 /**
  *
@@ -12,10 +13,12 @@ class Path
 	const DIRECTORY_SEPARATOR_ALT = '\\';
 	const PATH_SEPARATOR = PATH_SEPARATOR;
 
-	const LOGICAL_TO_PHYSICAL = 1;
-	const PHYSICAL_TO_LOGICAL = 2;
+	const INVALID_FILENAME_CHARS = "\\/:*?\"'<>|~#";
 
-	const INVALID_FILENAME_CHARS = "\\\\/:*?\"\\'<>|~";
+	protected static $physicalEncoding = "";
+	protected static $logicalEncoding = "";
+
+	protected static $directoryIndex = null;
 
 	public static function normalize($path)
 	{
@@ -23,7 +26,7 @@ class Path
 			return null;
 
 		//slashes doesn't matter for Windows
-		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0? "'[\\\\/]+'" : "'[/]+'");
+		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0 ? "'[\\\\/]+'" : "'[/]+'");
 		$pathTmp = preg_replace($pattern, "/", $path);
 
 		if (($p = strpos($pathTmp, "\0")) !== false)
@@ -79,7 +82,7 @@ class Path
 
 	public static function getName($path)
 	{
-		$path = self::normalize($path);
+		//$path = self::normalize($path);
 
 		$p = Text\String::strrpos($path, self::DIRECTORY_SEPARATOR);
 		if ($p !== false)
@@ -93,25 +96,66 @@ class Path
 		return substr($path, 0, -strlen(self::getName($path)) - 1);
 	}
 
-	protected static function convertCharset($path, $direction = 1)
+	public static function convertLogicalToPhysical($path)
 	{
-		static $physicalEncoding = "";
-		if ($physicalEncoding == "")
-			$physicalEncoding = self::getPhysicalEncoding();
+		if (self::$physicalEncoding == "")
+			self::$physicalEncoding = self::getPhysicalEncoding();
 
-		static $logicalEncoding = "";
-		if ($logicalEncoding == "")
-			$logicalEncoding = self::getLogicalEncoding();
+		if (self::$logicalEncoding == "")
+			self::$logicalEncoding = self::getLogicalEncoding();
 
-		if ($physicalEncoding == $logicalEncoding)
+		if (self::$physicalEncoding == self::$logicalEncoding)
 			return $path;
 
-		if ($direction == self::LOGICAL_TO_PHYSICAL)
-			$result = Text\Encoding::convertEncoding($path, $logicalEncoding, $physicalEncoding);
-		else
-			$result = Text\Encoding::convertEncoding($path, $physicalEncoding, $logicalEncoding);
+		return Text\Encoding::convertEncoding($path, self::$logicalEncoding, self::$physicalEncoding);
+	}
 
-		return $result;
+	public static function convertPhysicalToLogical($path)
+	{
+		if (self::$physicalEncoding == "")
+			self::$physicalEncoding = self::getPhysicalEncoding();
+
+		if (self::$logicalEncoding == "")
+			self::$logicalEncoding = self::getLogicalEncoding();
+
+		if (self::$physicalEncoding == self::$logicalEncoding)
+			return $path;
+
+		return Text\Encoding::convertEncoding($path, self::$physicalEncoding, self::$logicalEncoding);
+	}
+
+	public static function convertLogicalToUri($path)
+	{
+		if (self::$logicalEncoding == "")
+			self::$logicalEncoding = self::getLogicalEncoding();
+
+		if (self::$directoryIndex == null)
+			self::$directoryIndex = self::getDirectoryIndexArray();
+
+		if (isset(self::$directoryIndex[self::getName($path)]))
+			$path = self::getDirectory($path)."/";
+
+		if ('utf-8' !== self::$logicalEncoding)
+			$path = Text\Encoding::convertEncoding($path, self::$logicalEncoding, 'utf-8');
+
+		return implode('/', array_map("rawurlencode", explode('/', $path)));
+	}
+
+	public static function convertPhysicalToUri($path)
+	{
+		if (self::$physicalEncoding == "")
+			self::$physicalEncoding = self::getPhysicalEncoding();
+
+		if (self::$directoryIndex == null)
+			self::$directoryIndex = self::getDirectoryIndexArray();
+
+		if (isset(self::$directoryIndex[self::getName($path)]))
+			$path = self::getDirectory($path)."/";
+
+		if ('utf-8' !== self::$physicalEncoding)
+			$path = Text\Encoding::convertEncoding($path, self::$physicalEncoding, 'utf-8');
+
+		return implode('/', array_map("rawurlencode", explode('/', $path)));
 	}
 
 	protected static function getLogicalEncoding()
@@ -190,9 +234,9 @@ class Path
 	public static function convertRelativeToAbsolute($relativePath)
 	{
 		if (!is_string($relativePath))
-			throw new \Bitrix\Main\ArgumentTypeException("relativePath", "string");
+			throw new Main\ArgumentTypeException("relativePath", "string");
 		if ($relativePath == "")
-			throw new \Bitrix\Main\ArgumentNullException("relativePath");
+			throw new Main\ArgumentNullException("relativePath");
 
 		return self::combine($_SERVER["DOCUMENT_ROOT"], $relativePath);
 	}
@@ -202,19 +246,9 @@ class Path
 		if (!is_string($relativePath) || $relativePath == "")
 			$site = SITE_ID;
 
-		$basePath = \CSite::getSiteDocRoot($site);
+		$basePath = Main\SiteTable::getDocumentRoot($site);
 
 		return self::combine($basePath, $relativePath);
-	}
-
-	public static function convertLogicalToPhysical($path)
-	{
-		return self::convertCharset($path, self::LOGICAL_TO_PHYSICAL);
-	}
-
-	public static function convertPhysicalToLogical($path)
-	{
-		return self::convertCharset($path, self::PHYSICAL_TO_LOGICAL);
 	}
 
 	public static function validate($path)
@@ -229,7 +263,7 @@ class Path
 		if (strpos($path, "\0") !== false)
 			return false;
 
-		return (preg_match("#^([a-z]:)?/([^".self::INVALID_FILENAME_CHARS."]+/?)*$#is", $path) > 0);
+		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+/?)*$#is", $path) > 0);
 	}
 
 	public static function validateFilename($filename)
@@ -244,11 +278,27 @@ class Path
 		if (strpos($filename, "\0") !== false)
 			return false;
 
-		return (preg_match("#^[^".self::INVALID_FILENAME_CHARS."]+$#is", $filename) > 0);
+		return (preg_match("#^[^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+$#is", $filename) > 0);
 	}
 
 	public static function randomizeInvalidFilename($filename)
 	{
-		return preg_replace('#(['.self::INVALID_FILENAME_CHARS.'])#e', "chr(rand(97, 122))", $filename);
+		return preg_replace("#([\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."])#e", "chr(rand(97, 122))", $filename);
+	}
+
+	public static function isAbsolute($path)
+	{
+		return (substr($path, 0, 1) === "/") || preg_match("#^[a-z]:/#i", $path);
+	}
+
+	protected static function getDirectoryIndexArray()
+	{
+		static $directoryIndexDefault = array("index.php" => 1, "index.html" => 1, "index.htm" => 1, "index.phtml" => 1, "default.html" => 1, "index.php3" => 1);
+
+		$directoryIndex = Main\Config\Configuration::getValue("directory_index");
+		if ($directoryIndex !== null)
+			return $directoryIndex;
+
+		return $directoryIndexDefault;
 	}
 }

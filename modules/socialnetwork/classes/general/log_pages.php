@@ -14,12 +14,13 @@ class CAllSocNetLogPages
 		global $DB;
 
 		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("USER_ID", "SITE_ID", "PAGE_SIZE", "PAGE_NUM", "PAGE_LAST_DATE");
+			$arSelectFields = array("USER_ID", "SITE_ID", "GROUP_CODE", "PAGE_SIZE", "PAGE_NUM", "PAGE_LAST_DATE");
 
 		// FIELDS -->
 		$arFields = array(
 			"USER_ID" => Array("FIELD" => "SLP.USER_ID", "TYPE" => "int"),
 			"SITE_ID" => Array("FIELD" => "SLP.SITE_ID", "TYPE" => "string"),
+			"GROUP_CODE" => Array("FIELD" => "SLP.GROUP_CODE", "TYPE" => "string"),
 			"PAGE_SIZE" => array("FIELD" => "SLP.PAGE_SIZE", "TYPE" => "int"),
 			"PAGE_NUM" => array("FIELD" => "SLP.PAGE_NUM", "TYPE" => "int"),
 			"PAGE_LAST_DATE" => Array("FIELD" => "SLP.PAGE_LAST_DATE", "TYPE" => "datetime"),
@@ -44,7 +45,7 @@ class CAllSocNetLogPages
 		return $dbRes;
 	}
 
-	public static function DeleteEx($user_id, $site_id = '**', $page_size = false)
+	public static function DeleteEx($user_id, $site_id = '**', $page_size = false, $group_code = '**')
 	{
 		global $DB;
 		
@@ -58,7 +59,13 @@ class CAllSocNetLogPages
 			strlen($site_id) > 0
 			&& $site_id != "**"
 		)
-			$strWhere .= " AND SITE_ID = '".$site_id."'";
+			$strWhere .= " AND SITE_ID = '".$DB->ForSQL($site_id)."'";
+
+		if (
+			strlen($group_code) > 0
+			&& $group_code != "**"
+		)
+			$strWhere .= " AND GROUP_CODE = '".$DB->ForSQL($group_code)."'";
 
 		if (intval($page_size) > 0)
 			$strWhere .= " AND PAGE_SIZE = ".$page_size;

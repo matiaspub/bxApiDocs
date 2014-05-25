@@ -53,17 +53,16 @@ class CAllCatalogContractor
 	{
 		global $DB;
 		$id = intval($id);
-		if ($id > 0)
+		if($id > 0)
 		{
 			$dbDocument = CCatalogDocs::getList(array(), array("CONTRACTOR_ID" => $id));
 			if($arDocument = $dbDocument->Fetch())
-				{
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CC_CONTRACTOR_HAVE_DOCS"));
-					return false;
-				}
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CC_CONTRACTOR_HAVE_DOCS"));
+				return false;
+			}
 
-			$DB->Query("DELETE FROM b_catalog_contractor WHERE ID = ".$id." ", true);
-			return true;
+			return $DB->Query("DELETE FROM b_catalog_contractor WHERE ID = ".$id." ", true);
 		}
 		return false;
 	}

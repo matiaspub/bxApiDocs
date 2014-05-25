@@ -18,39 +18,39 @@ class CAllStatEventType
 {
 	
 	/**
-	 * <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a>, вместе со всеми событиями данного типа.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $type_id  ID типа события.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает "true" в случае успешного удаления типа
-	 * события, либо "false" в противном случае.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $type_id = 1;
-	 * if (<b>CStatEventType::Delete</b>($type_id)) 
-	 *     echo "Тип события #".$type_id." успешно удалено.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
-	 * события"</a> </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a>, вместе со всеми событиями данного типа.</p>
+	*
+	*
+	*
+	*
+	* @param int $type_id  ID типа события.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает "true" в случае успешного удаления типа
+	* события, либо "false" в противном случае.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $type_id = 1;
+	* if (<b>CStatEventType::Delete</b>($type_id)) 
+	*     echo "Тип события #".$type_id." успешно удалено.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
+	* события"</a> </li></ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID, $DELETE_EVENT="Y")
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
@@ -154,56 +154,56 @@ class CAllStatEventType
 
 	
 	/**
-	 * <p>Находит <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>, либо создает новый тип события если такого ещё не существует.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $event1  Идентификатор event1 типа события.
-	 *
-	 *
-	 *
-	 * @param string $event2  Идентификатор event2 типа события.
-	 *
-	 *
-	 *
-	 * @param array &$type  Ссылка на массив описывающий найденный, либо созданный тип
-	 * события. Структура данного массива: <pre style="font-size:95%"> Array ( [TYPE_ID] =&gt; ID
-	 * типа события [DYNAMIC_KEEP_DAYS] =&gt; количество дней, отведенное для
-	 * хранения статистики по данному типу события в разрезе по дням
-	 * [KEEP_DAYS] =&gt; количество дней, отведенное для хранения событий
-	 * данного типа [DATE_ENTER_STR] =&gt; дата создания события )</pre>
-	 *
-	 *
-	 *
-	 * @return int <p>Функция возвращает ID найденного типа события, либо вновь
-	 * созданного.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим ID типа события "softkey/order"
-	 * // либо создадим новый тип события
-	 * $TYPE_ID = <b>CStatEventType::ConditionSet</b>("softkey", "order", $arEventType);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип события"</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/conditionset.php
-	 * @author Bitrix
-	 */
+	* <p>Находит <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>, либо создает новый тип события если такого ещё не существует.</p>
+	*
+	*
+	*
+	*
+	* @param string $event1  Идентификатор event1 типа события.
+	*
+	*
+	*
+	* @param string $event2  Идентификатор event2 типа события.
+	*
+	*
+	*
+	* @param array &$type  Ссылка на массив описывающий найденный, либо созданный тип
+	* события. Структура данного массива: <pre style="font-size:95%"> Array ( [TYPE_ID] =&gt; ID
+	* типа события [DYNAMIC_KEEP_DAYS] =&gt; количество дней, отведенное для
+	* хранения статистики по данному типу события в разрезе по дням
+	* [KEEP_DAYS] =&gt; количество дней, отведенное для хранения событий
+	* данного типа [DATE_ENTER_STR] =&gt; дата создания события )</pre>
+	*
+	*
+	*
+	* @return int <p>Функция возвращает ID найденного типа события, либо вновь
+	* созданного.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // получим ID типа события "softkey/order"
+	* // либо создадим новый тип события
+	* $TYPE_ID = <b>CStatEventType::ConditionSet</b>("softkey", "order", $arEventType);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип события"</a>
+	* </li> </ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/conditionset.php
+	* @author Bitrix
+	*/
 	public static function ConditionSet($event1, $event2, &$arEventType)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
@@ -228,6 +228,66 @@ class CAllStatEventType
 		return intval($EVENT_ID);
 	}
 
+	
+	/**
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $event1  Идентификатор event1 типа события.
+	*
+	*
+	*
+	* @param string $event2  Идентификатор event2 типа события.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // зафиксируем событие типа "Скачивание файла manual.chm" (download/manual)
+	* // если такого типа не существует, он будет автоматически создан
+	* // событие будет фиксироваться по параметрам текущего посетителя сайта
+	* 
+	* // сначала проверим не скачивал ли уже текущий посетитель этот файл
+	* // в течение последнего часа
+	* 
+	* // получим ID типа события
+	* $rs = <b>CStatEventType::GetByEvents</b>($event1, $event2);
+	* if ($ar = $rs-&gt;Fetch())
+	* {
+	*     // теперь получим все события данного типа для текущего посетителя сайта
+	*     // произошедшие за последний час (3600 секунд)
+	*     $rs = CStatEvent::GetListByGuest($_SESSION["SESS_GUEST_ID"], 
+	*                                      $ar["TYPE_ID"], "", 3600);
+	*     
+	*     // если таких событий не было...
+	*     if (!($ar = $rs-&gt;Fetch()))
+	*     {
+	*         // ...добавляем данное событие
+	*         CStatEvent::AddCurrent("download", "manual");
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/conditionset.php">CStatEventType::ConditionSet</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
+	* события"</a> </li> </ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php
+	* @author Bitrix
+	*/
 	public static function GetByEvents($event1, $event2)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";

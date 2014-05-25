@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityFilePermissionsTest extends CSecurityBaseTest
+/**
+ * Class CSecurityFilePermissionsTest
+ * @since 12.5.0
+ */
+class CSecurityFilePermissionsTest
+	extends CSecurityBaseTest
 {
 	const MAX_OUTPUT_FILES = 5;
 	protected $internalName = "FilePermissionsTest";
@@ -32,11 +43,11 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 	/**
 	 * Check test requirements (e.g. max_execution_time)
 	 *
-	 * @param array $pParams
+	 * @param array $params
 	 * @throws CSecurityRequirementsException
 	 * @return bool
 	 */
-	public function checkRequirements($pParams = array())
+	public function checkRequirements($params = array())
 	{
 		if($this->maximumExecutionTime - time() <= 5)
 			throw new CSecurityRequirementsException(GetMessage('SECURITY_SITE_CHECKER_FILE_PERM_SMALL_MAX_EXEC'));
@@ -45,12 +56,12 @@ class CSecurityFilePermissionsTest extends CSecurityBaseTest
 
 	/**
 	 * Run test and return results
-	 * @param array $pParams
+	 * @param array $params
 	 * @return array
 	 */
-	public function check($pParams = array())
+	public function check($params = array())
 	{
-		self::initializeParams($pParams);
+		$this->initializeParams($params);
 		if(!self::isRunOnWin())
 		{
 			$folder = self::getParam("folder", $_SERVER["DOCUMENT_ROOT"]);

@@ -167,55 +167,64 @@ class CSocNetGroup extends CAllSocNetGroup
 
 	
 	/**
-	 * <p>Метод изменяет параметры группы с заданным идентификатором.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор группы
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров группы, которые должны быть изменены. Ключами в
-	 * массиве являются названия параметров, а значениями - новые
-	 * значения. Допустимые ключи: SITE_ID - код сайта,<br> NAME - название
-	 * группы,<br> DESCRIPTION - описание группы,<br> VISIBLE - флаг Y/N - видна ли группа
-	 * в списке групп,<br> OPENED - флаг Y/N - открыта ли группа для свободного
-	 * вступления,<br> SUBJECT_ID - код темы,<br> KEYWORDS - ключевые слова,<br> IMAGE_ID -
-	 * иконка группы,<br> INITIATE_PERMS - кто имеет право на приглашение
-	 * пользователей в группу: SONET_ROLES_OWNER - только владелец группы,
-	 * SONET_ROLES_MODERATOR - владелец группы и модераторы группы, SONET_ROLES_USER - все
-	 * члены группы,<br> CLOSED - флаг Y/N - является ли группа архивной,<br> SPAM_PERMS
-	 * - кто имеет право на отправку сообщений в группу: SONET_ROLES_OWNER -
-	 * только владелец группы, SONET_ROLES_MODERATOR - владелец группы и
-	 * модераторы группы, SONET_ROLES_USER - все члены группы.
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает код изменяемой группы или false в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = array(
-	 * 	"NAME" =&gt; $_POST["GROUP_NAME"],
-	 * 	"DESCRIPTION" =&gt; $_POST["GROUP_DESCRIPTION"],
-	 * );
-	 * if (!CSocNetGroup::Update($ID, $arFields))
-	 * {
-	 * 	if ($e = $GLOBALS["APPLICATION"]-&gt;GetException())
-	 * 		$errorMessage .= $e-&gt;GetString();
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры группы с заданным идентификатором.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор группы </htm
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров группы, которые должны быть изменены. Ключами в
+	* массиве являются названия параметров, а значениями - новые
+	* значения. Допустимые ключи: <b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название
+	* группы,<br><b>DESCRIPTION</b> - описание группы,<br><b>VISIBLE</b> - флаг Y/N - видна ли
+	* группа в списке групп,<br><b>OPENED</b> - флаг Y/N - открыта ли группа для
+	* свободного вступления,<br><b>SUBJECT_ID</b> - код темы,<br><b>KEYWORDS</b> - ключевые
+	* слова,<br><b>IMAGE_ID</b> - иконка группы,<br><b>INITIATE_PERMS</b> - кто имеет право на
+	* приглашение пользователей в группу: SONET_ROLES_OWNER - только владелец
+	* группы, SONET_ROLES_MODERATOR - владелец группы и модераторы группы,
+	* SONET_ROLES_USER - все члены группы,<br><b>CLOSED</b> - флаг Y/N - является ли группа
+	* архивной,<br><b>SPAM_PERMS</b> - кто имеет право на отправку сообщений в
+	* группу: SONET_ROLES_OWNER - только владелец группы, SONET_ROLES_MODERATOR - владелец
+	* группы и модераторы группы, SONET_ROLES_USER - все члены группы.
+	*
+	*
+	*
+	* @param bool $bAutoSubscribe = true Флаг автоподписки на уведомления. Необязательный. По умолчанию
+	* равен true.
+	*
+	*
+	*
+	* @param bool $bClearCommonTag = true Необязательный. По умолчанию равен true.
+	*
+	*
+	*
+	* @return int <p>Метод возвращает код изменяемой группы или false в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array(
+	* 	"NAME" =&gt; $_POST["GROUP_NAME"],
+	* 	"DESCRIPTION" =&gt; $_POST["GROUP_DESCRIPTION"],
+	* );
+	* if (!CSocNetGroup::Update($ID, $arFields))
+	* {
+	* 	if ($e = $GLOBALS["APPLICATION"]-&gt;GetException())
+	* 		$errorMessage .= $e-&gt;GetString();
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $bAutoSubscribe = true, $bClearCommonTag = true)
 	{
 		global $DB;
@@ -454,66 +463,70 @@ class CSocNetGroup extends CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	 * <p>Возвращает список групп в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, SITE_ID,
-	 * NAME, DATE_CREATE, DATE_UPDATE, DATE_ACTIVITY, ACTIVE, VISIBLE, OPENED, CLOSED, SUBJECT_ID, OWNER_ID, NUMBER_OF_MEMBERS,
-	 * INITIATE_PERMS, SPAM_PERMS, SUBJECT_NAME, OWNER_NAME, OWNER_LAST_NAME, OWNER_LOGIN.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимае
-	 * поля: ID, SITE_ID, NAME, DATE_CREATE, DATE_UPDATE, DATE_ACTIVITY, ACTIVE, VISIBLE, OPENED, CLOSED, SUBJECT_ID,
-	 * OWNER_ID, KEYWORDS, NUMBER_OF_MEMBERS, INITIATE_PERMS, SPAM_PERMS, SUBJECT_NAME, OWNER_NAME, OWNER_LAST_NAME,
-	 * OWNER_LOGIN.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, SITE_ID, NAME, DESCRIPTION, DATE_CREATE, DATE_UPDATE, DATE_ACTIVITY, ACTIVE, VISIBLE, OPENED, CLOSED,
-	 * SUBJECT_ID, OWNER_ID, KEYWORDS, IMAGE_ID, NUMBER_OF_MEMBERS, INITIATE_PERMS, SPAM_PERMS, SUBJECT_NAME. В массиве
-	 * допустимы любые поля из списка полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetById</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список групп в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
+	* <b>SITE_ID</b>, <b>NAME</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>, <b>DATE_ACTIVITY</b>, <b>ACTIVE</b>,
+	* <b>VISIBLE</b>, <b>OPENED</b>, <b>CLOSED</b>, <b>SUBJECT_ID</b>, <b>OWNER_ID</b>, <b>NUMBER_OF_MEMBERS</b>,
+	* <b>INITIATE_PERMS</b>, <b>SPAM_PERMS</b>, <b>SUBJECT_NAME</b>, <b>OWNER_NAME</b>, <b>OWNER_LAST_NAME</b>,
+	* <b>OWNER_LOGIN</b>.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимые
+	* поля:<b>ID</b>, <b>SITE_ID</b>, <b>NAME</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>, <b>DATE_ACTIVITY</b>,
+	* <b>ACTIVE</b>, <b>VISIBLE</b>, <b>OPENED</b>, <b>CLOSED</b>, <b>SUBJECT_ID</b>, <b>OWNER_ID</b>,
+	* <b>NUMBER_OF_MEMBERS</b>, <b>INITIATE_PERMS</b>, <b>SPAM_PERMS</b>, <b>SUBJECT_NAME</b>, <b>OWNER_NAME</b>,
+	* <b>OWNER_LAST_NAME</b>, <b>OWNER_LOGIN</b>.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>SITE_ID</b>, <b>NAME</b>, <b>DESCRIPTION</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
+	* <b>DATE_ACTIVITY</b>, <b>ACTIVE</b>, <b>VISIBLE</b>, <b>OPENED</b>, <b>CLOSED</b>, <b>SUBJECT_ID</b>, <b>OWNER_ID</b>,
+	* <b>KEYWORDS</b>, <b>IMAGE_ID</b>, <b>NUMBER_OF_MEMBERS</b>, <b>INITIATE_PERMS</b>, <b>SPAM_PERMS</b>,
+	* <b>SUBJECT_NAME</b>. В массиве допустимы любые поля из списка полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/getbyid.php">CSocNetGroup::GetById</a> </li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB, $USER_FIELD_MANAGER;

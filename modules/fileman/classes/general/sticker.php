@@ -495,8 +495,8 @@ class CSticker
 	{
 		global $APPLICATION, $USER;
 		CUtil::InitJSCore(array('window', 'ajax'));
-		$APPLICATION->AddHeadScript('/bitrix/js/fileman/sticker.js');
-		$APPLICATION->SetAdditionalCSS('/bitrix/js/fileman/sticker.css');
+		$APPLICATION->AddHeadScript('/bitrix/js/fileman/sticker.js', true);
+		$APPLICATION->SetAdditionalCSS('/bitrix/js/fileman/sticker.css', true);
 
 		$pageUrl = $APPLICATION->GetCurPage();
 		$pageTitle = $APPLICATION->GetTitle();
@@ -515,7 +515,7 @@ class CSticker
 			"min_width" => $min_width,
 			"min_height" => $min_height,
 			"start_color" => CUserOptions::GetOption('fileman', "stickers_last_color", 0),
-			"zIndex" => 800,
+			"zIndex" => 5000,
 			"curUserName" => CSticker::GetUserName(),
 			"curUserId" => $USER->GetId(),
 			"pageUrl" => $pageUrl,
@@ -969,7 +969,7 @@ class blogTextParser1
 			if ($allow["IMG"]=="Y")
 			{
 				$text = preg_replace(
-					"#<img[^>]+src\s*=[\s\011\012]*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?]+)+)[\s\011\012]*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
+					"#<img[^>]+src\s*=[\s\011\012]*(((http|https|ftp)://[.-_:a-z0-9@]+)*(\/[-_/=:.a-z0-9@{}&?%]+)+)[\s\011\012]*[^>]*>#is".BX_UTF_PCRE_MODIFIER,
 					"[img]\\1[/img]", $text);
 			}
 			if ($allow["FONT"]=="Y")

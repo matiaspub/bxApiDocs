@@ -1,4 +1,13 @@
-<?
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
+
+use Bitrix\Main\Text\String;
+
 class CCSVData
 {
 	var $sFileName;			// full file name
@@ -31,23 +40,34 @@ class CCSVData
 		$this->SetPos(0);
 	}
 
+	public function CloseFile()
+	{
+		if($this->__file)
+		{
+			fclose($this->__file);
+			$this->__file = null;
+		}
+	}
+
 	public function CheckUTF8BOM()
 	{
 		//check UTF-8 Byte-Order Mark
 		fseek($this->__file, 0);
 		$sBOM = fread($this->__file, 3);
 		if($sBOM == "\xEF\xBB\xBF")
+		{
 			$this->__hasBOM = true;
+		}
 	}
 
 	public function SetFieldsType($fields_type = "R")
 	{
-		$this->cFieldsType = ($fields_type=="F") ? "F" : "R";
+		$this->cFieldsType = ($fields_type == "F"? "F" : "R");
 	}
 
 	public function SetDelimiter($delimiter = ";")
 	{
-		$this->cDelimiter = (strlen($delimiter)>1) ? substr($delimiter, 0, 1) : $delimiter;
+		$this->cDelimiter = (strlen($delimiter) > 1? substr($delimiter, 0, 1) : $delimiter);
 	}
 
 	public function SetFirstHeader($first_header = false)
@@ -63,9 +83,9 @@ class CCSVData
 	public function SetWidthMap($arMap)
 	{
 		$this->arWidthMap = array();
-		for ($i = 0; $i < count($arMap); $i++)
+		for ($i = 0, $n = count($arMap); $i < $n; $i++)
 		{
-			$this->arWidthMap[$i] = IntVal($arMap[$i]);
+			$this->arWidthMap[$i] = intval($arMap[$i]);
 		}
 	}
 
@@ -73,7 +93,7 @@ class CCSVData
 	{
 		$bInString = false;
 		$str = "";
-		$res_r = Array();
+		$res_r = array();
 		while ($this->iCurPos < $this->iFileLength)
 		{
 			$ch = $this->__buffer[$this->__buffer_pos];
@@ -85,11 +105,14 @@ class CCSVData
 					{
 						$this->IncCurPos();
 						$ch = $this->__buffer[$this->__buffer_pos];
-						if ($ch != "\r" && $ch != "\n") break;
+						if ($ch != "\r" && $ch != "\n")
+						{
+							break;
+						}
 					}
 					if ($this->bFirstHeader)
 					{
-						$this->bFirstHeader = False;
+						$this->bFirstHeader = false;
 						$res_r = array();
 						$str = "";
 						continue;
@@ -130,30 +153,39 @@ class CCSVData
 				}
 			}
 
-			//$this->IncCurPos();
 			//inline "call"
 			$this->iCurPos++;
 			$this->__buffer_pos++;
 			if($this->__buffer_pos >= $this->__buffer_size)
 			{
 				if(feof($this->__file))
+				{
 					$this->__buffer = "";
+				}
 				else
+				{
 					$this->__buffer = fread($this->__file, 1024*1024);
-				$this->__buffer_size = function_exists("mb_strlen")? mb_strlen($this->__buffer, 'latin1'): strlen($this->__buffer);
+				}
+				$this->__buffer_size = String::getBinaryLength($this->__buffer);
 				$this->__buffer_pos = 0;
 			}
 
 			$str .= $ch;
 		}
 
-		if (strlen($str))
+		if ($str <> '')
+		{
 			$res_r[] = $str;
+		}
 
 		if(empty($res_r))
+		{
 			return false;
+		}
 		else
+		{
 			return $res_r;
+		}
 	}
 
 	public function FetchWidth()
@@ -161,7 +193,7 @@ class CCSVData
 		$str = "";
 		$ind = 1;
 		$jnd = 0;
-		$res_r = Array();
+		$res_r = array();
 
 		while ($this->iCurPos < $this->iFileLength)
 		{
@@ -172,11 +204,14 @@ class CCSVData
 				{
 					$this->IncCurPos();
 					$ch = $this->__buffer[$this->__buffer_pos];
-					if ($ch != "\r" && $ch != "\n") break;
+					if ($ch != "\r" && $ch != "\n")
+					{
+						break;
+					}
 				}
 				if ($this->bFirstHeader)
 				{
-					$this->bFirstHeader = False;
+					$this->bFirstHeader = false;
 					$res_r = array();
 					$ind = 1;
 					$str = "";
@@ -198,17 +233,20 @@ class CCSVData
 				continue;
 			}
 
-			//$this->IncCurPos();
 			//inline "call"
 			$this->iCurPos++;
 			$this->__buffer_pos++;
 			if($this->__buffer_pos >= $this->__buffer_size)
 			{
 				if(feof($this->__file))
+				{
 					$this->__buffer = "";
+				}
 				else
+				{
 					$this->__buffer = fread($this->__file, 1024*1024);
-				$this->__buffer_size = function_exists("mb_strlen")? mb_strlen($this->__buffer, 'latin1'): strlen($this->__buffer);
+				}
+				$this->__buffer_size = String::getBinaryLength($this->__buffer);
 				$this->__buffer_pos = 0;
 			}
 
@@ -216,25 +254,37 @@ class CCSVData
 			$str .= $ch;
 		}
 
-		if (strlen($str)>0)
+		if ($str <> '')
+		{
 			$res_r[] = $str;
+		}
 
 		if(empty($res_r))
+		{
 			return false;
+		}
 		else
+		{
 			return $res_r;
+		}
 	}
 
 	public function Fetch()
 	{
-		if ($this->cFieldsType=="R")
+		if ($this->cFieldsType == "R")
 		{
-			if (strlen($this->cDelimiter)<=0) return false;
+			if ($this->cDelimiter == '')
+			{
+				return false;
+			}
 			return $this->FetchDelimiter();
 		}
 		else
 		{
-			if (count($this->arWidthMap)<=0) return false;
+			if (empty($this->arWidthMap))
+			{
+				return false;
+			}
 			return $this->FetchWidth();
 		}
 	}
@@ -246,10 +296,14 @@ class CCSVData
 		if($this->__buffer_pos >= $this->__buffer_size)
 		{
 			if(feof($this->__file))
+			{
 				$this->__buffer = "";
+			}
 			else
+			{
 				$this->__buffer = fread($this->__file, 1024*1024);
-			$this->__buffer_size = function_exists("mb_strlen")? mb_strlen($this->__buffer, 'latin1'): strlen($this->__buffer);
+			}
+			$this->__buffer_size = String::getBinaryLength($this->__buffer);
 			$this->__buffer_pos = 0;
 		}
 	}
@@ -266,22 +320,32 @@ class CCSVData
 
 	public function SetPos($iCurPos = 0)
 	{
-		$iCurPos = IntVal($iCurPos);
-		if ($iCurPos<=$this->iFileLength)
-			$this->iCurPos = IntVal($iCurPos);
+		$iCurPos = intval($iCurPos);
+		if ($iCurPos <= $this->iFileLength)
+		{
+			$this->iCurPos = $iCurPos;
+		}
 		else
+		{
 			$this->iCurPos = $this->iFileLength;
+		}
 
 		$pos = $this->iCurPos;
 		if($this->__hasBOM)
+		{
 			$pos += 3;
+		}
 		fseek($this->__file, $pos);
 
 		if(feof($this->__file))
+		{
 			$this->__buffer = "";
+		}
 		else
+		{
 			$this->__buffer = fread($this->__file, 1024*1024);
-		$this->__buffer_size = function_exists("mb_strlen")? mb_strlen($this->__buffer, 'latin1'): strlen($this->__buffer);
+		}
+		$this->__buffer_size = String::getBinaryLength($this->__buffer);
 		$this->__buffer_pos = 0;
 	}
 
@@ -289,14 +353,15 @@ class CCSVData
 	{
 		$this->sFileName = $filename;
 
-		if ($this->cFieldsType=="R")
+		if ($this->cFieldsType == 'R' && $this->cDelimiter <> '')
 		{
-			if (strlen($this->cDelimiter)<=0) return false;
-
-			$this->sContent = "";
-			for ($i = 0; $i < count($arFields); $i++)
+			$this->sContent = '';
+			for ($i = 0, $n = count($arFields); $i < $n; $i++)
 			{
-				if ($i>0) $this->sContent .= $this->cDelimiter;
+				if ($i>0)
+				{
+					$this->sContent .= $this->cDelimiter;
+				}
 				$pos1 = strpos($arFields[$i], $this->cDelimiter);
 				$pos2 = strpos($arFields[$i], "\"");
 				$pos3 = strpos($arFields[$i], "\n");
@@ -312,7 +377,7 @@ class CCSVData
 					$this->sContent .= $arFields[$i];
 				}
 			}
-			if (strlen($this->sContent)>0)
+			if ($this->sContent <> '')
 			{
 				$this->sContent .= "\n";
 				$file_id = fopen($this->sFileName, "ab");
@@ -322,4 +387,3 @@ class CCSVData
 		}
 	}
 }
-?>

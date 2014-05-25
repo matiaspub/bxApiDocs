@@ -1,8 +1,15 @@
 <?php
 namespace Bitrix\Main;
 
+/**
+ * Class Loader loads required files, classes and modules. It is the only class which is included directly.
+ * @package Bitrix\Main
+ */
 final class Loader
 {
+	/**
+	 * Can be used to prevent loading all modules except main and fileman
+	 */
 	const SAFE_MODE = false;
 
 	const BITRIX_HOLDER = "bitrix";
@@ -11,12 +18,25 @@ final class Loader
 	private static $safeModeModules = array("main", "fileman");
 
 	private static $arLoadedModules = array("main" => true);
+	private static $arSemiloadedModules = array();
 	private static $arLoadedModulesHolders = array("main" => self::BITRIX_HOLDER);
 	private static $arSharewareModules = array();
 
+	/**
+	 * Returned by includeSharewareModule() if module is not found
+	 */
 	const MODULE_NOT_FOUND = 0;
+	/**
+	 * Returned by includeSharewareModule() if module is installed
+	 */
 	const MODULE_INSTALLED = 1;
+	/**
+	 * Returned by includeSharewareModule() if module works in demo mode
+	 */
 	const MODULE_DEMO = 2;
+	/**
+	 * Returned by includeSharewareModule() if the trial period is expired
+	 */
 	const MODULE_DEMO_EXPIRED = 3;
 
 	private static $arAutoLoadClasses = array();
@@ -26,6 +46,13 @@ final class Loader
 	const ALPHA_LOWER = "qwertyuioplkjhgfdsazxcvbnm";
 	const ALPHA_UPPER = "QWERTYUIOPLKJHGFDSAZXCVBNM";
 
+	/**
+	 * Includes module by its name
+	 *
+	 * @param string $moduleName Name of the included module
+	 * @return bool Returns true if module was included successfully, otherwise returns false
+	 * @throws LoaderException
+	 */
 	public static function includeModule($moduleName)
 	{
 		if (!is_string($moduleName) || $moduleName == "")
@@ -44,6 +71,9 @@ final class Loader
 		if (isset(self::$arLoadedModules[$moduleName]))
 			return self::$arLoadedModules[$moduleName];
 
+		if (isset(self::$arSemiloadedModules[$moduleName]))
+			trigger_error("Module '".$moduleName."' is in loading progress", E_USER_WARNING);
+
 		$arInstalledModules = ModuleManager::getInstalledModules();
 		if (!isset($arInstalledModules[$moduleName]))
 			return self::$arLoadedModules[$moduleName] = false;
@@ -51,43 +81,23 @@ final class Loader
 		$documentRoot = static::getDocumentRoot();
 
 		$moduleHolder = self::LOCAL_HOLDER;
-		$pathToModule = $documentRoot."/".$moduleHolder."/modules/".$moduleName;
-		$pathToInclude = $pathToModule."/include_module.php";
+		$pathToInclude = $documentRoot."/".$moduleHolder."/modules/".$moduleName."/include.php";
 		if (!file_exists($pathToInclude))
 		{
-			$pathToInclude = $pathToModule."/include.php";
+			$moduleHolder = self::BITRIX_HOLDER;
+			$pathToInclude = $documentRoot."/".$moduleHolder."/modules/".$moduleName."/include.php";
 			if (!file_exists($pathToInclude))
-			{
-				$moduleHolder = self::BITRIX_HOLDER;
-				$pathToModule = $documentRoot."/".$moduleHolder."/modules/".$moduleName;
-				$pathToInclude = $pathToModule."/include_module.php";
-				if (!file_exists($pathToInclude))
-				{
-					$pathToInclude = $pathToModule."/include.php";
-					if (!file_exists($pathToInclude))
-						return self::$arLoadedModules[$moduleName] = false;
-				}
-			}
+				return self::$arLoadedModules[$moduleName] = false;
 		}
 
 		self::$arLoadedModulesHolders[$moduleName] = $moduleHolder;
+		self::$arSemiloadedModules[$moduleName] = true;
 
 		$res = self::includeModuleInternal($pathToInclude);
+
+		unset(self::$arSemiloadedModules[$moduleName]);
 		if ($res === false)
 			return self::$arLoadedModules[$moduleName] = false;
-
-		if (strpos($moduleName, ".") !== false)
-		{
-			$moduleNameTmp = str_replace(".", "_", $moduleName);
-			$className = "\\".$moduleNameTmp."\\".$moduleNameTmp;
-		}
-		else
-		{
-			$className = "\\Bitrix\\".$moduleName;
-		}
-
-		if (class_exists($className))
-			return self::$arLoadedModules[$moduleName] = new $className();
 
 		return self::$arLoadedModules[$moduleName] = true;
 	}
@@ -99,6 +109,15 @@ final class Loader
 		return include_once($path);
 	}
 
+	/**
+	 * Includes shareware module by its name.
+	 * Module must initialize constant <module name>_DEMO = Y in include.php to define demo mode.
+	 * include.php must return false to define trial period expiration.
+	 * Constants is used because it is easy to obfuscate them.
+	 *
+	 * @param string $moduleName Name of the included module
+	 * @return int One of the following constant: Loader::MODULE_NOT_FOUND, Loader::MODULE_INSTALLED, Loader::MODULE_DEMO, Loader::MODULE_DEMO_EXPIRED
+	 */
 	public static function includeSharewareModule($moduleName)
 	{
 		if (isset(self::$arSharewareModules[$moduleName]))
@@ -133,6 +152,11 @@ final class Loader
 			unset(static::$arSharewareModules[$moduleName]);
 	}
 
+	/**
+	 * Returns document root
+	 *
+	 * @return string Document root
+	 */
 	public static function getDocumentRoot()
 	{
 		static $documentRoot = null;
@@ -146,6 +170,15 @@ final class Loader
 		static::$isAutoLoadOn = $value;
 	}
 
+	/**
+	 * Registers classes for auto loading.
+	 * All the frequently used classes should be registered for auto loading (performance).
+	 * It is not necessary to register rarely used classes. They can be found and loaded dynamically.
+	 *
+	 * @param string $moduleName Name of the module. Can be null if classes are not part of any module
+	 * @param array $arClasses Array of classes with class names as keys and paths as values.
+	 * @throws LoaderException
+	 */
 	public static function registerAutoLoadClasses($moduleName, array $arClasses)
 	{
 		if (empty($arClasses))
@@ -231,8 +264,7 @@ final class Loader
 			}
 			else
 			{
-				if (($includePath = self::getLocal($pathInfo["file"], $documentRoot)) !== false)
-					require_once($includePath);
+				require_once($documentRoot.$pathInfo["file"]);
 			}
 			return;
 		}
@@ -267,7 +299,7 @@ final class Loader
 			$module = $module1.".".$module2;
 		}
 
-		if (!isset(self::$arLoadedModules[$module]))
+		if (!isset(self::$arLoadedModulesHolders[$module]))
 			return;
 
 		$filePath = $documentRoot."/".self::$arLoadedModulesHolders[$module]."/modules/".$module."/lib/".implode("/", $arFile).".php";
@@ -296,6 +328,13 @@ final class Loader
 			return false;
 	}
 
+	/**
+	 * Checks if file exists in personal directory.
+	 * If $_SERVER["BX_PERSONAL_ROOT"] is not set than personal directory is equal to /bitrix/
+	 *
+	 * @param string $path File path relative to personal directory
+	 * @return string|bool Returns combined path or false if the file does not exist
+	 */
 	public static function getPersonal($path)
 	{
 		$root = static::getDocumentRoot();

@@ -79,17 +79,17 @@ class IWebService
 	// May be called by Event to collect CWebServiceDesc on configuring WS.Server
 	
 	/**
-	 * <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. </p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @return CWebServiceDesc 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/iwebservice/getwebservicedesc.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. </p> <br><br>
+	*
+	*
+	*
+	*
+	* @return CWebServiceDesc 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/webservice/classes/iwebservice/getwebservicedesc.php
+	* @author Bitrix
+	*/
 	public static function GetWebServiceDesc() {}
 
 	//function TestComponent() {}
@@ -144,41 +144,41 @@ class CWebService
 
 	
 	/**
-	 * <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается <i>true</i>, иначе <i>false</i>. </p> <p>Если веб-сервис реализован через систему компонентов, то <b>RegisterWebService </b>вызывается автоматически в компоненте <b>webservice.server</b>. В этом случае <i>className = $arParams["WEBSERVICE_NAME"]</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $className  Название класса веб-сервиса. реализующего интерфейс <b>IWebService</b>.
-	 *
-	 *
-	 *
-	 * @return boolean 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <buttononclick>
-	 * // В компоненте webservice.server
-	 * CWebService::RegisterWebService($arParams["WEBSERVICE_CLASS"]);
-	 * 
-	 * // В компоненте веб-сервиса
-	 * $arParams["WEBSERVICE_NAME"] = "bitrix.webservice.checkauth";
-	 * // Следующий параметр прямо передается в SOAPServerProcessRequest
-	 * $arParams["WEBSERVICE_CLASS"] = "CCheckAuthWS";
-	 * $arParams["WEBSERVICE_MODULE"] = "";
-	 * $APPLICATION-&gt;IncludeComponent(
-	 *     "bitrix:webservice.server",
-	 *     "",
-	 *     $arParams
-	 *     );</buttononclick>
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservice/registerwebservice.php
-	 * @author Bitrix
-	 */
+	* <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается <i>true</i>, иначе <i>false</i>. </p> <p>Если веб-сервис реализован через систему компонентов, то <b>RegisterWebService </b>вызывается автоматически в компоненте <b>webservice.server</b>. В этом случае <i>className = $arParams["WEBSERVICE_NAME"]</i>.</p>
+	*
+	*
+	*
+	*
+	* @param string $className  Название класса веб-сервиса. реализующего интерфейс <b>IWebService</b>.
+	*
+	*
+	*
+	* @return boolean 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* <buttononclick>
+	* // В компоненте webservice.server
+	* CWebService::RegisterWebService($arParams["WEBSERVICE_CLASS"]);
+	* 
+	* // В компоненте веб-сервиса
+	* $arParams["WEBSERVICE_NAME"] = "bitrix.webservice.checkauth";
+	* // Следующий параметр прямо передается в SOAPServerProcessRequest
+	* $arParams["WEBSERVICE_CLASS"] = "CCheckAuthWS";
+	* $arParams["WEBSERVICE_MODULE"] = "";
+	* $APPLICATION-&gt;IncludeComponent(
+	*     "bitrix:webservice.server",
+	*     "",
+	*     $arParams
+	*     );</buttononclick>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservice/registerwebservice.php
+	* @author Bitrix
+	*/
 	public static function RegisterWebService($className /*IWebService implementor*/)
 	{
 		$ifce =& CWebService::GetInterface($className);

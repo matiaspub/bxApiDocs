@@ -16,51 +16,77 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllCatalogSKU
 {
+	const TYPE_CATALOG = 'D';
+	const TYPE_PRODUCT = 'P';
+	const TYPE_OFFERS = 'O';
+	const TYPE_FULL = 'X';
+
 	static protected $arOfferCache = array();
 	static protected $arProductCache = array();
 	static protected $arPropertyCache = array();
+	static protected $arIBlockCache = array();
+
+	static public function GetCatalogTypes($boolFull = false)
+	{
+		$boolFull = (true == $boolFull);
+		if ($boolFull)
+		{
+			return array(
+				self::TYPE_CATALOG => GetMessage('BT_CAT_SKU_TYPE_CATALOG'),
+				self::TYPE_PRODUCT => GetMessage('BT_CAT_SKU_TYPE_PRODUCT'),
+				self::TYPE_OFFERS => GetMessage('BT_CAT_SKU_TYPE_OFFERS'),
+				self::TYPE_FULL => GetMessage('BT_CAT_SKU_TYPE_FULL')
+			);
+		}
+		return array(
+			self::TYPE_CATALOG,
+			self::TYPE_PRODUCT,
+			self::TYPE_OFFERS,
+			self::TYPE_FULL
+		);
+	}
 
 	
 	/**
-	 * <p>Функция позволяет получить по ID торгового предложения ID товара.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $intOfferI $D  ID торгового предложения.
-	 *
-	 *
-	 *
-	 * @param $intIBlockI $D = 0 ID инфоблока торговых предложений. Необязательный параметр.
-	 *
-	 *
-	 *
-	 * @return mixed <ul> <li> <b>false</b> - в случае ошибки;</li> <li>в противном случае массив
-	 * следующей структуры: <b>ID</b> (ID товара), <b>IBLOCK_ID</b> (ID инфоблока
-	 * товаров).</li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $intElementID = 100; // ID предложения
-	 * $mxResult = CCatalogSku::GetProductInfo(
-	 * $intElementID
-	 * );
-	 * if (is_array($mxResult))
-	 * {
-	 * 	echo 'ID товара = '.$mxResult['ID'];
-	 * }
-	 * else
-	 * {
-	 * 	ShowError('Это не торговое предложение');
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getproductinfo.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет получить по ID торгового предложения ID товара.</p>
+	*
+	*
+	*
+	*
+	* @param $intOfferI $D  ID торгового предложения.
+	*
+	*
+	*
+	* @param $intIBlockI $D = 0 ID инфоблока торговых предложений. Необязательный параметр.
+	*
+	*
+	*
+	* @return mixed <ul> <li> <b>false</b> - в случае ошибки;</li> <li>в противном случае массив
+	* следующей структуры: <b>ID</b> (ID товара), <b>IBLOCK_ID</b> (ID инфоблока
+	* товаров).</li> </ul> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $intElementID = 100; // ID предложения
+	* $mxResult = CCatalogSku::GetProductInfo(
+	* $intElementID
+	* );
+	* if (is_array($mxResult))
+	* {
+	* 	echo 'ID товара = '.$mxResult['ID'];
+	* }
+	* else
+	* {
+	* 	ShowError('Это не торговое предложение');
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getproductinfo.php
+	* @author Bitrix
+	*/
 	static public function GetProductInfo($intOfferID, $intIBlockID = 0)
 	{
 		$intOfferID = intval($intOfferID);
@@ -75,7 +101,7 @@ class CAllCatalogSKU
 		if (0 >= $intIBlockID)
 			return false;
 
-		if (!array_key_exists($intIBlockID, self::$arOfferCache))
+		if (!isset(self::$arOfferCache[$intIBlockID]))
 		{
 			$arSkuInfo = CCatalogSKU::GetInfoByOfferIBlock($intIBlockID);
 		}
@@ -86,7 +112,12 @@ class CAllCatalogSKU
 		if (empty($arSkuInfo) || empty($arSkuInfo['SKU_PROPERTY_ID']))
 			return false;
 
-		$rsItems = CIBlockElement::GetProperty($intIBlockID,$intOfferID,array(),array('ID' => $arSkuInfo['SKU_PROPERTY_ID']));
+		$rsItems = CIBlockElement::GetProperty(
+			$intIBlockID,
+			$intOfferID,
+			array(),
+			array('ID' => $arSkuInfo['SKU_PROPERTY_ID'])
+		);
 		if ($arItem = $rsItems->Fetch())
 		{
 			$arItem['VALUE'] = intval($arItem['VALUE']);
@@ -103,66 +134,72 @@ class CAllCatalogSKU
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @param $intIBlockI $D  ID инфоблока торговых предложений.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает информацию о том, является ли инфоблок инфоблоком
-	 * торговых предложений:</p><ul> <li> <b>false</b> - не является;</li> <li>Если
-	 * является, то возвращается массив следующего вида: <b>IBLOCK_ID</b> (ID
-	 * инфоблока торговых предложений), <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока
-	 * товаров), <b>SKU_PROPERTY_ID</b> (ID свойства привязки торговых предложений к
-	 * товарам).</li> </ul><p>Начиная с версии модуля <b>12.5.6</b>, возвращаемое
-	 * значение метода кешируется в течение хита.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Проверяем, хранит ли инфоблок торговые предложения:
-	 * $intIBlockID = 11;
-	 * $mxResult = CCatalogSKU::GetInfoByOfferIBlock(
-	 *  $intIBlockID
-	 * );
-	 * if (is_array($mxResult))
-	 * {
-	 * 	echo 'ID инфоблока товаров = '.$mxResult['PRODUCT_IBLOCK_ID'];
-	 * }
-	 * else
-	 * {
-	 * 	ShowError('Этот инфоблок не хранит торговых предложений');
-	 * }
-	 * Проверяем, является ли свойство привязкой торговых предложений к товару:
-	 * $intPropertyID = 53;
-	 * $mxResult = CCatalogSKU::GetInfoByLinkProperty(
-	 *  $intPropertyID
-	 * );
-	 * if (is_array($mxResult))
-	 * {
-	 * 	echo 'Свойство связывает инфоблоки '.$mxResult['PRODUCT_IBLOCK_ID'].' и 	'.$mxResult['IBLOCK_ID'];
-	 * }
-	 * else
-	 * {
-	 * 	ShowError('Свойство не является привязкой торговых предложений');
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyofferiblock.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @param $intIBlockI $D  ID инфоблока торговых предложений.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает информацию о том, является ли инфоблок инфоблоком
+	* торговых предложений:</p> <ul> <li> <b>false</b> - не является;</li> <li>Если
+	* является, то возвращается массив следующего вида: <b>IBLOCK_ID</b> (ID
+	* инфоблока торговых предложений), <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока
+	* товаров), <b>SKU_PROPERTY_ID</b> (ID свойства привязки торговых предложений к
+	* товарам).</li> </ul> <p>Начиная с версии модуля <b>12.5.6</b>, возвращаемое
+	* значение метода кешируется в течение хита.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Проверяем, хранит ли инфоблок торговые предложения:
+	* 
+	* 
+	* $intIBlockID = 11;
+	* $mxResult = CCatalogSKU::GetInfoByOfferIBlock(
+	*  $intIBlockID
+	* );
+	* if (is_array($mxResult))
+	* {
+	* 	echo 'ID инфоблока товаров = '.$mxResult['PRODUCT_IBLOCK_ID'];
+	* }
+	* else
+	* {
+	* 	ShowError('Этот инфоблок не хранит торговых предложений');
+	* }
+	* 
+	* 
+	* Проверяем, является ли свойство привязкой торговых предложений к товару:
+	* 
+	* 
+	* $intPropertyID = 53;
+	* $mxResult = CCatalogSKU::GetInfoByLinkProperty(
+	*  $intPropertyID
+	* );
+	* if (is_array($mxResult))
+	* {
+	* 	echo 'Свойство связывает инфоблоки '.$mxResult['PRODUCT_IBLOCK_ID'].' и 	'.$mxResult['IBLOCK_ID'];
+	* }
+	* else
+	* {
+	* 	ShowError('Свойство не является привязкой торговых предложений');
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyofferiblock.php
+	* @author Bitrix
+	*/
 	static public function GetInfoByOfferIBlock($intIBlockID)
 	{
 		$intIBlockID = intval($intIBlockID);
 		if (0 >= $intIBlockID)
 			return false;
 
-		if (!array_key_exists($intIBlockID, self::$arOfferCache))
+		if (!isset(self::$arOfferCache[$intIBlockID]))
 		{
 			$rsOffers = CCatalog::GetList(
 				array(),
@@ -189,51 +226,51 @@ class CAllCatalogSKU
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @param $intIBlockI $D  ID инфоблока.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает информацию о том, является ли инфоблок инфоблоком
-	 * товаров.</p><ul> <li> <b>false</b> - не является;</li> <li>Если является, то
-	 * возвращается массив следующего вида: <b>IBLOCK_ID</b> (ID инфоблока
-	 * торговых предложений), <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока товаров),
-	 * <b>SKU_PROPERTY_ID</b> (ID свойства привязки торговых предложений к
-	 * товарам).</li> </ul><p>Начиная с версии модуля <b>12.5.6</b>, возвращаемое
-	 * значение метода кешируется в течение хита.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $intIBlockID = 7;
-	 * $mxResult = CCatalogSKU::GetInfoByProductIBlock(
-	 *  $intIBlockID
-	 * );
-	 * if (is_array($mxResult))
-	 * {
-	 * 	echo 'ID инфоблока торговых предложений = '.$mxResult['IBLOCK_ID'];
-	 * }
-	 * else
-	 * {
-	 * 	ShowError('У этого инфоблока нет SKU');
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyproductiblock.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @param $intIBlockI $D  ID инфоблока.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает информацию о том, является ли инфоблок инфоблоком
+	* товаров.</p> <ul> <li> <b>false</b> - не является;</li> <li>Если является, то
+	* возвращается массив следующего вида: <b>IBLOCK_ID</b> (ID инфоблока
+	* торговых предложений), <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока товаров),
+	* <b>SKU_PROPERTY_ID</b> (ID свойства привязки торговых предложений к
+	* товарам).</li> </ul> <p>Начиная с версии модуля <b>12.5.6</b>, возвращаемое
+	* значение метода кешируется в течение хита.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $intIBlockID = 7;
+	* $mxResult = CCatalogSKU::GetInfoByProductIBlock(
+	*  $intIBlockID
+	* );
+	* if (is_array($mxResult))
+	* {
+	* 	echo 'ID инфоблока торговых предложений = '.$mxResult['IBLOCK_ID'];
+	* }
+	* else
+	* {
+	* 	ShowError('У этого инфоблока нет SKU');
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyproductiblock.php
+	* @author Bitrix
+	*/
 	static public function GetInfoByProductIBlock($intIBlockID)
 	{
 		$intIBlockID = intval($intIBlockID);
 		if (0 >= $intIBlockID)
 			return false;
-		if (!array_key_exists($intIBlockID, self::$arProductCache))
+		if (!isset(self::$arProductCache[$intIBlockID]))
 		{
 			$rsProducts = CCatalog::GetList(
 				array(),
@@ -260,34 +297,34 @@ class CAllCatalogSKU
 
 	
 	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @param $intPropertyI $D  ID свойства инфоблока.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает информацию о том, является ли свойство инфоблока
-	 * свойством привязки торговых предложений к товарам:</p><ul> <li> <b>false</b>
-	 * - не является;</li> <li>Если является, то возвращается массив
-	 * следующего вида: <b>IBLOCK_ID</b> (ID инфоблока торговых предложений),
-	 * <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока товаров), <b>SKU_PROPERTY_ID</b> (ID свойства
-	 * привязки торговых предложений к товарам).</li> </ul><p>Начиная с версии
-	 * модуля <b>12.5.6</b>, возвращаемое значение метода кешируется в
-	 * течение хита.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobylinkproperty.php
-	 * @author Bitrix
-	 */
+	* 
+	*
+	*
+	*
+	*
+	* @param $intPropertyI $D  ID свойства инфоблока. </ht
+	*
+	*
+	*
+	* @return mixed <p>Возвращает информацию о том, является ли свойство инфоблока
+	* свойством привязки торговых предложений к товарам:</p> <ul> <li>
+	* <b>false</b> - не является;</li> <li>Если является, то возвращается массив
+	* следующего вида: <b>IBLOCK_ID</b> (ID инфоблока торговых предложений),
+	* <b>PRODUCT_IBLOCK_ID</b> (ID инфоблока товаров), <b>SKU_PROPERTY_ID</b> (ID свойства
+	* привязки торговых предложений к товарам).</li> </ul> <p>Начиная с
+	* версии модуля <b>12.5.6</b>, возвращаемое значение метода кешируется в
+	* течение хита.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobylinkproperty.php
+	* @author Bitrix
+	*/
 	static public function GetInfoByLinkProperty($intPropertyID)
 	{
 		$intPropertyID = intval($intPropertyID);
 		if (0 >= $intPropertyID)
 			return false;
-		if (!array_key_exists($intPropertyID, self::$arPropertyCache))
+		if (!isset(self::$arPropertyCache[$intPropertyID]))
 		{
 			$rsProducts = CCatalog::GetList(
 				array(),
@@ -312,34 +349,38 @@ class CAllCatalogSKU
 		return $arResult;
 	}
 
+	static public function GetInfoByIBlock($intIBlockID)
+	{
+	}
+
 	
 	/**
-	 * <p>Метод определяет имеются ли у товара торговые предложения.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $intProductID  ID товара.
-	 *
-	 *
-	 *
-	 * @param int $intIBlockID = 0 ID инфоблока товаров (может отсутствовать, в этом случае будет
-	 * лишний запрос к базе) .
-	 *
-	 *
-	 *
-	 * @return boolean <p>Метод возвращает <i>true</i> в случае наличия торговых предложений и
-	 * <i>false</i> в случае отсутствия или ошибки (некорректных
-	 * параметров).</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/isexistoffers.php
-	 * @author Bitrix
-	 */
+	* <p>Метод определяет имеются ли у товара торговые предложения.</p>
+	*
+	*
+	*
+	*
+	* @param int $intProductID  ID товара.
+	*
+	*
+	*
+	* @param int $intIBlockID = 0 ID инфоблока товаров (может отсутствовать, в этом случае будет
+	* лишний запрос к базе) .
+	*
+	*
+	*
+	* @return boolean <p>Метод возвращает <i>true</i> в случае наличия торговых предложений и
+	* <i>false</i> в случае отсутствия или ошибки (некорректных
+	* параметров).</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/isexistoffers.php
+	* @author Bitrix
+	*/
 	static public function IsExistOffers($intProductID, $intIBlockID = 0)
 	{
 		$intProductID = intval($intProductID);
-		if (0 >= $intProductID)
+		if (0 == $intProductID)
 			return false;
 
 		$intIBlockID = intval($intIBlockID);
@@ -350,7 +391,7 @@ class CAllCatalogSKU
 		if (0 >= $intIBlockID)
 			return false;
 
-		if (!array_key_exists($intIBlockID, self::$arProductCache))
+		if (!isset(self::$arProductCache[$intIBlockID]))
 		{
 			$arSkuInfo = CCatalogSKU::GetInfoByProductIBlock($intIBlockID);
 		}
@@ -358,7 +399,7 @@ class CAllCatalogSKU
 		{
 			$arSkuInfo = self::$arProductCache[$intIBlockID];
 		}
-		if (empty($arSkuInfo) || empty($arSkuInfo['SKU_PROPERTY_ID']))
+		if (empty($arSkuInfo))
 			return false;
 
 		$intCount = CIBlockElement::GetList(
@@ -371,27 +412,28 @@ class CAllCatalogSKU
 
 	
 	/**
-	 * <p>Метод автоматически вызывается после изменения данных в <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/index.php">CCatalog</a> и сбрасывает кеш, созданный методами <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyofferiblock.php">CCatalogSKU::GetInfoByOfferIBlock</a>, <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyproductiblock.php">CCatalogSKU::GetInfoByProductIBlock</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobylinkproperty.php">CCatalogSKU::GetInfoByLinkProperty</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/index.php">CCatalog</a></li> </ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/clearcache.php
-	 * @author Bitrix
-	 */
+	* <p>Метод автоматически вызывается после изменения данных в <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/index.php">CCatalog</a> и сбрасывает кеш, созданный методами <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyofferiblock.php">CCatalogSKU::GetInfoByOfferIBlock</a>, <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobyproductiblock.php">CCatalogSKU::GetInfoByProductIBlock</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/getinfobylinkproperty.php">CCatalogSKU::GetInfoByLinkProperty</a>.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/index.php">CCatalog</a></li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/catalogsku/clearcache.php
+	* @author Bitrix
+	*/
 	public static function ClearCache()
 	{
 		self::$arOfferCache = array();
 		self::$arProductCache = array();
 		self::$arPropertyCache = array();
+		self::$arIBlockCache = array();
 	}
 }
 ?>

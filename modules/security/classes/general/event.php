@@ -57,7 +57,7 @@ class CSecurityEvent
 		$savedInDB = $savedInFile = $savedInSyslog = false;
 		if ($this->isDBEngineActive)
 		{
-			$savedInDB = CEventLog::log($severity, $auditType, "security", $itemName, "=".base64_encode($itemDescription));
+			$savedInDB = CEventLog::log($severity, $auditType, "security", $itemName, base64_encode($itemDescription));
 		}
 		$message = "";
 		if ($this->isSyslogEngineActive)

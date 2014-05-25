@@ -21,7 +21,7 @@ global $USER_FIELD_MANAGER;
 abstract class CAllTestAttempt
 {
 	// 2012-04-13 Checked/modified for compatibility with new data model
-	public static function CheckFields(&$arFields, $ID = false)
+	public static function CheckFields(&$arFields, $ID = false, $bCheckRights = true)
 	{
 		global $DB, $APPLICATION;
 
@@ -32,7 +32,19 @@ abstract class CAllTestAttempt
 		}
 		elseif (is_set($arFields, "TEST_ID"))
 		{
-			$r = CTest::GetByID($arFields["TEST_ID"]);
+			if ($bCheckRights)
+				$r = CTest::GetByID($arFields["TEST_ID"]);
+			else
+			{
+				$r = CTest::getList(
+					array(),
+					array(
+						'ID'                => $arFields['TEST_ID'],
+						'CHECK_PERMISSIONS' => 'N'
+					)
+				);
+			}
+
 			if(!$r->Fetch())
 			{
 				$APPLICATION->ThrowException(GetMessage("LEARNING_BAD_TEST_ID_EX"), "ERROR_NO_TEST_ID");
@@ -81,67 +93,67 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод добавляет новую попытку.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает идентификатор добавленной попытки, если
-	 * добавление прошло успешно. При возникновении ошибки метод вернёт
-	 * <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_ID = 32;
-	 *     $STUDENT_ID = 3;
-	 * 
-	 *     $arFields = Array(
-	 *         "TEST_ID" =&gt; $TEST_ID,
-	 *         "STUDENT_ID" =&gt; $STUDENT_ID,
-	 *         "STATUS" =&gt; "B"
-	 *     );
-	 * 
-	 *     $attempt = new CTestAttempt;
-	 *     $ID = $attempt-&gt;Add($arFields);
-	 *     $success = ($ID&gt;0);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новую попытку.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return int <p>Метод возвращает идентификатор добавленной попытки, если
+	* добавление прошло успешно. При возникновении ошибки метод вернёт
+	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_ID = 32;
+	*     $STUDENT_ID = 3;
+	* 
+	*     $arFields = Array(
+	*         "TEST_ID" =&gt; $TEST_ID,
+	*         "STUDENT_ID" =&gt; $STUDENT_ID,
+	*         "STATUS" =&gt; "B"
+	*     );
+	* 
+	*     $attempt = new CTestAttempt;
+	*     $ID = $attempt-&gt;Add($arFields);
+	*     $success = ($ID&gt;0);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -173,75 +185,81 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод изменяет параметры попытки с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор попытки
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	 * возникновении ошибки функция вернёт <i>false</i>. При возникновении
-	 * ошибки в исключениях будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 596;
-	 * 
-	 *     $arFields = Array(
-	 *         "STATUS" =&gt; "F",
-	 *         "DATE_END" =&gt; ConvertTimeStamp(false,"FULL")
-	 *     );
-	 * 
-	 *     $attempt = new CTestAttempt;
-	 *     $ID = $attempt-&gt;Update($ATTEMPT_ID, $arFields);
-	 *     $success = ($ID&gt;0);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php
-	 * @author Bitrix
-	 */
-	public function Update($ID, $arFields)
+	* <p>Метод изменяет параметры попытки с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор попытки
+	*
+	*
+	*
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* возникновении ошибки функция вернёт <i>false</i>. При возникновении
+	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 596;
+	* 
+	*     $arFields = Array(
+	*         "STATUS" =&gt; "F",
+	*         "DATE_END" =&gt; ConvertTimeStamp(false,"FULL")
+	*     );
+	* 
+	*     $attempt = new CTestAttempt;
+	*     $ID = $attempt-&gt;Update($ATTEMPT_ID, $arFields);
+	*     $success = ($ID&gt;0);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php
+	* @author Bitrix
+	*/
+	public function Update($ID, $arFields, $arParams = array())
 	{
 		global $DB, $USER_FIELD_MANAGER;
 
 		$ID = intval($ID);
 		if ($ID < 1) return false;
 
-		if ($this->CheckFields($arFields, $ID) && $USER_FIELD_MANAGER->CheckFields("LEARN_ATTEMPT", 0, $arFields))
+		$bCheckRights = true;
+		if (isset($arParams['CHECK_PERMISSIONS']) && ($arParams['CHECK_PERMISSIONS'] === 'N'))
+			$bCheckRights = false;
+
+		if ($this->CheckFields($arFields, $ID, $bCheckRights) && $USER_FIELD_MANAGER->CheckFields("LEARN_ATTEMPT", 0, $arFields))
 		{
 			unset($arFields["ID"]);
 			unset($arFields["TEST_ID"]);
@@ -266,48 +284,48 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод удаляет попытку с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления попытки, в
-	 * противном случае возвращает <i>false</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 83;
-	 *     $ATTEMPT_ID = 596;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $DB-&gt;StartTransaction();
-	 *         if (!CTestAttempt::Delete($ATTEMPT_ID))
-	 *         {
-	 *             echo "Error!";
-	 *             $DB-&gt;Rollback();
-	 *         }
-	 *         else
-	 *             $DB-&gt;Commit();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет попытку с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления попытки, в
+	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 83;
+	*     $ATTEMPT_ID = 596;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $DB-&gt;StartTransaction();
+	*         if (!CTestAttempt::Delete($ATTEMPT_ID))
+	*         {
+	*             echo "Error!";
+	*             $DB-&gt;Rollback();
+	*         }
+	*         else
+	*             $DB-&gt;Commit();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -382,28 +400,28 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>See Also</h4> 
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		if ((int) $ID > 0)
@@ -416,25 +434,25 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает количество попыток студента для указанного теста.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $TEST_ID  Идентификатор теста.
-	 *
-	 *
-	 *
-	 * @param int $STUDENT_ID  Идентификатор студента.
-	 *
-	 *
-	 *
-	 * @return int <p>Число - количество попыток.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество попыток студента для указанного теста.</p>
+	*
+	*
+	*
+	*
+	* @param int $TEST_ID  Идентификатор теста.
+	*
+	*
+	*
+	* @param int $STUDENT_ID  Идентификатор студента.
+	*
+	*
+	*
+	* @return int <p>Число - количество попыток.</p>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getcount.php
+	* @author Bitrix
+	*/
 	public static function GetCount($TEST_ID, $STUDENT_ID)
 	{
 		global $DB;
@@ -454,50 +472,50 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Проверяет, пройден ли тест.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ATTEMPT_ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @param int $PERCENT  Количество процентов, необходимых для прохождения теста.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если тест пройден, иначе - <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 563;
-	 *     $PERCENT = 30;
-	 * 
-	 *     $complete = CTestAttempt::IsTestCompleted($ATTEMPT_ID, $PERCENT);
-	 * 
-	 *     if ($complete)
-	 *         echo "Test has been completed";
-	 *     else
-	 *         echo "Try again";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/istestcompleted.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, пройден ли тест.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @param int $PERCENT  Количество процентов, необходимых для прохождения теста.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если тест пройден, иначе - <i>false</i>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 563;
+	*     $PERCENT = 30;
+	* 
+	*     $complete = CTestAttempt::IsTestCompleted($ATTEMPT_ID, $PERCENT);
+	* 
+	*     if ($complete)
+	*         echo "Test has been completed";
+	*     else
+	*         echo "Try again";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/istestcompleted.php
+	* @author Bitrix
+	*/
 	public static function IsTestCompleted($ATTEMPT_ID, $PERCENT)
 	{
 		global $DB;
@@ -631,44 +649,45 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ATTEMPT_ID  Идентификатор попытки.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если операция выполнилась успешно,
-	 * иначе <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $ATTEMPT_ID = 23;
-	 *     $oTestAttempt = new CTestAttempt;
-	 *     $success = $oTestAttempt-&gt;AttemptFinished($ATTEMPT_ID);
-	 *     if ($success)
-	 *         echo "Attempt has been finished";
-	 *     else
-	 *         echo "Error!";
-	 * }
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/attemptfinished.php
-	 * @author Bitrix
-	 */
+	* <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если операция выполнилась успешно,
+	* иначе <i>false</i>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 23;
+	*     $oTestAttempt = new CTestAttempt;
+	*     $success = $oTestAttempt-&gt;AttemptFinished($ATTEMPT_ID);
+	*     if ($success)
+	*         echo "Attempt has been finished";
+	*     else
+	*         echo "Error!";
+	* }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/attemptfinished.php
+	* @author Bitrix
+	*/
 	public function AttemptFinished($ATTEMPT_ID)
 	{
 		global $DB;
@@ -696,6 +715,9 @@ abstract class CAllTestAttempt
 				"~DATE_END"=>CDatabase::CurrentTimeFunction(),
 			)
 		);
+
+		foreach(GetModuleEvents('learning', 'OnAfterAttemptFinished', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($ATTEMPT_ID));
 
 		if($res)
 			return CTestAttempt::OnAttemptChange($ATTEMPT_ID);
@@ -792,85 +814,118 @@ abstract class CAllTestAttempt
 	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = Array("ID"=>"DESC") 
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() 
-	 *
-	 *
-	 *
-	 * @param array $arrayarSelect = Array() 9.5.2
-	 *
-	 *
-	 *
-	 * @param array $arrayarNavParams = Array() 12.5.1
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_ID = 45;
-	 *     $res = CTestAttempt::GetList(
-	 *         Array("ID" =&gt; "ASC"), 
-	 *         Array("TEST_ID" =&gt; $TEST_ID)
-	 *     );
-	 * 
-	 *     while ($arAttempt = $res-&gt;GetNext())
-	 *     {
-	 *         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
-	 *     }
-	 * }
-	 * 
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * 
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $TEST_ID = 45;
-	 *     $STUDENT_ID = 3;
-	 * 
-	 *     $res = CTestAttempt::GetList(
-	 *         Array("SCORE" =&gt; "DESC"), 
-	 *         Array("CHECK_PERMISSIONS" =&gt; "N", "TEST_ID" =&gt; $TEST_ID, "STUDENT_ID" =&gt; $STUDENT_ID)
-	 *     );
-	 * 
-	 *     while ($arAttempt = $res-&gt;GetNext())
-	 *     {
-	 *         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
-	 *     }
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
+	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
+	* попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li> <b>STUDENT_ID</b> -
+	* идентификатор студента ; </li> <li> <b>DATE_START</b> - дата начала попытки; </li>
+	* <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>STATUS</b> - статус
+	* попытки; </li> <li> <b>SCORE</b> - количество баллов; </li> <li> <b>MAX_SCORE</b> -
+	* максимальное количество баллов; </li> <li> <b>COMPLETED</b> - тест пройден; </li>
+	* <li> <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>USER_NAME</b> - имя студента ;
+	* </li> <li> <b>TEST_NAME</b> - название теста. </li> </ul>Направление сортировки
+	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
+	* <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
+	* фильтруется по убыванию идентификатора попытки.
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
+	* идентификатор попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li>
+	* <b>STUDENT_ID</b> - идентификатор студента; </li> <li> <b>SCORE</b> - количество
+	* баллов; </li> <li> <b>MAX_SCORE</b> - максимальное количество баллов; </li> <li>
+	* <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>STATUS</b> - статус попытки (B -
+	* тестирование началось, D - тест прерван, F - тест закончен.); </li> <li>
+	* <b>COMPLETED</b> - тест пройден (Y|N); </li> <li> <b>DATE_START</b> - дата начала попытки;
+	* </li> <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>USER</b> -
+	* пользователь (возможны сложные условия по полям пользователя ID,
+	* LOGIN, NAME, LAST_NAME); </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
+	* умолчанию "R". Список прав доступа см. в <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li>
+	* <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
+	* значение "N" - права доступа не проверяются. </li> </ul>Перед названием
+	* фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
+	* </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
+	* </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" -
+	* одиночное значение или массив.<br><br>Необязательный. По умолчанию
+	* записи не фильтруются.
+	*
+	*
+	*
+	* @param array $arrayarSelect = Array() Массив полей записей, которые будут возвращены функцией.<br><br>
+	* Значение по умолчанию - пустой массив array() - означает, что будут
+	* возвращены все поля основной таблицы запроса.
+	*
+	*
+	*
+	* @param array $arrayarNavParams = Array() Массив настроек постраничной навигации.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_ID = 45;
+	*     $res = CTestAttempt::GetList(
+	*         Array("ID" =&gt; "ASC"), 
+	*         Array("TEST_ID" =&gt; $TEST_ID)
+	*     );
+	* 
+	*     while ($arAttempt = $res-&gt;GetNext())
+	*     {
+	*         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* 
+	* &lt;?
+	* 
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $TEST_ID = 45;
+	*     $STUDENT_ID = 3;
+	* 
+	*     $res = CTestAttempt::GetList(
+	*         Array("SCORE" =&gt; "DESC"), 
+	*         Array("CHECK_PERMISSIONS" =&gt; "N", "TEST_ID" =&gt; $TEST_ID, "STUDENT_ID" =&gt; $STUDENT_ID)
+	*     );
+	* 
+	*     while ($arAttempt = $res-&gt;GetNext())
+	*     {
+	*         echo "Attempt ID:".$arAttempt["ID"]."; Date start: ".$arAttempt["DATE_START"]."; Test name: ".$arAttempt["TEST_NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder=array(), $arFilter=array(), $arSelect = array(), $arNavParams = array())
 	{
 		global $DB, $USER, $USER_FIELD_MANAGER;

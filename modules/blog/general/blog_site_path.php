@@ -39,6 +39,17 @@ class CAllBlogSitePath
 			}
 		}
 
+		if(is_set($arFields, "SITE_ID") && strlen($arFields["SITE_ID"]) > 0 && is_set($arFields, "TYPE") && strlen($arFields["TYPE"]) > 0)
+		{
+			$dbPath = CBlogSitePath::GetList(array(), array("SITE_ID" => $arFields["SITE_ID"], "TYPE" => $arFields["TYPE"]));
+			if($dbPath->Fetch())
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GSP_ERROR_DUPLICATE"), "ERROR_DUPLICATE");
+				return false;
+
+			}
+		}
+
 		return True;
 	}
 

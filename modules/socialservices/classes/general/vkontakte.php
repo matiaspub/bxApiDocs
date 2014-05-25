@@ -26,11 +26,13 @@ class CSocServVKontakte extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"]));
+			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php?state=";
+			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl")));
+			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
 		else
 		{
-			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
+			//$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
 			$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage(true).'?auth_service_id='.self::ID;
 			$state = urlencode('site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))));
 		}

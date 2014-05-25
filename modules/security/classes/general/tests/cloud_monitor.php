@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityCloudMonitorTest extends CSecurityBaseTest
+/**
+ * Class CSecurityCloudMonitorTest
+ * @since 12.5.0
+ */
+class CSecurityCloudMonitorTest
+	extends CSecurityBaseTest
 {
 	const DEFAULT_RECEIVE_RESULTS_TIME = 15;
 	const MAX_CHECKING_REQUEST_REPEATE_COUNT = 5;
@@ -13,18 +24,24 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 
 	static public function __construct()
 	{
-		require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/classes/general/update_client.php');
 		IncludeModuleLangFile(__FILE__);
+	}
+
+	static public function checkRequirements($params = array())
+	{
+		if(!function_exists('json_decode'))
+			throw new CSecurityRequirementsException(GetMessage('SECURITY_SITE_CHECKER_CLOUD_JSON_UNAVAILABLE'));
+		return true;
 	}
 
 	/**
 	 * Run test and return results
-	 * @param array $pParams
+	 * @param array $params
 	 * @return array
 	 */
-	public function check($pParams)
+	public function check($params)
 	{
-		$this->initializeParams($pParams);
+		$this->initializeParams($params);
 		$testID = $this->getParam('TEST_ID', $this->internalName);
 		$this->sessionData = new CSecurityTemporaryStorage($testID);
 
@@ -145,13 +162,13 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	}
 
 	/**
-	 * @param string $pToken
+	 * @param string $token
 	 */
-	protected function setCheckingToken($pToken)
+	protected function setCheckingToken($token)
 	{
-		if(is_string($pToken) && $pToken != '')
+		if(is_string($token) && $token != '')
 		{
-			$this->sessionData->setData('testing_token', $pToken);
+			$this->sessionData->setData('testing_token', $token);
 		}
 	}
 
@@ -164,43 +181,43 @@ class CSecurityCloudMonitorTest extends CSecurityBaseTest
 	}
 
 	/**
-	 * @param int $pTimeOut
+	 * @param int $timeOut
 	 */
-	protected function setTimeOut($pTimeOut)
+	protected function setTimeOut($timeOut)
 	{
-		if(intval($pTimeOut) > 0 )
+		if(intval($timeOut) > 0 )
 		{
-			$this->sessionData->setData('timeout', $pTimeOut);
+			$this->sessionData->setData('timeout', $timeOut);
 		}
 	}
 
 	/**
-	 * @param array $pResult
+	 * @param array $result
 	 */
-	protected function setCheckingResult($pResult)
+	protected function setCheckingResult(array $result)
 	{
-		$this->checkingResults = $pResult;
+		$this->checkingResults = $result;
 	}
 
 	/**
-	 * @param string $pMessage
+	 * @param string $message
 	 */
-	protected function stopChecking($pMessage = '')
+	protected function stopChecking($message = '')
 	{
 		$this->checkingResults['status'] = true;
-		$this->checkingResults['fatal_error_text'] = $pMessage;
+		$this->checkingResults['fatal_error_text'] = $message;
 	}
 
 	/**
 	 * Format test results for checking output
-	 * @param array $pResults
+	 * @param array $results
 	 * @return array
 	 */
-	protected static function formatResults($pResults)
+	protected static function formatResults(array $results)
 	{
 		$formattedResult = array();
 		$count = 0;
-		foreach($pResults as $result)
+		foreach($results as $result)
 		{
 			if(isset($result['name']))
 			{

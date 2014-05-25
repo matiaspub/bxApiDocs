@@ -80,13 +80,11 @@ class CListFileControl
 			if($bPopUp)
 				$html .= '</a>';
 		}
-		else
-		{
-			$html .= '<br />'.$this->_ob_file->GetLinkHtml(array(
-				'url_template' => $url_template,
-				'download_text' => $params['download_text'],
-			));
-		}
+
+		$html .= '<br />'.$this->_ob_file->GetLinkHtml(array(
+			'url_template' => $url_template,
+			'download_text' => $params['download_text'],
+		));
 
 		return $html;
 	}

@@ -1,6 +1,5 @@
 <?
 
-// 2012-04-13 Checked/modified for compatibility with new data model
 
 /**
  * 
@@ -16,8 +15,6 @@
  */
 class CAllTest
 {
-
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function CheckFields(&$arFields, $ID = false)
 	{
 		global $DB;
@@ -111,74 +108,73 @@ class CAllTest
 			$arFields["NEXT_QUESTION_ON_ERROR"] = "N";
 
 		return true;
-
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод добавляет новый тест.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает идентификатор добавленного теста, если
-	 * добавление прошло успешно. При возникновении ошибки метод вернёт
-	 * <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 * 
-	 *     $COURSE_ID = 97;
-	 * 
-	 *     $arFields = Array(
-	 *         "COURSE_ID" =&gt; $COURSE_ID,
-	 *         "NAME" =&gt; "New test!",
-	 *         "INCLUDE_SELF_TEST" =&gt; "Y"
-	 *     );
-	 * 
-	 *     $test = new CTest;
-	 *     $ID = $test-&gt;Add($arFields);
-	 *     $success = ($ID&gt;0);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новый тест.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return int <p>Метод возвращает идентификатор добавленного теста, если
+	* добавление прошло успешно. При возникновении ошибки метод вернёт
+	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	* 
+	*     $COURSE_ID = 97;
+	* 
+	*     $arFields = Array(
+	*         "COURSE_ID" =&gt; $COURSE_ID,
+	*         "NAME" =&gt; "New test!",
+	*         "INCLUDE_SELF_TEST" =&gt; "Y"
+	*     );
+	* 
+	*     $test = new CTest;
+	*     $ID = $test-&gt;Add($arFields);
+	*     $success = ($ID&gt;0);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php
+	* @author Bitrix
+	*/
 	public function Add($arFields)
 	{
 		global $DB;
@@ -201,72 +197,72 @@ class CAllTest
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод изменяет параметры теста с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор теста.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
-	 * Обязательные поля должны быть заполнены. <br>
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	 * возникновении ошибки функция вернет <i>false</i>. При возникновении
-	 * ошибки в исключениях будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 * 
-	 *     $TEST_ID = 99;
-	 * 
-	 *     $arFields = Array(
-	 *         "NAME" =&gt; "New name",
-	 *         "INCLUDE_SELF_TEST" =&gt; "N",
-	 *         "QUESTIONS_AMOUNT" =&gt; 5
-	 *     );
-	 * 
-	 *     $test = new CTest;
-	 *     $success = $test-&gt;Update($TEST_ID, $arFields);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * 
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php">Add</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры теста с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор теста.
+	*
+	*
+	*
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">всех полей</a> теста.
+	* Обязательные поля должны быть заполнены. <br>
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* возникновении ошибки функция вернет <i>false</i>. При возникновении
+	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	* 
+	*     $TEST_ID = 99;
+	* 
+	*     $arFields = Array(
+	*         "NAME" =&gt; "New name",
+	*         "INCLUDE_SELF_TEST" =&gt; "N",
+	*         "QUESTIONS_AMOUNT" =&gt; 5
+	*     );
+	* 
+	*     $test = new CTest;
+	*     $success = $test-&gt;Update($TEST_ID, $arFields);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* 
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/add.php">Add</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/update.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		global $DB;
@@ -297,52 +293,51 @@ class CAllTest
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод удаляет тест с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор теста.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления теста, в
-	 * противном случае возвращает <i>false</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 * 
-	 *     $TEST_ID = 99;
-	 *     $COURSE_ID = 97;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $DB-&gt;StartTransaction();
-	 *         if (!CTest::Delete($TEST_ID))
-	 *         {
-	 *             echo "Error!";
-	 *             $DB-&gt;Rollback();
-	 *         }
-	 *         else
-	 *             $DB-&gt;Commit();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет тест с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор теста.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления теста, в
+	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	* 
+	*     $TEST_ID = 99;
+	*     $COURSE_ID = 97;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $DB-&gt;StartTransaction();
+	*         if (!CTest::Delete($TEST_ID))
+	*         {
+	*             echo "Error!";
+	*             $DB-&gt;Rollback();
+	*         }
+	*         else
+	*             $DB-&gt;Commit();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -376,23 +371,26 @@ class CAllTest
 				return false;
 		}
 
-
 		$strSql = "DELETE FROM b_learn_test WHERE ID = ".$ID;
 
 		if (!$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__))
 			return false;
 
+		CEventLog::add(array(
+			'AUDIT_TYPE_ID' => 'LEARNING_REMOVE_ITEM',
+			'MODULE_ID'     => 'learning',
+			'ITEM_ID'       => 'T #' . $ID,
+			'DESCRIPTION'   => 'test removed'
+		));
+
 		CLearnHelper::FireEvent('OnAfterTestDelete', $ID);
 
 		return true;
-
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetFilter($arFilter)
 	{
-
 		if (!is_array($arFilter))
 			$arFilter = Array();
 
@@ -413,12 +411,12 @@ class CAllTest
 				case "COURSE_ID":
 				case "ATTEMPT_LIMIT":
 				case "TIME_LIMIT":
-					$arSqlSearch[] = CLearnHelper::FilterCreate("T.".$key, $val, "number", $bFullJoin, $cOperationType);
+					$arSqlSearch[] = CLearnHelper::FilterCreate("LT.".$key, $val, "number", $bFullJoin, $cOperationType);
 					break;
 
 				case "NAME":
 				case "DESCRIPTION":
-					$arSqlSearch[] = CLearnHelper::FilterCreate("T.".$key, $val, "string", $bFullJoin, $cOperationType);
+					$arSqlSearch[] = CLearnHelper::FilterCreate("LT.".$key, $val, "string", $bFullJoin, $cOperationType);
 					break;
 
 				case "ACTIVE":
@@ -427,105 +425,104 @@ class CAllTest
 				case "RANDOM_ANSWERS":
 				case "RANDOM_QUESTIONS":
 				case "QUESTIONS_FROM":
+				case "QUESTIONS_FROM_ID":
 				case "PASSAGE_TYPE":
-					$arSqlSearch[] = CLearnHelper::FilterCreate("T.".$key, $val, "string_equal", $bFullJoin, $cOperationType);
+					$arSqlSearch[] = CLearnHelper::FilterCreate("LT.".$key, $val, "string_equal", $bFullJoin, $cOperationType);
 					break;
 			}
 
 		}
 
 		return $arSqlSearch;
-
 	}
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
+
 	
 	/**
-	 * <p>Возвращает тест по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор теста.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает тест по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор теста.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>See Also</h4> 
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a> </li>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		return CTest::GetList($arOrder=Array(), $arFilter=Array("ID" => $ID));
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает количество тестов по заданному фильтру.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	 * Описание фильтра см. в <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">CTest::GetList</a>.<br> По
-	 * умолчанию тесты не фильтруются.
-	 *
-	 *
-	 *
-	 * @return int <p>Число - количество тестов.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 *     
-	 *     $cnt = CTest::GetCount(Array("ACTIVE" =&gt; "Y", "COURSE_ID" =&gt; $COURSE_ID));
-	 * 
-	 *     echo "Number of tests: ".$cnt;
-	 * }
-	 * 
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 *     
-	 *     $cnt = CTest::GetCount(Array("CHECK_PERMISSIONS" =&gt; "N", "COURSE_ID" =&gt; $COURSE_ID));
-	 * 
-	 *     echo "Number of tests: ".$cnt;
-	 * }
-	 * 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество тестов по заданному фильтру.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	* Описание фильтра см. в <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">CTest::GetList</a>.<br> По
+	* умолчанию тесты не фильтруются.
+	*
+	*
+	*
+	* @return int <p>Число - количество тестов.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	*     
+	*     $cnt = CTest::GetCount(Array("ACTIVE" =&gt; "Y", "COURSE_ID" =&gt; $COURSE_ID));
+	* 
+	*     echo "Number of tests: ".$cnt;
+	* }
+	* 
+	* ?&gt;
+	* 
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	*     
+	*     $cnt = CTest::GetCount(Array("CHECK_PERMISSIONS" =&gt; "N", "COURSE_ID" =&gt; $COURSE_ID));
+	* 
+	*     echo "Number of tests: ".$cnt;
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getcount.php
+	* @author Bitrix
+	*/
 	public static function GetCount($arFilter = Array())
 	{
 		global $DB, $USER, $APPLICATION;
@@ -545,9 +542,9 @@ class CAllTest
 
 		$strSql = 
 			"SELECT COUNT(*) as CNT 
-			FROM b_learn_test T 
+			FROM b_learn_test LT 
 			INNER JOIN b_learn_course C 
-				ON T.COURSE_ID = C.ID
+				ON LT.COURSE_ID = C.ID
 			WHERE 1=1";
 
 		if ($oPermParser->IsNeedCheckPerm())
@@ -555,31 +552,15 @@ class CAllTest
 
 		$strSql .= $strSqlSearch;
 
-		/* was:
-
-		$strSql = "SELECT COUNT(*) as CNT ".
-					"FROM b_learn_test T ".
-					"INNER JOIN b_learn_course C ON T.COURSE_ID = C.ID ".
-					($bCheckPerm ? "LEFT JOIN b_learn_course_permission CP ON CP.COURSE_ID = C.ID " : "").
-					"WHERE 1=1 ".
-					($bCheckPerm ?
-						"AND CP.USER_GROUP_ID IN (".$USER->GetGroups().") ".
-						"AND CP.PERMISSION >= '".(strlen($arFilter["MIN_PERMISSION"])==1 ? $arFilter["MIN_PERMISSION"] : "R")."' ".
-						"AND (CP.PERMISSION='X' OR C.ACTIVE='Y')"
-					:"").
-					$strSqlSearch;
-		*/
-
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if ($ar = $res->Fetch())
 			return intval($ar["CNT"]);
 		else
 			return 0;
-
 	}
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
+
 	public static function isPrevPassed($ID, $SCORE)
 	{
 		global $DB, $USER;
@@ -587,15 +568,14 @@ class CAllTest
 		$SCORE = intval($SCORE);
 		$strSql = "SELECT * FROM b_learn_gradebook WHERE STUDENT_ID = ".$USER->GetID()." AND TEST_ID = ".$ID." AND 1.0*RESULT/MAX_RESULT*100 >= ".$SCORE;
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
 		if ($res->Fetch())
 			return true;
 		else
 			return false;
-
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetStats($ID)
 	{
 		global $DB;
@@ -612,5 +592,249 @@ class CAllTest
 			return array("ALL_CNT" => 0, "CORRECT_CNT" => 0);
 		}
 	}
+
+
+	
+	/**
+	* <p>Возвращает список тестов по фильтру arFilter, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("TIMESTAMP_X"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
+	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
+	* теста;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>NAME</b> - название
+	* теста;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>TIMESTAMP_X</b> - даты
+	* изменения теста;</li> </ul> Направление сортировки может принимать
+	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
+	* убыванию;</li> </ul> Необязательный. По умолчанию фильтруется по
+	* убыванию даты изменения теста.
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
+	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
+	* идентификатор теста;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li>
+	* <b>COURSE_ID</b> - идентификатор курса;</li> <li> <b>ATTEMPT_LIMIT</b> - количество
+	* попыток;</li> <li> <b>TIME_LIMIT</b> - ограничение времени прохождения теста
+	* (в минутах);</li> <li> <b>NAME</b> - название теста (можно искать по шаблону
+	* [%_]);</li> <li> <b>DESCRIPTION</b> - описание теста (можно искать по шаблону
+	* [%_]);</li> <li> <b>ACTIVE</b> - фильтр по активности (Y|N);</li> <li> <b>APPROVED</b> -
+	* автоматическая проверка результатов (Y|N);</li> <li> <b>INCLUDE_SELF_TEST</b> -
+	* включать вопросы для самопроверки (Y|N);</li> <li> <b>RANDOM_QUESTIONS</b> -
+	* случайный порядок вопросов (Y|N);</li> <li> <b>RANDOM_ANSWERS</b> - случайный
+	* порядок ответов (Y|N);</li> <li> <b>QUESTIONS_FROM</b> - в тесте участвуют вопросы
+	* (A - со всего курса, C - с каждой главы, L - с каждого урока);</li> <li>
+	* <b>PASSAGE_TYPE</b> - Тип прохождения теста. 0 - запретить переход к
+	* следующему вопросу без ответа на текущий вопрос, пользователь не
+	* может изменять свои ответы; 1 - разрешить переход к следующему
+	* вопросу без ответа на текущий вопрос, пользователь не может
+	* изменять свои ответы; 3 - разрешить переход к следующему вопросу
+	* без ответа на текущий вопрос, пользователь может изменять свои
+	* ответы.</li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
+	* умолчанию "R". Список прав доступа см. в <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
+	* <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
+	* значение "N" - права доступа не проверяются.</li> </ul> Перед названием
+	* фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не
+	* равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше либо равно</li> <li>"&gt;" -
+	* больше</li> <li>"&gt;=" - больше либо равно</li> </ul> <br> "<i>значения
+	* фильтра</i>" - одиночное значение или массив.<br><br> Необязательный.
+	* По умолчанию записи не фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	*     $res = CTest::GetList(
+	*         Array("SORT"=&gt;"ASC"), 
+	*         Array("ACTIVE" =&gt; "Y", "COURSE_ID" =&gt; $COURSE_ID)
+	*     );
+	* 
+	*     while ($arTest = $res-&gt;GetNext())
+	*     {
+	*         echo "Test name: ".$arTest["NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* 
+	* &lt;?
+	* 
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $res = CTest::GetList(
+	*         Array("SORT"=&gt;"ASC"), 
+	*         Array("?NAME" =&gt; "Site")
+	*     );
+	* 
+	*     while ($arTest = $res-&gt;GetNext())
+	*     {
+	*         echo "Test name: ".$arTest["NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* ?&gt;
+	* 
+	* &lt;?
+	* 
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	* 
+	*     $res = CTest::GetList(
+	*         Array("NAME" =&gt; "ASC", "SORT"=&gt;"ASC"), 
+	*         Array("COURSE_ID" =&gt; $COURSE_ID, "APPROVED" =&gt; "Y")
+	*     );
+	* 
+	*     while ($arTest = $res-&gt;GetNext())
+	*     {
+	*         echo "Test name: ".$arTest["NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* 
+	* &lt;?
+	* 
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	* 
+	*     $res = CTest::GetList(
+	*         Array("TIMESTAMP_X" =&gt; "ASC", "SORT"=&gt;"ASC"), 
+	*         Array("CHECK_PERMISSIONS" =&gt; "N", "COURSE_ID" =&gt; $COURSE_ID)
+	*     );
+	* 
+	*     while ($arTest = $res-&gt;GetNext())
+	*     {
+	*         echo "Test name: ".$arTest["NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getbyid.php">GetByID</a> </li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#test">Поля теста</a></li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php
+	* @author Bitrix
+	*/
+	public static function GetList($arOrder = array(), $arFilter = array(), $arNavParams = array())
+	{
+		global $DB, $USER;
+
+		if (!is_array($arFilter))
+			$arFilter = Array();
+
+		$oPermParser = new CLearnParsePermissionsFromFilter ($arFilter);
+		$arSqlSearch = CTest::GetFilter($arFilter);
+
+		// Remove empty strings from array
+		$arSqlSearch = array_filter($arSqlSearch);
+
+		if ($oPermParser->IsNeedCheckPerm())
+			$arSqlSearch[] = " C.LINKED_LESSON_ID IN (" . $oPermParser->SQLForAccessibleLessons() . ") ";
+
+		$strSqlSearch = ' ';
+		if ( ! empty($arSqlSearch) )
+		{
+			$strSqlSearch = ' WHERE ';
+			$strSqlSearch .= implode(' AND ', $arSqlSearch);
+		}
+
+		$strSqlFrom = "FROM b_learn_test LT ".
+			"INNER JOIN b_learn_course C ON LT.COURSE_ID = C.ID "
+			. $strSqlSearch;
+
+		$strSql =
+			"SELECT LT.ID, LT.COURSE_ID, LT.SORT, LT.ACTIVE, LT.NAME, 
+				LT.DESCRIPTION, LT.DESCRIPTION_TYPE, LT.ATTEMPT_LIMIT, 
+				LT.TIME_LIMIT, LT.COMPLETED_SCORE, LT.QUESTIONS_FROM, 
+				LT.QUESTIONS_FROM_ID, LT.QUESTIONS_AMOUNT, LT.RANDOM_QUESTIONS, 
+				LT.RANDOM_ANSWERS, LT.APPROVED, LT.INCLUDE_SELF_TEST, 
+				LT.PASSAGE_TYPE, LT.PREVIOUS_TEST_ID, LT.PREVIOUS_TEST_SCORE, 
+				LT.INCORRECT_CONTROL, LT.CURRENT_INDICATION, 
+				LT.FINAL_INDICATION, LT.MIN_TIME_BETWEEN_ATTEMPTS, 
+				LT.SHOW_ERRORS, LT.NEXT_QUESTION_ON_ERROR, ".
+			$DB->DateToCharFunction("LT.TIMESTAMP_X")." as TIMESTAMP_X "
+			. $strSqlFrom;
+
+		if (!is_array($arOrder))
+			$arOrder = Array();
+
+		foreach($arOrder as $by=>$order)
+		{
+			$by = strtolower($by);
+			$order = strtolower($order);
+
+			if ($order!="asc")
+				$order = "desc";
+
+			if ($by == "id")
+				$arSqlOrder[] = " LT.ID ".$order." ";
+			elseif ($by == "name")
+				$arSqlOrder[] = " LT.NAME ".$order." ";
+			elseif ($by == "active")
+				$arSqlOrder[] = " LT.ACTIVE ".$order." ";
+			elseif ($by == "sort")
+				$arSqlOrder[] = " LT.SORT ".$order." ";
+			else
+			{
+				$arSqlOrder[] = " LT.TIMESTAMP_X ".$order." ";
+				$by = "timestamp_x";
+			}
+		}
+
+		$strSqlOrder = "";
+		DelDuplicateSort($arSqlOrder);
+		for ($i=0; $i<count($arSqlOrder); $i++)
+		{
+			if($i==0)
+				$strSqlOrder = " ORDER BY ";
+			else
+				$strSqlOrder .= ",";
+
+			$strSqlOrder .= $arSqlOrder[$i];
+		}
+
+		$strSql .= $strSqlOrder;
+
+		if (is_array($arNavParams) && ( ! empty($arNavParams) ) )
+		{
+			if (isset($arNavParams['nTopCount']) && ((int) $arNavParams['nTopCount'] > 0))
+			{
+				$strSql = $DB->TopSql($strSql, (int) $arNavParams['nTopCount']);
+				$res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+			}
+			else
+			{
+				$res_cnt = $DB->Query("SELECT COUNT(LT.ID) as C " . $strSqlFrom);
+				$res_cnt = $res_cnt->fetch();
+				$res = new CDBResult();
+				$res->NavQuery($strSql, $res_cnt['C'], $arNavParams);
+			}
+		}
+		else
+			$res = $DB->Query($strSql, false, "File: " . __FILE__ . "<br>Line: " . __LINE__);
+
+		return $res;
+	}
 }
-?>

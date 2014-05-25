@@ -28,10 +28,11 @@ class CBlog extends CAllBlog
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_BLOG", 0, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforeBlogAdd");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeBlogAdd", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_blog", $arFields);
 
@@ -62,9 +63,10 @@ class CBlog extends CAllBlog
 				
 			$GLOBALS["USER_FIELD_MANAGER"]->Update("BLOG_BLOG", $ID, $arFields);
 
-			$events = GetModuleEvents("blog", "OnBlogAdd");
-			while ($arEvent = $events->Fetch())
+			foreach(GetModuleEvents("blog", "OnBlogAdd", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
+			}
 		}
 
 		if ($ID && (is_set($arFields, "NAME") || is_set($arFields, "DESCRIPTION")))
@@ -140,10 +142,11 @@ class CBlog extends CAllBlog
 		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_BLOG", $ID, $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("blog", "OnBeforeBlogUpdate");
-		while ($arEvent = $db_events->Fetch())
+		foreach(GetModuleEvents("blog", "OnBeforeBlogUpdate", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$arFields))===false)
 				return false;
+		}
 
 		$arBlogOld = CBlog::GetByID($ID);
 
@@ -168,9 +171,10 @@ class CBlog extends CAllBlog
 			unset($GLOBALS["BLOG"]["BLOG4OWNER_CACHE_".$arBlogOld["OWNER_ID"]]);
 			unset($GLOBALS["BLOG"]["BLOG4OWNERGROUP_CACHE_".$arBlogOld["SOCNET_GROUP_ID"]]);
 
-			$events = GetModuleEvents("blog", "OnBlogUpdate");
-			while ($arEvent = $events->Fetch())
+			foreach(GetModuleEvents("blog", "OnBlogUpdate", true) as $arEvent)
+			{
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
+			}
 
 			if (is_set($arFields, "PERMS_POST"))
 				CBlog::SetBlogPerms($ID, $arFields["PERMS_POST"], BLOG_PERMS_POST);
@@ -243,7 +247,7 @@ class CBlog extends CAllBlog
 	//*************** SELECT *********************/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $USER;
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("BLOG_BLOG", "B.ID");
@@ -251,11 +255,14 @@ class CBlog extends CAllBlog
 		$obUserFieldsSql->SetFilter($arFilter);
 		$obUserFieldsSql->SetOrder($arOrder);
 
+		if(!empty($arSelectFields) && !in_array("ID", $arSelectFields))
+			$arSelectFields[] = "ID";
+
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "NAME", "DESCRIPTION", "DATE_CREATE", "DATE_UPDATE", "ACTIVE", "OWNER_ID", "URL", "REAL_URL", "GROUP_ID", "ENABLE_COMMENTS", "ENABLE_IMG_VERIF", "EMAIL_NOTIFY", "ENABLE_RSS", "LAST_POST_ID", "LAST_POST_DATE", "AUTO_GROUPS", "ALLOW_HTML", "SOCNET_GROUP_ID");
 		if(in_array("*", $arSelectFields))
 			$arSelectFields = array("ID", "NAME", "DESCRIPTION", "DATE_CREATE", "DATE_UPDATE", "ACTIVE", "OWNER_ID", "SOCNET_GROUP_ID", "URL", "REAL_URL", "GROUP_ID", "ENABLE_COMMENTS", "ENABLE_IMG_VERIF", "EMAIL_NOTIFY", "ENABLE_RSS", "ALLOW_HTML", "LAST_POST_ID", "LAST_POST_DATE", "AUTO_GROUPS", "SEARCH_INDEX", "USE_SOCNET", "OWNER_LOGIN", "OWNER_NAME", "OWNER_LAST_NAME", "OWNER_EMAIL", "OWNER", "GROUP_NAME", "GROUP_SITE_ID", "BLOG_USER_ALIAS", "BLOG_USER_AVATAR");
-			
+
 		// FIELDS -->
 		$arFields = array(
 				"ID" => array("FIELD" => "B.ID", "TYPE" => "int"),
@@ -298,7 +305,7 @@ class CBlog extends CAllBlog
 			);
 		// <-- FIELDS
 		
-		if($GLOBALS["USER"] -> IsAuthorized())
+		if(isset($USER) && is_object($USER) && $USER->IsAuthorized())
 		{
 			$arFields["PERMS"] = Array(
 				"FIELD" => "bugp.PERMS",

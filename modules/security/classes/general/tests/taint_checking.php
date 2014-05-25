@@ -1,6 +1,17 @@
 <?
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage security
+ * @copyright 2001-2013 Bitrix
+ */
 
-class CSecurityTaintCheckingTest extends CSecurityBaseTest
+/**
+ * Class CSecurityTaintCheckingTest
+ * @since 12.5.0
+ */
+class CSecurityTaintCheckingTest
+	extends CSecurityBaseTest
 {
 	const REQUEST_TIMEOUT = 3;
 	protected $internalName = "TaintCheckingTest";
@@ -14,11 +25,11 @@ class CSecurityTaintCheckingTest extends CSecurityBaseTest
 	/**
 	 * Check test requirements (e.g. max_execution_time)
 	 *
-	 * @param array $pParams
+	 * @param array $params
 	 * @throws CSecurityRequirementsException
 	 * @return bool
 	 */
-	static public function checkRequirements($pParams = array())
+	static public function checkRequirements($params = array())
 	{
 		if(extension_loaded('tokenizer') !== true)
 			throw new CSecurityRequirementsException(GetMessage("SECURITY_SITE_CHECKER_TAINT_TOKENIZER_NOT_FOUND"));
@@ -33,12 +44,12 @@ class CSecurityTaintCheckingTest extends CSecurityBaseTest
 
 	/**
 	 * Run test and return results
-	 * @param array $pParams
+	 * @param array $params
 	 * @return array
 	 */
-	public function check($pParams)
+	public function check($params)
 	{
-		$dirtyResults = CQAACheckListTests::checkVulnerabilities($pParams);
+		$dirtyResults = CQAACheckListTests::checkVulnerabilities($params);
 		$result = $this->formatResults($dirtyResults);
 		return $result;
 	}

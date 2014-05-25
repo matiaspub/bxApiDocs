@@ -4,8 +4,7 @@ namespace Bitrix\Main;
 /**
  * Base class for fatal exceptions
  */
-class SystemException
-	extends \Exception
+class SystemException extends \Exception
 {
 	/**
 	 * Creates new exception object.
@@ -28,8 +27,7 @@ class SystemException
 /**
  * Exception is thrown when function argument is not valid.
  */
-class ArgumentException
-	extends SystemException
+class ArgumentException extends SystemException
 {
 	protected $parameter;
 
@@ -49,15 +47,10 @@ class ArgumentException
 /**
  * Exception is thrown when "empty" value is passed to a function that does not accept it as a valid argument.
  */
-class ArgumentNullException
-	extends ArgumentException
+class ArgumentNullException extends ArgumentException
 {
 	static public function __construct($parameter, \Exception $previous = null)
 	{
-		/*$message = Loc::getMessage(
-			"argument_null_exception_message",
-			array("#PARAMETER#" => $parameter)
-		);*/
 		$message = sprintf("Argument '%s' is null or empty", $parameter);
 		parent::__construct($message, $parameter, $previous);
 	}
@@ -67,8 +60,7 @@ class ArgumentNullException
 /**
  * Exception is thrown when the value of an argument is outside the allowable range of values.
  */
-class ArgumentOutOfRangeException
-	extends ArgumentException
+class ArgumentOutOfRangeException extends ArgumentException
 {
 	protected $lowerLimit;
 	protected $upperLimit;
@@ -115,8 +107,7 @@ class ArgumentOutOfRangeException
 /**
  * Exception is thrown when the type of an argument is not accepted by function.
  */
-class ArgumentTypeException
-	extends ArgumentException
+class ArgumentTypeException	extends ArgumentException
 {
 	protected $requiredType;
 
@@ -149,8 +140,7 @@ class ArgumentTypeException
 /**
  * Exception is thrown when operation is not implemented but should be.
  */
-class NotImplementedException
-	extends SystemException
+class NotImplementedException extends SystemException
 {
 	static public function __construct($message = "", \Exception $previous = null)
 	{
@@ -162,8 +152,7 @@ class NotImplementedException
 /**
  * Exception is thrown when operation is not supported.
  */
-class NotSupportedException
-	extends SystemException
+class NotSupportedException extends SystemException
 {
 	static public function __construct($message = "", \Exception $previous = null)
 	{
@@ -183,4 +172,13 @@ class ObjectPropertyException extends ArgumentException
 	}
 }
 
-
+/**
+ * Exception is thrown when the object can't be constructed.
+ */
+class ObjectException extends SystemException
+{
+	static public function __construct($message = "", \Exception $previous = null)
+	{
+		parent::__construct($message, 500, '', 0, $previous);
+	}
+}

@@ -20,16 +20,18 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			}
 		}
 
-		if (!CSocNetLogComments::CheckFields("ADD", $arFields))
-			return false;
-
-		$arCommentEvent = CSocNetLogTools::FindLogCommentEventByID($arFields["EVENT_ID"]);
-		if (
-			!$arCommentEvent
-			|| !array_key_exists("ADD_CALLBACK", $arCommentEvent)
-			|| !is_callable($arCommentEvent["ADD_CALLBACK"])
-		)
-			$bSetSource = false;
+		if (strlen($arFields["EVENT_ID"]) > 0)
+		{
+			$arCommentEvent = CSocNetLogTools::FindLogCommentEventByID($arFields["EVENT_ID"]);
+			if (
+				!$arCommentEvent
+				|| !array_key_exists("ADD_CALLBACK", $arCommentEvent)
+				|| !is_callable($arCommentEvent["ADD_CALLBACK"])
+			)
+			{
+				$bSetSource = false;
+			}
+		}
 
 		$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetLogCommentAdd");
 		while ($arEvent = $db_events->Fetch())
@@ -39,9 +41,16 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		if ($bSetSource)
 		{
 			$arSource = CSocNetLogComments::SetSource($arFields);
-			if (intval($arSource["SOURCE_ID"]) > 0)
+			if (
+				$arSource["NO_SOURCE"] == "Y"
+				|| intval($arSource["SOURCE_ID"]) > 0
+			)
 			{
-				$arFields["SOURCE_ID"] = $arSource["SOURCE_ID"];
+				if ($arSource["NO_SOURCE"] == "Y")
+					$bSetSource = false;
+				else
+					$arFields["SOURCE_ID"] = $arSource["SOURCE_ID"];
+
 				if (
 					array_key_exists("RATING_ENTITY_ID", $arSource)
 					&& array_key_exists("RATING_TYPE_ID", $arSource)
@@ -71,7 +80,6 @@ class CSocNetLogComments extends CAllSocNetLogComments
 						$arSource["UF"]["FILE"] = array($arSource["UF"]["FILE"]);
 
 					$arFields["UF_SONET_COM_FILE"] = $arSource["UF"]["FILE"];
-					$bNeedCheck = true;
 				}
 
 				if (
@@ -83,14 +91,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 						$arSource["UF"]["DOC"] = array($arSource["UF"]["DOC"]);
 
 					$arFields["UF_SONET_COM_DOC"] = $arSource["UF"]["DOC"];
-					$bNeedCheck = true;
 				}
-
-				if (
-					$bNeedCheck 
-					&& !CSocNetLogComments::CheckFields("ADD", $arFields)
-				)
-					return false;
 			}
 			else
 				$strMessage =
@@ -103,6 +104,11 @@ class CSocNetLogComments extends CAllSocNetLogComments
 								: ""
 						)
 				);
+		}
+
+		if (!CSocNetLogComments::CheckFields("ADD", $arFields))
+		{
+			return false;
 		}
 
 		if (
@@ -184,17 +190,31 @@ class CSocNetLogComments extends CAllSocNetLogComments
 					}
 
 					if ($bSendEvent)
+					{
 						CSocNetLogComments::SendEvent($ID, "SONET_NEW_EVENT");
+					}
+
 					CSocNetLogComments::UpdateLogData($arFields["LOG_ID"], $bSetLogUpDate);
 
 					$db_events = GetModuleEvents("socialnetwork", "OnAfterSocNetLogCommentAdd");
 					while ($arEvent = $db_events->Fetch())
+					{
 						ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+					}
 
 					$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields);
 
 					if(defined("BX_COMP_MANAGED_CACHE"))
+					{
 						$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$arFields["LOG_ID"]);
+					}
+					else
+					{
+						$cache = new CPHPCache;
+						$cache->CleanDir("/sonet/log/".$arFields["LOG_ID"]."/comments/");
+					}
+
+					CSocNetLogComments::SendMentionNotification(array_merge($arFields, array("ID" => $ID)));
 				}
 			}
 
@@ -383,6 +403,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			$strSqlUFFilter = " (".$r.") ";
 
 		$arSqls["RIGHTS"] = "";
+		$arSqls["CRM_RIGHTS"] = "";
 
 		if (
 			!empty($arParams)
@@ -454,9 +475,20 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		}
 
 		if (
+			!empty($arParams)
+			&& array_key_exists("CHECK_CRM_RIGHTS", $arParams)
+			&& $arParams["CHECK_CRM_RIGHTS"] == "Y"
+			&& array_key_exists("USER_ID", $arParams)
+		)
+		{
+			$arSqls["CRM_RIGHTS"] = "";
+		}
+
+		if (
 			$arParams["USE_SUBSCRIBE"] == "Y"
 			&& intval($arParams["SUBSCRIBE_USER_ID"]) > 0
 		)
+		{
 			$arSqls["SUBSCRIBE"] = CSocNetLogEvents::GetSQL(
 				$arParams["SUBSCRIBE_USER_ID"],
 				(is_array($arParams["MY_ENTITIES"]) ? $arParams["MY_ENTITIES"] : array()),
@@ -464,6 +496,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				$arParams["VISIBLE"],
 				"LC"
 			);
+		}
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", $strDistinct, $arSqls["SELECT"]);
 
@@ -476,27 +509,37 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				"	".$arSqls["FROM"]." ".
 				$obUserFieldsSql->GetJoin("LC.ID")." ";
 
+			$bWhereStarted = false;
+
 			if (strlen($arSqls["WHERE"]) > 0)
+			{
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
-			else
-				$strSql .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
+				$bWhereStarted = true;
+			}
+			elseif (strlen($arSqls["SUBSCRIBE"]) > 0)
+			{
+				$strSql .= "WHERE (".$arSqls["SUBSCRIBE"].") ";
+				$bWhereStarted = true;
+			}
 
 			if (strlen($strSqlUFFilter) > 0)
 			{
-				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
-					$strSql .= " AND ".$strSqlUFFilter." ";
-				else
-					$strSql .= " WHERE ".$strSqlUFFilter." ";
+				$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$strSqlUFFilter." ";
+				$bWhereStarted = true;
 			}
 
 			if (strlen($arSqls["RIGHTS"]) > 0)
 			{
-				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
-					$strSql .= " AND ";
-				else
-					$strSql .= " WHERE ";
-				$strSql .= $arSqls["RIGHTS"]." ";
+				$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["RIGHTS"]." ";
+				$bWhereStarted = true;
 			}
+
+			if (strlen($arSqls["CRM_RIGHTS"]) > 0)
+			{
+				$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["CRM_RIGHTS"]." ";
+				$bWhereStarted = true;
+			}
+
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
@@ -516,27 +559,37 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			"	".$arSqls["FROM"]." ".
 			$obUserFieldsSql->GetJoin("LC.ID")." ";
 
+		$bWhereStarted = false;
+
 		if (strlen($arSqls["WHERE"]) > 0)
+		{
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
-		else
-			$strSql .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
+			$bWhereStarted = true;
+		}
+		elseif (strlen($arSqls["SUBSCRIBE"]) > 0)
+		{
+			$strSql .= "WHERE (".$arSqls["SUBSCRIBE"].") ";
+			$bWhereStarted = true;
+		}
 
 		if (strlen($strSqlUFFilter) > 0)
 		{
-			if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
-				$strSql .= " AND ".$strSqlUFFilter." ";
-			else
-				$strSql .= " WHERE ".$strSqlUFFilter." ";
+			$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$strSqlUFFilter." ";
+			$bWhereStarted = true;
 		}
 
 		if (strlen($arSqls["RIGHTS"]) > 0)
 		{
-			if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
-				$strSql .= " AND ";
-			else
-				$strSql .= " WHERE ";
-			$strSql .= $arSqls["RIGHTS"]." ";
+			$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["RIGHTS"]." ";
+			$bWhereStarted = true;
 		}
+
+		if (strlen($arSqls["CRM_RIGHTS"]) > 0)
+		{
+			$strSql .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["CRM_RIGHTS"]." ";
+			$bWhereStarted = true;
+		}
+
 		if (strlen($arSqls["GROUPBY"]) > 0)
 			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 		if (strlen($arSqls["ORDERBY"]) > 0)
@@ -551,27 +604,37 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				"	".$arSqls["FROM"]." ".
 				$obUserFieldsSql->GetJoin("LC.ID")." ";
 
+			$bWhereStarted = false;
+
 			if (strlen($arSqls["WHERE"]) > 0)
+			{
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ".(strlen($arSqls["SUBSCRIBE"]) > 0 ? "AND (".$arSqls["SUBSCRIBE"].") " : "");
-			else
-				$strSql_tmp .= (strlen($arSqls["SUBSCRIBE"]) > 0 ? "WHERE (".$arSqls["SUBSCRIBE"].") " : "");
-				
+				$bWhereStarted = true;
+			}
+			elseif (strlen($arSqls["SUBSCRIBE"]) > 0)
+			{
+				$strSql_tmp .= "WHERE (".$arSqls["SUBSCRIBE"].") ";
+				$bWhereStarted = true;
+			}
+
 			if (strlen($strSqlUFFilter) > 0)
 			{
-				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0)
-					$strSql_tmp .= " AND ".$strSqlUFFilter." ";
-				else
-					$strSql_tmp .= " WHERE ".$strSqlUFFilter." ";
+				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$strSqlUFFilter." ";
+				$bWhereStarted = true;
 			}
 
 			if (strlen($arSqls["RIGHTS"]) > 0)
 			{
-				if (strlen($arSqls["WHERE"]) > 0 || strlen($arSqls["SUBSCRIBE"]) > 0 || strlen($strSqlUFFilter) > 0)
-					$strSql_tmp .= " AND ";
-				else
-					$strSql_tmp .= " WHERE ";
-				$strSql_tmp .= $arSqls["RIGHTS"]." ";
+				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["RIGHTS"]." ";
+				$bWhereStarted = true;
 			}
+
+			if (strlen($arSqls["CRM_RIGHTS"]) > 0)
+			{
+				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["CRM_RIGHTS"]." ";
+				$bWhereStarted = true;
+			}
+
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
@@ -609,8 +672,8 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 		return $dbRes;
 	}
-	
-	public static function OnBlogDelete($blog_id)
+
+public static 	function OnBlogDelete($blog_id)
 	{
 		return $GLOBALS["DB"]->Query("DELETE SLC FROM b_sonet_log_comment SLC INNER JOIN b_blog_comment BC ON SLC.SOURCE_ID = BC.ID AND BC.BLOG_ID = ".intval($blog_id)." WHERE SLC.EVENT_ID = 'blog_comment_micro' OR SLC.EVENT_ID = 'blog_comment'", true);	
 	}

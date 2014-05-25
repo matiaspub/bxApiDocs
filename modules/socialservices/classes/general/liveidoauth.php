@@ -4,17 +4,16 @@ IncludeModuleLangFile(__FILE__);
 class CSocServLiveIDOAuth extends CSocServAuth
 {
 	const ID = "LiveIDOAuth";
+	const CONTROLLER_URL = "https://www.bitrix24.ru/controller";
 
 	/** @var CLiveIDOAuthInterface null  */
 	protected $entityOAuth = null;
-	/**
-	 * @var CUser null
-	 */
-	protected $user = null;
 
-	public function __construct($user = null)
+	protected $userId = null;
+
+	public function __construct($userId = null)
 	{
-		$this->user = $user;
+		$this->userId = $userId;
 	}
 
 	public function getEntityOAuth()
@@ -45,7 +44,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		$appSecret = trim(self::GetOption("liveid_appsecret"));
 
 		$this->entityOAuth = new CLiveIDOAuthInterface($appID, $appSecret);
-		if($this->user == null)
+		if($this->userId == null)
 			$this->entityOAuth->setRefreshToken("skip");
 		if($addScope !== null)
 			$this->entityOAuth->addScope($addScope);
@@ -53,12 +52,14 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"].'&mode='.$location));
+			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php?state=";
+			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;
+			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
 		else
 		{
-			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("current_fieldset"));
-			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;;
+			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php";
+			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;
 		}
 
 		return $this->entityOAuth->GetAuthUrl($redirect_uri, $state);
@@ -67,9 +68,10 @@ class CSocServLiveIDOAuth extends CSocServAuth
 	public function getStorageToken()
 	{
 		$accessToken = null;
-		if(is_object($this->user))
+		$userId = intval($this->userId);
+		if($userId > 0)
 		{
-			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $this->user->GetID(), "EXTERNAL_AUTH_ID" => "LiveIDOAuth"), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
+			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $userId, "EXTERNAL_AUTH_ID" => "LiveIDOAuth"), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
 			if($arOauth = $dbSocservUser->Fetch())
 			{
 				$accessToken = $arOauth["OATOKEN"];
@@ -77,7 +79,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 				if(empty($accessToken) || ((intval($arOauth["OATOKEN_EXPIRES"]) > 0) && (intval($arOauth["OATOKEN_EXPIRES"] < intval(time())))))
 				{
 					if(isset($arOauth['REFRESH_TOKEN']))
-						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $this->user->GetID(), true);
+						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $userId, true);
 					if(($accessToken = $this->entityOAuth->getToken()) === false)
 						return null;
 				}
@@ -93,9 +95,14 @@ class CSocServLiveIDOAuth extends CSocServAuth
 
 		$APPLICATION->RestartBuffer();
 		$bSuccess = SOCSERV_AUTHORISATION_ERROR;
+
 		if(isset($_REQUEST["code"]) && $_REQUEST["code"] != '' && CSocServAuthManager::CheckUniqueKey())
 		{
-			$redirect_uri= CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code", "state", "backurl", "check_key", "current_fieldset"));
+			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
+				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
+			else
+				$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php";
+
 			$appID = trim(self::GetOption("liveid_appid"));
 			$appSecret = trim(self::GetOption("liveid_appsecret"));
 
@@ -184,7 +191,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 			$url .= 'auth_service_id='.self::ID.'&auth_service_error='.SOCSERV_REGISTRATION_DENY;
 		}
 		elseif($bSuccess !== true)
-			$url = (isset($urlPath)) ? $urlPath.'?auth_service_id='.self::ID.'&auth_service_error='.$bSuccess : $APPLICATION->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
+			$url = (isset($parseUrl)) ? $parseUrl.'?auth_service_id='.self::ID.'&auth_service_error='.$bSuccess : $APPLICATION->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
 		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
 			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
 

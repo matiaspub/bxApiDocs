@@ -425,7 +425,7 @@ class CComponentUtil
 			return 0;
 	}
 
-	public static function GetComponentProps($componentName, $arCurrentValues = array())
+	public static function GetComponentProps($componentName, $arCurrentValues = array(), $templateProperties = array())
 	{
 		$arComponentParameters = array();
 
@@ -452,6 +452,11 @@ class CComponentUtil
 
 			if (!array_key_exists("PARAMETERS", $arComponentParameters) || !is_array($arComponentParameters["PARAMETERS"]))
 				return false;
+
+			if ($templateProperties && is_array($templateProperties))
+			{
+				$arComponentParameters["PARAMETERS"] = array_merge ($arComponentParameters["PARAMETERS"], $templateProperties);
+			}
 
 			if (!array_key_exists("GROUPS", $arComponentParameters) || !is_array($arComponentParameters["GROUPS"]))
 				$arComponentParameters["GROUPS"] = array();

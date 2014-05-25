@@ -129,18 +129,20 @@ $forumCache = new CForumCacheManager();
 $forumEventManager = new ForumEventManager();
 
 
-function ForumCurrUserPermissions($FID)
+function ForumCurrUserPermissions($FID, $arAddParams = array())
 {
 	static $arCache = array();
-	if (! isset($arCache[$FID]))
+	$arAddParams = (is_array($arAddParams) ? $arAddParams : array());
+	$arAddParams["PERMISSION"] = (!!$arAddParams["PERMISSION"] ? $arAddParams["PERMISSION"] : '');
+	if (! isset($arCache[$FID.$arAddParams["PERMISSION"]]))
 	{
-		if ($GLOBALS["USER"]->IsAdmin() || $GLOBALS["APPLICATION"]->GetGroupRight("forum") >= "W")
+		if (CForumUser::IsAdmin())
 		{
 			$result = "Y";
 		}
 		else
 		{
-			$strPerms = CForumNew::GetUserPermission($FID, $GLOBALS["USER"]->GetUserGroupArray());
+			$strPerms = (!!$arAddParams["PERMISSION"] ? $arAddParams["PERMISSION"] : CForumNew::GetUserPermission($FID, $GLOBALS["USER"]->GetUserGroupArray()));
 			if ($strPerms <= "E")
 			{
 				$result = $strPerms;
@@ -155,10 +157,10 @@ function ForumCurrUserPermissions($FID)
 				$result = $strPerms;
 			}
 		}
-		$arCache[$FID] = $result;
+		$arCache[$FID.$arAddParams["PERMISSION"]] = $result;
 	}
 
-	return $arCache[$FID];
+	return $arCache[$FID.$arAddParams["PERMISSION"]];
 }
 
 function ForumSubscribeNewMessagesEx($FID, $TID, $NEW_TOPIC_ONLY, &$strErrorMessage, &$strOKMessage, $strSite = false, $SOCNET_GROUP_ID = false)
@@ -249,7 +251,7 @@ function ForumUnsubscribeNewMessages($FID, $TID, &$strErrorMessage, &$strOKMessa
  *
  *
  *
- * @return bool 
+ * @return bool <br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forumsubscribenewmessages.php
@@ -411,7 +413,9 @@ function ForumGetRealIP()
  *
  *
  *
- * @return int 
+ * @return int <p>Следует помнить, что внутри функции используется глобальная
+ * переменная <b>$USER</b>. То есть, сообщение запишется в базу от
+ * текущего авторизованного пользователя.</p> <br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php
@@ -500,7 +504,7 @@ function ForumAddMessage(
 		$bUpdateTopic = True;
 	}
 ?><?
-	if ($MESSAGE_TYPE =="EDIT" && (ForumCurrUserPermissions($FID) > "Q" && $arFieldsG["EDIT_ADD_REASON"] == "N"))
+	if ($MESSAGE_TYPE =="EDIT" && (ForumCurrUserPermissions($FID, $arParams) > "Q" && $arFieldsG["EDIT_ADD_REASON"] == "N"))
 		$bAddEditNote = false;
 	//*************************!CAPTCHA********************************************************************************
 	if (!$USER->IsAuthorized() && $arForum["USE_CAPTCHA"]=="Y")
@@ -525,7 +529,8 @@ function ForumAddMessage(
 	if (empty($arFieldsG["POST_MESSAGE"]))
 		$aMsg[] = array("id" => "POST_MESSAGE", "text" => GetMessage("ADDMESS_INPUT_MESSAGE").".");
 
-	if ($bUpdateTopic && is_set($arFieldsG, "TITLE")) {
+	if ($bUpdateTopic && is_set($arFieldsG, "TITLE"))
+	{
 		$arFieldsG["TITLE"] = trim($arFieldsG["TITLE"]);
 		if (empty($arFieldsG["TITLE"]))
 			$aMsg[] = array("id" => "TITLE", "text" => GetMessage("ADDMESS_INPUT_TITLE").".");
@@ -660,14 +665,14 @@ function ForumAddMessage(
 		else
 		{
 			$arFieldsG["APPROVED"] = ($arForum["MODERATION"]=="Y") ? "N" : "Y";
-			if (ForumCurrUserPermissions($FID)>="Q")
+			if (ForumCurrUserPermissions($FID, $arParams)>="Q")
 				$arFieldsG["APPROVED"] = "Y";
 		}
 
 		if ($bUpdateTopic)
 		{
 			$arFields = array();
-			foreach (array("TITLE", "DESCRIPTION", "ICON_ID", "TAGS") as $key)
+			foreach (array("TITLE", "TITLE_SEO", "DESCRIPTION", "ICON_ID", "TAGS") as $key)
 				if (is_set($arFieldsG, $key))
 					$arFields[$key] = $arFieldsG[$key];
 
@@ -857,10 +862,10 @@ function ForumAddMessage(
 		}
 	}
 //*************************/Add/edit message ***********************************************************************
-	if (empty($aMsg)) {
-		$DB->Commit(); }
-	else {
-		$DB->Rollback(); }
+	if (empty($aMsg))
+		$DB->Commit();
+	else
+		$DB->Rollback();
 
 	if (empty($aMsg) && CModule::IncludeModule("statistic"))
 	{
@@ -897,7 +902,8 @@ function ForumAddMessage(
 			$arNote = array("id" => "EDIT", "text" => GetMessage("ADDMESS_SUCCESS_EDIT").". \n");
 		}
 
-		if ($arFieldsG["APPROVED"]!="Y") {
+		if ($arFieldsG["APPROVED"]!="Y")
+		{
 			$arNote["id"] .= "_NOT_APPROVED";
 			$arNote["text"] .= GetMessage("ADDMESS_AFTER_MODERATE").". \n";
 		}
@@ -922,7 +928,8 @@ function ForumAddMessage(
  *
  *
  *
- * @param int $MID  Код сообщения для публикации или скрытия.
+ * @param int $message  Код сообщения для публикации или скрытия. <br><b>Примечание</b>: До
+ * версии 7.0.0 параметр назывался <b>MID</b>.
  *
  *
  *
@@ -931,17 +938,21 @@ function ForumAddMessage(
  *
  *
  *
- * @param &string $strErrorMessage  Переменная, в которую функция дописывает сообщения об ошибках,
+ * @param array $arAddParams = Array() Переменная, в которую функция дописывает сообщения об ошибках,
  * которые произошли при подписке.
  *
  *
  *
- * @param &string $strOKMessage  Переменная, в которую функция дописывает сообщения об успехах,
+ * @param &string $strErrorMessage  Переменная, в которую функция дописывает сообщения об успехах,
  * которые произошли при подписке.
  *
  *
  *
- * @return bool 
+ * @param &string $strOKMessage  Массив добавления параметров.
+ *
+ *
+ *
+ * @return bool <br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forummoderatemessage.php
@@ -966,19 +977,14 @@ function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage
 		{
 			while ($arMessage = $db_res->Fetch())
 			{
-				if (!(ForumCurrUserPermissions($arMessage["FORUM_ID"]) >= "Q" ||
+				if (!(ForumCurrUserPermissions($arMessage["FORUM_ID"], $arAddParams) >= "Q" ||
 					CForumMessage::CanUserUpdateMessage($arMessage["ID"], $USER->GetUserGroupArray(), $USER->GetID(), $arAddParams["PERMISSION"])))
 					$arError[] = GetMessage("MODMESS_NO_PERMS")." (MID=".$arMessage["ID"]."). \n";
 				else
 				{
-					$arFields = array();
-					$arFields["APPROVED"] = ($TYPE == "SHOW") ? "Y" : "N";
+					$arFields = array("APPROVED" => ($TYPE == "SHOW" ? "Y" : "N"));
 					$ID = CForumMessage::Update($arMessage["ID"], $arFields);
-					if (IntVal($ID)<=0)
-					{
-						$arError[] = GetMessage("MODMESS_ERROR_MODER")." (MID=".$arMessage["ID"]."). \n";
-					}
-					else
+					if ($ID > 0)
 					{
 						/***************** Events onMessageModerate ************************/
 						foreach (GetModuleEvents("forum", "onMessageModerate", true) as $arEvent)
@@ -995,15 +1001,22 @@ function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage
 								"FORUM_ID" => $arMessage["FORUM_ID"]
 						);
 						$res = serialize($res);
-						if ($TYPE == "SHOW"):
+						if ($TYPE == "SHOW")
+						{
 							$arOK[] = GetMessage("MODMESS_SUCCESS_SHOW")." (MID=".$arMessage["ID"]."). \n";
 							CForumMessage::SendMailMessage($arMessage["ID"], array(), false, "NEW_FORUM_MESSAGE");
 							CForumEventLog::Log("message", "approve", $arMessage["ID"], $res);
-						else:
+						}
+						else
+						{
 							$arOK[] = GetMessage("MODMESS_SUCCESS_HIDE")." (MID=".$arMessage["ID"]."). \n";
 							CForumMessage::SendMailMessage($arMessage["ID"], array(), false, "EDIT_FORUM_MESSAGE");
 							CForumEventLog::Log("message", "unapprove", $arMessage["ID"], $res);
-						endif;
+						}
+					}
+					else
+					{
+						$arError[] = GetMessage("MODMESS_ERROR_MODER")." (MID=".$arMessage["ID"]."). \n";
 					}
 				}
 			}
@@ -1035,7 +1048,7 @@ function ForumOpenCloseTopic($topic, $TYPE, &$strErrorMessage, &$strOKMessage, $
 	}
 	else
 	{
-		if (!$USER->IsAdmin() && !$arAddParams["PERMISSION"])
+		if (!CForumUser::IsAdmin() && !$arAddParams["PERMISSION"])
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic), "PERMISSION_STRONG" => true));
 		else
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic)));
@@ -1112,7 +1125,7 @@ function ForumTopOrdinaryTopic($topic, $TYPE, &$strErrorMessage, &$strOKMessage,
 	}
 	else
 	{
-		if (!$USER->IsAdmin() && !$arAddParams["PERMISSION"])
+		if (!CForumUser::IsAdmin() && !$arAddParams["PERMISSION"])
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic), "PERMISSION_STRONG" => true));
 		else
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic)));
@@ -1182,7 +1195,7 @@ function ForumDeleteTopic($topic, &$strErrorMessage, &$strOKMessage, $arAddParam
 	}
 	else
 	{
-		if (!$USER->IsAdmin() && !$arAddParams["PERMISSION"])
+		if (!CForumUser::IsAdmin() && !$arAddParams["PERMISSION"])
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic), "PERMISSION_STRONG" => true));
 		else
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic)));
@@ -1284,7 +1297,7 @@ function ForumSpamTopic($topic, &$strErrorMessage, &$strOKMessage, $arAddParams 
 	}
 	else
 	{
-		if (!$USER->IsAdmin() && !$arAddParams["PERMISSION"])
+		if (!CForumUser::IsAdmin() && !$arAddParams["PERMISSION"])
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic), "PERMISSION_STRONG" => true));
 		else
 			$db_res = CForumTopic::GetListEx(array(), array("@ID" => implode(",", $topic)));
@@ -1524,6 +1537,7 @@ function ForumMoveMessage($FID, $TID, $Message, $NewTID = 0, $arFields, &$strErr
 			}
 			$arFieldsTopic = array(
 				"TITLE"			=> $arFields["TITLE"],
+				"TITLE_SEO"			=> $arFields["TITLE_SEO"],
 				"DESCRIPTION"	=> $arFields["DESCRIPTION"],
 				"ICON_ID"		=> $arFields["ICON_ID"],
 				"TAGS"		=> $arFields["TAGS"],
@@ -1570,25 +1584,6 @@ function ForumMoveMessage($FID, $TID, $Message, $NewTID = 0, $arFields, &$strErr
 
 					$arMessage["FORUM_ID"] = $NewFID;
 					$arMessage["POST_MESSAGE_HTML"] = "";
-					// check attach
-					if (false && intVal($res["ATTACH_IMG"]) > 0)
-					{
-						$iFileSize = COption::GetOptionString("forum", "file_max_size", 5242880);
-						$attach_img = CFile::GetByID(intVal($res["ATTACH_IMG"]));
-						$attach = "";
-						if ($attach_img && is_set($attach_img, "ORIGINAL_NAME"))
-						{
-							// Y - Image files		F - Files of specified type		A - All files
-							if ($arNewForum["ALLOW_UPLOAD"]=="Y")
-								$attach = CFile::CheckImageFile($attach_img["ORIGINAL_NAME"], $iFileSize, 0, 0);
-							elseif ($arNewForum["ALLOW_UPLOAD"]=="F")
-								$attach = CFile::CheckFile($attach_img["ORIGINAL_NAME"], $iFileSize, false, $arNewForum["ALLOW_UPLOAD_EXT"]);
-							elseif ($arNewForum["ALLOW_UPLOAD"]=="A")
-								$attach = CFile::CheckFile($attach_img["ORIGINAL_NAME"], $iFileSize, false, false);
-							if (strLen($attach) > 0)
-								$arMessage["ATTACH_IMG"] = "";
-						}
-					}
 				}
 
 				if ($NewTID != $TID)
@@ -1750,12 +1745,12 @@ function ForumPrintSmilesList($num_cols, $strLang = false, $strPath2Icons = fals
 	$ind = 0;
 	foreach ($arSmile as $res)
 	{
-		if ($ind == 0) {$res_str .= "<tr align=\"center\">";}
+		if ($ind == 0) $res_str .= "<tr align=\"center\">";
 		$res_str .= "<td width=\"".IntVal(100/$num_cols)."%\">";
 		$strTYPING = strtok($res['TYPING'], " ");
 		$res_str .= "<img src=\"".$strPath2Icons.$res['IMAGE']."\" alt=\"".$res['NAME']."\" title=\"".$res['NAME']."\" border=\"0\"";
-		if (IntVal($res['IMAGE_WIDTH'])>0) {$res_str .= " width=\"".$res['IMAGE_WIDTH']."\"";}
-		if (IntVal($res['IMAGE_HEIGHT'])>0) {$res_str .= " height=\"".$res['IMAGE_HEIGHT']."\"";}
+		if (IntVal($res['IMAGE_WIDTH'])>0) $res_str .= " width=\"".$res['IMAGE_WIDTH']."\"";
+		if (IntVal($res['IMAGE_HEIGHT'])>0) $res_str .= " height=\"".$res['IMAGE_HEIGHT']."\"";
 		$res_str .= " class=\"smiles-list\" alt=\"smile".$strTYPING."\" onclick=\"if(emoticon){emoticon('".$strTYPING."');}\" name=\"smile\"  id='".$strTYPING."' ";
 		$res_str .= "/>&nbsp;</td>\n";
 		$ind++;
@@ -1860,7 +1855,7 @@ function ForumSetAllMessagesReaded($FID = false) // DEPRECATED
 	}
 
 	$arFilter = array();
-	if (!$USER->IsAdmin())
+	if (!CForumUser::IsAdmin())
 	{
 		$arFilter["LID"] = LANG;
 		$arFilter["PERMS"] = array($USER->GetGroups(), 'A');
@@ -1912,7 +1907,7 @@ function ForumVote4User($UID, $VOTES, $bDelVote, &$strErrorMessage, &$strOKMessa
 		else
 		{
 			$CurrUserID = IntVal($USER->GetParam("USER_ID"));
-			if ($CurrUserID == $UID && !$USER->IsAdmin())
+			if ($CurrUserID == $UID && !CForumUser::IsAdmin())
 			{
 				$arError[] = GetMessage("FORUM_GV_OTHER");
 			}
@@ -1920,13 +1915,13 @@ function ForumVote4User($UID, $VOTES, $bDelVote, &$strErrorMessage, &$strOKMessa
 			{
 				$arUserRank = CForumUser::GetUserRank($CurrUserID);
 
-				if (IntVal($arUserRank["VOTES"])<=0 && !$bDelVote && !$USER->IsAdmin())
+				if (IntVal($arUserRank["VOTES"])<=0 && !$bDelVote && !CForumUser::IsAdmin())
 				{
 					$arError[] = GetMessage("FORUM_GV_ERROR_NO_VOTE");
 				}
 				else
 				{
-					if (!$USER->IsAdmin() || $VOTES<=0)
+					if (!CForumUser::IsAdmin() || $VOTES<=0)
 						$VOTES = IntVal($arUserRank["VOTES"]);
 
 					if ($VOTES == 0) $VOTES = 1; // no ranks configured
@@ -1948,7 +1943,7 @@ function ForumVote4User($UID, $VOTES, $bDelVote, &$strErrorMessage, &$strOKMessa
 						else
 						{
 							if (IntVal($arUserPoints["POINTS"])<IntVal($arUserRank["VOTES"])
-								|| $USER->IsAdmin())
+								|| CForumUser::IsAdmin())
 							{
 								if (CForumUserPoints::Update(IntVal($USER->GetParam("USER_ID")), $UID, $arFields))
 									$arNote[] = GetMessage("FORUM_GV_SUCCESS_VOTE_UPD");
@@ -2575,7 +2570,8 @@ function ForumGetTopicSort(&$field_name, &$direction, $arForumInfo = array())
 		"V" => "VIEWS",
 		"D" => "START_DATE",
 		"A" => "USER_START_NAME");
-	if (empty($field_name) && !empty($arForumInfo)) {
+	if (empty($field_name) && !empty($arForumInfo))
+	{
 		$field_name = trim($arForumInfo["ORDER_BY"]);
 		$direction = trim($arForumInfo["ORDER_DIRECTION"]);
 	}
@@ -2794,6 +2790,9 @@ function CustomizeLHEForForum()
 			}
 		}
 	}
+	if (!LHEButtons['InputVideo'])
+		LHEButtons['InputVideo'] = LHEButtons['ForumVideo'];
+
 	window.LHEDailogs['ForumVideo'] = function(pObj)
 	{
 		var str = '<table width="100%"><tr>' +
@@ -2853,7 +2852,8 @@ function CustomizeLHEForForum()
 	</script>
 <?
 }
-function ForumGetEntity($entityId, $value = true) {
+function ForumGetEntity($entityId, $value = true)
+{
 	static $arForumGetEntity = array();
 	if (array_key_exists($entityId, $arForumGetEntity))
 		return $arForumGetEntity[$entityId];

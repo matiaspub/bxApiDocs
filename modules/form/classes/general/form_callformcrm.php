@@ -188,8 +188,10 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 		if (!$arLink)
 			return false;
 
+		$arResultFields = array();
+		$arAnswers = array();
+
 		CFormResult::GetDataByID($RESULT_ID, array(), $arResultFields, $arAnswers);
-		//echo '<pre>'; print_r($arAnswers); echo '</pre>';
 
 		$ob = new CFormCrmSender($arLink['CRM_ID']);
 		$arCrmF = $ob->GetFields();
@@ -414,7 +416,7 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 
 		$strResult = "";
 
-		$w = CFormField::GetList($WEB_FORM_ID, "ALL", $by, $order, array(), $is_filtered);
+		$w = CFormField::GetList($WEB_FORM_ID, "ALL", $by, $order, array("ACTIVE" => "Y"), $is_filtered);
 		while ($wr=$w->Fetch())
 		{
 			$answer = "";
@@ -557,16 +559,13 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 
 		$strResult = "";
 
-		$w = CFormField::GetList($WEB_FORM_ID, "ALL", $by, $order, array(), $is_filtered);
+		$w = CFormField::GetList($WEB_FORM_ID, "ALL", $by, $order, array("ACTIVE" => "Y"), $is_filtered);
 		while ($wr=$w->Fetch())
 		{
 			$answer = "";
 			$answer_raw = '';
 			if (is_array($arAnswers[$wr["SID"]]))
 			{
-				//echo '<pre>'; print_r($wr); echo '</pre>';
-				//echo '<pre>'; print_r($arrResult[$wr['SID']]);
-
 				$bHasDiffTypes = false;
 				$lastType = '';
 				foreach ($arAnswers[$wr['SID']] as $arrA)
@@ -829,7 +828,8 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 				|| count($arSelectFields)<=0
 				|| in_array("*", $arSelectFields))
 			{
-				for ($i = 0; $i < count($arFieldsKeys); $i++)
+				$cntFieldsKeys = count($arFieldsKeys);
+				for ($i = 0; $i < $cntFieldsKeys; $i++)
 				{
 					if (isset($arFields[$arFieldsKeys[$i]]["WHERE_ONLY"])
 						&& $arFields[$arFieldsKeys[$i]]["WHERE_ONLY"] == "Y")
@@ -928,14 +928,15 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 		// <-- SELECT
 
 		// WHERE -->
-		$arSqlSearch = Array();
+		$arSqlSearch = array();
 
 		if (!is_array($arFilter))
-			$filter_keys = Array();
+			$filter_keys = array();
 		else
 			$filter_keys = array_keys($arFilter);
 
-		for ($i = 0; $i < count($filter_keys); $i++)
+		$cntFilterKeys = count($filter_keys);
+		for ($i = 0; $i < $cntFilterKeys; $i++)
 		{
 			$vals = $arFilter[$filter_keys[$i]];
 			if (!is_array($vals))
@@ -953,7 +954,8 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 			if (array_key_exists($key, $arFields))
 			{
 				$arSqlSearch_tmp = array();
-				for ($j = 0; $j < count($vals); $j++)
+				$cntVals = count($vals);
+				for ($j = 0; $j < $cntVals; $j++)
 				{
 					$val = $vals[$j];
 					if (isset($arFields[$key]["WHERE"]))
@@ -1025,7 +1027,9 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 				}
 
 				$strSqlSearch_tmp = "";
-				for ($j = 0; $j < count($arSqlSearch_tmp); $j++)
+				$cntSqlSearch_tmp = count($arSqlSearch_tmp);
+
+				for ($j = 0; $j < $cntSqlSearch_tmp; $j++)
 				{
 					if ($j > 0)
 						$strSqlSearch_tmp .= ($strNegative=="Y" ? " AND " : " OR ");
@@ -1052,7 +1056,8 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 			}
 		}
 
-		for ($i = 0; $i < count($arSqlSearch); $i++)
+		$cntSqlSearch = count($arSqlSearch);
+		for ($i = 0; $i < $cntSqlSearch; $i++)
 		{
 			if (strlen($strSqlWhere) > 0)
 				$strSqlWhere .= " AND ";
@@ -1089,7 +1094,8 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 		}
 
 		DelDuplicateSort($arSqlOrder);
-		for ($i=0; $i<count($arSqlOrder); $i++)
+		$cntSqlOrder = count($arSqlOrder);
+		for ($i=0; $i<$cntSqlOrder; $i++)
 		{
 			if (strlen($strSqlOrderBy) > 0)
 				$strSqlOrderBy .= ", ";

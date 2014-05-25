@@ -28,7 +28,7 @@ class CMobile
 		$this->setScreenCategory($_COOKIE["MOBILE_SCREEN_CATEGORY"]);
 		$this->setPixelratio($_COOKIE["MOBILE_SCALE"]);
 		$this->setPgVersion($_COOKIE["PG_VERSION"]);
-		if(isset($_COOKIE["MOBILE_IS_DEV"]) && $_COOKIE["MOBILE_IS_DEV"] == "Y")
+		if (isset($_COOKIE["MOBILE_IS_DEV"]) && $_COOKIE["MOBILE_IS_DEV"] == "Y")
 			self::$isDev = true;
 
 		$this->setDevice($_COOKIE["MOBILE_DEVICE"]);
@@ -80,7 +80,7 @@ class CMobile
 
 	public static function setPgVersion($pgVersion)
 	{
-		if($pgVersion)
+		if ($pgVersion)
 			self::$pgVersion = $pgVersion;
 	}
 
@@ -113,19 +113,12 @@ class CMobile
 		global $APPLICATION;
 
 		$pgJsFile = "/bitrix/js/mobileapp/" . self::$platform . "-cordova-" . self::$pgVersion . ".js";
-		if(!file_exists($_SERVER["DOCUMENT_ROOT"]. $pgJsFile))
+		if (!file_exists($_SERVER["DOCUMENT_ROOT"] . $pgJsFile))
 			$pgJsFile = self::$remoteScriptPath . self::$platform . "-cordova-" . self::$pgVersion . ".js";
 		$APPLICATION->AddHeadString("<script type=\"text/javascript\"> var appVersion = " . self::$apiVersion . ";var platform = \"" . self::$platform . "\";</script>", false, true);
 		$APPLICATION->AddHeadString("<script type=\"text/javascript\" src=\"" . CUtil::GetAdditionalFileURL($pgJsFile) . "\"></script>", false, true);
+		$APPLICATION->AddHeadString("<script type=\"text/javascript\" src=\"" . CUtil::GetAdditionalFileURL("/bitrix/js/mobileapp/bitrix_mobile.js") . "\"></script>", false, true);
 
-		if ($APPLICATION->IsJSOptimized())
-		{
-			$APPLICATION->AddHeadScript("/bitrix/js/mobileapp/bitrix_mobile.js");
-		}
-		else
-		{
-			$APPLICATION->AddHeadString("<script type=\"text/javascript\" src=\"" . CUtil::GetAdditionalFileURL("/bitrix/js/mobileapp/bitrix_mobile.js") . "\"></script>", false, true);
-		}
 
 		if (self::$platform == "android")
 		{
@@ -172,7 +165,7 @@ class CMobile
 		AddEventHandler("main", "OnBeforeEndBufferContent", Array("CMobile", "initScripts"));
 		self::$isAlreadyInit = true;
 		$db_events = GetModuleEvents("mobileapp", "OnMobileInit");
-		while($arEvent = $db_events->Fetch())
+		while ($arEvent = $db_events->Fetch())
 			ExecuteModuleEventEx($arEvent);
 	}
 
@@ -246,13 +239,21 @@ class CMobile
 			$contentAttributes[] = "maximum-scale=" . $this->getMaxscale();
 		if ($this->getMinscale())
 			$contentAttributes[] = "minimum-scale=" . $this->getMinscale();
-		if ($this->getIniscale())
-			$contentAttributes[] = "width=" . ($width / $this->getIniscale());
-		$contentAttributes[] = "target-densitydpi=" . $this->getTargetDpi();
-		$contentAttributes[] = "user-scalable=0";
-		$content = implode(", ", $contentAttributes);
 
-		return str_replace("#content_value#", $content, $viewPortMeta);
+
+		if (toUpper($this->getPlatform()) == "ANDROID")
+		{
+			$contentAttributes[] = "width=device-width";
+			$contentAttributes[] = "target-densitydpi=" . $this->getTargetDpi();
+		}
+		elseif ($this->getIniscale())
+		{
+			$contentAttributes[] = "width=" . ($width / $this->getIniscale());
+		}
+
+		$contentAttributes[] = "user-scalable=0";
+
+		return str_replace("#content_value#", implode(", ", $contentAttributes), $viewPortMeta);
 	}
 
 	/**

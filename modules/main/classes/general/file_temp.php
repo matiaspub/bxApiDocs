@@ -64,12 +64,14 @@ class CTempFile
 		}
 		else //Fixed name during the session
 		{
+			$subdir = implode("/", (is_array($subdir) ? $subdir : array($subdir, bitrix_sessid())))."/";
+			while (strpos($subdir, "//") !== false)
+				$subdir = str_replace("//", "/", $subdir);
 			$bFound = false;
-			$sessid = bitrix_sessid();
 			for($i = $hours_to_keep_files-1; $i > 0; $i--)
 			{
 				$dir_name = self::GetAbsoluteRoot().'/BXTEMP-'.date('Y-m-d/H/', time()+3600*$i);
-				$temp_path = $dir_name.$subdir."/".$sessid."/";
+				$temp_path = $dir_name.$subdir;
 				if(file_exists($temp_path) && is_dir($temp_path))
 				{
 					$bFound = true;
@@ -80,7 +82,7 @@ class CTempFile
 			if(!$bFound)
 			{
 				$dir_name = self::GetAbsoluteRoot().'/BXTEMP-'.date('Y-m-d/H/', time()+3600*$hours_to_keep_files);
-				$temp_path = $dir_name.$subdir."/".$sessid."/";
+				$temp_path = $dir_name.$subdir;
 			}
 		}
 

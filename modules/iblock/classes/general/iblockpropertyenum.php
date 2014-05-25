@@ -28,58 +28,58 @@ class CIBlockPropertyEnum
 {
 	
 	/**
-	 * <p>Возвращает список вариантов значений свойств типа "список" по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = Array("SORT"=>"ASC", "VALUE"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
-	 * <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> <br> by</i> - поле сортировки, может
-	 * принимать значения: <br><ul> <li> <i>id</i> - код варианта значения; </li> <li>
-	 * <i>value</i> - значение варианта; </li> <li> <i>sort</i> - индекс сортировки
-	 * варианта; </li> <li> <i>xml_id </i>или <i>external_id</i> - внешний код варианта
-	 * значения; </li> <li> <i> def </i>- по признаку "значение по умолчанию"; </li> <li>
-	 * <i>property_id</i> - код свойства; </li> <li> <i>property_sort</i> - индекс сортировки
-	 * свойства; </li> <li> <i>property_code</i> - мнемонический код свойства;</li> </ul> <i>
-	 * order</i> - порядок сортировки, может принимать значения: <br><ul> <li>
-	 * <i>asc</i> - по возрастанию; </li> <li> <i>desc</i> - по убыванию; </li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]) <br>
-	 * "фильтруемое поле" может принимать значения: <br><ul> <li> <i>VALUE</i> - по
-	 * значению (по шаблону [%_]); </li> <li> <i>ID</i> - по коду значения варианта
-	 * свойства; </li> <li> <i>SORT</i> - по индексу сортировки варианта свойства;
-	 * </li> <li> <i>DEF</i> - по параметру "значение по умолчанию" (Y|N); </li> <li>
-	 * <i>XML_ID</i> - по внешнему коду(по шаблону [%_]); </li> <li> <i>EXTERNAL_ID</i> - по
-	 * внешнему коду; </li> <li> <i>CODE</i> - по мнемоническому коду свойства (по
-	 * шаблону [%_]); </li> <li> <i>PROPERTY_ID</i> - по числовому или мнемоническому
-	 * коду свойства; </li> <li> <i>IBLOCK_ID</i> - фильтр по коду информационного
-	 * блока, которому принадлежит свойство; </li> </ul> Необязательное. По
-	 * умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$property_enums = CIBlockPropertyEnum::GetList(Array("DEF"=&gt;"DESC", "SORT"=&gt;"ASC"), Array("IBLOCK_ID"=&gt;$IBLOCK_ID, "CODE"=&gt;"COLORS"));<br>while($enum_fields = $property_enums-&gt;GetNext())<br>{<br>  echo $enum_fields["ID"]." - ".$enum_fields["VALUE"]."&lt;br&gt;";<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля варианта значений
-	 * свойства типа "список"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список вариантов значений свойств типа "список" по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("SORT"=>"ASC", "VALUE"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
+	* <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> <br> by</i> - поле сортировки, может
+	* принимать значения: <br><ul> <li> <i>id</i> - код варианта значения; </li> <li>
+	* <i>value</i> - значение варианта; </li> <li> <i>sort</i> - индекс сортировки
+	* варианта; </li> <li> <i>xml_id </i>или <i>external_id</i> - внешний код варианта
+	* значения; </li> <li> <i> def </i>- по признаку "значение по умолчанию"; </li> <li>
+	* <i>property_id</i> - код свойства; </li> <li> <i>property_sort</i> - индекс сортировки
+	* свойства; </li> <li> <i>property_code</i> - мнемонический код свойства;</li> </ul> <i>
+	* order</i> - порядок сортировки, может принимать значения: <br><ul> <li>
+	* <i>asc</i> - по возрастанию; </li> <li> <i>desc</i> - по убыванию; </li> </ul>
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]) <br>
+	* "фильтруемое поле" может принимать значения: <br><ul> <li> <i>VALUE</i> - по
+	* значению (по шаблону [%_]); </li> <li> <i>ID</i> - по коду значения варианта
+	* свойства; </li> <li> <i>SORT</i> - по индексу сортировки варианта свойства;
+	* </li> <li> <i>DEF</i> - по параметру "значение по умолчанию" (Y|N); </li> <li>
+	* <i>XML_ID</i> - по внешнему коду(по шаблону [%_]); </li> <li> <i>EXTERNAL_ID</i> - по
+	* внешнему коду; </li> <li> <i>CODE</i> - по мнемоническому коду свойства (по
+	* шаблону [%_]); </li> <li> <i>PROPERTY_ID</i> - по числовому или мнемоническому
+	* коду свойства; </li> <li> <i>IBLOCK_ID</i> - фильтр по коду информационного
+	* блока, которому принадлежит свойство; </li> </ul> Необязательное. По
+	* умолчанию записи не фильтруются.
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$property_enums = CIBlockPropertyEnum::GetList(Array("DEF"=&gt;"DESC", "SORT"=&gt;"ASC"), Array("IBLOCK_ID"=&gt;$IBLOCK_ID, "CODE"=&gt;"COLORS"));<br>while($enum_fields = $property_enums-&gt;GetNext())<br>{<br>  echo $enum_fields["ID"]." - ".$enum_fields["VALUE"]."&lt;br&gt;";<br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля варианта значений
+	* свойства типа "список"</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("SORT"=>"ASC", "VALUE"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -122,6 +122,9 @@ class CIBlockPropertyEnum
 					$arSqlSearch[] = CIBlock::FilterCreate("P.ID", $val, "number", $bInvert);
 				else
 					$arSqlSearch[] = CIBlock::FilterCreate("P.CODE", $val, "string", $bInvert);
+				break;
+			case "PROPERTY_ACTIVE":
+				$arSqlSearch[] = CIBlock::FilterCreate("P.ACTIVE", $val, "string_equal", $bInvert);
 				break;
 			case "ID":
 			case "SORT":
@@ -188,43 +191,43 @@ class CIBlockPropertyEnum
 
 	
 	/**
-	 * <p>Функция добавляет новый вариант значения свойства типа "список". </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
-	 * значения свойства.
-	 *
-	 *
-	 *
-	 * @return int <p>Функция возвращает код добавленного свойства, если добавление
-	 * прошло успешно, при возникновении ошибки функция вернет false.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ibpenum = new CIBlockPropertyEnum;
-	 * if($PropID = $ibpenum-&gt;Add(Array('PROPERTY_ID'=&gt;$PROPERTY_ID, 'VALUE'=&gt;'New Enum 1')))
-	 *  echo 'New ID:'.$PropID;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php">CIBlockPropertyEnum::Update</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
-	 * значения свойств типа "список" </a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет новый вариант значения свойства типа "список". </p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
+	* значения свойства.
+	*
+	*
+	*
+	* @return int <p>Функция возвращает код добавленного свойства, если добавление
+	* прошло успешно, при возникновении ошибки функция вернет false.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ibpenum = new CIBlockPropertyEnum;
+	* if($PropID = $ibpenum-&gt;Add(Array('PROPERTY_ID'=&gt;$PROPERTY_ID, 'VALUE'=&gt;'New Enum 1')))
+	*  echo 'New ID:'.$PropID;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php">CIBlockPropertyEnum::Update</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
+	* значения свойств типа "список" </a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -257,46 +260,46 @@ class CIBlockPropertyEnum
 
 	
 	/**
-	 * <p>Функция изменяет параметры варианта свойства с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  ID изменяемой записи.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
-	 * значения свойства.
-	 *
-	 *
-	 *
-	 * @return bool <p>Функция возвращает true если изменение прошло успешно, при
-	 * возникновении ошибки метод вернет false.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $ibpenum = new CIBlockPropertyEnum;
-	 * $ibpenum-&gt;Update($PROPERTY_ENUM_ID, Array('VALUE'=&gt;'Enum 1'));
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php">CIBlockPropertyEnum::Add</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля свойства</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры варианта свойства с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  ID изменяемой записи. </htm
+	*
+	*
+	*
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта
+	* значения свойства.
+	*
+	*
+	*
+	* @return bool <p>Функция возвращает true если изменение прошло успешно, при
+	* возникновении ошибки метод вернет false.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $ibpenum = new CIBlockPropertyEnum;
+	* $ibpenum-&gt;Update($PROPERTY_ENUM_ID, Array('VALUE'=&gt;'Enum 1'));
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/add.php">CIBlockPropertyEnum::Add</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля свойства</a> </li>
+	* </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -343,21 +346,21 @@ class CIBlockPropertyEnum
 
 	
 	/**
-	 * <p>Функция удаляет вариант значения свойства типа "список".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код варианта значения свойства.
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае успешного удаления возвращается true, иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет вариант значения свойства типа "список".</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код варианта значения свойства.
+	*
+	*
+	*
+	* @return bool <p>В случае успешного удаления возвращается true, иначе - false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -376,27 +379,27 @@ class CIBlockPropertyEnum
 
 	
 	/**
-	 * <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта значения свойства типа "список".Или false если такой вариант отсутствует. <br></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код варианта значения свойства.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив если такой вариант есть и false если вариант отсутствует.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
-	 * значения свойств типа "список" </a> </li> </ul><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/GetByID.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">всех полей</a> варианта значения свойства типа "список". Или false, если такой вариант отсутствует. <br></p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код варианта значения свойства.
+	*
+	*
+	*
+	* @return array <p>Массив если такой вариант есть и false если вариант отсутствует.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fpropertyenum">Поля вариантов
+	* значения свойств типа "список" </a> </li> </ul> <br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockpropertyenum/GetByID.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB, $CACHE_MANAGER;

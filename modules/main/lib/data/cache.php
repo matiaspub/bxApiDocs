@@ -1,4 +1,11 @@
 <?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
+
 namespace Bitrix\Main\Data;
 
 use Bitrix\Main;
@@ -23,8 +30,8 @@ interface ICacheEngineStat
 
 class Cache
 {
-	/* *
-	 * @var ICacheEngine or ICacheBackend
+	/**
+	 * @var ICacheEngine | ICacheBackend
 	 */
 	private $cacheEngine;
 
@@ -84,6 +91,10 @@ class Cache
 				case "apc":
 					if (extension_loaded('apc'))
 						$cacheEngine = new CacheEngineApc();
+					break;
+				case "xcache":
+					if (extension_loaded('xcache'))
+						$cacheEngine = new CacheEngineXCache();
 					break;
 				case "files":
 					$cacheEngine = new CacheEngineFiles();
@@ -154,7 +165,24 @@ class Cache
 		static::$clearCacheSession = $clearCacheSession;
 	}
 
-	private function shouldClearCache()
+	public static function getSalt()
+	{
+		$context = Main\Application::getInstance()->getContext();
+		$server = $context->getServer();
+
+		$scriptName = $server->get("SCRIPT_NAME");
+		if ($scriptName == "/bitrix/urlrewrite.php" && (($v = $server->get("REAL_FILE_PATH")) != null))
+		{
+			$scriptName = $v;
+		}
+		elseif ($scriptName == "/404.php" && (($v = $server->get("REAL_FILE_PATH")) != null))
+		{
+			$scriptName = $v;
+		}
+		return "/".substr(md5($scriptName), 0, 3);
+	}
+
+	public static function shouldClearCache()
 	{
 		if (isset(static::$clearCacheSession) || isset(static::$clearCache))
 		{
@@ -231,7 +259,7 @@ class Cache
 		if ($TTL <= 0)
 			return false;
 
-		if ($this->shouldClearCache())
+		if (static::shouldClearCache())
 			return false;
 
 		$arAllVars = array("CONTENT" => "", "VARS" => "");
@@ -249,7 +277,10 @@ class Cache
 			}
 			elseif ($this->cacheEngine instanceof \ICacheBackend)
 			{
+				/** @noinspection PhpUndefinedFieldInspection */
 				$read = $this->cacheEngine->read;
+
+				/** @noinspection PhpUndefinedFieldInspection */
 				$path = $this->cacheEngine->path;
 			}
 			Diag\CacheTracker::addCacheStatBytes($read);
@@ -334,7 +365,10 @@ class Cache
 			}
 			elseif ($this->cacheEngine instanceof \ICacheBackend)
 			{
+				/** @noinspection PhpUndefinedFieldInspection */
 				$written = $this->cacheEngine->written;
+
+				/** @noinspection PhpUndefinedFieldInspection */
 				$path = $this->cacheEngine->path;
 			}
 			Diag\CacheTracker::addCacheStatBytes($written);
@@ -350,6 +384,11 @@ class Cache
 	public function isCacheExpired($path)
 	{
 		return $this->cacheEngine->isCacheExpired($path);
+	}
+
+	public function isStarted()
+	{
+		return $this->isStarted;
 	}
 
 	public static function clearCache($full = false, $initDir = "")

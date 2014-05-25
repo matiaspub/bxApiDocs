@@ -18,6 +18,36 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllForumUser
 {
+	static public function IsAdmin($userId = false, $arGroups = false)
+	{
+		global $USER;
+		if (is_array($userId) && !empty($userId) && $arGroups === false)
+		{
+			$arGroups = $userId;
+			$userId = false;
+		}
+		if (is_array($arGroups) && !empty($arGroups))
+		{
+			//
+		}
+		elseif (!is_object($GLOBALS["USER"]))
+		{
+			$arGroups = array(2);
+		}
+		elseif ($userId === false || $userId == $USER->GetID())
+		{
+			$arGroups = $USER->GetUserGroupArray();
+		}
+		else
+		{
+			$arGroups = $USER->GetUserGroup($userId);
+		}
+		$result = (
+			in_array(1, $arGroups) ||
+			$GLOBALS["APPLICATION"]->GetGroupRight("forum", $arGroups) >= "W"
+		);
+		return $result;
+	}
 
 	public static function GetUserTopicVisits($forumID, $arTopic, $userID=null)
 	{
@@ -95,33 +125,6 @@ class CAllForumUser
 		return array_key_exists($USER_ID, $GLOBALS["FORUM_CACHE"]["LOCKED_USERS"]);
 	}
 
-	
-	/**
-	 * <p>Всесторонне проверяет, может ли пользователь, входящий в группы <i>arUserGroups</i>, добавить новый профайл.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php
-	 * @author Bitrix
-	 */
 	public static function CanUserAddUser($arUserGroups)
 	{
 		return True;
@@ -129,40 +132,40 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить профайл с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла, который пользователь хочет изменить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить профайл с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профайла, который пользователь хочет изменить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом <code>$USER-&gt;GetUserGroupArray()</code>.
+	*
+	*
+	*
+	* @param int $CurrentUserID = 0 Код пользователя. Для текущего пользователя он возвращается
+	* методом <code>$USER-&gt;GetID()</code>.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php
+	* @author Bitrix
+	*/
 	public static function CanUserUpdateUser($ID, $arUserGroups, $CurrentUserID = 0)
 	{
 		$ID = intVal($ID);
@@ -175,35 +178,35 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь, входящий в группы <i>arUserGroups</i>, удалить профайл с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла, который пользователь хочет удалить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь, входящий в группы <i>arUserGroups</i>, удалить профайл с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профайла, который пользователь хочет удалить.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php
+	* @author Bitrix
+	*/
 	public static function CanUserDeleteUser($ID, $arUserGroups)
 	{
 		$ID = intVal($ID);
@@ -320,42 +323,6 @@ class CAllForumUser
 		return True;
 	}
 
-	
-	/**
-	 * <p>Создает новый профайл с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного профайла.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">списке полей
-	 * профайла пользователя</a>. Обязательные поля должны быть
-	 * заполнены.
-	 *
-	 *
-	 *
-	 * @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
-	 * главного каталога для загрузки. Необязательный. По умолчанию
-	 * равен "forum".
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
-	 * <li>Перед добавлением профайла следует проверить возможность
-	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/add.php
-	 * @author Bitrix
-	 */
 	public static function Add($arFields, $strUploadDir = false)
 	{
 		global $DB;
@@ -405,45 +372,6 @@ class CAllForumUser
 		return $ID;
 	}
 
-	
-	/**
-	 * <p>Изменяет параметры существующего профайла с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого профайла.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла, параметры которого необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">списке полей
-	 * профайла</a>.
-	 *
-	 *
-	 *
-	 * @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
-	 * главного каталога для загрузки. Необязательный. По умолчанию
-	 * равен "forum".
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
-	 * <li>Перед изменением профайла следует проверить возможность
-	 * изменения методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserupdateuser.php">CForumUser::CanUserUpdateUser</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/update.php
-	 * @author Bitrix
-	 */
 	public static function Update($ID, $arFields, $strUploadDir = false, $UpdateByUserId = false)
 	{
 		global $DB;
@@ -544,31 +472,6 @@ class CAllForumUser
 		return $ID;
 	}
 
-	
-	/**
-	 * <p>Удаляет профайл с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li>Перед удалением профайла следует проверить возможность
-	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuserdeleteuser.php">CForumUser::CanUserDeleteUser</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/delete.php
-	 * @author Bitrix
-	 */
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -635,26 +538,27 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Возвращает массив параметров профайла по его коду <i>ID</i>. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же профайла не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров профайла).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров профайла по его коду <i>ID</i>. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же профайла не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров профайла).</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профайла.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -731,26 +635,31 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Возвращает массив параметров профайла, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профайла.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyidex.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров профайла, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профайла.
+	*
+	*
+	*
+	* @param arAddParam $s = array() Массив параметров. </h
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -792,26 +701,27 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Возвращает массив параметров профайла по коду <i>USER_ID</i> пользователя, которому этот профайл принадлежит. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же пользователя не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров профайла).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $USER_ID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyuserid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив параметров профайла по коду <i>USER_ID</i> пользователя, которому этот профайл принадлежит. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одного и того же пользователя не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров профайла).</p>
+	*
+	*
+	*
+	*
+	* @param int $USER_ID  Код пользователя. </h
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li></ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getbyuserid.php
+	* @author Bitrix
+	*/
 	public static function GetByUSER_ID($USER_ID)
 	{
 		global $DB;
@@ -892,50 +802,50 @@ class CAllForumUser
 
 	
 	/**
-	 * <p>Функция возвращает параметры звания пользователя по его коду USER_ID. Если Установлено значение второго параметра strLang, то возвращаются в том числе и языкозависимые параметры.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $USER_ID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param string $strLang = false Код языка. Если этот параметр установлен, то возвращаются в том
-	 * числе и языкозависимые параметры звания на языке с кодом strLang.
-	 * Если параметр не установлен (равен false), то возвращаются только
-	 * языконезависимые параметры.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращяется ассоциативный массив с ключами</p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	 * звания.</td> </tr> <tr> <td>MIN_POINTS</td> <td>Количество баллов, необходимое для
-	 * получения этого звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td>
-	 * </tr> <tr> <td>VOTES</td> <td>Количество голосов, которое имеет пользователь с
-	 * этим званием.</td> </tr> <tr> <td> LID</td> <td>Код языка (если установлен
-	 * параметр strLang) </td> </tr> <tr> <td> NAME</td> <td>Название звания на языке LID
-	 * (если установлен параметр strLang)</td> </tr> </table><p> </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Если в глобальных настройках форума разрешено показывать звания
-	 * if (COption::GetOptionString("forum", "SHOW_VOTES", "Y")=="Y")
-	 * {
-	 *    // Выведем название звания текущего пользователя на текущем языке
-	 *    $arUserRank = CForumUser::GetUserRank($USER-&gt;GetID(), LANGUAGE_ID);
-	 *    echo $arUserRank["NAME"];
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/cuser.getuserrank.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры звания пользователя по его коду USER_ID. Если Установлено значение второго параметра strLang, то возвращаются в том числе и языкозависимые параметры.</p>
+	*
+	*
+	*
+	*
+	* @param int $USER_ID  Код пользователя. </h
+	*
+	*
+	*
+	* @param string $strLang = false Код языка. Если этот параметр установлен, то возвращаются в том
+	* числе и языкозависимые параметры звания на языке с кодом strLang.
+	* Если параметр не установлен (равен false), то возвращаются только
+	* языконезависимые параметры.
+	*
+	*
+	*
+	* @return array <p>Возвращяется ассоциативный массив с ключами</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
+	* звания.</td> </tr> <tr> <td>MIN_POINTS</td> <td>Количество баллов, необходимое для
+	* получения этого звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td>
+	* </tr> <tr> <td>VOTES</td> <td>Количество голосов, которое имеет пользователь с
+	* этим званием.</td> </tr> <tr> <td> LID</td> <td>Код языка (если установлен
+	* параметр strLang) </td> </tr> <tr> <td> NAME</td> <td>Название звания на языке LID
+	* (если установлен параметр strLang)</td> </tr> </table> <p> </p<a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Если в глобальных настройках форума разрешено показывать звания
+	* if (COption::GetOptionString("forum", "SHOW_VOTES", "Y")=="Y")
+	* {
+	*    // Выведем название звания текущего пользователя на текущем языке
+	*    $arUserRank = CForumUser::GetUserRank($USER-&gt;GetID(), LANGUAGE_ID);
+	*    echo $arUserRank["NAME"];
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/cuser.getuserrank.php
+	* @author Bitrix
+	*/
 	public static function GetUserRank($USER_ID, $strLang = false)
 	{
 		$USER_ID = intval($USER_ID);
@@ -1325,7 +1235,7 @@ class CAllForumUser
 		$strSqlOrder = "";
 		$strSqlSearch = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
-		if ((!$USER->IsAdmin()) && $check_permission)
+		if (!CForumUser::IsAdmin() && $check_permission)
 		{
 			$arFilter["LID"] = SITE_ID;
 			$arFilter["PERMISSION"] = true;
@@ -1452,6 +1362,7 @@ class CAllForumUser
 		// *****************************************************
 		$strSql = "
 		SELECT FMM.*, FT.TITLE, FT.DESCRIPTION, FT.VIEWS, FT.LAST_POSTER_ID,
+			".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO,
 			".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE,
 			FT.USER_START_NAME,	FT.USER_START_ID, FT.POSTS, FT.LAST_POSTER_NAME,
 			FT.LAST_MESSAGE_ID, FS.IMAGE, '' as IMAGE_DESCR,
@@ -1548,33 +1459,33 @@ class CAllForumSubscribe
 	//---------------> User insert, update, delete
 	
 	/**
-	 * <p>Всесторонне проверяет, может ли пользователь, входящий в группы <i>arUserGroups</i>, добавить новую подписку на этот форум.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $FID  ID форума, на который пользователь хочет добавить новую подписку.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php
-	 * @author Bitrix
-	 */
+	* <p>Всесторонне проверяет, может ли пользователь, входящий в группы <i>arUserGroups</i>, добавить новую подписку на этот форум.</p>
+	*
+	*
+	*
+	*
+	* @param int $FID  ID форума, на который пользователь хочет добавить новую подписку.
+	*
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php
+	* @author Bitrix
+	*/
 	public static function CanUserAddSubscribe($FID, $arUserGroups)
 	{
 		if (CForumNew::GetUserPermission($FID, $arUserGroups)>="E") return True;
@@ -1592,40 +1503,6 @@ class CAllForumSubscribe
 		return False;
 	}
 
-	
-	/**
-	 * <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить подписку с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код подписки, которую пользователь хочет удалить.
-	 *
-	 *
-	 *
-	 * @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	 * пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	 *
-	 *
-	 *
-	 * @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	 * методом $USER-&gt;GetID()
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php
-	 * @author Bitrix
-	 */
 	public static function CanUserDeleteSubscribe($ID, $arUserGroups, $CurrentUserID = 0)
 	{
 		$ID = intVal($ID);
@@ -1664,40 +1541,40 @@ class CAllForumSubscribe
 
 	
 	/**
-	 * <p>Создает новую запись в таблице подписки с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">списке
-	 * полей подписки</a>. Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CForumSubscribe::Add(array( <br>   "USER_ID" =&gt; $USER-&gt;GetID(), <br>   "FORUM_ID" =&gt; $arParams["FORUM_ID"], <br>   "TOPIC_ID" =&gt; $arResult["TOPIC_ID"], <br>   "SITE_ID" =&gt; SITE_ID));
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a>
-	 * </li> <li>Перед добавлением подписки следует проверить возможность
-	 * добавления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новую запись в таблице подписки с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">списке
+	* полей подписки</a>. Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CForumSubscribe::Add(array( <br>   "USER_ID" =&gt; $USER-&gt;GetID(), <br>   "FORUM_ID" =&gt; $arParams["FORUM_ID"], <br>   "TOPIC_ID" =&gt; $arResult["TOPIC_ID"], <br>   "SITE_ID" =&gt; SITE_ID));
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a>
+	* </li> <li>Перед добавлением подписки следует проверить возможность
+	* добавления методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuseraddsubscribe.php">CForumSubscribe::CanUserAddSubscribe</a>
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -1739,29 +1616,29 @@ class CAllForumSubscribe
 
 	
 	/**
-	 * <p>Удаляет подписку с кодом <i>ID</i></p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код подписки, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li>Перед удалением подписки следует проверить возможность
-	 * удаления методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
-	 * </li></ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет подписку с кодом <i>ID</i></p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код подписки, которую необходимо удалить.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li>Перед удалением подписки следует проверить возможность
+	* удаления методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/canuserdeletesubscribe.php">CForumSubscribe::CanUserDeleteSubscribe</a>
+	* </li></ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -1798,49 +1675,54 @@ class CAllForumSubscribe
 
 	
 	/**
-	 * <p>Возвращает список подписок по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	 * <br><br><i>by</i> - поле для сортировки, может принимать значения<br><ul> <li>
-	 * <i>ID</i> - ID подписки;<br> </li> <li> <i>FORUM_ID</i> - ID форума;<br> </li> <li> <i>USER_ID</i> - ID
-	 * подписанного пользователя;<br> </li> <li> <i>TOPIC_ID</i> - ID темы;<br> </li> <li>
-	 * <i>START_DATE</i> - дата подписки;<br> </li> </ul> <i>order</i> - порядок сортировки,
-	 * может принимать значения<br><ul> <li> <i>ASC</i> - по возрастанию;<br> </li> <li>
-	 * <i>DESC</i> - по убыванию;<br><br> </li> </ul> Необязательный. По умолчанию
-	 * равен <code>Array("ID"=&gt;"ASC")</code>.
-	 *
-	 *
-	 *
-	 * @param array $arFilter  Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	 * "фильтруемое поле" может принимать значения<br><ul> <li> <i>ID</i> - ID
-	 * подписки;<br> </li> <li> <i>USER_ID</i> - ID подписанного пользователя;<br> </li> <li>
-	 * <i>FORUM_ID</i> - ID форума;<br> </li> <li> <i>TOPIC_ID</i> - ID темы;<br> </li> <li> <i>TOPIC_ID_OR_NULL</i>
-	 * - ID темы или NULL (проверка только на "равно");<br> </li> <li> <i>LAST_SEND</i> - ID
-	 * последнего отправленного сообщения;<br> </li> <li> <i>LAST_SEND_OR_NULL</i> - ID
-	 * последнего отправленного сообщения или NULL (проверка только на
-	 * "меньше");</li> </ul> Фильтруемое поле может иметь содержать перед
-	 * названием тип проверки фильтра<br><ul> <li>"!" - не равно<br> </li> <li>"&lt;" -
-	 * меньше<br> </li> <li>"&lt;=" - меньше либо равно<br> </li> <li>"&gt;" - больше<br> </li>
-	 * <li>"&gt;=" - больше либо равно<br> </li> </ul> Необязательное. По умолчанию
-	 * записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список подписок по фильтру <i>arFilter</i>, отсортированный в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = Array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
+	*    <b>ID</b> - ID подписки;<br>    <b>FORUM_ID</b> - ID форума;<br>    <b>USER_ID</b> - ID
+	* подписанного пользователя;<br>    <b>TOPIC_ID</b> - ID темы;<br>    <b>START_DATE</b>
+	* - дата подписки;<br><br><i>order</i> - порядок сортировки, может принимать
+	* значения<br>    <b>ASC</b> - по возрастанию;<br>    <b>DESC</b> - по
+	* убыванию;<br><br> Необязательный. По умолчанию равен
+	* <code>Array("ID"=&gt;"ASC")</code>.
+	*
+	*
+	*
+	* @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
+	* "фильтруемое поле" может принимать значения<br>    <b>ID</b> - ID
+	* подписки;<br>    <b>USER_ID</b> - ID подписанного пользователя;<br>
+	*    <b>FORUM_ID</b> - ID форума;<br>    <b>TOPIC_ID</b> - ID темы;<br>    <b>TOPIC_ID_OR_NULL</b> - ID
+	* темы или NULL (проверка только на "равно");<br>    <b>LAST_SEND</b> - ID
+	* последнего отправленного сообщения;<br>    <b>LAST_SEND_OR_NULL</b> - ID
+	* последнего отправленного сообщения или NULL (проверка только на
+	* "меньше").<br><br>Фильтруемое поле может иметь содержать перед
+	* названием тип проверки фильтра<br>    "!" - не равно<br>    "&lt;" -
+	* меньше<br>    "&lt;=" - меньше либо равно<br>    "&gt;" - больше<br>    "&gt;=" -
+	* больше либо равно<br> Необязательное. По умолчанию записи не
+	* фильтруются.
+	*
+	*
+	*
+	* @param array $arrayarAddParams = Array() Массив параметров. </h
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsubscribe">Поля подписки</a> </li> </ul>
+	* <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array(), $arAddParams = array())
 	{
 		global $DB;
@@ -1936,7 +1818,9 @@ class CAllForumSubscribe
 		{
 			$db_res =  new CDBResult();
 			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
-		} else {
+		}
+		else
+		{
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
@@ -1945,60 +1829,62 @@ class CAllForumSubscribe
 
 	
 	/**
-	 * <p>Функция возвращает записи из таблицы подписки на сообщения форума удовлетворяющие фильтру arFilter и упорядоченные в соответствии с сортировкой arOrder. С каждой записью идет email пользователя, которому принадлежит эта запись (т.е. email подписчика). </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arrayarOrder = array("ID"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
-	 * массив, в котором ключами являются названия параметров записей, а
-	 * значениями - направления сортировки.</p> <p>Допустимые параметры
-	 * записи для сортировки:<br> ID - код записи<br> FORUM_ID - код форума, на
-	 * сообщения которого осуществлена подписка <br> USER_ID - код
-	 * пользователя-подписчика<br> TOPIC_ID - код темы, на сообщения которой
-	 * осуществлена подписка<br> START_DATE - дата начала подписки</p>
-	 *
-	 *
-	 *
-	 * @param array $arrayarFilter = array() <p>Фильтр на возвращаемые записи; представляет собой
-	 * ассоциативный массив, в котором ключами являются названия
-	 * параметров записи, а значениями - условия на эти параметры.</p>
-	 * <p>Допустимые параметры записи для фильтрации:<br> ID - код
-	 * подписки<br> USER_ID - код пользователя-подписчика <br> FORUM_ID - код форума,
-	 * на сообщения которого осуществлена подписка <br> TOPIC_ID - код темы, на
-	 * сообщения которой осуществлена подписка<br> TOPIC_ID_OR_NULL - код темы, на
-	 * сообщения которой осуществлена подписка, включая пустые
-	 * значения<br> NEW_TOPIC_ONLY - флаг, определяющий подписку только на новые
-	 * темы (допустимые значения Y/N)<br> LAST_SEND - код последнего
-	 * отправленного по данной подписке сообщения<br> LAST_SEND_OR_NULL - код
-	 * последнего отправленного по данной подписке сообщения, включая
-	 * пустые значения<br> PERMISSION - минимальное право на доступ к форуму, на
-	 * сообщения которого осуществлена подписка<br></p>
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращяется объект класса CDBResult, каждая запись которого
-	 * представляет собой массив с ключами</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код подписки.</td> </tr> <tr>
-	 * <td>USER_ID</td> <td>Код пользователя-подписчика.</td> </tr> <tr> <td>FORUM_ID</td> <td>Код
-	 * форума, на сообщения которого осуществлена подписка.</td> </tr> <tr>
-	 * <td>TOPIC_ID</td> <td>Код темы, на сообщения которой осуществлена
-	 * подписка.</td> </tr> <tr> <td> LAST_SEND</td> <td>Код последнего отправленного по
-	 * подписке сообщения.</td> </tr> <tr> <td> NEW_TOPIC_ONLY</td> <td>Флаг, означающий
-	 * подписку только на новые темы (значения Y/N) </td> </tr> <tr> <td>SITE_ID</td>
-	 * <td>Код сайта, на котором осуществлена подписка.</td> </tr> <tr>
-	 * <td>START_DATE</td> <td>Дата подписки.</td> </tr> <tr> <td>EMAIL</td> <td>Email адрес
-	 * пользователя-подписчика.</td> </tr> </table>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/getlistex.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает записи из таблицы подписки на сообщения форума удовлетворяющие фильтру arFilter и упорядоченные в соответствии с сортировкой arOrder. С каждой записью идет email пользователя, которому принадлежит эта запись (т.е. email подписчика). </p>
+	*
+	*
+	*
+	*
+	* @param array $arrayarOrder = array("ID"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
+	* массив, в котором ключами являются названия параметров записей, а
+	* значениями - направления сортировки.</p> <p>Допустимые параметры
+	* записи для сортировки:<br>    <b>ID</b> - код записи<br>    <b>FORUM_ID</b> - код
+	* форума, на сообщения которого осуществлена подписка <br>
+	*    <b>USER_ID</b> - код пользователя-подписчика<br>    <b>TOPIC_ID</b> - код темы,
+	* на сообщения которой осуществлена подписка<br>    <b>START_DATE</b> - дата
+	* начала подписки</p>
+	*
+	*
+	*
+	* @param array $arrayarFilter = array() <p>Фильтр на возвращаемые записи; представляет собой
+	* ассоциативный массив, в котором ключами являются названия
+	* параметров записи, а значениями - условия на эти параметры.</p>
+	* <p>Допустимые параметры записи для фильтрации:<br>    <b>ID</b> - код
+	* подписки<br>    <b>USER_ID</b> - код пользователя-подписчика <br>
+	*    <b>FORUM_ID</b> - код форума, на сообщения которого осуществлена
+	* подписка <br>    <b>TOPIC_ID</b> - код темы, на сообщения которой
+	* осуществлена подписка<br>    <b>TOPIC_ID_OR_NULL</b> - код темы, на сообщения
+	* которой осуществлена подписка, включая пустые значения<br>
+	*    <b>NEW_TOPIC_ONLY</b> - флаг, определяющий подписку только на новые темы
+	* (допустимые значения Y/N)<br>    <b>LAST_SEND</b> - код последнего
+	* отправленного по данной подписке сообщения<br>    <b>LAST_SEND_OR_NULL</b> -
+	* код последнего отправленного по данной подписке сообщения,
+	* включая пустые значения<br>    <b>PERMISSION</b> - минимальное право на
+	* доступ к форуму, на сообщения которого осуществлена подписка<br></p>
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращяется объект класса CDBResult, каждая запись которого
+	* представляет собой массив с ключами</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код подписки.</td> </tr> <tr>
+	* <td>USER_ID</td> <td>Код пользователя-подписчика.</td> </tr> <tr> <td>FORUM_ID</td> <td>Код
+	* форума, на сообщения которого осуществлена подписка.</td> </tr> <tr>
+	* <td>TOPIC_ID</td> <td>Код темы, на сообщения которой осуществлена
+	* подписка.</td> </tr> <tr> <td> LAST_SEND</td> <td>Код последнего отправленного по
+	* подписке сообщения.</td> </tr> <tr> <td> NEW_TOPIC_ONLY</td> <td>Флаг, означающий
+	* подписку только на новые темы (значения Y/N) </td> </tr> <tr> <td>SITE_ID</td>
+	* <td>Код сайта, на котором осуществлена подписка.</td> </tr> <tr>
+	* <td>START_DATE</td> <td>Дата подписки.</td> </tr> <tr> <td>EMAIL</td> <td>Email адрес
+	* пользователя-подписчика.</td> </tr> </table>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/getlistex.php
+	* @author Bitrix
+	*/
 	public static function GetListEx($arOrder = array("ID"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -2017,6 +1903,7 @@ class CAllForumSubscribe
 			"FS.USER_ID" => "FS.USER_ID",
 			"FS.FORUM_ID" => "FS.FORUM_ID",
 			"FS.TOPIC_ID" => "FS.TOPIC_ID",
+			"TITLE_SEO" => CForumNew::Concat("-", array("FS.TOPIC_ID", "FT.TITLE_SEO")),
 			"FS.LAST_SEND" => "FS.LAST_SEND",
 			"FS.NEW_TOPIC_ONLY" => "FS.NEW_TOPIC_ONLY",
 			"FS.SITE_ID" => "FS.SITE_ID",
@@ -2155,6 +2042,7 @@ class CAllForumSubscribe
 
 		$strSql = "
 			SELECT FS.ID, FS.USER_ID, FS.FORUM_ID, FS.TOPIC_ID, FS.LAST_SEND, FS.NEW_TOPIC_ONLY, FS.SITE_ID,
+				".CForumNew::Concat("-", array("FS.TOPIC_ID", "FT.TITLE_SEO"))." as TITLE_SEO,
 				".$DB->DateToCharFunction("FS.START_DATE", "FULL")." as START_DATE,
 				U.EMAIL, U.LOGIN, U.NAME, U.LAST_NAME, FT.TITLE, F.NAME AS FORUM_NAME".$strSqlSelect."
 			FROM b_forum_subscribe FS
@@ -2284,9 +2172,8 @@ class CAllForumRank
 		$DB->Query("DELETE FROM b_forum_rank_lang WHERE RANK_ID = ".$ID, True);
 		$DB->Query("DELETE FROM b_forum_rank WHERE ID = ".$ID, True);
 
-		foreach ($arUsers as $userId) {
+		foreach ($arUsers as $userId)
 			CForumUser::SetStat($userId);
-		}
 
 		return true;
 	}

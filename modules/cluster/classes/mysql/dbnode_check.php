@@ -16,6 +16,13 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 
 		$result = array();
 
+		$is_ok  = CCluster::checkForServers(1);
+		$result["server_count"] = array(
+			"IS_OK" => $is_ok? CClusterDBNodeCheck::OK: CClusterDBNodeCheck::WARNING,
+			"MESSAGE" => GetMessage("CLUSTER_SERVER_COUNT_CHECK"),
+			"WIZ_REC" => "",
+		);
+
 		$is_ok = !file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/after_connect.php");
 		$result["after_connect"] = array(
 			"IS_OK" => $is_ok? CClusterDBNodeCheck::OK: CClusterDBNodeCheck::ERROR,
@@ -141,7 +148,7 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 					$is_ok = false;
 
 			$result["binlog_do_db"] = array(
-				"IS_OK" => $is_ok? CClusterDBNodeCheck::OK: CClusterDBNodeCheck::ERROR,
+				"IS_OK" => $is_ok? CClusterDBNodeCheck::OK: CClusterDBNodeCheck::WARNING,
 				"MESSAGE" => GetMessage("CLU_SYNC_BINLOGDODB_MSG"),
 				"WIZ_REC" => GetMessage("CLU_SYNC_BINLOGDODB_WIZREC", array("#database#" => $DatabaseName)),
 			);
@@ -275,11 +282,6 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 			);
 		}
 
-/*		$result["test"] = array(
-			"IS_OK" => CClusterDBNodeCheck::ERROR,
-			"MESSAGE" => print_r($arMasters,1),
-			"WIZ_REC" => print_r($arData,1),
-		);*/
 		return $result;
 	}
 

@@ -21,7 +21,8 @@ class CAllPullWatch
 		{
 			CTimeZone::Disable();
 			$strSql = "
-					SELECT ID, USER_ID, CHANNEL_ID, TAG, ".$DB->DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE FROM b_pull_watch
+					SELECT ID, USER_ID, TAG, ".$DB->DatetimeToTimestampFunction("DATE_CREATE")." DATE_CREATE
+					FROM b_pull_watch
 					WHERE USER_ID = ".intval($userId)."
 			";
 			CTimeZone::Enable();
@@ -74,26 +75,39 @@ class CAllPullWatch
 			");
 		}
 
-		if (!empty(self::$arInsert))
+		$dbType = strtolower($DB->type);
+		if ($dbType == "mysql")
 		{
-			$strSqlPrefix = "INSERT INTO b_pull_watch (USER_ID, CHANNEL_ID, TAG, DATE_CREATE) VALUES ";
-			$maxValuesLen = 2048;
-			$strSqlValues = "";
-
-			foreach(self::$arInsert as $tag)
+			if (!empty(self::$arInsert))
 			{
-				$strSqlValues .= ",\n(".intval($userId).", '".$DB->ForSql($arChannel['CHANNEL_ID'])."', '".$DB->ForSql($tag)."', ".$DB->CurrentTimeFunction().")";
-				if(strlen($strSqlValues) > $maxValuesLen)
+				$strSqlPrefix = "INSERT INTO b_pull_watch (USER_ID, CHANNEL_ID, TAG, DATE_CREATE) VALUES ";
+				$maxValuesLen = 2048;
+				$strSqlValues = "";
+
+				foreach(self::$arInsert as $tag)
+				{
+					$strSqlValues .= ",\n(".intval($userId).", '".$DB->ForSql($arChannel['CHANNEL_ID'])."', '".$DB->ForSql($tag)."', ".$DB->CurrentTimeFunction().")";
+					if(strlen($strSqlValues) > $maxValuesLen)
+					{
+						$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
+						$strSqlValues = "";
+					}
+				}
+				if(strlen($strSqlValues) > 0)
 				{
 					$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
-					$strSqlValues = "";
 				}
 			}
-			if(strlen($strSqlValues) > 0)
+		}
+		else if (!empty(self::$arInsert))
+		{
+			foreach(self::$arInsert as $tag)
 			{
-				$DB->Query($strSqlPrefix.substr($strSqlValues, 2));
+				$DB->Query("INSERT INTO b_pull_watch (USER_ID, CHANNEL_ID, TAG, DATE_CREATE) VALUES (".intval($userId).", '".$DB->ForSql($arChannel['CHANNEL_ID'])."', '".$DB->ForSql($tag)."', ".$DB->CurrentTimeFunction().")");
 			}
 		}
+
+		return true;
 	}
 
 	public static function Delete($userId, $tag = null)
@@ -131,16 +145,23 @@ class CAllPullWatch
 	{
 		global $DB;
 
-		$result = false;
-		$strSql = "SELECT CHANNEL_ID FROM b_pull_watch WHERE TAG = '".$DB->ForSQL($tag)."'";
+		$arChannels = Array();
+		$strSql = "
+				SELECT pc.CHANNEL_ID
+				FROM b_pull_watch pw
+				LEFT JOIN b_pull_channel pc ON pw.USER_ID = pc.USER_ID
+				WHERE pw.TAG = '".$DB->ForSQL($tag)."'
+		";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
 		{
-			$result = CPullStack::AddByChannel($arRes['CHANNEL_ID'], $arMessage);
-			if (!$result)
-				break;
+			$arChannels[] = $arRes['CHANNEL_ID'];
 		}
-		return !$result? false: true;
+		$result = CPullStack::AddByChannel($arChannels, $arMessage);
+		if (!$result)
+			return false;
+
+		return true;
 	}
 
 	public static function GetUserList($tag)

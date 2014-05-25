@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialservices/classes/general/descriptions.php");
+require_once(dirname(__FILE__)."/descriptions.php");
 
 //manager to operate with services
 class CSocServAuthManager
@@ -140,7 +140,7 @@ class CSocServAuthManager
 			$_SESSION["UNIQUE_KEY"] = md5(bitrix_sessid_get().uniqid(rand(), true));
 	}
 
-	public static function CheckUniqueKey()
+	public static function CheckUniqueKey($bUnset = true)
 	{
 		if(isset($_REQUEST["state"]))
 		{
@@ -153,7 +153,10 @@ class CSocServAuthManager
 			InitURLParam($_REQUEST['backurl']);
 		if($_SESSION["UNIQUE_KEY"] <> '' && ($_REQUEST['check_key'] === $_SESSION["UNIQUE_KEY"]))
 		{
-			unset($_SESSION["UNIQUE_KEY"]);
+			if($bUnset)
+			{
+				unset($_SESSION["UNIQUE_KEY"]);
+			}
 			return true;
 		}
 		return false;
@@ -363,7 +366,9 @@ class CSocServAuthManager
 			//	if(strlen($_POST["DATE_PUBLISH_DEF"]) > 0)
 			//		$DATE_PUBLISH = $_POST["DATE_PUBLISH_DEF"];
 			//	elseif (strlen($_POST["DATE_PUBLISH"])<=0)
+
 			$DATE_PUBLISH = ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL");
+
 			//	else
 			//		$DATE_PUBLISH = $_POST["DATE_PUBLISH"];
 
@@ -917,8 +922,8 @@ class CSocServAuth
 		}
 		else
 		{
-			$dbUsersOld = $GLOBALS["USER"]->GetList($_REQUEST["by"], $_REQUEST["ord"], array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-			$dbUsersNew = $GLOBALS["USER"]->GetList($_REQUEST["by"], $_REQUEST["ord"], array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+			$dbUsersOld = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+			$dbUsersNew = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
 
 			if($arUser = $dbSocUser->Fetch())
 			{

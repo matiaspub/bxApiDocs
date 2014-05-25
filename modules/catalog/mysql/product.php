@@ -18,58 +18,101 @@ class CCatalogProduct extends CAllCatalogProduct
 {
 	
 	/**
-	 * <p>Функция добавляет (или обновляет) параметры товара к элементу каталога.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив, ключами которого являются названия
-	 * параметров товара, а значениями - новые значения параметров.<br>
-	 * Допустимые ключи: <ul> <li> <b>ID</b> - код товара (элемента каталога -
-	 * обязательный);</li> <li> <b>QUANTITY</b> - количество товара на складе;</li> <li>
-	 * <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b> "уменьшать ли количество при
-	 * заказе";</li> <li> <b>WEIGHT</b> - вес единицы товара;</li> <li> <b>PRICE_TYPE</b> - тип
-	 * цены (S - одноразовый платеж, R - регулярные платежи, T - пробная
-	 * подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> - тип периода подписки ("H" - час, "D" -
-	 * сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год);</li>
-	 * <li> <b>RECUR_SCHEME_LENGTH</b> - длина периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код
-	 * товара, для которого данный товар является пробным;</li> <li>
-	 * <b>WITHOUT_ORDER</b> - флаг "Продление подписки без оформления заказа";</li>
-	 * <li> <b>VAT_ID</b> - код НДС;</li> <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в
-	 * цену;</li> <li> <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> -
-	 * валюта закупочной цены;</li> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить
-	 * покупку при отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг
-	 * (Y/N/D)<b>*</b> "разрешить отрицательное количество товара".</li> </ul>
-	 *
-	 *
-	 *
-	 * @param boolean $boolCheck = true Параметр, указывающий, проверять ли наличие в базе информации о
-	 * товаре или нет, перед добавлением.<br>По умолчанию - проверять.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
-	 * <i>false</i> в противном случае. </p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $arFields = array(
-	 *                   "ID" =&gt; $PRODUCT_ID, 
-	 *                   "VAT_ID" =&gt; 1, //выставляем тип ндс (задается в админке)  
-	 *                   "VAT_INCLUDED" =&gt; "Y" //НДС входит в стоимость
-	 *                   );
-	 * if(CCatalogProduct::Add($arFields))
-	 *     echo "Добавили параметры товара к элементу каталога ".$PRODUCT_ID.'&lt;br&gt;';
-	 * else
-	 *     echo 'Ошибка добавления параметров&lt;br&gt;';
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет наличие информации (доступное количество, разрешена ли покупка при отсутствии товара и т.д.) о товаре с кодом <i>intID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $intID  Код товара.
+	*
+	*
+	*
+	* @return bool <p> В случае наличия информации о товаре возвращает true, иначе -
+	* false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/isexistproduct.php
+	* @author Bitrix
+	*/
+	public static function IsExistProduct($intID)
+	{
+		global $DB;
+		$intID = intval($intID);
+		if (0 >= $intID)
+			return false;
+
+		$strSql = 'select ID from b_catalog_product where ID='.$intID;
+		$rsProducts = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($arProduct = $rsProducts->Fetch())
+		{
+			return true;
+		}
+		return false;
+	}
+
+	
+	/**
+	* <p>Функция добавляет (или обновляет) параметры товара к элементу каталога.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив, ключами которого являются названия
+	* параметров товара, а значениями - новые значения параметров.
+	* Допустимые ключи: <br><br> ключи, независящие от вида товаров: <ul> <li>
+	* <b>ID</b> - код товара (элемента каталога - обязательный);</li> <li> <b>VAT_ID</b>
+	* - код НДС;</li> <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в цену;</li> <li>
+	* <b>QUANTITY</b> - количество товара на складе;</li> <li> <b>QUANTITY_RESERVED</b> -
+	* зарезервированное количество;</li> <li> <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b>
+	* "включить количественный учет" (до версии 12.5.0 параметр назывался
+	* "уменьшать ли количество при заказе");</li> </ul> <br> ключи для обычных
+	* товаров: <ul> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить покупку при
+	* отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b>
+	* "разрешить отрицательное количество товара";</li> <li> <b>SUBSCRIBE</b> - флаг
+	* (Y/N/D)<b>*</b> "разрешить подписку при отсутствии товара"; <br><br> </li> <li>
+	* <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> - валюта
+	* закупочной цены;<br><br> </li> <li> <b>WEIGHT</b> - вес единицы товара;<br><br> </li> <li>
+	* <b>WIDTH</b> - ширина товара (в мм);</li> <li> <b>LENGTH</b> - длина товара (в мм);</li>
+	* <li> <b>HEIGHT</b> - высота товара (в мм);</li> <li> <b>MEASURE</b> - ID единицы
+	* измерения;<br><br> </li> <li> <b>BARCODE_MULTI</b> - (Y/N) определяет каждый ли
+	* экземпляр товара имеет собственный штрихкод;</li> </ul> <br> ключи для
+	* продажи контента: <ul> <li> <b>PRICE_TYPE</b> - тип цены (S - одноразовый платеж,
+	* R - регулярные платежи, T - пробная подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> -
+	* тип периода подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" -
+	* квартал, "S" - полугодие, "Y" - год);</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
+	* периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код товара, для которого
+	* данный товар является пробным;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Продление
+	* подписки без оформления заказа".</li> </ul>
+	*
+	*
+	*
+	* @param boolean $boolCheck = true Параметр, указывающий, проверять ли наличие в базе информации о
+	* товаре или нет, перед добавлением.<br>По умолчанию - проверять.
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
+	* <i>false</i> в противном случае. </p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arFields = array(
+	*                   "ID" =&gt; $PRODUCT_ID, 
+	*                   "VAT_ID" =&gt; 1, //выставляем тип ндс (задается в админке)  
+	*                   "VAT_INCLUDED" =&gt; "Y" //НДС входит в стоимость
+	*                   );
+	* if(CCatalogProduct::Add($arFields))
+	*     echo "Добавили параметры товара к элементу каталога ".$PRODUCT_ID.'&lt;br&gt;';
+	* else
+	*     echo 'Ошибка добавления параметров&lt;br&gt;';
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php
+	* @author Bitrix
+	*/
 	static public function Add($arFields, $boolCheck = true)
 	{
 		global $DB;
@@ -127,52 +170,62 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	 * <p>Функция обновляет параметры товара, относящиеся к товару как к таковому.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код товара.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив, ключами которого являются названия
-	 * параметров товара, а значениями - новые значения
-	 * параметров.<br>Допустимые ключи: <ul> <li> <b>QUANTITY</b> - Количество товара
-	 * на складе;</li> <li> <b>QUANTITY_TRACE</b> - Флаг (Y/N/D)<b>*</b> "уменьшать ли
-	 * количество при заказе";</li> <li> <b>WEIGHT</b> - вес единицы товара;</li> <li>
-	 * <b>PRICE_TYPE</b> - тип цены (S - одноразовый платеж, R - регулярные платежи, T
-	 * - пробная подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> - тип периода подписки ("H" -
-	 * час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" -
-	 * год);</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина периода подписки;</li> <li>
-	 * <b>TRIAL_PRICE_ID</b> - код товара, для которого данный товар является
-	 * пробным;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Продление подписки без
-	 * оформления заказа";</li> <li> <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li>
-	 * <b>PURCHASING_CURRENCY</b> - валюта закупочной цены;</li> <li> <b>CAN_BUY_ZERO</b> - флаг
-	 * (Y/N/D)<b>*</b> "разрешить покупку при отсутствии товара";</li> <li>
-	 * <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b> "разрешить отрицательное
-	 * количество товара".</li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
-	 * <i>false</i> в противном случае.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Обновление зарезервированного количества товара
-	 * Cmodule::IncludeModule('catalog');
-	 * $PRODUCT_ID = 51; // id товара
-	 * $arFields = array('QUANTITY_RESERVED' =&gt; 11);// зарезервированное количество
-	 * CCatalogProduct::Update($PRODUCT_ID, $arFields);
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры товара, относящиеся к товару как к таковому.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код товара.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив, ключами которого являются названия
+	* параметров товара, а значениями - новые значения параметров.
+	* Допустимые ключи: <br><br> ключи, независящие от типа товаров: <ul> <li>
+	* <b>QUANTITY</b> - количество товара на складе;</li> <li> <b>QUANTITY_RESERVED</b> -
+	* зарезервированное количество;</li> <li> <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b>
+	* "включить количественный учет" (до версии 12.5.0 параметр назывался
+	* "уменьшать ли количество при заказе");</li> </ul> <br> ключи для обычных
+	* товаров: <ul> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить покупку при
+	* отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b>
+	* "разрешить отрицательное количество товара";</li> <li> <b>SUBSCRIBE</b> - флаг
+	* (Y/N/D)<b>*</b> "разрешить подписку при отсутствии товара"; <br><br> </li> <li>
+	* <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> - валюта
+	* закупочной цены;<br><br> </li> <li> <b>WEIGHT</b> - вес единицы товара;<br><br> </li> <li>
+	* <b>WIDTH</b> - ширина товара (в мм);</li> <li> <b>LENGTH</b> - длина товара (в мм);</li>
+	* <li> <b>HEIGHT</b> - высота товара (в мм);</li> <li> <b>MEASURE</b> - ID единицы
+	* измерения;<br><br> </li> <li> <b>BARCODE_MULTI</b> - (Y/N) определяет каждый ли
+	* экземпляр товара имеет собственный штрихкод;</li> </ul> <br> ключи для
+	* продажи контента: <ul> <li> <b>PRICE_TYPE</b> - тип цены (S - одноразовый платеж,
+	* R - регулярные платежи, T - пробная подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> -
+	* тип периода подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" -
+	* квартал, "S" - полугодие, "Y" - год);</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
+	* периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код товара, для которого
+	* данный товар является пробным;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Продление
+	* подписки без оформления заказа".</li> </ul>
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
+	* <i>false</i> в противном случае.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Обновление зарезервированного количества товара
+	* 
+	* 
+	* Cmodule::IncludeModule('catalog');
+	* $PRODUCT_ID = 51; // id товара
+	* $arFields = array('QUANTITY_RESERVED' =&gt; 11);// зарезервированное количество
+	* CCatalogProduct::Update($PRODUCT_ID, $arFields);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php
+	* @author Bitrix
+	*/
 	static public function Update($ID, $arFields)
 	{
 		global $DB;
@@ -246,23 +299,23 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	 * <p>Функция удаляет из элемента каталога свойства, относящиеся к товару </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код товара (элемента каталога)
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * противном случае </p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__delete.ed301fc8.php
-	 * @author Bitrix
-	 */
-	public static function Delete($ID)
+	* <p>Функция удаляет из элемента каталога свойства, относящиеся к товару </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код товара (элемента каталога)
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
+	* противном случае </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__delete.ed301fc8.php
+	* @author Bitrix
+	*/
+	static public function Delete($ID)
 	{
 		global $DB;
 
@@ -270,8 +323,9 @@ class CCatalogProduct extends CAllCatalogProduct
 		if (0 >= $ID)
 			return false;
 
-		$DB->Query("DELETE FROM b_catalog_price WHERE PRODUCT_ID = ".$ID, true);
-		$DB->Query("DELETE FROM b_catalog_product2group WHERE PRODUCT_ID = ".$ID, true);
+		$DB->Query('delete from b_catalog_price where PRODUCT_ID = '.$ID, true);
+		$DB->Query('delete from b_catalog_product2group where PRODUCT_ID = '.$ID, true);
+		$DB->Query('delete from b_catalog_product_sets where ITEM_ID = '.$ID.' or OWNER_ID = '.$ID, true);
 
 		if (array_key_exists($ID, self::$arProductCache))
 		{
@@ -282,7 +336,7 @@ class CCatalogProduct extends CAllCatalogProduct
 				$CATALOG_PRODUCT_CACHE = self::$arProductCache;
 			}
 		}
-		return $DB->Query("DELETE FROM b_catalog_product WHERE ID = ".$ID, true);
+		return $DB->Query("delete from b_catalog_product where ID = ".$ID, true);
 	}
 
 	public static function GetQueryBuildArrays($arOrder, $arFilter, $arSelect)
@@ -290,15 +344,18 @@ class CCatalogProduct extends CAllCatalogProduct
 		global $DB, $USER;
 		global $stackCacheManager;
 
-		$strDefQuantityTrace = COption::GetOptionString('catalog','default_quantity_trace','N');
+		$strDefQuantityTrace = COption::GetOptionString('catalog', 'default_quantity_trace');
 		if ('Y' != $strDefQuantityTrace)
 			$strDefQuantityTrace = 'N';
-		$strDefCanBuyZero = COption::GetOptionString('catalog','default_can_buy_zero','N');
+		$strDefCanBuyZero = COption::GetOptionString('catalog', 'default_can_buy_zero');
 		if ('Y' != $strDefCanBuyZero)
 			$strDefCanBuyZero = 'N';
-		$strDefNegAmount = COption::GetOptionString('catalog','allow_negative_amount','N');
+		$strDefNegAmount = COption::GetOptionString('catalog', 'allow_negative_amount');
 		if ('Y' != $strDefNegAmount)
 			$strDefNegAmount = 'N';
+		$strSubscribe = COption::GetOptionString('catalog', 'default_subscribe');
+		if ('N' != $strSubscribe)
+			$strSubscribe = 'Y';
 
 		$sResSelect = "";
 		$sResFrom = "";
@@ -349,6 +406,11 @@ class CCatalogProduct extends CAllCatalogProduct
 					elseif ($by == 'AVAILABLE')
 					{
 						$arResOrder[$key] = " ".CIBlock::_Order("CATALOG_AVAILABLE", $order, "desc", false)." ";
+						continue;
+					}
+					elseif ($by == "TYPE")
+					{
+						$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.TYPE", $order, "asc", false)." ";
 						continue;
 					}
 					else
@@ -423,6 +485,9 @@ class CCatalogProduct extends CAllCatalogProduct
 					break;
 				case "WEIGHT":
 					$res = CIBlock::FilterCreate("CAT_PR.WEIGHT", $val, "number", $cOperationType);
+					break;
+				case 'TYPE':
+					$res = CIBlock::FilterCreate("CAT_PR.TYPE", $val, "number", $cOperationType);
 					break;
 				}
 
@@ -532,22 +597,20 @@ class CCatalogProduct extends CAllCatalogProduct
 			" CAT_PR.QUANTITY_TRACE as CATALOG_QUANTITY_TRACE_ORIG, ".
 			" IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) as CATALOG_CAN_BUY_ZERO, ".
 			" IF (CAT_PR.NEGATIVE_AMOUNT_TRACE = 'D', '".$strDefNegAmount."', CAT_PR.NEGATIVE_AMOUNT_TRACE) as CATALOG_NEGATIVE_AMOUNT_TRACE, ".
+			" IF (CAT_PR.SUBSCRIBE = 'D', '".$strSubscribe."', CAT_PR.SUBSCRIBE) as CATALOG_SUBSCRIBE, ".
 			" IF (
 				CAT_PR.QUANTITY > 0 OR
 				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
 				IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
 				'Y', 'N'
 			) as CATALOG_AVAILABLE, ".
-			" CAT_PR.WEIGHT as CATALOG_WEIGHT, ".
-			" CAT_VAT.RATE as CATALOG_VAT, ".
-			" CAT_PR.VAT_INCLUDED as CATALOG_VAT_INCLUDED, ".
-			" CAT_PR.PRICE_TYPE as CATALOG_PRICE_TYPE, ".
-			" CAT_PR.RECUR_SCHEME_TYPE as CATALOG_RECUR_SCHEME_TYPE, ".
-			" CAT_PR.RECUR_SCHEME_LENGTH as CATALOG_RECUR_SCHEME_LENGTH, ".
-			" CAT_PR.TRIAL_PRICE_ID as CATALOG_TRIAL_PRICE_ID, ".
-			" CAT_PR.WITHOUT_ORDER as CATALOG_WITHOUT_ORDER, ".
-			" CAT_PR.SELECT_BEST_PRICE as CATALOG_SELECT_BEST_PRICE, ".
-			" CAT_PR.PURCHASING_PRICE as CATALOG_PURCHASING_PRICE, CAT_PR.PURCHASING_CURRENCY as CATALOG_PURCHASING_CURRENCY ";
+			" CAT_PR.WEIGHT as CATALOG_WEIGHT, CAT_PR.WIDTH as CATALOG_WIDTH, CAT_PR.LENGTH as CATALOG_LENGTH, CAT_PR.HEIGHT as CATALOG_HEIGHT, ".
+			" CAT_PR.MEASURE as CATALOG_MEASURE, ".
+			" CAT_VAT.RATE as CATALOG_VAT, CAT_PR.VAT_INCLUDED as CATALOG_VAT_INCLUDED, ".
+			" CAT_PR.PRICE_TYPE as CATALOG_PRICE_TYPE, CAT_PR.RECUR_SCHEME_TYPE as CATALOG_RECUR_SCHEME_TYPE, ".
+			" CAT_PR.RECUR_SCHEME_LENGTH as CATALOG_RECUR_SCHEME_LENGTH, CAT_PR.TRIAL_PRICE_ID as CATALOG_TRIAL_PRICE_ID, ".
+			" CAT_PR.WITHOUT_ORDER as CATALOG_WITHOUT_ORDER, CAT_PR.SELECT_BEST_PRICE as CATALOG_SELECT_BEST_PRICE, ".
+			" CAT_PR.PURCHASING_PRICE as CATALOG_PURCHASING_PRICE, CAT_PR.PURCHASING_CURRENCY as CATALOG_PURCHASING_CURRENCY, CAT_PR.TYPE as CATALOG_TYPE ";
 
 		$sResFrom .= " LEFT JOIN b_catalog_product CAT_PR ON (CAT_PR.ID = BE.ID) ";
 		$sResFrom .= " LEFT JOIN b_catalog_iblock CAT_IB ON ((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0) AND CAT_IB.IBLOCK_ID = BE.IBLOCK_ID) ";
@@ -568,128 +631,153 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	 * <p>Функция возвращает результат выборки записей товаров в соответствии со своими параметрами. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
-	 * "направление_сортировки1", "название_поля2" =&gt;
-	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	 * может стоять любое поле товара, а в качестве
-	 * "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
-	 * возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
-	 * имеет несколько элементов, то результирующий набор сортируется
-	 * последовательно по каждому элементу (т.е. сначала сортируется по
-	 * первому элементу, потом результат сортируется по второму и
-	 * т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что результат отсортирован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи товара.
-	 * Массив имеет вид: <pre class="syntax">array(
-	 * "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
-	 * "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
-	 * Удовлетворяющие фильтру записи возвращаются в результате, а
-	 * записи, которые не удовлетворяют условиям фильтра,
-	 * отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
-	 * <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
-	 * так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
-	 * являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
-	 * или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	 * поля строго больше передаваемой в фильтр величины;</li> <li><b> -
-	 * значение поля меньше или равно передаваемой в фильтр
-	 * величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
-	 * фильтр величины;</b></li> <li> <b>@</b> - значение поля находится в
-	 * передаваемом в фильтр разделенном запятой списке значений;</li> <li>
-	 * <b>~</b> - значение поля проверяется на соответствие передаваемому в
-	 * фильтр шаблону;</li> <li> <b>%</b> - значение поля проверяется на
-	 * соответствие передаваемой в фильтр строке в соответствии с
-	 * языком запросов.</li> </ul> В качестве "название_поляX" может стоять
-	 * любое поле товара.<br><br> Пример фильтра: <pre class="syntax">array("SUBSCRIPTION" =&gt;
-	 * "Y")</pre> Этот фильтр означает "выбрать все записи, в которых
-	 * значение в поле SUBSCRIPTION (флаг "Продажа контента") равно Y".<br><br>
-	 * Значение по умолчанию - пустой массив array() - означает, что
-	 * результат отфильтрован не будет.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив полей, по которым группируются записи типов товара. Массив
-	 * имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
-	 * качестве "название_поля<i>N</i>" может стоять любое поле типов
-	 * товара. <br><br> Если массив пустой, то функция вернет число записей,
-	 * удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
-	 * означает, что результат группироваться не будет.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	 * <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
-	 * ограничено сверху значением этого ключа;</li> <li> любой ключ,
-	 * принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	 * параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
-	 * параметров выборки нет.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
-	 * указать только те поля, которые необходимы. Если в массиве
-	 * присутствует значение "*", то будут возвращены все доступные
-	 * поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
-	 * что будут возвращены все поля основной таблицы запроса.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Объект класса CDBResult, содержащий записи в виде ассоциативных
-	 * массивов параметров товара с ключами</p><table class="tnormal" width="100%"> <tr> <th
-	 * width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код товара.</td> </tr> <tr>
-	 * <td>QUANTITY</td> <td>Количество на складе.</td> </tr> <tr> <td>QUANTITY_TRACE</td> <td>Флаг
-	 * (Y/N/D - значение берется из настроек модуля) "уменьшать количество
-	 * при оформлении заказа"</td> </tr> <tr> <td>WEIGHT</td> <td>Вес единицы товара.</td>
-	 * </tr> <tr> <td>PRICE_TYPE</td> <td>Тип цены (S - одноразовый платеж, R - регулярные
-	 * платежи, T - пробная подписка)</td> </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип
-	 * периода подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" -
-	 * квартал, "S" - полугодие, "Y" - год)</td> </tr> <tr> <td>RECUR_SCHEME_LENGTH</td> <td>Длина
-	 * периода подписки.</td> </tr> <tr> <td>TRIAL_PRICE_ID</td> <td>Код товара, для
-	 * которого данный товар является пробным.</td> </tr> <tr> <td>WITHOUT_ORDER</td>
-	 * <td>Флаг "Продление подписки без оформления заказа"</td> </tr> <tr>
-	 * <td>VAT_ID</td> <td>Идентификатор ставки НДС.</td> </tr> <tr> <td>VAT_INCLUDED</td>
-	 * <td>Признак включённости НДС в цену (Y/N).</td> </tr> <tr> <td>PURCHASING_PRICE</td>
-	 * <td>Величина закупочной цены.</td> </tr> <tr> <td>PURCHASING_CURRENCY</td> <td>Валюта
-	 * закупочной цены.</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Флаг (Y/N/D - значение
-	 * берется из настроек модуля) "разрешить покупку при отсутствии
-	 * товара".</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Флаг (Y/N/D - значение берется из
-	 * настроек модуля) "разрешить отрицательное количество товара".</td>
-	 * </tr> </table><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выведем коды 10 товаров с самым большим количеством на складе
-	 * // из тех, количество которых при заказе должно уменьшаться
-	 * $ind = 0;
-	 * $db_res = CCatalogProduct::GetList(
-	 *         array("QUANTITY" =&gt; "DESC"),
-	 *         array("QUANTITY_TRACE" =&gt; "Y"),
-	 *         false,
-	 *         array("nTopCount" =&gt; 10)
-	 *     );
-	 * while (($ar_res = $db_res-&gt;Fetch()) &amp;&amp; ($ind &lt; 10))
-	 * {
-	 *     echo $ar_res["ID"].", ";
-	 *     $ind++;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getlist.971a2b70.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает результат выборки записей товаров в соответствии со своими параметрами. </p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* "направление_сортировки1", "название_поля2" =&gt;
+	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	* может стоять любое поле товара, а в качестве
+	* "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
+	* возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
+	* имеет несколько элементов, то результирующий набор сортируется
+	* последовательно по каждому элементу (т.е. сначала сортируется по
+	* первому элементу, потом результат сортируется по второму и
+	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
+	* что результат отсортирован не будет.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи товара.
+	* Массив имеет вид: <pre class="syntax">array(
+	* "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
+	* "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
+	* Удовлетворяющие фильтру записи возвращаются в результате, а
+	* записи, которые не удовлетворяют условиям фильтра,
+	* отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
+	* <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
+	* так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
+	* являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
+	* или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
+	* поля строго больше передаваемой в фильтр величины;</li> <li><b> -
+	* значение поля меньше или равно передаваемой в фильтр
+	* величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
+	* фильтр величины;</b></li> <li> <b>@</b> - оператор может использоваться для
+	* целочисленных и вещественных данных при передаче набора
+	* значений (массива). В этом случае при генерации sql-запроса будет
+	* использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
+	* <li> <b>~</b> - значение поля проверяется на соответствие
+	* передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
+	* проверяется на соответствие передаваемой в фильтр строке в
+	* соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
+	* может стоять любое поле товара.<br><br> Пример фильтра: <pre
+	* class="syntax">array("QUANTITY_TRACE" =&gt; "Y")</pre> Этот фильтр означает "выбрать все
+	* записи, в которых значение в поле QUANTITY_TRACE (т.е. ведется
+	* количественный учет) равно Y".<br><br> Значение по умолчанию - пустой
+	* массив array() - означает, что результат отфильтрован не будет.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив полей, по которым группируются записи типов товара. Массив
+	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
+	* качестве "название_поля<i>N</i>" может стоять любое поле типов
+	* товара. <br><br> Если массив пустой, то функция вернет число записей,
+	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
+	* означает, что результат группироваться не будет.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
+	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
+	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
+	* параметров выборки нет.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* указать только те поля, которые необходимы. Если в массиве
+	* присутствует значение "*", то будут возвращены все доступные
+	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
+	* что будут возвращены все поля основной таблицы запроса.
+	*
+	*
+	*
+	* @return CDBResult <p>Объект класса CDBResult, содержащий записи в виде ассоциативных
+	* массивов параметров товара с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th> <th>Описание</th> <th width="10%">С версии</th> </tr> <tr> <td>ID</td>
+	* <td>Код товара.</td> <td></td> </tr> <tr> <td>QUANTITY</td> <td>Количество на складе.</td>
+	* <td></td> </tr> <tr> <td>QUANTITY_RESERVED</td> <td>Зарезервированное количество.</td>
+	* <td>12.5.0</td> </tr> <tr> <td>QUANTITY_TRACE</td> <td>Определяет ведется ли
+	* количественный учет (Y/N). До версии 12.5.0 параметр назывался
+	* "уменьшать количество при оформлении заказа". Оригинальное
+	* значение доступно в ключе QUANTITY_TRACE_ORIG.</td> <td></td> </tr> <tr>
+	* <td>QUANTITY_TRACE_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "включить количественный учет".</td>
+	* <td>12.0.0</td> </tr> <tr> <td>SUBSCRIBE</td> <td>Разрешение/запрет подписки при
+	* отсутствии товара (Y/N/D<b>*</b>).</td> <td>14.0.0</td> </tr> <tr> <td>WEIGHT</td> <td>Вес
+	* единицы товара.</td> <td>14.0.0</td> </tr> <tr> <td>WIDTH</td> <td>Ширина товара (в
+	* мм).</td> <td>14.0.0</td> </tr> <tr> <td>LENGTH</td> <td>Длина товара (в мм).</td> <td>14.0.0</td> </tr>
+	* <tr> <td>HEIGHT</td> <td>Высота товара (в мм).</td> <td>14.0.0</td> </tr> <tr> <td>PRICE_TYPE</td>
+	* <td>Тип цены (S - одноразовый платеж, R - регулярные платежи, T -
+	* пробная подписка)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип периода
+	* подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" -
+	* полугодие, "Y" - год)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_LENGTH</td> <td>Длина периода
+	* подписки.</td> <td></td> </tr> <tr> <td>TRIAL_PRICE_ID</td> <td>Код товара, для которого
+	* данный товар является пробным.</td> <td></td> </tr> <tr> <td>WITHOUT_ORDER</td> <td>Флаг
+	* "Продление подписки без оформления заказа"</td> <td></td> </tr> <tr>
+	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи. Задается в
+	* формате сайта.</td> <td></td> </tr> <tr> <td>VAT_ID</td> <td>Идентификатор ставки
+	* НДС.</td> <td></td> </tr> <tr> <td>VAT_INCLUDED</td> <td>Признак включённости НДС в цену
+	* (Y/N).</td> <td></td> </tr> <tr> <td>PURCHASING_PRICE</td> <td>Величина закупочной цены.</td>
+	* <td>12.5.0</td> </tr> <tr> <td>PURCHASING_CURRENCY</td> <td>Валюта закупочной цены.</td>
+	* <td>12.5.0</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Разрешена ли покупка при отсутствии
+	* товара (Y/N). Оригинальное значение доступно в ключе CAN_BUY_ZERO_ORIG.</td>
+	* <td>12.0.0</td> </tr> <tr> <td>CAN_BUY_ZERO_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "разрешить покупку
+	* при отсутствии товара".</td> <td>12.0.0</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td>
+	* <td>Разрешено ли отрицательное количество товара (Y/N). Оригинальное
+	* значение доступно в ключе NEGATIVE_AMOUNT_TRACE_ORIG.</td> <td>12.0.0</td> </tr> <tr>
+	* <td>NEGATIVE_AMOUNT_TRACE_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "разрешить отрицательное
+	* количество товара".</td> <td>12.0.0</td> </tr> <tr> <td>TMP_ID</td> <td>Временный
+	* строковый идентификатор, используемый для служебных целей.</td>
+	* <td></td> </tr> <tr> <td>BARCODE_MULTI</td> <td>(Y/N) Определяет каждый ли экземпляр
+	* товара имеет собственный штрихкод.</td> <td>12.5.0</td> </tr> <tr> <td>MEASURE</td> <td>ID
+	* единицы измерения.</td> <td>14.0.0</td> </tr> <tr> <td>TYPE</td> <td>Тип товара (для
+	* типа товара "комплект" значение равно "2", во всех других случаях -
+	* "1").</td> <td>14.0.0</td> </tr> <tr> <td>ELEMENT_IBLOCK_ID</td> <td>Код инфоблока товара.</td>
+	* <td></td> </tr> <tr> <td>ELEMENT_XML_ID</td> <td>Внешний код товара.</td> <td></td> </tr> <tr>
+	* <td>ELEMENT_NAME </td> <td>Название товара.</td> <td></td> </tr> <tr><td colspan="3"> <b>*</b> -
+	* значение берется из настроек модуля.</td></tr> </table> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выведем коды 10 товаров с самым большим количеством на складе
+	* // из тех, количество которых при заказе должно уменьшаться
+	* $ind = 0;
+	* $db_res = CCatalogProduct::GetList(
+	*         array("QUANTITY" =&gt; "DESC"),
+	*         array("QUANTITY_TRACE" =&gt; "Y"),
+	*         false,
+	*         array("nTopCount" =&gt; 10)
+	*     );
+	* while (($ar_res = $db_res-&gt;Fetch()) &amp;&amp; ($ind &lt; 10))
+	* {
+	*     echo $ar_res["ID"].", ";
+	*     $ind++;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getlist.971a2b70.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -716,10 +804,15 @@ class CCatalogProduct extends CAllCatalogProduct
 			"QUANTITY_TRACE_ORIG" => array("FIELD" => "CP.QUANTITY_TRACE", "TYPE" => "char"),
 			"CAN_BUY_ZERO_ORIG" => array("FIELD" => "CP.CAN_BUY_ZERO", "TYPE" => "char"),
 			"NEGATIVE_AMOUNT_TRACE_ORIG" => array("FIELD" => "CP.NEGATIVE_AMOUNT_TRACE", "TYPE" => "char"),
-			"QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char"),
-			"CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char"),
-			"NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char"),
+			"QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog', 'default_quantity_trace'))."', CP.QUANTITY_TRACE)", "TYPE" => "char"),
+			"CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog', 'default_can_buy_zero'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char"),
+			"NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog', 'allow_negative_amount'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char"),
+			"SUBSCRIBE_ORIG" => array("FIELD" => "CP.SUBSCRIBE", "TYPE" => "char"),
+			"SUBSCRIBE" => array("FIELD" => "IF (CP.SUBSCRIBE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog', 'default_subscribe'))."', CP.SUBSCRIBE)", "TYPE" => "char"),
 			"WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "double"),
+			"WIDTH" => array("FIELD" => "CP.WIDTH", "TYPE" => "double"),
+			"LENGTH" => array("FIELD" => "CP.LENGTH", "TYPE" => "double"),
+			"HEIGHT" => array("FIELD" => "CP.HEIGHT", "TYPE" => "double"),
 			"TIMESTAMP_X" => array("FIELD" => "CP.TIMESTAMP_X", "TYPE" => "datetime"),
 			"PRICE_TYPE" => array("FIELD" => "CP.PRICE_TYPE", "TYPE" => "char"),
 			"RECUR_SCHEME_TYPE" => array("FIELD" => "CP.RECUR_SCHEME_TYPE", "TYPE" => "char"),
@@ -733,6 +826,8 @@ class CCatalogProduct extends CAllCatalogProduct
 			"PURCHASING_PRICE" => array("FIELD" => "CP.PURCHASING_PRICE", "TYPE" => "double"),
 			"PURCHASING_CURRENCY" => array("FIELD" => "CP.PURCHASING_CURRENCY", "TYPE" => "string"),
 			"BARCODE_MULTI" => array("FIELD" => "CP.BARCODE_MULTI", "TYPE" => "char"),
+			"MEASURE" => array("FIELD" => "CP.MEASURE", "TYPE" => "int"),
+			"TYPE" => array("FIELD" => "CP.TYPE", "TYPE" => "int"),
 			"ELEMENT_IBLOCK_ID" => array("FIELD" => "I.IBLOCK_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
 			"ELEMENT_XML_ID" => array("FIELD" => "I.XML_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)"),
 			"ELEMENT_NAME" => array("FIELD" => "I.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element I ON (CP.ID = I.ID)")
@@ -851,7 +946,7 @@ class CCatalogProduct extends CAllCatalogProduct
 				"	".$DB->DateToCharFunction("BE.ACTIVE_TO", "SHORT")." as ACTIVE_TO, ".
 				"	".$DB->DateToCharFunction("BE.WF_DATE_LOCK")." as WF_DATE_LOCK, ".
 				"	L.DIR as LANG_DIR, B.DETAIL_PAGE_URL, B.LIST_PAGE_URL, ".
-				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE) as QUANTITY_TRACE, CAP.WEIGHT, ".
+				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE) as QUANTITY_TRACE, CAP.WEIGHT, CAP.WIDTH, CAP.LENGTH, CAP.HEIGHT, CAP.MEASURE, ".
 				"   IF (CAP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAP.CAN_BUY_ZERO) as CAN_BUY_ZERO, ".
 				"   IF (CAP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CAP.NEGATIVE_AMOUNT_TRACE) as NEGATIVE_AMOUNT_TRACE, ".
 				"	CAP.VAT_ID, CAP.VAT_INCLUDED, ".
@@ -883,7 +978,7 @@ class CCatalogProduct extends CAllCatalogProduct
 				"	".$DB->DateToCharFunction("BE.ACTIVE_TO", "SHORT")." as ACTIVE_TO, ".
 				"	".$DB->DateToCharFunction("BE.WF_DATE_LOCK")." as WF_DATE_LOCK, ".
 				"	L.DIR as LANG_DIR, B.DETAIL_PAGE_URL, B.LIST_PAGE_URL, ".
-				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE)  as QUANTITY_TRACE, CAP.WEIGHT, ".
+				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE)  as QUANTITY_TRACE, CAP.WEIGHT, CAP.WIDTH, CAP.LENGTH, CAP.HEIGHT, CAP.MEASURE, ".
 				"   IF (CAP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAP.CAN_BUY_ZERO) as CAN_BUY_ZERO, ".
 				"   IF (CAP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CAP.NEGATIVE_AMOUNT_TRACE) as NEGATIVE_AMOUNT_TRACE, ".
 				"	CAP.VAT_ID, CAP.VAT_INCLUDED, ".
@@ -967,6 +1062,20 @@ WHERE CAT_PR.ID = '".intval($PRODUCT_ID)."'
 AND CAT_VAT.ACTIVE='Y'
 ";
 		return $DB->Query($query);
+	}
+
+	static public function SetProductType($intID, $intTypeID)
+	{
+		global $DB;
+		$intID = intval($intID);
+		if (0 >= $intID)
+			return false;
+		$intTypeID = intval($intTypeID);
+		if (self::TYPE_PRODUCT != $intTypeID && self::TYPE_SET != $intTypeID)
+			return false;
+		$strSql = 'update b_catalog_product set TYPE='.$intTypeID.' where ID='.$intID;
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		return true;
 	}
 }
 ?>

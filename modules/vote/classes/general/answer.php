@@ -70,8 +70,7 @@ class CAllVoteAnswer
 		if (!CVoteAnswer::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeVoteAnswerAdd *********************/
-		$events = GetModuleEvents("vote", "onBeforeVoteAnswerAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onBeforeVoteAnswerAdd", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
 /***************** /Event ******************************************/
@@ -84,8 +83,7 @@ class CAllVoteAnswer
 		$ID = $DB->Add("b_vote_answer", $arFields, $arBinds);
 
 /***************** Event onAfterVoteAnswerAdd **********************/
-		$events = GetModuleEvents("vote", "onAfterVoteAnswerAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteAnswerAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -101,8 +99,7 @@ class CAllVoteAnswer
 		if ($ID <= 0 || !CVoteAnswer::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 /***************** Event onBeforeVoteQuestionUpdate ****************/
-		$events = GetModuleEvents("vote", "onBeforeVoteAnswerUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onBeforeVoteAnswerUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields)) === false)
 				return false;
 /***************** /Event ******************************************/
@@ -120,8 +117,7 @@ class CAllVoteAnswer
 			$DB->Query($strSql, false, $err_mess);
 			endif;
 /***************** Event onAfterVoteAnswerUpdate *******************/
-		$events = GetModuleEvents("vote", "onAfterVoteAnswerUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteAnswerUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -132,8 +128,7 @@ class CAllVoteAnswer
 		global $DB, $CACHE_MANAGER;
 		$err_mess = (self::err_mess())."<br>Function: Delete<br>Line: ";
 /***************** Event onBeforeVoteAnswerDelete ******************/
-		$events = GetModuleEvents("vote", "onBeforeVoteAnswerDelete");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteAnswerDelete", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$QUESTION_ID, &$VOTE_ID)) === false)
 				return false;}
 /***************** /Event ******************************************/
@@ -164,14 +159,13 @@ class CAllVoteAnswer
 		$DB->Query($strSqlEventAnswer, false, $err_mess.__LINE__);
 		$DB->Query($strSqlAnswer, false, $err_mess.__LINE__);
 /***************** Event onAfterVoteAnswerDelete *******************/
-		$events = GetModuleEvents("vote", "onAfterVoteAnswerDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteAnswerDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $QUESTION_ID, $VOTE_ID));
 /***************** /Event ******************************************/
 		return true;
 	}
 
-	public static function GetList($QUESTION_ID, $by="s_c_sort", $order="asc", $arFilter=array())
+	public static function GetList($QUESTION_ID, $by="s_c_sort", $order="asc", $arFilter=array(), $arAddParams = array())
 	{
 		$err_mess = (self::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB;
@@ -203,28 +197,37 @@ class CAllVoteAnswer
 		}
 		
 		$order = ($order!="desc" ? "asc" : "desc");
-		if ($by == "s_id")				$strSqlOrder = "ORDER BY A.ID";
-		elseif ($by == "s_counter")		$strSqlOrder = "ORDER BY A.COUNTER";
+		if ($by == "s_id")				$strSqlOrder = " ORDER BY A.ID";
+		elseif ($by == "s_counter")		$strSqlOrder = " ORDER BY A.COUNTER";
 		else 
 		{
 			$by = "s_c_sort";
-			$strSqlOrder = "ORDER BY A.C_SORT";
+			$strSqlOrder = " ORDER BY A.C_SORT";
 		}
 		$strSqlOrder .= " ".$order;
-		
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
-		$strSql = "
-			SELECT 
-				A.* 
-			FROM 
-				b_vote_answer A
-			WHERE 
-			$strSqlSearch
-			and	A.QUESTION_ID='$QUESTION_ID' 
-			$strSqlOrder
-			";
-		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
-		return $res;
+		$strSqlFrom = "FROM b_vote_answer A WHERE ".$strSqlSearch." and A.QUESTION_ID=".$QUESTION_ID."";
+		$strSql = "SELECT A.* ".$strSqlFrom.$strSqlOrder;
+
+		if ($arAddParams["nTopCount"] > 0)
+		{
+			$arAddParams["nTopCount"] = intval($arAddParams["nTopCount"]);
+			if ($DB->type=="MSSQL")
+				$strSql = "SELECT TOP ".$arAddParams["nTopCount"]." A.* ".$strSqlFrom.$strSqlOrder;
+			else if ($DB->type=="ORACLE")
+				$strSql = "SELECT * FROM(".$strSql.") WHERE ROWNUM<=".$arAddParams["nTopCount"];
+			else
+				$strSql = "SELECT A.* ".$strSqlFrom.$strSqlOrder." LIMIT 0,".$arAddParams["nTopCount"];
+		}
+		else if (is_set($arAddParams, "bDescPageNumbering"))
+		{
+			$db_res = $DB->Query("SELECT COUNT(A.ID) as CNT ".$strSqlFrom, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$iCnt = (($db_res && ($ar_res = $db_res->Fetch())) ? intval($ar_res["CNT"]) : 0 );
+			$db_res =  new CDBResult();
+			$db_res->NavQuery($strSql, $iCnt, $arAddParams);
+			return $db_res;
+		}
+		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
 	public static function GetListEx($arOrder = array("ID" => "ASC"), $arFilter=array(), $arAddParams = array())
@@ -258,8 +261,10 @@ class CAllVoteAnswer
 						$str = ($strNegative=="Y"?" VA.".$key." IS NULL OR NOT ":"")."(VA.".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(VA.".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(VA.".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -271,8 +276,10 @@ class CAllVoteAnswer
 						$str = ($strNegative=="Y"?" VQ.".$key." IS NULL OR NOT ":"")."(VQ.".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -284,8 +291,10 @@ class CAllVoteAnswer
 						$str = ($strNegative=="Y"?" V.".$key." IS NULL OR NOT ":"")."(V.".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;

@@ -119,21 +119,22 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод удаляет связь между пользователем и рабочей группой.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код связи.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет связь между пользователем и рабочей группой.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код связи.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID, $bSendExclude = false)
 	{
 		global $DB;
@@ -251,29 +252,29 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает параметры связи между пользователем и группой.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код связи.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив параметров связи с ключами:<br> ID - код записи,<br> USER_ID - код
-	 * пользователя,<br> GROUP_ID - код группы,<br> ROLE - роль пользователя в
-	 * группе: SONET_ROLES_MODERATOR - модератор, SONET_ROLES_USER - пользователь, SONET_ROLES_BAN -
-	 * черный список, SONET_ROLES_REQUEST - запрос на вступление,<br> DATE_CREATE - дата
-	 * создания записи,<br> DATE_UPDATE - дата изменения записи,<br> INITIATED_BY_TYPE -
-	 * кем инициализирована связь: SONET_INITIATED_BY_USER - пользователем,
-	 * SONET_INITIATED_BY_GROUP - группой,<br> INITIATED_BY_USER_ID - код пользователя,
-	 * инициализировавшего связь,<br> MESSAGE - сообщение при запросе на
-	 * создание связи.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetByID.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает параметры связи между пользователем и группой.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код связи.
+	*
+	*
+	*
+	* @return array <p>Массив параметров связи с ключами:<br><b>ID</b> - код записи,<br><b>USER_ID</b>
+	* - код пользователя,<br><b>GROUP_ID</b> - код группы,<br><b>ROLE</b> - роль
+	* пользователя в группе: SONET_ROLES_MODERATOR - модератор, SONET_ROLES_USER -
+	* пользователь, SONET_ROLES_BAN - черный список, SONET_ROLES_REQUEST - запрос на
+	* вступление,<br><b>DATE_CREATE</b> - дата создания записи,<br><b>DATE_UPDATE</b> - дата
+	* изменения записи,<br><b>INITIATED_BY_TYPE</b> - кем инициализирована связь:
+	* SONET_INITIATED_BY_USER - пользователем, <b>SONET_INITIATED_BY_GROUP</b> -
+	* группой,<br><b>INITIATED_BY_USER_ID</b> - код пользователя, инициализировавшего
+	* связь,<br><b>MESSAGE</b> - сообщение при запросе на создание связи.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetByID.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -301,35 +302,51 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает роль пользователя в группе. В случае повторных вызовов метод не порождает дополнительных запросов к базе данных.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param mixed $groupID  Код группы, либо (с версии 8.6.4) массив кодов групп.
-	 *
-	 *
-	 *
-	 * @return mixed <p>Если в параметре groupID передано скалярное значение, то
-	 * возвращается одно из следующих значений:<br> SONET_ROLES_MODERATOR -
-	 * пользователь является модератором группы,<br> SONET_ROLES_USER -
-	 * пользователь является членом группы,<br> SONET_ROLES_BAN - пользователь в
-	 * черном списке группы,<br> SONET_ROLES_REQUEST - направлен запрос на
-	 * вступление в группу,<br> SONET_ROLES_OWNER - пользователь является
-	 * владельцем группы,<br> false - пользователь не связан с данной
-	 * группой.</p><p>Если (с версии 8.6.4) в параметре groupID передан массив
-	 * кодов групп, то возвращается ассоциативный массив, ключами для
-	 * которого являются коды групп, а значения соответствуют
-	 * вышеописанной логике. </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetUserRole.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает роль пользователя в группе. В случае повторных вызовов метод не порождает дополнительных запросов к базе данных.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param mixed $groupID  Код группы, либо (с версии 8.6.4) массив кодов групп.
+	*
+	*
+	*
+	* @return mixed <p>Если в параметре groupID передано скалярное значение, то
+	* возвращается одно из следующих значений:<br><b>SONET_ROLES_MODERATOR</b> -
+	* пользователь является модератором группы,<br><b>SONET_ROLES_USER</b> -
+	* пользователь является членом группы,<br><b>SONET_ROLES_BAN</b> -
+	* пользователь в черном списке группы,<br><b>SONET_ROLES_REQUEST</b> - направлен
+	* запрос на вступление в группу,<br><b>SONET_ROLES_OWNER</b> - пользователь
+	* является владельцем группы,<br><b>false</b> - пользователь не связан с
+	* данной группой.</p> <p>Если (с версии 8.6.4) в параметре groupID передан
+	* массив кодов групп, то возвращается ассоциативный массив,
+	* ключами для которого являются коды групп, а значения
+	* соответствуют вышеописанной логике. <a name="examples"></a> </p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Возвращает значение констант -  $Role вернет "E", т.е. значение SONET_ROLES_MODERATOR.
+	* 
+	* 
+	* &lt;? 
+	*     // $UserID - модератор группы $GroupID
+	*     $Role=CSocNetUserToGroup::GetUserRole($UserID,$GroupID);
+	*     echo $Role;
+	* ?&gt;
+	* 
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetUserRole.php
+	* @author Bitrix
+	*/
 	public static function GetUserRole($userID, $groupID)
 	{
 		global $DB;
@@ -502,30 +519,39 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод отправляет запрос от пользователя на вступление в рабочую группу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, отправляющего запрос.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param string $message  Дополнительный текст запроса.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SendRequestToBeMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод отправляет запрос от пользователя на вступление в рабочую группу.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, отправляющего запрос.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param string $message  Дополнительный текст запроса.
+	*
+	*
+	*
+	* @param text $RequestConfirmUrl = "" Ссылка на подтверждение вступления в группу.
+	*
+	*
+	*
+	* @param bool $bAutoSubscribe = true Флаг автоподписки на пользователя. Необязательный параметр. По
+	* умолчанию равен true.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SendRequestToBeMember.php
+	* @author Bitrix
+	*/
 	public static function SendRequestToBeMember($userID, $groupID, $message, $RequestConfirmUrl = "", $bAutoSubscribe = true)
 	{
 		global $APPLICATION;
@@ -594,8 +620,29 @@ class CAllSocNetUserToGroup
 				CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 			}
 		}
-		elseif(strlen(trim($RequestConfirmUrl)) > 0)
+		elseif (
+			strlen(trim($RequestConfirmUrl)) > 0
+			&& CModule::IncludeModule("im")
+		)
 		{
+			static $serverName;
+			if (!$serverName)
+			{
+				$dbSite = CSite::GetByID(SITE_ID);
+				$arSite = $dbSite->Fetch();
+				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
+				if (strlen($serverName) <= 0)
+				{
+					if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
+						$serverName = SITE_SERVER_NAME;
+					else
+						$serverName = COption::GetOptionString("main", "server_name", "");
+					if (strlen($serverName) <=0)
+						$serverName = $_SERVER["SERVER_NAME"];
+				}
+				$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".$serverName;
+			}
+
 			// send sonet system messages to owner and (may be) moderators to accept or refuse request
 			if ($arGroup["INITIATE_PERMS"] == SONET_ROLES_OWNER)
 				$FilterRole = SONET_ROLES_OWNER;
@@ -615,80 +662,56 @@ class CAllSocNetUserToGroup
 			);
 			if ($dbRequests)
 			{
-				$emailTemplate = 'SONET_REQUEST_GROUP';
-
-				$rsUser = CUser::GetByID($userID);
-				$arUser = $rsUser->GetNext();
-				$userName = $arUser["NAME"]." ".$arUser["LAST_NAME"];
-
-				$groupName = $arGroup["NAME"];
-
 				while ($arRequests = $dbRequests->GetNext())
 				{
-					if (CModule::IncludeModule("im"))
-					{
-						$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
-						$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
-						$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
-						$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
-						
-						$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRequests["USER_ID"]);
-						$groupUrl = $arTmp["URLS"]["GROUP_URL"];
+					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
+					$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
+					$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
+					$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
+					
+					$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRequests["USER_ID"]);
+					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
-						$arMessageFields = array(
-							"TO_USER_ID" => $arRequests["USER_ID"],
-							"FROM_USER_ID" => $userID,
-							"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
-							"NOTIFY_MODULE" => "socialnetwork",
-							"NOTIFY_EVENT" => "invite_group_btn",
-							"NOTIFY_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID)."|".$arRequests["USER_ID"],
-							"NOTIFY_SUB_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID),
-							"NOTIFY_TITLE" => str_replace(
-								"#GROUP_NAME#", 
-								$groupName,
-								GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+					$arMessageFields = array(
+						"TO_USER_ID" => $arRequests["USER_ID"],
+						"FROM_USER_ID" => $userID,
+						"NOTIFY_TYPE" => IM_NOTIFY_CONFIRM,
+						"NOTIFY_MODULE" => "socialnetwork",
+						"NOTIFY_EVENT" => "invite_group_btn",
+						"NOTIFY_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID)."|".$arRequests["USER_ID"],
+						"NOTIFY_SUB_TAG" => "SOCNET|REQUEST_GROUP|".intval($userID)."|".$groupID."|".intval($ID),
+						"NOTIFY_TITLE" => str_replace(
+							"#GROUP_NAME#", 
+							$arGroup["NAME"],
+							GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+						),
+						"NOTIFY_MESSAGE" => str_replace(
+							array(
+								"#TEXT#", 
+								"#GROUP_NAME#"
+							), 
+							array(
+								$message, 
+								"<a href=\"".$groupUrl."\" class=\"bx-notifier-item-action\">".$arGroup["NAME"]."</a>"
 							),
-							"NOTIFY_MESSAGE" => str_replace(
-								array(
-									"#TEXT#", 
-									"#GROUP_NAME#"
-								), 
-								array(
-									$message, 
-									"<a href=\"".$groupUrl."\" class=\"bx-notifier-item-action\">".$groupName."</a>"
-								),
-								(empty($message)
-									? GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
-									: GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT")
-								)
-							),
-							"NOTIFY_BUTTONS" => Array(
-								Array("TITLE" => GetMessage("SONET_UG_REQUEST_CONFIRM"), "VALUE" => "Y", "TYPE" => "accept"),
-								Array("TITLE" => GetMessage("SONET_UG_REQUEST_REJECT"), "VALUE" => "N", "TYPE" => "cancel"),
-							),
-						);
+							(empty($message)
+								? GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT_EMPTY")
+								: GetMessage("SONET_UG_REQUEST_CONFIRM_TEXT")
+							)
+						),
+						"NOTIFY_BUTTONS" => Array(
+							Array("TITLE" => GetMessage("SONET_UG_REQUEST_CONFIRM"), "VALUE" => "Y", "TYPE" => "accept"),
+							Array("TITLE" => GetMessage("SONET_UG_REQUEST_REJECT"), "VALUE" => "N", "TYPE" => "cancel"),
+						),
+					);
 
-						$dbSite = CSite::GetByID(SITE_ID);
-						$arSite = $dbSite->Fetch();
-						$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
-						if (strlen($serverName) <= 0)
-						{
-							if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
-								$serverName = SITE_SERVER_NAME;
-							else
-								$serverName = COption::GetOptionString("main", "server_name", "");
-							if (strlen($serverName) <=0)
-								$serverName = $_SERVER["SERVER_NAME"];
-						}
-						$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".$serverName;
-						$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
+					$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
 
-						$arMessageFields["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE"];
-						$arMessageFields["NOTIFY_MESSAGE_OUT"] .= "\n\n".GetMessage("SONET_UG_GROUP_LINK").$groupUrl;
-						$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage("SONET_UG_REQUEST_CONFIRM_REJECT").": ".$RequestConfirmUrl;
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE"];
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] .= "\n\n".GetMessage("SONET_UG_GROUP_LINK").$groupUrl;
+					$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage("SONET_UG_REQUEST_CONFIRM_REJECT").": ".$RequestConfirmUrl;
 
-						CIMNotify::Add($arMessageFields);
-					}
+					CIMNotify::Add($arMessageFields);
 				}
 			}
 		}
@@ -698,34 +721,39 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Отправляет пользователю предложение присоединиться к рабочей группе.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $senderID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, которому направляется предложение.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param int $message  Дополнительный текст предложения.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SendRequestToJoinGroup.php
-	 * @author Bitrix
-	 */
+	* <p>Отправляет пользователю предложение присоединиться к рабочей группе.</p>
+	*
+	*
+	*
+	*
+	* @param int $senderID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, которому направляется предложение.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param string $message  Дополнительный текст предложения.
+	*
+	*
+	*
+	* @param bool $bMail = true Флаг отправки на e-mail. Необязательный параметр. По умолчанию равен
+	* true .
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SendRequestToJoinGroup.php
+	* @author Bitrix
+	*/
 	public static function SendRequestToJoinGroup($senderID, $userID, $groupID, $message, $bMail = true)
 	{
 		global $APPLICATION;
@@ -867,30 +895,35 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод служит для принятия запросов на вступление в группу.</p> <p><b>Примечание</b>: возможное примечание.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/ConfirmRequestToBeMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для принятия запросов на вступление в группу.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
+	*
+	*
+	*
+	* @param bool $bAutoSubscribe = true Флаг автоподписки на события пользователя. Необязательный
+	* параметр. По умолчанию равен true.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/ConfirmRequestToBeMember.php
+	* @author Bitrix
+	*/
 	public static function ConfirmRequestToBeMember($userID, $groupID, $arRelationID, $bAutoSubscribe = true)
 	{
 		global $APPLICATION, $DB;
@@ -974,7 +1007,7 @@ class CAllSocNetUserToGroup
 					
 				if (CModule::IncludeModule("im"))
 				{
-					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 					$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 					$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 					$arTmp = CSocNetLogTools::ProcessPath(
@@ -986,8 +1019,8 @@ class CAllSocNetUserToGroup
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -1048,30 +1081,30 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод служит для отклонения запросов на вступление в группу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/RejectRequestToBeMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для отклонения запросов на вступление в группу.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/RejectRequestToBeMember.php
+	* @author Bitrix
+	*/
 	public static function RejectRequestToBeMember($userID, $groupID, $arRelationID)
 	{
 		global $APPLICATION, $DB;
@@ -1162,27 +1195,33 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод служит для принятия предложения вступить в группу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $targetUserID  Код пользователя, которому было направлено предложение на
-	 * вступление в группу и который принимает это предложение.
-	 *
-	 *
-	 *
-	 * @param int $relationID  Код связи между группой и пользователем.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UserConfirmRequestToBeMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для принятия предложения вступить в группу.</p>
+	*
+	*
+	*
+	*
+	* @param int $targetUserID  Код пользователя, которому было направлено предложение на
+	* вступление в группу и который принимает это предложение. До
+	* версии 11.5.4.
+	*
+	*
+	*
+	* @param int $relationID  Код пользователя, которому было направлено предложение на
+	* вступление в группу и который принимает это предложение.
+	*
+	*
+	*
+	* @param bool $bAutoSubscribe = true Код связи между группой и пользователем.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UserConfirmRequestToBeMember.php
+	* @author Bitrix
+	*/
 	public static function UserConfirmRequestToBeMember($targetUserID, $relationID, $bAutoSubscribe = true)
 	{
 		global $APPLICATION;
@@ -1233,7 +1272,7 @@ class CAllSocNetUserToGroup
 				{
 					CIMNotify::DeleteByTag("SOCNET|INVITE_GROUP|".intval($targetUserID)."|".intval($relationID));
 
-					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+					$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 					$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 					$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 					$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $arResult["GROUP_ID"], $groupUrlTemplate);
@@ -1302,27 +1341,29 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод служит для отклонения предложения вступить в группу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $targetUserID  Код пользователя, которому было направлено предложение на
-	 * вступление в группу и который отклоняет это предложение.
-	 *
-	 *
-	 *
-	 * @param int $relationID  Код связи между группой и пользователем.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UserRejectRequestToBeMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для отклонения предложения вступить в группу.</p>
+	*
+	*
+	*
+	*
+	* @param int $targetUserID  Код пользователя, которому было направлено предложение на
+	* вступление в группу и который отклоняет это предложение. До
+	* версии 11.5.4.
+	*
+	*
+	*
+	* @param int $relationID  Код пользователя, которому было направлено предложение на
+	* вступление в группу и который отклоняет это предложение.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UserRejectRequestToBeMember.php
+	* @author Bitrix
+	*/
 	public static function UserRejectRequestToBeMember($targetUserID, $relationID)
 	{
 		global $APPLICATION;
@@ -1423,35 +1464,35 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод снимает пользователей с должности модераторов группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между группой и пользователями.
-	 *
-	 *
-	 *
-	 * @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
-	 * действие.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/TransferModerator2Member.php
-	 * @author Bitrix
-	 */
+	* <p>Метод снимает пользователей с должности модераторов группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
+	*
+	*
+	*
+	* @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
+	* действие.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/TransferModerator2Member.php
+	* @author Bitrix
+	*/
 	public static function TransferModerator2Member($userID, $groupID, $arRelationID, $currentUserIsAdmin)
 	{
 		global $APPLICATION, $DB;
@@ -1492,10 +1533,13 @@ class CAllSocNetUserToGroup
 		$arSuccessRelations = array();
 		$tmp_count = count($arRelationID);
 
-		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 		$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 		$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 		$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
+
+		if (CModule::IncludeModule("im"))
+			$bIMIncluded = true;
 
 		for ($i = 0; $i < $tmp_count; $i++)
 		{
@@ -1518,14 +1562,14 @@ class CAllSocNetUserToGroup
 			{
 				$arSuccessRelations[] = $arRelation;
 
-				if (CModule::IncludeModule("im"))
+				if ($bIMIncluded)
 				{
 					$arTmp = CSocNetLogTools::ProcessPath(array("GROUP_URL" => $groupUrl), $arRelation["USER_ID"]);
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -1582,35 +1626,35 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод назначает пользователей группы на должность модераторов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между группой и пользователями.
-	 *
-	 *
-	 *
-	 * @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
-	 * действие.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/TransferMember2Moderator.php
-	 * @author Bitrix
-	 */
+	* <p>Метод назначает пользователей группы на должность модераторов.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
+	*
+	*
+	*
+	* @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
+	* действие.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/TransferMember2Moderator.php
+	* @author Bitrix
+	*/
 	public static function TransferMember2Moderator($userID, $groupID, $arRelationID, $currentUserIsAdmin)
 	{
 		global $APPLICATION, $DB;
@@ -1651,7 +1695,7 @@ class CAllSocNetUserToGroup
 		$arSuccessRelations = array();
 		$tmp_count = count($arRelationID);
 		
-		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 		$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 		$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 		$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
@@ -1683,8 +1727,8 @@ class CAllSocNetUserToGroup
 					$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 					if (
-						strpos($url, "http://") === 0
-						|| strpos($url, "https://") === 0
+						strpos($groupUrl, "http://") === 0
+						|| strpos($groupUrl, "https://") === 0
 					)
 						$serverName = "";
 					else
@@ -1743,35 +1787,35 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод заносит пользователя в черный список группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между группой и пользователями.
-	 *
-	 *
-	 *
-	 * @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
-	 * действие.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/BanMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод заносит пользователя в черный список группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
+	*
+	*
+	*
+	* @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
+	* действие.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/BanMember.php
+	* @author Bitrix
+	*/
 	public static function BanMember($userID, $groupID, $arRelationID, $currentUserIsAdmin)
 	{
 		global $APPLICATION, $DB;
@@ -1858,35 +1902,35 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод исключает пользователя из черного списка группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, осуществляющего действие.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @param array $arRelationID  Массив кодов связей между группой и пользователями.
-	 *
-	 *
-	 *
-	 * @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
-	 * действие.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного выполнения метода и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UnBanMember.php
-	 * @author Bitrix
-	 */
+	* <p>Метод исключает пользователя из черного списка группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, осуществляющего действие.
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
+	*
+	*
+	*
+	* @param bool $currentUserIsAdmin  Флаг, является ли администратором пользователь, осуществляющий
+	* действие.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного выполнения метода и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/UnBanMember.php
+	* @author Bitrix
+	*/
 	public static function UnBanMember($userID, $groupID, $arRelationID, $currentUserIsAdmin)
 	{
 		global $APPLICATION, $DB;
@@ -2103,7 +2147,7 @@ class CAllSocNetUserToGroup
 
 		if (CModule::IncludeModule("im"))
 		{
-			$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+			$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 			$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 			$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 			$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $groupID, $groupUrlTemplate);
@@ -2116,8 +2160,8 @@ class CAllSocNetUserToGroup
 			$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 			if (
-				strpos($url, "http://") === 0
-				|| strpos($url, "https://") === 0
+				strpos($groupUrl, "http://") === 0
+				|| strpos($groupUrl, "https://") === 0
 			)
 				$serverName = "";
 			else
@@ -2138,7 +2182,7 @@ class CAllSocNetUserToGroup
 				"NOTIFY_MESSAGE_OUT" => str_replace(
 					"#NAME#",
 					$arGroup["NAME"],
-					GetMessage("SONET_UG_OWNER2MEMBER_MESSAGE")." (".$serverName.$url.")"
+					GetMessage("SONET_UG_OWNER2MEMBER_MESSAGE")." (".$serverName.$groupUrl.")"
 				)
 			);
 
@@ -2152,8 +2196,8 @@ class CAllSocNetUserToGroup
 			$groupUrl = $arTmp["URLS"]["GROUP_URL"];
 
 			if (
-				strpos($url, "http://") === 0
-				|| strpos($url, "https://") === 0
+				strpos($groupUrl, "http://") === 0
+				|| strpos($groupUrl, "https://") === 0
 			)
 				$serverName = "";
 			else
@@ -2174,7 +2218,7 @@ class CAllSocNetUserToGroup
 				"NOTIFY_MESSAGE_OUT" => str_replace(
 					"#NAME#",
 					$arGroup["NAME"],
-					GetMessage("SONET_UG_MEMBER2OWNER_MESSAGE")." (".$serverName.$url.")"
+					GetMessage("SONET_UG_MEMBER2OWNER_MESSAGE")." (".$serverName.$groupUrl.")"
 				)
 			);
 
@@ -2207,25 +2251,25 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Удаляет связь между пользователем и рабочей группой.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param int $groupID  Код рабочей группы.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного удаления и false - в противном случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/DeleteRelation.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет связь между пользователем и рабочей группой.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param int $groupID  Код рабочей группы. </ht
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/DeleteRelation.php
+	* @author Bitrix
+	*/
 	public static function DeleteRelation($userID, $groupID)
 	{
 		global $APPLICATION;
@@ -2301,66 +2345,66 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод возвращает массив прав пользователя на действия в рамках текущей группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param array $arGroup  Массив, содержащий параметры группы. Этот массив возвращается
-	 * методом <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetByID.php">CSocNetGroup::GetByID</a> или
-	 * может быть получен с памощью метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a>.
-	 *
-	 *
-	 *
-	 * @param bool $bCurrentUserIsAdmin  Флаг, является ли пользователь администратором модуля
-	 * социальной сети или администратором сайта.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается массив вида:<br> array<br> (<br> [UserRole] =&gt; A // роль
-	 * пользователя в группе <br> [UserIsMember] =&gt; true // является ли
-	 * пользователь членом группы <br> [UserIsOwner] =&gt; false // является ли
-	 * пользователь владельцем группы <br> [UserCanInitiate] =&gt; false // может ли
-	 * пользователь принимать новых членов в группу <br> [UserCanViewGroup] =&gt; true
-	 * // может ли пользователь видеть группу <br> [UserCanAutoJoinGroup] =&gt; true //
-	 * может ли пользователь вступить в группу без одобрения <br>
-	 * [UserCanModifyGroup] =&gt; false // может ли пользователь изменять параметры
-	 * группы <br> [UserCanModerateGroup] =&gt; true // является ли пользователь
-	 * модератором группы <br> [UserCanSpamGroup] =&gt; true // может ли пользователь
-	 * отправлять сообщения в чат всем участникам <br> )</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Получим массив прав текущего пользователя на группу $ID
-	 * $arGroup = CSocNetGroup::GetByID($ID); 
-	 * $arCurrentUserPerms = CSocNetUserToGroup::InitUserPerms(
-	 *     $GLOBALS["USER"]-&gt;GetID(),
-	 *     $arGroup,
-	 *     CSocNetUser::IsCurrentUserModuleAdmin()
-	 * );
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsCurrentUserModuleAdmin.php">CSocNetUser::IsCurrentUserModuleAdmin</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/InitUserPerms.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает массив прав пользователя на действия в рамках текущей группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param array $arGroup  Массив, содержащий параметры группы. Этот массив возвращается
+	* методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/getbyid.php">CSocNetGroup::GetByID</a> или
+	* может быть получен с памощью метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a>.
+	*
+	*
+	*
+	* @param bool $bCurrentUserIsAdmin  Флаг, является ли пользователь администратором модуля
+	* социальной сети или администратором сайта.
+	*
+	*
+	*
+	* @return array <p>Возвращается массив вида:<br> array<br> (<br> [UserRole] =&gt; A // роль
+	* пользователя в группе <br> [UserIsMember] =&gt; true // является ли
+	* пользователь членом группы <br> [UserIsOwner] =&gt; false // является ли
+	* пользователь владельцем группы <br> [UserCanInitiate] =&gt; false // может ли
+	* пользователь принимать новых членов в группу <br> [UserCanViewGroup] =&gt; true
+	* // может ли пользователь видеть группу <br> [UserCanAutoJoinGroup] =&gt; true //
+	* может ли пользователь вступить в группу без одобрения <br>
+	* [UserCanModifyGroup] =&gt; false // может ли пользователь изменять параметры
+	* группы <br> [UserCanModerateGroup] =&gt; true // является ли пользователь
+	* модератором группы <br> [UserCanSpamGroup] =&gt; true // может ли пользователь
+	* отправлять сообщения в чат всем участникам <br> )</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Получим массив прав текущего пользователя на группу $ID
+	* $arGroup = CSocNetGroup::GetByID($ID); 
+	* $arCurrentUserPerms = CSocNetUserToGroup::InitUserPerms(
+	*     $GLOBALS["USER"]-&gt;GetID(),
+	*     $arGroup,
+	*     CSocNetUser::IsCurrentUserModuleAdmin()
+	* );
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/iscurrentusermoduleadmin.php">CSocNetUser::IsCurrentUserModuleAdmin</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/InitUserPerms.php
+	* @author Bitrix
+	*/
 	public static function InitUserPerms($userID, $arGroup, $bCurrentUserIsAdmin)
 	{
 		global $arSocNetAllowedInitiatePerms;
@@ -2527,22 +2571,22 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод проверяет, есть ли новые изменения в привязке пользователя к рабочим группам.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если есть ли новые изменения в привязке пользователя к
-	 * рабочим группам. Иначе - False.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SpeedFileExists.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, существуют ли приглашения данного пользователя в группы.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @return bool <p>True, если есть приглашения пользователя к рабочим группам. Иначе
+	* - False.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/SpeedFileExists.php
+	* @author Bitrix
+	*/
 	public static function SpeedFileExists($userID)
 	{
 		global $CACHE_MANAGER;
@@ -2580,7 +2624,9 @@ class CAllSocNetUserToGroup
 				else
 					self::RejectRequestToBeMember($GLOBALS["USER"]->GetID(), $arTag[3], array($arTag[4]));
 
-				CIMNotify::DeleteBySubTag("SOCNET|REQUEST_GROUP|".$arTag[2]."|".$arTag[3]."|".$arTag[4]);
+				if (CModule::IncludeModule('im'))
+					CIMNotify::DeleteBySubTag("SOCNET|REQUEST_GROUP|".$arTag[2]."|".$arTag[3]."|".$arTag[4]);
+
 				return true;
 			}			
 		}
@@ -2689,7 +2735,7 @@ class CAllSocNetUserToGroup
 			"NOTIFY_TAG" => "SOCNET|".$notify_tag."|".intval($arNotifyParams["USER_ID"])."|".intval($arNotifyParams["GROUP_ID"])."|".intval($arNotifyParams["RELATION_ID"]),
 		);
 
-		$groups_path = COption::GetOptionString("socialnetwork", "workgroup_page", SITE_DIR."workgroups/");
+		$groups_path = COption::GetOptionString("socialnetwork", "workgroups_page", SITE_DIR."workgroups/");
 		$group_url_template = str_replace(
 			$groups_path, 
 			"#GROUPS_PATH#", 

@@ -23,7 +23,7 @@ class CIMNotify
 		return CIMMessenger::Add($arFields);
 	}
 
-	public function GetNotifyList($arParams)
+	public function GetNotifyList($arParams = array())
 	{
 		global $DB;
 
@@ -97,9 +97,6 @@ class CIMNotify
 			$arGetUsers = Array();
 			while ($arRes = $dbRes->Fetch())
 			{
-				if ($arRes['NOTIFY_READ'] == 'N')
-					continue;
-
 				if ($this->bHideLink)
 					$arRes['HIDE_LINK'] = 'Y';
 
@@ -166,6 +163,7 @@ class CIMNotify
 					M.NOTIFY_BUTTONS,
 					M.NOTIFY_TAG,
 					M.NOTIFY_SUB_TAG,
+					M.NOTIFY_READ,
 					$this->user_id TO_USER_ID,
 					M.AUTHOR_ID FROM_USER_ID
 				FROM b_im_message M
@@ -246,21 +244,9 @@ class CIMNotify
 	{
 		global $DB;
 
-		$strSql ="
+		$strSqlRelation ="
 			SELECT
-				M.ID,
-				M.CHAT_ID,
-				M.MESSAGE,
-				M.MESSAGE_OUT,
-				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
-				M.NOTIFY_TYPE,
-				M.NOTIFY_MODULE,
-				M.NOTIFY_EVENT,
-				M.NOTIFY_TITLE,
-				M.NOTIFY_BUTTONS,
-				M.NOTIFY_TAG,
-				M.NOTIFY_SUB_TAG,
-				M.EMAIL_TEMPLATE,
+				R.CHAT_ID,
 				R.LAST_SEND_ID,
 				R.USER_ID TO_USER_ID,
 				U1.LOGIN TO_USER_LOGIN,
@@ -269,24 +255,49 @@ class CIMNotify
 				U1.SECOND_NAME TO_USER_SECOND_NAME,
 				U1.EMAIL TO_USER_EMAIL,
 				U1.ACTIVE TO_USER_ACTIVE,
-				U1.LID TO_USER_LID,
-				M.AUTHOR_ID FROM_USER_ID,
-				U2.LOGIN FROM_USER_LOGIN,
-				U2.NAME FROM_USER_NAME,
-				U2.LAST_NAME FROM_USER_LAST_NAME,
-				U2.SECOND_NAME FROM_USER_SECOND_NAME
+				U1.LID TO_USER_LID
 			FROM b_im_relation R
-			INNER JOIN b_im_message M ON M.ID > R.LAST_SEND_ID AND M.CHAT_ID = R.CHAT_ID
 			LEFT JOIN b_user U1 ON U1.ID = R.USER_ID
-			LEFT JOIN b_user U2 ON U2.ID = M.AUTHOR_ID
 			WHERE R.MESSAGE_TYPE = '".IM_MESSAGE_SYSTEM."' AND R.STATUS < ".IM_STATUS_NOTIFY."
-			".($order == "DESC"? "ORDER BY DATE_CREATE DESC, ID DESC": "")."
 		";
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$dbResRelation = $DB->Query($strSqlRelation, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$arNotify = Array();
-		while ($arRes = $dbRes->Fetch())
-			$arNotify[$arRes['ID']] = $arRes;
+		while ($arResRelation = $dbResRelation->Fetch())
+		{
+			$strSql ="
+				SELECT
+					M.ID,
+					M.CHAT_ID,
+					M.MESSAGE,
+					M.MESSAGE_OUT,
+					".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
+					M.NOTIFY_TYPE,
+					M.NOTIFY_MODULE,
+					M.NOTIFY_EVENT,
+					M.NOTIFY_TITLE,
+					M.NOTIFY_BUTTONS,
+					M.NOTIFY_TAG,
+					M.NOTIFY_SUB_TAG,
+					M.EMAIL_TEMPLATE,
+					M.AUTHOR_ID FROM_USER_ID,
+					U2.LOGIN FROM_USER_LOGIN,
+					U2.NAME FROM_USER_NAME,
+					U2.LAST_NAME FROM_USER_LAST_NAME,
+					U2.SECOND_NAME FROM_USER_SECOND_NAME
+				FROM b_im_message M
+				LEFT JOIN b_user U2 ON U2.ID = M.AUTHOR_ID
+				WHERE M.ID > ".intval($arResRelation['LAST_SEND_ID'])." AND M.CHAT_ID = ".intval($arResRelation['CHAT_ID'])."
+				".($order == "DESC"? "ORDER BY DATE_CREATE DESC, ID DESC": "")."
+			";
+			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			while ($arRes = $dbRes->Fetch())
+			{
+				$arRes = array_merge($arRes, $arResRelation);
+				$arNotify[$arRes['ID']] = $arRes;
+			}
+		}
 
 		return $arNotify;
 	}
@@ -350,6 +361,7 @@ class CIMNotify
 			'text' => str_replace('#BR#', '<br>', $CCTP->convertText($arFields['MESSAGE'])),
 			'tag' => strlen($arFields['NOTIFY_TAG'])>0? md5($arFields['NOTIFY_TAG']): '',
 			'original_tag' => $arFields['NOTIFY_TAG'],
+			'read' => $arFields['NOTIFY_READ'],
 			'settingName' => $arFields['NOTIFY_MODULE'].'|'.$arFields['NOTIFY_EVENT']
 		);
 		if (!isset($arFields["FROM_USER_DATA"]))
@@ -450,7 +462,10 @@ class CIMNotify
 
 		$ssqlLastId = "";
 		if (!is_null($lastId))
-			$ssqlLastId = "LAST_ID = ".intval($lastId).", LAST_SEND_ID = ".intval($lastId).", ";
+		{
+			$ssqlLastId = "LAST_ID = (case when LAST_ID < ".intval($lastId)." then ".intval($lastId)." else LAST_ID end),";
+			$ssqlLastId .= "LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastId)." then ".intval($lastId)." else LAST_SEND_ID end),";
+		}
 
 		$strSql = "UPDATE b_im_relation SET ".$ssqlLastId." STATUS = ".IM_STATUS_READ." WHERE CHAT_ID = ".intval($chatId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -467,8 +482,8 @@ class CIMNotify
 
 		$strSql = "
 		UPDATE b_im_relation SET
-			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then '".intval($lastSendId)."' else LAST_SEND_ID end),
-			STATUS = '".IM_STATUS_NOTIFY."'
+			LAST_SEND_ID = (case when LAST_SEND_ID < ".intval($lastSendId)." then ".intval($lastSendId)." else LAST_SEND_ID end),
+			STATUS = ".IM_STATUS_NOTIFY."
 		WHERE CHAT_ID = ".intval($chatId);
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 

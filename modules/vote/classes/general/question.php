@@ -108,8 +108,7 @@ class CAllVoteQuestion
 		if (!CVoteQuestion::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeVoteQuestionAdd *******************/
-		$events = GetModuleEvents("vote", "onBeforeVoteQuestionAdd");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionAdd", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
 		}
@@ -135,9 +134,9 @@ class CAllVoteQuestion
 		$ID = $DB->Add("b_vote_question", $arFields/*, $arBinds*/);
 
 /***************** Event onAfterVoteQuestionAdd ********************/
-		$events = GetModuleEvents("vote", "onAfterVoteQuestionAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteQuestionAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+
 /***************** /Event ******************************************/
 		return $ID;
 	}
@@ -153,8 +152,7 @@ class CAllVoteQuestion
 		if ($ID <= 0 || !CVoteQuestion::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 /***************** Event onBeforeVoteQuestionUpdate ****************/
-		$events = GetModuleEvents("vote", "onBeforeVoteQuestionUpdate");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionUpdate", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields)) === false)
 				return false;
 		}
@@ -187,8 +185,7 @@ class CAllVoteQuestion
 
 		unset($GLOBALS["VOTE_CACHE"]["QUESTION"][$ID]);
 /***************** Event onAfterVoteQuestionUpdate *****************/
-		$events = GetModuleEvents("vote", "onAfterVoteQuestionUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteQuestionUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Event ******************************************/
 		return $ID;
@@ -356,8 +353,10 @@ class CAllVoteQuestion
 						$str = ($strNegative=="Y"?" VQ.".$key." IS NULL OR NOT ":"")."(VQ.".$key." ".$strOperation." ".intVal($val).")";
 						if ($strOperation == "IN")
 						{
-							$val = array_unique((is_array($val) ? $val : explode(",", $val)), SORT_NUMERIC);
-							$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".$DB->ForSql(implode(",", $val))."))";
+							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
+							if (!empty($val)) {
+								$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".implode(",", $val)."))";
+							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -410,8 +409,7 @@ class CAllVoteQuestion
 		global $DB, $CACHE_MANAGER;
 		$err_mess = (CVoteQuestion::err_mess())."<br>Function: Delete<br>Line: ";
 /***************** Event onBeforeVoteQuestionDelete ****************/
-		$events = GetModuleEvents("vote", "onBeforeVoteQuestionDelete");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionDelete", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$VOTE_ID)) === false)
 				return false;
 		}
@@ -462,8 +460,7 @@ class CAllVoteQuestion
 /***************** Cleaning cache/**********************************/
 
 /***************** Event onAfterForumDelete ************************/
-		$events = GetModuleEvents("vote", "onAfterVoteQuestionDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteQuestionDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $VOTE_ID));
 /***************** /Event ******************************************/
 		return true;

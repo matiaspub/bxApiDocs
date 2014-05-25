@@ -27,48 +27,48 @@ class CAllFormResult extends CFormResult_old
 
 	
 	/**
-	 * <p>Возвращает массив, содержащий ряд параметров файла, загруженного в поле <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "image" или "file" для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. В случае успеха функция возвратит массив, в противном случае - "false".</p> <p> Структура возвращаемого массива: </p> <pre class="syntax">Array ( [USER_FILE_ID] =&gt; ID файла [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - если тип ответа "image"; "N" - если тип ответа "file" [USER_FILE_HASH] =&gt; хэш файла (если тип ответа "file") [USER_FILE_SUFFIX] =&gt; суффикс к расширению файла (если тип ответа "file") [USER_FILE_SIZE] =&gt; размер файла в байтах )</pre>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * $ANSWER_ID = 148; // ID ответа
-	 * 
-	 * // получим данные по изображению
-	 * $arImage = <b>CFormResult::GetFileByAnswerID</b>($RESULT_ID, $ANSWER_ID);
-	 * 
-	 * // выведем изображение
-	 * echo CFile::ShowImage($arImage["USER_FILE_ID"], 0, 0, "border=0", "", true);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getfilebyanswerid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив, содержащий ряд параметров файла, загруженного в поле <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> типа "image" или "file" для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. В случае успеха функция возвратит массив, в противном случае - "false".</p> <p> Структура возвращаемого массива: </p> <pre class="syntax">Array ( [USER_FILE_ID] =&gt; ID файла [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - если тип ответа "image"; "N" - если тип ответа "file" [USER_FILE_HASH] =&gt; хэш файла (если тип ответа "file") [USER_FILE_SUFFIX] =&gt; суффикс к расширению файла (если тип ответа "file") [USER_FILE_SIZE] =&gt; размер файла в байтах )</pre>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* $ANSWER_ID = 148; // ID ответа
+	* 
+	* // получим данные по изображению
+	* $arImage = <b>CFormResult::GetFileByAnswerID</b>($RESULT_ID, $ANSWER_ID);
+	* 
+	* // выведем изображение
+	* echo CFile::ShowImage($arImage["USER_FILE_ID"], 0, 0, "border=0", "", true);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getfilebyanswerid.php
+	* @author Bitrix
+	*/
 	public static function GetFileByAnswerID($RESULT_ID, $ANSWER_ID)
 	{
 		global $DB, $strError;
@@ -144,79 +144,79 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// create new event
 	
 	/**
-	 * <p>Создает событие в модуле "Статистика". Возвращает "true" в случае успеха, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param string $event1 = false Идентификатор типа события - event1.<br> Параметр необязательный. По
-	 * умолчанию - "false" (будет равен "form").
-	 *
-	 *
-	 *
-	 * @param string $event2 = false Идентификатор типа события - event2.<br> Параметр необязательный. По
-	 * умолчанию - "false" (будет равен символьному идентификатору
-	 * соответствующей веб-формы).
-	 *
-	 *
-	 *
-	 * @param string $event3 = false Дополнительный параметр события - event3.<br> Параметр
-	 * необязательный. По умолчанию - "false" (будет равен ссылке, ведущей на
-	 * административную страницу просмотра результата <i>result_id</i>).
-	 *
-	 *
-	 *
-	 * @param mixed $money = "" Денежная сумма события.<br> Параметр необязательный. По умолчанию -
-	 * "".
-	 *
-	 *
-	 *
-	 * @param mixed $currency = "" Трехсимвольный идентификатор валюты денежной суммы <i>money</i>.<br>
-	 * Параметр необязательный. По умолчанию - "".
-	 *
-	 *
-	 *
-	 * @param mixed $goto = "" Если в данный параметр передано значение "Y", при создании события
-	 * в модуле "Статистика" денежная сумма <i>money</i> будет зафиксирована с
-	 * отрицательным знаком.<br> Параметр необязательный. По умолчанию -
-	 * "N".
-	 *
-	 *
-	 *
-	 * @param mixed $chargeback = "N" 
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // создадим событие в модуле "Статистика"
-	 * if (<b>CFormResult::SetEvent</b>($RESULT_ID))
-	 * {
-	 *     echo "Событие успешно создано.";
-	 * }
-	 * else // ошибка
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setevent.php
-	 * @author Bitrix
-	 */
+	* <p>Создает событие в модуле "Статистика". Возвращает "true" в случае успеха, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param string $event1 = false Идентификатор типа события - event1.<br> Параметр необязательный. По
+	* умолчанию - "false" (будет равен "form").
+	*
+	*
+	*
+	* @param string $event2 = false Идентификатор типа события - event2.<br> Параметр необязательный. По
+	* умолчанию - "false" (будет равен символьному идентификатору
+	* соответствующей веб-формы).
+	*
+	*
+	*
+	* @param string $event3 = false Дополнительный параметр события - event3.<br> Параметр
+	* необязательный. По умолчанию - "false" (будет равен ссылке, ведущей на
+	* административную страницу просмотра результата <i>result_id</i>).
+	*
+	*
+	*
+	* @param mixed $money = "" Денежная сумма события.<br> Параметр необязательный. По умолчанию -
+	* "".
+	*
+	*
+	*
+	* @param mixed $currency = "" Трехсимвольный идентификатор валюты денежной суммы <i>money</i>.<br>
+	* Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @param mixed $goto = "" Если в данный параметр передано значение "Y", при создании события
+	* в модуле "Статистика" денежная сумма <i>money</i> будет зафиксирована с
+	* отрицательным знаком.<br> Параметр необязательный. По умолчанию -
+	* "N".
+	*
+	*
+	*
+	* @param mixed $chargeback = "N" Параметр необязательный. По умолчанию - "".
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // создадим событие в модуле "Статистика"
+	* if (<b>CFormResult::SetEvent</b>($RESULT_ID))
+	* {
+	*     echo "Событие успешно создано.";
+	* }
+	* else // ошибка
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setevent.php
+	* @author Bitrix
+	*/
 	public static function SetEvent($RESULT_ID, $IN_EVENT1=false, $IN_EVENT2=false, $IN_EVENT3=false, $money="", $currency="", $goto="", $chargeback="N")
 	{
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: SetEvent<br>Line: ";
@@ -267,125 +267,127 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	//returns data for questions and answers array
 	
 	/**
-	 * <p>Возвращает массив, описывающий значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> или значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает массив, содержащий <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>.</p> <p> Формат массива возвращаемый функцией: </p> <pre class="syntax">Array ( [<i>символьный идентификатор вопроса 1</i>] =&gt; массив описывающий ответы на вопрос 1 Array ( [0] =&gt; массив описывающий ответ 1 Array ( [RESULT_ID] =&gt; ID результата [FIELD_ID] =&gt; ID вопроса [SID] =&gt; символьный идентификатор вопроса [TITLE] =&gt; текст вопроса [TITLE_TYPE] =&gt; тип текста вопроса [text|html] [FILTER_TITLE] =&gt; заголовок поля фильтра [RESULTS_TABLE_TITLE] =&gt; заголовок столбца таблицы результатов [ANSWER_ID] =&gt; ID ответа [ANSWER_TEXT] =&gt; параметр ответа <font color="green">ANSWER_TEXT</font> [ANSWER_VALUE] =&gt; параметр ответа <font color="red">ANSWER_VALUE</font> [USER_TEXT] =&gt; текст введенный с клавиатуры [USER_DATE] =&gt; введенная дата (если FIELD_TYPE=date) [USER_FILE_ID] =&gt; ID файла (если FIELD_TYPE=[file|image]) [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - FIELD_TYPE=image; "N" - FIELD_TYPE=file [USER_FILE_HASH] =&gt; хэш файла (если FIELD_TYPE=file) [USER_FILE_SUFFIX] =&gt; суффикс к расширению файла (если FIELD_TYPE=file) [USER_FILE_SIZE] =&gt; размер файла (если FIELD_TYPE=[file|image]) [FIELD_TYPE] =&gt; тип ответа [FIELD_WIDTH] =&gt; ширина поля ответа [FIELD_HEIGHT] =&gt; высота поля ответа [FIELD_PARAM] =&gt; параметр поля ответа ) [1] =&gt; массив описывающий ответ 2 [2] =&gt; массив описывающий ответ 3 ... [N-1] =&gt; массив описывающий ответ N ) [<i>символьный идентификатор вопроса 2</i>] =&gt; массив описывающий ответы на вопрос 2 [<i>символьный идентификатор вопроса 3</i>] =&gt; массив описывающий ответы на вопрос 3 ... [<i>символьный идентификатор вопроса N</i>] =&gt; массив описывающий ответы на вопрос N )</pre>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID результата.
-	 *
-	 *
-	 *
-	 * @param array $field  Массив символьных идентификаторов вопросов или полей веб-формы,
-	 * значения которых необходимо получить.
-	 *
-	 *
-	 *
-	 * @param array &$result  Ссылка на массив <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">полей
-	 * результата</a>, а также некоторых <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">полей веб-формы</a> и <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">полей статуса</a>.
-	 * Структура данного массива: <pre>Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt;
-	 * время изменения результата [DATE_CREATE] =&gt; дата создания результата
-	 * [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат
-	 * (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании
-	 * результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат
-	 * [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID
-	 * статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок
-	 * статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание
-	 * статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в
-	 * котором находится результат [SID] =&gt; символьный идентификатор
-	 * веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения
-	 * веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип
-	 * описания веб-формы [text|html] )</pre>
-	 *
-	 *
-	 *
-	 * @param array &$answer  Ссылка на массив, описывающий значения ответов на вопросы или
-	 * значения полей веб-формы для указанного результата <i>result_id</i>.
-	 * Структура данного массива: <pre>Array ( [<i>символьный идентификатор
-	 * вопроса 1</i>] =&gt; массив описывающий ответы на вопрос 1 Array ( [<i>ID
-	 * ответа 1</i>] =&gt; массив описывающий ответ 1 Array ( [RESULT_ID] =&gt; ID
-	 * результата [FIELD_ID] =&gt; ID вопроса [SID] =&gt; символьный идентификатор
-	 * вопроса [TITLE] =&gt; текст вопроса [TITLE_TYPE] =&gt; тип текста вопроса [text|html]
-	 * [FILTER_TITLE] =&gt; заголовок поля фильтра [RESULTS_TABLE_TITLE] =&gt; заголовок
-	 * столбца таблицы результатов [ANSWER_ID] =&gt; ID ответа [ANSWER_TEXT] =&gt;
-	 * параметр ответа <font color="green">ANSWER_TEXT</font> [ANSWER_VALUE] =&gt; параметр ответа
-	 * <font color="red">ANSWER_VALUE</font> [USER_TEXT] =&gt; текст введенный с клавиатуры
-	 * [USER_DATE] =&gt; введенная дата (если FIELD_TYPE=date) [USER_FILE_ID] =&gt; ID файла
-	 * (FIELD_TYPE=[file|image]) [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - FIELD_TYPE=image;
-	 * "N" - FIELD_TYPE=file [USER_FILE_HASH] =&gt; хэш файла (если FIELD_TYPE=file) [USER_FILE_SUFFIX] =&gt;
-	 * суффикс к расширению файла (FIELD_TYPE=file) [USER_FILE_SIZE] =&gt; размер файла
-	 * (если FIELD_TYPE=[file|image]) [FIELD_TYPE] =&gt; тип ответа [FIELD_WIDTH] =&gt; ширина поля
-	 * ответа [FIELD_HEIGHT] =&gt; высота поля ответа [FIELD_PARAM] =&gt; параметр поля
-	 * ответа ) [<i>ID ответа 2</i>] =&gt; массив описывающий ответ 2 [<i>ID ответа
-	 * 3</i>] =&gt; массив описывающий ответ 3 ... [<i>ID ответа N</i>] =&gt; массив
-	 * описывающий ответ N ) [<i>символьный идентификатор вопроса 2</i>] =&gt;
-	 * массив описывающий ответы на вопрос 2 [<i>символьный идентификатор
-	 * вопроса 3</i>] =&gt; массив описывающий ответы на вопрос 3 ...
-	 * [<i>символьный идентификатор вопроса N</i>] =&gt; массив описывающий
-	 * ответы на вопрос N )</pre>
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * $arAnswer = <b>CFormResult::GetDataByID</b>(
-	 * 	$RESULT_ID, 
-	 * 	array("VS_INTEREST"),  // вопрос "Какие области знаний вас интересуют?" 
-	 * 	$arResult, 
-	 * 	$arAnswer2);
-	 * 
-	 * // выведем поля результата
-	 * echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем значения ответов
-	 * echo "&lt;pre&gt;"; print_r($arAnswer); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем значения ответов в несколько ином формате
-	 * echo "&lt;pre&gt;"; print_r($arAnswer2); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * 
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // получим данные по всем вопросам
-	 * $arAnswer = <b>CFormResult::GetDataByID</b>(
-	 * 	$RESULT_ID, 
-	 * 	array(), 
-	 * 	$arResult, 
-	 * 	$arAnswer2);
-	 * 
-	 * // выведем поля результата
-	 * echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем значения ответов
-	 * echo "&lt;pre&gt;"; print_r($arAnswer); echo "&lt;/pre&gt;";
-	 * 
-	 * // выведем значения ответов в несколько ином формате
-	 * echo "&lt;pre&gt;"; print_r($arAnswer2); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">Поля CFormResult</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив, описывающий значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> или значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает массив, содержащий <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>.</p> <p> Формат массива возвращаемый функцией: </p> <pre class="syntax">Array ( [<i>символьный идентификатор вопроса 1</i>] =&gt; массив описывающий ответы на вопрос 1 Array ( [0] =&gt; массив описывающий ответ 1 Array ( [RESULT_ID] =&gt; ID результата [FIELD_ID] =&gt; ID вопроса [SID] =&gt; символьный идентификатор вопроса [TITLE] =&gt; текст вопроса [TITLE_TYPE] =&gt; тип текста вопроса [text|html] [FILTER_TITLE] =&gt; заголовок поля фильтра [RESULTS_TABLE_TITLE] =&gt; заголовок столбца таблицы результатов [ANSWER_ID] =&gt; ID ответа [ANSWER_TEXT] =&gt; параметр ответа <font color="green">ANSWER_TEXT</font> [ANSWER_VALUE] =&gt; параметр ответа <font color="red">ANSWER_VALUE</font> [USER_TEXT] =&gt; текст введенный с клавиатуры [USER_DATE] =&gt; введенная дата (если FIELD_TYPE=date) [USER_FILE_ID] =&gt; ID файла (если FIELD_TYPE=[file|image]) [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - FIELD_TYPE=image; "N" - FIELD_TYPE=file [USER_FILE_HASH] =&gt; хэш файла (если FIELD_TYPE=file) [USER_FILE_SUFFIX] =&gt; суффикс к расширению файла (если FIELD_TYPE=file) [USER_FILE_SIZE] =&gt; размер файла (если FIELD_TYPE=[file|image]) [FIELD_TYPE] =&gt; тип ответа [FIELD_WIDTH] =&gt; ширина поля ответа [FIELD_HEIGHT] =&gt; высота поля ответа [FIELD_PARAM] =&gt; параметр поля ответа ) [1] =&gt; массив описывающий ответ 2 [2] =&gt; массив описывающий ответ 3 ... [N-1] =&gt; массив описывающий ответ N ) [<i>символьный идентификатор вопроса 2</i>] =&gt; массив описывающий ответы на вопрос 2 [<i>символьный идентификатор вопроса 3</i>] =&gt; массив описывающий ответы на вопрос 3 ... [<i>символьный идентификатор вопроса N</i>] =&gt; массив описывающий ответы на вопрос N )</pre>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID результата.
+	*
+	*
+	*
+	* @param array $field  Массив символьных идентификаторов вопросов или полей веб-формы,
+	* значения которых необходимо получить.
+	*
+	*
+	*
+	* @param array &$result  Ссылка на массив <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">полей
+	* результата</a>, а также некоторых <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">полей веб-формы</a> и <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">полей статуса</a>.
+	* Структура данного массива: <pre>Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt;
+	* время изменения результата [DATE_CREATE] =&gt; дата создания результата
+	* [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат
+	* (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании
+	* результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат
+	* [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID
+	* статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок
+	* статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание
+	* статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в
+	* котором находится результат [SID] =&gt; символьный идентификатор
+	* веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения
+	* веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип
+	* описания веб-формы [text|html] )</pre>
+	*
+	*
+	*
+	* @param array &$answer  Ссылка на массив, описывающий значения ответов на вопросы или
+	* значения полей веб-формы для указанного результата <i>result_id</i>.
+	* Структура данного массива: <pre>Array ( [<i>символьный идентификатор
+	* вопроса 1</i>] =&gt; массив описывающий ответы на вопрос 1 Array ( [<i>ID
+	* ответа 1</i>] =&gt; массив описывающий ответ 1 Array ( [RESULT_ID] =&gt; ID
+	* результата [FIELD_ID] =&gt; ID вопроса [SID] =&gt; символьный идентификатор
+	* вопроса [TITLE] =&gt; текст вопроса [TITLE_TYPE] =&gt; тип текста вопроса [text|html]
+	* [FILTER_TITLE] =&gt; заголовок поля фильтра [RESULTS_TABLE_TITLE] =&gt; заголовок
+	* столбца таблицы результатов [ANSWER_ID] =&gt; ID ответа [ANSWER_TEXT] =&gt;
+	* параметр ответа <font color="green">ANSWER_TEXT</font> [ANSWER_VALUE] =&gt; параметр ответа
+	* <font color="red">ANSWER_VALUE</font> [USER_TEXT] =&gt; текст введенный с клавиатуры
+	* [USER_DATE] =&gt; введенная дата (если FIELD_TYPE=date) [USER_FILE_ID] =&gt; ID файла
+	* (FIELD_TYPE=[file|image]) [USER_FILE_NAME] =&gt; имя файла [USER_FILE_IS_IMAGE] =&gt; "Y" - FIELD_TYPE=image;
+	* "N" - FIELD_TYPE=file [USER_FILE_HASH] =&gt; хэш файла (если FIELD_TYPE=file) [USER_FILE_SUFFIX] =&gt;
+	* суффикс к расширению файла (FIELD_TYPE=file) [USER_FILE_SIZE] =&gt; размер файла
+	* (если FIELD_TYPE=[file|image]) [FIELD_TYPE] =&gt; тип ответа [FIELD_WIDTH] =&gt; ширина поля
+	* ответа [FIELD_HEIGHT] =&gt; высота поля ответа [FIELD_PARAM] =&gt; параметр поля
+	* ответа ) [<i>ID ответа 2</i>] =&gt; массив описывающий ответ 2 [<i>ID ответа
+	* 3</i>] =&gt; массив описывающий ответ 3 ... [<i>ID ответа N</i>] =&gt; массив
+	* описывающий ответ N ) [<i>символьный идентификатор вопроса 2</i>] =&gt;
+	* массив описывающий ответы на вопрос 2 [<i>символьный идентификатор
+	* вопроса 3</i>] =&gt; массив описывающий ответы на вопрос 3 ...
+	* [<i>символьный идентификатор вопроса N</i>] =&gt; массив описывающий
+	* ответы на вопрос N )</pre>
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* $arAnswer = <b>CFormResult::GetDataByID</b>(
+	* 	$RESULT_ID, 
+	* 	array("VS_INTEREST"),  // вопрос "Какие области знаний вас интересуют?" 
+	* 	$arResult, 
+	* 	$arAnswer2);
+	* 
+	* // выведем поля результата
+	* echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
+	* 
+	* // выведем значения ответов
+	* echo "&lt;pre&gt;"; print_r($arAnswer); echo "&lt;/pre&gt;";
+	* 
+	* // выведем значения ответов в несколько ином формате
+	* echo "&lt;pre&gt;"; print_r($arAnswer2); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* 
+	* 
+	* 
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // получим данные по всем вопросам
+	* $arAnswer = <b>CFormResult::GetDataByID</b>(
+	* 	$RESULT_ID, 
+	* 	array(), 
+	* 	$arResult, 
+	* 	$arAnswer2);
+	* 
+	* // выведем поля результата
+	* echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
+	* 
+	* // выведем значения ответов
+	* echo "&lt;pre&gt;"; print_r($arAnswer); echo "&lt;/pre&gt;";
+	* 
+	* // выведем значения ответов в несколько ином формате
+	* echo "&lt;pre&gt;"; print_r($arAnswer2); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">Поля CFormResult</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">Поля CForm</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php
+	* @author Bitrix
+	*/
 	public static function GetDataByID($RESULT_ID, $arrFIELD_SID, &$arrRES, &$arrANSWER)
 	{
 		global $DB, $strError;
@@ -430,114 +432,109 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 		if (is_array($arrReturn)) reset($arrReturn);
 		if (is_array($arrRES)) reset($arrRES);
 
-		/*
-		echo "<pre>arrRES\n";
-		print_r($arrRES);
-		echo "arrANSWER\n";
-		print_r($arrANSWER);
-		echo "arrReturn\n";
-		print_r($arrReturn);
-		echo "</pre>";
-		*/
-
 		return $arrReturn;
 	}
 
 	// return array of result values for component
 	
 	/**
-	 * <p>Возвращает массив значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы, а также значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. </p> <p>Ключи возвращаемого массива в точности соответствуют <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">правилам</a> формирования имен HTML полей для веб-формы.</p> <p> Пример массива, возвращаемого функцией: </p> <pre class="syntax">Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt; 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST] =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597 [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607] =&gt; 1045 )</pre>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID результата.
-	 *
-	 *
-	 *
-	 * @param string $get_fields = "N" Если значение данного параметра равно "Y", то в в массиве
-	 * возвращаемом данной функцией будет также значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы; в противном
-	 * случае, в возвращаемом массиве будут только значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a> веб-формы.<br><br>
-	 * Параметр необязательный. По умолчанию - "N".
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Array
-	 * (
-	 *     [form_text_586] =&gt; Иванов Иван Иванович
-	 *     [form_date_587] =&gt; 10.03.1992
-	 *     [form_textarea_588] =&gt; г. Мурманск
-	 *     [form_radio_VS_MARRIED] =&gt; 589
-	 *     [form_checkbox_VS_INTEREST] =&gt; Array
-	 *         (
-	 *             [0] =&gt; 592
-	 *             [1] =&gt; 593
-	 *             [2] =&gt; 594
-	 *         )
-	 * 
-	 *     [form_dropdown_VS_AGE] =&gt; 597
-	 *     [form_multiselect_VS_EDUCATION] =&gt; Array
-	 *         (
-	 *             [0] =&gt; 603
-	 *             [1] =&gt; 604
-	 *         )
-	 * 
-	 *     [form_text_606] =&gt; 2345
-	 *     [form_image_607] =&gt; 1045
-	 * )Параметры функции
-	<tr>
-	<th width="15%">Параметр</th>
-	 * 	<th>Описание</th>
-	 * </tr>
-	<tr>
-	<td><i>result_id</i></td>
-	 * 	<td>ID результата.</td>
-	 * </tr>
-	<tr>
-	<td><i>get_fields</i></td>
-	 * 	<td>Если значение данного параметра равно "Y", то в в массиве возвращаемом данной функцией будет также значения <a href="/api_help/form/terms.php#field">полей</a> веб-формы; в противном случае, в возвращаемом массиве будут только значения <a href="/api_help/form/terms.php#answer">ответов</a> на <a href="/api_help/form/terms.php#question">вопросов</a> веб-формы.<br><br>
-	 * 	Параметр необязательный. По умолчанию - "N".
-	 * </td>
-	 * </tr>
-	
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // получим данные результата
-	 * $arValues = <b>CFormResult::GetDataByIDForHTML</b>($RESULT_ID, "Y");
-	 * 
-	 * // выведем ответ на вопрос "Фамилия, имя, отчество"
-	 * echo $arValues["form_text_586"]; // "Иванов Василий"
-	 * 
-	 * // выведем фотографию загруженную в качестве ответа на вопрос "Фотография"
-	 * CFile::ShowImage($arValues["form_image_607"], 200, 200, "border=0", "", true);
-	 * 
-	 * // выведем значение поля веб-формы "Рассчитанная стоимость"
-	 * echo $arValues["form_textarea_ADDITIONAL_149"]; // 134 руб.
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/check.php">CForm::Check</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы, а также значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. </p> <p>Ключи возвращаемого массива в точности соответствуют <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">правилам</a> формирования имен HTML полей для веб-формы.</p> <p> Пример массива, возвращаемого функцией: </p> <pre class="syntax">Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt; 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST] =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597 [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607] =&gt; 1045 )</pre>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID результата.
+	*
+	*
+	*
+	* @param string $get_fields = "N" Если значение данного параметра равно "Y", то в в массиве
+	* возвращаемом данной функцией будет также значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы; в противном
+	* случае, в возвращаемом массиве будут только значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a> веб-формы.<br><br>
+	* Параметр необязательный. По умолчанию - "N".
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Array
+	* (
+	*     [form_text_586] =&gt; Иванов Иван Иванович
+	*     [form_date_587] =&gt; 10.03.1992
+	*     [form_textarea_588] =&gt; г. Мурманск
+	*     [form_radio_VS_MARRIED] =&gt; 589
+	*     [form_checkbox_VS_INTEREST] =&gt; Array
+	*         (
+	*             [0] =&gt; 592
+	*             [1] =&gt; 593
+	*             [2] =&gt; 594
+	*         )
+	* 
+	*     [form_dropdown_VS_AGE] =&gt; 597
+	*     [form_multiselect_VS_EDUCATION] =&gt; Array
+	*         (
+	*             [0] =&gt; 603
+	*             [1] =&gt; 604
+	*         )
+	* 
+	*     [form_text_606] =&gt; 2345
+	*     [form_image_607] =&gt; 1045
+	* )
+	* 
+	* Параметры функции
+	* </htm
+	* <tr>
+	* <th width="15%">Параметр</th>
+	* 	<th>Описание</th>
+	* </tr>
+	* <tr>
+	* <td><i>result_id</i></td>
+	* 	<td>ID результата.</td>
+	* </tr>
+	* <tr>
+	* <td><i>get_fields</i></td>
+	* 	<td>Если значение данного параметра равно "Y", то в в массиве возвращаемом данной функцией будет также значения <a href="/api_help/form/terms.php#field">полей</a> веб-формы; в противном случае, в возвращаемом массиве будут только значения <a href="/api_help/form/terms.php#answer">ответов</a> на <a href="/api_help/form/terms.php#question">вопросов</a> веб-формы.<br><br>
+	* 	Параметр необязательный. По умолчанию - "N".
+	* </td>
+	* </tr>
+	* 
+	* 
+	* 
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // получим данные результата
+	* $arValues = <b>CFormResult::GetDataByIDForHTML</b>($RESULT_ID, "Y");
+	* 
+	* // выведем ответ на вопрос "Фамилия, имя, отчество"
+	* echo $arValues["form_text_586"]; // "Иванов Василий"
+	* 
+	* // выведем фотографию загруженную в качестве ответа на вопрос "Фотография"
+	* CFile::ShowImage($arValues["form_image_607"], 200, 200, "border=0", "", true);
+	* 
+	* // выведем значение поля веб-формы "Рассчитанная стоимость"
+	* echo $arValues["form_textarea_ADDITIONAL_149"]; // 134 руб.
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/check.php">CForm::Check</a> </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php
+	* @author Bitrix
+	*/
 	public static function GetDataByIDForHTML($RESULT_ID, $GET_ADDITIONAL="N")
 	{
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: GetDataByIDForHTML<br>Line: ";
@@ -659,101 +656,101 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// add new form result
 	
 	/**
-	 * <p>Создает новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a> веб-формы. В случае успеха - возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, в противном случае - "false".</p> <p><b>Примечание: </b>в случае неактивных вопросов данные из формы в них не сохраняются и сообщения об ошибках не выводятся.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param array $values = false Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>. Массив имеет
-	 * следующую структуру: <pre> array( "<i>имя HTML поля ответа 1</i>" =&gt;
-	 * "<i>значение ответа 1</i>", "<i>имя HTML поля ответа 2</i>" =&gt; "<i>значение
-	 * ответа 2</i>", ... "<i>имя HTML поля ответа N</i>" =&gt; "<i>значение ответа N</i>" )
-	 * </pre> Правила формирования "<i>имен HTML полей ответов</i>" и "<i>значений
-	 * ответов</i>" описаны в разделе "<a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей веб-форм</a>".
-	 * <h5>Пример:</h5> <pre> Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt;
-	 * 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST]
-	 * =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
-	 * [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
-	 * =&gt; 1045 ) </pre> Параметр необязательный. По умолчанию - "false" (будет
-	 * взят стандартный массив $_REQUEST).
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
-	 * создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
-	 * необходимо иметь право <b>[10] Заполнение веб-формы</b> на веб-форму
-	 * <i>form_id</i>.<br><br>Параметр необязательный. По умолчанию - "Y" (права
-	 * необходимо проверить).
-	 *
-	 *
-	 *
-	 * @param int $user_id = false ID пользователя, который будет записан как создатель данного <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.<br><br> Параметр
-	 * необязательный. По умолчанию - "false" (будет взят ID текущего
-	 * пользователя).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // ID веб-формы
-	 * $FORM_ID = 4;
-	 * 
-	 * // массив описывающий загруженную на сервер фотографию
-	 * $arImage = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
-	 * 
-	 * // массив значений ответов
-	 * $arValues = array (
-	 *     "form_text_586"                 =&gt; "Иванов Иван",    // "Фамилия, имя, отчество"
-	 *     "form_date_587"                 =&gt; "01.06.1904",     // "Дата рождения"
-	 *     "form_textarea_588"             =&gt; "г. Москва",      // "Адрес"
-	 *     "form_radio_VS_MARRIED"         =&gt; 590,              // "Женаты/замужем?"
-	 *     "form_checkbox_VS_INTEREST"     =&gt; array(612, 613),  // "Увлечения"
-	 *     "form_dropdown_VS_AGE"          =&gt; 601,              // "Возраст"
-	 *     "form_multiselect_VS_EDUCATION" =&gt; array(602, 603),  // "Образование"
-	 *     "form_text_606"                 =&gt; 300,              // "Доход"
-	 *     "form_image_607"                =&gt; $arImage          // "Фотография"
-	 * )
-	 * 
-	 * // создадим новый результат
-	 * if ($RESULT_ID = <b>CFormResult::Add</b>($FORM_ID, $arValues))
-	 * {
-	 *     echo "Результат #".$RESULT_ID." успешно создан";
-	 * }
-	 * else
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php">CFormResult::SetField</a>; </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a> веб-формы. В случае успеха - возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>, в противном случае - "false".</p> <p><b>Примечание: </b>в случае неактивных вопросов данные из формы в них не сохраняются и сообщения об ошибках не выводятся.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @param array $values = false Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a>. Массив имеет
+	* следующую структуру: <pre> array( "<i>имя HTML поля ответа 1</i>" =&gt;
+	* "<i>значение ответа 1</i>", "<i>имя HTML поля ответа 2</i>" =&gt; "<i>значение
+	* ответа 2</i>", ... "<i>имя HTML поля ответа N</i>" =&gt; "<i>значение ответа N</i>" )
+	* </pre> Правила формирования "<i>имен HTML полей ответов</i>" и "<i>значений
+	* ответов</i>" описаны в разделе "<a
+	* href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">Имена HTML полей веб-форм</a>".
+	* <h5>Пример:</h5> <pre> Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt;
+	* 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST]
+	* =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
+	* [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
+	* =&gt; 1045 ) </pre> Параметр необязательный. По умолчанию - "false" (будет
+	* взят стандартный массив $_REQUEST).
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>
+	* необходимо иметь право <b>[10] Заполнение веб-формы</b> на веб-форму
+	* <i>form_id</i>.<br><br>Параметр необязательный. По умолчанию - "Y" (права
+	* необходимо проверить).
+	*
+	*
+	*
+	* @param int $user_id = false ID пользователя, который будет записан как создатель данного <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.<br><br> Параметр
+	* необязательный. По умолчанию - "false" (будет взят ID текущего
+	* пользователя).
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // ID веб-формы
+	* $FORM_ID = 4;
+	* 
+	* // массив описывающий загруженную на сервер фотографию
+	* $arImage = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
+	* 
+	* // массив значений ответов
+	* $arValues = array (
+	*     "form_text_586"                 =&gt; "Иванов Иван",    // "Фамилия, имя, отчество"
+	*     "form_date_587"                 =&gt; "01.06.1904",     // "Дата рождения"
+	*     "form_textarea_588"             =&gt; "г. Москва",      // "Адрес"
+	*     "form_radio_VS_MARRIED"         =&gt; 590,              // "Женаты/замужем?"
+	*     "form_checkbox_VS_INTEREST"     =&gt; array(612, 613),  // "Увлечения"
+	*     "form_dropdown_VS_AGE"          =&gt; 601,              // "Возраст"
+	*     "form_multiselect_VS_EDUCATION" =&gt; array(602, 603),  // "Образование"
+	*     "form_text_606"                 =&gt; 300,              // "Доход"
+	*     "form_image_607"                =&gt; $arImage          // "Фотография"
+	* )
+	* 
+	* // создадим новый результат
+	* if ($RESULT_ID = <b>CFormResult::Add</b>($FORM_ID, $arValues));
+	* {
+	*     echo "Результат #".$RESULT_ID." успешно создан";
+	* }
+	* else
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php">CFormResult::SetField</a>; </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php
+	* @author Bitrix
+	*/
 	public static function Add($WEB_FORM_ID, $arrVALUES=false, $CHECK_RIGHTS="Y", $USER_ID=false)
 	{
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: Add<br>Line: ";
@@ -881,7 +878,10 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 									ExecuteModuleEventEx($arEvent, array($WEB_FORM_ID, &$arFields, &$arrVALUES));
 
 									if ($ex = $APPLICATION->GetException())
+									{
 										$strError .= $ex->GetString().'<br />';
+										$APPLICATION->ResetException();
+									}
 								}
 
 								if (strlen($strError) <= 0)
@@ -1180,111 +1180,111 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// update result
 	
 	/**
-	 * <p>Обновляет все значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> веб-формы. В случае успеха возвращает "true", в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param array $values = false Массив со значениями <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Массив имеет
-	 * следующую структуру: <pre>array( "<i>имя HTML поля 1</i>" =&gt; "<i>значение 1</i>",
-	 * "<i>имя HTML поля 2</i>" =&gt; "<i>значение 2</i>", ... "<i>имя HTML поля N</i>" =&gt;
-	 * "<i>значение N</i>" )</pre> Правила формирования "<i>имен HTML полей</i>" и
-	 * "<i>значений</i>" можно посмотреть <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">здесь</a>. <h5>Пример:</h5> <pre
-	 * style="height:450px">Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt;
-	 * 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST]
-	 * =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
-	 * [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
-	 * =&gt; 1045 [form_textarea_ADDITIONAL_149] =&gt; 155 ) </pre> Параметр необязательный. По
-	 * умолчанию - "false" (будет взят стандартный массив $_REQUEST).
-	 *
-	 *
-	 *
-	 * @param string $update_fields = "N" Флаг необходимости обновления <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возможны
-	 * следующие значения: <ul> <li> <b>Y</b> - необходимо обновить; </li> <li> <b>N</b> -
-	 * не нужно обновлять. </li> </ul> Параметр необязательный. По умолчанию -
-	 * "N" (не нужно обновлять).
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
-	 * успешного обновления <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
-	 * обладать следующими <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму, к
-	 * которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
-	 * всеми результатами в соответствии с их статусами</b> <br><br>или, в
-	 * случае, если вы являетесь создателем редактируемого результата,
-	 * достаточно права: <br><br><b>[15] Работа со своим результатом в
-	 * соответствии с его статусом</b> <br> </li> <li>На статус, в котором
-	 * находится редактируемый результат, необходимо иметь право:
-	 * <br><br><b>[EDIT] редактирование</b> </li> </ol> Параметр необязательный. По
-	 * умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // ID результата
-	 * $RESULT_ID = 186;
-	 * 
-	 * // массив описывающий загруженную на сервер фотографию
-	 * $arImage = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
-	 * 
-	 * // массив значений ответов и полей веб-формы
-	 * $arValues = array (
-	 *     "form_text_586"                 =&gt; "Иванов Иван",    // "Фамилия, имя, отчество"
-	 *     "form_date_587"                 =&gt; "01.06.1904",     // "Дата рождения"
-	 *     "form_textarea_588"             =&gt; "г. Москва",      // "Адрес"
-	 *     "form_radio_VS_MARRIED"         =&gt; 590,              // "Женаты/замужем?"
-	 *     "form_checkbox_VS_INTEREST"     =&gt; array(612, 613),  // "Увлечения"
-	 *     "form_dropdown_VS_AGE"          =&gt; 601,              // "Возраст"
-	 *     "form_multiselect_VS_EDUCATION" =&gt; array(602, 603),  // "Образование"
-	 *     "form_text_606"                 =&gt; 300,              // "Доход"
-	 *     "form_image_607"                =&gt; $arImage,         // "Фотография"
-	 *     "form_textarea_ADDITIONAL_149"  =&gt; "155 рублей"      // "Рассчитанная сумма"
-	 * )
-	 * 
-	 * //обновим результат
-	 * if (<b>CFormResult::Update</b>($RESULT_ID, $arValues, "Y"))
-	 * {
-	 *     echo "Результат #".$RESULT_ID." успешно обновлен.";
-	 * }
-	 * else
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php">CFormResult::SetField</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php
-	 * @author Bitrix
-	 */
+	* <p>Обновляет все значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> веб-формы. В случае успеха возвращает "true", в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param array $values = false Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Массив имеет
+	* следующую структуру: <pre>array( "<i>имя HTML поля 1</i>" =&gt; "<i>значение 1</i>",
+	* "<i>имя HTML поля 2</i>" =&gt; "<i>значение 2</i>", ... "<i>имя HTML поля N</i>" =&gt;
+	* "<i>значение N</i>" )</pre> Правила формирования "<i>имен HTML полей</i>" и
+	* "<i>значений</i>" можно посмотреть <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/htmlnames.php">здесь</a>. <h5>Пример:</h5> <pre
+	* style="height:450px">Array ( [form_text_586] =&gt; Иванов Иван Иванович [form_date_587] =&gt;
+	* 10.03.1992 [form_textarea_588] =&gt; г. Мурманск [form_radio_VS_MARRIED] =&gt; 589 [form_checkbox_VS_INTEREST]
+	* =&gt; Array ( [0] =&gt; 592 [1] =&gt; 593 [2] =&gt; 594 ) [form_dropdown_VS_AGE] =&gt; 597
+	* [form_multiselect_VS_EDUCATION] =&gt; Array ( [0] =&gt; 603 [1] =&gt; 604 ) [form_text_606] =&gt; 2345 [form_image_607]
+	* =&gt; 1045 [form_textarea_ADDITIONAL_149] =&gt; 155 ) </pre> Параметр необязательный. По
+	* умолчанию - "false" (будет взят стандартный массив $_REQUEST).
+	*
+	*
+	*
+	* @param string $update_fields = "N" Флаг необходимости обновления <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Возможны
+	* следующие значения: <ul> <li> <b>Y</b> - необходимо обновить; </li> <li> <b>N</b> -
+	* не нужно обновлять. </li> </ul> Параметр необязательный. По умолчанию -
+	* "N" (не нужно обновлять).
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
+	* успешного обновления <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
+	* обладать следующими <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму, к
+	* которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
+	* всеми результатами в соответствии с их статусами</b> <br><br>или, в
+	* случае, если вы являетесь создателем редактируемого результата,
+	* достаточно права: <br><br><b>[15] Работа со своим результатом в
+	* соответствии с его статусом</b> <br> </li> <li>На статус, в котором
+	* находится редактируемый результат, необходимо иметь право:
+	* <br><br><b>[EDIT] редактирование</b> </li> </ol> Параметр необязательный. По
+	* умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // ID результата
+	* $RESULT_ID = 186;
+	* 
+	* // массив описывающий загруженную на сервер фотографию
+	* $arImage = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
+	* 
+	* // массив значений ответов и полей веб-формы
+	* $arValues = array (
+	*     "form_text_586"                 =&gt; "Иванов Иван",    // "Фамилия, имя, отчество"
+	*     "form_date_587"                 =&gt; "01.06.1904",     // "Дата рождения"
+	*     "form_textarea_588"             =&gt; "г. Москва",      // "Адрес"
+	*     "form_radio_VS_MARRIED"         =&gt; 590,              // "Женаты/замужем?"
+	*     "form_checkbox_VS_INTEREST"     =&gt; array(612, 613),  // "Увлечения"
+	*     "form_dropdown_VS_AGE"          =&gt; 601,              // "Возраст"
+	*     "form_multiselect_VS_EDUCATION" =&gt; array(602, 603),  // "Образование"
+	*     "form_text_606"                 =&gt; 300,              // "Доход"
+	*     "form_image_607"                =&gt; $arImage,         // "Фотография"
+	*     "form_textarea_ADDITIONAL_149"  =&gt; "155 рублей"      // "Рассчитанная сумма"
+	* )
+	* 
+	* //обновим результат
+	* if (<b>CFormResult::Update</b>($RESULT_ID, $arValues, "Y"))
+	* {
+	*     echo "Результат #".$RESULT_ID." успешно обновлен.";
+	* }
+	* else
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php">CFormResult::SetField</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyidforhtml.php">CFormResult::GetDataByIDForHTML</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/add.php">CFormResult::Add</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php
+	* @author Bitrix
+	*/
 	public static function Update($RESULT_ID, $arrVALUES=false, $UPDATE_ADDITIONAL="N", $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: Update<br>Line: ";
@@ -1779,133 +1779,97 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// set question or field value in existed result
 	
 	/**
-	 * <p>Для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> обновляет значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> или обновляет значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param string $field_sid  Символьный идентификатор <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $value = false Значение, которое необходимо сохранить. В зависимости от типа
-	 * обновляемого поля, данный параметр имеет различный формат. <ul>
-	 * <li>При обновлении значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>, в данном параметре
-	 * достаточно указать новое значение обновляемого <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>. </li> <li>При обновлении
-	 * значений <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>, формат данного
-	 * параметра следующий: <pre>array ( <i>ID ответа 1</i> =&gt; <i>значение ответа
-	 * 1</i>, <i>ID ответа 2</i> =&gt; <i>значение ответа 2</i>, ... )</pre>Если <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> принадлежит к одним из
-	 * следующих типов: <ul> <li> <b>radio</b> - переключатель одиночного выбора
-	 * (radio-кнопка); </li> <li> <b>checkbox</b> - флаг множественного выбора (checkbox); </li>
-	 * <li> <b>dropdown</b> - элемент выпадающего списка одиночного выбора; </li> <li>
-	 * <b>multiselect</b> - элемент списка множественного выбора, </li> </ul>то в
-	 * качестве "<i>значения ответа</i>" достаточно указать "" (пустое
-	 * значение). <br><br>Если <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a>
-	 * имеет один из следующих типов: <ul> <li> <b>text</b> - однострочное
-	 * текстовое поле; </li> <li> <b>textarea</b> - многострочное текстовое поле; </li>
-	 * <li> <b>date</b> - поле для ввода даты; </li> <li> <b>password</b> - поле для ввода
-	 * пароля, </li> </ul>то в качестве "<i>значения ответа</i>" необходимо
-	 * указать значение, которое могло бы быть введено с клавиатуры при
-	 * ответе на данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>.
-	 * <br><br>Если <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> имеет один
-	 * из следующих типов: <ul> <li> <b>image</b> - поле для загрузки изображения;
-	 * </li> <li> <b>file</b> - поле для загрузки произвольного файла. </li> </ul>то в
-	 * качестве "<i>значения ответа</i>" необходимо указать массив,
-	 * описывающий файл и имеющий следующий ключи: <ul> <li> <b>name</b> - имя
-	 * файла; </li> <li> <b>size</b> - размер файла; </li> <li> <b>tmp_name</b> - временный путь
-	 * на сервере; </li> <li> <b>type</b> - тип загружаемого файла. </li> </ul>Такой
-	 * массив можно получить с помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a>. </li>
-	 * </ul>Параметр <i>value</i> необязательный. По умолчанию - false (значение <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> или значение <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> будут просто
-	 * удалены).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $RESULT_ID = 186;
-	 * 
-	 * //<*************************************************************
-	 *             Обновление значений ответов на вопросы
-	 * *************************************************************>//
-	 * 
-	 * // обновим ответ на вопрос "Фамилия, имя, отчество"
-	 * $arVALUE = array();
-	 * $FIELD_SID = "VS_NAME"; // символьный идентификатор вопроса
-	 * $ANSWER_ID = 586; // ID поля ответа
-	 * $arVALUE[$ANSWER_ID] = "Иванов Иван";
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
-	 * 
-	 * // обновим ответ на вопрос "Дата рождения"
-	 * $arVALUE = array();
-	 * $FIELD_SID = "VS_BIRTHDAY"; // символьный идентификатор вопроса
-	 * $ANSWER_ID = 587; // ID поля ответа
-	 * $arVALUE[$ANSWER_ID] = "18.06.1975";
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
-	 * 
-	 * // обновим ответ на вопрос "Какие области знаний вас интересуют?"
-	 * $arVALUE = array();
-	 * $FIELD_SID = "VS_INTEREST"; // символьный идентификатор вопроса
-	 * $arVALUE[612] = ""; // ID поля ответа "математика"
-	 * $arVALUE[613] = ""; // ID поля ответа "физика"
-	 * $arVALUE[614] = ""; // ID поля ответа "история"
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
-	 * 
-	 * // обновим ответ на вопрос "Фотография"
-	 * $arVALUE = array();
-	 * $FIELD_SID = "VS_PHOTO"; // символьный идентификатор вопроса
-	 * $ANSWER_ID = 607; // ID поля ответа
-	 * $path = $_SERVER["DOCUMENT_ROOT"]."/images/news.gif"; // путь к файлу
-	 * $arVALUE[$ANSWER_ID] = CFile::MakeFileArray($path);
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
-	 * 
-	 * // обновим ответ на вопрос "Резюме"
-	 * $arVALUE = array();
-	 * $FIELD_SID = "VS_RESUME"; // символьный идентификатор вопроса
-	 * $ANSWER_ID = 610; // ID поля ответа
-	 * $path = $_SERVER["DOCUMENT_ROOT"]."/docs/alawarauthorarea.doc"; // путь к файлу
-	 * $arVALUE[$ANSWER_ID] = CFile::MakeFileArray($path);
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
-	 * 
-	 * //<*************************************************************
-	 *                 Обновление значений полей
-	 * *************************************************************>//
-	 * 
-	 * // обновим значение поля "Рассчитанная стоимость"
-	 * $FIELD_SID = "VS_PRICE"; // символьный идентификатор вопроса
-	 * $VALUE = "155";
-	 * <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $VALUE);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li>
-	 * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php
-	 * @author Bitrix
-	 */
+	* <p>Для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> обновляет значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> или обновляет значение <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param string $field_sid  
+	*
+	*
+	*
+	* @param mixed $value = false Символьный идентификатор <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $RESULT_ID = 186;
+	* 
+	* //<*************************************************************
+	*             Обновление значений ответов на вопросы
+	* *************************************************************>//
+	* 
+	* // обновим ответ на вопрос "Фамилия, имя, отчество"
+	* $arVALUE = array();
+	* $FIELD_SID = "VS_NAME"; // символьный идентификатор вопроса
+	* $ANSWER_ID = 586; // ID поля ответа
+	* $arVALUE[$ANSWER_ID] = "Иванов Иван";
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
+	* 
+	* // обновим ответ на вопрос "Дата рождения"
+	* $arVALUE = array();
+	* $FIELD_SID = "VS_BIRTHDAY"; // символьный идентификатор вопроса
+	* $ANSWER_ID = 587; // ID поля ответа
+	* $arVALUE[$ANSWER_ID] = "18.06.1975";
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
+	* 
+	* // обновим ответ на вопрос "Какие области знаний вас интересуют?"
+	* $arVALUE = array();
+	* $FIELD_SID = "VS_INTEREST"; // символьный идентификатор вопроса
+	* $arVALUE[612] = ""; // ID поля ответа "математика"
+	* $arVALUE[613] = ""; // ID поля ответа "физика"
+	* $arVALUE[614] = ""; // ID поля ответа "история"
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
+	* 
+	* // обновим ответ на вопрос "Фотография"
+	* $arVALUE = array();
+	* $FIELD_SID = "VS_PHOTO"; // символьный идентификатор вопроса
+	* $ANSWER_ID = 607; // ID поля ответа
+	* $path = $_SERVER["DOCUMENT_ROOT"]."/images/news.gif"; // путь к файлу
+	* $arVALUE[$ANSWER_ID] = CFile::MakeFileArray($path);
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
+	* 
+	* // обновим ответ на вопрос "Резюме"
+	* $arVALUE = array();
+	* $FIELD_SID = "VS_RESUME"; // символьный идентификатор вопроса
+	* $ANSWER_ID = 610; // ID поля ответа
+	* $path = $_SERVER["DOCUMENT_ROOT"]."/docs/alawarauthorarea.doc"; // путь к файлу
+	* $arVALUE[$ANSWER_ID] = CFile::MakeFileArray($path);
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $arVALUE);
+	* 
+	* //<*************************************************************
+	*                 Обновление значений полей
+	* *************************************************************>//
+	* 
+	* // обновим значение поля "Рассчитанная стоимость"
+	* $FIELD_SID = "VS_PRICE"; // символьный идентификатор вопроса
+	* $VALUE = "155";
+	* <b>CFormResult::SetField</b>($RESULT_ID, $FIELD_SID, $VALUE);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/update.php">CFormResult::Update</a> </li>
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a></li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setfield.php
+	* @author Bitrix
+	*/
 	public static function SetField($RESULT_ID, $FIELD_SID, $VALUE=false)
 	{
 		global $DB, $strError;
@@ -2200,68 +2164,68 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// delete result
 	
 	/**
-	 * <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a>. В случае успеха функция возвращает "true", иначе - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
-	 * успешного удаления <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
-	 * обладать следующими <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму, к
-	 * которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
-	 * всеми результатами в соответствии с их статусами</b> <br><br>или, в
-	 * случае, если вы являетесь создателем удаляемого результата,
-	 * достаточно права <br><br><b>[15] Работа со своим результатом в
-	 * соответствии с его статусом.</b> <br> </li> <li>На статус в котором
-	 * находится редактируемый результат необходимо иметь право:
-	 * <br><br><b>[DELETE] удаление.</b> </li> </ol> Параметр необязательный. По
-	 * умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // удалим результат с проверкой прав текущего пользователя
-	 * if (<b>CFormResult::Delete</b>($RESULT_ID))
-	 * {
-	 *     echo "Результат # ".$RESULT_ID." успешно удален.";
-	 * }
-	 * else // ошибка
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a>; </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a>. В случае успеха функция возвращает "true", иначе - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
+	* успешного удаления <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
+	* обладать следующими <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму, к
+	* которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
+	* всеми результатами в соответствии с их статусами</b> <br><br>или, в
+	* случае, если вы являетесь создателем удаляемого результата,
+	* достаточно права <br><br><b>[15] Работа со своим результатом в
+	* соответствии с его статусом.</b> <br> </li> <li>На статус в котором
+	* находится редактируемый результат необходимо иметь право:
+	* <br><br><b>[DELETE] удаление.</b> </li> </ol> Параметр необязательный. По
+	* умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // удалим результат с проверкой прав текущего пользователя
+	* if (<b>CFormResult::Delete</b>($RESULT_ID))
+	* {
+	*     echo "Результат # ".$RESULT_ID." успешно удален.";
+	* }
+	* else // ошибка
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/delete.php">CForm::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php">CFormField::Delete</a>; </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/delete.php">CFormAnswer::Delete</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/delete.php">CFormStatus::Delete</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($RESULT_ID, $CHECK_RIGHTS="Y")
 	{
 //		echo $RESULT_ID; exit();
@@ -2330,63 +2294,63 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// clear result
 	
 	/**
-	 * <p>Удаляет все значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы, а также значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Сам результат при этом остается. Если в процессе работы функции ошибок не возникло, то функция возвращает "true".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param bool $del_files = true Флаг необходимости удаления файлов, загруженных в качестве
-	 * значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>.<br> Параметр
-	 * необязательный. По умолчанию - "true" (файлы необходимо удалить).
-	 *
-	 *
-	 *
-	 * @param string $del_fields = "N" Флаг необходимости удаления значений <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы.<br> Параметр
-	 * необязательный. По умолчанию - "N" (значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> необходимо удалить).
-	 *
-	 *
-	 *
-	 * @param array $exception = array() Массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a> и <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы, для которых
-	 * не нужно удалять значения.<br> Параметр необязательный. По
-	 * умолчанию - пустой массив.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // удалим все значения ответов на вопросы и полей веб-формы
-	 * // вместе с файлами
-	 * // исключение составят вопросы с ID = 140 и ID = 141
-	 * <b>CFormResult::Reset</b>($RESULT_ID, true, "Y", array(140, 141));
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/reset.php">CForm::Reset</a>; </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/reset.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет все значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> на <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы, а также значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Сам результат при этом остается. Если в процессе работы функции ошибок не возникло, то функция возвращает "true".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param bool $del_files = true Флаг необходимости удаления файлов, загруженных в качестве
+	* значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> на <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>.<br> Параметр
+	* необязательный. По умолчанию - "true" (файлы необходимо удалить).
+	*
+	*
+	*
+	* @param string $del_fields = "N" Флаг необходимости удаления значений <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы.<br> Параметр
+	* необязательный. По умолчанию - "N" (значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> необходимо удалить).
+	*
+	*
+	*
+	* @param array $exception = array() Массив ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a> и <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы, для которых
+	* не нужно удалять значения.<br> Параметр необязательный. По
+	* умолчанию - пустой массив.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // удалим все значения ответов на вопросы и полей веб-формы
+	* // вместе с файлами
+	* // исключение составят вопросы с ID = 140 и ID = 141
+	* <b>CFormResult::Reset</b>($RESULT_ID, true, "Y", array(140, 141));
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/reset.php">CForm::Reset</a>; </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php">CFormField::Reset</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/reset.php
+	* @author Bitrix
+	*/
 	public static function Reset($RESULT_ID, $DELETE_FILES=true, $DELETE_ADDITIONAL="N", $arrException=array())
 	{
 		global $DB, $strError;
@@ -2448,68 +2412,68 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	// update result status
 	
 	/**
-	 * <p>Устанавливает новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a> для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Возвращает "true" в случае успеха, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param int $status_id  ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
-	 * успешной установки нового <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> для указанного <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
-	 * обладать следующими <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму к
-	 * которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
-	 * всеми результатами в соответствии с их статусами</b> <br><br>или, в
-	 * случае, если вы являетесь создателем удаляемого результата,
-	 * достаточно права: <br><br><b>[15] Работа со своим результатом в
-	 * соответствии с его статусом</b> <br> </li> <li>На статус, в котором
-	 * находится редактируемый результат, необходимо иметь право:
-	 * <br><br><b>[EDIT] редактирование</b> <br> </li> <li>На новый статус <i>status_id</i>
-	 * необходимо иметь право: <br><br><b>[MOVE] перевод результатов в данный
-	 * статус</b> </li> </ol> Параметр необязательный. По умолчанию - "Y" (права
-	 * необходимо проверить).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * $STATUS_ID = 1; // ID статуса "Опубликовано"
-	 * 
-	 * // установим новый статус для результата
-	 * // с проверкой прав текущего пользователя
-	 * if (<b>CFormResult::SetStatus</b>($RESULT_ID, $STATUS_ID))
-	 * {
-	 *     echo "Статус #".$STATUS_ID." для результата #".$RESULT_ID." успешно установлен.";
-	 * }
-	 * else // ошибка
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setstatus.php
-	 * @author Bitrix
-	 */
+	* <p>Устанавливает новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a> для <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Возвращает "true" в случае успеха, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param int $status_id  ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для
+	* успешной установки нового <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> для указанного <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> необходимо
+	* обладать следующими <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму к
+	* которой принадлежит редактируемый результат: <br><br><b>[20] Работа со
+	* всеми результатами в соответствии с их статусами</b> <br><br>или, в
+	* случае, если вы являетесь создателем удаляемого результата,
+	* достаточно права: <br><br><b>[15] Работа со своим результатом в
+	* соответствии с его статусом</b> <br> </li> <li>На статус, в котором
+	* находится редактируемый результат, необходимо иметь право:
+	* <br><br><b>[EDIT] редактирование</b> <br> </li> <li>На новый статус <i>status_id</i>
+	* необходимо иметь право: <br><br><b>[MOVE] перевод результатов в данный
+	* статус</b> </li> </ol> Параметр необязательный. По умолчанию - "Y" (права
+	* необходимо проверить).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* $STATUS_ID = 1; // ID статуса "Опубликовано"
+	* 
+	* // установим новый статус для результата
+	* // с проверкой прав текущего пользователя
+	* if (<b>CFormResult::SetStatus</b>($RESULT_ID, $STATUS_ID))
+	* {
+	*     echo "Статус #".$STATUS_ID." для результата #".$RESULT_ID." успешно установлен.";
+	* }
+	* else // ошибка
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/setstatus.php
+	* @author Bitrix
+	*/
 	public static function SetStatus($RESULT_ID, $NEW_STATUS_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: SetStatus<br>Line: ";
@@ -2596,47 +2560,47 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	//send form event notification;
 	
 	/**
-	 * <p>Создает почтовое событие для отсылки данных <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> по e-mail. Возвращает "true" в случае успеха, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param mixed $template_id = false ID почтового шаблона.<br><br> Параметр необязательный. По умолчанию -
-	 * "false" (будут использованы почтовые шаблоны из настроек
-	 * соответствующей веб-формы).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // создадим почтовое событие для отсылки по EMail данных результата
-	 * if (<b>CFormResult::Mail</b>($RESULT_ID))
-	 * {
-	 *     echo "Почтовое событие успешно создано.";
-	 * }
-	 * else // ошибка
-	 * {
-	 *     global $strError;
-	 *     echo $strError;
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/mail.php
-	 * @author Bitrix
-	 */
+	* <p>Создает почтовое событие для отсылки данных <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a> по e-mail. Возвращает "true" в случае успеха, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param mixed $template_id = false ID почтового шаблона.<br><br> Параметр необязательный. По умолчанию -
+	* "false" (будут использованы почтовые шаблоны из настроек
+	* соответствующей веб-формы).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // создадим почтовое событие для отсылки по EMail данных результата
+	* if (<b>CFormResult::Mail</b>($RESULT_ID))
+	* {
+	*     echo "Почтовое событие успешно создано.";
+	* }
+	* else // ошибка
+	* {
+	*     global $strError;
+	*     echo $strError;
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/mail.php
+	* @author Bitrix
+	*/
 	public static function Mail($RESULT_ID, $TEMPLATE_ID = false)
 	{
 		global $APPLICATION, $DB, $MESS, $strError;
@@ -2737,9 +2701,6 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 						$answer_raw = '';
 						if (is_array($arrResult[$wr["SID"]]))
 						{
-							//echo '<pre>'; print_r($wr); echo '</pre>';
-							//echo '<pre>'; print_r($arrResult[$wr['SID']]);
-
 							$bHasDiffTypes = false;
 							$lastType = '';
 							foreach ($arrResult[$wr['SID']] as $arrA)
@@ -2761,11 +2722,6 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 								$ANSWER_TEXT_EXIST = (strlen(trim($arrA["ANSWER_TEXT"]))>0);
 								$ANSWER_VALUE_EXIST = (strlen(trim($arrA["ANSWER_VALUE"]))>0);
 								$USER_FILE_EXIST = (intval($arrA["USER_FILE_ID"])>0);
-
-								//echo 'USER_TEXT_EXIST '.$USER_TEXT_EXIST.' '.$USER_TEXT.'<br />';
-								//echo 'ANSWER_TEXT_EXIST '.$ANSWER_TEXT_EXIST.' '.$ANSWER_TEXT.'<br />';
-								//echo 'ANSWER_VALUE_EXIST '.$ANSWER_VALUE_EXIST.' '.$ANSWER_VALUE.'<br />';
-								//echo 'USER_FILE_EXIST '.$USER_FILE_EXIST.' '.$USER_FILE.'<br />';
 
 								if ($arrTemplate["BODY_TYPE"]=="html")
 								{
@@ -2870,8 +2826,6 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 								}
 								else
 								{
-									//echo $bHasDiffTypes.'*'.$USER_TEXT_EXIST.'<br />';
-
 									if (
 										$bHasDiffTypes
 										&&
@@ -2986,31 +2940,31 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> указанной веб-формы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $FORM_ID = 4; // ID веб-формы
-	 * echo "Количество результатов веб-формы #".$FORM_ID.": ".<b>CFormResult::GetCount</b>($FORM_ID);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> указанной веб-формы.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $FORM_ID = 4; // ID веб-формы
+	* echo "Количество результатов веб-формы #".$FORM_ID.": ".<b>CFormResult::GetCount</b>($FORM_ID);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getcount.php
+	* @author Bitrix
+	*/
 	public static function GetCount($WEB_FORM_ID)
 	{
 		global $DB, $USER, $strError;

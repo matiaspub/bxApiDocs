@@ -64,8 +64,6 @@ class CDeliveryUPS
 
 	public static function GetConfig()
 	{
-		$dir = substr(dirname(__FILE__), strlen($_SERVER["DOCUMENT_ROOT"]));
-
 		$arConfig = array(
 			"CONFIG_GROUPS" => array(
 				"tariff_tables" => GetMessage('SALE_DH_UPS_TARIFF_TITLE'),
@@ -75,19 +73,18 @@ class CDeliveryUPS
 				"zones_csv" => array(
 					"TYPE" => "TEXT",
 					"TITLE" => GetMessage('SALE_DH_UPS_CONFIG_zones_csv'),
-					"DEFAULT" => $dir."/ups/ru_csv_zones.csv",
+					"DEFAULT" => "/bitrix/modules/sale/delivery/ups/ru_csv_zones.csv",
 					"GROUP" => "tariff_tables",
 				),
 
 				"export_csv" => array(
 					"TYPE" => "TEXT",
 					"TITLE" => GetMessage('SALE_DH_UPS_CONFIG_export_csv'),
-					"DEFAULT" => $dir."/ups/ru_csv_export.csv",
+					"DEFAULT" => "/bitrix/modules/sale/delivery/ups/ru_csv_export.csv",
 					"GROUP" => "tariff_tables",
 				),
 			),
 		);
-
 		return $arConfig;
 	}
 

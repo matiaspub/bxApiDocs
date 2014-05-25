@@ -25,24 +25,24 @@ class CAllExtra
 
 	
 	/**
-	 * <p>Функция возвращает параметры наценки по ее коду ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код наценки.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив с ключами </p><table class="tnormal"
-	 * width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	 * наценки.</td> </tr> <tr> <td>NAME</td> <td>Название наценки.</td> </tr> <tr> <td>PERCENTAGE</td>
-	 * <td>Процент наценки.</td> </tr> </table><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__getbyid.949068d9.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры наценки по ее коду ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код наценки.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив с ключами </p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* наценки.</td> </tr> <tr> <td>NAME</td> <td>Название наценки.</td> </tr> <tr> <td>PERCENTAGE</td>
+	* <td>Процент наценки.</td> </tr> </table> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__getbyid.949068d9.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -51,7 +51,7 @@ class CAllExtra
 		if (0 >= $ID)
 			return false;
 
-		if (array_key_exists($ID, self::$arExtraCache))
+		if (isset(self::$arExtraCache[$ID]))
 		{
 			return self::$arExtraCache[$ID];
 		}
@@ -69,53 +69,53 @@ class CAllExtra
 
 	
 	/**
-	 * <p>Функция возвращает HTML код для отображения выпадающего списка (select) наценок. Функция кэширует список наценок, поэтому ее повторный вызов на одной странице не приводит к дополнительным запросам базы данных. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $sFieldName  Название выпадающего списка (атрибут name)
-	 *
-	 *
-	 *
-	 * @param string $sValue  Начальное значение.
-	 *
-	 *
-	 *
-	 * @param string $sDefaultValue = "" Название особого значения, относящееся к пустому значению
-	 * наценки (например, "Все" или "Нет")
-	 *
-	 *
-	 *
-	 * @param string $JavaChangeFunc = "" JavaScript обработчик события OnChange списка. Если указана пустая строка,
-	 * то событие OnChange не обрабатывается.
-	 *
-	 *
-	 *
-	 * @param string $sAdditionalParams = "" Дополнительные атрибуты тега &lt;select&gt;
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращает HTML код для вывода выпадающего списка наценок </p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * echo CExtra::SelectBox("CAT_EXTRA",
-	 *                        2,
-	 *                        "Не установлено",
-	 *                        "ChangeExtra()",
-	 *                        "class='typeselect'");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__selectbox.81640baf.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает HTML код для отображения выпадающего списка (select) наценок. Функция кэширует список наценок, поэтому ее повторный вызов на одной странице не приводит к дополнительным запросам базы данных. </p>
+	*
+	*
+	*
+	*
+	* @param string $sFieldName  Название выпадающего списка (атрибут name)
+	*
+	*
+	*
+	* @param string $sValue  Начальное значение. </htm
+	*
+	*
+	*
+	* @param string $sDefaultValue = "" Название особого значения, относящееся к пустому значению
+	* наценки (например, "Все" или "Нет")
+	*
+	*
+	*
+	* @param string $JavaChangeFunc = "" JavaScript обработчик события OnChange списка. Если указана пустая строка,
+	* то событие OnChange не обрабатывается.
+	*
+	*
+	*
+	* @param string $sAdditionalParams = "" Дополнительные атрибуты тега &lt;select&gt;
+	*
+	*
+	*
+	* @return string <p>Возвращает HTML код для вывода выпадающего списка наценок </p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* echo CExtra::SelectBox("CAT_EXTRA",
+	*                        2,
+	*                        "Не установлено",
+	*                        "ChangeExtra()",
+	*                        "class='typeselect'");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__selectbox.81640baf.php
+	* @author Bitrix
+	*/
 	public static function SelectBox($sFieldName, $sValue, $sDefaultValue = "", $JavaChangeFunc = "", $sAdditionalParams = "")
 	{
 		if (empty(self::$arExtraCache))
@@ -141,7 +141,7 @@ class CAllExtra
 			$s .= ' '.$sAdditionalParams.' ';
 		$s .= '>';
 		$sValue = intval($sValue);
-		$boolFound = array_key_exists($sValue, self::$arExtraCache);
+		$boolFound = isset(self::$arExtraCache[$sValue]);
 		if (!empty($sDefaultValue))
 			$s .= '<option value="0"'.($boolFound ? '' : ' selected').'>'.htmlspecialcharsex($sDefaultValue).'</option>';
 
@@ -156,30 +156,30 @@ class CAllExtra
 
 	
 	/**
-	 * <p>Функция обновляет параметры наценки с кодом ID на значения из массива arFields.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров наценки с ключами: <ul> <li>NAME
-	 * - название наценки;</li> <li>PERCENTAGE - процент наценки (может быть как
-	 * положительным, так и отрицательным);</li> <li>RECALCULATE - если имеет
-	 * значение Y, то будут автоматически пересчитаны все цены, которые
-	 * заданы этой наценкой</li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает значение <i>true</i> в случае успешного сохранения
-	 * наценки и <i>false</i> - в противном случае </p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры наценки с кодом ID на значения из массива arFields.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код.</b
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров наценки с ключами: <ul> <li>NAME
+	* - название наценки;</li> <li>PERCENTAGE - процент наценки (может быть как
+	* положительным, так и отрицательным);</li> <li>RECALCULATE - если имеет
+	* значение Y, то будут автоматически пересчитаны все цены, которые
+	* заданы этой наценкой</li> </ul>
+	*
+	*
+	*
+	* @return bool <p>Возвращает значение <i>true</i> в случае успешного сохранения
+	* наценки и <i>false</i> - в противном случае </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -196,7 +196,7 @@ class CAllExtra
 			$strSql = "UPDATE b_catalog_extra SET ".$strUpdate." WHERE ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			if (array_key_exists('RECALCULATE', $arFields) && 'Y' == $arFields['RECALCULATE'])
+			if (isset($arFields['RECALCULATE']) && 'Y' == $arFields['RECALCULATE'])
 			{
 				CPrice::ReCalculate('EXTRA', $ID, $arFields['PERCENTAGE']);
 			}
@@ -207,22 +207,22 @@ class CAllExtra
 
 	
 	/**
-	 * <p>Удаляет запись наценки из базы. Цены, которые были заданы в виде наценки от базовой цены, становятся заданными абсолютным значением. Сама величина цены не меняется. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код наценки.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае </p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__delete.ca4c66fe.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет запись наценки из базы. Цены, которые были заданы в виде наценки от базовой цены, становятся заданными абсолютным значением. Сама величина цены не меняется. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код наценки.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__delete.ca4c66fe.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -236,46 +236,46 @@ class CAllExtra
 
 	
 	/**
-	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $strAction  Указывает, для какого метода идет проверка. Возможные значения:
-	 * <br><ul> <li> <b>ADD</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a>;</li> <li>
-	 * <b>UPDATE</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив параметров наценки. Допустимые ключи: <ul> <li>
-	 * <b>NAME</b> - название наценки;</li> <li> <b>PERCENTAGE</b> - процент наценки (может
-	 * быть как положительным, так и отрицательным).</li> </ul>
-	 *
-	 *
-	 *
-	 * @param int $ID  Код наценки.
-	 *
-	 *
-	 *
-	 * @return bool <p> В случае корректности переданных параметров возвращает true,
-	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	 * можно получить текст ошибок.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a></li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/checkfields.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $strAction  Указывает, для какого метода идет проверка. Возможные значения:
+	* <br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a>;</li> <li>
+	* <b>UPDATE</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a>.</li>
+	* </ul>
+	*
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров наценки. Допустимые ключи: <ul> <li>
+	* <b>NAME</b> - название наценки;</li> <li> <b>PERCENTAGE</b> - процент наценки (может
+	* быть как положительным, так и отрицательным).</li> </ul>
+	*
+	*
+	*
+	* @param int $ID  Код наценки.
+	*
+	*
+	*
+	* @return bool <p> В случае корректности переданных параметров возвращает true,
+	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	* можно получить текст ошибок.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__add.937250e4.php">CExtra::Add</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/cextra__update.8ab660d7.php">CExtra::Update</a></li> </ul>
+	* </ht<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/checkfields.php
+	* @author Bitrix
+	*/
 	public static function CheckFields($strAction, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;

@@ -3,7 +3,7 @@
  * Bitrix Framework
  * @package    bitrix
  * @subpackage main
- * @copyright  2001-2012 Bitrix
+ * @copyright  2001-2013 Bitrix
  */
 
 namespace Bitrix\Main\Entity\Validator;
@@ -11,13 +11,6 @@ namespace Bitrix\Main\Entity\Validator;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Type;
 
-IncludeModuleLangFile(__FILE__);
-
-/**
- * Class description
- * @package    bitrix
- * @subpackage main
- */
 class Date extends Base
 {
 	public function validate($value, $primary, array $row, Entity\Field $field)
@@ -28,7 +21,7 @@ class Date extends Base
 			return true;
 		}
 
-		if (CheckDateTime($value, FORMAT_DATE))
+		if (\CheckDateTime($value, FORMAT_DATE))
 		{
 			return true;
 		}

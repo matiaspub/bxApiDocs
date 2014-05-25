@@ -558,6 +558,13 @@ class CPostingGeneral
 			$DB->Query("UPDATE b_posting SET VERSION='2', BCC_TO_SEND=null, ERROR_EMAIL=null, SENT_BCC=null WHERE ID=".$ID);
 		}
 
+		$tools = new CMailTools;
+		//MIME with attachments
+		if($post_arr["BODY_TYPE"]=="html" && COption::GetOptionString("subscribe", "attach_images")=="Y")
+		{
+			$post_arr["BODY"] = $tools->ReplaceImages($post_arr["BODY"]);
+		}
+
 		if(strlen($post_arr["CHARSET"]) > 0)
 		{
 			$from_charset = $post_arr["MSG_CHARSET"]? $post_arr["MSG_CHARSET"]: SITE_CHARSET;
@@ -567,7 +574,13 @@ class CPostingGeneral
 		}
 
 		//Preparing message header, text, subject
-		$sBody = str_replace("\r\n","\n",$post_arr["BODY"]);
+		$sBody = str_replace("\r\n", "\n", $post_arr["BODY"]);
+		$sBody = implode(
+			"\n",
+			array_filter(
+				preg_split("/(.{512}[^ ]*[ ])/", $sBody." ", -1, PREG_SPLIT_DELIM_CAPTURE)
+			)
+		); //Some MTA has 4K limit for fgets function. So we have to split the message body.
 		if(COption::GetOptionString("main", "CONVERT_UNIX_NEWLINE_2_WINDOWS", "N") == "Y")
 			$sBody = str_replace("\n", "\r\n", $sBody);
 
@@ -585,58 +598,68 @@ class CPostingGeneral
 		if($post_arr["BODY_TYPE"] == "html")
 		{
 			//URN2URI
-			$tools = new CMailTools;
-			$sBody = $tools->ReplaceHrefs($sBody);
+			$tmpTools = new CMailTools;
+			$sBody = $tmpTools->ReplaceHrefs($sBody);
 		}
 
 		$bHasAttachments = false;
-		if($post_arr["BODY_TYPE"]=="html" && COption::GetOptionString("subscribe", "attach_images")=="Y")
+		if(count($tools->aMatches) > 0)
 		{
-			//MIME with attachments
-			$tools = new CMailTools;
-			$sBody = $tools->ReplaceImages($sBody);
-			if(count($tools->aMatches) > 0)
+			$bHasAttachments = true;
+
+			$sBoundary = "----------".uniqid("");
+			$sHeader =
+				'From: '.$sFrom.$eol.
+				'X-Bitrix-Posting: '.$post_arr["ID"].$eol.
+				'MIME-Version: 1.0'.$eol.
+				'Content-Type: multipart/mixed; boundary="'.$sBoundary.'"'.$eol.
+				'Content-Transfer-Encoding: 8bit';
+
+			$sBody =
+				"--".$sBoundary.$eol.
+				"Content-Type: ".($post_arr["BODY_TYPE"]=="html"? "text/html":"text/plain").($post_arr["CHARSET"]<>""? "; charset=".$post_arr["CHARSET"]:"").$eol.
+				"Content-Transfer-Encoding: 8bit".$eol.$eol.
+				$sBody.$eol;
+
+			foreach($tools->aMatches as $attachment)
 			{
-				$bHasAttachments = true;
-
-				$sBoundary = "----------".uniqid("");
-				$sHeader =
-					'From: '.$sFrom.$eol.
-					'X-Bitrix-Posting: '.$post_arr["ID"].$eol.
-					'MIME-Version: 1.0'.$eol.
-					'Content-Type: multipart/mixed; boundary="'.$sBoundary.'"'.$eol.
-					'Content-Transfer-Encoding: 8bit';
-
-				$sBody =
-					"--".$sBoundary.$eol.
-					"Content-Type: ".($post_arr["BODY_TYPE"]=="html"? "text/html":"text/plain").($post_arr["CHARSET"]<>""? "; charset=".$post_arr["CHARSET"]:"").$eol.
-					"Content-Transfer-Encoding: 8bit".$eol.$eol.
-					$sBody.$eol;
-
-				foreach($tools->aMatches as $attachment)
+				if(strlen($post_arr["CHARSET"]) > 0)
 				{
-					$aImage = CFile::GetImageSize($_SERVER["DOCUMENT_ROOT"].$attachment["SRC"]);
-					if($aImage === false)
-						continue;
-
-					$filename = $_SERVER["DOCUMENT_ROOT"].$attachment["SRC"];
-					$handle = fopen($filename, "rb");
-					$file = fread($handle, filesize($filename));
-					fclose($handle);
-
-					$sBody .=
-						$eol."--".$sBoundary.$eol.
-						"Content-Type: ".(function_exists("image_type_to_mime_type")? image_type_to_mime_type($aImage[2]) : CMailTools::ImageTypeToMimeType($aImage[2]))."; name=\"".$attachment["DEST"]."\"".$eol.
-						"Content-Transfer-Encoding: base64".$eol.
-						"Content-ID: <".$attachment["ID"].">".$eol.$eol.
-						chunk_split(base64_encode($file), 72, $eol);
+					$from_charset = $post_arr["MSG_CHARSET"]? $post_arr["MSG_CHARSET"]: SITE_CHARSET;
+					$attachment["DEST"] = $APPLICATION->ConvertCharset($attachment["DEST"], $from_charset, $post_arr["CHARSET"]);
 				}
+
+				if(COption::GetOptionString("subscribe", "allow_8bit_chars") <> "Y")
+					$name = CMailTools::EncodeSubject($attachment["DEST"], $post_arr["CHARSET"]);
+				else
+					$name = $attachment["DEST"];
+
+				$sBody .=
+					$eol."--".$sBoundary.$eol.
+					"Content-Type: ".$attachment["CONTENT_TYPE"]."; name=\"".$name."\"".$eol.
+					"Content-Transfer-Encoding: base64".$eol.
+					"Content-ID: <".$attachment["ID"].">".$eol.$eol.
+					chunk_split(
+						base64_encode(
+							file_get_contents($attachment["PATH"])
+						), 72, $eol
+					);
 			}
 		}
 
+		$arFiles = array();
+		$maxFileSize = intval(COption::GetOptionInt("subscribe", "max_file_size"));
 		$rsFile = CPosting::GetFileList($ID);
-		$arFile = $rsFile->Fetch();
-		if($arFile)
+		while($arFile = $rsFile->Fetch())
+		{
+			if (
+				$maxFileSize == 0
+				|| $arFile["FILE_SIZE"] <= $maxFileSize
+			)
+				$arFiles[] = $arFile;
+		}
+
+		if(!empty($arFiles))
 		{
 			if(!$bHasAttachments)
 			{
@@ -656,7 +679,8 @@ class CPostingGeneral
 					$sBody.$eol;
 			}
 
-			do {
+			foreach ($arFiles as $arFile)
+			{
 				if(strlen($post_arr["CHARSET"]) > 0)
 				{
 					$from_charset = $post_arr["MSG_CHARSET"]? $post_arr["MSG_CHARSET"]: SITE_CHARSET;
@@ -681,7 +705,7 @@ class CPostingGeneral
 					72,
 					$eol
 				);
-			} while ($arFile = $rsFile->Fetch());
+			}
 		}
 
 		if($bHasAttachments)
@@ -989,6 +1013,7 @@ class CMailTools
 	var $aMatches = array();
 	var $pcre_backtrack_limit = false;
 	var $server_name = null;
+	var $maxFileSize = 0;
 
 	public static function IsEightBit($str)
 	{
@@ -1040,27 +1065,48 @@ class CMailTools
 
 	public function __replace_img($matches)
 	{
+		$io = CBXVirtualIo::GetInstance();
 		$src = $matches[3];
-		if($src <> "")
+
+		if($src == "")
+			return $matches[0];
+
+		if(array_key_exists($src, $this->aMatches))
 		{
-			if(array_key_exists($src, $this->aMatches))
-			{
-				$uid = $this->aMatches[$src]["ID"];
-			}
-			elseif(
-				file_exists($_SERVER["DOCUMENT_ROOT"].$src)
-				&& is_array(CFile::GetImageSize($_SERVER["DOCUMENT_ROOT"].$src))
-			)
-			{
-				$dest = basename($src);
-				$uid = uniqid(md5($dest));
-				$this->aMatches[$src] = array("SRC"=>$src, "DEST"=>$dest, "ID"=>$uid);
-			}
-			else
-				return $matches[0];
+			$uid = $this->aMatches[$src]["ID"];
 			return $matches[1].$matches[2]."cid:".$uid.$matches[4].$matches[5];
 		}
-		return $matches[0];
+
+		$filePath = $io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$src);
+		if(!file_exists($filePath))
+			return $matches[0];
+
+		if (
+			$this->maxFileSize > 0
+			&& filesize($filePath) > $this->maxFileSize
+		)
+			return $matches[0];
+
+		$aImage = CFile::GetImageSize($filePath, true);
+		if (!is_array($aImage))
+			return $matches[0];
+
+		if (function_exists("image_type_to_mime_type"))
+			$contentType = image_type_to_mime_type($aImage[2]);
+		else
+			$contentType = CMailTools::ImageTypeToMimeType($aImage[2]);
+
+		$uid = uniqid(md5($src));
+
+		$this->aMatches[$src] = array(
+			"SRC" => $src,
+			"PATH" => $filePath,
+			"CONTENT_TYPE" => $contentType,
+			"DEST" => bx_basename($src),
+			"ID" => $uid,
+		);
+
+		return $matches[1].$matches[2]."cid:".$uid.$matches[4].$matches[5];
 	}
 
 	public function ReplaceHrefs($text)
@@ -1099,6 +1145,7 @@ class CMailTools
 			@ini_set("pcre.backtrack_limit", $text_len);
 			$this->pcre_backtrack_limit = intval(ini_get("pcre.backtrack_limit"));
 		}
+		$this->maxFileSize = intval(COption::GetOptionInt("subscribe", "max_file_size"));
 		$this->aMatches = array();
 		$text = preg_replace_callback(
 			"/(<img\\s[^>]*?(?<=\\s)src\\s*=\\s*)([\"']?)(.*?)(\\2)(\\s.+?>|\\s*>)/is",

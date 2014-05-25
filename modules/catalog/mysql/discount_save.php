@@ -7,39 +7,11 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 	{
 		global $DB;
 		global $stackCacheManager;
-		global $USER;
-
-		$arFields1 = array();
-		if (isset($USER) && $USER instanceof CUser && 'CUser' == get_class($USER))
-		{
-			if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
-				$arFields["CREATED_BY"] = intval($USER->GetID());
-			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
-				$arFields["MODIFIED_BY"] = intval($USER->GetID());
-		}
-		if (array_key_exists('TIMESTAMP_X', $arFields))
-			unset($arFields['TIMESTAMP_X']);
-		if (array_key_exists('DATE_CREATE', $arFields))
-			unset($arFields['DATE_CREATE']);
-
-		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
-		$arFields1['DATE_CREATE'] = $DB->GetNowFunction();
 
 		if (!CCatalogDiscountSave::CheckFields("ADD", $arFields))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_catalog_discount", $arFields);
-
-		foreach ($arFields1 as $key => $value)
-		{
-			if (strlen($arInsert[0])>0)
-			{
-				$arInsert[0] .= ", ";
-				$arInsert[1] .= ", ";
-			}
-			$arInsert[0] .= $key;
-			$arInsert[1] .= $value;
-		}
 
 		$strSql = "INSERT INTO b_catalog_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);

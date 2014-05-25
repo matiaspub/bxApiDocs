@@ -23,6 +23,7 @@ $arClasses = array(
 	"CTwitterInterface" => "classes/general/twitter.php",
 	"CSocServVKontakte" => "classes/general/vkontakte.php",
 	"CSocServGoogleOAuth" => "classes/general/google.php",
+	"CGoogleOAuthInterface" => "classes/general/google.php",
 	"CSocServLiveIDOAuth" => "classes/general/liveidoauth.php",
 	"CSocServOdnoklassniki" => "classes/general/odnoklassniki.php",
 	"COpenIDClient" => "classes/general/openidclient.php",
@@ -30,6 +31,8 @@ $arClasses = array(
 	"CBitrixOAuthInterface" => "classes/general/bitrix24.php",
 	"CSocServBitrixOAuth" => "classes/general/bitrix24.php",
 	"CBitrixPHPAppTransport" => "classes/general/bitrix24.php",
+	"CSocServYandexAuth" => "classes/general/yandex.php",
+	"CYandexOAuthInterface" => "classes/general/yandex.php",
 	//"CSocServDropbox" => "classes/general/dropbox.php",
 );
 
@@ -209,7 +212,7 @@ class CSocServEventHandlers
 			$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
 
 			if (
-				$arParams["MOBILE"] != "Y" 
+				$arParams["MOBILE"] != "Y"
 				&& $arParams["NEW_TEMPLATE"] != "Y"
 			)
 				$arResult["EVENT_FORMATTED"]["IS_MESSAGE_SHORT"] = CSocNetLogTools::FormatEvent_IsMessageShort($arResult["EVENT_FORMATTED"]["MESSAGE"], $arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"]);
@@ -319,7 +322,7 @@ class CSocServEventHandlers
 			$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
 
 			if (
-				$arParams["MOBILE"] != "Y" 
+				$arParams["MOBILE"] != "Y"
 				&& $arParams["NEW_TEMPLATE"] != "Y"
 			)
 			{

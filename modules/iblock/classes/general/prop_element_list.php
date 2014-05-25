@@ -202,7 +202,7 @@ class CIBlockPropertyElementList
 		$arValue['VALUE'] = intval($arValue['VALUE']);
 		if (0 < $arValue['VALUE'])
 		{
-			if (!array_key_exists($arValue['VALUE'],$cache))
+			if (!isset($cache[$arValue['VALUE']]))
 			{
 				$arFilter = array();
 				$intIBlockID = intval($arProperty['LINK_IBLOCK_ID']);
@@ -220,9 +220,13 @@ class CIBlockPropertyElementList
 				{
 					$strResult = $cache[$arValue['VALUE']]['ID'];
 				}
+				elseif (isset($strHTMLControlName['MODE']) && ('SIMPLE_TEXT' == $strHTMLControlName['MODE'] || 'ELEMENT_TEMPLATE' == $strHTMLControlName['MODE']))
+				{
+					$strResult = $cache[$arValue['VALUE']]["NAME"];
+				}
 				else
 				{
-					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.$cache[$arValue['VALUE']]["NAME"].'</a>';;
+					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.htmlspecialcharsEx($cache[$arValue['VALUE']]["NAME"]).'</a>';;
 				}
 			}
 		}

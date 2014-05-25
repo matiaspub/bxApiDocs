@@ -58,7 +58,7 @@ class CBlogComment extends CAllBlogComment
 
 			$arComment = CBlogComment::GetByID($ID);
 			if($arComment["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH)
-				CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1"));
+				CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1"), false);
 		}
 
 		$arBlog = CBlog::GetByID($arComment["BLOG_ID"]);
@@ -67,7 +67,6 @@ class CBlogComment extends CAllBlogComment
 
 		foreach(GetModuleEvents("blog", "OnCommentAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
-		
 		if (CModule::IncludeModule("search"))
 		{
 			if (CBlogUserGroup::GetGroupPerms(1, $arComment["BLOG_ID"], $arComment["POST_ID"], BLOG_PERMS_POST) >= BLOG_PERMS_READ)
@@ -195,9 +194,9 @@ class CBlogComment extends CAllBlogComment
 			{
 				$arComment = CBlogComment::GetByID($ID);
 				if($arComment["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH && $arFields["PUBLISH_STATUS"] != BLOG_PUBLISH_STATUS_PUBLISH)
-					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS - 1"));
+					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS - 1"), false);
 				elseif($arComment["PUBLISH_STATUS"] != BLOG_PUBLISH_STATUS_PUBLISH && $arFields["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH)
-					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1"));
+					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1", false));
 			}
 			
 			$strSql =

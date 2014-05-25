@@ -1,95 +1,167 @@
 <?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
 namespace Bitrix\Main\Web;
-
-use \Bitrix\Main\IO;
 
 class Uri
 {
-	protected $uri;
-	protected $uriType;
+	protected $url;
+	protected $parsed = false;
 
-	protected static $directoryIndex = "index.php";
+	protected $scheme;
+	protected $host;
+	protected $port;
+	protected $user;
+	protected $pass;
+	protected $path;
+	protected $query;
+	protected $pathQuery;
+	protected $fragment;
 
-	public function __construct($uri, $uriType)
+	public function __construct($url)
 	{
-		if ($uriType < UriType::UNKNOWN || $uriType > UriType::RELATIVE)
-			throw new \Bitrix\Main\ArgumentOutOfRangeException("uriType", UriType::getTypeNamesArray());
-
-		if ($uri == null)
-			$uri = "";
-
-		$this->uri = $uri;
-		$this->uriType = $uriType;
+		$this->url = $url;
 	}
 
-	public function parse($uriPart = -1)
+	public function getUrl()
 	{
-		return parse_url($this->uri, $uriPart);
-	}
-
-	public function convertToPath()
-	{
-		if ($this->uriType != UriType::RELATIVE)
+		if(!$this->parsed)
 		{
-			$path = $this->parse(UriPart::PATH);
-		}
-		else
-		{
-			$path = $this->uri;
-			$p = strpos($path, "?");
-			if ($p !== false)
-				$path = substr($path, 0, $p);
+			$this->parse();
 		}
 
-		if (substr($path, -1, 1) === "/")
-			$path = self::addDirectoryIndex($path);
+		$url = "";
+		if($this->host <> '')
+		{
+			$url .= $this->scheme."://".$this->host;
 
-		$path = IO\Path::normalize($path);
+			if(($this->scheme == "http" && $this->port <> 80) || ($this->scheme == "https" && $this->port <> 443))
+			{
+				$url .= ":".$this->port;
+			}
+		}
 
-		return $path;
+		$url .= $this->pathQuery;
+
+		return $url;
 	}
 
-	public static function addDirectoryIndex($dir)
+	public function parse()
 	{
-		if (!is_string($dir))
-			throw new \Bitrix\Main\ArgumentTypeException("dir", "string");
+		$parsedUrl = parse_url($this->url);
 
-		$dir = rtrim($dir, "/");
+		$this->parsed = true;
 
-		return $dir."/".self::$directoryIndex;
+		if($parsedUrl !== false)
+		{
+			$this->scheme = (isset($parsedUrl["scheme"])? strtolower($parsedUrl["scheme"]) : "http");
+			$this->host = $parsedUrl["host"];
+			if(isset($parsedUrl["port"]))
+			{
+				$this->port = $parsedUrl["port"];
+			}
+			else
+			{
+				$this->port = ($this->scheme == "https"? 443 : 80);
+			}
+			$this->user = $parsedUrl["user"];
+			$this->pass = $parsedUrl["pass"];
+			$this->path = ((isset($parsedUrl["path"])? $parsedUrl["path"] : "/"));
+			$this->query = $parsedUrl["query"];
+			$this->pathQuery = $this->path;
+			if($this->query <> "")
+			{
+				$this->pathQuery .= '?'.$this->query;
+			}
+			$this->fragment = $parsedUrl["fragment"];
+
+			return true;
+		}
+		return false;
 	}
 
-	public static function isPathTraversalUri($uri)
+	public function getFragment()
 	{
-		if (($pos = strpos($uri, "?")) !== false)
-			$uri = substr($uri, 0, $pos);
-
-		$uri = trim($uri);
-		return preg_match("#(?:/|2f|^)(?:(?:%0*(25)*2e)|\.){2,}(?:/|%0*(25)*2f|$)#", $uri) ? true : false;
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->fragment;
 	}
-}
 
-class UriType
-{
-	const UNKNOWN = 0;
-	const ABSOLUTE = 1;
-	const RELATIVE = 2;
-
-	public static function getTypeNamesArray()
+	public function getHost()
 	{
-		return array("UriType.UNKNOWN", "UriType.ABSOLUTE", "UriType.RELATIVE");
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->host;
 	}
-}
 
-class UriPart
-{
-	const ALL = -1;
-	const SCHEME = PHP_URL_SCHEME;
-	const HOST = PHP_URL_HOST;
-	const PORT = PHP_URL_PORT;
-	const USER = PHP_URL_USER;
-	const PASSWORD = PHP_URL_PASS;
-	const PATH = PHP_URL_PATH;
-	const QUERY = PHP_URL_QUERY;
-	const FRAGMENT = PHP_URL_FRAGMENT;
+	public function getPass()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->pass;
+	}
+
+	public function getPath()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->path;
+	}
+
+	public function getPathQuery()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->pathQuery;
+	}
+
+	public function getPort()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->port;
+	}
+
+	public function getQuery()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->query;
+	}
+
+	public function getScheme()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->scheme;
+	}
+
+	public function getUser()
+	{
+		if(!$this->parsed)
+		{
+			$this->parse();
+		}
+		return $this->user;
+	}
 }

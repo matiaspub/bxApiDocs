@@ -191,10 +191,11 @@ class QueryChainElement
 		}
 		else
 		{
-			global $DB;
+			$connection = \Bitrix\Main\Application::getConnection();
+			$helper = $connection->getSqlHelper();
 
-			$sql = $DB->escL . $this->getParameter('talias') . $DB->escR . '.';
-			$sql .= $DB->escL . $this->value->getColumnName() . $DB->escR;
+			$sql = $helper->quote($this->getParameter('talias')) . '.';
+			$sql .= $helper->quote($this->value->getColumnName());
 		}
 
 		return $sql;

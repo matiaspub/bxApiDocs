@@ -18,35 +18,35 @@ class CAllSaleOrderPropsGroup
 {
 	
 	/**
-	 * <p>Функция возвращает параметры группы свойств заказа с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы заказов.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров группы свойств с
-	 * ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код группы заказов.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
-	 * плательщика.</td> </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>SORT</td>
-	 * <td>Индекс сортировки.</td> </tr> </table><p>  </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($arPropsGroup = CSaleOrderPropsGroup::GetByID(3))
-	 *    echo $arPropsGroup["NAME"];
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__getbyid.e6e82420.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры группы свойств заказа с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы заказов.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров группы свойств с
+	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код группы заказов.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
+	* плательщика.</td> </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>SORT</td>
+	* <td>Индекс сортировки.</td> </tr> </table> <p>  </p<a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($arPropsGroup = CSaleOrderPropsGroup::GetByID(3))
+	*    echo $arPropsGroup["NAME"];
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__getbyid.e6e82420.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -97,38 +97,38 @@ class CAllSaleOrderPropsGroup
 
 	
 	/**
-	 * <p>Функция обновляет параметры группы заказов с кодом ID на параметры из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы заказов.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров группы свойств, в котором
-	 * ключами являются названия параметров, а значениями - новые
-	 * значения.<br><br> Допустимые ключи: <ul> <li> <b>PERSON_TYPE_ID</b> - тип
-	 * плательщика;</li> <li> <b>NAME</b> - название группы (группа привязывается
-	 * к типу плательщика, тип плательщика привязывается к сайту, сайт
-	 * привязывается к языку, название задается на этом языке);</li> <li>
-	 * <b>SORT</b> - индекс сортировки.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__update.169e4e27.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры группы заказов с кодом ID на параметры из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы заказов.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров группы свойств, в котором
+	* ключами являются названия параметров, а значениями - новые
+	* значения.<br><br> Допустимые ключи: <ul> <li> <b>PERSON_TYPE_ID</b> - тип
+	* плательщика;</li> <li> <b>NAME</b> - название группы (группа привязывается
+	* к типу плательщика, тип плательщика привязывается к сайту, сайт
+	* привязывается к языку, название задается на этом языке);</li> <li>
+	* <b>SORT</b> - индекс сортировки.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__update.169e4e27.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
 
 		$ID = IntVal($ID);
-		
+
 		if (!CSaleOrderPropsGroup::CheckFields("UPDATE", $arFields, $ID)) return false;
 
 		$strUpdate = $DB->PrepareUpdate("b_sale_order_props_group", $arFields);
@@ -141,22 +141,22 @@ class CAllSaleOrderPropsGroup
 
 	
 	/**
-	 * <p>Функция удаляет группу свойств с кодом ID. Так же удаляются свойства этой группы и другие сопутствующие данные. Значения свойств этой группы, привязанные к заказам, отвязываются от удаляемых свойств. <br> Если необходимо удалить только группу, то сначала от нее необходимо отвязать все свойства. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код группы свойств.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__delete.cae2758a.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет группу свойств с кодом ID. Так же удаляются свойства этой группы и другие сопутствующие данные. Значения свойств этой группы, привязанные к заказам, отвязываются от удаляемых свойств. <br> Если необходимо удалить только группу, то сначала от нее необходимо отвязать все свойства. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код группы свойств.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__delete.cae2758a.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -168,6 +168,7 @@ class CAllSaleOrderPropsGroup
 		{
 			$DB->Query("DELETE FROM b_sale_order_props_variant WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("UPDATE b_sale_order_props_value SET ORDER_PROPS_ID = NULL WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
+			$DB->Query("DELETE FROM b_sale_order_props_relation WHERE PROPERTY_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("DELETE FROM b_sale_user_props_value WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 		}
 		$DB->Query("DELETE FROM b_sale_order_props WHERE PROPS_GROUP_ID = ".$ID."", true);

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами <br>
+ * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br>
  *
  *
  *
@@ -252,9 +252,10 @@ class CIBlockRSS extends CAllIBlockRSS
 		global $DB;
 
 		$strSql =
-			"SELECT DISTINCT B.*, S.CHARSET, S.SERVER_NAME, ".$DB->DateToCharFunction("B.TIMESTAMP_X")." as TIMESTAMP_X ".
+			"SELECT DISTINCT B.*, C.CHARSET, S.SERVER_NAME, ".$DB->DateToCharFunction("B.TIMESTAMP_X")." as TIMESTAMP_X ".
 			"FROM b_iblock B LEFT JOIN b_iblock_group IBG ON IBG.IBLOCK_ID=B.ID ".
 			"	LEFT JOIN b_lang S ON S.LID=B.LID ".
+			"	LEFT JOIN b_culture C ON C.ID=S.CULTURE_ID ".
 			"WHERE B.ID = ".IntVal($IBLOCK_ID).
 			"	AND IBG.GROUP_ID IN (2) ".
 			"	AND IBG.PERMISSION>='R'".

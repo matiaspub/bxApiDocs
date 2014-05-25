@@ -556,7 +556,7 @@ if (!class_exists("CCaptcha"))
 			$this->image = $img2;
 		}
 
-		public function EmptyText()
+public 		function EmptyText()
 		{
 			$sx = imagesx($this->image)-1;
 			$sy = imagesy($this->image)-1;
@@ -602,17 +602,17 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public function DestroyImage()
+public 		function DestroyImage()
 		{
 			imagedestroy($this->image);
 		}
 
-		public function ShowImage()
+	public 	function ShowImage()
 		{
 			imagejpeg($this->image);
 		}
 
-		public function DrawText()
+public 		function DrawText()
 		{
 			if ($this->bTransparentText)
 				$alpha = floor($this->transparentTextPercent / 100 * 127);
@@ -751,7 +751,7 @@ if (!class_exists("CCaptcha"))
 			return $x2;
 		}
 
-		public function DrawEllipses()
+public 		function DrawEllipses()
 		{
 			if ($this->numEllipses > 0)
 			{
@@ -764,7 +764,7 @@ if (!class_exists("CCaptcha"))
 			}
 		}
 
-		public function DrawLines()
+public 		function DrawLines()
 		{
 			if ($this->numLines > 0)
 			{
@@ -778,7 +778,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 		/* OUTPUT */
-		public function Output()
+public 		function Output()
 		{
 			header("Expires: Sun, 1 Jan 2000 12:00:00 GMT");
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s")."GMT");
@@ -791,7 +791,7 @@ if (!class_exists("CCaptcha"))
 			$this->DestroyImage();
 		}
 
-		public function OutputError()
+public 		function OutputError()
 		{
 			header("Expires: Sun, 1 Jan 2000 12:00:00 GMT");
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s")."GMT");
@@ -813,7 +813,7 @@ if (!class_exists("CCaptcha"))
 
 
 		/* CODE */
-		public function SetCode()
+public 		function SetCode()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::SetCaptchaCode();
@@ -832,7 +832,7 @@ if (!class_exists("CCaptcha"))
 			$_SESSION["CAPTCHA_CODE"][$this->sid] = $this->code;
 		}
 
-		public function SetCodeCrypt($password = "")
+public 		function SetCodeCrypt($password = "")
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::SetCaptchaCode();
@@ -849,7 +849,7 @@ if (!class_exists("CCaptcha"))
 			$this->codeCrypt = $this->CryptData($this->code, "E", $_SESSION["CAPTCHA_PASSWORD"]);
 		}
 
-		public function SetCaptchaCode($sid = false)
+public 		function SetCaptchaCode($sid = false)
 		{
 			$max = count($this->arChars);
 
@@ -868,13 +868,13 @@ if (!class_exists("CCaptcha"))
 
 		}
 
-		public static function Generate32RandomString()
+	public 	function Generate32RandomString()
 		{
 			$prefix = (defined("BX_CLUSTER_GROUP")? BX_CLUSTER_GROUP: "0");
 			return substr($prefix.md5(uniqid()), 0, 32);
 		}
 
-		public function InitCaptchaCode($sid)
+public 		function InitCaptchaCode($sid)
 		{
 			global $DB;
 
@@ -895,7 +895,7 @@ if (!class_exists("CCaptcha"))
 
 		}
 
-		public function InitCode($sid)
+	public 	function InitCode($sid)
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::InitCaptchaCode($sid);
@@ -913,7 +913,7 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public function InitCodeCrypt($codeCrypt, $password = "")
+public 		function InitCodeCrypt($codeCrypt, $password = "")
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::InitCaptchaCode($codeCrypt);
@@ -931,12 +931,12 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public function GetSID()
+public static 		function GetSID()
 		{
 			return $this->sid;
 		}
 
-		public function GetCodeCrypt()
+		fupublic static nction GetCodeCrypt()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return $this->sid;
@@ -945,7 +945,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 
-		public static function CheckCaptchaCode($userCode, $sid, $bUpperCode = true)
+	public static 	function CheckCaptchaCode($userCode, $sid, $bUpperCode = true)
 		{
 			global $DB;
 
@@ -967,7 +967,7 @@ if (!class_exists("CCaptcha"))
 			return true;
 		}
 
-		public static function CheckCode($userCode, $sid, $bUpperCode = True)
+public static 		function CheckCode($userCode, $sid, $bUpperCode = True)
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::CheckCaptchaCode($userCode, $sid, $bUpperCode);
@@ -989,7 +989,7 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public function CheckCodeCrypt($userCode, $codeCrypt, $password = "", $bUpperCode = True)
+	public 	function CheckCodeCrypt($userCode, $codeCrypt, $password = "", $bUpperCode = True)
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return CCaptcha::CheckCaptchaCode($userCode, $codeCrypt, $bUpperCode);
@@ -1011,7 +1011,7 @@ if (!class_exists("CCaptcha"))
 			return True;
 		}
 
-		public static function CryptData($data, $type, $pwdString)
+public 		function CryptData($data, $type, $pwdString)
 		{
 			$type = strtoupper($type);
 			if ($type != "D")
@@ -1068,7 +1068,7 @@ if (!class_exists("CCaptcha"))
 		}
 
 
-		public function Add($arFields)
+public static 		function Add($arFields)
 		{
 			global $DB;
 
@@ -1096,7 +1096,7 @@ if (!class_exists("CCaptcha"))
 
 		}
 
-		public static function Delete($sid)
+public static 		function Delete($sid)
 		{
 			global $DB;
 

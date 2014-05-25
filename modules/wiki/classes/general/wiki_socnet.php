@@ -28,32 +28,32 @@ class CWikiSocnet
 
 	
 	/**
-	 * <p>Метод инициализирует интеграцию.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $SOCNET_GROUP_ID  Идентификатор рабочей группы соц. сети
-	 *
-	 *
-	 *
-	 * @param int $IBLOCK_ID  Идентификатор инфо.блока
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>// Инициализируем интеграцию<br>$SOCNET_GROUP_ID = 14;<br>$IBLOCK_ID = 3;<br><br>if (!CWikiSocnet::Init($SOCNET_GROUP_ID, $IBLOCK_ID))<br>	echo 'Ошибка. Не удалось инициализировать интеграцию.';<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/Init.php
-	 * @author Bitrix
-	 */
+	* <p>Метод инициализирует интеграцию.</p>
+	*
+	*
+	*
+	*
+	* @param int $SOCNET_GROUP_ID  Идентификатор рабочей группы соц. сети
+	*
+	*
+	*
+	* @param int $IBLOCK_ID  Идентификатор инфо.блока
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>// Инициализируем интеграцию<br>$SOCNET_GROUP_ID = 14;<br>$IBLOCK_ID = 3;<br><br>if (!CWikiSocnet::Init($SOCNET_GROUP_ID, $IBLOCK_ID))<br>	echo 'Ошибка. Не удалось инициализировать интеграцию.';<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/Init.php
+	* @author Bitrix
+	*/
 	static function Init($SOCNET_GROUP_ID, $IBLOCK_ID)
 	{
 		if (self::$bInit)
@@ -115,17 +115,17 @@ class CWikiSocnet
 
 	
 	/**
-	 * <p>Метод проверяет включена ли интеграция.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/IsEnabledSocnet.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет включена ли интеграция.</p> <br><br>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/isenabledsocnet.php
+	* @author Bitrix
+	*/
 	static function IsEnabledSocnet()
 	{
 		if (self::$bActive)
@@ -147,22 +147,39 @@ class CWikiSocnet
 
 	
 	/**
-	 * <p>Метод проверяет находится ли модуль в режиме интеграции.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/IsSocNet.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет находится ли модуль в режиме интеграции.</p> <br><br><br>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/IsSocNet.php
+	* @author Bitrix
+	*/
 	static function IsSocNet()
 	{
 		return self::$bInit;
 	}
 
+	
+	/**
+	* <p>Метод инициализирует интеграцию.</p>
+	*
+	*
+	*
+	*
+	* @param bool $bActive  true – включает интеграцию, false – отключает интеграцию
+	*
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisocnet/enablesocnet.php
+	* @author Bitrix
+	*/
 	static function EnableSocnet($bActive = false)
 	{
 		if($bActive)
@@ -497,27 +514,48 @@ class CWikiSocnet
 		}
 		else
 		{
-			$arAllow = array(
-				"HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y",
-				"IMG" => "Y", "LOG_IMG" => "N",
-				"QUOTE" => "Y", "LOG_QUOTE" => "N",
-				"CODE" => "Y", "LOG_CODE" => "N",
-				"FONT" => "Y", "LOG_FONT" => "N",
-				"LIST" => "Y",
-				"SMILES" => "Y",
-				"NL2BR" => "Y",
-				"MULTIPLE_BR" => "Y",
-				"VIDEO" => "Y", "LOG_VIDEO" => "N"
-			);
-
+			static $parserLog = false;
 			if (CModule::IncludeModule("forum"))
 			{
-				$parserLog = new forumTextParser(LANGUAGE_ID);
+				if (!$parserLog)
+					$parserLog = new forumTextParser(LANGUAGE_ID);
+
+				$arAllow = array(
+					"HTML" => "N",
+					"ALIGN" => "Y",
+					"ANCHOR" => "Y", "BIU" => "Y",
+					"IMG" => "Y", "QUOTE" => "Y",
+					"CODE" => "Y", "FONT" => "Y",
+					"LIST" => "Y", "SMILES" => "Y",
+					"NL2BR" => "Y", "VIDEO" => "Y",
+					"LOG_VIDEO" => "N", "SHORT_ANCHOR" => "Y",
+					"USERFIELDS" => $arFields["UF"],
+					"USER" => "Y"
+				);
+
+				$parserLog->pathToUser = $arParams["PATH_TO_USER"];
+				$parserLog->arUserfields = $arFields["UF"];
+
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
 			}
 			else
 			{
-				$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+				if (!$parserLog)
+					$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+
+				$arAllow = array(
+					"HTML" => "Y", "ANCHOR" => "Y", "BIU" => "Y",
+					"IMG" => "Y", "LOG_IMG" => "N",
+					"QUOTE" => "Y", "LOG_QUOTE" => "N",
+					"CODE" => "Y", "LOG_CODE" => "N",
+					"FONT" => "Y", "LOG_FONT" => "N",
+					"LIST" => "Y",
+					"SMILES" => "Y",
+					"NL2BR" => "Y",
+					"MULTIPLE_BR" => "Y",
+					"VIDEO" => "Y", "LOG_VIDEO" => "N"
+				);
+
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), array(), $arAllow));
 			}
 
@@ -623,7 +661,8 @@ class CWikiSocnet
 					$arFieldsMessage = array(
 						'POST_MESSAGE' => $arFields['TEXT_MESSAGE'],
 						'USE_SMILES' => 'Y',
-						'PARAM2' => $arElement['ID']
+						'PARAM2' => $arElement['ID'],
+						'APPROVED' => 'Y'
 					);
 
 					$GLOBALS["USER_FIELD_MANAGER"]->EditFormAddFields("SONET_COMMENT", $arTmp);
@@ -705,7 +744,7 @@ class CWikiSocnet
 								)).(strlen($url) > 0 
 									? " (".$serverName.$url.")"
 									: ""
-								);
+								)."#BR##BR#".$arFields["TEXT_MESSAGE"];
 
 								CIMNotify::Add($arMessageFields);
 							}

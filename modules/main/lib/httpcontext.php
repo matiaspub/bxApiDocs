@@ -1,6 +1,10 @@
 <?php
 namespace Bitrix\Main;
 
+/**
+ * Class HttpContext extends Context with http specific methods.
+ * @package Bitrix\Main
+ */
 class HttpContext
 	extends Context
 {

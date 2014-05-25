@@ -30,6 +30,24 @@ class CSecuritySystemInformation
 	}
 
 	/**
+	 * @since 14.0.4
+	 * @return bool
+	 */
+	public static function isRunOnWin()
+	{
+		return (strtoupper(substr(PHP_OS, 0, 3)) === "WIN");
+	}
+
+	/**
+	 * @since 14.0.6
+	 * @return bool
+	 */
+	public static function isCliMode()
+	{
+		return PHP_SAPI === 'cli';
+	}
+
+	/**
 	 * Return information about environment, such as BitrixVM version
 	 * @return array
 	 */

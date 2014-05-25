@@ -176,41 +176,41 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	 * <p>Функция возвращает параметры профиля покупателя с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профиля покупателя.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров профиля
-	 * покупателя с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	 * <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код профиля покупателя.</td> </tr> <tr>
-	 * <td>NAME</td> <td>Название профиля.</td> </tr> <tr> <td>USER_ID</td> <td>Код пользователя,
-	 * которому принадлежит профиль.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
-	 * плательщика.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
-	 * профиля.</td> </tr> </table><p>  </p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if ($ar = CSaleOrderUserProps::GetByID(12))
-	 * {
-	 *    echo "&lt;pre&gt;";
-	 *    print_r($ar);
-	 *    echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__getbyid.2fb0237e.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры профиля покупателя с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профиля покупателя.
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров профиля
+	* покупателя с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
+	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код профиля покупателя.</td> </tr> <tr>
+	* <td>NAME</td> <td>Название профиля.</td> </tr> <tr> <td>USER_ID</td> <td>Код пользователя,
+	* которому принадлежит профиль.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
+	* плательщика.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
+	* профиля.</td> </tr> </table> <p>  </p<a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ($ar = CSaleOrderUserProps::GetByID(12))
+	* {
+	*    echo "&lt;pre&gt;";
+	*    print_r($ar);
+	*    echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__getbyid.2fb0237e.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -259,45 +259,45 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	 * <p>Функция обновляет параметры профиля покупателя с кодом ID на значения из массива arFields </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профиля покупателя.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров профиля. Ключами являются
-	 * названия параметров, а значениями - соответствующие
-	 * значения.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название профиля
-	 * покупателя;</li> <li> <b>USER_ID</b> - код пользователя, которому
-	 * принадлежит профиль;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li>
-	 * <b>DATE_UPDATE</b> - дата последнего изменения.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененного профиля или <i>false</i> в случае
-	 * ошибки.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Изменим название профиля покупателя
-	 * $arFields = array(
-	 *    "NAME" =&gt; "Профиль 24"
-	 * );
-	 * if (!CSaleOrderUserProps::Update(258, $arFields))
-	 *    echo "Ошибка изменения профиля покупателя";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__update.4b826079.php
-	 * @author Bitrix
-	 */
+	* <p>Функция обновляет параметры профиля покупателя с кодом ID на значения из массива arFields </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профиля покупателя.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров профиля. Ключами являются
+	* названия параметров, а значениями - соответствующие
+	* значения.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название профиля
+	* покупателя;</li> <li> <b>USER_ID</b> - код пользователя, которому
+	* принадлежит профиль;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li>
+	* <b>DATE_UPDATE</b> - дата последнего изменения.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененного профиля или <i>false</i> в случае
+	* ошибки.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Изменим название профиля покупателя
+	* $arFields = array(
+	*    "NAME" =&gt; "Профиль 24"
+	* );
+	* if (!CSaleOrderUserProps::Update(258, $arFields))
+	*    echo "Ошибка изменения профиля покупателя";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__update.4b826079.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -320,17 +320,17 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	 * <p>Функция удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). </p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__clearempty.7bfe4eef.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). </p> <br><br>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__clearempty.7bfe4eef.php
+	* @author Bitrix
+	*/
 	public static function ClearEmpty()
 	{
 		global $DB;
@@ -348,31 +348,31 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	 * <p>Функция удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код профиля покупателя.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * CSaleOrderUserProps::Delete(12);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__delete.118435cf.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код профиля покупателя.
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* CSaleOrderUserProps::Delete(12);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__delete.118435cf.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;

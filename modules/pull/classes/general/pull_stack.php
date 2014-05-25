@@ -37,6 +37,9 @@ class CAllPullStack
 	{
 		global $DB;
 
+		if (!is_array($channelId))
+			$channelId = Array($channelId);
+
 		if (strlen($arParams['module_id']) > 0 || strlen($arParams['command']) > 0)
 		{
 			$arData = Array(
@@ -44,23 +47,31 @@ class CAllPullStack
 				'command' => $arParams['command'],
 				'params' => is_array($arParams['params'])? $arParams['params']: Array(),
 			);
-			if (CPullOptions::GetNginxStatus())
+			if (CPullOptions::GetQueueServerStatus())
 			{
-				$message = CUtil::PhpToJsObject(Array('CHANNEL_ID' => $channelId, 'MESSAGE' => Array($arData), 'ERROR' => ''));
+				$command = Array('MESSAGE' => Array($arData), 'ERROR' => '');
+				if (!is_array($channelId) && CPullOptions::GetQueueServerVersion() == 1)
+					$command['CHANNEL_ID'] = $channelId;
+
+				$message = CUtil::PhpToJsObject($command);
 				if (!defined('BX_UTF') || !BX_UTF)
 					$message = $GLOBALS['APPLICATION']->ConvertCharset($message, SITE_CHARSET,'utf-8');
 
-				$result = CPullChannel::Send($channelId, str_replace("\n", " ", $message));
+				$res = CPullChannel::Send($channelId, str_replace("\n", " ", $message));
+				$result = $res? true: false;
 			}
 			else
 			{
-				$arParams = Array(
-					'CHANNEL_ID' => $channelId,
-					'MESSAGE' => str_replace("\n", " ", serialize($arData)),
-					'~DATE_CREATE' => $DB->CurrentTimeFunction(),
-				);
-				$id = IntVal($DB->Add("b_pull_stack", $arParams, Array("MESSAGE")));
-				$result = $id? '{"channel": "'.$channelId.'", "id": "'.$id.'"}': false;
+				foreach ($channelId as $channel)
+				{
+					$arParams = Array(
+						'CHANNEL_ID' => $channel,
+						'MESSAGE' => str_replace("\n", " ", serialize($arData)),
+						'~DATE_CREATE' => $DB->CurrentTimeFunction(),
+					);
+					$res = IntVal($DB->Add("b_pull_stack", $arParams, Array("MESSAGE")));
+					$result = $res? true: false;
+				}
 			}
 
 			if (isset($arParams['push_text']) && strlen($arParams['push_text'])>0
@@ -95,7 +106,7 @@ class CAllPullStack
 
 	public static function AddShared($arMessage)
 	{
-		if (!CPullOptions::GetNginxStatus())
+		if (!CPullOptions::GetQueueServerStatus())
 			return false;
 
 		$arChannel = CPullChannel::GetShared();
@@ -106,13 +117,19 @@ class CAllPullStack
 	{
 		global $DB;
 
-		$strSql = "SELECT CHANNEL_ID FROM b_pull_channel";
+		$strSql = "SELECT CHANNEL_ID, USER_ID FROM b_pull_channel";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$arChannels = Array();
 		while ($arRes = $dbRes->Fetch())
 		{
-			if(!self::AddByChannel($arRes['CHANNEL_ID'], $arMessage))
-				break;
+			if ($arRes['USER_ID'] != 0)
+				continue;
+
+			$arChannels[] = $arRes['CHANNEL_ID'];
 		}
+		if(!self::AddByChannel($arChannels, $arMessage))
+			return false;
 
 		return true;
 	}

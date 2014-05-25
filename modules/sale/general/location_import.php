@@ -21,7 +21,10 @@ function saleLocationLoadFile($arParams)
 	// define('DLMETHOD', $arParams['DLMETHOD']);
 	define('DLZIPFILE', $arParams['DLZIPFILE']);
 
-	$sTmpFilePath = CTempFile::GetDirectoryName(12, 'sale');
+	if(isset($arParams['TMP_PATH']))
+		$sTmpFilePath = $arParams['TMP_PATH'];
+	else
+		$sTmpFilePath = CTempFile::GetDirectoryName(12, 'sale');
 
 	set_time_limit(600);
 
@@ -31,6 +34,8 @@ function saleLocationLoadFile($arParams)
 
 	if (strlen($CSVFILE) > 0 && !in_array($CSVFILE, array(
 													'loc_ussr.csv',
+													'loc_ua.csv',
+													'loc_kz.csv',
 													'loc_usa.csv',
 													'loc_cntr.csv',
 													'locations.csv')
@@ -150,9 +155,16 @@ function saleLocationImport($arParams)
 	$CSVFILE = $arParams["CSVFILE"];
 	$LOADZIP = $arParams["LOADZIP"];
 	$bSync = $arParams["SYNC"] == "Y";
-	$sTmpFilePath = CTempFile::GetDirectoryName(12, 'sale');
+
+	if(isset($arParams['TMP_PATH']))
+		$sTmpFilePath = $arParams['TMP_PATH'];
+	else
+		$sTmpFilePath = CTempFile::GetDirectoryName(12, 'sale');
+
 
 	if (strlen($CSVFILE) > 0 && !in_array($CSVFILE, array(	'loc_ussr.csv',
+															'loc_ua.csv',
+															'loc_kz.csv',
 															'loc_usa.csv',
 															'loc_cntr.csv',
 															'locations.csv')

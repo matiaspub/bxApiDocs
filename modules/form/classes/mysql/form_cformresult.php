@@ -19,7 +19,7 @@
  */
 class CFormResult extends CAllFormResult
 {
-	public static function err_mess()
+public static 	function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -27,229 +27,229 @@ class CFormResult extends CAllFormResult
 	}
 
 	// список результатов
-	
+
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $form_id  ID веб-формы.
-	 *
-	 *
-	 *
-	 * @param string &$by = "s_timestamp" Ссылка на переменную с полем для сортировки; может принимать
-	 * значения: <ul> <li> <b>s_id</b> - ID результата; </li> <li> <b>s_date_create</b> - дата
-	 * создания; </li> <li> <b>s_timestamp</b> - дата изменения (значение по
-	 * умолчанию); </li> <li> <b>s_user_id</b> - ID пользователя, создавшего результат;
-	 * </li> <li> <b>s_guest_id</b> - ID посетителя, создавшего результат; </li> <li>
-	 * <b>s_session_id</b> - ID сессии, в которой был создан результат; </li> <li>
-	 * <b>s_status</b> - ID статуса. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param string &$order = "desc" Ссылка на переменную с порядком сортировки. Допустимы следующие
-	 * значения: <ul> <li> <b>desc</b> - по убыванию (значение по умолчанию); </li> <li>
-	 * <b>asc</b> - по возрастанию. </li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $filter = array() Массив содержащий параметры фильтра. В массиве допустимы
-	 * следующие ключи: <ul> <li> <b>ID</b>* - ID результата (по умолчанию будет
-	 * искаться точное совпадение); </li> <li> <b>ID_EXACT_MATCH</b> - если значение
-	 * равно "N", то при фильтрации по <b>ID</b> будет искаться вхождение; </li>
-	 * <li> <b>STATUS_ID</b>* - ID статуса (по умолчанию будет искаться точное
-	 * совпадение); </li> <li> <b>STATUS_ID_EXACT_MATCH</b> - если значение равно "N", то при
-	 * фильтрации по <b>STATUS_ID</b> будет искаться вхождение; </li> <li> <b>TIMESTAMP_1</b>
-	 * - левое значение интервала ("с") по дате изменения (задается в
-	 * формате даты текущего сайта); </li> <li> <b>TIMESTAMP_2</b> - правое значение
-	 * интервала ("по") по дате изменения (задается в формате даты
-	 * текущего сайта); </li> <li> <b>DATE_CREATE_1</b> - левое значение интервала ("с")
-	 * по дате создания (задается в формате даты текущего сайта); </li> <li>
-	 * <b>DATE_CREATE_2</b> - правое значение интервала ("по") по дате создания
-	 * (задается в формате даты текущего сайта); </li> <li> <b>TIME_CREATE_1</b> - левое
-	 * значение интервала ("с") по дате создания в полном формате (дата и
-	 * время); </li> <li> <b>TIME_CREATE_2</b> - правое значение интервала ("по") по дате
-	 * создания в полном формате (дата и время); </li> <li> <b>REGISTERED</b> - флаг
-	 * зарегистрированности автора результата; допустимы следующие
-	 * значения: <ul> <li> <b>Y</b> - автор был зарегистрирован как пользователь;
-	 * </li> <li> <b>N</b> - автор не был зарегистрирован как пользователь. </li> </ul>
-	 * </li> <li> <b>USER_AUTH</b> - флаг авторизованности автора результата;
-	 * допустимы следующие значения: <ul> <li> <b>Y</b> - автор был авторизован;
-	 * </li> <li> <b>N</b> - автор не был авторизован. </li> </ul> </li> <li> <b>USER_ID</b>* - ID
-	 * пользователя, создавшего результат (автор результата) (по
-	 * умолчанию будет искаться точное совпадение); </li> <li> <b>USER_ID_EXACT_MATCH</b>
-	 * - если значение равно "N", то при фильтрации по <b>USER_ID</b> будет
-	 * искаться вхождение; </li> <li> <b>GUEST_ID</b>* - ID посетителя создавшего
-	 * результат (автор результата) (по умолчанию будет искаться точное
-	 * совпадение); </li> <li> <b>GUEST_ID_EXACT_MATCH</b> - если значение равно "N", то при
-	 * фильтрации по <b>GUEST_ID</b> будет искаться вхождение; </li> <li> <b>SESSION_ID</b>*
-	 * - ID сессии в которой был создан результат (по умолчанию будет
-	 * искаться точное совпадение); </li> <li> <b>SESSION_ID_EXACT_MATCH</b> - если
-	 * значение равно "N", то при фильтрации по <b>SESSION_ID</b> будет искаться
-	 * вхождение; </li> <li> <b>FIELDS</b> - массив, содержащий параметры фильтра
-	 * для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>
-	 * по значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Каждый
-	 * элемент данного массива представляет из себя массив, описывающий
-	 * параметры фильтра по <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросу</a> или <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полю</a> веб-формы; ключами
-	 * подобного массива могут быть: <ul> <li> <b>SID</b> - символьный
-	 * идентификатор <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; синоним -
-	 * <b>CODE</b>;</li> <li> <b>PARAMETER_NAME</b> - тип данных по которым фильтруем,
-	 * допустимы следующие значения: <ul> <li> <b>USER</b> - фильтруем по ответам
-	 * введенных авторами с клавиатуры; </li> <li> <b>ANSWER_TEXT</b> - фильтруем по
-	 * параметру <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> - фильтруем по
-	 * параметру <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> - значение, по
-	 * которому фильтруем (допускается <a
-	 * href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>); </li> <li>
-	 * <b>FILTER_TYPE</b> - тип фильтра, определяет, как интерпретировать данные
-	 * по которым фильтруем: <ul> <li> <b>integer</b> - означает, что данные, по
-	 * которым будет осуществляться фильтрация, считать числами
-	 * (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>text</b>
-	 * - означает, что данные, по которым будет осуществляться
-	 * фильтрация, должны обрабатываться как текстовые поля
-	 * (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>date</b>
-	 * - означает, что данные по которым будет осуществляться
-	 * фильтрация, должны обрабатываться как даты (используется только
-	 * с <b>PARAMETER_NAME</b>=USER); </li> <li> <b>answer_id</b> - означает, что фильтрация будет
-	 * производиться только по прямому совпадению с ID <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (при этом PARAMETER_NAME не
-	 * имеет значения). </li> </ul> </li> <li> <b>PART</b> - если тип фильтра
-	 * <b>FILTER_TYPE</b>=[integer|date], то данное поле <b>должно</b>содержать одно из
-	 * трех значений: <ul> <li> <b>0</b> - прямое совпадение со значением; </li> <li>
-	 * <b>1</b> - левое значение интервала ("с"); </li> <li> <b>2</b> - правое значение
-	 * интервала ("по") </li> </ul> </li> <li> <b>EXACT_MATCH</b> - если <b>FILTER_TYPE</b>="text", то в
-	 * данном поле можно задать следующие значения: <ul> <li> <b>Y</b> - прямое
-	 * совпадение; </li> <li> <b>N</b> - будет искаться вхождение (по умолчанию).
-	 * </li> </ul> </li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @param bool &$is_filtered  Ссылка на переменную хранящую флаг отфильтрованности
-	 * результирующего списка. Если значение равно "true", то список был
-	 * отфильтрован.
-	 *
-	 *
-	 *
-	 * @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	 * Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	 * проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для того
-	 * чтобы <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a> попал в
-	 * результирующий список, необходимо обладать следующими <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму
-	 * <i>form_id</i>: <br><br><b>[20] Работа со всеми результатами в соответствии с
-	 * их статусами</b> <br><br> или <br><br><b>[15] Работа со своим результатом в
-	 * соответствии с его статусом</b> - в этом случае результирующий
-	 * список будет состоять только из тех результатов создателем
-	 * которых является текущий пользователь. <br> </li> <li>На статус, в
-	 * котором находится результат, необходимо иметь право: <br><br><b>[VIEW]
-	 * просмотр</b> <br><br> или <br><br><b>[EDIT] редактирование</b> <br><br> или
-	 * <br><br><b>[DELETE] удаление</b> </li> </ol> Параметр необязательный. По
-	 * умолчанию - "Y" (права необходимо проверить).
-	 *
-	 *
-	 *
-	 * @param mixed $limit = false Максимальное количество результатов, которые войдут в
-	 * результирующий список. <br><br> Параметр необязательный. По
-	 * умолчанию - "false" (без ограничений).
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // ID веб-формы
-	 * $FORM_ID = 4;
-	 * 
-	 * // фильтр по полям результата
-	 * $arFilter = array(
-	 *     "ID"                   =&gt; "12",              // ID результата
-	 *     "ID_EXACT_MATCH"       =&gt; "N",               // вхождение
-	 *     "STATUS_ID"            =&gt; "9 | 10",          // статус
-	 *     "TIMESTAMP_1"          =&gt; "10.10.2003",      // изменен "с"
-	 *     "TIMESTAMP_2"          =&gt; "15.10.2003",      // изменен "до"
-	 *     "DATE_CREATE_1"        =&gt; "10.10.2003",      // создан "с"
-	 *     "DATE_CREATE_2"        =&gt; "12.10.2003",      // создан "до"
-	 *     "REGISTERED"           =&gt; "Y",               // был зарегистрирован
-	 *     "USER_AUTH"            =&gt; "N",               // не был авторизован
-	 *     "USER_ID"              =&gt; "45 | 35",         // пользователь-автор
-	 *     "USER_ID_EXACT_MATCH"  =&gt; "Y",               // точное совпадение
-	 *     "GUEST_ID"             =&gt; "4456 | 7768",     // посетитель-автор
-	 *     "SESSION_ID"           =&gt; "456456 | 778768", // сессия
-	 *     );
-	 * 
-	 * // фильтр по вопросам
-	 * $arFields = array();
-	 * 
-	 * $arFields[] = array(
-	 *     "CODE"              =&gt; "GAME_ID",       // код поля по которому фильтруем
-	 *     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
-	 *     "PARAMETER_NAME"    =&gt; "USER",          // по значению введенному с клавиатуры
-	 *     "VALUE"             =&gt; $arGame["ID"],   // значение по которому фильтруем
-	 *     "PART"              =&gt; 0                // прямое совпадение со значением (не интервал)
-	 *     );
-	 * 
-	 * $arFields[] = array(
-	 *     "CODE"              =&gt; "GAME_NAME",     // код поля по которому фильтруем
-	 *     "FILTER_TYPE"       =&gt; "text",          // фильтруем по числовому полю
-	 *     "PARAMETER_NAME"    =&gt; "USER",          // фильтруем по введенному значению
-	 *     "VALUE"             =&gt; "Tetris",        // значение по которому фильтруем
-	 *     "EXACT_MATCH"       =&gt; "Y"              // ищем точное совпадение
-	 *     );
-	 * 
-	 * $arFields[] = array(
-	 *     "CODE"              =&gt; "GENRE_ID",      // код поля по которому фильтруем
-	 *     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
-	 *     "PARAMETER_NAME"    =&gt; "ANSWER_VALUE",  // фильтруем по параметру ANSWER_VALUE
-	 *     "VALUE"             =&gt; "3",             // значение по которому фильтруем
-	 *     "PART"              =&gt; 1                // с
-	 *     );
-	 * 
-	 * $arFields[] = array(
-	 *     "CODE"              =&gt; "GENRE_ID",      // код поля по которому фильтруем
-	 *     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
-	 *     "PARAMETER_NAME"    =&gt; "ANSWER_VALUE",  // фильтруем по параметру ANSWER_VALUE
-	 *     "VALUE"             =&gt; "6",             // значение по которому фильтруем
-	 *     "PART"              =&gt; 2                // по
-	 *     );
-	 * 
-	 * $arFilter["FIELDS"] = $arFields;
-	 * 
-	 * // выберем первые 10 результатов
-	 * $rsResults = <b>CFormResult::GetList</b>($FORM_ID, 
-	 *     ($by="s_timestamp"), 
-	 *     ($order="desc"), 
-	 *     $arFilter, 
-	 *     $is_filtered, 
-	 *     "Y", 
-	 *     10);
-	 * while ($arResult = $rsResults-&gt;Fetch())
-	 * {
-	 *     echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
-	 * }
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getlist.php
-	 * @author Bitrix
-	 */
-	public static function GetList($WEB_FORM_ID, &$by, &$order, $arFilter=Array(), &$is_filtered, $CHECK_RIGHTS="Y", $records_limit=false)
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $form_id  ID веб-формы.
+	*
+	*
+	*
+	* @param string &$by = "s_timestamp" Ссылка на переменную с полем для сортировки; может принимать
+	* значения: <ul> <li> <b>s_id</b> - ID результата; </li> <li> <b>s_date_create</b> - дата
+	* создания; </li> <li> <b>s_timestamp</b> - дата изменения (значение по
+	* умолчанию); </li> <li> <b>s_user_id</b> - ID пользователя, создавшего результат;
+	* </li> <li> <b>s_guest_id</b> - ID посетителя, создавшего результат; </li> <li>
+	* <b>s_session_id</b> - ID сессии, в которой был создан результат; </li> <li>
+	* <b>s_status</b> - ID статуса. </li> </ul>
+	*
+	*
+	*
+	* @param string &$order = "desc" Ссылка на переменную с порядком сортировки. Допустимы следующие
+	* значения: <ul> <li> <b>desc</b> - по убыванию (значение по умолчанию); </li> <li>
+	* <b>asc</b> - по возрастанию. </li> </ul>
+	*
+	*
+	*
+	* @param array $filter = array() Массив содержащий параметры фильтра. Необязательный параметр. В
+	* массиве допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID результата (по
+	* умолчанию будет искаться точное совпадение); </li> <li> <b>ID_EXACT_MATCH</b> -
+	* если значение равно "N", то при фильтрации по <b>ID</b> будет искаться
+	* вхождение; </li> <li> <b>STATUS_ID</b>* - ID статуса (по умолчанию будет
+	* искаться точное совпадение); </li> <li> <b>STATUS_ID_EXACT_MATCH</b> - если значение
+	* равно "N", то при фильтрации по <b>STATUS_ID</b> будет искаться вхождение;
+	* </li> <li> <b>TIMESTAMP_1</b> - левое значение интервала ("с") по дате изменения
+	* (задается в формате даты текущего сайта); </li> <li> <b>TIMESTAMP_2</b> - правое
+	* значение интервала ("по") по дате изменения (задается в формате
+	* даты текущего сайта); </li> <li> <b>DATE_CREATE_1</b> - левое значение интервала
+	* ("с") по дате создания (задается в формате даты текущего сайта); </li>
+	* <li> <b>DATE_CREATE_2</b> - правое значение интервала ("по") по дате создания
+	* (задается в формате даты текущего сайта); </li> <li> <b>TIME_CREATE_1</b> - левое
+	* значение интервала ("с") по дате создания в полном формате (дата и
+	* время); </li> <li> <b>TIME_CREATE_2</b> - правое значение интервала ("по") по дате
+	* создания в полном формате (дата и время); </li> <li> <b>REGISTERED</b> - флаг
+	* зарегистрированности автора результата; допустимы следующие
+	* значения: <ul> <li> <b>Y</b> - автор был зарегистрирован как пользователь;
+	* </li> <li> <b>N</b> - автор не был зарегистрирован как пользователь. </li> </ul>
+	* </li> <li> <b>USER_AUTH</b> - флаг авторизованности автора результата;
+	* допустимы следующие значения: <ul> <li> <b>Y</b> - автор был авторизован;
+	* </li> <li> <b>N</b> - автор не был авторизован. </li> </ul> </li> <li> <b>USER_ID</b>* - ID
+	* пользователя, создавшего результат (автор результата) (по
+	* умолчанию будет искаться точное совпадение); </li> <li> <b>USER_ID_EXACT_MATCH</b>
+	* - если значение равно "N", то при фильтрации по <b>USER_ID</b> будет
+	* искаться вхождение; </li> <li> <b>GUEST_ID</b>* - ID посетителя создавшего
+	* результат (автор результата) (по умолчанию будет искаться точное
+	* совпадение); </li> <li> <b>GUEST_ID_EXACT_MATCH</b> - если значение равно "N", то при
+	* фильтрации по <b>GUEST_ID</b> будет искаться вхождение; </li> <li> <b>SESSION_ID</b>*
+	* - ID сессии в которой был создан результат (по умолчанию будет
+	* искаться точное совпадение); </li> <li> <b>SESSION_ID_EXACT_MATCH</b> - если
+	* значение равно "N", то при фильтрации по <b>SESSION_ID</b> будет искаться
+	* вхождение; </li> <li> <b>FIELDS</b> - массив, содержащий параметры фильтра
+	* для фильтрации <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>
+	* по значениям <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> и <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы. Каждый
+	* элемент данного массива представляет из себя массив, описывающий
+	* параметры фильтра по <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросу</a> или <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полю</a> веб-формы; ключами
+	* подобного массива могут быть: <ul> <li> <b>SID</b> - символьный
+	* идентификатор <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; синоним -
+	* <b>CODE</b>;</li> <li> <b>PARAMETER_NAME</b> - тип данных по которым фильтруем,
+	* допустимы следующие значения: <ul> <li> <b>USER</b> - фильтруем по ответам
+	* введенных авторами с клавиатуры; </li> <li> <b>ANSWER_TEXT</b> - фильтруем по
+	* параметру <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> - фильтруем по
+	* параметру <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> - значение, по
+	* которому фильтруем (допускается <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>); </li> <li>
+	* <b>FILTER_TYPE</b> - тип фильтра, определяет, как интерпретировать данные
+	* по которым фильтруем: <ul> <li> <b>integer</b> - означает, что данные, по
+	* которым будет осуществляться фильтрация, считать числами
+	* (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>text</b>
+	* - означает, что данные, по которым будет осуществляться
+	* фильтрация, должны обрабатываться как текстовые поля
+	* (используется только с <b>PARAMETER_NAME</b>=[USER|ANSWER_TEXT|ANSWER_VALUE]); </li> <li> <b>date</b>
+	* - означает, что данные по которым будет осуществляться
+	* фильтрация, должны обрабатываться как даты (используется только
+	* с <b>PARAMETER_NAME</b>=USER); </li> <li> <b>answer_id</b> - означает, что фильтрация будет
+	* производиться только по прямому совпадению с ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (при этом PARAMETER_NAME не
+	* имеет значения). </li> </ul> </li> <li> <b>PART</b> - если тип фильтра
+	* <b>FILTER_TYPE</b>=[integer|date], то данное поле <b>должно</b>содержать одно из
+	* трех значений: <ul> <li> <b>0</b> - прямое совпадение со значением; </li> <li>
+	* <b>1</b> - левое значение интервала ("с"); </li> <li> <b>2</b> - правое значение
+	* интервала ("по") </li> </ul> </li> <li> <b>EXACT_MATCH</b> - если <b>FILTER_TYPE</b>="text", то в
+	* данном поле можно задать следующие значения: <ul> <li> <b>Y</b> - прямое
+	* совпадение; </li> <li> <b>N</b> - будет искаться вхождение (по умолчанию).
+	* </li> </ul> </li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @param bool &$is_filtered  Ссылка на переменную хранящую флаг отфильтрованности
+	* результирующего списка. Если значение равно "true", то список был
+	* отфильтрован.
+	*
+	*
+	*
+	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
+	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
+	* проверить; </li> <li> <b>N</b> - права не нужно проверять. </li> </ul> Для того
+	* чтобы <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результат</a> попал в
+	* результирующий список, необходимо обладать следующими <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">правами</a>: <ol> <li>На веб-форму
+	* <i>form_id</i>: <br><br><b>[20] Работа со всеми результатами в соответствии с
+	* их статусами</b> <br><br> или <br><br><b>[15] Работа со своим результатом в
+	* соответствии с его статусом</b> - в этом случае результирующий
+	* список будет состоять только из тех результатов создателем
+	* которых является текущий пользователь. <br> </li> <li>На статус, в
+	* котором находится результат, необходимо иметь право: <br><br><b>[VIEW]
+	* просмотр</b> <br><br> или <br><br><b>[EDIT] редактирование</b> <br><br> или
+	* <br><br><b>[DELETE] удаление</b> </li> </ol> Параметр необязательный. По
+	* умолчанию - "Y" (права необходимо проверить).
+	*
+	*
+	*
+	* @param mixed $limit = false Максимальное количество результатов, которые войдут в
+	* результирующий список. <br><br> Параметр необязательный. По
+	* умолчанию - "false" (без ограничений).
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // ID веб-формы
+	* $FORM_ID = 4;
+	* 
+	* // фильтр по полям результата
+	* $arFilter = array(
+	*     "ID"                   =&gt; "12",              // ID результата
+	*     "ID_EXACT_MATCH"       =&gt; "N",               // вхождение
+	*     "STATUS_ID"            =&gt; "9 | 10",          // статус
+	*     "TIMESTAMP_1"          =&gt; "10.10.2003",      // изменен "с"
+	*     "TIMESTAMP_2"          =&gt; "15.10.2003",      // изменен "до"
+	*     "DATE_CREATE_1"        =&gt; "10.10.2003",      // создан "с"
+	*     "DATE_CREATE_2"        =&gt; "12.10.2003",      // создан "до"
+	*     "REGISTERED"           =&gt; "Y",               // был зарегистрирован
+	*     "USER_AUTH"            =&gt; "N",               // не был авторизован
+	*     "USER_ID"              =&gt; "45 | 35",         // пользователь-автор
+	*     "USER_ID_EXACT_MATCH"  =&gt; "Y",               // точное совпадение
+	*     "GUEST_ID"             =&gt; "4456 | 7768",     // посетитель-автор
+	*     "SESSION_ID"           =&gt; "456456 | 778768", // сессия
+	*     );
+	* 
+	* // фильтр по вопросам
+	* $arFields = array();
+	* 
+	* $arFields[] = array(
+	*     "CODE"              =&gt; "GAME_ID",       // код поля по которому фильтруем
+	*     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
+	*     "PARAMETER_NAME"    =&gt; "USER",          // по значению введенному с клавиатуры
+	*     "VALUE"             =&gt; $arGame["ID"],   // значение по которому фильтруем
+	*     "PART"              =&gt; 0                // прямое совпадение со значением (не интервал)
+	*     );
+	* 
+	* $arFields[] = array(
+	*     "CODE"              =&gt; "GAME_NAME",     // код поля по которому фильтруем
+	*     "FILTER_TYPE"       =&gt; "text",          // фильтруем по числовому полю
+	*     "PARAMETER_NAME"    =&gt; "USER",          // фильтруем по введенному значению
+	*     "VALUE"             =&gt; "Tetris",        // значение по которому фильтруем
+	*     "EXACT_MATCH"       =&gt; "Y"              // ищем точное совпадение
+	*     );
+	* 
+	* $arFields[] = array(
+	*     "CODE"              =&gt; "GENRE_ID",      // код поля по которому фильтруем
+	*     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
+	*     "PARAMETER_NAME"    =&gt; "ANSWER_VALUE",  // фильтруем по параметру ANSWER_VALUE
+	*     "VALUE"             =&gt; "3",             // значение по которому фильтруем
+	*     "PART"              =&gt; 1                // с
+	*     );
+	* 
+	* $arFields[] = array(
+	*     "CODE"              =&gt; "GENRE_ID",      // код поля по которому фильтруем
+	*     "FILTER_TYPE"       =&gt; "integer",       // фильтруем по числовому полю
+	*     "PARAMETER_NAME"    =&gt; "ANSWER_VALUE",  // фильтруем по параметру ANSWER_VALUE
+	*     "VALUE"             =&gt; "6",             // значение по которому фильтруем
+	*     "PART"              =&gt; 2                // по
+	*     );
+	* 
+	* $arFilter["FIELDS"] = $arFields;
+	* 
+	* // выберем первые 10 результатов
+	* $rsResults = <b>CFormResult::GetList</b>($FORM_ID, 
+	*     ($by="s_timestamp"), 
+	*     ($order="desc"), 
+	*     $arFilter, 
+	*     $is_filtered, 
+	*     "Y", 
+	*     10);
+	* while ($arResult = $rsResults-&gt;Fetch())
+	* {
+	*     echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
+	* }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	* </li> </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getlist.php
+	* @author Bitrix
+	*/
+	public static 	function GetList($WEB_FORM_ID, &$by, &$order, $arFilter=Array(), &$is_filtered, $CHECK_RIGHTS="Y", $records_limit=false)
 	{
 		$err_mess = (CFormResult::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $USER, $strError;
@@ -603,43 +603,43 @@ class CFormResult extends CAllFormResult
 
 	
 	/**
-	 * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данной функцией: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsResult = <b>CFormResult::GetByID</b>(189);
-	 * $arResult = $rsResult-&gt;Fetch();
-	 * echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>;
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getlist.php">CFormResult::GetList</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>; </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данной функцией: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsResult = <b>CFormResult::GetByID</b>(189);
+	* $arResult = $rsResult-&gt;Fetch();
+	* echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">Поля CFormResult</a>;
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getlist.php">CFormResult::GetList</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>; </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a>
+	* </li> </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB, $strError;
@@ -670,64 +670,64 @@ class CFormResult extends CAllFormResult
 	}
 
 	// права на результат
-	
+
 	/**
-	 * <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	 *
-	 *
-	 *
-	 * @param int &$current_status_id  Ссылка на переменную, в которую будет сохранен ID <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>, указанного
-	 * результата <i>result_id</i>.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $RESULT_ID = 189; // ID результата
-	 * 
-	 * // получим массив прав
-	 * $arPerm = <b>CFormResult::GetPermissions</b>($RESULT_ID, $current_status_id);
-	 * 
-	 * echo "Результат #".$RESULT_ID." находится в статусе ".$current_status_id;
-	 * 
-	 * if (in_array("VIEW", $arPerm)) 
-	 *     echo "У вас есть право на просмотр результата #".$RESULT_ID;
-	 * 
-	 * if (in_array("EDIT", $arPerm)) 
-	 *     echo "У вас есть право на редактирование результата #".$RESULT_ID;
-	 * 
-	 * if (in_array("DELETE", $arPerm)) 
-	 *     echo "У вас есть право на удаление результата #".$RESULT_ID;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php
-	 * @author Bitrix
-	 */
-	public static function GetPermissions($RESULT_ID, &$CURRENT_STATUS_ID)
+	* <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
+	*
+	*
+	*
+	*
+	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
+	*
+	*
+	*
+	* @param int &$current_status_id  Ссылка на переменную, в которую будет сохранен ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>, указанного
+	* результата <i>result_id</i>.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $RESULT_ID = 189; // ID результата
+	* 
+	* // получим массив прав
+	* $arPerm = <b>CFormResult::GetPermissions</b>($RESULT_ID, $current_status_id);
+	* 
+	* echo "Результат #".$RESULT_ID." находится в статусе ".$current_status_id;
+	* 
+	* if (in_array("VIEW", $arPerm)) 
+	*     echo "У вас есть право на просмотр результата #".$RESULT_ID;
+	* 
+	* if (in_array("EDIT", $arPerm)) 
+	*     echo "У вас есть право на редактирование результата #".$RESULT_ID;
+	* 
+	* if (in_array("DELETE", $arPerm)) 
+	*     echo "У вас есть право на удаление результата #".$RESULT_ID;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#result">Права на результат</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissions.php">CFormStatus::GetPermissions</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/getpermissionlist.php">CFormStatus::GetPermissionList</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getpermission.php">CForm::GetPermission</a>
+	* </li> </ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getpermissions.php
+	* @author Bitrix
+	*/
+	public static 	function GetPermissions($RESULT_ID, &$CURRENT_STATUS_ID)
 	{
 		$err_mess = (CFormResult::err_mess())."<br>Function: GetPermissions<br>Line: ";
 		global $DB, $USER, $strError;
@@ -766,7 +766,7 @@ class CFormResult extends CAllFormResult
 		return $arrReturn;
 	}
 
-	public static function AddAnswer($arFields)
+public static 	function AddAnswer($arFields)
 	{
 		$err_mess = (CFormResult::err_mess())."<br>Function: AddAnswer<br>Line: ";
 		global $DB, $strError;
@@ -776,7 +776,7 @@ class CFormResult extends CAllFormResult
 		return intval($DB->LastID());
 	}
 
-	public static function UpdateField($arFields, $RESULT_ID, $FIELD_ID)
+public static 	function UpdateField($arFields, $RESULT_ID, $FIELD_ID)
 	{
 		$err_mess = (CFormResult::err_mess())."<br>Function: UpdateField<br>Line: ";
 		global $DB, $strError;

@@ -8,6 +8,8 @@ class CLearnParsePermissionsFromFilter
 	protected $cachedSQL           = false;
 	protected $requestedOperations = false;
 	protected $oAccess             = false;
+	private static $availableLessons = array();
+
 
 	public function __construct ($arFilter)
 	{
@@ -115,7 +117,19 @@ class CLearnParsePermissionsFromFilter
 
 		// Is not cached yet?
 		if ($this->cachedSQL === false)
+		{
 			$this->cachedSQL = $this->oAccess->SQLClauseForAccessibleLessons ($this->requestedOperations);
+
+			if ( ! empty(self::$availableLessons[$this->requestedUserId]) )
+			{
+				foreach (self::$availableLessons[$this->requestedUserId] as $lessonId)
+				{
+					$this->cachedSQL .= " UNION SELECT " . (int) $lessonId . " AS LESSON_ID 
+						FROM b_learn_lesson 
+						WHERE ID = " . (int) $lessonId;
+				}
+			}
+		}
 
 		return ($this->cachedSQL);
 	}
@@ -124,5 +138,21 @@ class CLearnParsePermissionsFromFilter
 	public function IsNeedCheckPerm()
 	{
 		return ($this->bCheckPerm);
+	}
+
+
+	public static function registerAvailableCourse($lessonId)
+	{
+		global $USER;
+
+		if (is_object($USER) && method_exists($USER, 'GetID'))
+		{
+			$loggedUserId = (int) $USER->GetID();
+
+			if ( ! isset(self::$availableLessons[$loggedUserId]) )
+				self::$availableLessons[$loggedUserId] = array();
+
+			self::$availableLessons[$loggedUserId][] = (int) $lessonId;
+		}
 	}
 }

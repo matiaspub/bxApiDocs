@@ -124,11 +124,11 @@ class CSecuritySession
 
 	/**
 	 * @param string $id
-	 * @return int
+	 * @return bool
 	 */
 	public static function checkSessionId($id)
 	{
-		return preg_match("/^[\da-z]{1,32}$/i", $id);
+		return (bool) preg_match("/^[\da-z]{10,32}$/i", $id);
 	}
 
 	public static function activate()

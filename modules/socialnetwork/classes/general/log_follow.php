@@ -23,10 +23,12 @@ class CSocNetLogFollow
 			)
 		);
 		while($arFollow = $rsFollow->Fetch())
+		{
 			$arFollows[$arFollow["CODE"]] = array(
 				"TYPE" => $arFollow["TYPE"],
 				"FOLLOW_DATE" => $arFollow["FOLLOW_DATE"]
 			);
+		}
 
 		if (array_key_exists("**", $arFollows))
 			$default_type = $arFollows["**"]["TYPE"];
@@ -65,6 +67,7 @@ class CSocNetLogFollow
 					$log_update = (strlen($arLog["LOG_UPDATE"]) > 0 ? $arLog["LOG_UPDATE"] : false);
 
 					if (array_key_exists($code, $arFollows)) // already in the follows table
+					{
 						$res = CSocNetLogFollow::Update(
 							$user_id, 
 							$code, 
@@ -75,11 +78,13 @@ class CSocNetLogFollow
 									: (
 										$type == "N" 
 											? $log_update 
-											: $log_date
+											: ($code == "**" ? $log_date : false)
 									)
 							)
 						);
+					}
 					elseif ($type != $default_type) // new record in the follow table only if not equal to default type
+					{
 						$res = CSocNetLogFollow::Add(
 							$user_id, 
 							$code, 
@@ -94,6 +99,7 @@ class CSocNetLogFollow
 									)
 							)
 						);
+					}
 				}
 			}
 		}
@@ -112,18 +118,25 @@ class CSocNetLogFollow
 	{
 		global $DB;
 
-		if (intval($user_id) <= 0 || strlen($code) <= 0)
+		if (
+			intval($user_id) <= 0 
+			|| strlen($code) <= 0
+		)
+		{
 			return false;
+		}
 
 		if ($type != "Y")
+		{
 			$type = "N";
+		}
 
-		if (preg_match('/(\d+)/', $code, $matches))
-			$ref_id = intval($matches[1]);
-		else
-			$ref_id = 0;
+		$ref_id = (preg_match('/(\d+)/', $code, $matches) ? intval($matches[1]) : 0);
 
-		$strSQL = "INSERT INTO b_sonet_log_follow (USER_ID, CODE, REF_ID, TYPE, FOLLOW_DATE) VALUES(".$user_id.", '".$code."', ".$ref_id.", '".$type."', ".($follow_date ? $DB->CharToDateFunction($follow_date) : $DB->CurrentTimeFunction()).")";
+		$strSQL = "INSERT INTO b_sonet_log_follow 
+			(USER_ID, CODE, REF_ID, TYPE, FOLLOW_DATE) 
+			VALUES(".$user_id.", '".$code."', ".$ref_id.", '".$type."', ".($follow_date ? $DB->CharToDateFunction($follow_date) : $DB->CurrentTimeFunction()).")";
+
 		if ($DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__))
 		{
 			if (
@@ -131,7 +144,9 @@ class CSocNetLogFollow
 				&& intval($user_id) > 0 
 				&& $code === "**"
 			)
+			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+			}
 
 			return true;
 		}
@@ -469,7 +484,14 @@ class CSocNetLogFollow
 			&& intval($arMessageFields["TO_USER_ID"]) > 0
 			&& intval($arMessageFields["LOG_ID"]) > 0
 		)
-			$res = CSocNetLogFollow::Set(intval($arMessageFields["TO_USER_ID"]), "L".intval($arMessageFields["LOG_ID"]), "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
+		{
+			$res = CSocNetLogFollow::Set(
+				intval($arMessageFields["TO_USER_ID"]), 
+				"L".intval($arMessageFields["LOG_ID"]), 
+				"Y", 
+				ConvertTimeStamp(time() + (CTimeZone::GetOffset()*2), "FULL", SITE_ID)
+			);
+		}
 
 		return $res;
 	}

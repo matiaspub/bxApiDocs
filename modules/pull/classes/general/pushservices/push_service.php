@@ -8,6 +8,8 @@ abstract class CPushService
 	{
 		global $APPLICATION;
 		$batch = "";
+		if(!is_array($appMessages) || count($appMessages) <= 0)
+			return $batch;
 		foreach ($appMessages as $appID => $arMessages)
 		{
 			$appModifier = ";tkey=" . $appID . ";";

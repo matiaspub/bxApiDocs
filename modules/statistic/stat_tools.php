@@ -906,8 +906,7 @@ function SendDailyStatistics()
 			';
 
 		$HTML_FOOTER = '
-			</body>
-			</html>
+
 			';
 
 		$arEventFields = array(

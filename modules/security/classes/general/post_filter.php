@@ -2,7 +2,7 @@
 
 class CSecurityXSSDetect
 {
-
+	const SCRIPT_MARK = '<!-- deleted by bitrix WAF -->';
 	private $quotes = array();
 
 	private $action = "filter";
@@ -11,20 +11,20 @@ class CSecurityXSSDetect
 	/** @var CSecurityXSSDetectVariables */
 	private $variables = null;
 
-	public function __construct($pCustomOptions = array())
+	public function __construct($options = array())
 	{
-		if(isset($pCustomOptions["action"]))
+		if(isset($options["action"]))
 		{
-			$this->setAction($pCustomOptions["action"]);
+			$this->setAction($options["action"]);
 		}
 		else
 		{
 			$this->setAction(COption::GetOptionString("security", "filter_action"));
 		}
 
-		if(isset($pCustomOptions["log"]))
+		if(isset($options["log"]))
 		{
-			$this->setLog($pCustomOptions["log"]);
+			$this->setLog($options["log"]);
 		}
 		else
 		{
@@ -33,15 +33,18 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param $pContent
+	 * @param $content
 	 */
-	public static function OnEndBufferContent(&$pContent)
+	public static function OnEndBufferContent(&$content)
 	{
-		if(CSecurityFilterMask::Check(SITE_ID, $_SERVER["REQUEST_URI"]))
+		if (CSecuritySystemInformation::isCliMode())
+			return;
+
+		if (CSecurityFilterMask::Check(SITE_ID, $_SERVER["REQUEST_URI"]))
 			return;
 
 		$filter = new CSecurityXSSDetect();
-		$pContent = $filter->process($pContent);
+		$content = $filter->process($content);
 	}
 
 	/**
@@ -72,14 +75,14 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param string $pString
-	 * @param bool $pIsSaveQuotes
+	 * @param string $string
+	 * @param bool $isSaveQuotes
 	 * @return mixed
 	 */
-	public function removeQuotedStrings($pString, $pIsSaveQuotes = true)
+	public function removeQuotedStrings($string, $isSaveQuotes = true)
 	{
 		// http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
-		if($pIsSaveQuotes)
+		if($isSaveQuotes)
 		{
 			$this->quotes = array();
 			return preg_replace_callback('/(
@@ -92,7 +95,7 @@ class CSecurityXSSDetect
 				\\/\\/.*?(?:\\n|$)                                       # singleline comments
 				|
 				string.replace\\(\\/[^\\/\\\\]*(?:\\\\.[^\\/\\\\]*)*\\/  # an JS regexp
-			)/x', array($this, "pushQuote"), $pString);
+			)/x', array($this, "pushQuote"), $string);
 		}
 		else
 		{
@@ -106,24 +109,24 @@ class CSecurityXSSDetect
 				\\/\\/.*?(?:\\n|$)                                       # singleline comments
 				|
 				string.replace\\(\\/[^\\/\\\\]*(?:\\\\.[^\\/\\\\]*)*\\/  # an JS regexp
-			)/x', '', $pString);
+			)/x', '', $string);
 		}
 	}
 
 	/**
-	 * @param string $pAction
+	 * @param string $action
 	 */
-	protected function setAction($pAction)
+	protected function setAction($action)
 	{
-		$this->action = $pAction;
+		$this->action = $action;
 	}
 
 	/**
-	 * @param string $pLog - only Y/N
+	 * @param string $log - only Y/N
 	 */
-	protected function setLog($pLog)
+	protected function setLog($log)
 	{
-		if(is_string($pLog) && $pLog == "Y")
+		if(is_string($log) && $log == "Y")
 		{
 			$this->doLog = true;
 		}
@@ -134,16 +137,17 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param $pName
-	 * @param $pValue
-	 * @param $pSourceScript
+	 * @param $name
+	 * @param $value
+	 * @param $sourceScript
 	 * @return mixed
 	 */
-	protected function logVariable($pName, $pValue, $pSourceScript)
+	protected function logVariable($name, $value, $sourceScript)
 	{
 		if(defined("ANTIVIRUS_CREATE_TRACE"))
-			$this->CreateTrace($pName, $pValue, $pSourceScript);
-		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_XSS2", $pName, $pValue);
+			$this->CreateTrace($name, $value, $sourceScript);
+
+		return CSecurityEvent::getInstance()->doLog("SECURITY", "SECURITY_FILTER_XSS2", $name, $value);
 	}
 
 	/**
@@ -172,28 +176,28 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param string $pQuote
+	 * @param string $quote
 	 * @return string
 	 */
-	protected function pushQuote($pQuote)
+	protected function pushQuote($quote)
 	{
-		$this->quotes[] = $pQuote[0];
+		$this->quotes[] = $quote[0];
 		return "";
 	}
 
 	/**
-	 * @param string $pString
-	 * @param array $pPatterns
+	 * @param string $string
+	 * @param array $patterns
 	 * @return bool
 	 */
-	protected static function isFoundInString($pString, $pPatterns)
+	protected static function isFoundInString($string, $patterns)
 	{
-		foreach($pPatterns as $pattern)
+		foreach($patterns as $pattern)
 		{
 			if(isset($pattern["variable_len"]))
-				$isFound = strlen($pString) > $pattern["variable_len"] && preg_match($pattern["pattern"], $pString);
+				$isFound = strlen($string) > $pattern["variable_len"] && preg_match($pattern["pattern"], $string);
 			else
-				$isFound = preg_match($pattern, $pString);
+				$isFound = preg_match($pattern, $string);
 
 			if($isFound)
 				return true;
@@ -202,18 +206,18 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param string $pBody
+	 * @param string $body
 	 * @return bool
 	 */
-	protected function isDangerBody($pBody)
+	protected function isDangerBody($body)
 	{
-		if(self::isFoundInString($pBody ,$this->variables->getQuoteSearchPattern()))
+		if(self::isFoundInString($body ,$this->variables->getQuoteSearchPattern()))
 		{
 			return true;
 		}
 		else
 		{
-			$bodyWithoutQuotes = $this->removeQuotedStrings($pBody, false);
+			$bodyWithoutQuotes = $this->removeQuotedStrings($body, false);
 			if(self::isFoundInString($bodyWithoutQuotes, $this->variables->getSearchPattern()))
 			{
 				return true;
@@ -223,12 +227,12 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param string $pBody
+	 * @param string $body
 	 * @return string
 	 */
-	protected function getFilteredScriptBody($pBody)
+	protected function getFilteredScriptBody($body)
 	{
-		if($this->isDangerBody($pBody))
+		if($this->isDangerBody($body))
 		{
 //                if($this->mIsLogNeeded)
 //			      {
@@ -236,11 +240,11 @@ class CSecurityXSSDetect
 //                }
 			if($this->action !== "none")
 			{
-				$pBody = "";
+				$body = self::SCRIPT_MARK;
 			}
 		}
 
-		return $pBody;
+		return $body;
 	}
 
 	/**
@@ -256,47 +260,47 @@ class CSecurityXSSDetect
 	}
 
 	/**
-	 * @param string $pString
+	 * @param string $string
 	 * @return string
 	 */
-	protected function filter($pString)
+	protected function filter($string)
 	{
-		$stringLen = CUtil::BinStrlen($pString) * 2;
+		$stringLen = CUtil::BinStrlen($string) * 2;
 		CUtil::AdjustPcreBacktrackLimit($stringLen);
 
-		return preg_replace_callback("/(<script[^>]*>)(.*?)(<\\/script[^>]*>)/is", array($this, "getFilteredScript"), $pString);
+		return preg_replace_callback("/(<script[^>]*>)(.*?)(<\\/script[^>]*>)/is", array($this, "getFilteredScript"), $string);
 	}
 
 	/**
-	 * @param string $pName
-	 * @param string $pValue
+	 * @param string $name
+	 * @param string $value
 	 */
-	protected function addVariable($pName, $pValue)
+	protected function addVariable($name, $value)
 	{
-		if(!is_string($pValue))
+		if(!is_string($value))
 			return;
-		if(strlen($pValue) <= 2)
+		if(strlen($value) <= 2)
 			return; //too short
-		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/", $pValue))
+		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/", $value))
 			return; //there is no potantially dangerous code
-		if(preg_match("/^[,0-9_-]*\$/", $pValue))
+		if(preg_match("/^[,0-9_-]*\$/", $value))
 			return; //there is no potantially dangerous code
-		if($pName === '$_COOKIE[__utmz]' && preg_match("/^[0-9.]++(utm[a-z]{3}=\(?([a-z\/0-1.]++|\(not provided\))\)?\|?)++\$/i", $pValue))
+		if($name === '$_COOKIE[__utmz]' && preg_match("/^[0-9.]++(utm[a-z]{3}=\(?([a-z\/0-1.]++|\(not provided\))\)?\|?)++\$/i", $value))
 			return; //there is no potantially dangerous code, google analytics
 
-		$this->variables->addVariable($pName, str_replace(chr(0), "", $pValue));
+		$this->variables->addVariable($name, str_replace(chr(0), "", $value));
 	}
 
 	/**
-	 * @param string $pName
-	 * @param array $pArray
+	 * @param string $name
+	 * @param array $array
 	 */
-	protected function extractVariablesFromArray($pName, array $pArray)
+	protected function extractVariablesFromArray($name, $array)
 	{
-		if(is_array($pArray))
+		if(is_array($array))
 		{
-			foreach($pArray as $key => $value)
-				$this->addVariable($pName."[".$key."]", $value);
+			foreach($array as $key => $value)
+				$this->addVariable($name."[".$key."]", $value);
 		}
 	}
 

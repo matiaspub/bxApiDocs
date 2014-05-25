@@ -58,22 +58,22 @@ class CAllSaleUserTransact
 
 	
 	/**
-	 * <p>Метод удаляет транзакцию с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Номер транзакции.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет транзакцию с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Номер транзакции. </h
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -97,8 +97,8 @@ class CAllSaleUserTransact
 	{
 		global $DB;
 		$OrderID = IntVal($OrderID);
-
-		return $DB->Query("DELETE FROM b_sale_user_transact WHERE ORDER_ID = ".$OrderID." ", true);
+		$DB->Query("Update b_sale_user_transact SET NOTES='ORDER ".$OrderID."' WHERE ORDER_ID = ".$OrderID." ", true);
+		return $DB->Query("Update b_sale_user_transact SET ORDER_ID = NULL WHERE ORDER_ID = ".$OrderID." ", true);
 	}
 }
 ?>

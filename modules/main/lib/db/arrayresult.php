@@ -3,9 +3,9 @@ namespace Bitrix\Main\DB;
 
 class ArrayResult extends Result
 {
-	static public function __construct($result, Connection $dbConnection = null, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
+	static public function __construct($result)
 	{
-		parent::__construct($result, $dbConnection, $trackerQuery);
+		parent::__construct($result);
 	}
 
 	protected function convertDataFromDb($value, $fieldType)

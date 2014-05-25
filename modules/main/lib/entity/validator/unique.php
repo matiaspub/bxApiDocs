@@ -9,21 +9,16 @@
 namespace Bitrix\Main\Entity\Validator;
 
 use Bitrix\Main\Entity;
-use \Bitrix\Main\Config\ConfigurationException;
+use Bitrix\Main\Localization\Loc;
 
-IncludeModuleLangFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
-/**
- * Class description
- * @package    bitrix
- * @subpackage main
- */
 class Unique extends Base
 {
 	/**
 	 * @var string
 	 */
-	protected $errorPhrase = 'MAIN_ENTITY_VALIDATOR_UNIQUE';
+	protected $errorPhraseCode = 'MAIN_ENTITY_VALIDATOR_UNIQUE';
 
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{

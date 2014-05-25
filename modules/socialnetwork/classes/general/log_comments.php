@@ -20,7 +20,7 @@ class CAllSocNetLogComments
 		{
 			$rsSite = CSite::GetList($by="sort", $order="desc", Array("ACTIVE" => "Y"));
 			while($arSite = $rsSite->Fetch())
-				$arSiteWorkgroupsPage[$arSite["ID"]] = COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]);
+				$arSiteWorkgroupsPage[$arSite["ID"]] = COption::GetOptionString("socialnetwork", "workgroups_page", $arSite["DIR"]."workgroups/", $arSite["ID"]);
 		}
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
@@ -169,8 +169,8 @@ class CAllSocNetLogComments
 	{
 		global $DB;
 
-		$ID = IntVal($ID);
-		if ($ID <= 0)
+		$userID = IntVal($userID);
+		if ($userID <= 0)
 			return false;
 
 		$DB->Query("DELETE FROM b_sonet_log_comment WHERE ENTITY_TYPE = 'U' AND ENTITY_ID = ".$userID."", true);
@@ -501,7 +501,13 @@ class CAllSocNetLogComments
 			}
 		}
 		CUserCounter::IncrementWithSelect(
-			CSocNetLogCounter::GetSubSelect($arLogComment["ID"], $arLog["ENTITY_TYPE"], $arLog["ENTITY_ID"], $arLogComment["EVENT_ID"], $arLogComment["USER_ID"], $arOfEntities, false, false, "Y", "LC")
+			CSocNetLogCounter::GetSubSelect2(
+				$arLogComment["ID"], 
+				array(
+					"TYPE" => "LC",
+					"FOR_ALL_ACCESS" => $bHasAccessAll
+				)
+			)
 		);
 
 		return true;
@@ -528,7 +534,7 @@ class CAllSocNetLogComments
 				$arFields["=LOG_UPDATE"] = $GLOBALS["DB"]->CurrentTimeFunction();
 
 			CSocNetLog::Update($arResult["ID"], $arFields);
-			CSocNetLogFollow::DeleteByLogID($log_id, "Y", true);
+			CSocNetLogFollow::DeleteByLogID($log_id, "Y", true); // not only delete but update to NULL for existing records
 		}	
 	}
 
@@ -544,6 +550,143 @@ class CAllSocNetLogComments
 			$arSource = call_user_func_array($arCallback, array($arFields));
 
 		return $arSource;
+	}
+
+	public static function SendMentionNotification($arCommentFields)
+	{
+		if (!CModule::IncludeModule("im"))
+		{
+			return false;
+		}
+
+		$db_events = GetModuleEvents("socialnetwork", "OnSendMentionGetEntityFields");
+		while ($arEvent = $db_events->Fetch())
+		{
+			$arTitleRes = ExecuteModuleEventEx($arEvent, array($arCommentFields));
+			if ($arTitleRes)
+			{
+				break;
+			}
+		}
+
+		if (
+			$arTitleRes 
+			&& is_array($arTitleRes)
+			&& !empty($arTitleRes["NOTIFY_MESSAGE"])
+		)
+		{
+			$arMessageFields = array(
+				"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+				"FROM_USER_ID" => $arCommentFields["USER_ID"],
+				"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+				"NOTIFY_MODULE" => (!empty($arTitleRes["NOTIFY_MODULE"]) ? $arTitleRes["NOTIFY_MODULE"] : "socialnetwork"),
+				"NOTIFY_TAG" => (!empty($arTitleRes["NOTIFY_TAG"]) ? $arTitleRes["NOTIFY_TAG"] : "LOG_COMMENT|COMMENT_MENTION|".$arCommentFields["ID"])
+			);
+
+			preg_match_all("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/ies".BX_UTF_PCRE_MODIFIER, $arCommentFields["MESSAGE"], $arMention);
+
+			if(!empty($arMention))
+			{
+				$arMention = $arMention[1];
+				$arExcludeUsers = array();
+
+				if (!empty($arCommentFields["LOG_ID"]))
+				{
+					$rsUnFollower = CSocNetLogFollow::GetList(
+						array(
+							"CODE" => "L".$arCommentFields["LOG_ID"],
+							"TYPE" => "N"
+						),
+						array("USER_ID")
+					);
+
+					while ($arUnFollower = $rsUnFollower->Fetch())
+					{
+						$arExcludeUsers[] = $arUnFollower["USER_ID"];
+					}
+				}
+				
+				$arSourceURL = array(
+					"URL" => $arTitleRes["URL"]
+				);
+				if (!empty($arTitleRes["CRM_URL"]))
+				{
+					$arSourceURL["CRM_URL"] = $arTitleRes["CRM_URL"];
+				}
+
+				foreach ($arMention as $mentionUserID)
+				{
+					$bHaveRights = CSocNetLogRights::CheckForUserOnly($arCommentFields["LOG_ID"], $mentionUserID);
+					if (
+						!$bHaveRights
+						&& $arTitleRes["IS_CRM"] == "Y"
+					)
+					{
+						$dbLog = CSocNetLog::GetList(
+							array(),
+							array(
+								"ID" => $arCommentFields["LOG_ID"],
+								"ENTITY_TYPE" => $arCommentFields["ENTITY_TYPE"],
+							),
+							false,
+							false,
+							array("ID"),
+							array(
+								"IS_CRM" => "Y",
+								"CHECK_CRM_RIGHTS" => "Y",
+								"USER_ID" => $mentionUserID,
+								"USE_SUBSCRIBE" => "N"
+							)
+						);
+						if ($arLog = $dbLog->Fetch())
+						{
+							$bHaveCrmRights = true;
+						}
+					}
+
+					if (
+						in_array($mentionUserID, $arExcludeUsers)
+						|| (!$bHaveRights && !$bHaveCrmRights)
+					)
+					{
+						continue;
+					}
+
+					$url = false;
+
+					if (
+						!empty($arSourceURL["URL"]) 
+						|| !empty($arSourceURL["CRM_URL"])
+					)
+					{
+						$arTmp = CSocNetLogTools::ProcessPath(
+							$arSourceURL,
+							$mentionUserID
+						);
+
+						if (
+							$arTitleRes["IS_CRM"] == "Y" 
+							&& !$bHaveRights 
+							&& !empty($arTmp["URLS"]["CRM_URL"])
+						)
+						{
+							$url = $arTmp["URLS"]["CRM_URL"];
+						}
+						else
+						{
+							$url = $arTmp["URLS"]["URL"];
+						}
+						$serverName = (strpos($url, "http://") === 0 || strpos($url, "https://") === 0 ? "" : $arTmp["SERVER_NAME"]);
+					}
+
+					$arMessageFields["TO_USER_ID"] = $mentionUserID;
+					$arMessageFields["NOTIFY_MESSAGE"] = str_replace(array("#url#", "#server_name#"), array($url, $serverName), $arTitleRes["NOTIFY_MESSAGE"]);
+					$arMessageFields["NOTIFY_MESSAGE_OUT"] = (!empty($arTitleRes["NOTIFY_MESSAGE_OUT"]) ? str_replace(array("#url#", "#server_name#"), array($url, $serverName), $arTitleRes["NOTIFY_MESSAGE_OUT"]) : "");
+
+					CIMNotify::Add($arMessageFields);					
+				}
+			}
+		}
 	}
 }
 ?>

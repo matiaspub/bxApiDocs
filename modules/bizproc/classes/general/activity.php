@@ -224,16 +224,17 @@ abstract class CBPActivity
 	/************************************************/
 	
 	/**
-	 * <p>Метод возвращает имя действия. Имя действия уникально в рамках бизнес-процесса.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string <p>Строка, содержащая имя действия.</p><br><br>
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetName.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает имя действия. Имя действия уникально в рамках бизнес-процесса.</p>
+	*
+	*
+	*
+	*
+	* @return string <p>Строка, содержащая имя действия.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetName.php
+	* @author Bitrix
+	*/
 	public function GetName()
 	{
 		return $this->name;
@@ -241,25 +242,25 @@ abstract class CBPActivity
 
 	
 	/**
-	 * <p>Метод возвращает корневое действие бизнес-процесса. Корневое действие реализует интерфейс <b>IBPRootActivity</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return CBPActivity <p>Объект типа <i>CBPActivity</i>, представляющий корневое действие
-	 * бизнес-процесса.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$rootActivity = $this-&gt;GetRootActivity();<br>$documentId = $rootActivity-&gt;GetDocumentId();<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetRootActivity.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает корневое действие бизнес-процесса. Корневое действие реализует интерфейс <b>IBPRootActivity</b>.</p>
+	*
+	*
+	*
+	*
+	* @return CBPActivity <p>Объект типа <i>CBPActivity</i>, представляющий корневое действие
+	* бизнес-процесса.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$rootActivity = $this-&gt;GetRootActivity();<br>$documentId = $rootActivity-&gt;GetDocumentId();<br>?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetRootActivity.php
+	* @author Bitrix
+	*/
 	static public function GetRootActivity()
 	{
 		$p = $this;
@@ -275,23 +276,24 @@ abstract class CBPActivity
 
 	
 	/**
-	 * <p>Метод возвращает код бизнес-процесса.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string <p>Строка, содержащая идентификатор экземпляра бизнес-процесса.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetInstanceId.php">CBPWorkflow::GetInstanceId</a>
-	 * </li> </ul><br><br>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetWorkflowInstanceId.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает код бизнес-процесса.</p>
+	*
+	*
+	*
+	*
+	* @return string <p>Строка, содержащая идентификатор экземпляра бизнес-процесса.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetInstanceId.php">CBPWorkflow::GetInstanceId</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetWorkflowInstanceId.php
+	* @author Bitrix
+	*/
 	public function GetWorkflowInstanceId()
 	{
 		return $this->workflow->GetInstanceId();
@@ -734,41 +736,42 @@ abstract class CBPActivity
 
 	
 	/**
-	 * <p>Метод добавляет новый обработчик события изменения статуса действия.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
-	 * <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
-	 * будет вызываться обработчик.
-	 *
-	 *
-	 *
-	 * @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
-	 * <b>IBPActivityEventListener</b>.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>class CBPMyActivity<br>	extends CBPCompositeActivity    // наследуем, так как составное действие<br>	implements IBPEventActivity	// обработка события завершения дочернего действия<br>{<br>	// Исполняемый метод действия<br>	public function Execute()<br>	{<br>		// Возьмем первое дочернее действие<br>		$activity = $this-&gt;arActivities[0];<br>		// Подпишемся на событие изменения статуса дочернего действия (завершение)<br>		$activity-&gt;AddStatusChangeHandler(self::ClosedEvent, $this);<br>		// Отправим дочернее действие исполняющей среде на выполнение<br>		$this-&gt;workflow-&gt;ExecuteActivity($activity);<br><br>		// Вернем указание исполняющей среде, что действие еще выполняется<br>		return CBPActivityExecutionStatus::Executing;<br>	}<br><br>	// Обработчик события изменения статуса интерфейса IBPEventActivity<br>	// Параметром передается действие, изменившее статус<br>	protected function OnEvent(CBPActivity $sender)<br>	{<br>		// Отпишемся от события изменения статуса дочернего действия (завершения)<br>		$sender-&gt;RemoveStatusChangeHandler(self::ClosedEvent, $this);<br>		// Дочернее действие завершено, выполняем другой необходимый нам код<br>		// Например завершаем действие<br>		$this-&gt;workflow-&gt;CloseActivity($this);<br>	}<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php">RemoveStatusChangeHandler</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новый обработчик события изменения статуса действия.</p>
+	*
+	*
+	*
+	*
+	* @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
+	* <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
+	* будет вызываться обработчик.
+	*
+	*
+	*
+	* @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
+	* <b>IBPActivityEventListener</b>.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>class CBPMyActivity<br>	extends CBPCompositeActivity    // наследуем, так как составное действие<br>	implements IBPEventActivity	// обработка события завершения дочернего действия<br>{<br>	// Исполняемый метод действия<br>	public function Execute()<br>	{<br>		// Возьмем первое дочернее действие<br>		$activity = $this-&gt;arActivities[0];<br>		// Подпишемся на событие изменения статуса дочернего действия (завершение)<br>		$activity-&gt;AddStatusChangeHandler(self::ClosedEvent, $this);<br>		// Отправим дочернее действие исполняющей среде на выполнение<br>		$this-&gt;workflow-&gt;ExecuteActivity($activity);<br><br>		// Вернем указание исполняющей среде, что действие еще выполняется<br>		return CBPActivityExecutionStatus::Executing;<br>	}<br><br>	// Обработчик события изменения статуса интерфейса IBPEventActivity<br>	// Параметром передается действие, изменившее статус<br>	protected function OnEvent(CBPActivity $sender)<br>	{<br>		// Отпишемся от события изменения статуса дочернего действия (завершения)<br>		$sender-&gt;RemoveStatusChangeHandler(self::ClosedEvent, $this);<br>		// Дочернее действие завершено, выполняем другой необходимый нам код<br>		// Например завершаем действие<br>		$this-&gt;workflow-&gt;CloseActivity($this);<br>	}<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php">RemoveStatusChangeHandler</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php
+	* @author Bitrix
+	*/
 	public function AddStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
@@ -782,34 +785,35 @@ abstract class CBPActivity
 
 	
 	/**
-	 * <p>Метод удаляет обработчик события изменения статуса действия.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
-	 * <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
-	 * будет вызываться обработчик.
-	 *
-	 *
-	 *
-	 * @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
-	 * <b>IBPActivityEventListener</b>.
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php">AddStatusChangeHandler</a></li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет обработчик события изменения статуса действия.</p>
+	*
+	*
+	*
+	*
+	* @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
+	* <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
+	* будет вызываться обработчик.
+	*
+	*
+	*
+	* @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
+	* <b>IBPActivityEventListener</b>.
+	*
+	*
+	*
+	* @return void 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php">AddStatusChangeHandler</a></li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php
+	* @author Bitrix
+	*/
 	public function RemoveStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
@@ -873,7 +877,9 @@ abstract class CBPActivity
 
 	public static function CreateInstance($code, $data)
 	{
-		$code = preg_replace("[^a-zA-Z0-9]", "", $code);
+		if (preg_match("#[^a-zA-Z0-9_]#", $code))
+			throw new Exception("Activity '".$code."' is not valid");
+
 		$classname = 'CBP'.$code;
 		if (class_exists($classname))
 			return new $classname($data);
@@ -887,7 +893,9 @@ abstract class CBPActivity
 		if (!$runtime->IncludeActivityFile($code))
 			return array(array("code" => "ActivityNotFound", "parameter" => $code, "message" => GetMessage("BPGA_ACTIVITY_NOT_FOUND")));
 
-		$code = preg_replace("[^a-zA-Z0-9]", "", $code);
+		if (preg_match("#[^a-zA-Z0-9_]#", $code))
+			throw new Exception("Activity '".$code."' is not valid");
+
 		$classname = 'CBP'.$code;
 
 		return call_user_func_array(array($classname, $method), $arParameters);

@@ -1,11 +1,10 @@
 <?
 //<title>CSV Export (new)</title>
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/data_export.php"));
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/csv_data.php");
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/data_export.php');
 
 global $USER;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -104,12 +103,25 @@ if (!function_exists('__CSVExportFile'))
 
 $strCatalogDefaultFolder = COption::GetOptionString("catalog", "export_default_path", CATALOG_DEFAULT_EXPORT_PATH);
 
-$NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels", 3));
+$NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels"));
 if (0 >= $NUM_CATALOG_LEVELS)
 	$NUM_CATALOG_LEVELS = 3;
 
 $strExportErrorMessage = "";
 $arRunErrors = array();
+
+global
+	$arCatalogAvailProdFields,
+	$defCatalogAvailProdFields,
+	$arCatalogAvailPriceFields,
+	$defCatalogAvailPriceFields,
+	$arCatalogAvailValueFields,
+	$defCatalogAvailValueFields,
+	$arCatalogAvailQuantityFields,
+	$defCatalogAvailQuantityFields,
+	$arCatalogAvailGroupFields,
+	$defCatalogAvailGroupFields,
+	$defCatalogAvailCurrencies;
 
 $IBLOCK_ID = intval($IBLOCK_ID);
 if ($IBLOCK_ID<=0)
@@ -238,9 +250,6 @@ if (empty($arRunErrors))
 
 	if (empty($arRunErrors))
 	{
-		global $defCatalogAvailGroupFields, $defCatalogAvailProdFields, $defCatalogAvailPriceFields, $defCatalogAvailValueFields, $defCatalogAvailQuantityFields;
-		global $arCatalogAvailProdFields, $arCatalogAvailGroupFields, $arCatalogAvailPriceFields, $arCatalogAvailValueFields, $arCatalogAvailQuantityFields;
-
 		$intCount = 0; // count of all available fields, props, section fields, prices
 		$arSortFields = array(); // array for order
 		$selectArray = array("ID", "IBLOCK_ID", "IBLOCK_SECTION_ID"); // selected element fields
@@ -479,7 +488,7 @@ if (empty($arRunErrors))
 
 		$arUserTypeFormat = false;
 		$dbIBlockElement = CIBlockElement::GetList(
-				array(),
+				array('ID' => 'ASC'),
 				array("IBLOCK_ID" => $IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'),
 				false,
 				false,

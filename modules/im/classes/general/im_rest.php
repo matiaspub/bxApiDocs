@@ -17,13 +17,15 @@ class CIMRestService extends IRestService
 	{
 		global $USER;
 
+		$arParams = array_change_key_case($arParams, CASE_UPPER);
+
 		$arMessageFields = array(
-			"TO_USER_ID" => $arParams['to'],
+			"TO_USER_ID" => $arParams['TO'],
 			"FROM_USER_ID" => $USER->GetID(),
 			"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 			"NOTIFY_MODULE" => "rest",
 			"NOTIFY_EVENT" => "rest_notify",// - get it from the oauth module
-			"NOTIFY_MESSAGE" => $arParams['message'],
+			"NOTIFY_MESSAGE" => $arParams['MESSAGE'],
 		);
 
 		return CIMNotify::Add($arMessageFields);

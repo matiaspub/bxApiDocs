@@ -19,143 +19,191 @@ class CIBlockSection extends CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
-	 * <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> by1, ... </i> - поле сортировки, может
-	 * принимать значения: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код
-	 * родительской группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> -
-	 * мнемонический код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
-	 * <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина вложенности
-	 * (начинается с 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
-	 * времени создания группы;</li> <li> <b>created_by</b> - по идентификатору
-	 * создателя группы;</li> <li> <b>modified_by</b> - по идентификатору
-	 * пользователя изменившего группу;</li> <li> <b>element_cnt</b> - количество
-	 * элементов в группе, работает только если <b>bIncCnt</b> = true;</li> <li>
-	 * <b>timestamp_x</b> - по времени последнего изменения.</li> </ul> <i>order1, ... </i> -
-	 * порядок сортировки, может принимать значения: <ul> <li> <b>asc</b> - по
-	 * возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). <i>Фильтруемое
-	 * поле</i> может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по
-	 * активности (Y|N);</li> <li> <b>GLOBAL_ACTIVE</b> - фильтр по активности, учитывая
-	 * активность вышележащих разделов (Y|N);</li> <li> <b>NAME</b> - по названию
-	 * (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по мнемоническому
-	 * коду (по шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему
-	 * коду (по шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя;</li>
-	 * <li> <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li> <li>
-	 * <b>LEFT_BORDER</b>, <b> RIGHT_BORDER </b>- по левой и правой границе (поля <b>LEFT_MARGIN</b>
-	 * и <b>RIGHT_MARGIN</b>, см. примечание);</li> <li> <span style="font-weight: bold; ">LEFT_MARGIN</span> -
-	 * по положению в дереве; <br> </li> <li> <span style="font-weight: bold; ">RIGHT_MARGIN</span> - по
-	 * положению в дереве;</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
-	 * по коду родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> -
-	 * по активности родительского информационного блока;</li> <li>
-	 * <b>IBLOCK_NAME</b> - по названию информационного блока (по шаблону [%_]);</li>
-	 * <li> <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
-	 * <b>IBLOCK_CODE </b><i> - </i>по мнемоническому коду информационного блока (по
-	 * шаблону [%_]);</li> <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему коду
-	 * информационного блока (по шаблону [%_]);</li> <li> <span style="font-weight: bold;
-	 * ">TIMESTAMP_X</span> - по времени последнего изменения;</li> <li> <span style="font-weight:
-	 * bold; ">DATE_CREATE</span> - по времени создания;</li> <li> <span style="font-weight: bold;
-	 * ">MODIFIED_BY </span>- по коду пользователя изменившему раздел; <br> </li> <li> <span
-	 * style="font-weight: bold; ">CREATED_BY</span> - по содателю; <br> </li> <li> <span style="font-weight: bold;
-	 * ">SOCNET_GROUP_ID</span> - по привязке к группе Социальной сети;</li> <li>
-	 * <b>MIN_PERMISSION</b> - фильтр по правам доступа, по умолчанию принимает
-	 * <i>R</i> (уровень доступа <i>Чтение</i>);</li> <li> <b>CHECK_PERMISSIONS</b> - если
-	 * установлено значение "N", то проверки прав не происходит; </li> <li>
-	 * <b>PROPERTY </b><i> - </i>по значениям свойств внутрилежащих элементов, PROPERTY
-	 * - массив вида Array("код свойства"=&gt;"значение", ...).</li> </ul> Все
-	 * фильтруемые поля могут содержать перед названием <a
-	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
-	 * фильтра</a>. <br><br><b><i>Значения фильтра</i></b> одиночное значение или
-	 * массив. <br><br> Необязательное. По умолчанию записи не фильтруются.
-	 *
-	 *
-	 *
-	 * @param bool $bIncCnt = false Возвращать ли поле <i>ELEMENT_CNT</i> - количество элементов в разделе.
-	 * При этом arFilter дополнительно обрабатывает следующие фильтруемые
-	 * поля:<b> <br></b> <ul> <li> <b>ELEMENT_SUBSECTIONS</b> - подсчитывать элементы
-	 * вложенных подразделов или нет (Y|N). По умолчанию Y;</li> <li> <b>CNT_ALL</b> -
-	 * подсчитывать еще неопубликованные элементы (Y|N). По умолчанию N.
-	 * Актуально при установленном модуле документооборота;</li> <li>
-	 * <b>CNT_ACTIVE</b> - при подсчете учитывать активность элементов (Y|N). По
-	 * умолчанию N. Учитывается флаг активности элемента ACTIVE и даты
-	 * начала и окончания активности. <br> </li> </ul> Необязательный параметр,
-	 * по умолчанию равен false.
-	 *
-	 *
-	 *
-	 * @param array $Select = Array() Массив для выборки. <ul> <li> <b>ID</b> - ID группы информационного
-	 * блока.</li> <li> <b>CODE</b> - Мнемонический идентификатор.</li> <li> <b>EXTERNAL_ID
-	 * или XML_ID</b> - Внешний код.</li> <li> <b>IBLOCK_ID</b> - ID информационного блока.
-	 * </li> <li> <b>IBLOCK_SECTION_ID</b> - ID группы родителя, если не задан то группа
-	 * корневая. </li> <li> <b>TIMESTAMP_X</b> - Дата последнего изменения параметров
-	 * группы. </li> <li> <b>SORT</b> - Порядок сортировки (среди групп внутри
-	 * одной группы-родителя).</li> <li> <b>NAME</b> - Наименование группы.</li> <li>
-	 * <b>ACTIVE</b> - Флаг активности (Y|N)</li> <li> <b>GLOBAL_ACTIVE</b> - Флаг активности,
-	 * учитывая активность вышележащих (родительских) групп (Y|N).
-	 * Вычисляется автоматически (не может быть изменен вручную).</li> <li>
-	 * <b>PICTURE</b> - Код картинки в таблице файлов.</li> <li> <b>DESCRIPTION</b> - Описание
-	 * группы. </li> <li> <b>DESCRIPTION_TYPE</b> - Тип описания группы (text/html).</li> <li>
-	 * <b>LEFT_MARGIN</b> - Левая граница группы. Вычисляется автоматически (не
-	 * устанавливается вручную). </li> <li> <b>RIGHT_MARGIN</b> - Правая граница
-	 * группы. Вычисляется автоматически (не устанавливается вручную).
-	 * </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности группы. Начинается с 1.
-	 * Вычисляется автоматически (не устанавливается вручную) . </li> <li>
-	 * <b>SEARCHABLE_CONTENT</b> Содержимое для поиска при фильтрации групп.
-	 * Вычисляется автоматически. Складывается из полей <b>NAME</b> и
-	 * <b>DESCRIPTION</b> (без html тэгов, если <b>DESCRIPTION_TYPE</b> установлен в html).</li> <li>
-	 * <b>SECTION_PAGE_URL</b> - Шаблон URL-а к странице для детального просмотра
-	 * раздела. Определяется из параметров информационного блока.
-	 * Изменяется автоматически.</li> <li> <b>MODIFIED_BY</b> - Код пользователя, в
-	 * последний раз изменившего элемент.</li> <li> <b>DATE_CREATE</b> - Дата
-	 * создания элемента.</li> <li> <b>CREATED_BY</b> - Код пользователя, создавшего
-	 * элемент.</li> <li> <b>DETAIL_PICTURE</b> - Код картинки в таблице файлов для
-	 * детального просмотра.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array $NavStartParams = false Массив для постраничной навигации. <ul> <li> <b>bShowAll</b> - разрешить
-	 * вывести все элементы при постраничной навигации</li> <li> <b>iNumPage</b> -
-	 * номер страницы при постраничной навигации</li> <li> <b>nPageSize</b> -
-	 * количество элементов на странице при постраничной навигации</li>
-	 * </ul>
-	 *
-	 *
-	 *
-	 * @return CIBlockResult <a
-	 * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><h4>Примечание</h4><p>
-	 * Поле для сортировки <i>left_margin</i>, так называемая "сквозная"
-	 * сортировка, высчитывается на основании поля <i>sort</i>, уровня
-	 * вложенности и сортировкой верхнего уровня. Отличие полей <i>sort</i> и
-	 * <i>left_margin</i> в том, что <i>sort</i> указывается пользователем, для
-	 * сортировки разделов между собой в пределах одного
-	 * раздела-родителя, а вычисляемое <i>left_margin</i> предназначено для
-	 * сортировки во всем информационном блоке. </p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$arIBTYPE = CIBlockType::GetByIDLang($type, LANGUAGE_ID);<br>if($arIBTYPE!==false)<br>{<br>  // выборка только активных разделов из инфоблока $IBLOCK_ID, в которых есть элементы <br>  // со значением свойства SRC, начинающееся с https://<br>  $arFilter = Array('IBLOCK_ID'=&gt;$IBLOCK_ID, 'GLOBAL_ACTIVE'=&gt;'Y', 'PROPERTY'=&gt;Array('SRC'=&gt;'https://%'));<br>  $db_list = CIBlockSection::GetList(Array($by=&gt;$order), $arFilter, true);<br>  $db_list-&gt;NavStart(20);<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>  while($ar_result = $db_list-&gt;GetNext())<br>  {<br>    echo $ar_result['ID'].' '.$ar_result['NAME'].': '.$ar_result['ELEMENT_CNT'].'&lt;br&gt;';<br>  }<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
-	 * информационного блока </a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
+	* <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> by1, ... </i> - поле сортировки, может
+	* принимать значения: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код
+	* родительской группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> -
+	* мнемонический код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
+	* <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина вложенности
+	* (начинается с 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
+	* времени создания группы;</li> <li> <b>created_by</b> - по идентификатору
+	* создателя группы;</li> <li> <b>modified_by</b> - по идентификатору
+	* пользователя изменившего группу;</li> <li> <b>element_cnt</b> - количество
+	* элементов в группе, работает только если <b>bIncCnt</b> = true;</li> <li>
+	* <b>timestamp_x</b> - по времени последнего изменения.</li> </ul> <i>order1, ... </i> -
+	* порядок сортировки, может принимать значения: <ul> <li> <b>asc</b> - по
+	* возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> <br> Кроме того,
+	* сортировка возможна и по пользовательским свойствам UF_XXX. <br><br>
+	* Значение по умолчанию Array("SORT"=&gt;"ASC") означает, что результат
+	* выборки будет отсортирован по возрастанию. Если задать пустой
+	* массив Array(), то результат отсортирован не будет.
+	*
+	*
+	*
+	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). <i>Фильтруемое
+	* поле</i> может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по
+	* активности (Y|N);</li> <li> <b>GLOBAL_ACTIVE</b> - фильтр по активности, учитывая
+	* активность вышележащих разделов (Y|N);</li> <li> <b>NAME</b> - по названию
+	* (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по мнемоническому
+	* коду (по шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему
+	* коду (по шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя
+	* (если указать false, то будут возвращены корневые разделы);</li> <li>
+	* <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li> <li> <b>LEFT_BORDER</b>,
+	* <b> RIGHT_BORDER</b> - по левой и правой границе (поля <b>LEFT_MARGIN</b> и
+	* <b>RIGHT_MARGIN</b>, см. примечание №2);</li> <li> <b>LEFT_MARGIN</b>, <b>RIGHT_MARGIN</b> - по
+	* положению в дереве;</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
+	* по коду родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> -
+	* по активности родительского информационного блока;</li> <li>
+	* <b>IBLOCK_NAME</b> - по названию информационного блока (по шаблону [%_]);</li>
+	* <li> <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
+	* <b>IBLOCK_CODE </b><i> - </i>по мнемоническому коду информационного блока (по
+	* шаблону [%_]);</li> <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему коду
+	* информационного блока (по шаблону [%_]);</li> <li> <span style="font-weight: bold;
+	* ">TIMESTAMP_X</span> - по времени последнего изменения;</li> <li> <span style="font-weight:
+	* bold; ">DATE_CREATE</span> - по времени создания;</li> <li> <span style="font-weight: bold;
+	* ">MODIFIED_BY </span>- по коду пользователя изменившему раздел; <br> </li> <li> <span
+	* style="font-weight: bold; ">CREATED_BY</span> - по содателю; <br> </li> <li> <span style="font-weight: bold;
+	* ">SOCNET_GROUP_ID</span> - по привязке к группе Социальной сети;</li> <li>
+	* <b>MIN_PERMISSION</b> - фильтр по правам доступа, по умолчанию принимает
+	* <i>R</i> (уровень доступа <i>Чтение</i>);</li> <li> <b>CHECK_PERMISSIONS</b> - если
+	* установлено значение "N", то проверки прав не происходит; </li> <li>
+	* <b>PROPERTY </b><i> - </i>по значениям свойств внутрилежащих элементов, PROPERTY
+	* - массив вида Array("код свойства"=&gt;"значение", ...).</li> </ul> Все
+	* фильтруемые поля могут содержать перед названием <a
+	* href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
+	* фильтра</a>. <br><br><b><i>Значения фильтра</i></b> одиночное значение или
+	* массив. <br><br><b>Важно!</b> Чтобы фильтрация выполнялась по
+	* пользовательским свойствам, необходимо обязательно передавать в
+	* фильтр <i>IBLOCK_ID</i>. <br><br> Необязательное. По умолчанию записи не
+	* фильтруются.
+	*
+	*
+	*
+	* @param bool $bIncCnt = false Возвращать ли поле <i>ELEMENT_CNT</i> - количество элементов в разделе.
+	* При этом arFilter дополнительно обрабатывает следующие фильтруемые
+	* поля:<b> <br></b> <ul> <li> <b>ELEMENT_SUBSECTIONS</b> - подсчитывать элементы
+	* вложенных подразделов или нет (Y|N). По умолчанию Y;</li> <li> <b>CNT_ALL</b> -
+	* подсчитывать еще неопубликованные элементы (Y|N). По умолчанию N.
+	* Актуально при установленном модуле документооборота;</li> <li>
+	* <b>CNT_ACTIVE</b> - при подсчете учитывать активность элементов (Y|N). По
+	* умолчанию N. Учитывается флаг активности элемента ACTIVE и даты
+	* начала и окончания активности. <br> </li> </ul> Необязательный параметр,
+	* по умолчанию равен false.
+	*
+	*
+	*
+	* @param array $Select = Array() Массив для выборки. <ul> <li> <b>ID</b> - ID группы информационного
+	* блока.</li> <li> <b>CODE</b> - Мнемонический идентификатор.</li> <li> <b>EXTERNAL_ID
+	* или XML_ID</b> - Внешний код.</li> <li> <b>IBLOCK_ID</b> - ID информационного блока.
+	* </li> <li> <b>IBLOCK_SECTION_ID</b> - ID группы родителя, если не задан то группа
+	* корневая. </li> <li> <b>TIMESTAMP_X</b> - Дата последнего изменения параметров
+	* группы. </li> <li> <b>SORT</b> - Порядок сортировки (среди групп внутри
+	* одной группы-родителя).</li> <li> <b>NAME</b> - Наименование группы.</li> <li>
+	* <b>ACTIVE</b> - Флаг активности (Y|N)</li> <li> <b>GLOBAL_ACTIVE</b> - Флаг активности,
+	* учитывая активность вышележащих (родительских) групп (Y|N).
+	* Вычисляется автоматически (не может быть изменен вручную).</li> <li>
+	* <b>PICTURE</b> - Код картинки в таблице файлов.</li> <li> <b>DESCRIPTION</b> - Описание
+	* группы. </li> <li> <b>DESCRIPTION_TYPE</b> - Тип описания группы (text/html).</li> <li>
+	* <b>LEFT_MARGIN</b> - Левая граница группы. Вычисляется автоматически (не
+	* устанавливается вручную). </li> <li> <b>RIGHT_MARGIN</b> - Правая граница
+	* группы. Вычисляется автоматически (не устанавливается вручную).
+	* </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности группы. Начинается с 1.
+	* Вычисляется автоматически (не устанавливается вручную). </li> <li>
+	* <b>SEARCHABLE_CONTENT</b> Содержимое для поиска при фильтрации групп.
+	* Вычисляется автоматически. Складывается из полей <b>NAME</b> и
+	* <b>DESCRIPTION</b> (без html тэгов, если <b>DESCRIPTION_TYPE</b> установлен в html).</li> <li>
+	* <b>SECTION_PAGE_URL</b> - Шаблон URL-а к странице для детального просмотра
+	* раздела. Определяется из параметров информационного блока.
+	* Изменяется автоматически.</li> <li> <b>MODIFIED_BY</b> - Код пользователя, в
+	* последний раз изменившего элемент.</li> <li> <b>DATE_CREATE</b> - Дата
+	* создания элемента.</li> <li> <b>CREATED_BY</b> - Код пользователя, создавшего
+	* элемент.</li> <li> <b>DETAIL_PICTURE</b> - Код картинки в таблице файлов для
+	* детального просмотра.</li> </ul> Кроме того, можно вывести
+	* пользовательские свойства, если задать их код (см. примечание
+	* ниже).
+	*
+	*
+	*
+	* @param array $NavStartParams = false Массив для постраничной навигации. <ul> <li> <b>bShowAll</b> - разрешить
+	* вывести все элементы при постраничной навигации</li> <li> <b>iNumPage</b> -
+	* номер страницы при постраничной навигации</li> <li> <b>nPageSize</b> -
+	* количество элементов на странице при постраничной навигации</li>
+	* </ul>
+	*
+	*
+	*
+	* @return CIBlockResult <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><h4>Примечание
+	* №1</h4><p>Для вывода пользовательских свойств обязательно должен
+	* быть передан <i>IBLOCK_ID</i> и в arSelect код необходимых свойств <i>UF_XXX</i>.
+	* Если необходимо вывести все пользовательские свойства, то в arSelect
+	* необходимо передать <i>UF_*</i>.</p> <h4>Примечание №2</h4><p> Поле для
+	* сортировки <i>left_margin</i>, так называемая "сквозная" сортировка,
+	* высчитывается на основании поля <i>sort</i>, уровня вложенности и
+	* сортировкой верхнего уровня. Отличие полей <i>sort</i> и <i>left_margin</i> в
+	* том, что <i>sort</i> указывается пользователем, для сортировки
+	* разделов между собой в пределах одного раздела-родителя, а
+	* вычисляемое <i>left_margin</i> предназначено для сортировки во всем
+	* информационном блоке. </p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$arIBTYPE = CIBlockType::GetByIDLang($type, LANGUAGE_ID);<br>if($arIBTYPE!==false)<br>{<br>  // выборка только активных разделов из инфоблока $IBLOCK_ID, в которых есть элементы <br>  // со значением свойства SRC, начинающееся с https://<br>  $arFilter = Array('IBLOCK_ID'=&gt;$IBLOCK_ID, 'GLOBAL_ACTIVE'=&gt;'Y', 'PROPERTY'=&gt;Array('SRC'=&gt;'https://%'));<br>  $db_list = CIBlockSection::GetList(Array($by=&gt;$order), $arFilter, true);<br>  $db_list-&gt;NavStart(20);<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>  while($ar_result = $db_list-&gt;GetNext())<br>  {<br>    echo $ar_result['ID'].' '.$ar_result['NAME'].': '.$ar_result['ELEMENT_CNT'].'&lt;br&gt;';<br>  }<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>}<br>?&gt;<br>
+	* 
+	* 
+	* 
+	* //пример выборки дерева подразделов для раздела 
+	* $rsParentSection = CIBlockSection::GetByID(ID_необходимой_секции);
+	* if ($arParentSection = $rsParentSection-&gt;GetNext())
+	* {
+	*    $arFilter = array('IBLOCK_ID' =&gt; $arParentSection['IBLOCK_ID'],'&gt;LEFT_MARGIN' =&gt; $arParentSection['LEFT_MARGIN'],'&lt;RIGHT_MARGIN' =&gt; $arParentSection['RIGHT_MARGIN'],'&gt;DEPTH_LEVEL' =&gt; $arParentSection['DEPTH_LEVEL']); // выберет потомков без учета активности
+	*    $rsSect = CIBlockSection::GetList(array('left_margin' =&gt; 'asc'),$arFilter);
+	*    while ($arSect = $rsSect-&gt;GetNext())
+	*    {
+	*        // получаем подразделы
+	*    }
+	* }
+	* 
+	* 
+	* 
+	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле 
+	* 
+	* &lt;? 
+	* //внутри цикла построения меню
+	* $uf_iblock_id = 1; //ID инфоблока
+	* $uf_name = Array("UF_PAGE_LINK"); //пользовательское поле UF_PAGE_LINK
+	* 
+	* preg_match('/\?ID=([0-9]+)\&amp;?/i', $arItem["LINK"], $matches); //SEF отключен, поэтому спокойно берем SECTION_ID из ссылки по шаблону ID=#SECTION_ID#
+	* $uf_section_id = $matches[1];
+	* if(CModule::IncludeModule("iblock")): //подключаем модуль инфоблок для работы с классом CIBlockSection
+	*    $uf_arresult = CIBlockSection::GetList(Array("SORT"=&gt;"­­ASC"), Array("IBLOCK_ID" =&gt; $uf_iblock_id, "ID" =&gt; $uf_section_id), false, $uf_name);
+	*    if($uf_value = $uf_arresult-&gt;GetNext()):
+	*       if(strlen($uf_value["UF_PAGE_LINK"]) &gt; 0): //проверяем что поле заполнено
+	*          $arItem["LINK"] = $uf_value["UF_PAGE_LINK"]; //подменяем ссылку и используем её в дальнейшем
+	*       endif;
+	*    endif;
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
+	* информационного блока </a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $bIncCnt = false, $arSelect = array(), $arNavStartParams=false)
 	{
 		global $DB, $USER, $USER_FIELD_MANAGER;

@@ -28,7 +28,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CForumEMail
 {
-	public static function GetForumFilters($FID, $SOCNET_GROUP_ID = false)
+public static 	function GetForumFilters($FID, $SOCNET_GROUP_ID = false)
 	{
 		global $DB;
 		$strSql = 'SELECT *
@@ -40,7 +40,7 @@ class CForumEMail
 		return $dbr->Fetch();
 	}
 
-	public static function GetMailFilters($MAIL_FILTER_ID)
+public static 	function GetMailFilters($MAIL_FILTER_ID)
 	{
 		global $DB;
 		$strSql = 'SELECT fe.*, f.MODERATION
@@ -50,7 +50,7 @@ class CForumEMail
 		return $dbr;
 	}
 
-	public static function Set($arFields)
+public static 	function Set($arFields)
 	{
 		global $DB;
 
@@ -114,7 +114,7 @@ class CForumEMail
 		return $ID;
 	}
 
-	public static function OnGetSocNetFilterList()
+public static 	function OnGetSocNetFilterList()
 	{
 		return Array(
 			"ID"					=>	"forumsocnet",
@@ -126,14 +126,113 @@ class CForumEMail
 			);
 	}
 
-	public static function SocnetPrepareVars()
+public static 	function SocnetPrepareVars()
 	{
 		return '';
 	}
 
-	public static function SocnetEMailMessageCheck($arMessageFields, $ACTION_VARS)
+public static 	public static function SocnetLogMessageAdd($arParams, $arMessageFields, $action = "")
 	{
-		//print_r($arMessageFields);
+		static $parser = null;
+		if ($parser == null)
+			$parser = new forumTextParser();
+		$arAllow = array(
+			"HTML" => "N",
+			"ANCHOR" => "N",
+			"BIU" => "N",
+			"IMG" => "N",
+			"LIST" => "N",
+			"QUOTE" => "N",
+			"CODE" => "N",
+			"FONT" => "N",
+			"SMILES" => "N",
+			"UPLOAD" => "Y",
+			"NL2BR" => "N",
+			"TABLE" => "N",
+			"ALIGN" => "N"
+		);
+//		$arParams["LOG_ID"], $arParams["LANG"] ....
+
+		$arFieldsForSocnet = array(
+			"ENTITY_TYPE" => SONET_ENTITY_GROUP,
+			"ENTITY_ID" => $arParams["ENTITY_ID"],
+			"EVENT_ID" => "forum",
+			"=LOG_DATE" => (!!$arMessageFields["DATE_CREATE"] ? $arMessageFields["DATE_CREATE"] : $GLOBALS["DB"]->CurrentTimeFunction()),
+			"LOG_UPDATE" => (!!$arMessageFields["POST_DATE"] ? $arMessageFields["POST_DATE"] : null),
+			"TITLE_TEMPLATE" => str_replace(
+				"#AUTHOR_NAME#",
+				$arMessageFields["AUTHOR_NAME"],
+				CForumEmail::GetLangMessage("FORUM_MAIL_SOCNET_TITLE_TOPIC", $arParams["LANG"])),
+			"TITLE" => $arMessageFields["TITLE"],
+			"MESSAGE" => $parser->convert($arMessageFields["POST_MESSAGE"], $arAllow),
+			"TEXT_MESSAGE" => $parser->convert4mail($arMessageFields["POST_MESSAGE"]),
+			"URL" => CComponentEngine::MakePathFromTemplate($arParams["URL_TEMPLATES_MESSAGE"],
+					array(
+						"UID" => $arMessageFields["AUTHOR_ID"],
+						"FID" => $arMessageFields["FORUM_ID"],
+						"TID" => $arMessageFields["TOPIC_ID"],
+						"TITLE_SEO" => $arMessageFields["TOPIC_ID"],
+						"MID" => $arMessageFields["ID"]
+					)
+				),
+			"PARAMS" => serialize(
+				array(
+					"PATH_TO_MESSAGE" => CComponentEngine::MakePathFromTemplate(
+							$arParams["URL_TEMPLATES_MESSAGE"], array("TID" => $arMessageFields["TOPIC_ID"])))),
+			"MODULE_ID" => false,
+			"CALLBACK_FUNC" => false,
+			"SOURCE_ID" => $arMessageFields["ID"],
+			"RATING_TYPE_ID" => "FORUM_TOPIC",
+			"RATING_ENTITY_ID" => $arMessageFields["TOPIC_ID"]
+		);
+
+		if ($arMessageFields["AUTHOR_ID"] > 0)
+			$arFieldsForSocnet["USER_ID"] = $arMessageFields["AUTHOR_ID"];
+
+		$db_res = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => $arMessageFields["ID"]));
+		$ufFileID = array();
+		while ($res = $db_res->Fetch())
+			$ufFileID[] = $res["FILE_ID"];
+		$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $arMessageFields["ID"], LANGUAGE_ID);
+
+		$logID = $arParams["LOG_ID"];
+		if ($logID <= 0)
+		{
+			if (!empty($ufFileID))
+				$arFieldsForSocnet["UF_SONET_LOG_FILE"] = $ufFileID;
+			if ($ufDocID)
+				$arFieldsForSocnet["UF_SONET_LOG_DOC"] = $ufDocID;
+
+			$logID = CSocNetLog::Add($arFieldsForSocnet, false);
+
+			if (intval($logID) > 0)
+			{
+				CSocNetLog::Update($logID, array("TMP_ID" => $logID));
+				CSocNetLogRights::SetForSonet($logID, $arFieldsForSocnet["ENTITY_TYPE"], $arFieldsForSocnet["ENTITY_ID"], "forum", "view", true);
+				if ($action == "SEND_EVENT")
+					CSocNetLog::SendEvent($logID, "SONET_NEW_EVENT", $logID);
+			}
+		}
+		if ($logID > 0 && $action == "ADD_COMMENT")
+		{
+			if (!empty($ufFileID))
+				$arFieldsForSocnet["UF_SONET_COM_FILE"] = $ufFileID;
+			if ($ufDocID)
+				$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
+
+			$arFieldsForSocnet["LOG_ID"] = $logID;
+			$arFieldsForSocnet["RATING_TYPE_ID"] = "FORUM_POST";
+			$arFieldsForSocnet["RATING_ENTITY_ID"] = $arMessageFields["ID"];
+
+			$commentID = CSocNetLogComments::Add($arFieldsForSocnet);
+			CSocNetLog::CounterIncrement($commentID, false, false, "LC");
+			return $commentID;
+		}
+		return $logID;
+	}
+
+public static 	function SocnetEMailMessageCheck(&$arMessageFields, $ACTION_VARS)
+	{
 		$arEmails = CMailUtil::ExtractAllMailAddresses($arMessageFields["FIELD_TO"].",".$arMessageFields["FIELD_CC"].",".$arMessageFields["FIELD_BCC"]);
 		$dbMbx = CMailBox::GetById($arMessageFields["MAIL_FILTER"]["MAILBOX_ID"]);
 		$arMbx = $dbMbx->Fetch();
@@ -159,7 +258,7 @@ class CForumEMail
 		return false;
 	}
 
-	public static function SocnetEMailMessageAdd($arMessageFields, $ACTION_VARS)
+public static 	function SocnetEMailMessageAdd($arMessageFields, $ACTION_VARS)
 	{
 		if(!is_array($arMessageFields["FORUM_EMAIL_FILTER"]))
 			return false;
@@ -465,55 +564,29 @@ class CForumEMail
 				$lang = $arSite['LANGUAGE_ID'];
 			else
 				$lang = $LANGUAGE_ID;
-			$parser = new forumTextParser();
-			$arForum = CForumNew::GetByID($FORUM_ID);
-			$arAllow = array(
-				"HTML" => "N",
-				"ANCHOR" => "N",
-				"BIU" => "N",
-				"IMG" => "N",
-				"LIST" => "N",
-				"QUOTE" => "N",
-				"CODE" => "N",
-				"FONT" => "N",
-				"SMILES" => "N",
-				"UPLOAD" => $arForum["ALLOW_UPLOAD"],
-				"NL2BR" => "N",
-				"TABLE" => "N",
-				"ALIGN" => "N",
+			$params = array(
+				"LOG_ID" => 0,
+				"ENTITY_ID" => $SOCNET_GROUP_ID,
+				"URL_TEMPLATES_MESSAGE" => $arParams["URL_TEMPLATES_MESSAGE"],
+				"LANG" => $lang
 			);
 
+			$arMessageFields = array(
+				"FORUM_ID" => $FORUM_ID,
+				"TOPIC_ID" => $TOPIC_ID,
+				"ID" => $MESSAGE_ID,
+				"AUTHOR_NAME" => $AUTHOR_NAME,
+				"AUTHOR_ID" => $AUTHOR_USER_ID,
+				"TITLE" => $subject,
+				"POST_MESSAGE" => $body,
+			);
 			if ($arFields["NEW_TOPIC"] == "Y")
 			{
-				$arFieldsForSocnet = array(
-					"ENTITY_TYPE" => SONET_ENTITY_GROUP,
-					"ENTITY_ID" => $SOCNET_GROUP_ID,
-					"EVENT_ID" => "forum",
-					"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-					"TITLE_TEMPLATE" => str_replace("#AUTHOR_NAME#", $AUTHOR_NAME, CForumEmail::GetLangMessage("FORUM_MAIL_SOCNET_TITLE_TOPIC", $lang)),
-					"TITLE" => $subject,
-					"MESSAGE" => $parser->convert($body, $arAllow),
-					"TEXT_MESSAGE" => $parser->convert4mail($body),
-					"URL" => CComponentEngine::MakePathFromTemplate($arParams["URL_TEMPLATES_MESSAGE"], array("UID" => $AUTHOR_USER_ID, "FID" => $FORUM_ID, "TID" => $TOPIC_ID, "MID" => $MESSAGE_ID)),
-					"PARAMS" => serialize(array("PATH_TO_MESSAGE" => CComponentEngine::MakePathFromTemplate($arParams["URL_TEMPLATES_MESSAGE"], array("TID" => $TOPIC_ID)))),
-					"MODULE_ID" => false,
-					"CALLBACK_FUNC" => false,
-					"SOURCE_ID" => $MESSAGE_ID,
-					"RATING_TYPE_ID" => "FORUM_TOPIC",
-					"RATING_ENTITY_ID" => intval($TOPIC_ID)
+				$log_id = self::SocnetLogMessageAdd(
+					$params,
+					$arMessageFields,
+					"SEND_EVENT"
 				);
-
-				if (intVal($AUTHOR_USER_ID) > 0)
-					$arFieldsForSocnet["USER_ID"] = $AUTHOR_USER_ID;
-
-				$logID = CSocNetLog::Add($arFieldsForSocnet, false);
-
-				if (intval($logID) > 0)
-				{
-					CSocNetLog::Update($logID, array("TMP_ID" => $logID));
-					CSocNetLogRights::SetForSonet($logID, $arFieldsForSocnet["ENTITY_TYPE"], $arFieldsForSocnet["ENTITY_ID"], "forum", "view", true);
-					CSocNetLog::SendEvent($logID, "SONET_NEW_EVENT", $logID);
-				}
 			}
 			else
 			{
@@ -546,77 +619,28 @@ class CForumEMail
 						if ($arFirstMessage = $dbFirstMessage->Fetch())
 						{
 							$arTopic = CForumTopic::GetByID($arFirstMessage["TOPIC_ID"]);
-							$sFirstMessageText = (COption::GetOptionString("forum", "FILTER", "Y") == "Y" ? $arFirstMessage["POST_MESSAGE_FILTER"] : $arFirstMessage["POST_MESSAGE"]);
-
-							$sFirstMessageURL = CComponentEngine::MakePathFromTemplate(
-								$arParams["URL_TEMPLATES_MESSAGE"],
-								array(
-									"UID" => $arFirstMessage["AUTHOR_ID"],
-									"FID" => $arFirstMessage["FORUM_ID"],
-									"TID" => $arFirstMessage["TOPIC_ID"],
-									"MID" => $arFirstMessage["ID"])
+							$arFirstMessage["POST_MESSAGE"] = (COption::GetOptionString("forum", "FILTER", "Y") == "Y" ? $arFirstMessage["POST_MESSAGE_FILTER"] : $arFirstMessage["POST_MESSAGE"]);
+							$arFirstMessage["TITLE"] = $arTopic["TITLE"];
+							$log_id = self::SocnetLogMessageAdd(
+								$params,
+								$arFirstMessage
 							);
-
-							$arFieldsForSocnet = array(
-								"ENTITY_TYPE" => SONET_ENTITY_GROUP,
-								"ENTITY_ID" => $SOCNET_GROUP_ID,
-								"EVENT_ID" => "forum",
-								"LOG_DATE" => $arFirstMessage["POST_DATE"],
-								"LOG_UPDATE" => $arFirstMessage["POST_DATE"],
-								"TITLE_TEMPLATE" => str_replace("#AUTHOR_NAME#", $arFirstMessage["AUTHOR_NAME"], GetMessage("SONET_FORUM_LOG_TOPIC_TEMPLATE")),
-								"TITLE" => $arTopic["TITLE"],
-								"MESSAGE" => $parser->convert($sFirstMessageText, $arAllow),
-								"TEXT_MESSAGE" => $parser->convert4mail($sFirstMessageText),
-								"URL" => $sFirstMessageURL,
-								"PARAMS" => serialize(array("PATH_TO_MESSAGE" => CComponentEngine::MakePathFromTemplate($arParams["URL_TEMPLATES_MESSAGE"], array("TID" => $arFirstMessage["TOPIC_ID"])))),
-								"MODULE_ID" => false,
-								"CALLBACK_FUNC" => false,
-								"SOURCE_ID" => $arFirstMessage["ID"],
-								"RATING_TYPE_ID" => "FORUM_TOPIC",
-								"RATING_ENTITY_ID" => intval($arFirstMessage["TOPIC_ID"])
-							);
-
-							if (intVal($arFirstMessage["AUTHOR_ID"]) > 0)
-								$arFieldsForSocnet["USER_ID"] = $arFirstMessage["AUTHOR_ID"];
-
-							$log_id = CSocNetLog::Add($arFieldsForSocnet, false);
-							if (intval($log_id) > 0)
-							{
-								CSocNetLog::Update($log_id, array("TMP_ID" => $log_id));
-								CSocNetLogRights::SetForSonet($log_id, $arFieldsForSocnet["ENTITY_TYPE"], $arFieldsForSocnet["ENTITY_ID"], "forum", "view", true);
-							}
 						}
 					}
-
 					if (intval($log_id) > 0)
 					{
-						$arFieldsForSocnet = array(
-							"ENTITY_TYPE" => SONET_ENTITY_GROUP,
-							"ENTITY_ID" => $SOCNET_GROUP_ID,
-							"EVENT_ID" => "forum",
-							"LOG_ID" => $log_id,
-							"=LOG_DATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-							"MESSAGE" => $parser->convert($body, $arAllow),
-							"TEXT_MESSAGE" => $parser->convert4mail($body),
-							"URL" => CComponentEngine::MakePathFromTemplate($arParams["URL_TEMPLATES_MESSAGE"], array("UID" => $AUTHOR_USER_ID, "FID" => $FORUM_ID, "TID" => $TOPIC_ID, "MID" => $MESSAGE_ID)),
-							"MODULE_ID" => false,
-							"SOURCE_ID" => $MESSAGE_ID,
-							"RATING_TYPE_ID" => "FORUM_POST",
-							"RATING_ENTITY_ID" => intval($MESSAGE_ID)
+						$params["LOG_ID"] = $log_id;
+						self::SocnetLogMessageAdd(
+							$params,
+							$arMessageFields,
+							"ADD_COMMENT"
 						);
-
-						if (intVal($AUTHOR_USER_ID) > 0)
-							$arFieldsForSocnet["USER_ID"] = $AUTHOR_USER_ID;
-
-						$comment_id = CSocNetLogComments::Add($arFieldsForSocnet);
-						CSocNetLog::CounterIncrement($comment_id, false, false, "LC");
 					}
 				}
 			}
-
 		}
 	}
-	public static function GetLangMessage($ID, $lang)
+public static 	function GetLangMessage($ID, $lang)
 	{
 		$MESS = Array();
 		if(file_exists($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/forum/lang/'.$lang.'/mail/mail.php'))

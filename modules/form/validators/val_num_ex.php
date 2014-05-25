@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorNumberEx
@@ -16,7 +15,7 @@ class CFormValidatorNumberEx
 			"HANDLER" => array("CFormValidatorNumberEx", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -25,13 +24,13 @@ class CFormValidatorNumberEx
 				"TYPE" => "TEXT",
 				"DEFAULT" => "0",
 			),
-			
+
 			"NUMBER_TO" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_VAL_NUM_EX_SETTINGS_NUMBER_TO"),
 				"TYPE" => "TEXT",
 				"DEFAULT" => "100",
 			),
-			
+
 			"NUMBER_FLOAT" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_VAL_NUM_EX_SETTINGS_NUMBER_FLOAT"),
 				"TYPE" => "CHECKBOX",
@@ -39,37 +38,37 @@ class CFormValidatorNumberEx
 			),
 		);
 	}
-	
+
 	public static function ToDB($arParams)
 	{
 		$arParams["NUMBER_FLOAT"] = $arParams["NUMBER_FLOAT"] == "Y" ? "Y" : "N";
 		$arParams["NUMBER_FROM"] = $arParams["NUMBER_FLOAT"] == "Y" ? floatval($arParams["NUMBER_FROM"]) : intval($arParams["NUMBER_FROM"]);
 		$arParams["NUMBER_TO"] = $arParams["NUMBER_FLOAT"] == "Y" ? floatval($arParams["NUMBER_TO"]) : intval($arParams["NUMBER_TO"]);
-		
+
 		if ($arParams["NUMBER_FROM"] > $arParams["NUMBER_TO"])
 		{
 			$tmp = $arParams["NUMBER_FROM"];
 			$arParams["NUMBER_FROM"] = $arParams["NUMBER_TO"];
 			$arParams["NUMBER_TO"] = $tmp;
 		}
-		
+
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
+
 		foreach ($arValues as $value)
 		{
 			if (strlen($value) <= 0) continue;
-			
-			// do not return error if NaN, but set it to number - 
+
+			// do not return error if NaN, but set it to number -
 
 
 			// empty string is not a number but we won't return error - crossing with "required" mark
@@ -84,14 +83,14 @@ class CFormValidatorNumberEx
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_EX_ERROR_NOTINT"));
 				return false;
 			}
-			
+
 			// check minimum number
 			if (strlen($arParams["NUMBER_FROM"]) > 0 && $value < $arParams["NUMBER_FROM"])
 			{
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_EX_ERROR_LESS"));
 				return false;
 			}
-			
+
 			// check maximum number
 			if (strlen($arParams["NUMBER_TO"]) > 0 && $value > $arParams["NUMBER_TO"])
 			{
@@ -99,7 +98,7 @@ class CFormValidatorNumberEx
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

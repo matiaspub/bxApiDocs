@@ -34,53 +34,58 @@ class CWikiParser
 
 	
 	/**
-	 * <p>Метод обрабатывает содержимое Wiki-страницы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $text  Содержимое Wiki-страницы
-	 *
-	 *
-	 *
-	 * @param string $type  Тип содержимого Wiki-страницы (html|text)
-	 *
-	 *
-	 *
-	 * @param array $arFile  Массив изображений
-	 *
-	 *
-	 *
-	 * @return string <p>Возвращает обработанную Wiki-страницу, без Wiki-разметки. <br></p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>
-	 * // Обработаем содержимое страницы "Тестовая страница" инфо.блока с идентификатором 2
-	 * $IBLOCK_ID = 2;
-	 * $NAME = 'Тестовая страница';
-	 * $arFilter = array(
-	 * 	'ACTIVE' =&gt; 'Y',
-	 * 	'CHECK_PERMISSIONS' =&gt; 'N',
-	 * 	'IBLOCK_ID' =&gt; $IBLOCK_ID
-	 * );
-	 * $arElement = CWiki::GetElementByName($NAME, $arFilter);
-	 * 
-	 * $CWikiParser = new CWikiParser();
-	 * echo $CWikiParser-&gt;Parse($arElement['~DETAIL_TEXT'], $arElement['DETAIL_TEXT_TYPE'], $arElement['IMAGES']);<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/Parse.php
-	 * @author Bitrix
-	 */
+	* <p>Метод обрабатывает содержимое Wiki-страницы.</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Содержимое Wiki-страницы
+	*
+	*
+	*
+	* @param typ $e = 'text' Тип содержимого Wiki-страницы (html|text). Необязательный.
+	*
+	*
+	*
+	* @param arFil $e = array() Массив изображений. Необязательный.
+	*
+	*
+	*
+	* @param arParam $s = array() Путь до папки. Необязательный.
+	*
+	*
+	*
+	* @return string <p>Возвращает обработанную Wiki-страницу, без Wiki-разметки. <br></p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>
+	* // Обработаем содержимое страницы "Тестовая страница" инфо.блока с идентификатором 2
+	* $IBLOCK_ID = 2;
+	* $NAME = 'Тестовая страница';
+	* $arFilter = array(
+	* 	'ACTIVE' =&gt; 'Y',
+	* 	'CHECK_PERMISSIONS' =&gt; 'N',
+	* 	'IBLOCK_ID' =&gt; $IBLOCK_ID
+	* );
+	* $arElement = CWiki::GetElementByName($NAME, $arFilter);
+	* 
+	* $CWikiParser = new CWikiParser();
+	* echo $CWikiParser-&gt;Parse($arElement['~DETAIL_TEXT'], $arElement['DETAIL_TEXT_TYPE'], $arElement['IMAGES']);<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php
+	* @author Bitrix
+	*/
 	public function Parse($text, $type = 'text', $arFile = array(), $arParams = array())
 	{
 		$type = $this->textType = ($type == 'html' ? 'html' : 'text');
@@ -589,6 +594,35 @@ class CWikiParser
 
 	}
 
+	
+	/**
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением.</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Содержимое Wiki-страницы
+	*
+	*
+	*
+	* @param array &$arCat  Массив будет заполнен категориями, указанными в тексте страницы
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br><br>$IBLOCK_ID = 2;<br>$NAME = 'Тестовая страница';<br>$arFilter = array(<br>	'ACTIVE' =&gt; 'Y',<br>	'CHECK_PERMISSIONS' =&gt; 'N',<br>	'IBLOCK_ID' =&gt; $IBLOCK_ID<br>);<br>$arElement = CWiki::GetElementByName($NAME, $arFilter);<br>$arCat = array();<br><br>$CWikiParser = new CWikiParser();<br>echo $CWikiParser-&gt;parseBeforeSave($arElement['~DETAIL_TEXT'], $arCat);<br><br>?&gt;
+	* </htm
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parsebeforesave.php
+	* @author Bitrix
+	*/
 	public static function parseBeforeSave($text, &$arCat = array(), $nameTemplate = "")
 	{
 		$userLogin = CWikiUtils::GetUserLogin(array(), $nameTemplate);
@@ -610,21 +644,21 @@ class CWikiParser
 
 	
 	/**
-	 * <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $text  Содержимое Wiki-страницы
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parseForSearch.php
-	 * @author Bitrix
-	 */
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением</p>
+	*
+	*
+	*
+	*
+	* @param string $text  Содержимое Wiki-страницы
+	*
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parseForSearch.php
+	* @author Bitrix
+	*/
 	public static function parseForSearch($text)
 	{
 		// delete Category

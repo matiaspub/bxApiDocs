@@ -12,7 +12,7 @@ class CFormOutput_old
 	 * @param array $arParams
 	 * @return bool
 	 */
-	public function Init($arParams, $admin = false)
+public 	function Init($arParams, $admin = false)
 	{
 		global $APPLICATION, $USER;
 
@@ -160,7 +160,7 @@ class CFormOutput_old
 /*****************************************/
 	/*              Filter methods. Move to component     */
 	/*****************************************/
-	public static function __checkFilter(&$str_error) // check of filter values
+public static 	function __checkFilter(&$str_error) // check of filter values
 	{
 		global $strError, $MESS, $HTTP_GET_VARS, $arrFORM_FILTER;
 		global $find_date_create_1, $find_date_create_2;
@@ -211,7 +211,7 @@ class CFormOutput_old
 		if (strlen($str)>0) return false; else return true;
 	}
 
-	public function __prepareFilter()
+public 	function __prepareFilter()
 	{
 		$FilterArr = Array(
 			"find_id",
@@ -325,7 +325,7 @@ class CFormOutput_old
 	 * Use: $FORM->Out();
 	 *
 	 */
-	public function Out()
+public 	function Out()
 	{
 		global $APPLICATION, $USER;
 
@@ -343,10 +343,6 @@ class CFormOutput_old
 			{
 				$this->__form_validate_errors = CForm::Check($this->WEB_FORM_ID, $this->arrVALUES);
 			}
-
-			//echo "<pre>"; print_r($this); echo "</pre>";
-			//echo $this->__form_validate_errors;
-			//exit();
 
 			if (!$this->isFormErrors())
 			{
@@ -490,12 +486,10 @@ class CFormOutput_old
 
 		}
 
-		//echo "<pre>"; print_r($this->arForm); echo "</pre>";
-
 		echo $strReturn;
 	}
 
-	public function getData(&$arResult)
+	fpublic unction getData(&$arResult)
 	{
 		global $APPLICATION, $USER;
 
@@ -609,7 +603,7 @@ class CFormOutput_old
 		return $arResult;
 	}
 
-	public function getListData()
+public 	function getListData()
 	{
 		$arFilter = $this->__prepareFilter();
 		$arResult = $this->__prepareDataForTpl();
@@ -617,7 +611,7 @@ class CFormOutput_old
 		return $arResult;
 	}
 
-	public function __prepareDataForTpl()
+public 	function __prepareDataForTpl()
 	{
 		global $APPLICATION;
 
@@ -644,7 +638,7 @@ class CFormOutput_old
 	 * Initialize Captcha
 	 *
 	 */
-	public function CaptchaInitialize()
+	fpublic unction CaptchaInitialize()
 	{
 		$this->CAPTCHACode = $GLOBALS["APPLICATION"]->CaptchaGetCode();
 		//echo $this->CAPTCHACode;
@@ -703,11 +697,7 @@ class CFormOutput_old
 
 						$out .= "<a title=\"".GetMessage("FORM_VIEW_FILE")."\" target=\"_blank\" href=\"".$file_link."\">".htmlspecialcharsbx($arrA["USER_FILE_NAME"])."</a><br />(";
 
-						$a = array("b", "Kb", "Mb", "Gb");
-						$pos = 0;
-						$size = $arrA["USER_FILE_SIZE"];
-						while($size>=1024) {$size /= 1024; $pos++;}
-						$out .= round($size,2)." ".$a[$pos];
+						$out .= CFile::FormatSize($arrA["USER_FILE_SIZE"]);
 
 						$out .= ")<br />[&nbsp;<a title=\"".str_replace("#FILE_NAME#", $arrA["USER_FILE_NAME"], GetMessage("FORM_DOWNLOAD_FILE"))."\" href=\"".$file_link."&action=download\">".GetMessage("FORM_DOWNLOAD")."</a>&nbsp;]";
 					} //endif;

@@ -11,7 +11,7 @@ class CAllSaleOrderChange
 			return false;
 		}
 
-		if ((is_set($arFields, "USER_ID") || $ACTION=="ADD") && strlen($arFields["USER_ID"]) <= 0)
+		if ((is_set($arFields, "USER_ID") || $ACTION=="ADD") && strlen($arFields["USER_ID"]) < 0)
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SOC_EMPTY_USER_ID"), "SOC_ADD_EMPTY_USER_ID");
 			return false;
@@ -60,7 +60,6 @@ class CAllSaleOrderChange
 
 	/*
 	 * Adds record to the order change history
-	 *
 	 * Wrapper around CSaleOrderChange::Add method
 	 *
 	 * @param int $orderId - order ID
@@ -70,31 +69,33 @@ class CAllSaleOrderChange
 	 */
 	public static function AddRecord($orderId, $type, $data = array())
 	{
-		if (defined("SALE_DEBUG") && SALE_DEBUG)
-			CSaleHelper::WriteToLog("CSaleOrderChange - AddRecord", array("orderId" => $orderId, "type" => $type, "data" => $data), "SOCAR1");
-
 		global $USER;
+
+		if (is_object($USER))
+			$userId = intval($USER->GetID());
+		else
+			$userId = 0;
 
 		$arParams = array(
 			"ORDER_ID" => intval($orderId),
 			"TYPE" => $type,
 			"DATA" => (is_array($data) ? serialize($data) : $data),
-			"USER_ID" => $USER->GetID()
+			"USER_ID" => $userId
 		);
 
 		return CSaleOrderChange::Add($arParams);
 	}
 
 	/*
-	 * Adds records to the order changes list based on changes in the fields in the Update method.
-	 * By default changes in the order fields and basket items fields are supported.
+	 * Automatically adds records to the order changes list based on changes in the fields of the Update method.
+	 * By default changes in the CSaleOrder::Update and CSaleBasket::Update fields are supported.
 	 *
 	 * @see CSaleOrderChangeFormat - list of possible types of operations which will be used in analyzing incoming fields
 	 *
 	 * @param int $orderId - order ID
 	 * @param array $OldFields - old fields with values (retrieved by entity GetById method)
 	 * @param array $NewFields - new array of fields and their values
-	 * @param array $arDeleteFields - array of fields whose changes should be ignored
+	 * @param array $arDeleteFields - array of fields to be ignored
 	 * @param string $entity - name of the entity (empty for order, "BASKET" for basket items etc). Used in filtering operations when creating records automatically
 	 * @return bool
 	 */
@@ -111,6 +112,9 @@ class CAllSaleOrderChange
 
 		foreach ($arNewFields as $key => $val)
 		{
+			if (is_array($val))
+				continue;
+
 			if (!array_key_exists($key, $arOldFields) || (array_key_exists($key, $arOldFields) && strlen($val) > 0 && $val != $arOldFields[$key]) && !in_array($key, $arDeleteFields))
 			{
 				$arRecord = CSaleOrderChange::MakeRecordFromField($key, $arNewFields, $entity);
@@ -160,7 +164,7 @@ class CAllSaleOrderChange
 	 *
 	 * Function is used in the order history in the detailed order view.
 	 *
-	 * @param string $type - one of the operation types
+	 * @param string $type - one of the operation types (@see CSaleOrderChangeFormat)
 	 * @param string $data - serialized data saved in the database for the record of this type
 	 * @return array with keys: NAME - record name, INFO - full description (string)
 	 */
@@ -304,7 +308,13 @@ class CSaleOrderChangeFormat
 			"TRIGGER_FIELDS" => array("PRICE"),
 			"FUNCTION" => "FormatBasketPriceChanged",
 			"DATA_FIELDS" => array("PRODUCT_ID", "NAME", "PRICE", "CURRENCY")
-		)
+		),
+		"ORDER_DELIVERY_REQUEST_SENT" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatOrderDeliveryRequestSent",
+			"DATA_FIELDS" => array()
+		),
+
 	);
 
 	public static function FormatBasketAdded($arData)
@@ -631,4 +641,28 @@ class CSaleOrderChangeFormat
 			"INFO" => $info
 		);
 	}
+	public static function FormatOrderDeliveryRequestSent($arData)
+	{
+		if($arData["RESULT"] == "OK")
+		{
+			$reqDescription = GetMessage("SOC_ORDER_DELIVERY_REQUEST_SENT_SUCCESS");
+		}
+		else
+		{
+			$reqDescription = GetMessage("SOC_ORDER_DELIVERY_REQUEST_SENT_ERROR");
+
+			if(isset($arData["TEXT"]))
+				$reqDescription .=": ".$arData["TEXT"].".";
+
+			if(isset($arData["DATA"]))
+				$reqDescription .= GetMessage("SOC_ORDER_DELIVERY_REQUEST_SENT_ADD_INFO").": ".serialize($arData["DATA"]);
+
+		}
+
+		return array(
+			"NAME" => GetMessage("SOC_ORDER_DELIVERY_REQUEST_SENT"),
+			"INFO" => $reqDescription,
+		);
+	}
+
 }

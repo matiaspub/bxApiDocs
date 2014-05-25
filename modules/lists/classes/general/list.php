@@ -141,17 +141,60 @@ class CList
 
 	public static function OnGetDocumentAdminPage($arElement)
 	{
-		global $DB;
-		$rs = $DB->Query("SELECT URL FROM b_lists_url WHERE IBLOCK_ID = ".intval($arElement["IBLOCK_ID"]));
-		if($ar = $rs->Fetch())
+		$url = self::getUrlByIblockId($arElement["IBLOCK_ID"]);
+		if ($url != "")
 		{
 			return str_replace(
 				array("#section_id#", "#element_id#"),
 				array(intval($arElement["IBLOCK_SECTION_ID"]), intval($arElement["ID"])),
-				$ar["URL"]
+				$url
 			);
 		}
 		return "";
+	}
+
+	public static function OnSearchGetURL($arFields)
+	{
+
+		if (
+			$arFields["MODULE_ID"] === "iblock"
+			&& $arFields["ITEM_ID"] > 0
+			&& substr($arFields["URL"], 0, 1) === "="
+		)
+		{
+			$url = self::getUrlByIblockId($arFields["PARAM2"]);
+			if ($url != "")
+			{
+				$arElement = array();
+				parse_str(substr($arFields["URL"], 1), $arElement);
+
+				return str_replace(
+					array("#section_id#", "#element_id#"),
+					array(intval($arElement["IBLOCK_SECTION_ID"]), intval($arElement["ID"])),
+					$url
+				);
+			}
+		}
+
+		return $arFields["URL"];
+	}
+
+	public static function getUrlByIblockId($IBLOCK_ID)
+	{
+		global $DB;
+		static $cache = array();
+		$IBLOCK_ID = intval($IBLOCK_ID);
+
+		if (!isset($cache[$IBLOCK_ID]))
+		{
+			$rs = $DB->Query("SELECT URL FROM b_lists_url WHERE IBLOCK_ID = ".$IBLOCK_ID);
+			$cache[$IBLOCK_ID] = $rs->Fetch();
+		}
+
+		if ($cache[$IBLOCK_ID])
+			return $cache[$IBLOCK_ID]["URL"];
+		else
+			return "";
 	}
 }
 ?>

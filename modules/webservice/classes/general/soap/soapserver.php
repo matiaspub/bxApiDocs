@@ -293,9 +293,13 @@ class CWSSOAPResponser extends CSOAPServerResponser
  * <h4>Example</h4> 
  * <pre>
  * В этом примере в <b>$arParams["SOAPSERVER_RESPONSER"]</b> содержаться объекты 
- * обработчики SOAP. Обычно SOAP-обработчик создаётся в компоненте, сохраняется в массив в 
+ * обработчики SOAP. 
+ * 
+ * Обычно SOAP-обработчик создаётся в компоненте, сохраняется в массив в 
  * <b>$arParams["SOAPSERVER_RESPONSER"]</b> и далее, когда включается компонент 
  * webservice.server, выполняется следующий код. 
+ * 
+ * 
  * // В компоненте обработчика
  * 
  * // Создаем экземпляр обработчика

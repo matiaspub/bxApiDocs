@@ -8,6 +8,13 @@ class CIMSettings
 	const CLIENT_XMPP = 'xmpp';
 	const CLIENT_MAIL = 'email';
 
+	const PRIVACY_MESSAGE = 'privacyMessage';
+	const PRIVACY_CHAT = 'privacyChat';
+	const PRIVACY_CALL = 'privacyCall';
+	const PRIVACY_SEARCH = 'privacySearch';
+	const PRIVACY_RESULT_ALL = 'all';
+	const PRIVACY_RESULT_CONTACT = 'contact';
+
 	public static function Get($userId = false)
 	{
 		global $USER, $CACHE_MANAGER;
@@ -30,7 +37,6 @@ class CIMSettings
 		// Check fields and add default values
 		$arSettings[self::SETTINGS] = self::checkValues(self::SETTINGS, $arSettings[self::SETTINGS]);
 		$arSettings[self::NOTIFY] = self::checkValues(self::NOTIFY, $arSettings[self::NOTIFY]);
-
 		return $arSettings;
 	}
 
@@ -39,12 +45,26 @@ class CIMSettings
 		if (!in_array($type, Array(self::SETTINGS, self::NOTIFY)))
 			return false;
 
-		global $USER;
+		global $USER, $USER_FIELD_MANAGER;
 		$userId = intval($userId);
 		if ($userId == 0)
 			$userId = $USER->GetId();
 
+		
+		$arDefault = self::GetDefaultSettings($type);
+		foreach ($value as $key => $val)
+		{
+			if (isset($arDefault[$key]) && $arDefault[$key] == $val)
+			{
+				if ($key == self::PRIVACY_SEARCH)
+					$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => ''));
+				unset($value[$key]);
+			}
+		}
 		CUserOptions::SetOption('IM', $type, $value, false, $userId);
+
+		if (isset($value[self::PRIVACY_SEARCH]))
+			$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => $value[self::PRIVACY_SEARCH]));
 
 		self::ClearCache($userId);
 
@@ -62,9 +82,15 @@ class CIMSettings
 			$userId = $USER->GetId();
 
 		$arSettings = CUserOptions::GetOption('IM', $type, Array(), $userId);
-		foreach ($value as $key => $value)
-			$arSettings[$key] = $value;
+		foreach ($value as $key => $val)
+			$arSettings[$key] = $val;
 
+		$arDefault = self::GetDefaultSettings($type);
+		foreach ($arSettings as $key => $val)
+		{
+			if (isset($arDefault[$key]) && $arDefault[$key] == $val)
+				unset($arSettings[$key]);
+		}
 		CUserOptions::SetOption('IM', $type, $arSettings, false, $userId);
 
 		self::ClearCache($userId);
@@ -72,6 +98,15 @@ class CIMSettings
 		return true;
 	}
 
+	public static function GetSetting($type, $value, $userId = false)
+	{
+		if (!in_array($type, Array(self::SETTINGS, self::NOTIFY)))
+			return null;
+
+		$arSettings = self::Get($userId);
+
+		return isset($arSettings[$type][$value])? $arSettings[$type][$value]: null;
+	}
 
 	public static function GetNotifyAccess($userId, $moduleId, $eventId, $clientId)
 	{
@@ -115,20 +150,26 @@ class CIMSettings
 		{
 			$arDefault = Array(
 				'status' => 'online',
+				'bxdNotify' => true,
 				'sshNotify' => true,
-				'viewOffline' => true,
-				'viewGroup' => true,
+				'nativeNotify' => true,
+				'viewOffline' => COption::GetOptionString("im", "view_offline"),
+				'viewGroup' => COption::GetOptionString("im", "view_group"),
 				'enableSound' => true,
-				'sendByEnter' => false,
-				'panelPositionHorizontal' => 'right',
-				'panelPositionVertical' => 'bottom',
-				'loadLastMessage' => true,
-				'loadLastNotify' => true,
+				'sendByEnter' => COption::GetOptionString("im", "send_by_enter"),
+				'panelPositionHorizontal' => COption::GetOptionString("im", "panel_position_horizontal"),
+				'panelPositionVertical' => COption::GetOptionString("im", "panel_position_vertical"),
+				'loadLastMessage' => COption::GetOptionString("im", "load_last_message"),
+				'loadLastNotify' => COption::GetOptionString("im", "load_last_notify"),
 				'notifyScheme' => 'simple',
 				'notifySchemeLevel' => 'important',
 				'notifySchemeSendSite' => true,
 				'notifySchemeSendEmail' => true,
 				'notifySchemeSendXmpp' => true,
+				'privacyMessage' => COption::GetOptionString("im", "privacy_message"),
+				'privacyChat' => COption::GetOptionString("im", "privacy_chat"),
+				'privacyCall' => COption::GetOptionString("im", "privacy_call"),
+				'privacySearch' => COption::GetOptionString("im", "privacy_search"),
 			);
 		}
 		elseif ($type == self::NOTIFY)
@@ -148,7 +189,7 @@ class CIMSettings
 		return $arDefault;
 	}
 
-	private static function CheckValues($type, $value)
+	public static function CheckValues($type, $value)
 	{
 		$arValues = Array();
 
@@ -172,6 +213,10 @@ class CIMSettings
 				else if ($key == 'notifyScheme')
 				{
 					$arValues[$key] = in_array($value[$key], Array('simple', 'expert'))? $value[$key]: $default;
+				}
+				else if (in_array($key, Array('privacyMessage', 'privacyChat', 'privacyCall', 'privacySearch')))
+				{
+					$arValues[$key] = in_array($value[$key], Array(self::PRIVACY_RESULT_ALL, self::PRIVACY_RESULT_CONTACT))? $value[$key]: $default;
 				}
 				else if ($key == 'sendByEnter' && $value[$key] === 'Y') // for legacy
 				{
@@ -267,6 +312,12 @@ class CIMSettings
 		}
 
 		return $arNotifyBlocked;
+	}
+
+	public static function GetPrivacy($type, $userId = false)
+	{
+		$ar = CIMSettings::Get($userId);
+		return array_key_exists($type, $ar[CIMSettings::SETTINGS])? $ar[CIMSettings::SETTINGS][$type]: false;
 	}
 
 	public static function ClearCache($userId = false)

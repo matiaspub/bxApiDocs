@@ -31,6 +31,51 @@ require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/socialnetwork/tools.php
 
 // define("DisableSonetLogVisibleSubscr", true);
 
+$arClasses = array(
+	"CSocNetGroup" => "classes/".$DBType."/group.php",
+	"CSocNetGroupSubject" => "classes/".$DBType."/group_subject.php",
+	"CSocNetUserToGroup" => "classes/".$DBType."/user_group.php",
+	"CSocNetFeatures" => "classes/".$DBType."/group_features.php",
+	"CSocNetFeaturesPerms" => "classes/".$DBType."/group_features_perms.php",
+	"CSocNetUserRelations" => "classes/".$DBType."/user_relations.php",
+	"CSocNetSmile" => "classes/".$DBType."/smile.php",
+	"CSocNetUser" => "classes/".$DBType."/user.php",
+	"CSocNetUserPerms" => "classes/".$DBType."/user_perms.php",
+	"CSocNetUserEvents" => "classes/".$DBType."/user_events.php",
+	"CSocNetMessages" => "classes/".$DBType."/messages.php",
+	"CSocNetEventUserView" => "classes/".$DBType."/event_user_view.php",
+	"CSocNetLog" => "classes/".$DBType."/log.php",
+	"CSocNetLogTools" => "classes/general/log_tools.php",
+	"CSocNetLogToolsPhoto" => "classes/general/log_tools_photo.php",
+	"CSocNetForumComments" => "classes/general/log_forum_comments.php",
+	"CSocNetLogRights" => "classes/general/log_rights.php",
+	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
+	"CSocNetLogFollow" => "classes/general/log_follow.php",
+	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
+	"CSocNetLogRestService" => "classes/general/rest.php",
+	"logTextParser" => "classes/general/log_tools.php",
+	"CSocNetPhotoCommentEvent" => "classes/general/log_tools_photo.php",
+	"CSocNetLogComments" => "classes/".$DBType."/log_comments.php",
+	"CSocNetLogEvents" => "classes/".$DBType."/log_events.php",
+	"CSocNetLogCounter" => "classes/".$DBType."/log_counter.php",
+	"CSocNetLogFavorites" => "classes/".$DBType."/log_favorites.php",
+	"CSocNetLogComponent" => "classes/general/log_tools.php",
+	"CSocNetSubscription" => "classes/".$DBType."/subscription.php",
+	"CSocNetSearch" => "classes/general/search.php",
+	"CSocNetSearchReindex" => "classes/general/search_reindex.php",
+	"CSocNetTextParser" => "classes/general/functions.php",
+	"CSocNetTools" => "classes/general/functions.php",
+	"CSocNetGroupAuthProvider" => "classes/general/authproviders.php",
+	"CSocNetUserAuthProvider" => "classes/general/authproviders.php",
+	"CSocNetLogDestination" => "classes/general/log_destination.php",
+	"CSocNetNotifySchema" => "classes/general/notify_schema.php",
+	"CSocNetPullSchema" => "classes/general/notify_schema.php",
+	"Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
+	"\\Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
+	"socialnetwork" => "install/index.php",
+);
+CModule::AddAutoloadClasses("socialnetwork", $arClasses);
+
 global $arSocNetAllowedRolesForUserInGroup;
 $arSocNetAllowedRolesForUserInGroup = array(SONET_ROLES_MODERATOR, SONET_ROLES_USER, SONET_ROLES_BAN, SONET_ROLES_REQUEST, SONET_ROLES_OWNER);
 
@@ -134,50 +179,6 @@ foreach ($arSocNetAllowedSubscribeEntityTypesDesc as $key => $val)
 	if (!preg_match('/^[a-zA-Z0-9]+$/', $key))
 		unset($arSocNetAllowedSubscribeEntityTypesDesc[$key]);
 
-$arClasses = array(
-	"CSocNetGroup" => "classes/".$DBType."/group.php",
-	"CSocNetGroupSubject" => "classes/".$DBType."/group_subject.php",
-	"CSocNetUserToGroup" => "classes/".$DBType."/user_group.php",
-	"CSocNetFeatures" => "classes/".$DBType."/group_features.php",
-	"CSocNetFeaturesPerms" => "classes/".$DBType."/group_features_perms.php",
-	"CSocNetUserRelations" => "classes/".$DBType."/user_relations.php",
-	"CSocNetSmile" => "classes/".$DBType."/smile.php",
-	"CSocNetUser" => "classes/".$DBType."/user.php",
-	"CSocNetUserPerms" => "classes/".$DBType."/user_perms.php",
-	"CSocNetUserEvents" => "classes/".$DBType."/user_events.php",
-	"CSocNetMessages" => "classes/".$DBType."/messages.php",
-	"CSocNetEventUserView" => "classes/".$DBType."/event_user_view.php",
-	"CSocNetLog" => "classes/".$DBType."/log.php",
-	"CSocNetLogTools" => "classes/general/log_tools.php",
-	"CSocNetLogToolsPhoto" => "classes/general/log_tools_photo.php",
-	"CSocNetForumComments" => "classes/general/log_forum_comments.php",
-	"CSocNetLogRights" => "classes/general/log_rights.php",
-	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
-	"CSocNetLogFollow" => "classes/general/log_follow.php",
-	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
-	"CSocNetLogRestService" => "classes/general/rest.php",	
-	"logTextParser" => "classes/general/log_tools.php",
-	"CSocNetPhotoCommentEvent" => "classes/general/log_tools_photo.php",
-	"CSocNetLogComments" => "classes/".$DBType."/log_comments.php",
-	"CSocNetLogEvents" => "classes/".$DBType."/log_events.php",
-	"CSocNetLogCounter" => "classes/".$DBType."/log_counter.php",
-	"CSocNetLogFavorites" => "classes/".$DBType."/log_favorites.php",
-	"CSocNetSubscription" => "classes/".$DBType."/subscription.php",
-	"CSocNetSearch" => "classes/general/search.php",
-	"CSocNetSearchReindex" => "classes/general/search_reindex.php",
-	"CSocNetTextParser" => "classes/general/functions.php",
-	"CSocNetTools" => "classes/general/functions.php",
-	"CSocNetGroupAuthProvider" => "classes/general/authproviders.php",
-	"CSocNetUserAuthProvider" => "classes/general/authproviders.php",
-	"CSocNetLogDestination" => "classes/general/log_destination.php",
-	"CSocNetNotifySchema" => "classes/general/notify_schema.php",
-	"CSocNetPullSchema" => "classes/general/notify_schema.php",
-	"Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
-	"\\Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
-	"socialnetwork" => "install/index.php",
-);
-CModule::AddAutoloadClasses("socialnetwork", $arClasses);
-
 if (
 	!defined("BX_MOBILE_LOG")
 	|| BX_MOBILE_LOG != true
@@ -274,6 +275,14 @@ if (COption::GetOptionString("socialnetwork", "allow_photo_user", "Y") == "Y" ||
 				"METHOD_FORMAT"	=> "FormatEvent_Photo",
 				"HAS_CB" => "Y",
 				"FULL_SET" => array("photo", "photo_photo", "photo_comment"),
+				"COMMENT_EVENT"	=> array(
+					"EVENT_ID" => "photoalbum_comment",
+					"OPERATION" => "view",
+					"OPERATION_ADD"	=> "view",
+					"ADD_CALLBACK" => array("CSocNetPhotoCommentEvent", "AddComment_PhotoAlbum"),
+					"CLASS_FORMAT" => "CSocNetLogTools",
+					"METHOD_FORMAT"	=> "FormatComment_PhotoAlbum"
+				)
 			),
 			"photo_photo" =>  array(
 				"OPERATION" => "view",

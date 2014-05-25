@@ -75,43 +75,43 @@ class CModule
 
 	
 	/**
-	 * <p>Запускает процедуру инсталляции модуля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // если нажали кнопку "Установить" или "Деинсталлировать" то
-	 * if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
-	 * {
-	 *     // проверим наличие обязательного файла в каталоге модуля
-	 *     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
-	 *     {
-	 *         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
-	 *         $obModule = new $module_id;
-	 *         if($obModule-&gt;IsInstalled() &amp;&amp; strlen($uninstall)&gt;0) $obModule-&gt;DoUninstall();
-	 *         elseif(!$obModule-&gt;IsInstalled() &amp;&amp; strlen($install)&gt;0) <b>$obModule-&gt;DoInstall</b>();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/doinstall.php
-	 * @author Bitrix
-	 */
+	* <p>Запускает процедуру инсталляции модуля.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // если нажали кнопку "Установить" или "Деинсталлировать" то
+	* if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
+	* {
+	*     // проверим наличие обязательного файла в каталоге модуля
+	*     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
+	*     {
+	*         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
+	*         $obModule = new $module_id;
+	*         if($obModule-&gt;IsInstalled() &amp;&amp; strlen($uninstall)&gt;0) $obModule-&gt;DoUninstall();
+	*         elseif(!$obModule-&gt;IsInstalled() &amp;&amp; strlen($install)&gt;0) <b>$obModule-&gt;DoInstall</b>();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/doinstall.php
+	* @author Bitrix
+	*/
 	function DoInstall()
 	{
 	}
@@ -265,45 +265,46 @@ class CModule
 
 	
 	/**
-	 * <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае.</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // если нажали кнопку "Установить" или "Деинсталлировать" то
-	 * if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
-	 * {
-	 *     // проверим наличие обязательного файла в каталоге модуля
-	 *     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
-	 *     {
-	 *         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
-	 *         $obModule = new $module_id;
-	 *         if(<b>$obModule-&gt;IsInstalled()</b> &amp;&amp; strlen($uninstall)&gt;0) $obModule-&gt;DoUninstall();
-	 *         elseif(!<b>$obModule-&gt;IsInstalled()</b> &amp;&amp; strlen($install)&gt;0) $obModule-&gt;DoInstall();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
-	 * </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы модулей</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php
-	 * @author Bitrix
-	 */
+	* <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае.</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // если нажали кнопку "Установить" или "Деинсталлировать" то
+	* if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
+	* {
+	*     // проверим наличие обязательного файла в каталоге модуля
+	*     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
+	*     {
+	*         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
+	*         $obModule = new $module_id;
+	*         if(<b>$obModule-&gt;IsInstalled()</b> &amp;&amp; strlen($uninstall)&gt;0) $obModule-&gt;DoUninstall();
+	*         elseif(!<b>$obModule-&gt;IsInstalled()</b> &amp;&amp; strlen($install)&gt;0) $obModule-&gt;DoInstall();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы модулей</a>
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php
+	* @author Bitrix
+	*/
 	public function IsInstalled()
 	{
 		return \Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID);
@@ -311,81 +312,82 @@ class CModule
 
 	
 	/**
-	 * <p>Запускает процедуру деинсталляции модуля.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // если нажали кнопку "Установить" или "Деинсталлировать" то
-	 * if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
-	 * {
-	 *     // проверим наличие обязательного файла в каталоге модуля
-	 *     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
-	 *     {
-	 *         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
-	 *         $obModule = new $module_id;
-	 *         if($obModule-&gt;IsInstalled() &amp;&amp; strlen($uninstall)&gt;0) <b>$obModule-&gt;DoUninstall</b>();
-	 *         elseif(!$obModule-&gt;IsInstalled() &amp;&amp; strlen($install)&gt;0) $obModule-&gt;DoInstall();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/douninstall.php
-	 * @author Bitrix
-	 */
+	* <p>Запускает процедуру деинсталляции модуля.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // если нажали кнопку "Установить" или "Деинсталлировать" то
+	* if(strlen($uninstall)&gt;0 || strlen($install)&gt;0)
+	* {
+	*     // проверим наличие обязательного файла в каталоге модуля
+	*     if(@file_exists($DOCUMENT_ROOT."/bitrix/modules/".$module_id."/install/index.php"))
+	*     {
+	*         include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/index.php");
+	*         $obModule = new $module_id;
+	*         if($obModule-&gt;IsInstalled() &amp;&amp; strlen($uninstall)&gt;0) <b>$obModule-&gt;DoUninstall</b>();
+	*         elseif(!$obModule-&gt;IsInstalled() &amp;&amp; strlen($install)&gt;0) $obModule-&gt;DoInstall();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/douninstall.php
+	* @author Bitrix
+	*/
 	public static function DoUninstall()
 	{
 	}
 
 	
 	/**
-	 * <p>Удаляет регистрационную запись о модуле из базы данных.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function UnRegisterModule($id)
-	 * {
-	 *     $m = new CModule;
-	 *     $m-&gt;MODULE_ID = $id;
-	 *     <b>$m-&gt;Remove</b>();
-	 *     CAllMain::DelGroupRight($id);
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php">CModule::Add</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет регистрационную запись о модуле из базы данных.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function UnRegisterModule($id)
+	* {
+	*     $m = new CModule;
+	*     $m-&gt;MODULE_ID = $id;
+	*     <b>$m-&gt;Remove</b>();
+	*     CAllMain::DelGroupRight($id);
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php">CModule::Add</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php
+	* @author Bitrix
+	*/
 	public function Remove()
 	{
 		\Bitrix\Main\ModuleManager::delete($this->MODULE_ID);
@@ -393,34 +395,35 @@ class CModule
 
 	
 	/**
-	 * <p>Вставляет идентификатор модуля в таблицу b_module.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $m = new CModule;
-	 * $m-&gt;MODULE_ID = "iblock";
-	 * <b>$m-&gt;Add</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php">CModule::Remove</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php
-	 * @author Bitrix
-	 */
+	* <p>Вставляет идентификатор модуля в таблицу b_module.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $m = new CModule;
+	* $m-&gt;MODULE_ID = "iblock";
+	* <b>$m-&gt;Add</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermodule.php">RegisterModule</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/remove.php">CModule::Remove</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/add.php
+	* @author Bitrix
+	*/
 	public function Add()
 	{
 		\Bitrix\Main\ModuleManager::add($this->MODULE_ID);
@@ -428,37 +431,37 @@ class CModule
 
 	
 	/**
-	 * <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsInstalledModules = <b>CModule::GetList</b>();
-	 * while ($ar = $rsInstalledModules-&gt;Fetch())
-	 * {
-	 *     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getdropdownlist.php">CModule::GetDropDownList</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsInstalledModules = <b>CModule::GetList</b>();
+	* while ($ar = $rsInstalledModules-&gt;Fetch())
+	* {
+	*     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getdropdownlist.php">CModule::GetDropDownList</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList()
 	{
 		$result = new CDBResult;
@@ -474,42 +477,42 @@ class CModule
 	 */
 	
 	/**
-	 * <p>Проверяет установлен ли модуль и если установлен, то подключает его (точнее подключает файл <nobr><b>/bitrix/modules/</b><i>ID модуля</i><b>/include.php</b></nobr>). Возвращает "true", если модуль установлен, иначе - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $module_id  Идентификатор модуля.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // проверим установлен ли модуль "Информационные блоки" и если да то подключим его
-	 * if (<b>CModule::IncludeModule</b>("iblock")):
-	 *     // здесь необходимо использовать функции модуля "Информационные блоки"
-	 *     ...
-	 * endif;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы
-	 * модулей</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет установлен ли модуль и если установлен, то подключает его (точнее подключает файл <nobr><b>/bitrix/modules/</b><i>ID модуля</i><b>/include.php</b></nobr>). Возвращает "true", если модуль установлен, иначе - "false".</p>
+	*
+	*
+	*
+	*
+	* @param string $module_name  Идентификатор модуля.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // проверим установлен ли модуль "Информационные блоки" и если да то подключим его
+	* if (<b>CModule::IncludeModule</b>("iblock")):
+	*     // здесь необходимо использовать функции модуля "Информационные блоки"
+	*     ...
+	* endif;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/ismoduleinstalled.php">IsModuleInstalled</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/isinstalled.php">CModule::IsInstalled</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификаторы
+	* модулей</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php
+	* @author Bitrix
+	*/
 	public static function IncludeModule($module_name)
 	{
 		return \Bitrix\Main\Loader::includeModule($module_name);
@@ -568,7 +571,7 @@ class CModule
 
 
 /**
- * <p>Регистрация модуля в системе. Как правило регистрация модуля является неотъемлемой частью процесса [link=89619]инсталляции модуля[/link].</p>
+ * <p>Регистрация модуля в системе. Как правило регистрация модуля является неотъемлемой частью процесса <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3475" >инсталляции модуля</a>.</p>
  *
  *
  *
@@ -589,7 +592,7 @@ class CModule
  * &lt;?
  * // файл /bitrix/modules/statistic/install/step2.php 
  * <b>RegisterModule</b>("statistic");
- * ?&gt;
+ * ?&gt;</b
  * </pre>
  *
  *
@@ -611,7 +614,7 @@ function RegisterModule($id)
 
 
 /**
- * <p>Удаляет регистрационную запись, а также все настройки модуля из базы данных. Как правило удаление регистрационной записи модуля является неотъемлемой частью процесса [link=89620]деинсталляции модуля[/link].</p>
+ * <p>Удаляет регистрационную запись, а также все настройки модуля из базы данных. Как правило удаление регистрационной записи модуля является неотъемлемой частью процесса <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3475" >деинсталляции модуля</a>.</p>
  *
  *
  *
@@ -628,7 +631,7 @@ function RegisterModule($id)
  * &lt;?
  * // файл /bitrix/modules/statistic/install/unstep2.php 
  * <b>UnRegisterModule</b>("statistic");
- * ?&gt;
+ * ?&gt;</b
  * </pre>
  *
  *
@@ -660,7 +663,7 @@ function UnRegisterModule($id)
  *
  *
  *
- * @param string $event_id  Идентификатор события.
+ * @param string $MESSAGE_ID  Идентификатор события.
  *
  *
  *
@@ -705,9 +708,10 @@ function UnRegisterModule($id)
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li>[link=89622]Связи и взаимодействие модулей[/link] </li> <li> <a
+ * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2825" >Связи и
+ * взаимодействие модулей</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
- * </li> </ul><a name="examples"></a>
+ * </li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -726,6 +730,64 @@ function RemoveEventHandler($FROM_MODULE_ID, $MESSAGE_ID, $iEventHandlerKey)
 	return $eventManager->removeEventHandler($FROM_MODULE_ID, $MESSAGE_ID, $iEventHandlerKey);
 }
 
+
+/**
+ * <p>Возвращает список обработчиков события <i>event_id</i> модуля <i>module_id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+ *
+ *
+ *
+ *
+ * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
+ *
+ *
+ *
+ * @param string $event_id  Идентификатор события.
+ *
+ *
+ *
+ * @param bReturnArra $y = false Необязательный. По умолчанию "false".
+ *
+ *
+ *
+ * @return CDBResult 
+ *
+ *
+ * <h4>Example</h4> 
+ * <pre>
+ * &lt;?
+ * // проверка возможности удаления форума
+ * 
+ * // флаг запрещающий или разрешающий удалять форум
+ * $bCanDelete = true;
+ * 
+ * // получим данные по всем обработчикам события "OnBeforeForumDelete"
+ * // принадлежащего модулю с идентификатором "forum"
+ * $rsEvents = <b>GetModuleEvents</b>("forum", "OnBeforeForumDelete");
+ * while ($arEvent = $rsEvents-&gt;Fetch())
+ * {
+ *     // запустим на выполнение очередной обработчик события "OnBeforeForumDelete"
+ *     // если функция-обработчик возвращает false, то
+ *     if (ExecuteModuleEvent($arEvent, $del_id)===false)
+ *     {
+ *         // запрещаем удалять форум
+ *         $bCanDelete = false;
+ *         break;
+ *     }
+ * }
+ * ?&gt;
+ * </pre>
+ *
+ *
+ *
+ * <h4>See Also</h4> 
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/executemoduleevent.php">ExecuteModuleEvent</a>
+ * </li></ul><a name="examples"></a>
+ *
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php
+ * @author Bitrix
+ */
 function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
 {
 	$eventManager = \Bitrix\Main\EventManager::getInstance();
@@ -980,7 +1042,7 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  *
  *
- * @param string $event_id  Идентификатор события.
+ * @param string $MESSAGE_ID  Идентификатор события.
  *
  *
  *
@@ -1000,6 +1062,15 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  *
  *
+ * @param string $TO_PATH = "" Необязательный параметр, по умолчанию пустой.
+ *
+ *
+ *
+ * @param array $TO_METHOD_ARG = array() Массив аргументов для функции-обработчика событий. <br>
+ * Необязательный параметр.
+ *
+ *
+ *
  * @return mixed 
  *
  *
@@ -1013,9 +1084,10 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li>[link=89622]Связи и взаимодействие модулей[/link] </li> <li> <a
+ * <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2825" >Связи и
+ * взаимодействие модулей</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/registermoduledependences.php">RegisterModuleDependences</a>
- * </li> </ul><a name="examples"></a>
+ * </li> </ul> <a name="examples"></a>
  *
  *
  * @static
@@ -1040,7 +1112,7 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  *
  *
  *
- * @param string $event_id  Идентификатор события.
+ * @param string $MESSAGE_ID  Идентификатор события.
  *
  *
  *
@@ -1068,6 +1140,15 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  *
  *
  *
+ * @param TO_PAT $H = "" Необязательный параметр, по умолчанию пустой.
+ *
+ *
+ *
+ * @param TO_METHOD_AR $G = array() Массив аргументов для функции-обработчика событий. <br>
+ * Необязательный параметр.
+ *
+ *
+ *
  * @return mixed 
  *
  *
@@ -1082,7 +1163,7 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2825" >Связи и
  * взаимодействие модулей</a></li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermoduledependences.php">UnRegisterModuleDependences</a>
- * </li> </ul><a name="examples"></a>
+ * </li> </ul> <a name="examples"></a>
  *
  *
  * @static

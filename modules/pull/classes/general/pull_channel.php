@@ -3,8 +3,6 @@ IncludeModuleLangFile(__FILE__);
 
 class CPullChannel
 {
-	const bucket_size = 100;
-
 	public static function GetShared($cache = true, $reOpen = false)
 	{
 		return self::Get(0, $cache, $reOpen);
@@ -20,7 +18,7 @@ class CPullChannel
 	{
 		global $DB, $CACHE_MANAGER;
 
-		$nginxStatus = CPullOptions::GetNginxStatus();
+		$nginxStatus = CPullOptions::GetQueueServerStatus();
 
 		$arResult = false;
 		$userId = intval($userId);
@@ -125,7 +123,8 @@ class CPullChannel
 				'LAST_ID' => 0,
 			);
 			self::SaveToCache($cache_id, $arChannel);
-			if (CPullOptions::GetNginxStatus())
+
+			if (CPullOptions::GetQueueServerStatus())
 			{
 				$arData = Array(
 					'module_id' => 'pull',
@@ -148,7 +147,8 @@ class CPullChannel
 			$arChannel = $res->Fetch();
 			$channelId = $arChannel['CHANNEL_ID'];
 			self::SaveToCache($cache_id, $arChannel);
-			if (CPullOptions::GetNginxStatus())
+
+			if (CPullOptions::GetQueueServerStatus())
 			{
 				$arData = Array(
 					'module_id' => 'pull',
@@ -172,7 +172,7 @@ class CPullChannel
 		$res = $DB->Query($strSql);
 		if ($arRes = $res->Fetch())
 		{
-			$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSQL($channelId)."'";
+			$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$arRes['USER_ID'];
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			$CACHE_MANAGER->Clean("b_pchc_".intval($arRes['USER_ID']), "b_pull_channel");
@@ -202,7 +202,7 @@ class CPullChannel
 				$channelId = $arRes['CHANNEL_ID'];
 		}
 
-		$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSql($channelId)."'";
+		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$CACHE_MANAGER->Clean("b_pchc_".$userId, "b_pull_channel");
@@ -219,7 +219,61 @@ class CPullChannel
 
 	public static function Send($channelId, $message, $method = 'POST', $timeout = 5, $dont_wait_answer = true)
 	{
-		if (strlen($channelId) <= 0 || strlen($message) <= 0)
+		$result_start = '{"infos": ['; $result_end = ']}';
+		if (is_array($channelId) && CPullOptions::GetQueueServerVersion() == 1)
+		{
+			$results = Array();
+			foreach ($channelId as $channel)
+			{
+				$results[] = self::SendCommand($channel, $message, $method, $timeout, $dont_wait_answer);
+			}
+			$result = json_decode($result_start.implode(',', $results).$result_end);
+		}
+		else if (is_array($channelId))
+		{
+			$commandPerHit = CPullOptions::GetCommandPerHit();
+			if (count($channelId) > $commandPerHit)
+			{
+				$arGroup = Array();
+				$i = 0;
+				foreach($channelId as $channel)
+				{
+					if (count($arGroup[$i]) == $commandPerHit)
+						$i++;
+
+					$arGroup[$i][] = $channel;
+				}
+				$results = Array();
+				foreach($arGroup as $channels)
+				{
+					$result = self::SendCommand($channels, $message, $method, $timeout, $dont_wait_answer);
+					$subresult = json_decode($result);
+					$results = array_merge($results, $subresult->infos);
+				}
+				$result = json_decode('{"infos":'.json_encode($results).'}');
+			}
+			else
+			{
+				$result = self::SendCommand($channelId, $message, $method, $timeout, $dont_wait_answer);
+				$result = json_decode($result);
+			}
+		}
+		else
+		{
+			$result = self::SendCommand($channelId, $message, $method, $timeout, $dont_wait_answer);
+			$result = json_decode($result_start.$result.$result_end);
+		}
+
+		return $result;
+	}
+	private static function SendCommand($channelId, $message, $method = 'POST', $timeout = 5, $dont_wait_answer = true)
+	{
+		if (!is_array($channelId))
+			$channelId = Array($channelId);
+
+		$channelId = implode('/', array_unique($channelId));
+
+		if (strlen($channelId) <=0 || strlen($message) <= 0)
 			return false;
 
 		if (!in_array($method, Array('POST', 'GET')))
@@ -233,7 +287,7 @@ class CPullChannel
 			{
 				COption::SetOptionString("pull", "nginx_error", "N");
 				CAdminNotify::DeleteByTag("PULL_ERROR_SEND");
-				$nginx_error = false;
+				$nginx_error = "N";
 			}
 			else if ($nginx_error['count'] >= 10)
 			{
@@ -328,7 +382,7 @@ class CPullChannel
 
 	public static function CheckOnlineChannel()
 	{
-		if (!CPullOptions::GetNginxStatus())
+		if (!CPullOptions::GetQueueServerStatus())
 			return false;
 
 		global $DB;
@@ -351,7 +405,7 @@ class CPullChannel
 					WHERE DATE_CREATE >= ".$sqlDateFunction;
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arRes = $dbRes->Fetch())
-				$arUser[$arRes['USER_ID']] = $arRes['CHANNEL_ID'];
+				$arUser[$arRes['CHANNEL_ID']] = $arRes['USER_ID'];
 		}
 		if (count($arUser) > 0)
 		{
@@ -366,16 +420,16 @@ class CPullChannel
 				$arOnline[$agentUserId] = $agentUserId;
 			}
 
-			foreach ($arUser as $userId => $channelId)
+			$arOnline = Array();
+			$result = CPullChannel::Send(array_keys($arUser), 'ping', 'GET', 5, false);
+			if (is_object($result) && isset($result->infos))
 			{
-				if ($userId <= 0 || $agentUserId == $userId)
-					continue;
-
-				$result = self::Send($channelId, 'ping', 'GET', 5, false);
-				$result = json_decode($result);
-				if (is_object($result))
+				foreach ($result->infos as $info)
 				{
-					if ($result->subscribers > 0)
+					$userId = $arUser[$info->channel];
+					if ($userId <= 0 || $agentUserId == $userId)
+						continue;
+					if ($info->subscribers > 0)
 						$arOnline[$userId] = $userId;
 					else
 						$arOffline[$userId] = $userId;
@@ -412,6 +466,13 @@ class CPullChannel
 
 	public static function OnAfterUserAuthorize($arParams)
 	{
+		$arAuth = CHTTP::ParseAuthRequest();
+		if(isset($arAuth["basic"]) && $arAuth["basic"]["username"] <> '' && $arAuth["basic"]["password"] <> ''
+			&& strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'bitrix') === false)
+		{
+			return false;
+		}
+
 		if (isset($arParams['update']) && $arParams['update'] === false)
 			return false;
 
@@ -431,7 +492,7 @@ class CPullChannel
 			'module_id' => 'main',
 			'command' => 'user_authorize',
 			'params' => Array(
-				'USER_ID' => intval($arParams['user_fields']['ID'])
+				'USER_ID' => $arParams['user_fields']['ID']
 			),
 		));
 	}
@@ -454,7 +515,7 @@ class CPullChannel
 			'module_id' => 'main',
 			'command' => 'user_logout',
 			'params' => Array(
-				'USER_ID' => intval($arParams['USER_ID'])
+				'USER_ID' => $arParams['USER_ID']
 			),
 		));
 	}

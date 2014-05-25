@@ -123,7 +123,9 @@ class CSocServAuthDB
 		else
 		{
 			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
+			{
+				$strSql = $DB->TopSql($strSql, $arNavStartParams["nTopCount"]);
+			}
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
@@ -244,7 +246,9 @@ class CSocServMessage extends CSocServAllMessage
 		else
 		{
 			if (is_array($arNavStartParams) && intval($arNavStartParams["nTopCount"])>0)
-				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
+			{
+				$strSql = $DB->TopSql($strSql, $arNavStartParams["nTopCount"]);
+			}
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}

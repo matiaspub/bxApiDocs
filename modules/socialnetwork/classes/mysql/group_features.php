@@ -21,22 +21,22 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	/***************************************/
 	
 	/**
-	 * <p>Сохраняет в базу запись о новом дополнительном функционале пользователя или группы.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Параметры дополнительного функционала.
-	 *
-	 *
-	 *
-	 * @return int <p>Код записи, если сохранение прошло успешно. False - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Сохраняет в базу запись о новом дополнительном функционале пользователя или группы.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Параметры дополнительного функционала.
+	*
+	*
+	*
+	* @return int <p>Код записи, если сохранение прошло успешно. False - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -105,77 +105,80 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	/***************************************/
 	
 	/**
-	 * <p>Выбирает список дополнительного функционала в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, ENTITY_TYPE,
-	 * ENTITY_ID, FEATURE, FEATURE_NAME, ACTIVE, DATE_CREATE, DATE_UPDATE.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимае
-	 * поля: ID, ENTITY_TYPE, ENTITY_ID, FEATURE, FEATURE_NAME, ACTIVE, DATE_CREATE, DATE_UPDATE.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, ENTITY_TYPE, ENTITY_ID, FEATURE, FEATURE_NAME, ACTIVE, DATE_CREATE, DATE_UPDATE. В массиве
-	 * допустимы любые поля из списка полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // Выберем в массив весь дополнительный функционал группы с идентификатором $ID
-	 * $arFeaturesTmp = array(); 
-	 * $dbResultTmp = CSocNetFeatures::GetList( 
-	 *    array(), 
-	 *    array("ENTITY_ID" =&gt; $ID, "ENTITY_TYPE" =&gt; SONET_ENTITY_GROUP) 
-	 * ); 
-	 * while ($arResultTmp = $dbResultTmp-&gt;GetNext()) 
-	 *    $arFeaturesTmp[$arResultTmp["FEATURE"]] = $arResultTmp; 
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Выбирает список дополнительного функционала в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи:<b>ID</b>,
+	* <b>ENTITY_TYPE</b>, <b>ENTITY_ID</b>, <b>FEATURE</b>, <b>FEATURE_NAME</b>, <b>ACTIVE</b>, <b>DATE_CREATE</b>,
+	* <b>DATE_UPDATE</b>.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимае
+	* поля: <b>ID</b>, <b>ENTITY_TYPE</b>, <b>ENTITY_ID</b>, <b>FEATURE</b>, <b>FEATURE_NAME</b>, <b>ACTIVE</b>,
+	* <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>ENTITY_TYPE</b>, <b>ENTITY_ID</b>, <b>FEATURE</b>, <b>FEATURE_NAME</b>, <b>ACTIVE</b>,
+	* <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>. В массиве допустимы любые поля из списка
+	* полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Выберем в массив весь дополнительный функционал группы с идентификатором $ID
+	* $arFeaturesTmp = array(); 
+	* $dbResultTmp = CSocNetFeatures::GetList( 
+	*    array(), 
+	*    array("ENTITY_ID" =&gt; $ID, "ENTITY_TYPE" =&gt; SONET_ENTITY_GROUP) 
+	* ); 
+	* while ($arResultTmp = $dbResultTmp-&gt;GetNext()) 
+	*    $arFeaturesTmp[$arResultTmp["FEATURE"]] = $arResultTmp; 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;

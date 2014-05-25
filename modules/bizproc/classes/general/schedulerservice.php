@@ -7,6 +7,10 @@ class CBPSchedulerService
 	static public function SubscribeOnTime($workflowId, $eventName, $expiresAt)
 	{
 		CTimeZone::Disable();
+
+		$workflowId = preg_replace('#[^a-z0-9.]#i', '', $workflowId);
+		$eventName = preg_replace('#[^a-z0-9._-]#i', '', $eventName);
+
 		$result = CAgent::AddAgent(
 			"CBPSchedulerService::OnAgent('".$workflowId."', '".$eventName."', array('SchedulerService' => 'OnAgent'));",
 			"bizproc",

@@ -226,6 +226,8 @@ class CComponentAjax
 		if (strpos($url, '://') !== false)
 			return false;
 
+		$url = preg_replace('/#.*/', '', $url);
+
 		if ($this->arParams['SEF_MODE'] == 'Y')
 		{
 			if ($url == POST_FORM_ACTION_URI)

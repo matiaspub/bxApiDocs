@@ -6,7 +6,11 @@ class CIBlockSectionPropertyLink
 		global $DB;
 		$SECTION_ID = intval($SECTION_ID);
 		$PROPERTY_ID = intval($PROPERTY_ID);
-		$rs = $DB->Query("SELECT * FROM b_iblock_section_property WHERE SECTION_ID = ".$SECTION_ID." AND PROPERTY_ID = ".$PROPERTY_ID);
+		$rs = $DB->Query("
+			SELECT *
+			FROM b_iblock_section_property
+			WHERE SECTION_ID = ".$SECTION_ID." AND PROPERTY_ID = ".$PROPERTY_ID."
+		");
 		if (!$rs->Fetch())
 		{
 			if ($SECTION_ID == 0)
@@ -127,7 +131,9 @@ class CIBlockSectionPropertyLink
 					BP.ID PROPERTY_ID,
 					BSP.SECTION_ID LINK_ID,
 					BSP.SMART_FILTER,
-					BP.SORT
+					BP.SORT,
+					BS.LEFT_MARGIN,
+					BS.NAME LINK_TITLE
 				FROM
 					b_iblock B
 					INNER JOIN b_iblock_property BP ON BP.IBLOCK_ID = B.ID
@@ -149,6 +155,8 @@ class CIBlockSectionPropertyLink
 					"INHERITED" => $SECTION_ID == $ar["LINK_ID"] ? "N" : "Y",
 					"INHERITED_FROM" => $ar["LINK_ID"],
 					"SORT" => $ar["SORT"],
+					"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
+					"LINK_TITLE" => $ar["LINK_TITLE"],
 				);
 			}
 		}
@@ -160,7 +168,9 @@ class CIBlockSectionPropertyLink
 					BP.ID PROPERTY_ID,
 					BSP.SECTION_ID LINK_ID,
 					BSP.SMART_FILTER,
-					BP.SORT
+					BP.SORT,
+					0 LEFT_MARGIN,
+					B.NAME LINK_TITLE
 				FROM
 					b_iblock B
 					INNER JOIN b_iblock_property BP ON BP.IBLOCK_ID = B.ID
@@ -181,6 +191,8 @@ class CIBlockSectionPropertyLink
 							"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
 							"INHERITED_FROM" => 0,
 							"SORT" => $ar["SORT"],
+							"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
+							"LINK_TITLE" => $ar["LINK_TITLE"],
 						);
 				}
 				else
@@ -191,10 +203,13 @@ class CIBlockSectionPropertyLink
 						"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
 						"INHERITED_FROM" => 0,
 						"SORT" => $ar["SORT"],
+						"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
+						"LINK_TITLE" => $ar["LINK_TITLE"],
 					);
 				}
 			}
-			uasort($result, array("CIBlockSectionPropertyLink", "_sort"));
+			if (!empty($result))
+				\Bitrix\Main\Type\Collection::sortByColumn($result, array("SORT" => SORT_ASC, "PROPERTY_ID" => SORT_ASC), '', null, true);
 		}
 		return $result;
 	}

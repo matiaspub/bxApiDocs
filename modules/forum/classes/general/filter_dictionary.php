@@ -38,48 +38,48 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	 * <p>Создает новый словарь с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного словаря.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
-	 * Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращает код созданного сообщения. В случае ошибки
-	 * добавления возвращает False.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arFields = Array(
-	 * 	TITLE        - &gt; $TITLE,
-	 * 	TYPE      - &gt; $TYPE,     
-	 * );
-	 * $ID = CFilterDictionary::Add($arFields);
-	 * if (IntVal($ID)&lt;=0)
-	 *   echo "Error!";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>поля таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новый словарь с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного словаря.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
+	* Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return int <p>Возвращает код созданного словаря. В случае ошибки добавления
+	* возвращает False.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = Array(
+	* 	TITLE        - &gt; $TITLE,
+	* 	TYPE      - &gt; $TYPE,     
+	* );
+	* $ID = CFilterDictionary::Add($arFields);
+	* if (IntVal($ID)&lt;=0)
+	*   echo "Error!";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>поля таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul> </htm<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -93,34 +93,34 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	 * <p>Изменяет параметры существующего словаря с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого словаря.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, параметры которой необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>поля таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующего словаря с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого словаря.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, параметры которой необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>поля таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul> </htm<br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -143,21 +143,22 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	 * <p>Удаляет папку с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет папку с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, которую необходимо удалить.
+	*
+	*
+	*
+	* @return bool <p>Возвращает True в случае успешного удаления, в противном случае
+	* возвращает False. </p> <br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER;
@@ -260,31 +261,31 @@ class CAllFilterLetter
 
 	
 	/**
-	 * <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
-	 * Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
-	 * транслита"</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
+	* Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
+	* транслита"</a> </li> </ul> <br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB, $APPLICATION;
@@ -305,34 +306,34 @@ class CAllFilterLetter
 
 	
 	/**
-	 * <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, параметры которой необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
-	 * транслита"</a> </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, параметры которой необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
+	* транслита"</a> </li> </ul> <br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB, $APPLICATION;
@@ -379,21 +380,21 @@ class CAllFilterLetter
 
 	
 	/**
-	 * <p>Удаляет запись с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool <br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет запись с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, которую необходимо удалить.
+	*
+	*
+	*
+	* @return bool <br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER;
@@ -457,35 +458,11 @@ class CAllFilterUnquotableWords
 		return false;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/checkfields.php
-	 * @author Bitrix
-	 */
 	public static function CheckFields($action = "INSERT", $ID = false, $arFields = array())
 	{
 		global $APPLICATION, $DB;
 		$arError = array();
+		$sError = '';
 		$ID = intVal($ID);
 
 		if ($action == "INSERT")
@@ -535,32 +512,32 @@ class CAllFilterUnquotableWords
 
 	
 	/**
-	 * <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
-	 * Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
+	* Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>таблица <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	* </ul> </htm<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -584,35 +561,35 @@ class CAllFilterUnquotableWords
 
 	
 	/**
-	 * <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, параметры которой необходимо изменить.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	 * <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	 * перечислены в списке полей таблицы <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li>таблица <a
-	 * href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/update.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, параметры которой необходимо изменить.
+	*
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
+	* перечислены в списке полей таблицы <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>таблица <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	* </ul> </htm<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -660,21 +637,21 @@ class CAllFilterUnquotableWords
 
 	
 	/**
-	 * <p>Удаляет запись с кодом <i>ID</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи, которую необходимо удалить.
-	 *
-	 *
-	 *
-	 * @return bool <br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Удаляет запись с кодом <i>ID</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи, которую необходимо удалить.
+	*
+	*
+	*
+	* @return bool <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER;
@@ -684,31 +661,6 @@ class CAllFilterUnquotableWords
 		return $DB->Query("DELETE FROM b_forum_filter WHERE ID=".$ID);
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/getbyid.php
-	 * @author Bitrix
-	 */
 	public static function GetById($ID)
 	{
 		$ID = intval($ID);
@@ -716,31 +668,6 @@ class CAllFilterUnquotableWords
 		return $res->Fetch();
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/getfilteroperation.php
-	 * @author Bitrix
-	 */
 	public static function GetFilterOperation($key)
 	{
 		$strNegative = "N";
@@ -787,31 +714,6 @@ class CAllFilterUnquotableWords
 		return array("FIELD"=>$key, "NEGATIVE"=>$strNegative, "OPERATION"=>$strOperation);
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/genpattern.php
-	 * @author Bitrix
-	 */
 	public static function GenPattern($ID=false, $DICTIONARY_ID_T=0)
 	{
 		$DICTIONARY_ID_T = intVal($DICTIONARY_ID_T);
@@ -829,31 +731,6 @@ class CAllFilterUnquotableWords
 		return false;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/genpatternall.php
-	 * @author Bitrix
-	 */
 	public static function GenPatternAll($DICTIONARY_ID_W=0, $DICTIONARY_ID_T=0)
 	{
 		$DICTIONARY_ID_W = intVal($DICTIONARY_ID_W);
@@ -876,31 +753,6 @@ class CAllFilterUnquotableWords
 		return false;
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/createpattern.php
-	 * @author Bitrix
-	 */
 	public static function CreatePattern($pattern="", $DICTIONARY_ID=0)
 	{
 		$res = "";
@@ -999,64 +851,11 @@ class CAllFilterUnquotableWords
 	}
 
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/filterperm.php
-	 * @author Bitrix
-	 */
 	public static function FilterPerm()
 	{
-		global $USER, $APPLICATION;
-		if($USER->IsAdmin() || $APPLICATION->GetGroupRight("forum")>="W")
-			return true;
-		return false;
+		return CForumUser::IsAdmin();
 	}
 
-	
-	/**
-	 * 
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * <br><br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/filter.php
-	 * @author Bitrix
-	 */
 	public static function Filter($message)
 	{
 		global $USER, $DB, $CACHE_MANAGER, $APPLICATION;

@@ -18,42 +18,42 @@ class CAllStopList
 {
 	
 	/**
-	 * <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list_record">записи</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листа</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $record_id  ID записи сто-листа.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $stop_id = 1;
-	 * if ($rs = <b>CStopList::GetByID</b>($stop_id))
-	 * {
-	 *     $ar = $rs-&gt;Fetch();
-	 *     // выведем параметры записи стоп-листа
-	 *     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">Термин "Стоп-лист"</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstoplist/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list_record">записи</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листа</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $record_id  ID записи сто-листа. </ht
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $stop_id = 1;
+	* if ($rs = <b>CStopList::GetByID</b>($stop_id))
+	* {
+	*     $ar = $rs-&gt;Fetch();
+	*     // выведем параметры записи стоп-листа
+	*     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">Термин "Стоп-лист"</a>
+	* </li></ul> </ht<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstoplist/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($STOPLIST_ID)
 	{
 		$STOPLIST_ID = intval($STOPLIST_ID);

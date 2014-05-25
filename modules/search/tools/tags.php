@@ -5,12 +5,8 @@ function tags_prepare($sText, $site_id = false)
 {
 	static $arEvents = false;
 	if($arEvents === false)
-	{
-		$arEvents = array();
-		$rsEvents = GetModuleEvents("search", "OnSearchGetTag");
-		while($arEvent = $rsEvents->Fetch())
-			$arEvents[] = $arEvent;
-	}
+		$arEvents = GetModuleEvents("search", "OnSearchGetTag", true);
+
 	$arResult = array();
 	$arTags = explode(",", $sText);
 	foreach($arTags as $tag)
@@ -30,6 +26,8 @@ function tags_prepare($sText, $site_id = false)
 
 function TagsShowScript()
 {
+	global $APPLICATION;
+	$APPLICATION->SetAdditionalCSS("/bitrix/admin/htmleditor2/editor.css");
 	CJSCore::Init('search_tags');
 }
 
@@ -65,7 +63,7 @@ function TagsShowScript()
  *
  *
  *
- * @return string <p>Функция возвращает html код элемента управления.</p><a name="examples"></a>
+ * @return string <p>Функция возвращает html код элемента управления.</p> <a name="examples"></a>
  *
  *
  * <h4>Example</h4> 

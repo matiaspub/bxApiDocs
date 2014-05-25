@@ -7,7 +7,7 @@ class CBXVirtualIoFileSystem
 
 	const directionEncode = 1;
 	const directionDecode = 2;
-	const invalidChars = "\\/:*?\"'<>|~\0#";
+	const invalidChars = "\\/:*?\"'<>|~#";
 
 	private $arErrors = array();
 
@@ -230,7 +230,7 @@ class CBXVirtualIoFileSystem
 		if(defined("BX_UTF") && !mb_check_encoding($path, "UTF-8"))
 			return false;
 
-		return (preg_match("#^([a-z]:)?/([^".preg_quote(self::invalidChars, "#")."]+/?)*$#is", $path) > 0);
+		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+/?)*$#is", $path) > 0);
 	}
 
 	public static function ValidateFilenameString($filename)
@@ -245,12 +245,12 @@ class CBXVirtualIoFileSystem
 		if(defined("BX_UTF") && !mb_check_encoding($filename, "UTF-8"))
 			return false;
 
-		return (preg_match("#^[^".preg_quote(self::invalidChars, "#")."]+$#is", $filename) > 0);
+		return (preg_match("#^[^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+$#is", $filename) > 0);
 	}
 
 	public static function RandomizeInvalidFilename($filename)
 	{
-		return preg_replace('#(['.preg_quote(self::invalidChars, "#").'])#e', "chr(rand(97, 122))", $filename);
+		return preg_replace("#([\x01-\x1F".preg_quote(self::invalidChars, "#")."])#e", "chr(rand(97, 122))", $filename);
 	}
 
 	static public function DirectoryExists($path)

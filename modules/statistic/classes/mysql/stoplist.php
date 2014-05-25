@@ -7,7 +7,6 @@ class CStoplist extends CAllStopList
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$arSqlSearch = Array();
-		$strSqlSearch = "";
 		if (is_array($arFilter))
 		{
 			foreach ($arFilter as $key => $val)
@@ -84,18 +83,29 @@ class CStoplist extends CAllStopList
 			}
 		}
 
-		$strSqlOrder = "";
-		if ($order!="asc") $order = "desc";
-		if ($by == "s_id")					$strSqlOrder = "ORDER BY S.ID $order";
-		elseif ($by == "s_date_start")		$strSqlOrder = "ORDER BY S.DATE_START $order";
-		elseif ($by == "s_site_id"	)		$strSqlOrder = "ORDER BY S.SITE_ID $order";
-		elseif ($by == "s_date_end")		$strSqlOrder = "ORDER BY S.DATE_END $order";
-		elseif ($by == "s_active")			$strSqlOrder = "ORDER BY S.ACTIVE $order";
-		elseif ($by == "s_save_statistic")	$strSqlOrder = "ORDER BY S.SAVE_STATISTIC $order";
-		elseif ($by == "s_ip")				$strSqlOrder = "ORDER BY S.IP_1 $order, S.IP_2 $order, S.IP_3 $order, S.IP_4 $order";
-		elseif ($by == "s_mask")			$strSqlOrder = "ORDER BY S.MASK_1 $order, S.MASK_2 $order, S.MASK_3 $order, S.MASK_4 $order";
-		elseif ($by == "s_url_to")			$strSqlOrder = "ORDER BY S.URL_TO $order";
-		elseif ($by == "s_url_from")		$strSqlOrder = "ORDER BY S.URL_FROM $order";
+		if ($order!="asc")
+			$order = "desc";
+
+		if ($by == "s_id")
+			$strSqlOrder = "ORDER BY S.ID $order";
+		elseif ($by == "s_date_start")
+			$strSqlOrder = "ORDER BY S.DATE_START $order";
+		elseif ($by == "s_site_id")
+			$strSqlOrder = "ORDER BY S.SITE_ID $order";
+		elseif ($by == "s_date_end")
+			$strSqlOrder = "ORDER BY S.DATE_END $order";
+		elseif ($by == "s_active")
+			$strSqlOrder = "ORDER BY S.ACTIVE $order";
+		elseif ($by == "s_save_statistic")
+			$strSqlOrder = "ORDER BY S.SAVE_STATISTIC $order";
+		elseif ($by == "s_ip")
+			$strSqlOrder = "ORDER BY S.IP_1 $order, S.IP_2 $order, S.IP_3 $order, S.IP_4 $order";
+		elseif ($by == "s_mask")
+			$strSqlOrder = "ORDER BY S.MASK_1 $order, S.MASK_2 $order, S.MASK_3 $order, S.MASK_4 $order";
+		elseif ($by == "s_url_to")
+			$strSqlOrder = "ORDER BY S.URL_TO $order";
+		elseif ($by == "s_url_from")
+			$strSqlOrder = "ORDER BY S.URL_FROM $order";
 		else
 		{
 			$strSqlOrder = "ORDER BY S.ID $order";
@@ -125,7 +135,7 @@ class CStoplist extends CAllStopList
 			WHERE
 			$strSqlSearch
 			$strSqlOrder
-			LIMIT ".COption::GetOptionString('statistic','RECORDS_LIMIT')."
+			LIMIT ".intval(COption::GetOptionString('statistic','RECORDS_LIMIT'))."
 			";
 
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
@@ -140,66 +150,40 @@ class CStoplist extends CAllStopList
 		$test = ($test=="Y") ? "Y" : "N";
 
 		$arStopRecord = false;
-/*
-		This code needs to start session in main/include.php before OnPageStart event !
-
-		//Try to use session cache
-		if($test == "N" && CACHED_b_stop_list !== false)
-		{
-			$file = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/managed_cache/".$DB->type."/b_stop_list";
-			//If cache file does not exists when try to create it
-			if(!file_exists($file))
-			{
-				$fp = fopen($file, "w");
-				if($fp)
-				{
-					$rs = $DB->Query("SELECT ".$DB->DateToCharFunction("MAX(TIMESTAMP_X)")." AS TIMESTAMP_X FROM b_stop_list");
-					$ar = $rs->Fetch();
-					fputs($fp, "<?php \$TIMESTAMP_X='".str_replace("'", "\\'", $ar["TIMESTAMP_X"])."';?>");
-					fclose($fp);
-				}
-			}
-
-			if(file_exists($file))
-			{
-				//Check if we already checked the session
-				//and this check is actual one
-				include($file);
-				if(
-					array_key_exists("STAT_STOP_LIST", $_SESSION)
-					&& $_SESSION["STAT_STOP_LIST"]["TIMESTAMP_X"] === $TIMESTAMP_X
-				)
-				{
-					$arStopRecord = $_SESSION["STAT_STOP_LIST"]["DATA"];
-				}
-			}
-		}
-*/
+		$zr = false;
 		//We did not use cache or it was cache miss
 		if(!$arStopRecord)
 		{
+			$user_agent = "";
+			$url_from = "";
+			$url_to = "";
+			$site_id = "";
+			$site_where = "";
+			$ip = array(0, 0, 0, 0);
+
 			if ($arParams===false)
 			{
-				$ip = $_SERVER["REMOTE_ADDR"];
-				$user_agent = $_SERVER["HTTP_USER_AGENT"];
+				$ip = explode(".", $_SERVER["REMOTE_ADDR"]);
+				$user_agent = trim($_SERVER["HTTP_USER_AGENT"]);
 				$url_from = isset($_SERVER["HTTP_REFERER"])? $_SERVER["HTTP_REFERER"]: "";
 				$url_to = __GetFullRequestUri();
-				if (defined("SITE_ID")) $site_id = SITE_ID;
+				if (defined("SITE_ID"))
+					$site_id = SITE_ID;
 			}
 			elseif(is_array($arParams))
 			{
-				$ip = $arParams["IP"];
-				$user_agent = $arParams["USER_AGENT"];
+				$ip = explode(".", $arParams["IP"]);
+				$user_agent = trim($arParams["USER_AGENT"]);
 				$url_from = $arParams["URL_FROM"];
 				$url_to = $arParams["URL_TO"];
 				$site_id = $arParams["SITE_ID"];
 			}
-			$arr = explode(".",$ip);
-			$user_agent_len = intval(strlen(trim($user_agent)));
+
+			$user_agent_len = strlen($user_agent);
 			$user_agent = $DB->ForSql($user_agent, 500);
 			$url_from = $DB->ForSql($url_from, 2000);
 			$url_to = $DB->ForSql($url_to, 2000);
-			if (strlen($site_id)>0)
+			if (strlen($site_id) > 0)
 			{
 				$site_where = "and (SITE_ID = '".$DB->ForSql($site_id, 2)."' or SITE_ID is null or length(SITE_ID)<=0)";
 			}
@@ -220,10 +204,10 @@ class CStoplist extends CAllStopList
 				$site_where
 				and (DATE_START<=now() or DATE_START is null)
 				and (DATE_END>=now() or DATE_END is null)
-				and	((((MASK_1 & ".intval($arr[0]).")=IP_1 and
-						(MASK_2 & ".intval($arr[1]).")=IP_2 and
-						(MASK_3 & ".intval($arr[2]).")=IP_3 and
-						(MASK_4 & ".intval($arr[3]).")=IP_4)
+				and	((((MASK_1 & ".intval($ip[0]).")=IP_1 and
+						(MASK_2 & ".intval($ip[1]).")=IP_2 and
+						(MASK_3 & ".intval($ip[2]).")=IP_3 and
+						(MASK_4 & ".intval($ip[3]).")=IP_4)
 							or (IP_1 is null and IP_2 is null and IP_3 is null and IP_4 is null))
 						and (upper('".$DB->ForSql($user_agent)."') like concat('%',upper(USER_AGENT),'%')
 							or length(USER_AGENT)<=0 or USER_AGENT is null)
@@ -273,8 +257,7 @@ class CStoplist extends CAllStopList
 		{
 			foreach($arStopRecord as $key => $value)
 			{
-				global $$key;
-				$$key = $value;
+				$GLOBALS[$key] = $value;
 			}
 			return false;
 		}

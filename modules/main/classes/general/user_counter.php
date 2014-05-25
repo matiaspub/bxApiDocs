@@ -5,37 +5,38 @@ class CAllUserCounter
 
 	
 	/**
-	 * <p>Функция предназначена для получения определенного счетчика пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.2
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.2
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращаются данные определенного счетчика пользователя.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * echo $code = CUserCounter::GetValue($USER-&gt;GetID(), 'code1');
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getvalue.php
-	 * @author Bitrix
-	 */
+	* <p>Функция предназначена для получения определенного счетчика пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Идентификатор пользователя
+	*
+	*
+	*
+	* @param cod $e  Код счётчика
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* подставляется текущий сайт.
+	*
+	*
+	*
+	* @return mixed <p>Возвращаются данные определенного счетчика пользователя.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* echo $code = CUserCounter::GetValue($USER-&gt;GetID(), 'code1');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getvalue.php
+	* @author Bitrix
+	*/
 	public static function GetValue($user_id, $code, $site_id = SITE_ID)
 	{
 		$user_id = intval($user_id);
@@ -52,34 +53,35 @@ class CAllUserCounter
 
 	
 	/**
-	 * <p>Функция позволяет получить список всех счетчиков пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @param $site_i $d = SITE_ID 11.5.2
-	 *
-	 *
-	 *
-	 * @return mixed <p>Список счётчиков конкретного пользователя на сайте.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $codes = CUserCounter::GetValues($USER-&gt;GetID(), SITE_ID);
-	 * echo '&lt;pre&gt;'.print_r($codes, 1).'&lt;/pre&gt;';
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getvalues.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет получить список всех счетчиков пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param $user_i $d  Идентификатор пользователя, обязательный параметр.
+	*
+	*
+	*
+	* @param $site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* принимает значение текущего сайта.
+	*
+	*
+	*
+	* @return mixed <p>Список счётчиков конкретного пользователя на сайте.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $codes = CUserCounter::GetValues($USER-&gt;GetID(), SITE_ID);
+	* echo '&lt;pre&gt;'.print_r($codes, 1).'&lt;/pre&gt;';
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getvalues.php
+	* @author Bitrix
+	*/
 	public static function GetValues($user_id, $site_id = SITE_ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -138,21 +140,21 @@ class CAllUserCounter
 
 	
 	/**
-	 * <p>Функция позволяет получить все значения для всех доступных сайтов.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $user_i $d  12.5.8
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает все значения для всех доступных сайтов.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getallvalues.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет получить все значения для всех доступных сайтов.</p>
+	*
+	*
+	*
+	*
+	* @param $user_i $d  Идентификатор пользователя, обязательный параметр.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает все значения для всех доступных сайтов.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getallvalues.php
+	* @author Bitrix
+	*/
 	public static function GetAllValues($user_id)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -237,29 +239,38 @@ class CAllUserCounter
 
 	
 	/**
-	 * <p>Функция позволяет обнулить все счётчики пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param user_i $d  11.5.2
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter::ClearAll($user_id)
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearall.php
-	 * @author Bitrix
-	 */
+	* <p>Функция позволяет обнулить все счётчики пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param user_i $d  Идентификатор пользователя
+	*
+	*
+	*
+	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
+	* установке модуля и активации работы с "Сервером очередей", без
+	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
+	* данный счетчик не требуется пробрасывать, необходимо указать
+	* <i>false</i>. По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter::ClearAll($user_id)
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearall.php
+	* @author Bitrix
+	*/
 	public static function ClearAll($user_id, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -296,37 +307,46 @@ class CAllUserCounter
 
 	
 	/**
-	 * <p>Метод производит удаление счетчиков по тегу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param ta $g  11.5.6
-	 *
-	 *
-	 *
-	 * @param cod $e  11.5.6
-	 *
-	 *
-	 *
-	 * @param site_i $d = SITE_ID 11.5.6
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает <i>true</i> если успешно, <i>false</i> если какая то ошибка.</p><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CUserCounter:: ClearByTag("task_11", "task");
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearbytag.php
-	 * @author Bitrix
-	 */
+	* <p>Метод производит удаление счетчиков по тегу.</p>
+	*
+	*
+	*
+	*
+	* @param ta $g  Тег, по которому будут удалены счётчики.
+	*
+	*
+	*
+	* @param cod $e  Код удаляемого счётчика.
+	*
+	*
+	*
+	* @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	*
+	*
+	*
+	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
+	* установке модуля и активации работы с "Сервером очередей", без
+	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
+	* данный счетчик не требуется пробрасывать, необходимо указать
+	* <i>false</i>. По умолчанию <i>true</i>.
+	*
+	*
+	*
+	* @return mixed <p>Возвращает <i>true</i> если успешно, <i>false</i> если какая то ошибка.</p> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CUserCounter:: ClearByTag("task_11", "task");
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/clearbytag.php
+	* @author Bitrix
+	*/
 	public static function ClearByTag($tag, $code, $site_id = SITE_ID, $sendPull = true)
 	{
 		global $DB, $CACHE_MANAGER;

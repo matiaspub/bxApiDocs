@@ -27,7 +27,7 @@ class CPerfomanceTableList extends CDBResult
 			else
 				$ar = array(
 					"TABLE_NAME" => $ar["Name"],
-					"ENGINE_TYPE" => $ar["Engine"],
+					"ENGINE_TYPE" => $ar["Comment"]==="VIEW"? "VIEW": $ar["Engine"],
 					"NUM_ROWS" => $ar["Rows"],
 					"BYTES" => $ar["Data_length"],
 				);
@@ -135,40 +135,52 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			while($ar = $rs->Fetch())
 			{
 				$canSort = true;
+				$match = array();
 				if(preg_match("/^(varchar|char)\\((\\d+)\\)/", $ar["Type"], $match))
 				{
 					$ar["DATA_TYPE"] = "string";
 					$ar["DATA_LENGTH"] = $match[2];
+					if ($match[2] == 1 && ($ar["Default"] === "N" || $ar["Default"] === "Y"))
+						$ar["ORM_DATA_TYPE"] = "boolean";
+					else
+						$ar["ORM_DATA_TYPE"] = "string";
 				}
 				elseif(preg_match("/^(varchar|char)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "string";
+					$ar["ORM_DATA_TYPE"] = "string";
 				}
 				elseif(preg_match("/^(text|longtext|mediumtext)/", $ar["Type"]))
 				{
 					$canSort = false;
 					$ar["DATA_TYPE"] = "string";
+					$ar["ORM_DATA_TYPE"] = "text";
 				}
 				elseif(preg_match("/^(datetime|timestamp)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "datetime";
+					$ar["ORM_DATA_TYPE"] = "datetime";
 				}
 				elseif(preg_match("/^(date)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "date";
+					$ar["ORM_DATA_TYPE"] = "date";
 				}
 				elseif(preg_match("/^(int|smallint|bigint)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "int";
+					$ar["ORM_DATA_TYPE"] = "integer";
 				}
-				elseif(preg_match("/^float/", $ar["Type"]))
+				elseif(preg_match("/^(float|double)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "double";
+					$ar["ORM_DATA_TYPE"] = "float";
 				}
 				else
 				{
 					$canSort = false;
 					$ar["DATA_TYPE"] = "unknown";
+					$ar["ORM_DATA_TYPE"] = "UNKNOWN";
 				}
 				$arResult[$ar["Field"]] = $ar["DATA_TYPE"];
 				$arResultExt[$ar["Field"]] = array(
@@ -177,6 +189,8 @@ class CPerfomanceTable extends CAllPerfomanceTable
 					"nullable" => $ar["Null"] !== "NO",
 					"default" => $ar["Default"],
 					"sortable" => $canSort,
+					"orm_type" => $ar["ORM_DATA_TYPE"],
+					"increment" => ($ar["Extra"] === "auto_increment"),
 					//"info" => $ar,
 				);
 			}

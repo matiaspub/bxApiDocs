@@ -18,7 +18,7 @@
  */
 class CFormField extends CAllFormField
 {
-	public static function err_mess()
+public static 	function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");

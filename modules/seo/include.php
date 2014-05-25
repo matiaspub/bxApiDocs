@@ -1,12 +1,12 @@
 <?
 global $DB, $APPLICATION, $MESS, $DBType;
 
-CModule::AddAutoloadClasses(
+\Bitrix\Main\Loader::registerAutoLoadClasses(
 	"seo",
 	array(
 		'CSeoUtils' => 'classes/general/seo_utils.php',
 		'CSeoKeywords' => 'classes/general/seo_keywords.php',
-		'CSeoPageChecker' => 'classes/general/seo_page_checker.php',
+		'CSeoPageChecker' => 'classes/general/seo_page_checker.php'
 	)
 );
 
@@ -100,34 +100,152 @@ class CSeoEventHandlers
 				"TITLE" => GetMessage('SEO_ICON_TEXT'),
 				"TEXT" => GetMessage('SEO_ICON_HINT')
 			),
-/*			"MENU" => array(
-				array(
-					"TEXT"=> 'SEO (page)',
-					"TITLE"=> 'SEO (page)',
-					"ICON"=>"panel-new-file",
-					"ACTION" => $APPLICATION->GetPopupLink(
-						array(
-							"URL"=>"/bitrix/admin/public_seo_tools.php?lang=".LANGUAGE_ID."&bxpublic=Y&from_module=seo&site=".SITE_ID
-								."&path=".$encCurrentFilePath
-								."&title_final=".$encTitle."&title_changer_name=".$encTitleChangerName.'&title_changer_link='.$encTitleChangerLink
-								."&back_url=".$encRequestUri,
-							"PARAMS"=> Array("width"=>700, "height" => 400, 'resize' => false)
-						)),
-					"DEFAULT" => 'Y',
-				),
-				array(
-				"TEXT"=> 'SEO (site)',
-				"TITLE"=> 'SEO (site)',
-				"ICON"=>"panel-new-folder",
-				"ACTION" => $APPLICATION->GetPopupLink(
-					Array(
-						"URL"=>"/bitrix/admin/public_seo_tools_site.php?lang=".LANGUAGE_ID."&bxpublic=Y&from_module=seo&site=".SITE_ID.
-							"&path=".$encCurrentDirPath."&back_url=".$encRequestUri,
-						"PARAMS"=> Array("width"=>700, "height" => 400, 'resize' => false)
-					))
-				),
-			), */
 		));
+	}
+
+	public static function OnIncludeHTMLEditorScript()
+	{
+		if (COption::GetOptionString('main', 'vendor', '') == '1c_bitrix')
+		{
+?>
+<script>
+;(function(){
+	var originalTextWnd = null;
+	var originalTextBtn = new BX.CWindowButton({
+			title: '<?=GetMessageJS('SEO_UNIQUE_TEXT_YANDEX_SUBMIT')?>',
+			className: 'adm-btn-save',
+			action: function()
+			{
+				var content = document.forms.seo_original_text_form.original_text.value;
+				var domain = document.forms.seo_original_text_form.domain.options[document.forms.seo_original_text_form.domain.selectedIndex].value;
+				if(content.length < <?=\Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MIN_LENGTH?>)
+				{
+					alert('<?=GetMessageJS('SEO_YANDEX_ORIGINAL_TEXT_TOO_SHORT', array('#NUM#' => \Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MIN_LENGTH))?>');
+				}
+				else if(content.length > <?=\Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MAX_LENGTH?>)
+				{
+					alert('<?=GetMessageJS('SEO_YANDEX_ORIGINAL_TEXT_TOO_LONG', array('#NUM#' => \Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MAX_LENGTH))?>');
+				}
+				else
+				{
+					originalTextBtn.disable();
+					BX.ajax({
+						method: 'POST',
+						dataType: 'json',
+						url: '/bitrix/tools/seo_yandex.php',
+						data: {
+							action: 'original_text',
+							domain: domain,
+							dir: '/',
+							original_text: content,
+							sessid: BX.bitrix_sessid()
+						},
+						onsuccess: function(res)
+						{
+							originalTextBtn.enable();
+							if(!!res.error)
+							{
+								alert(BX.util.strip_tags(res.error));
+							}
+							else
+							{
+								BX('seo_original_text_form_form').style.display = 'none';
+								BX('seo_original_text_form_ok').style.display = 'block';
+
+								originalTextBtn.btn.disabled = true;
+
+								originalTextWnd.adjustSizeEx();
+								BX.defer(originalTextWnd.adjustPos, originalTextWnd)();
+							}
+						}
+					});
+				}
+			}
+		});
+
+	var originalTextLoader = function(res)
+	{
+		BX.closeWait();
+		originalTextWnd = new BX.CDialog({
+			content: res,
+			resizable: false,
+			width: 750,
+			height: 550,
+			title: '<?=GetMessageJS('SEO_UNIQUE_TEXT_YANDEX')?>',
+			buttons: [
+				originalTextBtn
+			]
+		});
+		originalTextHandler.apply(this, arguments);
+	};
+
+	var originalTextHandler = function()
+	{
+		if(!originalTextWnd)
+		{
+			BX.showWait();
+			BX.ajax.get('/bitrix/tools/seo_yandex.php?get=original_text_form&sessid=' + BX.bitrix_sessid(), BX.proxy(originalTextLoader, this));
+		}
+		else if(!!document.forms.seo_original_text_form)
+		{
+			this.pMainObj.SaveContent();
+
+			var content = BX.util.strip_tags(
+				this.pMainObj.GetContent()
+					.replace(/<\?(.|[\r\n])*?\?>/g, '')
+					.replace(/#PHP[^#]*#/ig, '')
+			);
+
+			originalTextWnd.Show();
+
+			document.forms.seo_original_text_form.original_text.value = content;
+			BX('seo_original_text_form_form').style.display = 'block';
+			BX('seo_original_text_form_ok').style.display = 'none';
+
+			originalTextWnd.adjustSizeEx();
+			originalTextBtn.enable();
+			originalTextBtn.btn.disabled = false;
+			BX.defer(originalTextWnd.adjustPos, originalTextWnd)();
+		}
+		else
+		{
+			originalTextWnd.Show();
+			originalTextBtn.btn.disabled = true;
+		}
+	};
+
+	var seoEditorButton = ['BXButton',
+	{
+		id : 'SeoUniqText',
+		src : '/bitrix/panel/seo/images/icon_editor_toolbar.png',
+		name : '<?=CUtil::JSEscape(GetMessage('SEO_UNIQUE_TEXT_YANDEX'))?>',
+		codeEditorMode : true,
+		handler : originalTextHandler
+	}];
+
+	if(typeof window.arToolbars != 'undefined' && !window.bSeoToolbarButtonAdded)
+	{
+		if(typeof window.arToolbars['manage'] != 'undefined')
+		{
+			window.arToolbars['manage'][1].push(seoEditorButton);
+		}
+		else
+		{
+			window.arToolbars['standart'][1].push(seoEditorButton);
+		}
+
+		window.bSeoToolbarButtonAdded = true;
+	}
+
+	if(typeof window.arGlobalToolbar != 'undefined' && !window.bSeoGlobalToolbarButtonAdded)
+	{
+		window.arGlobalToolbar.push(seoEditorButton);
+		window.bSeoGlobalToolbarButtonAdded = true;
+	}
+})();
+</script>
+<?
+		}
 	}
 }
 ?>

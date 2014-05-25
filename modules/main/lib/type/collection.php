@@ -56,7 +56,7 @@ class Collection
 				$value = isset($row[$column]) ? $row[$column] : $defaultValueIfNotSetValue;
 				if ($callback)
 				{
-					$value = $callback($value);
+					$value = call_user_func_array($callback, array($value));
 				}
 				$valueColumn[$column][$index] = $value;
 				if($preserveKeys && !$alreadyFillPreserveDataKeys)
@@ -87,5 +87,51 @@ class Collection
 		{
 			$array = array_combine(array_values($preserveDataKeys), array_values($array));
 		}
+	}
+
+	/**
+	 * Takes all arguments by pairs..
+	 * Odd arguments are arrays.
+	 * Even arguments ere keys to lookup in these arrays.
+	 * Keys may be arrays. In this case function will try to dig deeper.
+	 * Returns first not empty element of a[k] pair.
+	 *
+	 * @param array $a array to analyze
+	 * @param string|int $k key to lookup
+	 * @param mixed $a,... unlimited array/key pairs to go through
+	 */
+	public static function firstNotEmpty()
+	{
+		$argCount = func_num_args();
+		for ($i = 0; $i < $argCount; $i += 2)
+		{
+			$anArray = func_get_arg($i);
+			$key = func_get_arg($i+1);
+			if (is_array($key))
+			{
+				$current = &$anArray;
+				$found = true;
+				foreach ($key as $k)
+				{
+					if (!is_array($current) || !array_key_exists($k, $current))
+					{
+						$found = false;
+						break;
+					}
+					$current = &$current[$k];
+				}
+				if ($found)
+				{
+					if (is_array($current) || is_object($current) || $current != "")
+						return $current;
+				}
+			}
+			elseif (is_array($anArray) && array_key_exists($key, $anArray))
+			{
+				if (is_array($anArray[$key]) || is_object($anArray[$key]) || $anArray[$key] != "")
+					return $anArray[$key];
+			}
+		}
+		return "";
 	}
 }

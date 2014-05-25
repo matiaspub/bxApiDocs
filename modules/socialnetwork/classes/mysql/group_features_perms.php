@@ -21,31 +21,31 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	 * <p>Создает новое право.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив значений параметров. Допустимые ключи:<br> FEATURE_ID - код
-	 * дополнительного функционала,<br> OPERATION_ID - код операции,<br> ROLE - роль.
-	 *
-	 *
-	 *
-	 * @return int <p>Код вставленной записи.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
-	 * <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
-	 * </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Создает новое право.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив значений параметров. Допустимые ключи:<br> FEATURE_ID - код
+	* дополнительного функционала,<br> OPERATION_ID - код операции,<br> ROLE - роль.
+	*
+	*
+	*
+	* @return int <p>Код вставленной записи.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -110,63 +110,64 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	 * <p>Возвращает список прав.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, FEATURE_ID,
-	 * OPERATION_ID, ROLE, FEATURE_ENTITY_TYPE, FEATURE_ENTITY_ID, FEATURE_FEATURE, FEATURE_FEATURE_NAME, FEATURE_ACTIVE.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимае
-	 * поля: ID, FEATURE_ID, OPERATION_ID, ROLE, FEATURE_ENTITY_TYPE, FEATURE_ENTITY_ID, FEATURE_FEATURE,
-	 * FEATURE_FEATURE_NAME, FEATURE_ACTIVE.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, FEATURE_ID, OPERATION_ID, ROLE. В массиве допустимы любые поля из списка
-	 * полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetByID.php">CSocNetFeaturesPerms::GetById</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список прав.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
+	* <b>FEATURE_ID</b>, <b>OPERATION_ID, ROLE</b>, <b>FEATURE_ENTITY_TYPE</b>, <b>FEATURE_ENTITY_ID</b>,
+	* <b>FEATURE_FEATURE</b>, <b>FEATURE_FEATURE_NAME</b>,<b> FEATURE_ACTIVE</b>.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимые
+	* поля:<b>ID</b>, <b>FEATURE_ID</b>, <b>OPERATION_ID, ROLE</b>, <b>FEATURE_ENTITY_TYPE</b>, <b>FEATURE_ENTITY_ID</b>,
+	* <b>FEATURE_FEATURE</b>, <b>FEATURE_FEATURE_NAME</b>,<b> FEATURE_ACTIVE</b>.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>FEATURE_ID</b>, <b>OPERATION_ID</b>, <b>ROLE</b>. В массиве допустимы любые
+	* поля из списка полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetByID.php">CSocNetFeaturesPerms::GetById</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -267,7 +268,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 		return $dbRes;
 	}
 	
-	public static function GetAvaibleEntity($entityType, $feature, $role, $operation, $active, $visible, $siteID)
+public static 	function GetAvaibleEntity($entityType, $feature, $role, $operation, $active, $visible, $siteID)
 	{
 		global $DB;
 		

@@ -7,7 +7,7 @@ class CWorkflowStatus
 	{
 		$module_id = "workflow";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CWorkflowStatus<br>File: ".__FILE__;
+		return "<br>Module: ".$module_id." <br>Class: CWorkflowStatus<br>File: ".__FILE__;
 	}
 
 	//Despite this function is not documented it should be version compatible
@@ -335,6 +335,7 @@ class CWorkflowStatus
 		global $DB;
 		$STATUS_ID = intval($STATUS_ID);
 		$PERMISSION_TYPE = intval($PERMISSION_TYPE);
+		$err_mess = (CWorkflowStatus::err_mess())."<br>Function: SetPermissions<br>Line: ";
 
 		$DB->Query("DELETE FROM b_workflow_status2group WHERE STATUS_ID = ".$STATUS_ID." AND PERMISSION_TYPE = ".$PERMISSION_TYPE, false, $err_mess.__LINE__);
 		if(is_array($arGroups) && ($PERMISSION_TYPE == 1 || $PERMISSION_TYPE == 2))

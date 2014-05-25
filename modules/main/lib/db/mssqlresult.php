@@ -2,6 +2,7 @@
 namespace Bitrix\Main\DB;
 
 use Bitrix\Main\Diag;
+use Bitrix\Main\Type;
 
 class MssqlResult extends Result
 {
@@ -58,14 +59,22 @@ class MssqlResult extends Result
 		switch ($type)
 		{
 			case 93:
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
-				break;
-			case 91:
-				return $value === null ? null : new \Bitrix\Main\Type\DateTime($value, "Y-m-d");
+				if($value !== null)
+				{
+					$value = new Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
+				}
 				break;
 			case 12:
-				if ((strlen($value) == 19) && preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
-					return new \Bitrix\Main\Type\DateTime($value, "Y-m-d H:i:s");
+				if((strlen($value) == 19) && preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
+				{
+					$value = new Type\DateTime($value, "Y-m-d H:i:s");
+				}
+				break;
+			case 91:
+				if($value !== null)
+				{
+					$value = new Type\Date($value, "Y-m-d");
+				}
 				break;
 			default:
 				break;

@@ -101,6 +101,17 @@ class CBitrixCloudMonitoringWebService extends CBitrixCloudWebService
 			}
 		}
 
+		$option = CBitrixCloudOption::getOption('monitoring_devices');
+		$devices = $option->getArrayValue();
+		foreach($devices as $domain_device)
+		{
+			if (list ($myDomain, $myDevice) = explode("|", $domain_device, 2))
+			{
+				if ($myDomain === $domain)
+					$this->addStr .= "&ar_devices[]=".urlencode($myDevice);
+			}
+		}
+
 		$this->monitoring_action("monitoring_start");
 	}
 	/**

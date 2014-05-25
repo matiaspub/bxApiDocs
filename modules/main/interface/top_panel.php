@@ -163,11 +163,16 @@ if($USER->IsAuthorized())
 	}
 
 	//Help
+	$module = (defined("ADMIN_MODULE_NAME")? ADMIN_MODULE_NAME: "main");
 	$page = (defined("HELP_FILE") && strpos(HELP_FILE, '/') === false? HELP_FILE : basename($APPLICATION->GetCurPage()));
-	$module = (defined("ADMIN_MODULE_NAME")? ADMIN_MODULE_NAME:"main");
+
 	$aActiveSection = $adminMenu->ActiveSection();
+	$section = $aActiveSection["help_section"]."/";
+	if (defined("HELP_FILE") && strpos(HELP_FILE, $section) === 0)
+		$section = "";
+
 	if(LANGUAGE_ID == "ru")
-		$help_link = "http://dev.1c-bitrix.ru/user_help/".$aActiveSection["help_section"]."/".(defined("HELP_FILE") && strpos(HELP_FILE, '/') !== false?  HELP_FILE : $module."/".$page);
+		$help_link = "http://dev.1c-bitrix.ru/user_help/".$section.(defined("HELP_FILE") && strpos(HELP_FILE, '/') !== false?  HELP_FILE : $module."/".$page);
 	else
 		$help_link = "http://www.bitrixsoft.com/help/index.html?page=".urlencode("source/".$module."/help/en/".$page.".html");
 

@@ -10,6 +10,7 @@ namespace Bitrix\Main\Entity;
 
 class AddResult extends Result
 {
+	/** @var  int */
 	protected $id;
 
 	static public function __construct()
@@ -22,6 +23,10 @@ class AddResult extends Result
 		$this->id = $id;
 	}
 
+	/**
+	 * Returns id of added record
+	 * @return int
+	 */
 	public function getId()
 	{
 		return $this->id;

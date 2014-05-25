@@ -336,6 +336,7 @@ ML_MESS.ChangeType = '<?= GetMessageJS('ML_CHANGE_TYPE')?>';
 ML_MESS.ChangeTypeTitle = '<?= GetMessageJS('ML_CHANGE_TYPE_TITLE')?>';
 ML_MESS.ChangeTypeError = '<?= GetMessageJS('ML_CHANGE_TYPE_ERROR')?>';
 ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
+ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 <?
 	}
 
@@ -427,6 +428,21 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 		<?
 	}
 
+	public static function BuildAddCollectionDialogAdmin($Params)
+	{
+		?>
+		<div id="mlsd_coll" class="mlsd_admin">
+			<table>
+			<tr><td><b><?=GetMessage('ML_NAME')?>:</b></td><td><input type="text" id="mlsd_coll_name" /></td></tr>
+			<tr><td style="vertical-align: top;"><?=GetMessage('ML_DESC')?>:</td><td><textarea id="mlsd_coll_desc" rows="2" cols="21"></textarea></td></tr>
+			<tr><td><?=GetMessage('ML_KEYWORDS')?>:</td><td><input type="text" id="mlsd_coll_keywords" /></td></tr>
+			<tr><td><?=GetMessage('ML_PLACE')?>:</td>
+			<td><select id="mlsd_coll_parent" style="width: 190px;"><option value="0"><?= GetMessage('ML_UPPER_LEVEL')?></option></select></td></tr>
+			</table>
+		</div>
+		<?
+	}
+
 	public static function BuildAddCollectionDialog($Params)
 	{
 		?>
@@ -450,6 +466,78 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 		</table>
 		</div>
 		<?
+	}
+
+	public static function BuildAddItemDialogAdmin($Params)
+	{
+		?>
+		<div id="mlsd_item" class="mlsd_admin">
+		<table>
+		<tr><td class="ml-content-cell">
+<form name="ml_item_form" action="/bitrix/admin/fileman_medialib.php?action=edit_item&<?=bitrix_sessid_get()?>" onsubmit="return parent.oBXMediaLib.EditItemDialogOnsubmit();" method="post" enctype="multipart/form-data"><table class="mlsd-ifrm-tbl">
+		<tr><td colSpan="2">
+			<div id="mlsd_fname_cont">
+				<b><?=GetMessage('ML_FILE')?>:</b><span style="padding: 0px 15px" id="ml_file_name"></span>
+			</div>
+			<div id="mlsd_load_cont">
+				<b><label for="ml_load_file"><?=GetMessage('ML_FILE')?>:</label></b>
+				<input id="ml_load_file" type="file" name="load_file" style="margin-left: 15px; width:180px;">
+			</div>
+			<div id="mlsd_select_cont" style="display: none;">
+				<b><label for="mlsd_item_path"><?=GetMessage('ML_FILE')?>:</label></b>
+				<input type="text" size="25" value="" id="mlsd_item_path" style="margin-left: 15px;  width: 280px;" name="item_path">
+				<input type="button" id="mlsd_open_fd" value="..." style="width: 30px;">
+			</div>
+			<div style="text-align: right; padding-right: 20px;">
+			<div style="float: left; text-align: left; margin-top: -2px;">
+			<a id="mlsd_fname_change" href="javascript:void(0)" class="mlsd-up-link" title="<?=GetMessage('ML_CHANGE_FILE_TITLE')?>">(<?=GetMessage('ML_CHANGE')?>)</a>
+			<a id="mlsd_fname_change_back" href="javascript:void(0)" class="mlsd-up-link" title="<?=GetMessage('ML_CHANGE_UNDO_TITLE')?>">(<?=GetMessage('ML_CHANGE_UNDO')?>)</a>
+			</div>
+			<a id="mlsd_select_fd" href="javascript:void(0)" class="mlsd-up-link" title="<?=GetMessage('ML_SELECT_FILE_TITLE')?>"><?=GetMessage('ML_SELECT_FILE')?></a>
+			<a id="mlsd_select_pc" href="javascript:void(0)" class="mlsd-up-link" title="<?=GetMessage('ML_LOAD_FILE_TITLE')?>" style="display: none;"><?=GetMessage('ML_LOAD_FILE')?></a>
+			</div>
+		</td></tr>
+		<tr><td><b><label for="mlsd_item_name"><?=GetMessage('ML_NAME')?>:</label></b><br /><input type="text" id="mlsd_item_name" name="item_name"/></td>
+			<td rowSpan="3" style="padding-top: 10px;">
+			<div class="mlsd-prev-cont"><span id="mlsd_no_preview"><?= GetMessage('ML_NO_PREVIEW')?></span><img id="mlsd_item_thumb" src="/bitrix/images/1.gif" /></div>
+			<div class="mlsd-size-cont" id="mlsd_item_size"  title="<?=GetMessage('ML_SIZE_IN_PX')?>"></div>
+			</td></tr>
+		<tr>
+			<td style="vertical-align: top;"><label for="mlsd_item_desc"><?=GetMessage('ML_DESC')?>:</label><br />
+			<textarea id="mlsd_item_desc" rows="2" cols="26" name="item_desc"></textarea></td>
+		</tr>
+		<tr><td><label for="mlsd_item_keywords"><?=GetMessage('ML_KEYWORDS')?>:<br /></label><input type="text" id="mlsd_item_keywords" name="item_keywords"/></td></tr>
+		<tr><td colSpan="2">
+		<div class="mlsd-col-cont">
+			<div class="mlsd-col-label"><label for="mlsd_coll_sel"><?=GetMessage('ML_COLLECTIONS')?>:</label></div>
+			<div class="mlsd-col-sel"><select title="<?= GetMessage('ML_ADD_COL2ITEM')?>" id="mlsd_coll_sel"><option value="0"><?= GetMessage('ML_COL_SELECT')?></option></select></div>
+		</div>
+		</td></tr>
+	</table>
+
+	<? /* <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">*/?>
+	<input id="mlsd_item_collections" type="hidden" name="item_collections" value="">
+	<input id="mlsd_item_id" type="hidden" name="id" value="">
+	<input id="mlsd_source_type" type="hidden" name="source_type" value="PC">
+</form>
+		</td></tr>
+		</table>
+		</div>
+		<?
+		CAdminFileDialog::ShowScript(Array
+			(
+				"event" => "mlOpenFileDialog",
+				"arResultDest" => Array("FUNCTION_NAME" => "mlOnFileDialogSave"),
+				"arPath" => Array(),
+				"select" => 'F',
+				"operation" => 'O',// O - open, S - save
+				"showUploadTab" => true,
+				"showAddToMenuTab" => false,
+				"fileFilter" => CMedialib::GetMediaExtentions(),
+				"allowAllFiles" => false,
+				"SaveConfig" => true
+			)
+		);
 	}
 
 	public static function BuildAddItemDialog($Params)
@@ -1062,6 +1150,7 @@ ML_MESS.ChangeTypeChildConf = '<?= GetMessageJS('ML_CHANGE_TYPE_CHILD_CONF')?>';
 	public static function ShowBrowseButton($Params = array())
 	{
 		$value = isset($Params['value']) ? $Params['value'] : '...';
+		$buttonId = isset($Params['button_id']) ? $Params['button_id'] : '';
 		$inputId = isset($Params['id']) ? $Params['id'] : '';
 		$title = isset($Params['title']) ? $Params['title'] : '';
 		$event = $Params['event'];
@@ -1130,7 +1219,7 @@ if (!window.<?= $cid?>_onclick)
 }
 </script>
 
-<div class="bx-ml-pnbutton">
+<div id="<?= $buttonId?>" class="bx-ml-pnbutton">
 <div class="bx-pn1" title="<?= GetMessage('ML_BR_BUT_ML_TITLE')?>" onclick="<?= ($useMLDefault ? $arMLConfig['event'] : $event)?>();"></div>
 <div class="bx-pn2" title="<?= GetMessage('ML_BR_BUT_SEL')?>" onclick="<?= $cid?>_onclick(this);"></div>
 </div>
@@ -2277,4 +2366,5 @@ class CMedialibTabControl
 	{
 	}
 }
+
 ?>

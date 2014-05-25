@@ -16,56 +16,63 @@ class CAllCatalogExport
 {
 	
 	/**
-	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
-	 * <br><ul> <li> <b>ADD</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a>;</li> <li>
-	 * <b>UPDATE</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a>.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив параметров профиля экспорта. Допустимые
-	 * ключи: <ul> <li> <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li>
-	 * <b>MODIFIED_BY</b> - ID пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> -
-	 * время последнего изменения профиля в формате сайта;</li> <li>
-	 * <b>DATE_CREATE</b> - дата создания профиля в формате сайта;</li> <li> <b>FILE_NAME</b> -
-	 * имя файла профиля со скриптом, осуществляющего экспорт. Ключ
-	 * является обязательным, если $ACTION = 'ADD';</li> <li> <b>NAME</b> - название
-	 * профиля экспорта. Ключ является обязательным, если $ACTION = 'ADD';</li> <li>
-	 * <b>IN_MENU</b> - [Y|N] флаг отображения профиля в административном меню;</li>
-	 * <li> <b>DEFAULT_PROFILE</b> - [Y|N] признак использования профиля по
-	 * умолчанию;</li> <li> <b>IN_AGENT</b> - [Y|N] флаг наличия агента,
-	 * осуществляющего автоматическое выполнение профиля экспорта; </li>
-	 * <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите <i>cron</i> для
-	 * автоматической периодической выгрузки (только для Unix-систем);</li>
-	 * <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
-	 * пор, пока профиль не будет отредактирован, он выполняться не
-	 * будет). </li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
-	 * иначе - <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a>
-	 * </li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a></li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/checkfields.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
+	* <br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a>;</li> <li>
+	* <b>UPDATE</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a>.</li> </ul>
+	*
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров профиля экспорта. Допустимые
+	* ключи: <ul> <li> <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li>
+	* <b>MODIFIED_BY</b> - ID пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> -
+	* время последнего изменения профиля в формате сайта;</li> <li>
+	* <b>DATE_CREATE</b> - дата создания профиля в формате сайта;</li> <li> <b>FILE_NAME</b> -
+	* имя файла профиля со скриптом, осуществляющего экспорт. Ключ
+	* является обязательным, если $ACTION = 'ADD';</li> <li> <b>NAME</b> - название
+	* профиля экспорта. Ключ является обязательным, если $ACTION = 'ADD';</li> <li>
+	* <b>IN_MENU</b> - [Y|N] флаг отображения профиля в административном меню;</li>
+	* <li> <b>DEFAULT_PROFILE</b> - [Y|N] признак использования профиля по
+	* умолчанию;</li> <li> <b>IN_AGENT</b> - [Y|N] флаг наличия агента,
+	* осуществляющего автоматическое выполнение профиля экспорта; </li>
+	* <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите <i>cron</i> для
+	* автоматической периодической выгрузки (только для Unix-систем);</li>
+	* <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
+	* пор, пока профиль не будет отредактирован, он выполняться не
+	* будет). </li> </ul>
+	*
+	*
+	*
+	* @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
+	* иначе - <i>false</i>.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/add.php">CCatalogExport::Add</a>
+	* </li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/update.php">CCatalogExport::Update</a></li>
+	* </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/checkfields.php
+	* @author Bitrix
+	*/
 	public static function CheckFields($ACTION, &$arFields)
 	{
+		global $DB;
+		global $USER;
+
+		$ACTION = strtoupper($ACTION);
+		if ('UPDATE' != $ACTION && 'ADD' != $ACTION)
+			return false;
+
 		if ((is_set($arFields, "FILE_NAME") || $ACTION=="ADD") && strlen($arFields["FILE_NAME"])<=0)
 			return false;
 		if ((is_set($arFields, "NAME") || $ACTION=="ADD") && strlen($arFields["NAME"])<=0)
@@ -84,27 +91,81 @@ class CAllCatalogExport
 
 		$arFields["IS_EXPORT"] = "Y";
 
+		$intUserID = 0;
+		$boolUserExist = CCatalog::IsUserExists();
+		if ($boolUserExist)
+			$intUserID = intval($USER->GetID());
+		$strDateFunction = $DB->GetNowFunction();
+		$boolNoUpdate = false;
+		if (isset($arFields['=LAST_USE']) && $strDateFunction == $arFields['=LAST_USE'])
+		{
+			$arFields['~LAST_USE'] = $strDateFunction;
+			$boolNoUpdate = ('UPDATE' == $ACTION);
+		}
+		foreach ($arFields as $key => $value)
+		{
+			if (0 == strncmp($key, '=', 1))
+				unset($arFields[$key]);
+		}
+
+		if (array_key_exists('TIMESTAMP_X', $arFields))
+			unset($arFields['TIMESTAMP_X']);
+		if (array_key_exists('DATE_CREATE', $arFields))
+			unset($arFields['DATE_CREATE']);
+
+		if ('ADD' == $ACTION)
+		{
+			$arFields['~TIMESTAMP_X'] = $strDateFunction;
+			$arFields['~DATE_CREATE'] = $strDateFunction;
+			if ($boolUserExist)
+			{
+				if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
+					$arFields["CREATED_BY"] = $intUserID;
+				if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+					$arFields["MODIFIED_BY"] = $intUserID;
+			}
+		}
+		if ('UPDATE' == $ACTION)
+		{
+			if (array_key_exists('CREATED_BY', $arFields))
+				unset($arFields['CREATED_BY']);
+			if ($boolNoUpdate)
+			{
+				if (array_key_exists('MODIFIED_BY',$arFields))
+					unset($arFields['MODIFIED_BY']);
+			}
+			else
+			{
+				if ($boolUserExist)
+				{
+					if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+						$arFields["MODIFIED_BY"] = $intUserID;
+				}
+				$arFields['~TIMESTAMP_X'] = $strDateFunction;
+			}
+		}
+
 		return true;
 	}
 
 	
 	/**
-	 * <p>Функция удаляет профиль экспорта с кодом ID. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код удаляемого профиля экспорта.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	 * противном случае .</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет профиль экспорта с кодом ID. </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код удаляемого профиля экспорта.
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -115,79 +176,79 @@ class CAllCatalogExport
 
 	
 	/**
-	 * <p>Возвращает список профилей экспорта по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID"=>"ASC") Массив, в соответствии с которым сортируются результирующие
-	 * записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
-	 * "направление_сортировки1", "название_поля2" =&gt;
-	 * "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	 * могут использоваться: <ul> <li> <i>NAME</i> - название профиля экспорта;</li>
-	 * <li> <i>FILE_NAME</i> - имя файла профиля со скриптом, осуществляющего
-	 * экспорт;</li> <li> <i>DEFAULT_PROFILE</i> - Y|N] флаг использования профиля по
-	 * умолчанию;</li> <li> <i>IN_MENU</i> - [Y|N] флаг отображения профиля в
-	 * административном меню;</li> <li> <i>LAST_USE</i> - дата и время последнего
-	 * выполнения профиля в формате базы;</li> <li> <i>IN_AGENT</i> -[Y|N] флаг наличия
-	 * агента, осуществляющего автоматическое выполнение профиля
-	 * экспорта;</li> <li> <i>IN_CRON</i> - [Y|N] флаг привязки профиля к утилите
-	 * <i>cron</i> для автоматической периодической выгрузки;</li> <li> <i>NEED_EDIT</i>
-	 * - [Y|N] флаг означает неполную настройку профиля (до тех пор, пока
-	 * профиль не будет отредактирован, он выполняться не будет).</li> </ul>
-	 * Попытка сортировки по остальным полям профиля приведет к
-	 * сортировке по <i>ID</i>.<br><br> В качестве "направление_сортировки<i>X</i>"
-	 * могут быть значения "<i>ASC</i>" (по возрастанию) и "<i>DESC</i>" (по
-	 * убыванию).<br><br> Если массив сортировки имеет несколько элементов,
-	 * то результирующий набор сортируется последовательно по каждому
-	 * элементу (т.е. сначала сортируется по первому элементу, потом
-	 * результат сортируется по второму и т.д.).
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи профилей
-	 * экспорта. Массив имеет вид: <pre class="syntax">array(
-	 * "[модификатор]название_поля1" =&gt; "значение1",
-	 * "[модификатор]название_поля2" =&gt; "значение2", . . . )</pre>
-	 * Удовлетворяющие фильтру записи возвращаются в результате, а
-	 * записи, которые не удовлетворяют условиям фильтра,
-	 * отбрасываются.<br><br> Допустимым является следующий модификатор:
-	 * <ul> <li> <b> !</b> - отрицание;</li> </ul> В качестве "название_поляX" может
-	 * стоять любое поле профиля экспорта, кроме <i>SETUP_VARS</i>, <i>TIMESTAMP_X</i> и
-	 * <i>DATE_CREATE</i>.
-	 *
-	 *
-	 *
-	 * @param bool $bCount = false Если параметр равен <i>true</i>, то возвращается только количество
-	 * профилей, которое соответствует установленному фильтру.
-	 * Необязательный. По умолчанию равен <i>false</i>.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект класса CDBResult, содержащий коллекцию
-	 * ассоциативных массивов с ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li>
-	 * <b>FILE_NAME</b> - имя файла профиля со скриптом, осуществляющего
-	 * экспорт;</li> <li> <b>NAME</b> - название профиля экспорта;</li> <li> <b>IN_MENU</b> -
-	 * [Y|N] флаг отображения профиля в административном меню;</li> <li>
-	 * <b>IN_AGENT</b> -[Y|N] флаг наличия агента, осуществляющего автоматическое
-	 * выполнение профиля экспорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки
-	 * профиля к утилите <i>cron</i> для автоматической периодической
-	 * выгрузки;</li> <li> <b>SETUP_VARS</b> - параметры настройки профиля в виде
-	 * url-строки;</li> <li> <b>DEFAULT_PROFILE</b> - [Y|N] флаг использования профиля по
-	 * умолчанию;</li> <li> <b>LAST_USE</b> - дата и время последнего выполнения
-	 * профиля в формате базы;</li> <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную
-	 * настройку профиля (до тех пор, пока профиль не будет
-	 * отредактирован, он выполняться не будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата
-	 * и время последнего использования профиля в формате сайта;</li> <li>
-	 * <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID
-	 * пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время
-	 * последнего изменения профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> -
-	 * дата и время создания профиля в формате сайта.</li> </ul><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список профилей экспорта по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID"=>"ASC") Массив, в соответствии с которым сортируются результирующие
+	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* "направление_сортировки1", "название_поля2" =&gt;
+	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
+	* могут использоваться: <ul> <li> <i>NAME</i> - название профиля экспорта;</li>
+	* <li> <i>FILE_NAME</i> - имя файла профиля со скриптом, осуществляющего
+	* экспорт;</li> <li> <i>DEFAULT_PROFILE</i> - Y|N] флаг использования профиля по
+	* умолчанию;</li> <li> <i>IN_MENU</i> - [Y|N] флаг отображения профиля в
+	* административном меню;</li> <li> <i>LAST_USE</i> - дата и время последнего
+	* выполнения профиля в формате базы;</li> <li> <i>IN_AGENT</i> -[Y|N] флаг наличия
+	* агента, осуществляющего автоматическое выполнение профиля
+	* экспорта;</li> <li> <i>IN_CRON</i> - [Y|N] флаг привязки профиля к утилите
+	* <i>cron</i> для автоматической периодической выгрузки;</li> <li> <i>NEED_EDIT</i>
+	* - [Y|N] флаг означает неполную настройку профиля (до тех пор, пока
+	* профиль не будет отредактирован, он выполняться не будет).</li> </ul>
+	* Попытка сортировки по остальным полям профиля приведет к
+	* сортировке по <i>ID</i>.<br><br> В качестве "направление_сортировки<i>X</i>"
+	* могут быть значения "<i>ASC</i>" (по возрастанию) и "<i>DESC</i>" (по
+	* убыванию).<br><br> Если массив сортировки имеет несколько элементов,
+	* то результирующий набор сортируется последовательно по каждому
+	* элементу (т.е. сначала сортируется по первому элементу, потом
+	* результат сортируется по второму и т.д.).
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи профилей
+	* экспорта. Массив имеет вид: <pre class="syntax">array(
+	* "[модификатор]название_поля1" =&gt; "значение1",
+	* "[модификатор]название_поля2" =&gt; "значение2", . . . )</pre>
+	* Удовлетворяющие фильтру записи возвращаются в результате, а
+	* записи, которые не удовлетворяют условиям фильтра,
+	* отбрасываются.<br><br> Допустимым является следующий модификатор:
+	* <ul> <li> <b> !</b> - отрицание;</li> </ul> В качестве "название_поляX" может
+	* стоять любое поле профиля экспорта, кроме <i>SETUP_VARS</i>, <i>TIMESTAMP_X</i> и
+	* <i>DATE_CREATE</i>.
+	*
+	*
+	*
+	* @param bool $bCount = false Если параметр равен <i>true</i>, то возвращается только количество
+	* профилей, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен <i>false</i>.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий коллекцию
+	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
+	* <b>FILE_NAME</b> - имя файла профиля со скриптом, осуществляющего
+	* экспорт;</li> <li> <b>NAME</b> - название профиля экспорта;</li> <li> <b>IN_MENU</b> -
+	* [Y|N] флаг отображения профиля в административном меню;</li> <li>
+	* <b>IN_AGENT</b> -[Y|N] флаг наличия агента, осуществляющего автоматическое
+	* выполнение профиля экспорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки
+	* профиля к утилите <i>cron</i> для автоматической периодической
+	* выгрузки;</li> <li> <b>SETUP_VARS</b> - параметры настройки профиля в виде
+	* url-строки;</li> <li> <b>DEFAULT_PROFILE</b> - [Y|N] флаг использования профиля по
+	* умолчанию;</li> <li> <b>LAST_USE</b> - дата и время последнего выполнения
+	* профиля в формате базы;</li> <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную
+	* настройку профиля (до тех пор, пока профиль не будет
+	* отредактирован, он выполняться не будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата
+	* и время последнего использования профиля в формате сайта;</li> <li>
+	* <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID
+	* пользователя, изменившего профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время
+	* последнего изменения профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> -
+	* дата и время создания профиля в формате сайта.</li> </ul> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder=array("ID"=>"ASC"), $arFilter=array(), $bCount = false)
 	{
 		global $DB;
@@ -325,39 +386,39 @@ class CAllCatalogExport
 
 	
 	/**
-	 * <p>Метод возвращает информацию о профиле экспорта с заданным ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи.
-	 *
-	 *
-	 *
-	 * @return array <p>Метод возвращает ассоциативный массив параметров профиля с
-	 * ключами:</p><ul> <li> <b>ID</b> - код записи;</li> <li> <b>FILE_NAME</b> - имя файла
-	 * профиля со скриптом, осуществляющего экспорт;</li> <li> <b>NAME</b> -
-	 * название профиля экспорта;</li> <li> <b>IN_MENU</b> - [Y|N] флаг отображения
-	 * профиля в административном меню;</li> <li> <b>IN_AGENT</b> -[Y|N] флаг наличия
-	 * агента, осуществляющего автоматическое выполнение профиля
-	 * экспорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите
-	 * <i>cron</i> для автоматической периодической выгрузки;</li> <li> <b>SETUP_VARS</b>
-	 * - параметры настройки профиля в виде url-строки;</li> <li> <b>DEFAULT_PROFILE</b> -
-	 * [Y|N] флаг использования профиля по умолчанию;</li> <li> <b>LAST_USE</b> - дата
-	 * и время последнего выполнения профиля в формате базы;</li> <li>
-	 * <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
-	 * пор, пока профиль не будет отредактирован, он выполняться не
-	 * будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата и время последнего использования
-	 * профиля в формате сайта;</li> <li> <b>CREATED_BY</b> - ID пользователя,
-	 * создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID пользователя, изменившего
-	 * профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время последнего изменения
-	 * профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> - дата и время создания
-	 * профиля в формате сайта.</li> </ul><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает информацию о профиле экспорта с заданным ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи.
+	*
+	*
+	*
+	* @return array <p>Метод возвращает ассоциативный массив параметров профиля с
+	* ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li> <b>FILE_NAME</b> - имя файла
+	* профиля со скриптом, осуществляющего экспорт;</li> <li> <b>NAME</b> -
+	* название профиля экспорта;</li> <li> <b>IN_MENU</b> - [Y|N] флаг отображения
+	* профиля в административном меню;</li> <li> <b>IN_AGENT</b> -[Y|N] флаг наличия
+	* агента, осуществляющего автоматическое выполнение профиля
+	* экспорта; </li> <li> <b>IN_CRON</b> - [Y|N] флаг привязки профиля к утилите
+	* <i>cron</i> для автоматической периодической выгрузки;</li> <li> <b>SETUP_VARS</b>
+	* - параметры настройки профиля в виде url-строки;</li> <li> <b>DEFAULT_PROFILE</b> -
+	* [Y|N] флаг использования профиля по умолчанию;</li> <li> <b>LAST_USE</b> - дата
+	* и время последнего выполнения профиля в формате базы;</li> <li>
+	* <b>NEED_EDIT</b> - [Y|N] флаг означает неполную настройку профиля (до тех
+	* пор, пока профиль не будет отредактирован, он выполняться не
+	* будет); </li> <li> <b>LAST_USE_FORMAT</b> - дата и время последнего использования
+	* профиля в формате сайта;</li> <li> <b>CREATED_BY</b> - ID пользователя,
+	* создавшего профиль;</li> <li> <b>MODIFIED_BY</b> - ID пользователя, изменившего
+	* профиль;</li> <li> <b>TIMESTAMP_X</b> - дата и время последнего изменения
+	* профиля в формате сайта;</li> <li> <b>DATE_CREATE</b> - дата и время создания
+	* профиля в формате сайта.</li> </ul> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -381,23 +442,23 @@ class CAllCatalogExport
 
 	
 	/**
-	 * <p>Метод выполняет профиль <i>profile_id</i> на агенте.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $profile_id  Код выполняемого профиля.
-	 *
-	 *
-	 *
-	 * @return mixed <p>В случае успешного выполнения профиля экспорта метод
-	 * возвращает строку для следующего вызова агента. В противном
-	 * случае метод вернет <i>false</i>.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/pregenerateexport.php
-	 * @author Bitrix
-	 */
+	* <p>Метод выполняет профиль <i>profile_id</i> на агенте.</p>
+	*
+	*
+	*
+	*
+	* @param int $profile_id  Код выполняемого профиля.
+	*
+	*
+	*
+	* @return mixed <p>В случае успешного выполнения профиля экспорта метод
+	* возвращает строку для следующего вызова агента. В противном
+	* случае метод вернет <i>false</i>.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogexport/pregenerateexport.php
+	* @author Bitrix
+	*/
 	public static function PreGenerateExport($profile_id)
 	{
 		global $DB;

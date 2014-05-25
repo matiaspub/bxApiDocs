@@ -634,7 +634,7 @@ class PHPParser
 		return $arScripts;
 	}
 
-	public static function PreparePHP($str)
+public static 	function PreparePHP($str)
 	{
 		if(substr($str, 0, 2) == "={" && substr($str, -1, 1)=="}" && strlen($str)>3)
 			return substr($str, 2, -1);
@@ -712,7 +712,7 @@ class PHPParser
 	}
 
 	// Components 2. Return PHP string of component call params
-	public static function ReturnPHPStr2($arVals, $arParams=array())
+public static 	function ReturnPHPStr2($arVals, $arParams=array())
 	{
 		$res = "";
 		$i = 0;
@@ -728,7 +728,7 @@ class PHPParser
 		return Trim($res, " \t,\r\n");
 	}
 
-	public static function FindComponent($component_name, $filesrc, $src_line)
+public static 	function FindComponent($component_name, $filesrc, $src_line)
 	{
 		/* parse source file for PHP code */
 		$arComponents = PHPParser::ParseScript($filesrc);
@@ -754,7 +754,7 @@ class PHPParser
 		return $arComponent;
 	}
 
-	public static function getPhpChunks($filesrc, $limit = false)
+	fupublic static nction getPhpChunks($filesrc, $limit = false)
 	{
 		$chunks = array();
 		$chunk = '';
@@ -808,7 +808,7 @@ class PHPParser
 		return $chunks;
 	}
 
-	public static function getPageTitle($filesrc, $prolog = false)
+public static 	function getPageTitle($filesrc, $prolog = false)
 	{
 		if ($prolog === false)
 		{

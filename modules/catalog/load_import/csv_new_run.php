@@ -1,12 +1,12 @@
 <?
 //<title>CSV</title>
-__IncludeLang(GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/lang/", "/import_setup_templ.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/import_setup_templ.php');
 $startImportExecTime = getmicrotime();
 
 global $USER;
 global $APPLICATION;
 $bTmpUserCreated = false;
-if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))))
+if (!CCatalog::IsUserExists())
 {
 	$bTmpUserCreated = true;
 	if (isset($USER))
@@ -21,9 +21,20 @@ if (!isset($USER) || !(($USER instanceof CUser) && ('CUser' == get_class($USER))
 $strImportErrorMessage = "";
 $strImportOKMessage = "";
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/csv_data.php");
+global
+	$arCatalogAvailProdFields,
+	$defCatalogAvailProdFields,
+	$arCatalogAvailPriceFields,
+	$defCatalogAvailPriceFields,
+	$arCatalogAvailValueFields,
+	$defCatalogAvailValueFields,
+	$arCatalogAvailQuantityFields,
+	$defCatalogAvailQuantityFields,
+	$arCatalogAvailGroupFields,
+	$defCatalogAvailGroupFields,
+	$defCatalogAvailCurrencies;
 
-$NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels", 3));
+$NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels"));
 
 $max_execution_time = intval($max_execution_time);
 if ($max_execution_time <= 0)
@@ -36,18 +47,7 @@ if (defined("CATALOG_LOAD_NO_STEP") && CATALOG_LOAD_NO_STEP)
 
 $bAllLinesLoaded = true;
 
-if (!function_exists('__TTT'))
-{
-	function __TTT($txt)
-	{
-		if (strlen($txt) > 0)
-		{
-			$fff = fopen($_SERVER["DOCUMENT_ROOT"]."/__ttt.txt", "a");
-			fwrite($fff, $txt."\n");
-			fclose($fff);
-		}
-	}
-}
+$io = CBXVirtualIo::GetInstance();
 
 if (!function_exists('CSVCheckTimeout'))
 {
@@ -83,16 +83,30 @@ else
 	}
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' == $strImportErrorMessage)
 {
 	$bWorkflow = CModule::IncludeModule("workflow") && ($arIBlock["WORKFLOW"] != "N");
-}
 
-if (strlen($strImportErrorMessage) <= 0)
-{
 	$bIBlockIsCatalog = false;
-	if (CCatalog::GetByID($IBLOCK_ID))
+	$arSku = false;
+	$rsCatalogs = CCatalog::GetList(
+		array(),
+		array('IBLOCK_ID' => $IBLOCK_ID),
+		false,
+		false,
+		array('IBLOCK_ID', 'PRODUCT_IBLOCK_ID', 'SKU_PROPERTY_ID')
+	);
+	if ($arCatalog = $rsCatalogs->Fetch())
+	{
 		$bIBlockIsCatalog = true;
+		$arCatalog['IBLOCK_ID'] = intval($arCatalog['IBLOCK_ID']);
+		$arCatalog['PRODUCT_IBLOCK_ID'] = intval($arCatalog['PRODUCT_IBLOCK_ID']);
+		$arCatalog['SKU_PROPERTY_ID'] = intval($arCatalog['SKU_PROPERTY_ID']);
+		if (0 < $arCatalog['PRODUCT_IBLOCK_ID'] && 0 < $arCatalog['SKU_PROPERTY_ID'])
+		{
+			$arSku = $arCatalog;
+		}
+	}
 
 	$csvFile = new CCSVData();
 	$csvFile->LoadFile($_SERVER["DOCUMENT_ROOT"].$DATA_FILE_NAME);
@@ -101,7 +115,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		$strImportErrorMessage .= GetMessage("CATI_NO_FILE_FORMAT")."<br>";
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' == $strImportErrorMessage)
 {
 	$arDataFileFields = array();
 	$fields_type = (($fields_type=="F") ? "F" : "R" );
@@ -136,7 +150,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		if (strlen($delimiter_r_char) != 1)
 			$strImportErrorMessage .= GetMessage("CATI_NO_DELIMITER")."<br>";
 
-		if (strlen($strImportErrorMessage) <= 0)
+		if ('' == $strImportErrorMessage)
 			$csvFile->SetDelimiter($delimiter_r_char);
 	}
 	else
@@ -147,7 +161,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		if (strlen($metki_f) <= 0)
 			$strImportErrorMessage .= GetMessage("CATI_NO_METKI")."<br>";
 
-		if (strlen($strImportErrorMessage) <= 0)
+		if ('' == $strImportErrorMessage)
 		{
 			$arMetkiTmp = preg_split("/[\D]/i", $metki_f);
 
@@ -163,12 +177,12 @@ if (strlen($strImportErrorMessage) <= 0)
 			if (!is_array($arMetki) || count($arMetki)<1)
 				$strImportErrorMessage .= GetMessage("CATI_NO_METKI")."<br>";
 
-			if (strlen($strImportErrorMessage) <= 0)
+			if ('' == $strImportErrorMessage)
 				$csvFile->SetWidthMap($arMetki);
 		}
 	}
 
-	if (strlen($strImportErrorMessage) <= 0)
+	if ('' == $strImportErrorMessage)
 	{
 		$bFirstHeaderTmp = $csvFile->GetFirstHeader();
 		$csvFile->SetFirstHeader(false);
@@ -188,7 +202,7 @@ if (strlen($strImportErrorMessage) <= 0)
 	}
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' == $strImportErrorMessage)
 {
 	$bFieldsPres = false;
 	for ($i = 0; $i < $NUM_FIELDS; $i++)
@@ -203,7 +217,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		$strImportErrorMessage .= GetMessage("CATI_NO_FIELDS")."<br>";
 }
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' == $strImportErrorMessage)
 {
 	$USE_TRANSLIT = (isset($USE_TRANSLIT) && 'Y' == $USE_TRANSLIT ? 'Y' : 'N');
 	if ('Y' == $USE_TRANSLIT)
@@ -251,15 +265,26 @@ if (strlen($strImportErrorMessage) <= 0)
 }
 
 $IMAGE_RESIZE = (isset($IMAGE_RESIZE) && 'Y' == $IMAGE_RESIZE ? 'Y' : 'N');
+$CLEAR_EMPTY_PRICE = (isset($CLEAR_EMPTY_PRICE) && 'Y' == $CLEAR_EMPTY_PRICE ? 'Y' : 'N');
+$CML2_LINK_IS_XML = (isset($CML2_LINK_IS_XML) && 'Y' == $CML2_LINK_IS_XML ? 'Y' : 'N');
+if (empty($arSku))
+	$CML2_LINK_IS_XML = 'N';
 
-if (strlen($strImportErrorMessage) <= 0)
+if ('' == $strImportErrorMessage)
 {
+	$currentUserID = $USER->GetID();
+
 	$boolUseStoreControl = 'Y' == COption::GetOptionString('catalog', 'default_use_store_control', 'N');
 	$arDisableFields = array(
 		'CP_QUANTITY' => true,
 		'CP_PURCHASING_PRICE' => true,
 		'CP_PURCHASING_CURRENCY' => true,
 	);
+
+	$arProductCache = array();
+	$arPropertyListCache = array();
+	$arSectionCache = array();
+	$arElementCache = array();
 
 	$csvFile->SetPos($CUR_FILE_POS);
 	$arRes = $csvFile->Fetch();
@@ -282,12 +307,15 @@ if (strlen($strImportErrorMessage) <= 0)
 			$correct_lines = 0;
 			$error_lines = 0;
 			$killed_lines = 0;
+
 			$arIBlockProperty = array();
 			$arIBlockPropertyValue = array();
 			$bThereIsGroups = false;
 			$bDeactivationStarted = false;
 			$arProductGroups = array();
+			$bUpdatePrice = 'N';
 		}
+
 		$boolTranslitElement = false;
 		$boolTranslitSection = false;
 		$arTranslitElement = array();
@@ -323,7 +351,6 @@ if (strlen($strImportErrorMessage) <= 0)
 		}
 
 		// Prepare load arrays
-		global $defCatalogAvailGroupFields, $arCatalogAvailGroupFields;
 		$strAvailGroupFields = COption::GetOptionString("catalog", "allowed_group_fields", $defCatalogAvailGroupFields);
 		$arAvailGroupFields = explode(",", $strAvailGroupFields);
 		$arAvailGroupFields_names = array();
@@ -343,7 +370,6 @@ if (strlen($strImportErrorMessage) <= 0)
 		}
 
 		// Prepare load arrays
-		global $defCatalogAvailProdFields, $arCatalogAvailProdFields;
 		$strAvailProdFields = COption::GetOptionString("catalog", "allowed_product_fields", $defCatalogAvailProdFields);
 		$arAvailProdFields = explode(",", $strAvailProdFields);
 		$arAvailProdFields_names = array();
@@ -363,7 +389,6 @@ if (strlen($strImportErrorMessage) <= 0)
 		}
 
 		// Prepare load arrays
-		global $defCatalogAvailPriceFields, $arCatalogAvailPriceFields;
 		$strAvailPriceFields = COption::GetOptionString("catalog", "allowed_product_fields", $defCatalogAvailPriceFields);
 		$arAvailPriceFields = explode(",", $strAvailPriceFields);
 		$arAvailPriceFields_names = array();
@@ -379,14 +404,13 @@ if (strlen($strImportErrorMessage) <= 0)
 					$arAvailPriceFields_names[$arAvailPriceFields[$i]] = array(
 						"field" => $arCatalogAvailPriceFields[$j]["field"],
 						"important" => $arCatalogAvailPriceFields[$j]["important"]
-						);
+					);
 					break;
 				}
 			}
 		}
 
 		// Prepare load arrays
-		global $defCatalogAvailValueFields, $arCatalogAvailValueFields;
 		$strAvailValueFields = COption::GetOptionString("catalog", "allowed_price_fields", $defCatalogAvailValueFields);
 		$arAvailValueFields = explode(",", $strAvailValueFields);
 		$arAvailValueFields_names = array();
@@ -397,9 +421,10 @@ if (strlen($strImportErrorMessage) <= 0)
 				if ($arCatalogAvailValueFields[$j]["value"] == $arAvailValueFields[$i])
 				{
 					$arAvailValueFields_names[$arAvailValueFields[$i]] = array(
-							"field" => $arCatalogAvailValueFields[$j]["field"],
-							"important" => $arCatalogAvailValueFields[$j]["important"]
-						);
+						"field_name_size" =>  $arCatalogAvailValueFields[$j]["value_size"],
+						"field" => $arCatalogAvailValueFields[$j]["field"],
+						"important" => $arCatalogAvailValueFields[$j]["important"]
+					);
 					break;
 				}
 			}
@@ -412,6 +437,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			$line_num++;
 
 			$arGroupsTmp = array();
+
 			for ($i = 0; $i < $NUM_CATALOG_LEVELS; $i++)
 			{
 				$arGroupsTmp1 = array();
@@ -429,7 +455,7 @@ if (strlen($strImportErrorMessage) <= 0)
 
 					if ($ind>-1)
 					{
-						$arGroupsTmp1[$value["field"]] = Trim($arRes[$ind]);
+						$arGroupsTmp1[$value["field"]] = trim($arRes[$ind]);
 						$bThereIsGroups = true;
 					}
 				}
@@ -441,7 +467,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			{
 				foreach ($arAvailGroupFields_names as $key => $value)
 				{
-					if ($value["important"]=="Y" && strlen($arGroupsTmp[$i][$value["field"]])>0)
+					if ($value["important"]=="Y" && isset($arGroupsTmp[$i][$value["field"]]) && '' !== $arGroupsTmp[$i][$value["field"]])
 					{
 						break 2;
 					}
@@ -452,22 +478,28 @@ if (strlen($strImportErrorMessage) <= 0)
 
 			for ($i = 0, $intCount = count($arGroupsTmp); $i < $intCount; $i++)
 			{
-				if (array_key_exists('NAME', $arGroupsTmp[$i]) && strlen($arGroupsTmp[$i]["NAME"])<=0)
+				if (isset($arGroupsTmp[$i]['NAME']) && '' === $arGroupsTmp[$i]["NAME"])
+				{
 					$arGroupsTmp[$i]["NAME"] = GetMessage("CATI_NOMAME");
+				}
 				$arGroupsTmp[$i]["TMP_ID"] = $tmpid;
 			}
 
 			$LAST_GROUP_CODE = 0;
+			$sectionKey = '';
 			for ($i = 0, $intCount = count($arGroupsTmp); $i < $intCount; $i++)
 			{
-				$arFilter = array("IBLOCK_ID"=>$IBLOCK_ID);
-				if (strlen($arGroupsTmp[$i]["XML_ID"])>0)
+				$sectionFilter = '';
+				$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
+				if (isset($arGroupsTmp[$i]["XML_ID"]) && '' !== $arGroupsTmp[$i]["XML_ID"])
 				{
 					$arFilter["=XML_ID"] = $arGroupsTmp[$i]["XML_ID"];
+					$sectionFilter = 'XML'.md5($arGroupsTmp[$i]["XML_ID"]);
 				}
-				elseif (strlen($arGroupsTmp[$i]["NAME"])>0)
+				elseif (isset($arGroupsTmp[$i]["NAME"]) && '' !== $arGroupsTmp[$i]["NAME"])
 				{
 					$arFilter["=NAME"] = $arGroupsTmp[$i]["NAME"];
+					$sectionFilter = 'NAME'.md5($arGroupsTmp[$i]["NAME"]);
 				}
 
 				if ($LAST_GROUP_CODE>0)
@@ -480,87 +512,104 @@ if (strlen($strImportErrorMessage) <= 0)
 					$arFilter["SECTION_ID"] = 0;
 					$arGroupsTmp[$i]["IBLOCK_SECTION_ID"] = false;
 				}
-
-				if ($boolTranslitSection)
+				$sectionKey .= $LAST_GROUP_CODE.':';
+				$sectionIndex = $sectionKey.$sectionFilter;
+				if (!isset($arSectionCache[$sectionIndex]))
 				{
-					if (!isset($arGroupsTmp[$i]['CODE']) || 0 >= strlen($arGroupsTmp[$i]['CODE']))
+					if ($boolTranslitSection)
 					{
-						$arGroupsTmp[$i]['CODE'] = CUtil::translit($arGroupsTmp[$i]["NAME"], $TRANSLIT_LANG, $arTranslitSection);
+						if (!isset($arGroupsTmp[$i]['CODE']) || '' === $arGroupsTmp[$i]['CODE'])
+						{
+							$arGroupsTmp[$i]['CODE'] = CUtil::translit($arGroupsTmp[$i]["NAME"], $TRANSLIT_LANG, $arTranslitSection);
+						}
 					}
-				}
 
-				if (is_set($arGroupsTmp[$i], "PICTURE"))
-				{
-					$bFilePres = false;
-					if (strlen($arGroupsTmp[$i]["PICTURE"])>0)
+					if (isset($arGroupsTmp[$i]["PICTURE"]))
 					{
-						if (preg_match("/^(http|https):\\/\\//", $arGroupsTmp[$i]["PICTURE"]))
+						$bFilePres = false;
+						if ('' !== $arGroupsTmp[$i]["PICTURE"])
 						{
-							$arGroupsTmp[$i]["PICTURE"] = CFile::MakeFileArray($arGroupsTmp[$i]["PICTURE"]);
+							if (preg_match("/^(http|https):\\/\\//", $arGroupsTmp[$i]["PICTURE"]))
+							{
+								$arGroupsTmp[$i]["PICTURE"] = CFile::MakeFileArray($arGroupsTmp[$i]["PICTURE"]);
+							}
+							else
+							{
+								$arGroupsTmp[$i]["PICTURE"] = CFile::MakeFileArray($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arGroupsTmp[$i]["PICTURE"]));
+								if (!empty($arGroupsTmp[$i]["PICTURE"]) && is_array($arGroupsTmp[$i]["PICTURE"]))
+									$arGroupsTmp[$i]["PICTURE"]['COPY_FILE'] = 'Y';
+							}
+							$bFilePres = (!empty($arGroupsTmp[$i]["PICTURE"])
+								&& isset($arGroupsTmp[$i]["PICTURE"]["tmp_name"])
+								&& '' !== $arGroupsTmp[$i]["PICTURE"]["tmp_name"]
+							);
 						}
-						else
-						{
-							$arGroupsTmp[$i]["PICTURE"] = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arGroupsTmp[$i]["PICTURE"]);
-							if (is_array($arGroupsTmp[$i]["PICTURE"]))
-								$arGroupsTmp[$i]["PICTURE"]['COPY_FILE'] = 'Y';
-						}
-						if (is_array($arGroupsTmp[$i]["PICTURE"]) && strlen($arGroupsTmp[$i]["PICTURE"]["tmp_name"]) > 0)
-							$bFilePres = true;
+						if (!$bFilePres)
+							unset($arGroupsTmp[$i]["PICTURE"]);
 					}
-					if (!$bFilePres)
-						unset($arGroupsTmp[$i]["PICTURE"]);
-				}
-				if (is_set($arGroupsTmp[$i], "DETAIL_PICTURE"))
-				{
-					$bFilePres = false;
-					if (strlen($arGroupsTmp[$i]["DETAIL_PICTURE"])>0)
+					if (isset($arGroupsTmp[$i]["DETAIL_PICTURE"]))
 					{
-						if (preg_match("/^(http|https):\\/\\//", $arGroupsTmp[$i]["DETAIL_PICTURE"]))
+						$bFilePres = false;
+						if ('' !== $arGroupsTmp[$i]["DETAIL_PICTURE"])
 						{
-							$arGroupsTmp[$i]["DETAIL_PICTURE"] = CFile::MakeFileArray($arGroupsTmp[$i]["DETAIL_PICTURE"]);
+							if (preg_match("/^(http|https):\\/\\//", $arGroupsTmp[$i]["DETAIL_PICTURE"]))
+							{
+								$arGroupsTmp[$i]["DETAIL_PICTURE"] = CFile::MakeFileArray($arGroupsTmp[$i]["DETAIL_PICTURE"]);
+							}
+							else
+							{
+								$arGroupsTmp[$i]["DETAIL_PICTURE"] = CFile::MakeFileArray($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arGroupsTmp[$i]["DETAIL_PICTURE"]));
+								if (!empty($arGroupsTmp[$i]["DETAIL_PICTURE"]) && is_array($arGroupsTmp[$i]["DETAIL_PICTURE"]))
+									$arGroupsTmp[$i]["DETAIL_PICTURE"]['COPY_FILE'] = 'Y';
+							}
+							$bFilePres = (!empty($arGroupsTmp[$i]["DETAIL_PICTURE"])
+								&& isset($arGroupsTmp[$i]["DETAIL_PICTURE"]["tmp_name"])
+								&& '' !== $arGroupsTmp[$i]["DETAIL_PICTURE"]["tmp_name"]
+							);
 						}
-						else
-						{
-							$arGroupsTmp[$i]["DETAIL_PICTURE"] = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arGroupsTmp[$i]["DETAIL_PICTURE"]);
-							if (is_array($arGroupsTmp[$i]["DETAIL_PICTURE"]))
-								$arGroupsTmp[$i]["DETAIL_PICTURE"]['COPY_FILE'] = 'Y';
-						}
-						if (is_array($arGroupsTmp[$i]["DETAIL_PICTURE"]) && strlen($arGroupsTmp[$i]["DETAIL_PICTURE"]["tmp_name"]) > 0)
-							$bFilePres = true;
+						if (!$bFilePres)
+							unset($arGroupsTmp[$i]["DETAIL_PICTURE"]);
 					}
-					if (!$bFilePres)
-						unset($arGroupsTmp[$i]["DETAIL_PICTURE"]);
-				}
 
-				$res = CIBlockSection::GetList(array(), $arFilter);
-				if ($arr = $res->Fetch())
-				{
-					$LAST_GROUP_CODE = $arr["ID"];
-					$res = $bs->Update($LAST_GROUP_CODE, $arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
-					if (!$res)
+					$res = CIBlockSection::GetList(array(), $arFilter, false, array('ID'));
+					if ($arr = $res->Fetch())
 					{
-						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_UPDATE_SECT")." ".$bs->LAST_ERROR."<br>";
+						$LAST_GROUP_CODE = $arr["ID"];
+						$res = $bs->Update($LAST_GROUP_CODE, $arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
+						if (!$res)
+						{
+							$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_UPDATE_SECT")." ".$bs->LAST_ERROR."<br>";
+						}
+					}
+					else
+					{
+						$arGroupsTmp[$i]["IBLOCK_ID"] = $IBLOCK_ID;
+						$arGroupsTmp[$i]["ACTIVE"] = (isset($arGroupsTmp[$i]["ACTIVE"]) && 'N' === $arGroupsTmp[$i]["ACTIVE"] ? 'N' : 'Y');
+						$LAST_GROUP_CODE = $bs->Add($arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
+						if (!$LAST_GROUP_CODE)
+						{
+							$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_ADD_SECT")." ".$bs->LAST_ERROR."<br>";
+						}
+					}
+
+					if ('' === $strErrorR)
+					{
+						$arSectionCache[$sectionIndex] = $LAST_GROUP_CODE;
 					}
 				}
 				else
 				{
-					$arGroupsTmp[$i]["IBLOCK_ID"] = $IBLOCK_ID;
-					if ($arGroupsTmp[$i]["ACTIVE"]!="N") $arGroupsTmp[$i]["ACTIVE"] = "Y";
-					$LAST_GROUP_CODE = $bs->Add($arGroupsTmp[$i], true, true, 'Y' === $IMAGE_RESIZE);
-					if (!$LAST_GROUP_CODE)
-					{
-						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".GetMessage("CATI_ERR_ADD_SECT")." ".$bs->LAST_ERROR."<br>";
-					}
+					$LAST_GROUP_CODE = $arSectionCache[$sectionIndex];
 				}
 			}
 
-			if (empty($strErrorR))
+			if ('' === $strErrorR)
 			{
-				$arLoadProductArray = Array(
-					"MODIFIED_BY"		=>	$USER->GetID(),
-					"IBLOCK_ID"			=>	$IBLOCK_ID,
-					"TMP_ID"				=> $tmpid
-					);
+				$arLoadProductArray = array(
+					"MODIFIED_BY" => $currentUserID,
+					"IBLOCK_ID" => $IBLOCK_ID,
+					"TMP_ID" => $tmpid
+				);
 				foreach ($arAvailProdFields_names as $key => $value)
 				{
 					$ind = -1;
@@ -575,18 +624,18 @@ if (strlen($strImportErrorMessage) <= 0)
 
 					if ($ind>-1)
 					{
-						$arLoadProductArray[$value["field"]] = Trim($arRes[$ind]);
+						$arLoadProductArray[$value["field"]] = trim($arRes[$ind]);
 					}
 				}
 
-				$arFilter = array("IBLOCK_ID"=>$IBLOCK_ID);
-				if (strlen($arLoadProductArray["XML_ID"])>0)
+				$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
+				if (isset($arLoadProductArray["XML_ID"]) && '' !== $arLoadProductArray["XML_ID"])
 				{
 					$arFilter["=XML_ID"] = $arLoadProductArray["XML_ID"];
 				}
 				else
 				{
-					if (strlen($arLoadProductArray["NAME"])>0)
+					if (isset($arLoadProductArray["NAME"]) && '' !== $arLoadProductArray["NAME"])
 					{
 						$arFilter["=NAME"] = $arLoadProductArray["NAME"];
 					}
@@ -597,12 +646,12 @@ if (strlen($strImportErrorMessage) <= 0)
 				}
 			}
 
-			if (strlen($strErrorR)<=0)
+			if ('' === $strErrorR)
 			{
-				if (is_set($arLoadProductArray, "PREVIEW_PICTURE"))
+				if (isset($arLoadProductArray["PREVIEW_PICTURE"]))
 				{
 					$bFilePres = false;
-					if (strlen($arLoadProductArray["PREVIEW_PICTURE"])>0)
+					if ('' !== $arLoadProductArray["PREVIEW_PICTURE"])
 					{
 						if (preg_match("/^(http|https):\\/\\//", $arLoadProductArray["PREVIEW_PICTURE"]))
 						{
@@ -610,23 +659,23 @@ if (strlen($strImportErrorMessage) <= 0)
 						}
 						else
 						{
-							$arLoadProductArray["PREVIEW_PICTURE"] = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arLoadProductArray["PREVIEW_PICTURE"]);
-							if (is_array($arLoadProductArray["PREVIEW_PICTURE"]))
+							$arLoadProductArray["PREVIEW_PICTURE"] = CFile::MakeFileArray($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arLoadProductArray["PREVIEW_PICTURE"]));
+							if (!empty($arLoadProductArray["PREVIEW_PICTURE"]) && is_array($arLoadProductArray["PREVIEW_PICTURE"]))
 								$arLoadProductArray["PREVIEW_PICTURE"]["COPY_FILE"] = "Y";
 						}
-
-						if (is_array($arLoadProductArray["PREVIEW_PICTURE"]) && strlen($arLoadProductArray["PREVIEW_PICTURE"]["tmp_name"]) > 0)
-							$bFilePres = true;
+						$bFilePres = (!empty($arLoadProductArray["PREVIEW_PICTURE"])
+							&& isset($arLoadProductArray["PREVIEW_PICTURE"]["tmp_name"])
+							&& '' !== $arLoadProductArray["PREVIEW_PICTURE"]["tmp_name"]
+						);
 					}
-
 					if (!$bFilePres)
 						unset($arLoadProductArray["PREVIEW_PICTURE"]);
 				}
 
-				if (is_set($arLoadProductArray, "DETAIL_PICTURE"))
+				if (isset($arLoadProductArray["DETAIL_PICTURE"]))
 				{
 					$bFilePres = false;
-					if (strlen($arLoadProductArray["DETAIL_PICTURE"])>0)
+					if ('' !== $arLoadProductArray["DETAIL_PICTURE"])
 					{
 						if (preg_match("/^(http|https):\\/\\//", $arLoadProductArray["DETAIL_PICTURE"]))
 						{
@@ -634,22 +683,22 @@ if (strlen($strImportErrorMessage) <= 0)
 						}
 						else
 						{
-							$arLoadProductArray["DETAIL_PICTURE"] = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arLoadProductArray["DETAIL_PICTURE"]);
-							if (is_array($arLoadProductArray["DETAIL_PICTURE"]))
+							$arLoadProductArray["DETAIL_PICTURE"] = CFile::MakeFileArray($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES."/".$arLoadProductArray["DETAIL_PICTURE"]));
+							if (!empty($arLoadProductArray["DETAIL_PICTURE"]) && is_array($arLoadProductArray["DETAIL_PICTURE"]))
 								$arLoadProductArray["DETAIL_PICTURE"]["COPY_FILE"] = "Y";
 						}
-
-						if (is_array($arLoadProductArray["DETAIL_PICTURE"]) && strlen($arLoadProductArray["DETAIL_PICTURE"]["tmp_name"]) > 0)
-							$bFilePres = true;
+						$bFilePres = (!empty($arLoadProductArray["DETAIL_PICTURE"])
+							&& isset($arLoadProductArray["DETAIL_PICTURE"]["tmp_name"])
+							&& '' !== $arLoadProductArray["DETAIL_PICTURE"]["tmp_name"]
+						);
 					}
-
 					if (!$bFilePres)
 						unset($arLoadProductArray["DETAIL_PICTURE"]);
 				}
 
 				if ($boolTranslitElement)
 				{
-					if (!isset($arLoadProductArray['CODE']) || 0 >= strlen($arLoadProductArray['CODE']))
+					if (!isset($arLoadProductArray['CODE']) || '' === $arLoadProductArray['CODE'])
 					{
 						$arLoadProductArray['CODE'] = CUtil::translit($arLoadProductArray["NAME"], $TRANSLIT_LANG, $arTranslitElement);
 					}
@@ -665,18 +714,20 @@ if (strlen($strImportErrorMessage) <= 0)
 				if ($arr = $res->Fetch())
 				{
 					$PRODUCT_ID = $arr["ID"];
-					if (is_set($arLoadProductArray, "PREVIEW_PICTURE") && intval($arr["PREVIEW_PICTURE"])>0)
+					if (isset($arLoadProductArray["PREVIEW_PICTURE"]) && intval($arr["PREVIEW_PICTURE"])>0)
 					{
 						$arLoadProductArray["PREVIEW_PICTURE"]["old_file"] = $arr["PREVIEW_PICTURE"];
 					}
-					if (is_set($arLoadProductArray, "DETAIL_PICTURE") && intval($arr["DETAIL_PICTURE"])>0)
+					if (isset($arLoadProductArray["DETAIL_PICTURE"]) && intval($arr["DETAIL_PICTURE"])>0)
 					{
 						$arLoadProductArray["DETAIL_PICTURE"]["old_file"] = $arr["DETAIL_PICTURE"];
 					}
 					if ($bThereIsGroups)
 					{
 						$LAST_GROUP_CODE_tmp = (($LAST_GROUP_CODE > 0) ? $LAST_GROUP_CODE : false);
-						if (!is_array($arProductGroups[$PRODUCT_ID]) || !in_array($LAST_GROUP_CODE_tmp, $arProductGroups[$PRODUCT_ID]))
+						if (!isset($arProductGroups[$PRODUCT_ID]))
+							$arProductGroups[$PRODUCT_ID] = array();
+						if (!in_array($LAST_GROUP_CODE_tmp, $arProductGroups[$PRODUCT_ID]))
 						{
 							$arProductGroups[$PRODUCT_ID][] = $LAST_GROUP_CODE_tmp;
 						}
@@ -696,6 +747,8 @@ if (strlen($strImportErrorMessage) <= 0)
 					$PRODUCT_ID = $el->Add($arLoadProductArray, $bWorkflow, true, 'Y' === $IMAGE_RESIZE);
 					if ($bThereIsGroups)
 					{
+						if (!isset($arProductGroups[$PRODUCT_ID]))
+							$arProductGroups[$PRODUCT_ID] = array();
 						$arProductGroups[$PRODUCT_ID][] = (($LAST_GROUP_CODE > 0) ? $LAST_GROUP_CODE : false);
 					}
 					$res = ($PRODUCT_ID > 0);
@@ -707,15 +760,15 @@ if (strlen($strImportErrorMessage) <= 0)
 				}
 			}
 
-			if (strlen($strErrorR)<=0)
+			if ('' === $strErrorR)
 			{
 				$PROP = array();
 				for ($i = 0; $i < $NUM_FIELDS; $i++)
 				{
-					if (substr(${"field_".$i}, 0, 7) == "IP_PROP")
+					if (0 == strncmp(${"field_".$i}, "IP_PROP", 7))
 					{
 						$cur_prop_id = intval(substr(${"field_".$i}, 7));
-						if (!is_set($arIBlockProperty, $cur_prop_id))
+						if (!isset($arIBlockProperty[$cur_prop_id]))
 						{
 							$res1 = CIBlockProperty::GetByID($cur_prop_id, $IBLOCK_ID);
 							if ($arRes1 = $res1->Fetch())
@@ -723,28 +776,66 @@ if (strlen($strImportErrorMessage) <= 0)
 							else
 								$arIBlockProperty[$cur_prop_id] = array();
 						}
-						if (is_array($arIBlockProperty[$cur_prop_id]) && count($arIBlockProperty[$cur_prop_id])>0)
+						if (!empty($arIBlockProperty[$cur_prop_id]) && is_array($arIBlockProperty[$cur_prop_id]))
 						{
-							if ($arIBlockProperty[$cur_prop_id]["PROPERTY_TYPE"]=="L")
+							if ('Y' == $CML2_LINK_IS_XML && $cur_prop_id == $arSku['SKU_PROPERTY_ID'])
 							{
-								$res2 = CIBlockProperty::GetPropertyEnum(
-									$cur_prop_id,
-									array(),
-									array("IBLOCK_ID" => $IBLOCK_ID, "VALUE" => Trim($arRes[$i]))
-								);
-								if ($arRes2 = $res2->Fetch())
+								$arRes[$i] = trim($arRes[$i]);
+								if ('' != $arRes[$i])
 								{
-									$arRes[$i] = $arRes2["ID"];
+									if (!isset($arProductCache[$arRes[$i]]))
+									{
+										$rsProducts = CIBlockElement::GetList(
+											array(),
+											array('IBLOCK_ID' => $arSku['PRODUCT_IBLOCK_ID'], '=XML_ID' => $arRes[$i]),
+											false,
+											false,
+											array('ID')
+										);
+										if ($arParentProduct = $rsProducts->Fetch())
+										{
+											$arProductCache[$arRes[$i]] = $arParentProduct['ID'];
+										}
+									}
+									$arRes[$i] = (isset($arProductCache[$arRes[$i]]) ? $arProductCache[$arRes[$i]] : '');
 								}
-								else
+							}
+							elseif ($arIBlockProperty[$cur_prop_id]["PROPERTY_TYPE"]=="L")
+							{
+								$arRes[$i] = trim($arRes[$i]);
+								if ('' !== $arRes[$i])
 								{
-									$arRes[$i] = CIBlockPropertyEnum::Add(
-										array(
-											"PROPERTY_ID" => $cur_prop_id,
-											"VALUE" => Trim($arRes[$i]),
-											"TMP_ID" => $tmpid
-										)
-									);
+									$propValueHash = md5($arRes[$i]);
+									if (!isset($arPropertyListCache[$cur_prop_id]))
+									{
+										$arPropertyListCache[$cur_prop_id] = array();
+										$propEnumRes = CIBlockPropertyEnum::GetList(
+											array('SORT' => 'ASC', 'VALUE' => 'ASC'),
+											array('IBLOCK_ID' => $IBLOCK_ID, 'PROPERTY_ID' => $arIBlockProperty[$cur_prop_id]['ID'])
+										);
+										while ($propEnumValue = $propEnumRes->Fetch())
+										{
+											$arPropertyListCache[$cur_prop_id][md5($propEnumValue['VALUE'])] = $propEnumValue['ID'];
+										}
+									}
+									if (!isset($arPropertyListCache[$cur_prop_id][$propValueHash]))
+									{
+										$arPropertyListCache[$cur_prop_id][$propValueHash] = CIBlockPropertyEnum::Add(
+											array(
+												"PROPERTY_ID" => $arIBlockProperty[$cur_prop_id]['ID'],
+												"VALUE" => $arRes[$i],
+												"TMP_ID" => $tmpid
+											)
+										);
+									}
+									if (isset($arPropertyListCache[$cur_prop_id][$propValueHash]))
+									{
+										$arRes[$i] = $arPropertyListCache[$cur_prop_id][$propValueHash];
+									}
+									else
+									{
+										$arRes[$i] = '';
+									}
 								}
 							}
 							elseif ($arIBlockProperty[$cur_prop_id]["PROPERTY_TYPE"]=="F")
@@ -752,9 +843,9 @@ if (strlen($strImportErrorMessage) <= 0)
 								if(preg_match("/^(http|https):\\/\\//", $arRes[$i]))
 									$arRes[$i] = CFile::MakeFileArray($arRes[$i]);
 								else
-									$arRes[$i] = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES.$arRes[$i]);
+									$arRes[$i] = CFile::MakeFileArray($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$PATH2IMAGE_FILES.$arRes[$i]));
 
-								if (!is_array($arRes[$i]) || !isset($arRes[$i]["tmp_name"]))
+								if (!is_array($arRes[$i]) || !array_key_exists("tmp_name", $arRes[$i]))
 									$arRes[$i] = '';
 							}
 
@@ -771,7 +862,7 @@ if (strlen($strImportErrorMessage) <= 0)
 							}
 							else
 							{
-								$PROP[$cur_prop_id][] = is_array($arRes[$i]) ? $arRes[$i] : Trim($arRes[$i]);
+								$PROP[$cur_prop_id][] = is_array($arRes[$i]) ? $arRes[$i] : trim($arRes[$i]);
 							}
 						}
 					}
@@ -780,9 +871,9 @@ if (strlen($strImportErrorMessage) <= 0)
 				CIBlockElement::SetPropertyValuesEx($PRODUCT_ID, $IBLOCK_ID, $PROP);
 			}
 
-			if (strlen($strErrorR) <= 0 && $bIBlockIsCatalog)
+			if ('' == $strErrorR && $bIBlockIsCatalog)
 			{
-				$arLoadOfferArray = Array(
+				$arLoadOfferArray = array(
 					"ID" => $PRODUCT_ID
 				);
 				foreach ($arAvailPriceFields_names as $key => $value)
@@ -798,7 +889,7 @@ if (strlen($strImportErrorMessage) <= 0)
 					}
 
 					if ($ind > -1)
-						$arLoadOfferArray[$value["field"]] = Trim($arRes[$ind]);
+						$arLoadOfferArray[$value["field"]] = trim($arRes[$ind]);
 				}
 
 				CCatalogProduct::Add($arLoadOfferArray);
@@ -812,64 +903,119 @@ if (strlen($strImportErrorMessage) <= 0)
 					elseif (${"field_".$j} == "CV_QUANTITY_TO")
 						$quantityTo = intval($arRes[$j]);
 				}
+				if (0 >= $quantityFrom)
+					$quantityFrom = false;
+				if (0 >= $quantityTo)
+					$quantityTo = false;
 
 				$arFields = array();
 				for ($j = 0; $j < $NUM_FIELDS; $j++)
 				{
 					foreach ($arAvailValueFields_names as $key => $value)
 					{
-						if (substr(${"field_".$j}, 0, strlen($key) + 1) == $key."_")
+						if (0 == strncmp(${"field_".$j}, $key."_", $value['field_name_size'] + 1))
 						{
-							if (!isset($arFields[intval(substr(${"field_".$j}, strlen($key) + 1))]))
+							$strTempKey = intval(substr(${"field_".$j}, $value['field_name_size'] + 1));
+							if (!isset($arFields[$strTempKey]))
 							{
-								$arFields[intval(substr(${"field_".$j}, strlen($key) + 1))] = array(
-										"PRODUCT_ID" => $PRODUCT_ID,
-										"CATALOG_GROUP_ID" => intval(substr(${"field_".$j}, strlen($key) + 1)),
-										"QUANTITY_FROM" => (($quantityFrom > 0) ? $quantityFrom : false),
-										"QUANTITY_TO" => (($quantityTo > 0) ? $quantityTo : false)
-									);
+								$arFields[$strTempKey] = array(
+									"PRODUCT_ID" => $PRODUCT_ID,
+									"CATALOG_GROUP_ID" => $strTempKey,
+									"QUANTITY_FROM" => $quantityFrom,
+									"QUANTITY_TO" => $quantityTo,
+									"TMP_ID" => $tmpid
+								);
 							}
-
-							$arFields[intval(substr(${"field_".$j}, strlen($key) + 1))][$value["field"]] = Trim($arRes[$j]);
+							$arFields[$strTempKey][$value["field"]] = trim($arRes[$j]);
 						}
 					}
 				}
 
 				foreach ($arFields as $key => $value)
 				{
-					if (isset($value["PRICE"]))
-					{
-						$value["PRICE"] = str_replace(",", ".", Trim($value["PRICE"]));
-						$value["PRICE"] = preg_replace("/[^\d.]/i", "", $value["PRICE"]);
-						$value["PRICE"] = DoubleVal($value["PRICE"]);
-					}
-					else
-					{
-						$value["PRICE"] = false;
-					}
-					$value["TMP_ID"] = $tmpid;
-
-					$res = CPrice::GetList(
-							array(),
-							array(
-									"PRODUCT_ID" => $PRODUCT_ID,
-									"CATALOG_GROUP_ID" => $key,
-									"QUANTITY_FROM" => $quantityFrom,
-									"QUANTITY_TO" => $quantityTo
-								)
-						);
+					$strPriceErr = '';
+					$res = CPrice::GetListEx(
+						array(),
+						array(
+							"PRODUCT_ID" => $value['PRODUCT_ID'],
+							"CATALOG_GROUP_ID" => $value['CATALOG_GROUP_ID'],
+							"QUANTITY_FROM" => $value['QUANTITY_FROM'],
+							"QUANTITY_TO" => $value['QUANTITY_TO']
+						),
+						false,
+						false,
+						array('ID')
+					);
 					if ($arr = $res->Fetch())
 					{
-						CPrice::Update($arr["ID"], $value);
+						$boolEraseClear = false;
+						if ('Y' == $CLEAR_EMPTY_PRICE)
+						{
+							$boolEraseClear = (
+								(isset($value['PRICE']) && '' === $value['PRICE']) &&
+								(isset($value['CURRENCY']) && '' === $value['CURRENCY'])
+							);
+						}
+						if ($boolEraseClear)
+						{
+							if (!CPrice::Delete($arr["ID"]))
+							{
+								$strPriceErr = GetMessage('CATI_ERR_PRICE_DELETE');
+							}
+						}
+						else
+						{
+							if (CPrice::Update($arr["ID"], $value))
+							{
+								$bUpdatePrice = 'Y';
+							}
+							else
+							{
+								if ($ex = $APPLICATION->GetException())
+								{
+									$strPriceErr = GetMessage('CATI_ERR_PRICE_UPDATE').$ex->GetString();
+								}
+								else
+								{
+									$strPriceErr = GetMessage('CATI_ERR_PRICE_UPDATE_UNKNOWN');
+								}
+							}
+						}
 					}
 					else
 					{
-						CPrice::Add($value);
+						$boolEmptyNewPrice = (
+							(isset($value['PRICE']) && '' === $value['PRICE'])
+							&& (isset($value['CURRENCY']) && '' === $value['CURRENCY'])
+						);
+						if (!$boolEmptyNewPrice)
+						{
+							if (CPrice::Add($value))
+							{
+								$bUpdatePrice = 'Y';
+							}
+							else
+							{
+								if ($ex = $APPLICATION->GetException())
+								{
+									$strPriceErr = GetMessage('CATI_ERR_PRICE_ADD').$ex->GetString();
+								}
+								else
+								{
+									$strPriceErr = GetMessage('CATI_ERR_PRICE_ADD_UNKNOWN');
+								}
+							}
+						}
+					}
+					if ('' != $strPriceErr)
+					{
+						$strErrorR .= GetMessage("CATI_LINE_NO")." ".$line_num.". ".$strPriceErr.'<br>';
+						break;
 					}
 				}
 			}
 
-			if (strlen($strErrorR)<=0)
+			if ('' == $strErrorR)
 			{
 				$correct_lines++;
 			}
@@ -899,7 +1045,7 @@ if (strlen($strImportErrorMessage) <= 0)
 		);
 		while($arr = $res->Fetch())
 		{
-			$bs->Update($arr["ID"], Array("NAME"=>$arr["NAME"], "ACTIVE" => "Y"));
+			$bs->Update($arr["ID"], array("NAME"=>$arr["NAME"], "ACTIVE" => "Y"));
 			if (!($bAllLinesLoaded = CSVCheckTimeout($max_execution_time))) break;
 		}
 	}
@@ -978,7 +1124,7 @@ if (strlen($strImportErrorMessage) <= 0)
 			{
 
 			}
-			elseif ($outFileAction=="M")
+			elseif ($bIBlockIsCatalog && $outFileAction=="M")
 			{
 				CCatalogProduct::Update($arr['ID'], $arProductArray);
 				$killed_lines++;
@@ -995,7 +1141,7 @@ if (strlen($strImportErrorMessage) <= 0)
 	}
 
 	// delete 'not-in-file' element prices
-	if ($bAllLinesLoaded && $outFileAction=="D")
+	if ($bAllLinesLoaded && $bIBlockIsCatalog && 'Y' == $bUpdatePrice && $outFileAction=="D")
 	{
 		$res = CPrice::GetList(
 			array(),
@@ -1017,8 +1163,8 @@ if (strlen($strImportErrorMessage) <= 0)
 	{
 		$bAllDataLoaded = false;
 
-		$INTERNAL_VARS_LIST = "tmpid,line_num,correct_lines,error_lines,killed_lines,arIBlockProperty,bThereIsGroups,arProductGroups,arIBlockPropertyValue,bDeactivationStarted";
-		$SETUP_VARS_LIST = "IBLOCK_ID,URL_DATA_FILE,fields_type,first_names_r,delimiter_r,delimiter_other_r,first_names_f,metki_f,PATH2IMAGE_FILES,outFileAction,inFileAction,max_execution_time,IMAGE_RESIZE,USE_TRANSLIT,TRANSLIT_LANG";
+		$INTERNAL_VARS_LIST = "tmpid,line_num,correct_lines,error_lines,killed_lines,arIBlockProperty,bThereIsGroups,arProductGroups,arIBlockPropertyValue,bDeactivationStarted,bUpdatePrice";
+		$SETUP_VARS_LIST = "IBLOCK_ID,URL_DATA_FILE,fields_type,first_names_r,delimiter_r,delimiter_other_r,first_names_f,metki_f,PATH2IMAGE_FILES,outFileAction,inFileAction,max_execution_time,IMAGE_RESIZE,USE_TRANSLIT,TRANSLIT_LANG,CLEAR_EMPTY_PRICE";
 		for ($i = 0; $i < $NUM_FIELDS; $i++)
 			$SETUP_VARS_LIST .= ",field_".$i;
 		$CUR_FILE_POS = $csvFile->GetPos();

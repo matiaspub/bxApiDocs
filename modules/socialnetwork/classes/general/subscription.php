@@ -222,7 +222,7 @@ class CAllSocNetSubscription
 		while($arGroup = $rsGroup->GetNext())
 			$arGroups[$arGroup["ID"]] = $arGroup;
 
-		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroup_page", "/workgroups/", SITE_ID);
+		$workgroupsPage = COption::GetOptionString("socialnetwork", "workgroups_page", "/workgroups/", SITE_ID);
 		$groupUrlTemplate = COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID);
 		$groupUrlTemplate = "#GROUPS_PATH#".substr($groupUrlTemplate, strlen($workgroupsPage), strlen($groupUrlTemplate)-strlen($workgroupsPage));
 

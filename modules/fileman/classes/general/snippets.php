@@ -36,7 +36,14 @@ class CSnippets
 			$CACHE_MANAGER->Set("fileman_snippet_array", $CACHE_SNIPPETS);
 		}
 
-		?><script> window.arSnippets = <?= CUtil::PhpToJSObject($arSNIPPETS)?>; </script><?
+		if ($Params['returnArray'])
+		{
+			return $arSNIPPETS;
+		}
+		else
+		{
+			?><script>window.arSnippets = <?= CUtil::PhpToJSObject($arSNIPPETS)?>; </script><?
+		}
 	}
 
 	public static function HandleForTemplate($template, &$arSNIPPETS, &$arTemplateKeys)
@@ -51,78 +58,69 @@ class CSnippets
 	public static function ReadDir(&$arSNIPPETS, &$arKeys, $path, $template, $level = 0, $parent = "")
 	{
 		$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
-		if (!file_exists($basePath))
+
+		$io = CBXVirtualIo::GetInstance();
+
+		if(!$io->DirectoryExists($basePath))
 			return;
 		$imagesPath = $basePath."/images";
 
 		CSnippets::WriteHtaccess($imagesPath);
-
 		$bpPath = $basePath.($path == "" ? "" : "/").$path;
-		$handle  = @opendir($bpPath);
 
-		while(false !== ($file = @readdir($handle)))
+		$d = $io->GetDirectory($bpPath);
+		$arChildren = $d->GetChildren();
+		foreach ($arChildren as $child)
 		{
-			if($file == "." || $file == ".." || $file == ".htaccess" || $file == ".content.php" || ($level == 0 && $file == "images"))
+			$file = $child->GetName();
+			if($file == ".htaccess" || $file == ".content.php" || ($level == 0 && $file == "images"))
 				continue;
 
-			$fullPath = $bpPath."/".$file;
-			if (is_dir($fullPath))
+			$filePath = $child->GetPathWithName();
+			if($child->IsDirectory()) //if this is subfolder
 			{
 				$new_path = "".$path.($path == "" ? "" : "/").$file;
 				CSnippets::ReadDir($arSNIPPETS, $arKeys, $new_path, $template, $level + 1, $file);
 			}
-			elseif(is_file($fullPath))
+			else // File
 			{
 				$name = $file;
-				$pos = strrpos($name, ".");
-				$f_name = ($pos !== FALSE) ? substr($name, 0, $pos) : $name;
-				$f_ext = ($pos !== FALSE) ? substr($name, $pos + 1) : '';
+				$ext = $child->GetExtension();
 
 				// Rename file *.* => *.snp
-				if ($f_ext != 'snp')
+				if ($ext != 'snp')
 				{
-					$name = $f_name.".snp";
-
-					if (!file_exists($bpPath."/".$name))
+					$name = str_replace($ext, "snp", $name);
+					if (strpos($name, ".snp") === false)
 					{
-						rename($fullPath, $bpPath."/".$name);
+						$name = $name.".snp";
+					}
+
+					if (!$io->FileExists($bpPath."/".$name))
+					{
+						$io->Rename($filePath, $bpPath."/".$name);
 					}
 					else
 					{
 						for ($n = 1; $n < 256; $n++)
 						{
-							$test_f_name = $f_name."(".$n.")";
-							$name = $test_f_name.".snp";
-							if (!file_exists($bpPath."/".$name))
+							$name_ = str_replace(".snp", "(".$n.").snp", $name);
+							if (!$io->FileExists($bpPath."/".$name_))
 							{
-								rename($fullPath, $bpPath."/".$name);
+								$name = $name_;
+								$io->Rename($filePath, $bpPath."/".$name);
 								break;
 							}
 						}
 					}
-					$f_ext = 'snp';
 				}
-				$imgPath = $imagesPath."/".$path;
-				//Check thumbnail
-				if(file_exists($imgPath."/".$f_name.".gif"))
-					$thumb = $f_name.".gif";
-				elseif(file_exists($imgPath."/".$f_name.".jpg"))
-					$thumb = $f_name.".jpg";
-				elseif(file_exists($imgPath."/".$f_name.".jpeg"))
-					$thumb = $f_name.".jpeg";
-				elseif(file_exists($imgPath."/".$f_name.".png"))
-					$thumb = $f_name.".png";
-				elseif(file_exists($imgPath."/".$f_name.".bmp"))
-					$thumb = $f_name.".bmp";
-				else
-					$thumb = "";
 
 				$key = $path.($path != '' ? '/' : '').$name;
 				$arSNIPPETS[$key] = Array(
 					'name' => $name,
 					'path' => $path,
 					'title' => $name,
-					'thumb' => $thumb,
+					'thumb' => '',
 					'code' => CSnippets::GetCode($bpPath."/".$name),
 					'description' => "",
 					'template' => $template,
@@ -164,7 +162,8 @@ class CSnippets
 
 	public static function WriteHtaccess($path)
 	{
-		if(file_exists($path) && !file_exists($path."/.htaccess"))
+		$io = CBXVirtualIo::GetInstance();
+		if($io->DirectoryExists($path) && !$io->FileExists($path."/.htaccess"))
 			$GLOBALS['APPLICATION']->SaveFileContent($path."/.htaccess", "Allow from All");
 	}
 
@@ -172,11 +171,13 @@ class CSnippets
 	{
 		global $CACHE_MANAGER;
 		$CACHE_MANAGER->Clean("fileman_snippet_array");
+		$CACHE_MANAGER->Clean("fileman_snippet_group");
 	}
 
 	public static function GetCode($path)
 	{
-		return file_exists($path) ? $GLOBALS['APPLICATION']->GetFileContent($path) : '';
+		$io = CBXVirtualIo::GetInstance();
+		return $io->FileExists($path) ? $GLOBALS['APPLICATION']->GetFileContent($path) : '';
 	}
 
 	public static function Edit($Params)
@@ -243,7 +244,7 @@ class CSnippets
 		}
 
 		CSnippets::ClearCache();
-		
+
 		// 3. Handle thumbnail
 		if ($thumb !== false)
 		{
@@ -301,7 +302,9 @@ class CSnippets
 
 		//Delete thumbnail
 		if ($Params["thumb"] != '')
+		{
 			CFileman::DeleteFile(Array($Params["site"], $snPath.'/images/'.$path.($path == '' ?  '' : '/').CFileMan::SecurePathVar($Params["thumb"])));
+		}
 
 		if (file_exists($contPath."/.content.php"))
 		{
@@ -325,10 +328,10 @@ window.operation_success = true;
 <?
 	}
 
-	public static function CheckFile($Params)
+	public static function CheckFile($params)
 	{
-		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$Params['template']."/snippets";
-		return file_exists(CFileMan::SecurePathVar($contPath.'/'.$Params['path']));
+		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$params['template']."/snippets";
+		return file_exists(CFileMan::SecurePathVar($contPath.'/'.$params['path']));
 	}
 
 	public static function GetGroups($Params)
@@ -339,48 +342,81 @@ window.operation_success = true;
 		CSnippets::DisplayJSGroups($template, $arSnGroups);
 	}
 
+	public static function GetGroupList($Params)
+	{
+		global $CACHE_MANAGER;
+		$template = CFileMan::SecurePathVar($Params['template']);
+
+		$arGroups = false;
+		$CACHE_SNIPPETS = Array();
+
+		if ($Params['bClearCache'])
+			CSnippets::ClearCache();
+
+		$ttl = 30 * 24 * 60 * 60; // 30 days
+		if($CACHE_MANAGER->Read($ttl, "fileman_snippet_group"))
+		{
+			$CACHE_SNIPPETS = $CACHE_MANAGER->Get("fileman_snippet_group");
+			if (isset($CACHE_SNIPPETS[$template]))
+				$arGroups = $CACHE_SNIPPETS[$template];
+		}
+
+		if (!$arGroups || !is_array($arGroups))
+		{
+			$arGroups = Array();
+			CSnippets::InspectDir($arGroups, "", $template);
+			$CACHE_SNIPPETS[$template] = $arGroups;
+			$CACHE_MANAGER->Set("fileman_snippet_group", $CACHE_SNIPPETS);
+		}
+		return $arGroups;
+	}
+
+	public static function SaveGroupList($Params)
+	{
+
+	}
+
 	public static function InspectDir(&$arSnGroups, $path, $template, $level = 0, $parent = '')
 	{
+		$io = CBXVirtualIo::GetInstance();
+
 		$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
-		if (!file_exists($basePath))
+		if(!$io->DirectoryExists($basePath))
 			return;
 
 		$bpPath = $basePath.($path == "" ? "" : "/").$path;
-		$handle  = @opendir($bpPath);
 		if (!$level)
 			$level = 0;
 
-		if (!$parent)
-			$parent = "";
-
-		while(false !== ($file = @readdir($handle)))
+		$d = $io->GetDirectory($bpPath);
+		$arChildren = $d->GetChildren();
+		foreach ($arChildren as $child)
 		{
-			if($file == "." || $file == ".." || $file == ".htaccess" || $file == ".content.php" || ($level == 0 && $file == "images"))
+			$file = $child->GetName();
+			if($file == ".htaccess" || $file == ".content.php" || ($level == 0 && $file == "images") || !$child->IsDirectory())
 				continue;
 
-			$fullPath = $bpPath."/".$file;
-			if (!is_dir($fullPath))
-				continue;
-
+			$filePath = $child->GetPathWithName();
 			$arSnGroups[] = Array
 			(
 				'path' => $path,
 				'name' => $file,
 				'level' => $level,
-				'default_name' => CSnippets::GetDefaultFileName($fullPath)
+				'default_name' => CSnippets::GetDefaultFileName($filePath)
 			);
 
 			$new_path = "".$path.($path == "" ? "" : "/").$file;
-			CSnippets::InspectDir($arSnGroups, $new_path, $template, $level + 1,$parent);
+			CSnippets::InspectDir($arSnGroups, $new_path, $template, $level + 1, $parent);
 		}
 	}
 
 	public static function GetDefaultFileName($path)
 	{
-		for ($i=1; $i <= 9999; $i++)
+		$io = CBXVirtualIo::GetInstance();
+		for ($i = 1; $i <= 9999; $i++)
 		{
 			$name = 'snippet'.str_pad($i, 4, "0", STR_PAD_LEFT);
-			if (!file_exists($path.'/'.$name.'.snp'))
+			if (!$io->FileExists($path.'/'.$name.'.snp'))
 				break;
 		}
 		return $name;
@@ -407,6 +443,243 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		<?
 		}
 		?></script><?
+	}
+
+	/**
+	 * Adds a new snippet
+	 *
+	 * @param array - list of params
+	 * @return bool or object - result
+	 */
+	public static function Add($params = array())
+	{
+		$params['new'] = true;
+		return self::Update($params);
+	}
+
+	/**
+	 * Updates existent snippet
+	 *
+	 * @param array - list of params
+	 * @return bool or object - result
+	 */
+	public static function Update($params = array())
+	{
+		global $APPLICATION;
+		$res = false;
+		$title = $params['title'];
+		$description = $params['description'];
+		$currentPath = $params['new'] ? '' : CFileMan::SecurePathVar($params['current_path']);
+		$path = CFileMan::SecurePathVar($params['path']);
+		$template = CFileMan::SecurePathVar($params['template']);
+		//$site = $params['site'];
+		$code = $params['code'];
+		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
+
+		$io = CBXVirtualIo::GetInstance();
+		if(!$io->DirectoryExists($contPath))
+		{
+			$io->CreateDirectory($contPath);
+		}
+
+		if ($params['new'])
+		{
+			$fileName = CSnippets::GetDefaultFileName($snippetPath).'.snp';
+		}
+		else
+		{
+			$currentPath = $contPath.'/'.$currentPath;
+			$oldSnippetPath = $io->ExtractPathFromPath($currentPath);
+
+			if ($snippetPath !== $oldSnippetPath && $io->FileExists($currentPath))
+			{
+				$io->Delete($currentPath);
+				$fileName = CSnippets::GetDefaultFileName($snippetPath).'.snp';
+			}
+			else
+			{
+				$fileName = $io->ExtractNameFromPath($currentPath);
+			}
+		}
+		$key = ($path === '' ? '' : $path.'/').$fileName;
+
+		// 1. Save new snippet with new content
+		if ($code)
+		{
+			$APPLICATION->SaveFileContent($snippetPath.'/'.$fileName, $code);
+		}
+
+		// 2. Rewrite title & description in .content.php
+		if ($title || $description)
+		{
+			$SNIPPETS = array();
+			if ($io->FileExists($contPath."/.content.php"))
+				@include($contPath."/.content.php");
+
+			if ($title)
+				$SNIPPETS[$key]['title'] = $title;
+			if ($description)
+				$SNIPPETS[$key]['description'] = $description;
+
+			$contentSrc = '<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>'.chr(10);
+			$contentSrc .= '<?'.chr(10).'$SNIPPETS = Array();'.chr(10);
+			foreach ($SNIPPETS as $k => $snip)
+			{
+				if($io->FileExists(CFileMan::SecurePathVar($contPath.'/'.$k)))
+				{
+					$contentSrc .= '$SNIPPETS[\''.CUtil::addslashes($k).'\'] = Array(';
+
+					if (isset($snip['title']) && $snip['title'] !== '')
+					{
+						$contentSrc .= '\'title\' => \''.Cutil::addslashes($snip['title']).'\'';
+						if (isset($snip['description']) && $snip['description'] !== '')
+							$contentSrc .= ', ';
+					}
+					if (isset($snip['description']) && $snip['description'] !== '')
+					{
+						$contentSrc .= '\'description\' => \''.Cutil::addslashes($snip['description']).'\'';
+					}
+					$contentSrc .= ');'.chr(10);
+				}
+			}
+			$contentSrc .= '?>';
+
+			$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+		}
+		$res = array('result' => true);
+
+		CSnippets::ClearCache();
+
+		return $res;
+	}
+
+	/**
+	 * Removes snippet
+	 *
+	 * @param array - list of params (template, path)
+	 * @return bool - result
+	 */
+	public static function Remove($params = array())
+	{
+		global $APPLICATION;
+		$res = false;
+		$template = CFileMan::SecurePathVar($params['template']);
+		$path = CFileMan::SecurePathVar($params["path"]);
+		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
+
+		$io = CBXVirtualIo::GetInstance();
+		//Delete snippet file
+		if($io->FileExists($snippetPath))
+		{
+			$res = $io->Delete($snippetPath);
+		}
+
+		$SNIPPETS = array();
+		if ($io->FileExists($contPath."/.content.php"))
+			@include($contPath."/.content.php");
+
+		$contentSrc = '<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>'.chr(10);
+		$contentSrc .= '<?'.chr(10).'$SNIPPETS = Array();'.chr(10);
+		foreach ($SNIPPETS as $k => $snip)
+		{
+			if($io->FileExists(CFileMan::SecurePathVar($contPath.'/'.$k)))
+			{
+				$contentSrc .= '$SNIPPETS[\''.CUtil::addslashes($k).'\'] = Array(';
+
+				if (isset($snip['title']) && $snip['title'] !== '')
+				{
+					$contentSrc .= '\'title\' => \''.Cutil::addslashes($snip['title']).'\'';
+					if (isset($snip['description']) && $snip['description'] !== '')
+						$contentSrc .= ', ';
+				}
+				if (isset($snip['description']) && $snip['description'] !== '')
+				{
+					$contentSrc .= '\'description\' => \''.Cutil::addslashes($snip['description']).'\'';
+				}
+				$contentSrc .= ');'.chr(10);
+			}
+		}
+		$contentSrc .= '?>';
+		$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+
+		CSnippets::ClearCache();
+
+		return $res;
+	}
+
+	public static function CreateCategory($params = array())
+	{
+		$res = false;
+		if (is_array($params) && isset($params['name']))
+		{
+			$name = CFileMan::SecurePathVar($params['name']);
+			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
+			$templatePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template;
+			$basePath = $templatePath."/snippets";
+
+			$io = CBXVirtualIo::GetInstance();
+			if($io->DirectoryExists($templatePath))
+			{
+				if(!$io->DirectoryExists($basePath))
+				{
+					$io->CreateDirectory($basePath);
+				}
+
+				$parentPath = (isset($params['parent']) && $params['parent'] !== '') ? '/'.CFileMan::SecurePathVar($params['parent']) : '';
+				$categoryPath = $basePath.$parentPath.'/'.$name;
+				if (!$io->DirectoryExists($categoryPath))
+				{
+					$res = $io->CreateDirectory($categoryPath);
+				}
+			}
+			CSnippets::ClearCache();
+		}
+		return $res;
+	}
+
+	public static function RenameCategory($params)
+	{
+		$res = false;
+		if (is_array($params) && isset($params['path'], $params['new_name']))
+		{
+			$path = CFileMan::SecurePathVar($params['path']);
+			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
+			$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+			$categoryPath = $basePath.'/'.$path;
+
+			$io = CBXVirtualIo::GetInstance();
+			$newCategoryPath = $io->ExtractPathFromPath($categoryPath).'/'.$params['new_name'];
+			if($io->DirectoryExists($categoryPath) && !$io->DirectoryExists($newCategoryPath))
+			{
+				$res = $io->Rename($categoryPath, $newCategoryPath);
+			}
+
+			CSnippets::ClearCache();
+		}
+		return $res;
+	}
+
+	public static function RemoveCategory($params)
+	{
+		$res = false;
+		if (is_array($params) && isset($params['path']))
+		{
+			$path = CFileMan::SecurePathVar($params['path']);
+			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
+			$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+			$categoryPath = $basePath.'/'.$path;
+
+			$io = CBXVirtualIo::GetInstance();
+			if($io->DirectoryExists($categoryPath))
+			{
+				$res = $io->Delete($categoryPath);
+			}
+
+			CSnippets::ClearCache();
+		}
+		return $res;
 	}
 }
 ?>

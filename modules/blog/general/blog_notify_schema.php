@@ -25,6 +25,9 @@ class CBlogNotifySchema
 					"share" => Array(
 						"NAME" => GetMessage('BLG_NS_SHARE'),
 					),
+					"share2users" => Array(
+						"NAME" => GetMessage('BLG_NS_SHARE2USERS'),
+					),
 				),
 			),
 		);

@@ -2,7 +2,7 @@
 /**
  * IM_REVISION
  */
-define('IM_REVISION', 19);
+define('IM_REVISION', 30);
 
 /**
  * IM_MESSAGE_SYSTEM
@@ -48,36 +48,6 @@ define('IM_STATUS_NOTIFY', 1);
  * IM_STATUS_READ
  */
 define('IM_STATUS_READ', 2);
-
-/**
- * IM_SPEED_NOTIFY
- */
-define('IM_SPEED_NOTIFY', 1);
-
-/**
- * IM_SPEED_MESSAGE
- */
-define('IM_SPEED_MESSAGE', 2);
-
-/**
- * IM_SPEED_GROUP
- */
-define('IM_SPEED_GROUP', 3);
-
-/**
- * IM_FEATURE_DESKTOP
- */
-define('IM_FEATURE_DESKTOP', "DESKTOP");
-
-/**
- * IM_FEATURE_XMPP
- */
-define('IM_FEATURE_XMPP', "XMPP");
-
-/**
- * IM_FEATURE_MAIL
- */
-define('IM_FEATURE_MAIL', "MAIL");
 
 /**
  * IM_CALL_NONE
@@ -138,6 +108,36 @@ define('IM_CALL_END_ACCESS', 'errorAccess');
  * IM_CALL_END_OFFLINE
  */
 define('IM_CALL_END_OFFLINE', 'errorOffline');
+
+/**
+ * IM_SPEED_NOTIFY
+ */
+define('IM_SPEED_NOTIFY', 1);
+
+/**
+ * IM_SPEED_MESSAGE
+ */
+define('IM_SPEED_MESSAGE', 2);
+
+/**
+ * IM_SPEED_GROUP
+ */
+define('IM_SPEED_GROUP', 3);
+
+/**
+ * IM_FEATURE_DESKTOP
+ */
+define('IM_FEATURE_DESKTOP', "DESKTOP");
+
+/**
+ * IM_FEATURE_XMPP
+ */
+define('IM_FEATURE_XMPP', "XMPP");
+
+/**
+ * IM_FEATURE_MAIL
+ */
+define('IM_FEATURE_MAIL', "MAIL");
 
 
 ?>

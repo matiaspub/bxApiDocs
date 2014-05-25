@@ -21,49 +21,50 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод добавляет новую связь между пользователем и группой.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров связи, в котором ключами являются названия
-	 * параметров, а значениями - их значения. Может содержать следующие
-	 * ключи:<br> USER_ID - код пользователя,<br> GROUP_ID - код группы,<br> ROLE - роль
-	 * пользователя в группе: SONET_ROLES_MODERATOR - модератор, SONET_ROLES_USER -
-	 * пользователь, SONET_ROLES_BAN - черный список, SONET_ROLES_REQUEST - запрос на
-	 * вступление,<br> DATE_CREATE - дата создания записи,<br> DATE_UPDATE - дата
-	 * изменения записи,<br> INITIATED_BY_TYPE - кем инициализирована связь:
-	 * SONET_INITIATED_BY_USER - пользователем, SONET_INITIATED_BY_GROUP - группой,<br>
-	 * INITIATED_BY_USER_ID - код пользователя, инициализировавшего связь,<br> MESSAGE -
-	 * сообщение при запросе на создание связи.
-	 *
-	 *
-	 *
-	 * @return int <p>Код связи в случае успешного выполнения и false - в противном
-	 * случае.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * CSocNetUserToGroup::Add(
-	 *       array(
-	 *       "USER_ID" =&gt; $GLOBALS["USER"]-&gt;GetID(), 
-	 *       "GROUP_ID" =&gt; 1,
-	 *       "ROLE" =&gt; SONET_ROLES_USER,
-	 *       "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
-	 *       "=DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
-	 *       "INITIATED_BY_TYPE" =&gt; SONET_INITIATED_BY_USER,
-	 *       "INITIATED_BY_USER_ID" =&gt; CUser::GetID(),
-	 *       "MESSAGE" =&gt; false,
-	 *       )
-	 * );
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Add.php
-	 * @author Bitrix
-	 */
+	* <p>Метод добавляет новую связь между пользователем и группой.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
+	* параметров, а значениями - их значения. Может содержать следующие
+	* ключи:<br><b>USER_ID</b> - код пользователя,<br><b>GROUP_ID</b> - код
+	* группы,<br><b>ROLE</b> - роль пользователя в группе: SONET_ROLES_MODERATOR -
+	* модератор, SONET_ROLES_USER - пользователь, SONET_ROLES_BAN - черный список,
+	* SONET_ROLES_REQUEST - запрос на вступление,<br><b>DATE_CREATE</b> - дата создания
+	* записи,<br><b>DATE_UPDATE</b> - дата изменения записи,<br><b>INITIATED_BY_TYPE</b> - кем
+	* инициализирована связь: SONET_INITIATED_BY_USER - пользователем,
+	* <b>SONET_INITIATED_BY_GROUP</b> - группой,<br><b>INITIATED_BY_USER_ID</b> - код пользователя,
+	* инициализировавшего связь,<br><b>MESSAGE</b> - сообщение при запросе на
+	* создание связи.
+	*
+	*
+	*
+	* @return int <p>Код связи в случае успешного выполнения и false - в противном
+	* случае.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* CSocNetUserToGroup::Add(
+	*       array(
+	*       "USER_ID" =&gt; $GLOBALS["USER"]-&gt;GetID(), 
+	*       "GROUP_ID" =&gt; 1,
+	*       "ROLE" =&gt; SONET_ROLES_USER,
+	*       "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*       "=DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*       "INITIATED_BY_TYPE" =&gt; SONET_INITIATED_BY_USER,
+	*       "INITIATED_BY_USER_ID" =&gt; CUser::GetID(),
+	*       "MESSAGE" =&gt; false,
+	*       )
+	* );
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -152,35 +153,36 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 
 	
 	/**
-	 * <p>Метод изменяет параметры связи между пользователем и группой.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код связи.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив параметров связи, в котором ключами являются названия
-	 * параметров, а значениями - их значения. Может содержать следующие
-	 * ключи:<br> USER_ID - код пользователя,<br> GROUP_ID - код группы,<br> ROLE - роль
-	 * пользователя в группе: SONET_ROLES_MODERATOR - модератор, SONET_ROLES_USER -
-	 * пользователь, SONET_ROLES_BAN - черный список, SONET_ROLES_REQUEST - запрос на
-	 * вступление,<br> DATE_CREATE - дата создания записи,<br> DATE_UPDATE - дата
-	 * изменения записи,<br> INITIATED_BY_TYPE - кем инициализирована связь:
-	 * SONET_INITIATED_BY_USER - пользователем, SONET_INITIATED_BY_GROUP - группой,<br>
-	 * INITIATED_BY_USER_ID - код пользователя, инициализировавшего связь,<br> MESSAGE -
-	 * сообщение при запросе на создание связи.
-	 *
-	 *
-	 *
-	 * @return int <p>Код связи в случае успешного выполнения и false - в противном
-	 * случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры связи между пользователем и группой.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код связи.
+	*
+	*
+	*
+	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
+	* параметров, а значениями - их значения. Может содержать следующие
+	* ключи:<br><b>USER_ID</b> - код пользователя,<br><b>GROUP_ID</b> - код
+	* группы,<br><b>ROLE</b> - роль пользователя в группе: SONET_ROLES_MODERATOR -
+	* модератор, SONET_ROLES_USER - пользователь, SONET_ROLES_BAN - черный список,
+	* SONET_ROLES_REQUEST - запрос на вступление,<br><b>DATE_CREATE</b> - дата создания
+	* записи,<br><b>DATE_UPDATE</b> - дата изменения записи,<br><b>INITIATED_BY_TYPE</b> - кем
+	* инициализирована связь: SONET_INITIATED_BY_USER - пользователем,
+	* SONET_INITIATED_BY_GROUP - группой,<br><b>INITIATED_BY_USER_ID</b> - код пользователя,
+	* инициализировавшего связь,<br><b>MESSAGE</b> - сообщение при запросе на
+	* создание связи.
+	*
+	*
+	*
+	* @return int <p>Код связи в случае успешного выполнения и false - в противном
+	* случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -264,90 +266,95 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	 * <p>Метод выбирает список отношений между пользователями и группами в соответствии с фильтром.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
-	 * массива. Ключами в массиве являются поля для сортировки, а
-	 * значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, USER_ID,
-	 * GROUP_ID, ROLE, DATE_CREATE, DATE_UPDATE, INITIATED_BY_TYPE, INITIATED_BY_USER_ID, GROUP_NAME, GROUP_SITE_ID,
-	 * GROUP_VISIBLE, GROUP_OWNER_ID, GROUP_OPENED, GROUP_NUMBER_OF_MEMBERS, GROUP_DATE_ACTIVITY, USER_NAME, USER_LAST_NAME,
-	 * USER_LOGIN, USER_EMAIL, USER_PERSONAL_PHOTO, USER_LID, INITIATED_BY_USER_NAME, INITIATED_BY_USER_LAST_NAME,
-	 * INITIATED_BY_USER_LOGIN, INITIATED_BY_USER_EMAIL, RAND.
-	 *
-	 *
-	 *
-	 * @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	 * являются названия полей, а значениями - их значения. Допустимае
-	 * поля: ID, USER_ID, GROUP_ID, ROLE, DATE_CREATE, DATE_UPDATE, INITIATED_BY_TYPE, INITIATED_BY_USER_ID, GROUP_NAME,
-	 * GROUP_SITE_ID, GROUP_ACTIVE, GROUP_VISIBLE, GROUP_OWNER_ID, GROUP_INITIATE_PERMS, GROUP_OPENED, GROUP_NUMBER_OF_MEMBERS,
-	 * GROUP_DATE_ACTIVITY, USER_ACTIVE, USER_NAME, USER_LAST_NAME, USER_LOGIN, USER_EMAIL, USER_LID, INITIATED_BY_USER_NAME,
-	 * INITIATED_BY_USER_LAST_NAME, INITIATED_BY_USER_LOGIN, INITIATED_BY_USER_EMAIL.
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
-	 * параметр содержит массив названий полей, то по этим полям будет
-	 * произведена группировка. Если параметр содержит пустой массив,
-	 * то метод вернет количество записей, удовлетворяющих фильтру. По
-	 * умолчанию параметр равен false - не группировать.
-	 *
-	 *
-	 *
-	 * @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
-	 * навигации.
-	 *
-	 *
-	 *
-	 * @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
-	 * должны быть возвращены методом. Если массив пустой, то выбираются
-	 * поля ID, USER_ID, GROUP_ID, ROLE, DATE_CREATE, DATE_UPDATE, INITIATED_BY_TYPE, INITIATED_BY_USER_ID, MESSAGE. В
-	 * массиве допустимы любые поля из списка полей.
-	 *
-	 *
-	 *
-	 * @param array $arSelectFields = array() 
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
-	 * удовлетворяющие условию выборки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $dbRequests = CSocNetUserToGroup::GetList(
-	 * 	array("USER_LAST_NAME" =&gt; "ASC", "USER_NAME" =&gt; "ASC"),
-	 * 	array(
-	 * 		"GROUP_ID" =&gt; $groupId,
-	 * 		" SONET_ROLES_MODERATOR,
-	 * 		"USER_ACTIVE" =&gt; "Y"
-	 * 	),
-	 * 	false,
-	 * 	$arNavParams,
-	 * 	array("ID", "USER_ID", "DATE_CREATE", "DATE_UPDATE", "USER_NAME", "USER_LAST_NAME", "USER_PERSONAL_PHOTO")
-	 * );
-	 * while ($arRequests = $dbRequests-&gt;GetNext())
-	 * {
-	 * 	. . .
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetList.php
-	 * @author Bitrix
-	 */
+	* <p>Метод выбирает список отношений между пользователями и группами в соответствии с фильтром.</p>
+	*
+	*
+	*
+	*
+	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
+	* массива. Ключами в массиве являются поля для сортировки, а
+	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
+	* <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>, <b>INITIATED_BY_TYPE</b>,
+	* <b>INITIATED_BY_USER_ID</b>, <b>GROUP_NAME</b>, <b>GROUP_SITE_ID</b>, <b>GROUP_VISIBLE</b>, <b>GROUP_OWNER_ID</b>,
+	* <b>GROUP_OPENED</b>, <b>GROUP_NUMBER_OF_MEMBERS</b>, <b>GROUP_DATE_ACTIVITY</b>, <b>USER_NAME</b>,
+	* <b>USER_LAST_NAME</b>, <b>USER_LOGIN</b>, <b>USER_EMAIL</b>, <b>USER_PERSONAL_PHOTO</b>, <b>USER_LID</b>,
+	* <b>INITIATED_BY_USER_NAME</b>, <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>,
+	* <b>INITIATED_BY_USER_EMAIL</b>, <b>RAND</b>.
+	*
+	*
+	*
+	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. Допустимые
+	* поля: <b>ID</b>, <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
+	* <b>INITIATED_BY_TYPE</b>, <b>INITIATED_BY_USER_ID</b>, <b>GROUP_NAME</b>, <b>GROUP_SITE_ID</b>, <b>GROUP_ACTIVE</b>,
+	* <b>GROUP_VISIBLE</b>, <b>GROUP_OWNER_ID</b>, <b>GROUP_INITIATE_PERMS</b>, <b>GROUP_OPENED</b>,
+	* <b>GROUP_NUMBER_OF_MEMBERS</b>, <b>GROUP_DATE_ACTIVITY</b>, <b>USER_ACTIVE</b>, <b>USER_NAME</b>, <b>USER_LAST_NAME</b>,
+	* <b>USER_LOGIN</b>, <b>USER_EMAIL</b>, <b>USER_LID</b>, <b>INITIATED_BY_USER_NAME</b>,
+	* <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>, <b>INITIATED_BY_USER_EMAIL</b>.
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
+	* параметр содержит массив названий полей, то по этим полям будет
+	* произведена группировка. Если параметр содержит пустой массив,
+	* то метод вернет количество записей, удовлетворяющих фильтру. По
+	* умолчанию параметр равен false - не группировать.
+	*
+	*
+	*
+	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
+	* навигации.
+	*
+	*
+	*
+	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
+	* должны быть возвращены методом. Если массив пустой, то выбираются
+	* поля <b>ID</b>, <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
+	* <b>INITIATED_BY_TYPE</b>, <b>INITIATED_BY_USER_ID</b>, <b>MESSAGE</b>. В массиве допустимы любые
+	* поля из списка полей.
+	*
+	*
+	*
+	* @param array $arSelectFields = array() 
+	*
+	*
+	*
+	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
+	* удовлетворяющие условию выборки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $dbRequests = CSocNetUserToGroup::GetList(
+	* 	array("USER_LAST_NAME" =&gt; "ASC", "USER_NAME" =&gt; "ASC"),
+	* 	array(
+	* 		"GROUP_ID" =&gt; $groupId,
+	* 		" SONET_ROLES_MODERATOR,
+	* 		"USER_ACTIVE" =&gt; "Y"
+	* 	),
+	* 	false,
+	* 	$arNavParams,
+	* 	array("ID", "USER_ID", "DATE_CREATE", "DATE_UPDATE", "USER_NAME", "USER_LAST_NAME", "USER_PERSONAL_PHOTO")
+	* );
+	* while ($arRequests = $dbRequests-&gt;GetNext())
+	* {
+	* 	. . .
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetList.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;

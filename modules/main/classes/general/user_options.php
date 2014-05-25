@@ -98,7 +98,7 @@ class CUserOptions
 	{
 		global $DB, $USER, $CACHE_MANAGER;
 
-		if ($user_id === false)
+		if ($user_id === false && is_object($USER) && ((get_class($USER) === 'CUser') || ($USER instanceof CUser)))
 			$user_id = $USER->GetID();
 
 		$user_id = intval($user_id);
@@ -230,8 +230,11 @@ class CUserOptions
 				if (is_array($opt["v"]))
 				{
 					$val = CUserOptions::GetOption($opt["c"], $opt["n"], array());
-					foreach ($opt["v"] as $k => $v)
-						$val[$k] = $v;
+					if(is_array($val))
+					{
+						foreach ($opt["v"] as $k => $v)
+							$val[$k] = $v;
+					}
 				}
 				CUserOptions::SetOption($opt["c"], $opt["n"], $val);
 				if ($opt["d"] == "Y" && $USER->CanDoOperation('edit_other_settings'))

@@ -71,21 +71,21 @@ class CAllSocNetUserPerms
 
 	
 	/**
-	 * <p>Метод удаляет запись из базы данных.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код записи.
-	 *
-	 *
-	 *
-	 * @return bool <p>True в случае успешного удаления и false - в противном случае.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/Delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет запись из базы данных.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код записи.
+	*
+	*
+	*
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -120,28 +120,28 @@ class CAllSocNetUserPerms
 
 	
 	/**
-	 * <p>Метод изменяет параметры записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код записи.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив измененных параметров записи с ключами:<br> USER_ID - код
-	 * пользователя,<br> OPERATION_ID - операция,<br> RELATION_TYPE - тип отношений между
-	 * пользователями.
-	 *
-	 *
-	 *
-	 * @return int <p>Код записи в случае успешного выполнения и false - в случае
-	 * ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/Update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры записи.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код записи.
+	*
+	*
+	*
+	* @param array $arFields  Массив измененных параметров записи с ключами:<br><b>USER_ID</b>- код
+	* пользователя,<br><b>OPERATION_ID</b> - операция,<br><b>RELATION_TYPE</b> - тип отношений
+	* между пользователями.
+	*
+	*
+	*
+	* @return int <p>Код записи в случае успешного выполнения и false - в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -194,23 +194,23 @@ class CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает массив параметров записи.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  Код записи.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив с ключами:<br> ID - код записи,<br> USER_ID - код пользователя,<br>
-	 * OPERATION_ID - операция,<br> RELATION_TYPE - тип отношений между
-	 * пользователями.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/GetByID.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает массив параметров записи.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  Код записи.
+	*
+	*
+	*
+	* @return array <p>Массив с ключами:<br><b>ID</b> - код записи,<br><b>USER_ID</b> - код
+	* пользователя,<br><b>OPERATION_ID</b> - операция,<br><b>RELATION_TYPE</b> - тип отношений
+	* между пользователями.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -234,25 +234,25 @@ class CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	 * <p>Метод возвращает необходимые права на выполнение заданной операции над профайлом заданного пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, к профайлу которого осуществляется доступ.
-	 *
-	 *
-	 *
-	 * @param string $operation  Операция.
-	 *
-	 *
-	 *
-	 * @return char <p>Права на доступ.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/GetOperationPerms.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает необходимые права на выполнение заданной операции над профайлом заданного пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, к профайлу которого осуществляется доступ.
+	*
+	*
+	*
+	* @param string $operation  Операция.
+	*
+	*
+	*
+	* @return char <p>Права на доступ.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/getoperationperms.php
+	* @author Bitrix
+	*/
 	public static function GetOperationPerms($userID, $operation)
 	{
 		global $arSocNetUserOperations;
@@ -326,34 +326,34 @@ class CAllSocNetUserPerms
 
 	
 	/**
-	 * <p>Метод проверяет, может ли пользователь совершать указанную операцию над профайлом заданного пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $fromUserID  Код пользователя, права которого проверяются.
-	 *
-	 *
-	 *
-	 * @param int $toUserID  Код пользователя, к профайлу которого осуществляется доступ.
-	 *
-	 *
-	 *
-	 * @param string $operation  Операция.
-	 *
-	 *
-	 *
-	 * @param bool $bCurrentUserIsAdmin = false Является ли администратором пользователь, права которого
-	 * проверяются.
-	 *
-	 *
-	 *
-	 * @return bool <p>True, если права на выполнение операции есть. Иначе - false.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/CanPerformOperation.php
-	 * @author Bitrix
-	 */
+	* <p>Метод проверяет, может ли пользователь совершать указанную операцию над профайлом заданного пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $fromUserID  Код пользователя, права которого проверяются.
+	*
+	*
+	*
+	* @param int $toUserID  Код пользователя, к профайлу которого осуществляется доступ.
+	*
+	*
+	*
+	* @param string $operation  Операция.
+	*
+	*
+	*
+	* @param bool $bCurrentUserIsAdmin = false Является ли администратором пользователь, права которого
+	* проверяются. Необязательный парамтер. По умолчанию равен false.
+	*
+	*
+	*
+	* @return bool <p>True, если права на выполнение операции есть. Иначе - false.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/canperformoperation.php
+	* @author Bitrix
+	*/
 	public static function CanPerformOperation($fromUserID, $toUserID, $operation, $bCurrentUserIsAdmin = false)
 	{
 		global $arSocNetUserOperations;
@@ -418,36 +418,61 @@ class CAllSocNetUserPerms
 
 	
 	/**
-	 * <p>Метод инициализирует массив прав пользователя на операции над профайлом заданного пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $currentUserID  Код пользователя, права которого проверяются.
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя, к профайлу которого осуществляется доступ.
-	 *
-	 *
-	 *
-	 * @param bool $bCurrentUserIsAdmin  Флаг, является ли администратором пользователь, права которого
-	 * проверяются.
-	 *
-	 *
-	 *
-	 * @return array <p>Массив с ключами:<br> IsCurrentUser - флаг, осуществляется ли доступ к
-	 * собственному профайлу, Relation - отношения между пользователями,
-	 * Operations - массив операций: modifyuser - право на изменение профайла,
-	 * viewcontacts - право на просмотр контактной информации, invitegroup -
-	 * приглашение в группу, message - отправка персонального сообщения,
-	 * viewfriends - просмотр друзей, viewgroups - просмотр групп, viewprofile - просмотр
-	 * профиля. .</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/InitUserPerms.php
-	 * @author Bitrix
-	 */
+	* <p>Метод инициализирует массив прав пользователя на операции над профайлом заданного пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $currentUserID  Код пользователя, права которого проверяются.
+	*
+	*
+	*
+	* @param int $userID  Код пользователя, к профайлу которого осуществляется доступ.
+	*
+	*
+	*
+	* @param bool $bCurrentUserIsAdmin  Флаг, является ли администратором пользователь, права которого
+	* проверяются.
+	*
+	*
+	*
+	* @return array <p>Массив с ключами:<br><b>IsCurrentUser</b> - флаг, осуществляется ли доступ к
+	* собственному профайлу,<br><b>Relation</b> - отношения между
+	* пользователями,<br><b>Operations</b> - массив операций: <br> modifyuser - право на
+	* изменение профайла, если в главном модуле разрешено
+	* редактировать профиль,<br> modifyuser_main - право на изменение
+	* профайла,<br> viewcontacts - право на просмотр контактной информации,<br>
+	* invitegroup - приглашение в группу, <br> message - отправка персонального
+	* сообщения, <br> viewfriends - просмотр друзей, <br> viewgroups - просмотр групп,
+	* <br> viewprofile - просмотр профиля. </p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Array 
+	* ( 
+	*  [Operations] =&gt; Array 
+	* 	 ( 
+	* 		 [modifyuser] =&gt; 1 
+	* 		 [viewcontacts] =&gt; 1 
+	* 		 [invitegroup] =&gt; 1 
+	* 		 [message] =&gt; 1 
+	* 		 [viewfriends] =&gt; 1 
+	* 		 [viewgroups] =&gt; 1 
+	* 		 [viewprofile] =&gt; 1 
+	* 		 [modifyuser_main] =&gt; 
+	* 	 ) 
+	* 
+	*  [IsCurrentUser] =&gt; 
+	*  [Relation] =&gt; 
+	* )
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/inituserperms.php
+	* @author Bitrix
+	*/
 	public static function InitUserPerms($currentUserID, $userID, $bCurrentUserIsAdmin)
 	{
 		global $arSocNetUserOperations, $USER;
@@ -537,29 +562,30 @@ class CAllSocNetUserPerms
 
 	
 	/**
-	 * <p>Изменяет право на операцию, если таковое есть. Иначе добавляет новую запись.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $userID  Код пользователя.
-	 *
-	 *
-	 *
-	 * @param string $feature  Название функционала.
-	 *
-	 *
-	 *
-	 * @param string $perm  Право.
-	 *
-	 *
-	 *
-	 * @return int <p>Код записи при успешном сохранении и false - в случае ошибки.</p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/SetPerm.php
-	 * @author Bitrix
-	 */
+	* <p>Изменяет право на операцию, если таковое есть. Иначе добавляет новую запись.</p>
+	*
+	*
+	*
+	*
+	* @param int $userID  Код пользователя. </h
+	*
+	*
+	*
+	* @param string $feature  Название функционала. </htm
+	*
+	*
+	*
+	* @param string $perm  Право.</b
+	*
+	*
+	*
+	* @return int <p>Код записи при успешном сохранении и false - в случае ошибки.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/setperm.php
+	* @author Bitrix
+	*/
 	public static function SetPerm($userID, $feature, $perm)
 	{
 		$userID = IntVal($userID);

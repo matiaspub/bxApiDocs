@@ -115,8 +115,6 @@ class CAllBlogUserGroup
 		{
 			$oldGroupPerms = CBlogUserGroup::GetGroupPerms(1, $blogID, 0, BLOG_PERMS_POST);
 
-			$DB->StartTransaction();
-
 			$currentPerms = CBlogUserGroup::GetGroupPerms($ID, $blogID, $postID, $permsType);
 			if ($currentPerms)
 			{
@@ -155,8 +153,6 @@ class CAllBlogUserGroup
 						"VALUES (".$blogID.", ".$ID.", '".$DB->ForSql($permsType)."', null, '".$DB->ForSql($permission)."') "
 					);
 			}
-
-			$DB->Commit();
 
 			unset($GLOBALS["BLOG_USER_GROUP"]["BLOG_GROUP_PERMS_CACHE_".$blogID."_".$postID."_".$permsType."_".$ID]);
 			unset($GLOBALS["BLOG_USER_GROUP"]["BLOG_USER_PERMS_CACHE_".$blogID."_".$postID."_".$permsType]);

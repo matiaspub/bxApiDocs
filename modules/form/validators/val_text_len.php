@@ -1,5 +1,4 @@
 <?
-CModule::IncludeModule("form");
 IncludeModuleLangFile(__FILE__);
 
 class CFormValidatorTextLen
@@ -16,7 +15,7 @@ class CFormValidatorTextLen
 			"HANDLER" => array("CFormValidatorTextLen", "DoValidate") // main validation method
 		);
 	}
-	
+
 	public static function GetSettings()
 	{
 		return array(
@@ -25,7 +24,7 @@ class CFormValidatorTextLen
 				"TYPE" => "TEXT",
 				"DEFAULT" => "0",
 			),
-			
+
 			"LENGTH_TO" => array(
 				"TITLE" => GetMessage("FORM_VALIDATOR_VAL_TEXT_LEN_SETTINGS_LENGTH_TO"),
 				"TYPE" => "TEXT",
@@ -33,31 +32,31 @@ class CFormValidatorTextLen
 			),
 		);
 	}
-	
+
 	public static function ToDB($arParams)
 	{
 		$arParams["LENGTH_FROM"] = intval($arParams["LENGTH_FROM"]);
 		$arParams["LENGTH_TO"] = intval($arParams["LENGTH_TO"]);
-		
+
 		if ($arParams["LENGTH_FROM"] > $arParams["LENGTH_TO"])
 		{
 			$tmp = $arParams["LENGTH_FROM"];
 			$arParams["LENGTH_FROM"] = $arParams["LENGTH_TO"];
 			$arParams["LENGTH_TO"] = $tmp;
 		}
-		
+
 		return serialize($arParams);
 	}
-	
+
 	public static function FromDB($strParams)
 	{
 		return unserialize($strParams);
 	}
-	
+
 	public static function DoValidate($arParams, $arQuestion, $arAnswers, $arValues)
 	{
 		global $APPLICATION;
-		
+
 		foreach ($arValues as $value)
 		{
 			// check minimum length
@@ -66,7 +65,7 @@ class CFormValidatorTextLen
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_TEXT_LEN_ERROR_LESS"));
 				return false;
 			}
-			
+
 			// check maximum length
 			if (strlen($value) > $arParams["LENGTH_TO"])
 			{
@@ -74,7 +73,7 @@ class CFormValidatorTextLen
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

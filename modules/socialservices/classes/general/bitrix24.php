@@ -12,24 +12,26 @@ class CSocServBitrixOAuth extends CSocServAuth
 	protected $portalURI = '';
 	protected $redirectURI = '';
 
-	/**
-	 * @var CUser null
-	 */
-	protected $user = null;
+	protected $userId = null;
 
-	public function __construct($appID, $appSecret, $portalURI, $redirectURI, $user = null)
+	public function __construct($appID, $appSecret, $portalURI, $redirectURI, $userId = null)
 	{
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
 		$this->portalURI = $portalURI;
 		$this->redirectURI = $redirectURI;
-		$this->user = $user;
+		$this->userId = $userId;
 		$this->entityOAuth = new CBitrixOAuthInterface($this->appID, $this->appSecret, $this->portalURI);
 	}
 
 	public function getEntityOAuth()
 	{
 		return $this->entityOAuth;
+	}
+
+	public function addScope($scope)
+	{
+		return $this->entityOAuth->addScope($scope);
 	}
 
 
@@ -51,17 +53,17 @@ class CSocServBitrixOAuth extends CSocServAuth
 	public function getStorageToken()
 	{
 		$accessToken = null;
-
-		if(is_object($this->user))
+		$userId = intval($this->userId);
+		if($userId > 0)
 		{
-			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $this->user->GetID(), 'XML_ID' => $this->appID, "EXTERNAL_AUTH_ID" => "Bitrix24OAuth", 'PERSONAL_WWW' => $this->portalURI), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
+			$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => $userId, 'XML_ID' => $this->appID, "EXTERNAL_AUTH_ID" => "Bitrix24OAuth", 'PERSONAL_WWW' => $this->portalURI), false, false, array("OATOKEN", "REFRESH_TOKEN", "OATOKEN_EXPIRES"));
 			if($arOauth = $dbSocservUser->Fetch())
 			{
 				$accessToken = $arOauth["OATOKEN"];
 				if(empty($accessToken) || ((intval($arOauth["OATOKEN_EXPIRES"]) > 0) && (intval($arOauth["OATOKEN_EXPIRES"] < intval(time())))))
 				{
 					if(isset($arOauth['REFRESH_TOKEN']))
-						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $this->user->GetID(), true);
+						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $userId, true);
 					if(($accessToken = $this->entityOAuth->getToken()) === false)
 						return null;
 				}

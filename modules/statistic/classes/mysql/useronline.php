@@ -16,33 +16,33 @@ class CUserOnline
 {
 	
 	/**
-	 * <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность на сайте (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) за определённый интервал времени. Данный интервал времени задается в настройках модуля "Статистика" в параметре "Интервал посетителей в online (сек.)".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * echo "Сейчас на сайте посетителей: ".<b>CUserOnline::GetGuestCount</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a></li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getguestcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность на сайте (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) за определённый интервал времени. Данный интервал времени задается в настройках модуля "Статистика" в параметре "Интервал посетителей в online (сек.)".</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* echo "Сейчас на сайте посетителей: ".<b>CUserOnline::GetGuestCount</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a></li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getguestcount.php
+	* @author Bitrix
+	*/
 	public static function GetGuestCount()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -65,65 +65,65 @@ class CUserOnline
 
 	
 	/**
-	 * <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) на сайте за определённый интервал времени.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param function $GetList  Ссылка на переменную, которая после выполнения функции будет
-	 * содержать количество <a
-	 * href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a>.
-	 *
-	 *
-	 *
-	 * @param (&$guest_coun $t  Ссылка на переменную, которая после выполнения функции будет
-	 * содержать количество сессий посетителей в online.
-	 *
-	 *
-	 *
-	 * @param &$session_coun $t  
-	 *
-	 *
-	 *
-	 * @param $arOrde $r = Array() 
-	 *
-	 *
-	 *
-	 * @param $arFilte $r = Array()) 
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим список записей
-	 * $rs = <b>CUserOnline::GetList</b>($guest_counter, $session_counter);
-	 * 
-	 * echo "Количество посетителей в онлайн: ".$guest_counter;
-	 * echo "Количество сессий в онлайн: ".$session_counter;
-	 * 
-	 * // выведем все записи
-	 * while ($ar = $rs-&gt;Fetch())
-	 * {
-	 *     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/users_online.php">Отчет "Кто на сайте"</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) на сайте за определённый интервал времени.</p>
+	*
+	*
+	*
+	*
+	* @param function $GetList  Ссылка на переменную, которая после выполнения функции будет
+	* содержать количество <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a>.
+	*
+	*
+	*
+	* @param (&$guest_coun $t  Ссылка на переменную, которая после выполнения функции будет
+	* содержать количество сессий посетителей в online.
+	*
+	*
+	*
+	* @param &$session_coun $t  
+	*
+	*
+	*
+	* @param $arOrde $r = Array() 
+	*
+	*
+	*
+	* @param $arFilte $r = Array()) 
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // получим список записей
+	* $rs = <b>CUserOnline::GetList</b>($guest_counter, $session_counter);
+	* 
+	* echo "Количество посетителей в онлайн: ".$guest_counter;
+	* echo "Количество сессий в онлайн: ".$session_counter;
+	* 
+	* // выведем все записи
+	* while ($ar = $rs-&gt;Fetch())
+	* {
+	*     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/users_online.php">Отчет "Кто на сайте"</a>
+	* </li> </ul> </htm<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList(&$guest_count, &$session_count, $arOrder=Array(), $arFilter=Array())
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -131,7 +131,8 @@ class CUserOnline
 		$interval = intval(COption::GetOptionString("statistic", "ONLINE_INTERVAL"));
 
 		$arSqlSearch = Array();
-		$strSqlSearch = "";
+		$from1 = "";
+		$from2 = "";
 		if (is_array($arFilter))
 		{
 			foreach ($arFilter as $key => $val)
@@ -224,21 +225,22 @@ class CUserOnline
 						$arSqlSearch[] = "ifnull(S.USER_ID,0)>0";
 						$arSqlSearch[] = GetFilterQuery("S.USER_ID,A.LOGIN,A.LAST_NAME,A.NAME", $val, $match);
 						$from1 = "LEFT JOIN b_user A ON (A.ID = S.USER_ID)";
-						$select = " , A.LOGIN, concat(ifnull(A.NAME,''),' ',ifnull(A.LAST_NAME,'')) USER_NAME";
 						break;
 				}
 			}
 		}
 
-		if (!is_array($arOrder))
-			$arOrder = Array("s_id" => "desc");
-
-		foreach($arOrder as $by=>$order)
+		$by = "s_id";
+		$order = "desc";
+		if (is_array($arOrder) && !empty($arOrder))
 		{
-			$by = strtolower($by);
-			$order = strtolower($order);
-			if ($order!="asc")
-				$order = "desc";
+			foreach($arOrder as $by=>$order)
+			{
+				$by = strtolower($by);
+				$order = strtolower($order);
+				if ($order!="asc")
+					$order = "desc";
+			}
 		}
 
 		if ($by == "s_id") $strSqlOrder = "ORDER BY S.ID";
@@ -288,6 +290,7 @@ class CUserOnline
 				INNER JOIN b_stat_guest G ON (G.ID = S.GUEST_ID)
 				INNER JOIN b_stat_country C ON (C.ID = S.COUNTRY_ID)
 				".$from1."
+				".$from2."
 				LEFT JOIN b_stat_city CITY ON (CITY.ID = S.CITY_ID)
 			WHERE
 				S.DATE_STAT >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)

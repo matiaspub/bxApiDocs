@@ -1,4 +1,6 @@
 <?
+IncludeModuleLangFile(__FILE__);
+
 /**
 * Workflow runtime.
 */
@@ -142,47 +144,48 @@ class CBPRuntime
 	*/
 	
 	/**
-	 * <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p> <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $workflowTemplateId  Код шаблона бизнес-процесса
-	 *
-	 *
-	 *
-	 * @param array $documentId  Код документа, над которым запускается бизнес-процесс. Имеет вид
-	 * массива <i>array(код_модуля_документа, класс_документа,
-	 * код_документа)</i>
-	 *
-	 *
-	 *
-	 * @param array $workflowParameters = array() Массив параметров запуска бизнес-процесса
-	 *
-	 *
-	 *
-	 * @return CBPWorkflow <p>Возвращается запущенный экземпляр
-	 * бизнес-процесса.</p><h4>Исключения</h4><table width="100%" class="tnormal"><tbody> <tr> <th
-	 * width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowTemplateId</i></td> <td>Не указан
-	 * код шаблона бизнес-процесса</td> </tr> <tr> <td><i>EmptyRootActivity</i></td> <td>Не
-	 * удалось создать экземпляр бизнес-процесса</td> </tr> </tbody></table>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br><br>try<br>{<br>  $wi = $runtime-&gt;CreateWorkflow($workflowTemplateId, $documentId, $arParameters);<br>  $wi-&gt;Start();<br>}<br>catch (Exception $e)<br>{<br>  // <br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/CreateWorkflow.php
-	 * @author Bitrix
-	 */
+	* <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p> <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $workflowTemplateId  Код шаблона бизнес-процесса
+	*
+	*
+	*
+	* @param array $documentId  Код документа, над которым запускается бизнес-процесс. Имеет вид
+	* массива <i>array(код_модуля_документа, класс_документа,
+	* код_документа)</i>
+	*
+	*
+	*
+	* @param array $workflowParameters = array() Массив параметров запуска бизнес-процесса
+	*
+	*
+	*
+	* @return CBPWorkflow <p>Возвращается запущенный экземпляр бизнес-процесса.</p>
+	* <h4>Исключения</h4><table width="100%" class="tnormal"><tbody> <tr> <th width="15%">Код</th>
+	* <th>Описание</th> </tr> <tr> <td><i>workflowTemplateId</i></td> <td>Не указан код шаблона
+	* бизнес-процесса</td> </tr> <tr> <td><i>EmptyRootActivity</i></td> <td>Не удалось создать
+	* экземпляр бизнес-процесса</td> </tr> </tbody></table>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br><br>try<br>{<br>  $wi = $runtime-&gt;CreateWorkflow($workflowTemplateId, $documentId, $arParameters);<br>  $wi-&gt;Start();<br>}<br>catch (Exception $e)<br>{<br>  // <br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/CreateWorkflow.php
+	* @author Bitrix
+	*/
 	public function CreateWorkflow($workflowTemplateId, $documentId, $workflowParameters = array())
 	{
 		$workflowTemplateId = intval($workflowTemplateId);
@@ -190,6 +193,13 @@ class CBPRuntime
 			throw new Exception("workflowTemplateId");
 
 		$arDocumentId = CBPHelper::ParseDocumentId($documentId);
+
+		$limit = \Bitrix\Main\Config\Option::get("bizproc", "limit_simultaneous_processes", "0");
+		if (intval($limit) > 0)
+		{
+			if (CBPStateService::CountDocumentWorkflows($documentId) >= $limit)
+				throw new Exception(GetMessage("BPCGDOC_LIMIT_SIMULTANEOUS_PROCESSES", array("#NUM#" => $limit)));
+		}
 
 		if (!$this->isStarted)
 			$this->StartRuntime();
@@ -207,8 +217,7 @@ class CBPRuntime
 		//if (!is_a($rootActivity, "IBPRootActivity"))
 		//	throw new Exception("RootActivityIsNotAIBPRootActivity");
 
-		$events = GetModuleEvents("bizproc", "OnCreateWorkflow");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("bizproc", "OnCreateWorkflow", true)  as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($workflowTemplateId, $documentId, &$workflowParameters));
 
 		$workflow->Initialize($rootActivity, $arDocumentId, $workflowParameters, $workflowVariablesTypes, $workflowParametersTypes);
@@ -231,34 +240,35 @@ class CBPRuntime
 	*/
 	
 	/**
-	 * <p>Метод возвращает экземпляр бизнес-процесса по его идентификатору.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $workflowId  Идентификатор бизнес-процесса
-	 *
-	 *
-	 *
-	 * @return CBPWorkflow <p>Возвращается экземпляр класса <a
-	 * href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>,
-	 * представляющий собой экземпляр
-	 * существующего бизнес-процесса.</p><h4>Исключения</h4><table width="100%"
-	 * class="tnormal"><tbody> <tr> <th width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowId</i></td>
-	 * <td>Не указан код бизнес-процесса</td> </tr> <tr> <td><i>Empty root activity</i></td> <td>Не
-	 * удалось восстановить экземпляр бизнес-процесса</td> </tr> </tbody></table><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br><br>// Получим код документа, над которым запущен бизнес-процесс с указаным идентификатором<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>  $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>  $d = $workflow-&gt;GetDocumentId();<br>}<br>catch(Exception $e)<br>{<br>  //<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/GetWorkflow.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает экземпляр бизнес-процесса по его идентификатору.</p>
+	*
+	*
+	*
+	*
+	* @param string $workflowId  Идентификатор бизнес-процесса
+	*
+	*
+	*
+	* @return CBPWorkflow <p>Возвращается экземпляр класса <a
+	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>,
+	* представляющий собой экземпляр
+	* существующего бизнес-процесса.</p> <h4>Исключения</h4><table width="100%"
+	* class="tnormal"><tbody> <tr> <th width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowId</i></td>
+	* <td>Не указан код бизнес-процесса</td> </tr> <tr> <td><i>Empty root activity</i></td> <td>Не
+	* удалось восстановить экземпляр бизнес-процесса</td> </tr> </tbody></table> <a
+	* name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br><br>// Получим код документа, над которым запущен бизнес-процесс с указаным идентификатором<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>  $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>  $d = $workflow-&gt;GetDocumentId();<br>}<br>catch(Exception $e)<br>{<br>  //<br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/GetWorkflow.php
+	* @author Bitrix
+	*/
 	public function GetWorkflow($workflowId)
 	{
 		if (strlen($workflowId) <= 0)
@@ -351,7 +361,8 @@ class CBPRuntime
 		if (in_array($code, $this->arLoadedActivities))
 			return true;
 
-		$code = preg_replace("[^a-zA-Z0-9]", "", $code);
+		if (preg_match("#[^a-zA-Z0-9_]#", $code))
+			return false;
 		if (strlen($code) <= 0)
 			return false;
 
@@ -388,7 +399,8 @@ class CBPRuntime
 
 	public function GetActivityDescription($code)
 	{
-		$code = preg_replace("[^a-zA-Z0-9]", "", $code);
+		if (preg_match("#[^a-zA-Z0-9_]#", $code))
+			return null;
 		if (strlen($code) <= 0)
 			return null;
 
@@ -492,7 +504,8 @@ class CBPRuntime
 						continue;
 					if (!is_dir($folder."/".$dir))
 						continue;
-					if (array_key_exists($dir, $arProcessedDirs))
+					$dirKey = strtolower($dir);
+					if (array_key_exists($dirKey, $arProcessedDirs))
 						continue;
 					if (!file_exists($folder."/".$dir."/.description.php"))
 						continue;
@@ -502,8 +515,8 @@ class CBPRuntime
 					include($folder."/".$dir."/.description.php");
 					if (strtolower($arActivityDescription["TYPE"]) == $type)
 					{
-						$arProcessedDirs[$dir] = $arActivityDescription;
-						$arProcessedDirs[$dir]["PATH_TO_ACTIVITY"] = $folder."/".$dir;
+						$arProcessedDirs[$dirKey] = $arActivityDescription;
+						$arProcessedDirs[$dirKey]["PATH_TO_ACTIVITY"] = $folder."/".$dir;
 					}
 				}
 				closedir($handle);

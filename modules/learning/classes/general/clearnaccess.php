@@ -65,7 +65,7 @@ interface ILearnAccessInterface
 	 * @return array of base for all lessons permissions
 	 * @example
 	 * <?php
-	 * $oAccess = new CLearnAccess ($USER->GetID());
+	 * $oAccess = CLearnAccess::getInstance ($USER->GetID());
 	 * $arPermPairs = $oAccess->GetLessonPermissions ($some_lesson_id);
 	 * ?>
 	 * $arPermPairs now contains
@@ -78,7 +78,7 @@ interface ILearnAccessInterface
 	 * @return array of lesson's permissions
 	 * @example
 	 * <?php
-	 * $oAccess = new CLearnAccess ($USER->GetID());
+	 * $oAccess = CLearnAccess::getInstance ($USER->GetID());
 	 * $arPermPairs = $oAccess->GetLessonPermissions ($some_lesson_id);
 	 * ?>
 	 * $arPermPairs now contains
@@ -96,7 +96,7 @@ interface ILearnAccessInterface
 	 *    178  => array()	// for this lesson will be cleaned all rights
 	 * );
 	 * $userId = $USER->GetID();
-	 * $oAccess = new CLearnAccess ($userId);
+	 * $oAccess = CLearnAccess::getInstance ($userId);
 	 * $oAccess->SetLessonsPermissions ($arPermissions);
 	 * 
 	 */
@@ -490,7 +490,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * @return array of base for all lessons permissions
 	 * @example
 	 * <?php
-	 * $oAccess = new CLearnAccess ($USER->GetID());
+	 * $oAccess = CLearnAccess::getInstance ($USER->GetID());
 	 * $arPermPairs = $oAccess->GetLessonPermissions ($some_lesson_id);
 	 * ?>
 	 * $arPermPairs now contains
@@ -524,7 +524,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * @return array of lesson's permissions
 	 * @example
 	 * <?php
-	 * $oAccess = new CLearnAccess ($USER->GetID());
+	 * $oAccess = CLearnAccess::getInstance ($USER->GetID());
 	 * $arPermPairs = $oAccess->GetLessonPermissions ($some_lesson_id);
 	 * ?>
 	 * $arPermPairs now contains
@@ -566,7 +566,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 *    178  => array()	// for this lesson will be cleaned all rights
 	 * );
 	 * $userId = $USER->GetID();
-	 * $oAccess = new CLearnAccess ($userId);
+	 * $oAccess = CLearnAccess::getInstance ($userId);
 	 * $oAccess->SetLessonsPermissions ($arPermissions);
 	 * 
 	 */
@@ -781,7 +781,7 @@ class CLearnAccess implements ILearnAccessInterface
 
 		// optimize query for perfomance
 		if ($sqlWhere === '')
-			$sql = "SELECT ID FROM b_learn_lesson WHERE 1=1";
+			$sql = "SELECT ID AS LESSON_ID FROM b_learn_lesson WHERE 1=1";
 		else
 		{
 			$sql = "SELECT ${prfx}TLL.ID AS LESSON_ID
@@ -1020,9 +1020,9 @@ class CLearnAccess implements ILearnAccessInterface
 
 	public static function IsLoggedUserCanAccessModuleSettings()
 	{
-		global $USER;
+		global $USER, $APPLICATION;
 
-		if ($USER->IsAdmin())
+		if ($USER->IsAdmin() || ($APPLICATION->GetGroupRight('learning') === 'W'))
 			return (true);
 		else
 			return (false);

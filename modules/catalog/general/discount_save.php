@@ -1,6 +1,4 @@
 <?
-// define('CATALOG_DISCOUNT_SAVE_FILE','/bitrix/modules/catalog/discount_save.php');
-
 IncludeModuleLangFile(__FILE__);
 
 class CAllCatalogDiscountSave
@@ -44,6 +42,7 @@ class CAllCatalogDiscountSave
 	{
 		global $APPLICATION;
 		global $DB;
+		global $USER;
 
 		$arCurrencyList = array();
 		$rsCurrencies = CCurrency::GetList(($by = 'sort'), ($order = 'asc'));
@@ -55,7 +54,9 @@ class CAllCatalogDiscountSave
 		$boolResult = true;
 		$arMsg = array();
 
-		$strAction = strval($strAction);
+		$strAction = strtoupper($strAction);
+		if ('UPDATE' != $strAction && 'ADD' != $strAction)
+			return false;
 		$intID = intval($intID);
 
 		if (array_key_exists('ID',$arFields))
@@ -126,6 +127,36 @@ class CAllCatalogDiscountSave
 		$arFields["RENEWAL"] = 'N';
 		$arFields['PRIORITY'] = 1;
 		$arFields['LAST_DISCOUNT'] = 'Y';
+
+		$intUserID = 0;
+		$boolUserExist = CCatalog::IsUserExists();
+		if ($boolUserExist)
+			$intUserID = intval($USER->GetID());
+		$strDateFunction = $DB->GetNowFunction();
+		if (array_key_exists('TIMESTAMP_X', $arFields))
+			unset($arFields['TIMESTAMP_X']);
+		if (array_key_exists('DATE_CREATE', $arFields))
+			unset($arFields['DATE_CREATE']);
+		$arFields['~TIMESTAMP_X'] = $strDateFunction;
+		if ($boolUserExist)
+		{
+			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+				$arFields["MODIFIED_BY"] = $intUserID;
+		}
+		if ('ADD' == $strAction)
+		{
+			$arFields['~DATE_CREATE'] = $strDateFunction;
+			if ($boolUserExist)
+			{
+				if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
+					$arFields["CREATED_BY"] = $intUserID;
+			}
+		}
+		if ('UPDATE' == $strAction)
+		{
+			if (array_key_exists('CREATED_BY', $arFields))
+				unset($arFields['CREATED_BY']);
+		}
 
 		if (is_set($arFields,'RANGES') || $strAction == 'ADD')
 		{
@@ -269,26 +300,10 @@ class CAllCatalogDiscountSave
 	{
 		global $DB;
 		global $stackCacheManager;
-		global $USER;
 
 		$intID = intval($intID);
 		if ($intID <= 0)
 			return false;
-
-		$arFields1 = array();
-
-		if (array_key_exists('CREATED_BY',$arFields))
-			unset($arFields['CREATED_BY']);
-		if (array_key_exists('DATE_CREATE',$arFields))
-			unset($arFields['DATE_CREATE']);
-		if (array_key_exists('TIMESTAMP_X', $arFields))
-			unset($arFields['TIMESTAMP_X']);
-		if (isset($USER) && $USER instanceof CUser && 'CUser' == get_class($USER))
-		{
-			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
-				$arFields["MODIFIED_BY"] = intval($USER->GetID());
-		}
-		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
 
 		if (!CCatalogDiscountSave::CheckFields('UPDATE',$arFields,$intID))
 			return false;
@@ -296,12 +311,6 @@ class CAllCatalogDiscountSave
 		$strUpdate = $DB->PrepareUpdate("b_catalog_discount", $arFields);
 		if (!empty($strUpdate))
 		{
-			foreach ($arFields1 as $key => $value)
-			{
-				if (strlen($strUpdate)>0) $strUpdate .= ", ";
-				$strUpdate .= $key."=".$value." ";
-			}
-
 			$strSql = "UPDATE b_catalog_discount SET ".$strUpdate." WHERE ID = ".$intID." AND TYPE = ".DISCOUNT_TYPE_SAVE;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
@@ -662,16 +671,18 @@ class CAllCatalogDiscountSave
 		if (!empty($arCurrentDiscountID))
 		{
 			$intCurrentTime = getmicrotime();
+			$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), $intCurrentTime);
 			$arFilter = array(
 				"ID" => $arCurrentDiscountID,
 				'SITE_ID' => $strSiteID,
 				"TYPE" => DISCOUNT_TYPE_SAVE,
 				'ACTIVE' => 'Y',
-				"+<=ACTIVE_FROM" => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")),$intCurrentTime),
-				"+>=ACTIVE_TO" => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")),$intCurrentTime),
+				"+<=ACTIVE_FROM" => $strDate,
+				"+>=ACTIVE_TO" => $strDate
 			);
-
+			CTimeZone::Disable();
 			$rsDiscSaves = CCatalogDiscountSave::GetList(array(),$arFilter);
+			CTimeZone::Enable();
 			while ($arDiscSave = $rsDiscSaves->Fetch())
 			{
 				$arDiscSave['ACTION_SIZE'] = intval($arDiscSave['ACTION_SIZE']);
@@ -918,12 +929,11 @@ class CAllCatalogDiscountSave
 			'TIMESTAMP' => 0,
 			'RANGE_SUMM' => 0,
 		);
-		$events = GetModuleEvents("catalog", "OnSaleOrderSumm");
-		if ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("catalog", "OnSaleOrderSumm", true) as $arEvent)
 		{
 			$mxOrderCount = false;
 			$mxOrderCount = ExecuteModuleEventEx($arEvent, array($arOrderFilter));
-			if (is_array($mxOrderCount) && !empty($mxOrderCount))
+			if (!empty($mxOrderCount) && is_array($mxOrderCount))
 			{
 				if ($mxOrderCount['CURRENCY'] != $strCurrency)
 				{
@@ -939,6 +949,7 @@ class CAllCatalogDiscountSave
 				$arOrderSumm['TIMESTAMP'] = $mxOrderCount['TIMESTAMP'];
 				$arOrderSumm['RANGE_SUMM'] = $dblSumm;
 			}
+			break;
 		}
 		return $arOrderSumm;
 	}

@@ -7,16 +7,19 @@ class Dictionary
 	/**
 	 * @var array
 	 */
-	protected $arValues = array();
+	protected $values = array();
 
 	/**
 	 * Creates object.
 	 *
-	 * @param array $arValues
+	 * @param array $values
 	 */
-	public function __construct(array $arValues)
+	public function __construct(array $values = null)
 	{
-		$this->arValues = $arValues;
+		if($values !== null)
+		{
+			$this->values = $values;
+		}
 	}
 
 	/**
@@ -29,10 +32,22 @@ class Dictionary
 	{
 		// this condition a bit faster
 		// it is possible to omit array_key_exists here, but for uniformity...
-		if (isset($this->arValues[$name]) || array_key_exists($name, $this->arValues))
-			return $this->arValues[$name];
+		if (isset($this->values[$name]) || array_key_exists($name, $this->values))
+		{
+			return $this->values[$name];
+		}
 
 		return null;
+	}
+
+	public function set(array $values)
+	{
+		$this->values = $values;
+	}
+
+	public function clear()
+	{
+		$this->values = array();
 	}
 
 	/**
@@ -40,7 +55,7 @@ class Dictionary
 	 */
 	public function current()
 	{
-		return current($this->arValues);
+		return current($this->values);
 	}
 
 	/**
@@ -48,7 +63,7 @@ class Dictionary
 	 */
 	public function next()
 	{
-		return next($this->arValues);
+		return next($this->values);
 	}
 
 	/**
@@ -56,7 +71,7 @@ class Dictionary
 	 */
 	public function key()
 	{
-		return key($this->arValues);
+		return key($this->values);
 	}
 
 	/**
@@ -73,7 +88,7 @@ class Dictionary
 	 */
 	public function rewind()
 	{
-		return reset($this->arValues);
+		return reset($this->values);
 	}
 
 	/**
@@ -81,7 +96,7 @@ class Dictionary
 	 */
 	public function offsetExists($offset)
 	{
-		return isset($this->arValues[$offset]) || array_key_exists($offset, $this->arValues);
+		return isset($this->values[$offset]) || array_key_exists($offset, $this->values);
 	}
 
 	/**
@@ -89,10 +104,12 @@ class Dictionary
 	 */
 	public function offsetGet($offset)
 	{
-		if (isset($this->arValues[$offset]) || array_key_exists($offset, $this->arValues))
-			return $this->arValues[$offset];
+		if (isset($this->values[$offset]) || array_key_exists($offset, $this->values))
+		{
+			return $this->values[$offset];
+		}
 
-		return false;
+		return null;
 	}
 
 	/**
@@ -100,7 +117,7 @@ class Dictionary
 	 */
 	public function offsetSet($offset, $value)
 	{
-		$this->arValues[$offset] = $value;
+		$this->values[$offset] = $value;
 	}
 
 	/**
@@ -108,7 +125,7 @@ class Dictionary
 	 */
 	public function offsetUnset($offset)
 	{
-		unset($this->arValues[$offset]);
+		unset($this->values[$offset]);
 	}
 
 	/**
@@ -116,7 +133,7 @@ class Dictionary
 	 */
 	public function count()
 	{
-		return count($this->arValues);
+		return count($this->values);
 	}
 
 	/**
@@ -126,6 +143,6 @@ class Dictionary
 	 */
 	public function toArray()
 	{
-		return $this->arValues;
+		return $this->values;
 	}
 }

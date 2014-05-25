@@ -18,122 +18,134 @@ class CAllCatalogStore
 {
 	
 	/**
-	 * <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $action  Указывает, для какого метода идет проверка. Возможные значения:
-	 * <br><ul> <li> <b>ADD</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>;</li> <li>
-	 * <b>UPDATE</b> - для метода <a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</li> </ul>
-	 *
-	 *
-	 *
-	 * @param array &$arFields  Ассоциативный массив параметров склада. Допустимые ключи: <ul>
-	 * <li>TITLE - название склада;</li> <li>ACTIVE - активность склада('Y' - активен, 'N'
-	 * - не активен);</li> <li>ADDRESS - адрес склада;</li> <li>DESCRIPTION - описание
-	 * склада;</li> <li>GPS_N - GPS координата(широта);</li> <li>GPS_S - GPS
-	 * координата(долгота);</li> <li>IMAGE_ID - ID картинки склада;</li> <li>PHONE -
-	 * телефон;</li> <li>SCHEDULE - расписание работы склада;</li> <li>XML_ID - XML_ID
-	 * склада для экспорта\импорта из 1С;</li> </ul>
-	 *
-	 *
-	 *
-	 * @return bool <p> В случае корректности переданных параметров возвращает true,
-	 * иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	 * можно получить текст ошибок.</p>
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a></li>
-	 * </ul><br><br>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/checkfields.php
-	 * @author Bitrix
-	 */
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $action  Указывает, для какого метода идет проверка. Возможные значения:
+	* <br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>;</li> <li>
+	* <b>UPDATE</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</li> </ul>
+	*
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров склада. Допустимые ключи: <ul>
+	* <li>TITLE - название склада;</li> <li>ACTIVE - активность склада('Y' - активен, 'N'
+	* - не активен);</li> <li>ADDRESS - адрес склада;</li> <li>DESCRIPTION - описание
+	* склада;</li> <li>GPS_N - GPS координата(широта);</li> <li>GPS_S - GPS
+	* координата(долгота);</li> <li>IMAGE_ID - ID картинки склада;</li> <li>PHONE -
+	* телефон;</li> <li>SCHEDULE - расписание работы склада;</li> <li>XML_ID - XML_ID
+	* склада для экспорта\импорта из 1С;</li> </ul>
+	*
+	*
+	*
+	* @return bool <p> В случае корректности переданных параметров возвращает true,
+	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
+	* можно получить текст ошибок.</p>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a></li> </ul>
+	* </ht<br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/checkfields.php
+	* @author Bitrix
+	*/
 	protected function CheckFields($action, &$arFields)
 	{
-		if (is_set($arFields["ADDRESS"]) && strlen($arFields["ADDRESS"])<=0)
+		if(is_set($arFields["ADDRESS"]) && strlen($arFields["ADDRESS"]) <= 0)
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CS_EMPTY_ADDRESS"));
 			$arFields["ADDRESS"] = ' ';
 		}
-		if (($action == 'ADD') &&
-			((is_set($arFields, "IMAGE_ID") && strlen($arFields["IMAGE_ID"])<0)))
+		if(($action == 'ADD') &&
+			((is_set($arFields, "IMAGE_ID") && strlen($arFields["IMAGE_ID"]) < 0)))
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CS_WRONG_IMG"));
 			return false;
 		}
-		if (($action == 'ADD') &&
-			((is_set($arFields, "LOCATION_ID") && intval($arFields["LOCATION_ID"])<=0)))
+		if(($action == 'ADD') &&
+			((is_set($arFields, "LOCATION_ID") && intval($arFields["LOCATION_ID"]) <= 0)))
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CS_WRONG_LOC"));
 			return false;
 		}
-		if (($action == 'UPDATE') && is_set($arFields, "ID"))
+		if(($action == 'UPDATE') && is_set($arFields, "ID"))
 			unset($arFields["ID"]);
 
-		if (($action == 'UPDATE') && strlen($arFields["IMAGE_ID"])<=0)
+		if(($action == 'UPDATE') && strlen($arFields["IMAGE_ID"]) <= 0)
 			unset($arFields["IMAGE_ID"]);
 
+		if(isset($arFields["ISSUING_CENTER"]) && ($arFields["ISSUING_CENTER"]) !== 'Y')
+		{
+			$arFields["ISSUING_CENTER"] = 'N';
+		}
+		if(isset($arFields["SHIPPING_CENTER"]) && ($arFields["SHIPPING_CENTER"]) !== 'Y')
+		{
+			$arFields["SHIPPING_CENTER"] = 'N';
+		}
+		if(isset($arFields["SITE_ID"]) && ($arFields["SITE_ID"]) === '0')
+		{
+			$arFields["SITE_ID"] = '';
+		}
 		return true;
 	}
 
 	
 	/**
-	 * <p>Метод изменяет параметры склада с кодом ID, в соответствии с данными из массива arFields.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $Id  Код склада для изменения.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив параметров склада, ключами в котором
-	 * являются названия параметров, а значениями - соответствующие
-	 * значения. Допустимые ключи: <br><ul> <li>TITLE - название склада;</li> <li>ACTIVE -
-	 * активность склада('Y' - активен, 'N' - не активен);</li> <li>ADDRESS - адрес
-	 * склада;</li> <li>DESCRIPTION - описание склада;</li> <li>GPS_N - GPS
-	 * координата(широта);</li> <li>GPS_S - GPS координата(долгота);</li> <li>IMAGE_ID - ID
-	 * картинки склада;</li> <li>PHONE - телефон;</li> <li>SCHEDULE - расписание работы
-	 * склада;</li> <li>XML_ID - XML_ID склада для экспорта\импорта из 1С;</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращает <i>ID</i> измененного склада, если операция прошла
-	 * успешно, в противном случае - <i>false</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $arFields = Array(
-	 * 		"TITLE" =&gt; $TITLE,
-	 * 		"ACTIVE" =&gt; $ACTIVE,
-	 * 		"ADDRESS" =&gt; $ADDRESS,
-	 * 		"DESCRIPTION" =&gt; $DESCRIPTION,
-	 * 		"IMAGE_ID" =&gt; $fid,
-	 * 		"GPS_N" =&gt; $GPS_N,
-	 * 		"GPS_S" =&gt; $GPS_S,
-	 * 		"PHONE" =&gt; $PHONE,
-	 * 		"SCHEDULE" =&gt; $SCHEDULE,
-	 * 		"XML_ID" =&gt; $XML_ID,
-	 * 	);
-	 * 	
-	 * 	$ID = CCatalogStore::Update(1, $arFields);
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры склада с кодом ID, в соответствии с данными из массива arFields.</p>
+	*
+	*
+	*
+	*
+	* @param int $Id  Код склада для изменения.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив параметров склада, ключами в котором
+	* являются названия параметров, а значениями - соответствующие
+	* значения. Допустимые ключи: <br><ul> <li>TITLE - название склада;</li> <li>ACTIVE -
+	* активность склада('Y' - активен, 'N' - не активен);</li> <li>ADDRESS - адрес
+	* склада;</li> <li>DESCRIPTION - описание склада;</li> <li>GPS_N - GPS
+	* координата(широта);</li> <li>GPS_S - GPS координата(долгота);</li> <li>IMAGE_ID - ID
+	* картинки склада;</li> <li>PHONE - телефон;</li> <li>SCHEDULE - расписание работы
+	* склада;</li> <li>XML_ID - XML_ID склада для экспорта\импорта из 1С;</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращает <i>ID</i> измененного склада, если операция прошла
+	* успешно, в противном случае - <i>false</i>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arFields = Array(
+	* 		"TITLE" =&gt; $TITLE,
+	* 		"ACTIVE" =&gt; $ACTIVE,
+	* 		"ADDRESS" =&gt; $ADDRESS,
+	* 		"DESCRIPTION" =&gt; $DESCRIPTION,
+	* 		"IMAGE_ID" =&gt; $fid,
+	* 		"GPS_N" =&gt; $GPS_N,
+	* 		"GPS_S" =&gt; $GPS_S,
+	* 		"PHONE" =&gt; $PHONE,
+	* 		"SCHEDULE" =&gt; $SCHEDULE,
+	* 		"XML_ID" =&gt; $XML_ID,
+	* 	);
+	* 	
+	* 	$ID = CCatalogStore::Update(1, $arFields);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php
+	* @author Bitrix
+	*/
 	static function Update($id, $arFields)
 	{
 		global $DB;
@@ -189,38 +201,38 @@ class CAllCatalogStore
 
 	
 	/**
-	 * <p>Метод удаляет склад с кодом ID. При этом удаляются так же все остатки товаров, относящиеся к этому складу.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $Id  Код склада для удаления.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращает <i>true</i>, если операция прошла успешно, в противном
-	 * случае - <i>false</i>.</p><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $result = CCatalogStore::Delete($id);
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет склад с кодом ID. При этом удаляются так же все остатки товаров, относящиеся к этому складу.</p>
+	*
+	*
+	*
+	*
+	* @param int $Id  Код склада для удаления.
+	*
+	*
+	*
+	* @return bool <p>Возвращает <i>true</i>, если операция прошла успешно, в противном
+	* случае - <i>false</i>.</p> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $result = CCatalogStore::Delete($id);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/delete.php
+	* @author Bitrix
+	*/
 	static function Delete($id)
 	{
 		global $DB;
 		$id = intval($id);
-		if ($id > 0)
+		if($id > 0)
 		{
 			foreach (GetModuleEvents("catalog", "OnBeforeCatalogStoreDelete", true) as $arEvent)
 			{
-				if (ExecuteModuleEventEx($arEvent, array($id))===false)
+				if(ExecuteModuleEventEx($arEvent, array($id))===false)
 				return false;
 			}
 
@@ -249,7 +261,7 @@ class CAllCatalogStore
 		$arFields = array();
 		if(COption::GetOptionString('catalog','default_use_store_control','N') != 'Y')
 		{
-			return false;
+			return true;
 		}
 		$dbStoreProduct = CCatalogStoreProduct::GetList(array(), array("STORE_ID" => $id, "!AMOUNT" => 0), false, false, array("PRODUCT_ID", "AMOUNT"));
 		while($arStoreProduct = $dbStoreProduct->Fetch())
@@ -266,11 +278,7 @@ class CAllCatalogStore
 					$arFields["QUANTITY"] = doubleval(0 - $arReservAmount["QUANTITY_RESERVED"]);
 				}
 			}
-			if(!CCatalogProduct::Update($arStoreProduct["PRODUCT_ID"], $arFields))
-			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CAT_DOC_PURCHASING_INFO_ERROR"));
-				return false;
-			}
+			CCatalogProduct::Update($arStoreProduct["PRODUCT_ID"], $arFields);
 		}
 		return true;
 	}

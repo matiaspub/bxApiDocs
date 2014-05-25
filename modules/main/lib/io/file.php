@@ -5,9 +5,12 @@ class File
 	extends FileEntry
 	implements IFileStream
 {
-	static public function __construct($path)
+	const REWRITE = 0;
+	const APPEND = 1;
+
+	static public function __construct($path, $siteId = null)
 	{
-		parent::__construct($path);
+		parent::__construct($path, $siteId);
 	}
 
 	public function open($mode)
@@ -22,7 +25,7 @@ class File
 	public function isExists()
 	{
 		$p = $this->getPhysicalPath();
-		return file_exists($p) && is_file($p);
+		return file_exists($p) && (is_file($p) || is_link($p));
 	}
 
 	public function getContents()
@@ -33,7 +36,7 @@ class File
 		return file_get_contents($this->getPhysicalPath());
 	}
 
-	public function putContents($data)
+	public function putContents($data, $flags=self::REWRITE)
 	{
 		$dir = $this->getDirectory();
 		if (!$dir->isExists())
@@ -42,7 +45,9 @@ class File
 		if ($this->isExists() && !$this->isWritable())
 			$this->markWritable();
 
-		return file_put_contents($this->getPhysicalPath(), $data);
+		return $flags&self::APPEND
+			? file_put_contents($this->getPhysicalPath(), $data, FILE_APPEND)
+			: file_put_contents($this->getPhysicalPath(), $data);
 	}
 
 	public function getFileSize()
@@ -137,10 +142,10 @@ class File
 		return $f->getContents();
 	}
 
-	public static function putFileContents($path, $data)
+	public static function putFileContents($path, $data, $flags=self::REWRITE)
 	{
 		$f = new self($path);
-		return $f->putContents($data);
+		return $f->putContents($data, $flags);
 	}
 
 	public static function deleteFile($path)

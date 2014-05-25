@@ -3,29 +3,38 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/t
 
 class CSearchTitle extends CAllSearchTitle
 {
-	public function Search($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
+	public function searchTitle($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
 	{
 		$DB = CDatabase::GetModuleConnection('search');
-		$this->_arPhrase = stemming_split($phrase, LANGUAGE_ID);
 		$bOrderByRank = ($order == "rank");
 
+		$sqlHaving = array();
+		$sqlWords = array();
 		if(!empty($this->_arPhrase))
 		{
-			$nTopCount = intval($nTopCount);
-			if($nTopCount <= 0)
-				$nTopCount = 5;
-
-			$sqlHaving = array();
-			$sqlWords = array();
+			$last = true;
 			foreach(array_reverse($this->_arPhrase, true) as $word => $pos)
 			{
-				if(empty($sqlWords) && !preg_match("/[\\n\\r \\t]$/", $phrase))
-					$s = $sqlWords[] = "ct.WORD like '".$DB->ForSQL($word)."%'";
+				if($last && !preg_match("/[\\n\\r \\t]$/", $phrase))
+				{
+					$last = false;
+					if (strlen($word) >= $this->minLength)
+						$s = $sqlWords[] = "ct.WORD like '".$DB->ForSQL($word)."%'";
+					else
+						$s = "";
+				}
 				else
+				{
 					$s = $sqlWords[] = "ct.WORD = '".$DB->ForSQL($word)."'";
-				$sqlHaving[] = "(sum(".$s.") > 0)";
-			}
+				}
 
+				if ($s)
+					$sqlHaving[] = "(sum(".$s.") > 0)";
+			}
+		}
+
+		if (!empty($sqlWords))
+		{
 			$bIncSites = false;
 			$strSqlWhere = CSearch::__PrepareFilter($arParams, $bIncSites);
 			if($bNotFilter)
@@ -80,9 +89,22 @@ class CSearchTitle extends CAllSearchTitle
 		}
 		else
 		{
-
 			return false;
 		}
+	}
+
+	public static function getRankFunction($phrase)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		return "if(locate('".$DB->ForSQL(ToUpper($phrase))."', upper(sc.TITLE)) > 0, 1, 0)";
+	}
+
+	public static function getSqlOrder($bOrderByRank)
+	{
+		if ($bOrderByRank)
+			return "RANK1 DESC, TITLE";
+		else
+			return "DATE_CHANGE DESC, RANK1 DESC, TITLE";
 	}
 }
 ?>

@@ -63,7 +63,11 @@ class CAllCertification
 		}
 		elseif (is_set($arFields, "COURSE_ID"))
 		{
-			$r = CCourse::GetByID($arFields["COURSE_ID"]);
+			if ($bCheckRights)
+				$r = CCourse::GetByID($arFields["COURSE_ID"]);
+			else
+				$r = CCourse::GetList(Array(),Array("ID" => $arFields["COURSE_ID"], 'CHECK_PERMISSIONS' => 'N'));
+
 			if(!$r->Fetch())
 			{
 				$APPLICATION->ThrowException(GetMessage("LEARNING_BAD_COURSE_ID_EX"), "ERROR_NO_COURSE_ID");
@@ -97,80 +101,83 @@ class CAllCertification
 			$arFields["FROM_ONLINE"] = "Y";
 
 		return true;
-
 	}
 
 
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод добавляет новый сертификат.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
-	 * сертификата. Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает идентификатор добавленного сертификата, если
-	 * добавление прошло успешно. При возникновении ошибки метод вернет
-	 * <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 *     $STUDENT_ID = 3;
-	 * 
-	 *     $arFields = Array(
-	 *         "ACTIVE" =&gt; "Y",
-	 *         "COURSE_ID" =&gt; $COURSE_ID,
-	 *         "STUDENT_ID" =&gt; $STUDENT_ID,
-	 *         "SUMMARY" =&gt; 300,
-	 *         "MAX_SUMMARY" =&gt; 300
-	 *     );
-	 * 
-	 *     $certificate = new CCertification;
-	 *     $ID = $certificate-&gt;Add($arFields);
-	 *     $success = ($ID&gt;0);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php
-	 * @author Bitrix
-	 */
-	public static function Add($arFields)
+	* <p>Метод добавляет новый сертификат.</p>
+	*
+	*
+	*
+	*
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
+	* сертификата. Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return int <p>Метод возвращает идентификатор добавленного сертификата, если
+	* добавление прошло успешно. При возникновении ошибки метод вернет
+	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	*     $STUDENT_ID = 3;
+	* 
+	*     $arFields = Array(
+	*         "ACTIVE" =&gt; "Y",
+	*         "COURSE_ID" =&gt; $COURSE_ID,
+	*         "STUDENT_ID" =&gt; $STUDENT_ID,
+	*         "SUMMARY" =&gt; 300,
+	*         "MAX_SUMMARY" =&gt; 300
+	*     );
+	* 
+	*     $certificate = new CCertification;
+	*     $ID = $certificate-&gt;Add($arFields);
+	*     $success = ($ID&gt;0);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php
+	* @author Bitrix
+	*/
+	public static function Add($arFields, $arParams = array())
 	{
 		global $DB;
 
-		if(CCertification::CheckFields($arFields))
+		$bCheckRights = true;
+		if (isset($arParams['CHECK_PERMISSIONS']) && ($arParams['CHECK_PERMISSIONS'] === 'N'))
+			$bCheckRights = false;
+
+		if(CCertification::CheckFields($arFields, false, $bCheckRights))
 		{
 			unset($arFields["ID"]);
 
@@ -191,76 +198,80 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод изменяет параметры сертификата с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор сертификата.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
-	 * сертификата. Обязательные поля должны быть заполнены.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	 * возникновении ошибки функция вернет <i>false</i>. При возникновении
-	 * ошибки в исключениях будет содержаться текст ошибки</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $CERTIFICATE_ID = 15;
-	 * 
-	 *     $arFields = Array(
-	 *         "ACTIVE" =&gt; "N",
-	 *         "SUMMARY" =&gt; 290,
-	 *         "MAX_SUMMARY" =&gt; 555
-	 *     );
-	 * 
-	 *     $certificate = new CCertification;
-	 *     $success =  $certificate-&gt;Update($CERTIFICATE_ID, $arFields);
-	 * 
-	 *     if($success)
-	 *     {
-	 *         echo "Ok!";
-	 *     }
-	 *     else
-	 *     {
-	 *         if($e = $APPLICATION-&gt;GetException())
-	 *             echo "Error: ".$e-&gt;GetString();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php
-	 * @author Bitrix
-	 */
-	public static function Update($ID, $arFields)
+	* <p>Метод изменяет параметры сертификата с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор сертификата.
+	*
+	*
+	*
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
+	* сертификата. Обязательные поля должны быть заполнены.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* возникновении ошибки функция вернет <i>false</i>. При возникновении
+	* ошибки в исключениях будет содержаться текст ошибки</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $CERTIFICATE_ID = 15;
+	* 
+	*     $arFields = Array(
+	*         "ACTIVE" =&gt; "N",
+	*         "SUMMARY" =&gt; 290,
+	*         "MAX_SUMMARY" =&gt; 555
+	*     );
+	* 
+	*     $certificate = new CCertification;
+	*     $success =  $certificate-&gt;Update($CERTIFICATE_ID, $arFields);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Ok!";
+	*     }
+	*     else
+	*     {
+	*         if($e = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$e-&gt;GetString();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php
+	* @author Bitrix
+	*/
+	public static function Update($ID, $arFields, $arParams = array())
 	{
 		global $DB;
 
 		$ID = intval($ID);
 		if ($ID < 1) return false;
 
-		if (CCertification::CheckFields($arFields, $ID))
+		$bCheckRights = true;
+		if (isset($arParams['CHECK_PERMISSIONS']) && ($arParams['CHECK_PERMISSIONS'] === 'N'))
+			$bCheckRights = false;
+
+		if (CCertification::CheckFields($arFields, $ID, $bCheckRights))
 		{
 			unset($arFields["ID"]);
 			unset($arFields["STUDENT_ID"]);
@@ -288,55 +299,55 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Метод удаляет сертификат с идентификатором ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор сертификата.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления
-	 * сертификата, в противном случае возвращает <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $COURSE_ID = 97;
-	 *     $CERTIFICATE_ID = 19;
-	 * 
-	 *     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
-	 *     {
-	 *         @set_time_limit(0);
-	 *         $DB-&gt;StartTransaction();
-	 *         if (!CCertification::Delete($CERTIFICATE_ID))
-	 *         {
-	 *             echo "Error!";
-	 *             $DB-&gt;Rollback();
-	 *         }
-	 *         else
-	 *             $DB-&gt;Commit();
-	 *     }
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет сертификат с идентификатором ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор сертификата.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления
+	* сертификата, в противном случае возвращает <i>false</i>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $COURSE_ID = 97;
+	*     $CERTIFICATE_ID = 19;
+	* 
+	*     if (CCourse::GetPermission($COURSE_ID) &gt;= 'W')
+	*     {
+	*         @set_time_limit(0);
+	*         $DB-&gt;StartTransaction();
+	*         if (!CCertification::Delete($CERTIFICATE_ID))
+	*         {
+	*             echo "Error!";
+	*             $DB-&gt;Rollback();
+	*         }
+	*         else
+	*             $DB-&gt;Commit();
+	*     }
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -424,38 +435,38 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Возвращает сертификат по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Идентификатор сертификата.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается объект <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $CERTIFICATE_ID = 13;<br><br>    $res = CCertification::GetByID($CERTIFICATE_ID);<br><br>    if ($arCertificate = $res-&gt;GetNext())<br>    {<br>        echo "Course: ".$arCertificate["COURSE_NAME"].<br>             " User: ".$arCertificate["USER_NAME"].<br>             " Score: ".$arCertificate["SUMMARY"];<br>    }<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает сертификат по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Идентификатор сертификата.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $CERTIFICATE_ID = 13;<br><br>    $res = CCertification::GetByID($CERTIFICATE_ID);<br><br>    if ($arCertificate = $res-&gt;GetNext())<br>    {<br>        echo "Course: ".$arCertificate["COURSE_NAME"].<br>             " User: ".$arCertificate["USER_NAME"].<br>             " Score: ".$arCertificate["SUMMARY"];<br>    }<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul> </ht<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		return CCertification::GetList(Array(),Array("ID" => $ID));
@@ -465,55 +476,55 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Проверяет, пройден ли курс. Курс считается пройденным, если пройдены все его тесты.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $STUDENT_ID  Идентификатор студента.
-	 *
-	 *
-	 *
-	 * @param int $COURSE_ID  Идентификатор курса.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если курс пройден, иначе - <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (CModule::IncludeModule("learning"))
-	 * {
-	 *     $STUDENT_ID = 1;
-	 *     $COURSE_ID = 92;
-	 * 
-	 *     $done = CCertification::IsCourseCompleted($STUDENT_ID, $COURSE_ID);
-	 * 
-	 *     if ($done)
-	 *         echo "Course completed";
-	 *     else
-	 *         echo "Course is not completed";
-	 * 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/iscoursecompleted.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет, пройден ли курс. Курс считается пройденным, если пройдены все его тесты.</p>
+	*
+	*
+	*
+	*
+	* @param int $STUDENT_ID  Идентификатор студента.
+	*
+	*
+	*
+	* @param int $COURSE_ID  Идентификатор курса.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если курс пройден, иначе - <i>false</i>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $STUDENT_ID = 1;
+	*     $COURSE_ID = 92;
+	* 
+	*     $done = CCertification::IsCourseCompleted($STUDENT_ID, $COURSE_ID);
+	* 
+	*     if ($done)
+	*         echo "Course completed";
+	*     else
+	*         echo "Course is not completed";
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/iscoursecompleted.php
+	* @author Bitrix
+	*/
 	public static function IsCourseCompleted($STUDENT_ID, $COURSE_ID)
 	{
 		global $DB;
@@ -535,55 +546,89 @@ class CAllCertification
 
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+		$cntAll = $cntCompleted = null;
+
+		$isCourseCompleted = false;	// can be overrided below
 		if ( ($ar = $res->Fetch()) && intval($ar["CNT_ALL"]) > 0)
-			return ($ar["CNT_ALL"] === $ar["CNT_COMPLETED"]);
-		return false;
+		{
+			$cntAll       = $ar['CNT_ALL'];
+			$cntCompleted = $ar['CNT_COMPLETED'];
+
+			if ($cntCompleted == $cntAll)
+				$isCourseCompleted = true;
+		}
+
+		$arEventData = array(
+			'STUDENT_ID'    => $STUDENT_ID,
+			'COURSE_ID'     => $COURSE_ID,
+			'CNT_ALL'       => $cntAll,
+			'CNT_COMPLETED' => $cntCompleted
+		);
+
+		foreach(GetModuleEvents('learning', 'OnCheckCourseCompleted', true) as $arEvent)
+		{
+			$rc = ExecuteModuleEventEx($arEvent, array($arEventData));
+
+			if ($rc === false)
+			{
+				$isCourseCompleted = false;
+				break;
+			}
+			elseif ($rc === true)
+			{
+				$isCourseCompleted = true;
+				break;
+			}
+		}
+
+		return $isCourseCompleted;
 	}
+
 
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	 * <p>Добавляет или изменяет сертификат, если курс был пройден.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $STUDENT_ID  Идентификатор студента.
-	 *
-	 *
-	 *
-	 * @param int $COURSE_ID  Идентификатор курса.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i>, если сертификация прошла успешно,
-	 * иначе - <i>false</i>.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $STUDENT_ID = 1;<br>    $COURSE_ID = 92;<br><br>    $done = CCertification::Certificate($STUDENT_ID, $COURSE_ID);<br><br>    if ($done)<br>        echo "Success!";<br>    else<br>        echo "Course is not completed";<br>}<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	 * href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/certificate.php
-	 * @author Bitrix
-	 */
-	public static function Certificate($STUDENT_ID, $COURSE_ID)
+	* <p>Добавляет или изменяет сертификат, если курс был пройден.</p>
+	*
+	*
+	*
+	*
+	* @param int $STUDENT_ID  Идентификатор студента.
+	*
+	*
+	*
+	* @param int $COURSE_ID  Идентификатор курса.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если сертификация прошла успешно,
+	* иначе - <i>false</i>.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $STUDENT_ID = 1;<br>    $COURSE_ID = 92;<br><br>    $done = CCertification::Certificate($STUDENT_ID, $COURSE_ID);<br><br>    if ($done)<br>        echo "Success!";<br>    else<br>        echo "Course is not completed";<br>}<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/certificate.php
+	* @author Bitrix
+	*/
+	public static function Certificate($STUDENT_ID, $COURSE_ID, $checkPerms = true)
 	{
 		global $DB;
 
@@ -609,11 +654,29 @@ class CAllCertification
 				$MAX_SUMMARY = $ar["MAX_CNT"];
 			}
 
+			$arFields = array(
+				'STUDENT_ID'  => $STUDENT_ID,
+				'COURSE_ID'   => $COURSE_ID,
+				'SUMMARY'     => &$SUMMARY,
+				'MAX_SUMMARY' => &$MAX_SUMMARY 
+			);
+
+			foreach(GetModuleEvents('learning', 'OnBeforeCertificate', true) as $arEvent)
+			{
+				if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
+					return (false);
+			}
+
+			$arParams = array();
+
+			if ( ! $checkPerms )
+				$arParams['CHECK_PERMISSIONS'] = 'N';
+
 			$strSql = "SELECT ID FROM b_learn_certification WHERE STUDENT_ID = '".$STUDENT_ID."' AND COURSE_ID = '".$COURSE_ID."'";
 			$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($ar = $res->Fetch())
 			{
-				return CCertification::Update($ar["ID"], Array("SUMMARY" => $SUMMARY, "MAX_SUMMARY" => $MAX_SUMMARY, "ACTIVE" => "Y") );
+				return CCertification::Update($ar["ID"], Array("SUMMARY" => $SUMMARY, "MAX_SUMMARY" => $MAX_SUMMARY, "ACTIVE" => "Y"), $arParams);
 			}
 			else
 			{
@@ -625,13 +688,10 @@ class CAllCertification
 					"~DATE_CREATE" => CDatabase::CurrentTimeFunction(),
 				);
 
-				$ID = CCertification::Add($arFields);
+				$ID = CCertification::Add($arFields, $arParams);
 				return ($ID > 0);
 			}
 		}
 		return false;
 	}
-
 }
-
-?>

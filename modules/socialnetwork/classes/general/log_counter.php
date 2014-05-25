@@ -1,7 +1,16 @@
 <?
 class CAllSocNetLogCounter
 {
-	public static function GetSubSelect($log_id, $entity_type = false, $entity_id = false, $event_id = false, $created_by_id = false, $arOfEntities = false, $arAdmin = false, $transport = false, $visible = "Y", $type = "L", $params = array())
+	public static function GetSubSelect2($log_id, $arParams = array())
+	{
+		$type = (is_array($arParams) && !empty($arParams["TYPE"]) ? $arParams["TYPE"] : "L");
+		$bDecrement = (is_array($arParams) && $arParams["DECREMENT"]);
+		$bForAllAccess = (is_array($arParams) && $arParams["FOR_ALL_ACCESS"]);
+
+		return CSocNetLogCounter::GetSubSelect($log_id, false, false, false, false, false, false, false, "Y", $type, $arParams, $bDecrement, $bForAllAccess);
+	}
+
+	public static function GetSubSelect($log_id, $entity_type = false, $entity_id = false, $event_id = false, $created_by_id = false, $arOfEntities = false, $arAdmin = false, $transport = false, $visible = "Y", $type = "L", $params = array(), $bDecrement = false, $bForAllAccess = false)
 	{
 		global $DB;
 
@@ -9,6 +18,12 @@ class CAllSocNetLogCounter
 			return false;
 
 		$bGroupCounters = ($type === "group");
+/*
+		$bForAllAccess = (
+			$bForAllAccess 
+			&& (IsModuleInstalled("intranet") || $bGroupCounters)
+		);
+*/
 		$params = (is_array($params) ? $params : array());
 		$params['CODE'] = (!empty($params['CODE']) ? $params['CODE'] : ($bGroupCounters ? "SLR0.GROUP_CODE" : "'**'"));
 
@@ -124,7 +139,7 @@ class CAllSocNetLogCounter
 		$strSQL = "
 		SELECT DISTINCT
 			U.ID as ID
-			,1 as CNT
+			,".($bDecrement ? "-1" : "1")." as CNT
 			,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
 			,".$params['CODE']." as CODE,
 			0 as SENT
@@ -132,23 +147,31 @@ class CAllSocNetLogCounter
 			b_user U 
 			INNER JOIN b_sonet_log_right SLR ON SLR.LOG_ID = ".$log_id."
 			".($bGroupCounters ? "INNER JOIN b_sonet_log_right SLR0 ON SLR0.LOG_ID = SLR.LOG_ID ": "")."
-			INNER JOIN b_user_access UA ON UA.USER_ID = U.ID
+			".($bForAllAccess ? "" : "INNER JOIN b_user_access UA ON UA.USER_ID = U.ID")."
 			LEFT JOIN b_sonet_log_site SLS ON SLS.LOG_ID = SLR.LOG_ID
 			".(strlen($followJoin) > 0 ? $followJoin : "")."
 			".(!$bGroupCounters && !IsModuleInstalled("intranet") ? "LEFT JOIN b_sonet_log_smartfilter SLSF ON SLSF.USER_ID = U.ID " : "")."
 			
 		WHERE
 			U.ACTIVE = 'Y'
+			AND U.LAST_ACTIVITY_DATE IS NOT NULL
+			AND	U.LAST_ACTIVITY_DATE > ".CSocNetLogCounter::dbWeeksAgo(2)."
 			".(
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]) 
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y" 
+				(
+					$type == "LC"
+					||
+					(	array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]) 
+						&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y" 
+					)
+				)
 				&& intval($created_by_id) > 0 
 					? "AND U.ID <> ".$created_by_id 
 					: ""
 			)."
 			".($bGroupCounters ? "AND (SLR0.GROUP_CODE like 'SG%' AND SLR0.GROUP_CODE NOT LIKE 'SG%\_%')": "").
 			(
-				!$bGroupCounters && !IsModuleInstalled("intranet")
+				!$bGroupCounters 
+				&& !IsModuleInstalled("intranet")
 					? (
 						COption::GetOptionString("socialnetwork", "sonet_log_smart_filter", "N") == "Y"
 							? "
@@ -159,7 +182,7 @@ class CAllSocNetLogCounter
 											SLSF.USER_ID IS NULL 
 											OR SLSF.TYPE = 'Y'
 										) 
-										AND UA.ACCESS_CODE = SLR.GROUP_CODE 
+										".($bForAllAccess ? "" : "AND (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										AND (
 											SLR.GROUP_CODE LIKE 'SG%'
 											OR SLR.GROUP_CODE = 'U".$log_user_id."' 
@@ -170,7 +193,7 @@ class CAllSocNetLogCounter
 										SLSF.TYPE <> 'Y'
 										AND (
 											SLR.GROUP_CODE IN ('AU', 'G2') 
-											OR UA.ACCESS_CODE = SLR.GROUP_CODE
+											".($bForAllAccess ? "" : "OR (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										)
 									)
 								)
@@ -185,12 +208,12 @@ class CAllSocNetLogCounter
 										) 
 										AND (
 											SLR.GROUP_CODE IN ('AU', 'G2') 
-											OR UA.ACCESS_CODE = SLR.GROUP_CODE
+											".($bForAllAccess ? "" : "OR (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										)
 									)
 									OR (
 										SLSF.TYPE = 'Y' 
-										AND UA.ACCESS_CODE = SLR.GROUP_CODE 
+										".($bForAllAccess ? "" : "AND (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										AND (
 											SLR.GROUP_CODE LIKE 'SG%'
 											OR SLR.GROUP_CODE = 'U".$log_user_id."'
@@ -204,7 +227,7 @@ class CAllSocNetLogCounter
 						AND (
 							0=1 
 							OR (SLR.GROUP_CODE IN ('AU', 'G2'))
-							OR (UA.ACCESS_CODE = SLR.GROUP_CODE)
+							".($bForAllAccess ? "" : "OR (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 						)
 					"
 			)." ".

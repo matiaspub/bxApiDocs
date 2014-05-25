@@ -18,9 +18,6 @@ if($USER->IsAuthorized() && (!defined("BX_AUTH_FORM") || !BX_AUTH_FORM))
 	echo CAdminInformer::PrintHtml();
 }
 
-if(method_exists($APPLICATION, "ShowSpreadCookieHTML")) //for BitrixUpdate to 4.0
-	$APPLICATION->ShowSpreadCookieHTML();
-
 if (!defined('BX_PUBLIC_MODE') || BX_PUBLIC_MODE != 1)
 {
 	if (!defined("BX_AUTH_FORM") || !BX_AUTH_FORM)

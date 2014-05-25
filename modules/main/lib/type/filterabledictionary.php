@@ -22,17 +22,17 @@ class FilterableDictionary
 	/**
 	 * Creates object.
 	 *
-	 * @param array $arValues
+	 * @param array $values
 	 */
-	public function __construct(array $arValues, $name = null)
+	public function __construct(array $values, $name = null)
 	{
-		$this->arValues = $this->arRawValues = $arValues;
+		$this->values = $this->arRawValues = $values;
 		$this->name = $name;
 	}
 
 	public function addFilter(IDictionaryFilter $filter)
 	{
-		$this->arValues = $filter->filterArray($this->arValues, $this->name);
+		$this->values = $filter->filterArray($this->values, $this->name);
 		$this->arFilters[] = $filter;
 	}
 
@@ -55,9 +55,9 @@ class FilterableDictionary
 	 */
 	public function offsetSet($offset, $value)
 	{
-		$this->arValues[$offset] = $this->arRawValues[$offset] = $value;
+		$this->values[$offset] = $this->arRawValues[$offset] = $value;
 		foreach ($this->arFilters as $filter)
-			$this->arValues[$offset] = $filter->filter($this->arValues[$offset], $this->name."[".$offset."]", $this->arValues);
+			$this->values[$offset] = $filter->filter($this->values[$offset], $this->name."[".$offset."]", $this->values);
 	}
 
 	/**
@@ -65,7 +65,7 @@ class FilterableDictionary
 	 */
 	public function offsetUnset($offset)
 	{
-		unset($this->arValues[$offset]);
+		unset($this->values[$offset]);
 		unset($this->arRawValues[$offset]);
 	}
 }

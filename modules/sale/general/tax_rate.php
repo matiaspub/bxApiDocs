@@ -82,15 +82,17 @@ class CAllSaleTaxRate
 	public static function SetTaxRateLocation($ID, $arFields)
 	{
 		global $DB;
-		$ID = IntVal($ID);
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return;
 
-		$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID."");
+		$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID);
 		if (is_array($arFields))
 		{
 			$countField = count($arFields);
 			for ($i = 0; $i < $countField; $i++)
 			{
-				$arFields[$i]["LOCATION_ID"] = IntVal($arFields[$i]["LOCATION_ID"]);
+				$arFields[$i]["LOCATION_ID"] = intval($arFields[$i]["LOCATION_ID"]);
 				if ($arFields[$i]["LOCATION_TYPE"]!="G") $arFields[$i]["LOCATION_TYPE"] = "L";
 				if ($arFields[$i]["LOCATION_ID"]>0)
 				{
@@ -105,53 +107,52 @@ class CAllSaleTaxRate
 
 	
 	/**
-	 * <p>Функция изменяет параметры ставки налога с кодом ID</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код ставки налога.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров ставки налога. Ключами
-	 * являются названия параметров ставки, а значениями -
-	 * соответствующие значения.<br><br> Допустимые ключи: <ul> <li> <b>TAX_ID</b> -
-	 * код налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li> <b>VALUE</b> -
-	 * величина налога (в процентах);</li> <li> <b>CURRENCY</b> - валюта;</li> <li>
-	 * <b>IS_PERCENT</b> - всегда значение "Y";</li> <li> <b>IS_IN_PRICE</b> - налог уже включен
-	 * в цену товара;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ACTIVE</b> -
-	 * флаг (Y/N) активности налога;</li> <li> <b>TAX_LOCATION</b> - массив для указания
-	 * местоположений и групп местоположений, для которых действует эта
-	 * ставка. Каждый элемент массива представляет собой ассоциативный
-	 * массив с ключами: <ul> <li> <b>LOCATION_ID</b> - код местоположения или группы
-	 * местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
-	 * группы местоположений.</li> </ul> </li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Возвращается код измененной ставки налога или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__update.bd202837.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры ставки налога с кодом ID</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код ставки налога. </ht
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров ставки налога. Ключами
+	* являются названия параметров ставки, а значениями -
+	* соответствующие значения.<br><br> Допустимые ключи: <ul> <li> <b>TAX_ID</b> -
+	* код налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li> <b>VALUE</b> -
+	* величина налога (в процентах);</li> <li> <b>CURRENCY</b> - валюта;</li> <li>
+	* <b>IS_PERCENT</b> - всегда значение "Y";</li> <li> <b>IS_IN_PRICE</b> - налог уже включен
+	* в цену товара;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ACTIVE</b> -
+	* флаг (Y/N) активности налога;</li> <li> <b>TAX_LOCATION</b> - массив для указания
+	* местоположений и групп местоположений, для которых действует эта
+	* ставка. Каждый элемент массива представляет собой ассоциативный
+	* массив с ключами: <ul> <li> <b>LOCATION_ID</b> - код местоположения или группы
+	* местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
+	* группы местоположений.</li> </ul> </li> </ul>
+	*
+	*
+	*
+	* @return int <p>Возвращается код измененной ставки налога или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__update.bd202837.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
-		$ID = IntVal($ID);
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 
 		if (!CSaleTaxRate::CheckFields("UPDATE", $arFields)) return false;
 
 		$strUpdate = $DB->PrepareUpdate("b_sale_tax_rate", $arFields);
-		$strSql = "UPDATE b_sale_tax_rate SET ".
-			"	TIMESTAMP_X = ".$DB->GetNowFunction().", ".
-			"	".$strUpdate." ".
-			"WHERE ID = ".$ID." ";
+		$strSql = "UPDATE b_sale_tax_rate SET TIMESTAMP_X = ".$DB->GetNowFunction().", ".$strUpdate." WHERE ID = ".$ID;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		if (is_set($arFields, "TAX_LOCATION"))
+		if (array_key_exists("TAX_LOCATION", $arFields))
 		{
 			CSaleTaxRate::SetTaxRateLocation($ID, $arFields["TAX_LOCATION"]);
 		}
@@ -161,72 +162,75 @@ class CAllSaleTaxRate
 
 	
 	/**
-	 * <p>Функция удаляет ставку налога с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код ставки налога.
-	 *
-	 *
-	 *
-	 * @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> в
-	 * противном случае.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__delete.c72c6dd5.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет ставку налога с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код ставки налога. </ht
+	*
+	*
+	*
+	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> в
+	* противном случае.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__delete.c72c6dd5.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
-		$ID = IntVal($ID);
-		$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID."", true);
-		return $DB->Query("DELETE FROM b_sale_tax_rate WHERE ID = ".$ID."", true);
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
+		$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID, true);
+		return $DB->Query("DELETE FROM b_sale_tax_rate WHERE ID = ".$ID, true);
 	}
 
 	
 	/**
-	 * <p>Функция возвращает параметры ставки налога с кодом ID </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код ставки налога.
-	 *
-	 *
-	 *
-	 * @return array <p>Возвращается ассоциативный массив параметров ставки налога с
-	 * ключами</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	 * </tr> <tr> <td>ID</td> <td>Код ставки налога.</td> </tr> <tr> <td>TAX_ID</td> <td>Код
-	 * налога.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип плательщика.</td> </tr> <tr> <td>VALUE</td>
-	 * <td>Величина налога (в процентах) </td> </tr> <tr> <td>CURRENCY</td> <td>Валюта.</td>
-	 * </tr> <tr> <td>IS_PERCENT</td> <td>Y</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) входит ли уже
-	 * налог в цену.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr>
-	 * <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> <tr> <td>ACTIVE</td>
-	 * <td>Флаг (Y/N) активности ставки.</td> </tr> </table><p>  </p>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__getbyid.e4dc7ca3.php
-	 * @author Bitrix
-	 */
+	* <p>Функция возвращает параметры ставки налога с кодом ID </p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код ставки налога. </ht
+	*
+	*
+	*
+	* @return array <p>Возвращается ассоциативный массив параметров ставки налога с
+	* ключами</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
+	* </tr> <tr> <td>ID</td> <td>Код ставки налога.</td> </tr> <tr> <td>TAX_ID</td> <td>Код
+	* налога.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип плательщика.</td> </tr> <tr> <td>VALUE</td>
+	* <td>Величина налога (в процентах) </td> </tr> <tr> <td>CURRENCY</td> <td>Валюта.</td>
+	* </tr> <tr> <td>IS_PERCENT</td> <td>Y</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) входит ли уже
+	* налог в цену.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr>
+	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> <tr> <td>ACTIVE</td>
+	* <td>Флаг (Y/N) активности ставки.</td> </tr> </table> <p>  </p
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__getbyid.e4dc7ca3.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
 
-		$ID = IntVal($ID);
+		$ID = intval($ID);
+		if (0 >= $ID)
+			return false;
 
 		$strSql =
 			"SELECT ID, TAX_ID, PERSON_TYPE_ID, VALUE, CURRENCY, IS_PERCENT, IS_IN_PRICE, APPLY_ORDER, ".$DB->DateToCharFunction("TIMESTAMP_X", "FULL")." as TIMESTAMP_X, ACTIVE ".
-			"FROM b_sale_tax_rate ".
-			"WHERE ID = ".$ID."";
+			"FROM b_sale_tax_rate WHERE ID = ".$ID;
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if ($res = $db_res->Fetch())
 		{
 			return $res;
 		}
-		return False;
+		return false;
 	}
 
 	public static function GetLocationList($arFilter=Array())
@@ -234,7 +238,7 @@ class CAllSaleTaxRate
 		global $DB;
 		$arSqlSearch = Array();
 
-		if (!is_array($arFilter)) 
+		if (!is_array($arFilter))
 			$filter_keys = Array();
 		else
 			$filter_keys = array_keys($arFilter);
@@ -276,7 +280,7 @@ class CAllSaleTaxRate
 			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT TR2L.TAX_RATE_ID, TR2L.LOCATION_ID, TR2L.LOCATION_TYPE ".
 			"FROM b_sale_tax2location TR2L ".
 			"WHERE 1 = 1 ".

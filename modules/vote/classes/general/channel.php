@@ -96,8 +96,7 @@ class CAllVoteChannel
 		if (!self::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeMessageAdd ************************/
-		$events = GetModuleEvents("vote", "onBeforeVoteChannelAdd");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteChannelAdd", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false; }
 /***************** /Event ******************************************/
@@ -123,8 +122,7 @@ class CAllVoteChannel
 		if (is_array($arFields["GROUP_ID"]) && !empty($arFields["GROUP_ID"]))
 			self::SetAccessPermissions($ID, $arFields["GROUP_ID"]);
 /***************** Events onAfterMessageAdd ************************/
-		$events = GetModuleEvents("vote", "onAfterVoteChannelAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteChannelAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 /***************** /Events *****************************************/
 
@@ -138,8 +136,7 @@ class CAllVoteChannel
 			return false;
 		$ID = intval($ID);
 		/***************** Event onBeforeMessageAdd ************************/
-		$events = GetModuleEvents("vote", "onBeforeVoteChannelUpdate");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteChannelUpdate", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false; }
 		/***************** /Event ******************************************/
@@ -160,8 +157,7 @@ class CAllVoteChannel
 		if (is_array($arFields["GROUP_ID"]) && !empty($arFields["GROUP_ID"]))
 			self::SetAccessPermissions($ID, $arFields["GROUP_ID"]);
 		/***************** Events onAfterMessageAdd ************************/
-		$events = GetModuleEvents("vote", "onAfterVoteChannelUpdate");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteChannelUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 		/***************** /Events *****************************************/
 
@@ -376,8 +372,7 @@ class CAllVoteChannel
 			return true;
 		endif;
 		/***************** Event onBeforeVoteChannelDelete ******************/
-		$events = GetModuleEvents("vote", "onBeforeVoteChannelDelete");
-		while ($arEvent = $events->Fetch()) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteChannelDelete", true) as $arEvent) {
 			if (ExecuteModuleEventEx($arEvent, array(&$ID)) === false)
 				return false; }
 		/***************** /Event ******************************************/
@@ -391,8 +386,7 @@ class CAllVoteChannel
 		$DB->Query("DELETE FROM b_vote_channel_2_site WHERE CHANNEL_ID=".$ID, false, $err_mess.__LINE__);
 		$res = $DB->Query("DELETE FROM b_vote_channel WHERE ID=".$ID, false, $err_mess.__LINE__);
 		/***************** Event onAfterVoteChannelDelete ******************/
-		$events = GetModuleEvents("vote", "onAfterVoteChannelDelete");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents("vote", "onAfterVoteChannelDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID));
 		/***************** /Event ******************************************/
 		return $res;
@@ -450,7 +444,8 @@ class CAllVoteChannel
 		else
 		{
 			if ($params["get_from_database"] != "Y")
-				$permission = (($USER->IsAdmin() || $APPLICATION->GetGroupRight("vote") >= "W") ? 4 : $permission);
+				$permission = ((in_array(1, $USER->GetUserGroupArray()) || $APPLICATION->GetGroupRight("vote") >= "W") ? 4 : $permission);
+
 			if ($permission <= 0 && !empty($groups))
 			{
 				$strSql =

@@ -1,6 +1,19 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * Класс поддержки Google Sitemap.</body> <
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/search/classes/csitemap/index.php
+ * @author Bitrix
+ */
 class CAllSiteMap extends CDBResult
 {
 	var $m_href="";		//URL for result
@@ -11,48 +24,51 @@ class CAllSiteMap extends CDBResult
 
 	
 	/**
-	 * <p>Создание карты сайта в формате Google Sitemap.</p> <p>Создание всегда происходит в пошаговом режиме.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $site_id  Идентификатор сайта для которого будет создаваться карта.
-	 *
-	 *
-	 *
-	 * @param array $max_execution_time  Элемент этого массива с индексом 0 задает максимальное время одно
-	 * шага в секундах. А с индексом 1 - максимальное количество записей
-	 * поискового индекса (рекомендовано задавать не более 5000).
-	 *
-	 *
-	 *
-	 * @param array $NS  Начало шага. Передается результат, возвращенный предыдущим
-	 * вызовом этой функции.
-	 *
-	 *
-	 *
-	 * @param array $arOptions = array() Необязательный параметр. Если содержит ключ FORUM_TOPICS_ONLY со
-	 * значением Y, то при установленном модуле форума в Sitemap попадут не
-	 * все сообщения, а только те которые начинают новую тему на форуме.
-	 * Причем дата модификации будет равна дате добавления последнего
-	 * сообщения в данную тему.
-	 *
-	 *
-	 *
-	 * @return mixed <ul> <li> <b>false</b> - в случае возникновения ошибки. </li> <li> <b>true</b> -
-	 * успешное создание карты. </li> <li> <b>array</b> - требуется еще один вызов
-	 * функции. </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * Построение карты сайта из сценария вызываемого в cron'е.&lt;?<br>//подключение модуля поиска<br>if(CModule::IncludeModule('search'))<br>{<br>	//В этом массиве будут передаваться данные "прогресса". Он же послужит индикатором окончания исполнения.<br>	$NS=Array();<br>	//Задаем максимальную длительность одной итерации равной "бесконечности".<br>	$sm_max_execution_time = 0;<br>	//Это максимальное количество ссылок обрабатываемых за один шаг.<br>	//Установка слишком большого значения приведет к значительным потерям производительности.<br>	$sm_record_limit = 5000;<br>	do {<br>		$cSiteMap = new CSiteMap;<br>		//Выполняем итерацию создания,<br>		$NS = $cSiteMap-&gt;Create("ru", array($sm_max_execution_time, $sm_record_limit), $NS);<br>		//Пока карта сайта не будет создана.<br>	} while(is_array($NS));<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csitemap/create.php
-	 * @author Bitrix
-	 */
+	* <p>Создание карты сайта в формате Google Sitemap.</p> <p>Создание всегда происходит в пошаговом режиме.</p>
+	*
+	*
+	*
+	*
+	* @param string $site_id  Идентификатор сайта для которого будет создаваться карта.
+	*
+	*
+	*
+	* @param array $max_execution_time  Элемент этого массива с индексом 0 задает максимальное время одно
+	* шага в секундах. А с индексом 1 - максимальное количество записей
+	* поискового индекса (рекомендовано задавать не более 5000).
+	*
+	*
+	*
+	* @param array $NS  Начало шага. Передается результат, возвращенный предыдущим
+	* вызовом этой функции.
+	*
+	*
+	*
+	* @param array $arOptions = array() Необязательный параметр. Если содержит ключ FORUM_TOPICS_ONLY со
+	* значением Y, то при установленном модуле форума в Sitemap попадут не
+	* все сообщения, а только те которые начинают новую тему на форуме.
+	* Причем дата модификации будет равна дате добавления последнего
+	* сообщения в данную тему.
+	*
+	*
+	*
+	* @return mixed <ul> <li> <b>false</b> - в случае возникновения ошибки. </li> <li> <b>true</b> -
+	* успешное создание карты. </li> <li> <b>array</b> - требуется еще один вызов
+	* функции. </li> </ul> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* Построение карты сайта из сценария вызываемого в cron'е.
+	* 
+	* &lt;?<br>//подключение модуля поиска<br>if(CModule::IncludeModule('search'))<br>{<br>	//В этом массиве будут передаваться данные "прогресса". Он же послужит индикатором окончания исполнения.<br>	$NS=Array();<br>	//Задаем максимальную длительность одной итерации равной "бесконечности".<br>	$sm_max_execution_time = 0;<br>	//Это максимальное количество ссылок обрабатываемых за один шаг.<br>	//Установка слишком большого значения приведет к значительным потерям производительности.<br>	$sm_record_limit = 5000;<br>	do {<br>		$cSiteMap = new CSiteMap;<br>		//Выполняем итерацию создания,<br>		$NS = $cSiteMap-&gt;Create("ru", array($sm_max_execution_time, $sm_record_limit), $NS);<br>		//Пока карта сайта не будет создана.<br>	} while(is_array($NS));<br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csitemap/create.php
+	* @author Bitrix
+	*/
 	public function Create($site_id, $max_execution_time, $NS, $arOptions = array())
 	{
 		@set_time_limit(0);
@@ -125,9 +141,8 @@ class CAllSiteMap extends CDBResult
 				return false;
 			}
 			//Cache events
-			$events = GetModuleEvents("search", "OnSearchGetURL");
-				while ($arEvent = $events->Fetch())
-					$this->m_events[]=$arEvent;
+			$this->m_events = GetModuleEvents("search", "OnSearchGetURL", true);
+
 			//Clear error file
 			if($NS["ID"]==0 && $NS["CNT"]==0)
 			{
@@ -274,7 +289,7 @@ class CAllSiteMap extends CDBResult
 			{
 				$strFile = $arSite["DIR"]."sitemap_".sprintf("%03d",$i).".xml";
 				$strTime = $this->TimeEncode(filemtime($arSite["ABS_DOC_ROOT"].$strFile));
-				fwrite($f,"\t<sitemap>\n\t\t<loc>".$strProto.$arSite["SERVER_NAME"].$strFile."</loc>\n\t\t<lastmod>".$strTime."</lastmod>\n\t</sitemap>\n");
+				fwrite($f,"\t<sitemap>\n\t\t<loc>".$this->URLEncode($strProto.$arSite["SERVER_NAME"].$strFile, "UTF-8")."</loc>\n\t\t<lastmod>".$strTime."</lastmod>\n\t</sitemap>\n");
 			}
 			fwrite($f,"</sitemapindex>\n");
 			fclose($f);
@@ -334,9 +349,21 @@ class CAllSiteMap extends CDBResult
 		foreach($arUrlComponents as $i => $part_of_url)
 		{
 			if($i % 2)
+			{
 				$strEncodedURL .= $part_of_url;
+			}
 			else
-				$strEncodedURL .= urlencode($APPLICATION->ConvertCharset($part_of_url, LANG_CHARSET, $charset));
+			{
+				if ($i > 1 && $arUrlComponents[$i-1] === "://")
+				{
+					$converter = CBXPunycode::GetConverter();
+					$strEncodedURL .= $converter->Encode($part_of_url);
+				}
+				else
+				{
+					$strEncodedURL .= urlencode($APPLICATION->ConvertCharset(urldecode($part_of_url), LANG_CHARSET, $charset));
+				}
+			}
 		}
 		return $strEncodedURL;
 	}

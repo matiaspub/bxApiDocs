@@ -27,6 +27,10 @@ class CEventLog
 		global $USER, $DB;
 		static $arSeverity = array(
 			"SECURITY" => 1,
+			"ERROR" => 2,
+			"WARNING" => 3,
+			"INFO" => 4,
+			"DEBUG" => 5
 		);
 
 		$url = preg_replace("/(&?sessid=[0-9a-z]+)/", "", $_SERVER["REQUEST_URI"]);

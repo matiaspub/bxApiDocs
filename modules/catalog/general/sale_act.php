@@ -100,6 +100,12 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
+		$key = array_search(CSaleActionCtrlAction::GetControlID(), $arControls);
+		if (false !== $key)
+		{
+			unset($arControls[$key]);
+			$arControls = array_values($arControls);
+		}
 		return $arControls;
 	}
 
@@ -216,7 +222,7 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 		{
 			return $arControlList;
 		}
-		elseif (array_key_exists($strControlID, $arControlList))
+		elseif (isset($arControlList[$strControlID]))
 		{
 			return $arControlList[$strControlID];
 		}
@@ -332,6 +338,12 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 
 	public static function GetShowIn($arControls)
 	{
+		$key = array_search(CSaleActionCtrlAction::GetControlID(), $arControls);
+		if (false !== $key)
+		{
+			unset($arControls[$key]);
+			$arControls = array_values($arControls);
+		}
 		return $arControls;
 	}
 
@@ -488,7 +500,7 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 		{
 			return $arControlList;
 		}
-		elseif (array_key_exists($strControlID, $arControlList))
+		elseif (isset($arControlList[$strControlID]))
 		{
 			return $arControlList[$strControlID];
 		}

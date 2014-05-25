@@ -80,40 +80,40 @@ class CAllSaleRecurring
 
 	
 	/**
-	 * <p>Метод изменяет параметры записи на продление подписки в соответствии с параметрами из массива arFields.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код изменяемой записи на продление подписки.
-	 *
-	 *
-	 *
-	 * @param array $arFields  Ассоциативный массив новых параметров новой записи продления
-	 * подписки с ключами: <ul> <li> <b>USER_ID</b> - код пользователя;</li> <li> <b>MODULE</b>
-	 * - модуль, товар которого продлевается;</li> <li> <b>PRODUCT_ID</b> - код
-	 * продлеваемого товара;</li> <li> <b>PRODUCT_NAME</b> - название продлеваемого
-	 * товара;</li> <li> <b>PRODUCT_URL</b> - ссылка на продлеваемый товар;</li> <li>
-	 * <b>RECUR_SCHEME_TYPE</b> - тип периода оплаты;</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
-	 * периода оплаты;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Без оформления заказа";</li>
-	 * <li> <b>ORDER_ID</b> - код базового заказа для продления;</li> <li> <b>CANCELED</b> -
-	 * флаг отмены продления;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li>
-	 * <b>CALLBACK_FUNC</b> - функция обратного вызова для обновления параметров
-	 * продления;</li> <li> <b>REMAINING_ATTEMPTS</b> - количество оставшихся попыток
-	 * осуществления продления;</li> <li> <b>SUCCESS_PAYMENT</b> - успешное
-	 * осуществление продления;</li> <li> <b>CANCELED_REASON</b> - причина отмены;</li> <li>
-	 * <b>DATE_CANCELED</b> - дата отмены;</li> <li> <b>PRIOR_DATE</b> - дата последнего
-	 * продления;</li> <li> <b>NEXT_DATE</b> - дата очередного продления.</li> </ul>
-	 *
-	 *
-	 *
-	 * @return int <p>Метод возвращает код измененной записи или False в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.update.php
-	 * @author Bitrix
-	 */
+	* <p>Метод изменяет параметры записи на продление подписки в соответствии с параметрами из массива arFields.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код изменяемой записи на продление подписки.
+	*
+	*
+	*
+	* @param array $arFields  Ассоциативный массив новых параметров новой записи продления
+	* подписки с ключами: <ul> <li> <b>USER_ID</b> - код пользователя;</li> <li> <b>MODULE</b>
+	* - модуль, товар которого продлевается;</li> <li> <b>PRODUCT_ID</b> - код
+	* продлеваемого товара;</li> <li> <b>PRODUCT_NAME</b> - название продлеваемого
+	* товара;</li> <li> <b>PRODUCT_URL</b> - ссылка на продлеваемый товар;</li> <li>
+	* <b>RECUR_SCHEME_TYPE</b> - тип периода оплаты;</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
+	* периода оплаты;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Без оформления заказа";</li>
+	* <li> <b>ORDER_ID</b> - код базового заказа для продления;</li> <li> <b>CANCELED</b> -
+	* флаг отмены продления;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li>
+	* <b>CALLBACK_FUNC</b> - функция обратного вызова для обновления параметров
+	* продления;</li> <li> <b>REMAINING_ATTEMPTS</b> - количество оставшихся попыток
+	* осуществления продления;</li> <li> <b>SUCCESS_PAYMENT</b> - успешное
+	* осуществление продления;</li> <li> <b>CANCELED_REASON</b> - причина отмены;</li> <li>
+	* <b>DATE_CANCELED</b> - дата отмены;</li> <li> <b>PRIOR_DATE</b> - дата последнего
+	* продления;</li> <li> <b>NEXT_DATE</b> - дата очередного продления.</li> </ul>
+	*
+	*
+	*
+	* @return int <p>Метод возвращает код измененной записи или False в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -136,22 +136,22 @@ class CAllSaleRecurring
 
 	
 	/**
-	 * <p>Метод удаляет запись на продление подписки с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код удаляемой записи.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления или <i>false</i>
-	 * в случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.delete.php
-	 * @author Bitrix
-	 */
+	* <p>Метод удаляет запись на продление подписки с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код удаляемой записи.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления или <i>false</i>
+	* в случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -191,17 +191,17 @@ class CAllSaleRecurring
 
 	
 	/**
-	 * <p>Метод ищет подписки, которые пора продлить, и пытается осуществить продление. За раз осуществляется продление не более трех подписок. Этот метод можно вызывать из агентов или cron'а для автоматического продления подписки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return void <p>Метод не возвращает значений.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.checkrecurring.php
-	 * @author Bitrix
-	 */
+	* <p>Метод ищет подписки, которые пора продлить, и пытается осуществить продление. За раз осуществляется продление не более трех подписок. Этот метод можно вызывать из агентов или cron'а для автоматического продления подписки.</p>
+	*
+	*
+	*
+	*
+	* @return void <p>Метод не возвращает значений.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.checkrecurring.php
+	* @author Bitrix
+	*/
 	public static function CheckRecurring()
 	{
 		if (defined("SALE_PROC_REC_NUM"))
@@ -232,22 +232,22 @@ class CAllSaleRecurring
 
 	
 	/**
-	 * <p>Метод осуществляет продление подписки с кодом ID.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи с информацией о продлении.
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает <i>true</i> в случае успешного продления или <i>false</i>
-	 * в случае ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.nextpayment.php
-	 * @author Bitrix
-	 */
+	* <p>Метод осуществляет продление подписки с кодом ID.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи с информацией о продлении.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного продления или <i>false</i>
+	* в случае ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.nextpayment.php
+	* @author Bitrix
+	*/
 	public static function NextPayment($ID)
 	{
 		global $DB;
@@ -563,6 +563,7 @@ class CAllSaleRecurring
 						"DETAIL_PAGE_URL" => $arProduct["DETAIL_PAGE_URL"],
 						"VATE_RATE" => $arProduct["VATE_RATE"],
 						"PRODUCT_XML_ID" => $arProduct["PRODUCT_XML_ID"],
+						"TYPE" => $arProduct["TYPE"],
 						"RENEWAL" => "Y"
 					);
 
@@ -806,35 +807,35 @@ class CAllSaleRecurring
 
 	
 	/**
-	 * <p>Метод осуществляет отмену продления подписки с кодом ID.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $ID  Код записи с информацией о продлении.
-	 *
-	 *
-	 *
-	 * @param string $val  "Y", если подписка отменяется, и "N", если подписка
-	 * восстанавливается.
-	 *
-	 *
-	 *
-	 * @param  $string  Причина отмены подписки.
-	 *
-	 *
-	 *
-	 * @param descriptio $n = ""] 
-	 *
-	 *
-	 *
-	 * @return bool <p>Метод возвращает код отменяемой записи или <i>false</i> в случае
-	 * ошибки.</p><br><br>
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.cancelrecurring.php
-	 * @author Bitrix
-	 */
+	* <p>Метод осуществляет отмену продления подписки с кодом ID.</p>
+	*
+	*
+	*
+	*
+	* @param int $ID  Код записи с информацией о продлении.
+	*
+	*
+	*
+	* @param string $val  "Y", если подписка отменяется, и "N", если подписка
+	* восстанавливается.
+	*
+	*
+	*
+	* @param  $string  Причина отмены подписки.
+	*
+	*
+	*
+	* @param descriptio $n = ""] 
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает код отменяемой записи или <i>false</i> в случае
+	* ошибки.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.cancelrecurring.php
+	* @author Bitrix
+	*/
 	public static function CancelRecurring($ID, $val, $description = "")
 	{
 		global $DB, $USER;

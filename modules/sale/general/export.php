@@ -38,7 +38,7 @@ class CAllSaleExport
 		return $DB->Query("DELETE FROM b_sale_export WHERE ID = ".$ID."", true);
 	}
 
-	//*************** SELECT *********************/
+	/*************** SELECT *********************/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -66,12 +66,25 @@ class CAllSaleExport
 		return False;
 	}
 
-	public static function ExportOrders2Xml($arFilter = Array(), $nTopCount = 0, $currency = "", $crmMode = false)
+	public static function ExportOrders2Xml($arFilter = Array(), $nTopCount = 0, $currency = "", $crmMode = false, $time_limit = 0, $version = false)
 	{
 		global $DB;
 		$count = false;
 		if(IntVal($nTopCount)>0)
 			$count = Array("nTopCount" => $nTopCount);
+		$bNewVersion = (strlen($version) > 0);
+
+		if(IntVal($time_limit) > 0)
+		{
+			//This is an optimization. We assume than no step can take more than one year.
+			if($time_limit > 0)
+				$end_time = time() + $time_limit;
+			else
+				$end_time = time() + 365*24*3600; // One year
+
+			if(IntVal($_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"]) > 0)
+				$arFilter["<ID"] = $_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"];
+		}
 
 		$arResultStat = array(
 			"ORDERS" => 0,
@@ -80,25 +93,6 @@ class CAllSaleExport
 		);
 
 		$accountNumberPrefix = COption::GetOptionString("sale", "1C_SALE_ACCOUNT_NUMBER_SHOP_PREFIX", "");
-
-		$arOrder = array("ID" => "DESC");
-		if ($crmMode)
-			$arOrder = array("DATE_UPDATE" => "ASC");
-
-		$dbOrderList = CSaleOrder::GetList(
-				$arOrder,
-				$arFilter,
-				false,
-				$count,
-				array(
-					"ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED",
-					"EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID",
-					"PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE",
-					"SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION",
-					"ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE",
-					"COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "ACCOUNT_NUMBER"
-				)
-			);
 
 		$dbPaySystem = CSalePaySystem::GetList(Array("ID" => "ASC"), Array("ACTIVE" => "Y"), false, false, Array("ID", "NAME", "ACTIVE"));
 		while($arPaySystem = $dbPaySystem -> Fetch())
@@ -120,6 +114,33 @@ class CAllSaleExport
 			}
 		}
 
+		$arStore = array();
+		$arMeasures = array();
+		if(CModule::IncludeModule("catalog"))
+		{
+			$dbList = CCatalogStore::GetList(
+				array("SORT" => "DESC", "ID" => "ASC"),
+				array("ACTIVE" => "Y", "ISSUING_CENTER" => "Y"),
+				false,
+				false,
+				array("ID", "SORT", "TITLE", "ADDRESS", "DESCRIPTION", "PHONE", "EMAIL", "XML_ID")
+			);
+			while ($arStoreTmp = $dbList->Fetch())
+			{
+				if(strlen($arStoreTmp["XML_ID"]) <= 0)
+					$arStoreTmp["XML_ID"] = $arStoreTmp["ID"];
+				$arStore[$arStoreTmp["ID"]] = $arStoreTmp;
+			}
+
+			$dbList = CCatalogMeasure::getList(array(), array(), false, false, array("CODE", "MEASURE_TITLE"));
+			while($arList = $dbList->Fetch())
+			{
+				$arMeasures[$arList["CODE"]] = $arList["MEASURE_TITLE"];
+			}
+		}
+		if(empty($arMeasures))
+			$arMeasures[796] = GetMessage("SALE_EXPORT_SHTUKA");
+
 		$dbExport = CSaleExport::GetList();
 		while($arExport = $dbExport->Fetch())
 		{
@@ -140,9 +161,27 @@ class CAllSaleExport
 		else
 			echo "<"."?xml version=\"1.0\" encoding=\"windows-1251\"?".">\n";
 		?>
-		<<?=GetMessage("SALE_EXPORT_COM_INFORMATION")?> <?=GetMessage("SALE_EXPORT_SHEM_VERSION")?>="2.05" <?=GetMessage("SALE_EXPORT_SHEM_DATE_CREATE")?>="<?=date("Y-m-d")?>T<?=date("G:i:s")?>" <?=GetMessage("SALE_EXPORT_DATE_FORMAT")?>="<?=GetMessage("SALE_EXPORT_DATE_FORMAT_DF")?>=yyyy-MM-dd; <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DLF")?>=DT" <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DATETIME")?>="<?=GetMessage("SALE_EXPORT_DATE_FORMAT_DF")?>=<?=GetMessage("SALE_EXPORT_DATE_FORMAT_TIME")?>; <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DLF")?>=T" <?=GetMessage("SALE_EXPORT_DEL_DT")?>="T" <?=GetMessage("SALE_EXPORT_FORM_SUMM")?>="<?=GetMessage("SALE_EXPORT_FORM_CC")?>=18; <?=GetMessage("SALE_EXPORT_FORM_CDC")?>=2; <?=GetMessage("SALE_EXPORT_FORM_CRD")?>=." <?=GetMessage("SALE_EXPORT_FORM_QUANT")?>="<?=GetMessage("SALE_EXPORT_FORM_CC")?>=18; <?=GetMessage("SALE_EXPORT_FORM_CDC")?>=2; <?=GetMessage("SALE_EXPORT_FORM_CRD")?>=.">
+		<<?=GetMessage("SALE_EXPORT_COM_INFORMATION")?> <?=GetMessage("SALE_EXPORT_SHEM_VERSION")?>="<?=($bNewVersion ? "2.08" : "2.05")?>" <?=GetMessage("SALE_EXPORT_SHEM_DATE_CREATE")?>="<?=date("Y-m-d")?>T<?=date("G:i:s")?>" <?=GetMessage("SALE_EXPORT_DATE_FORMAT")?>="<?=GetMessage("SALE_EXPORT_DATE_FORMAT_DF")?>=yyyy-MM-dd; <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DLF")?>=DT" <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DATETIME")?>="<?=GetMessage("SALE_EXPORT_DATE_FORMAT_DF")?>=<?=GetMessage("SALE_EXPORT_DATE_FORMAT_TIME")?>; <?=GetMessage("SALE_EXPORT_DATE_FORMAT_DLF")?>=T" <?=GetMessage("SALE_EXPORT_DEL_DT")?>="T" <?=GetMessage("SALE_EXPORT_FORM_SUMM")?>="<?=GetMessage("SALE_EXPORT_FORM_CC")?>=18; <?=GetMessage("SALE_EXPORT_FORM_CDC")?>=2; <?=GetMessage("SALE_EXPORT_FORM_CRD")?>=." <?=GetMessage("SALE_EXPORT_FORM_QUANT")?>="<?=GetMessage("SALE_EXPORT_FORM_CC")?>=18; <?=GetMessage("SALE_EXPORT_FORM_CDC")?>=2; <?=GetMessage("SALE_EXPORT_FORM_CRD")?>=.">
 		<?
+		$arOrder = array("ID" => "DESC");
+		if ($crmMode)
+			$arOrder = array("DATE_UPDATE" => "ASC");
 
+		$dbOrderList = CSaleOrder::GetList(
+			$arOrder,
+			$arFilter,
+			false,
+			$count,
+			array(
+				"ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED",
+				"EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID",
+				"PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE",
+				"SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION",
+				"ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE",
+				"COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "ACCOUNT_NUMBER", "SUM_PAID", "DELIVERY_DOC_DATE", "DELIVERY_DOC_NUM", "TRACKING_NUMBER", "STORE_ID",
+				"ID_1C", "VERSION",
+			)
+		);
 		while($arOrder = $dbOrderList->Fetch())
 		{
 			if ($crmMode)
@@ -152,14 +191,18 @@ class CAllSaleExport
 
 			$agentParams = $arAgent[$arOrder["PERSON_TYPE_ID"]];
 			$arProp = Array();
-
 			$arProp["ORDER"] = $arOrder;
+
 			if (IntVal($arOrder["USER_ID"]) > 0)
 			{
 				$dbUser = CUser::GetByID($arOrder["USER_ID"]);
 				if ($arUser = $dbUser->Fetch())
 					$arProp["USER"] = $arUser;
 			}
+			if(IntVal($arOrder["PAY_SYSTEM_ID"]) > 0)
+				$arProp["ORDER"]["PAY_SYSTEM_NAME"] = $paySystems[$arOrder["PAY_SYSTEM_ID"]];
+			if(strlen($arOrder["DELIVERY_ID"]) > 0)
+				$arProp["ORDER"]["DELIVERY_NAME"] = $delivery[$arOrder["DELIVERY_ID"]];
 
 			$dbOrderPropVals = CSaleOrderPropsValue::GetList(
 					array(),
@@ -170,7 +213,6 @@ class CAllSaleExport
 				);
 			while ($arOrderPropVals = $dbOrderPropVals->Fetch())
 			{
-				//$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] = $arOrderPropVals["VALUE"];
 				if ($arOrderPropVals["PROP_TYPE"] == "CHECKBOX")
 				{
 					if ($arOrderPropVals["VALUE"] == "Y")
@@ -190,20 +232,20 @@ class CAllSaleExport
 				elseif ($arOrderPropVals["PROP_TYPE"] == "MULTISELECT")
 				{
 					$curVal = explode(",", $arOrderPropVals["VALUE"]);
-					for ($i = 0; $i < count($curVal); $i++)
+					foreach($curVal as $vm)
 					{
-						$arVal = CSaleOrderPropsVariant::GetByValue($arOrderPropVals["ORDER_PROPS_ID"], $curVal[$i]);
-						if ($i > 0)
-							$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] .=  ", ";
-						$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] .=  $arVal["NAME"];
+						$arVal = CSaleOrderPropsVariant::GetByValue($arOrderPropVals["ORDER_PROPS_ID"], $vm);
+						$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] .=  ", ".$arVal["NAME"];
 					}
+					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] = substr($arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]], 2);
 				}
 				elseif ($arOrderPropVals["PROP_TYPE"] == "LOCATION")
 				{
 					$arVal = CSaleLocation::GetByID($arOrderPropVals["VALUE"], LANGUAGE_ID);
-					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] =  ($arVal["COUNTRY_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["CITY_NAME"])<=0) ? "" : " - ").$arVal["CITY_NAME"]);
+					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] =  ($arVal["COUNTRY_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["REGION_NAME"])<=0) ? "" : " - ").$arVal["REGION_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["CITY_NAME"])<=0) ? "" : " - ").$arVal["CITY_NAME"]);
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_CITY"] = $arVal["CITY_NAME"];
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_COUNTRY"] = $arVal["COUNTRY_NAME"];
+					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_REGION"] = $arVal["REGION_NAME"];
 				}
 				else
 				{
@@ -222,13 +264,9 @@ class CAllSaleExport
 					else
 					{
 						if(strlen($v["TYPE"])<=0)
-						{
 							$agent["REKV"][$k] = $v["VALUE"];
-						}
 						else
-						{
 							$agent["REKV"][$k] = $arProp[$v["TYPE"]][$v["VALUE"]];
-						}
 					}
 				}
 				else
@@ -240,13 +278,9 @@ class CAllSaleExport
 					else
 					{
 						if(strlen($v["TYPE"])<=0)
-						{
 							$agent[$k] = $v["VALUE"];
-						}
 						else
-						{
 							$agent[$k] = $arProp[$v["TYPE"]][$v["VALUE"]];
-						}
 					}
 				}
 			}
@@ -261,409 +295,23 @@ class CAllSaleExport
 				<<?=GetMessage("SALE_EXPORT_CURRENCY_RATE")?>>1</<?=GetMessage("SALE_EXPORT_CURRENCY_RATE")?>>
 				<<?=GetMessage("SALE_EXPORT_AMOUNT")?>><?=$arOrder["PRICE"]?></<?=GetMessage("SALE_EXPORT_AMOUNT")?>>
 				<?
+				if($bNewVersion)
+				{
+					?>
+					<<?=GetMessage("SALE_EXPORT_VERSION")?>><?=(IntVal($arOrder["VERSION"]) > 0 ? $arOrder["VERSION"] : 0)?></<?=GetMessage("SALE_EXPORT_VERSION")?>>
+					<?
+					if(strlen($arOrder["ID_1C"]) > 0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_ID_1C")?>><?=htmlspecialcharsbx($arOrder["ID_1C"])?></<?=GetMessage("SALE_EXPORT_ID_1C")?>><?
+					}
+				}
 				if ($crmMode)
 				{
 					?><DateUpdate><?=$DB->FormatDate($arOrder["DATE_UPDATE"], $dateFormat, "YYYY-MM-DD HH:MI:SS");?></DateUpdate><?
 				}
+
+				$deliveryAdr = CSaleExport::ExportContragents($arOrder, $arProp, $agent, $arResultStat, $bNewVersion);
 				?>
-				<<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
-					<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
-						<<?=GetMessage("SALE_EXPORT_ID")?>><?=htmlspecialcharsbx($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"])?></<?=GetMessage("SALE_EXPORT_ID")?>>
-						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["AGENT_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-						<?
-						$address = "<".GetMessage("SALE_EXPORT_PRESENTATION").">".htmlspecialcharsbx($agent["ADDRESS_FULL"])."</".GetMessage("SALE_EXPORT_PRESENTATION").">";
-						if(strlen($agent["INDEX"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_POST_CODE")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["INDEX"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["COUNTRY"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_COUNTRY")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["COUNTRY"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["REGION"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_REGION")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["REGION"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["STATE"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_STATE")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["STATE"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["TOWN"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_SMALL_CITY")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["TOWN"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["CITY"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_CITY")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["CITY"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["STREET"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_STREET")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["STREET"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["HOUSE"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_HOUSE")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["HOUSE"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["BUILDING"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_BUILDING")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["BUILDING"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-						if(strlen($agent["FLAT"])>0)
-						{
-							$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
-										<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_FLAT")."</".GetMessage("SALE_EXPORT_TYPE").">
-										<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["FLAT"])."</".GetMessage("SALE_EXPORT_VALUE").">
-									</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
-						}
-
-						if($agent["IS_FIZ"]=="Y")
-						{
-							$arResultStat["CONTACTS"]++;
-							?>
-								<<?=GetMessage("SALE_EXPORT_FULL_NAME")?>><?=htmlspecialcharsbx($agent["FULL_NAME"])?></<?=GetMessage("SALE_EXPORT_FULL_NAME")?>>
-								<?
-								if(strlen($agent["SURNAME"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_SURNAME")?>><?=htmlspecialcharsbx($agent["SURNAME"])?></<?=GetMessage("SALE_EXPORT_SURNAME")?>><?
-								}
-								if(strlen($agent["NAME"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_NAME")?>><?=htmlspecialcharsbx($agent["NAME"])?></<?=GetMessage("SALE_EXPORT_NAME")?>><?
-								}
-								if(strlen($agent["SECOND_NAME"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_MIDDLE_NAME")?>><?=htmlspecialcharsbx($agent["SECOND_NAME"])?></<?=GetMessage("SALE_EXPORT_MIDDLE_NAME")?>><?
-								}
-								if(strlen($agent["BIRTHDAY"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_BIRTHDAY")?>><?=htmlspecialcharsbx($agent["BIRTHDAY"])?></<?=GetMessage("SALE_EXPORT_BIRTHDAY")?>><?
-								}
-								if(strlen($agent["MALE"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_SEX")?>><?=htmlspecialcharsbx($agent["MALE"])?></<?=GetMessage("SALE_EXPORT_SEX")?>><?
-								}
-								if(strlen($agent["INN"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_INN")?>><?=htmlspecialcharsbx($agent["INN"])?></<?=GetMessage("SALE_EXPORT_INN")?>><?
-								}
-								if(strlen($agent["KPP"])>0)
-								{
-									?><<?=GetMessage("SALE_EXPORT_KPP")?>><?=htmlspecialcharsbx($agent["KPP"])?></<?=GetMessage("SALE_EXPORT_KPP")?>><?
-								}
-								?>
-								<<?=GetMessage("SALE_EXPORT_REGISTRATION_ADDRESS")?>>
-									<?=$address?>
-								</<?=GetMessage("SALE_EXPORT_REGISTRATION_ADDRESS")?>>
-							<?
-						}
-						else
-						{
-							$arResultStat["COMPANIES"]++;
-							?>
-							<<?=GetMessage("SALE_EXPORT_OFICIAL_NAME")?>><?=htmlspecialcharsbx($agent["FULL_NAME"])?></<?=GetMessage("SALE_EXPORT_OFICIAL_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_UR_ADDRESS")?>>
-								<?=$address?>
-							</<?=GetMessage("SALE_EXPORT_UR_ADDRESS")?>>
-							<?
-							if(strlen($agent["INN"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_INN")?>><?=htmlspecialcharsbx($agent["INN"])?></<?=GetMessage("SALE_EXPORT_INN")?>><?
-							}
-							if(strlen($agent["KPP"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_KPP")?>><?=htmlspecialcharsbx($agent["KPP"])?></<?=GetMessage("SALE_EXPORT_KPP")?>><?
-							}
-							if(strlen($agent["EGRPO"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_EGRPO")?>><?=htmlspecialcharsbx($agent["EGRPO"])?></<?=GetMessage("SALE_EXPORT_EGRPO")?>><?
-							}
-							if(strlen($agent["OKVED"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_OKVED")?>><?=htmlspecialcharsbx($agent["OKVED"])?></<?=GetMessage("SALE_EXPORT_OKVED")?>><?
-							}
-							if(strlen($agent["OKDP"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_OKDP")?>><?=htmlspecialcharsbx($agent["OKDP"])?></<?=GetMessage("SALE_EXPORT_OKDP")?>><?
-							}
-							if(strlen($agent["OKOPF"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_OKOPF")?>><?=htmlspecialcharsbx($agent["OKOPF"])?></<?=GetMessage("SALE_EXPORT_OKOPF")?>><?
-							}
-							if(strlen($agent["OKFC"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_OKFC")?>><?=htmlspecialcharsbx($agent["OKFC"])?></<?=GetMessage("SALE_EXPORT_OKFC")?>><?
-							}
-							if(strlen($agent["OKPO"])>0)
-							{
-								?><<?=GetMessage("SALE_EXPORT_OKPO")?>><?=htmlspecialcharsbx($agent["OKPO"])?></<?=GetMessage("SALE_EXPORT_OKPO")?>><?
-							}
-							if(strlen($agent["ACCOUNT_NUMBER"])>0)
-							{
-								?>
-								<<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNTS")?>>
-									<<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNT")?>>
-										<<?=GetMessage("SALE_EXPORT_ACCOUNT_NUMBER")?>><?=htmlspecialcharsbx($agent["ACCOUNT_NUMBER"])?></<?=GetMessage("SALE_EXPORT_ACCOUNT_NUMBER")?>>
-										<<?=GetMessage("SALE_EXPORT_BANK")?>>
-											<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["B_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-											<<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
-												<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($agent["B_ADDRESS_FULL"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
-												<?
-												if(strlen($agent["B_INDEX"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_POST_CODE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_INDEX"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_COUNTRY"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_COUNTRY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_COUNTRY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_REGION"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_REGION")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_REGION"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_STATE"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STATE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_STATE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_TOWN"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_SMALL_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_TOWN"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_CITY"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_CITY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_STREET"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STREET")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_STREET"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_HOUSE"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_HOUSE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_HOUSE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_BUILDING"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_BUILDING")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_BUILDING"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												if(strlen($agent["B_FLAT"])>0)
-												{
-													?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-													<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_FLAT")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-													<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_FLAT"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-												</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
-												}
-												?>
-											</<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
-											<?
-											if(strlen($agent["B_BIK"])>0)
-											{
-												?><<?=GetMessage("SALE_EXPORT_BIC")?>><?=htmlspecialcharsbx($agent["B_BIK"])?></<?=GetMessage("SALE_EXPORT_BIC")?>><?
-											}
-											?>
-										</<?=GetMessage("SALE_EXPORT_BANK")?>>
-									</<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNT")?>>
-								</<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNTS")?>>
-								<?
-							}
-						}
-						if(strlen($agent["F_ADDRESS_FULL"])>0)
-						{
-							?>
-							<<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
-								<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($agent["F_ADDRESS_FULL"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
-								<?
-								if(strlen($agent["F_INDEX"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_POST_CODE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_INDEX"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_COUNTRY"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_COUNTRY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_COUNTRY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_REGION"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_REGION")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_REGION"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_STATE"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STATE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_STATE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_TOWN"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_SMALL_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_TOWN"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_CITY"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_CITY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_STREET"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STREET")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_STREET"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_HOUSE"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_HOUSE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_HOUSE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_BUILDING"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_BUILDING")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_BUILDING"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								if(strlen($agent["F_FLAT"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_FLAT")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_FLAT"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
-									<?
-								}
-								?>
-							</<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
-							<?
-						}
-						if(strlen($agent["PHONE"])>0 || strlen($agent["EMAIL"])>0)
-						{
-							?>
-							<<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
-								<?
-								if(strlen($agent["PHONE"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_CONTACT")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_WORK_PHONE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["PHONE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_CONTACT")?>>
-									<?
-								}
-								if(strlen($agent["EMAIL"])>0)
-								{
-									?>
-									<<?=GetMessage("SALE_EXPORT_CONTACT")?>>
-										<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_MAIL")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
-										<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["EMAIL"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
-									</<?=GetMessage("SALE_EXPORT_CONTACT")?>>
-									<?
-								}
-								?>
-							</<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
-							<?
-						}
-						if(strlen($agent["CONTACT_PERSON"])>0)
-						{
-							?>
-							<<?=GetMessage("SALE_EXPORT_REPRESENTATIVES")?>>
-								<<?=GetMessage("SALE_EXPORT_REPRESENTATIVE")?>>
-									<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
-										<<?=GetMessage("SALE_EXPORT_RELATION")?>><?=GetMessage("SALE_EXPORT_CONTACT_PERSON")?></<?=GetMessage("SALE_EXPORT_RELATION")?>>
-										<<?=GetMessage("SALE_EXPORT_ID")?>><?=md5($agent["CONTACT_PERSON"])?></<?=GetMessage("SALE_EXPORT_ID")?>>
-										<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["CONTACT_PERSON"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-									</<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
-								</<?=GetMessage("SALE_EXPORT_REPRESENTATIVE")?>>
-							</<?=GetMessage("SALE_EXPORT_REPRESENTATIVES")?>>
-							<?
-						}?>
-						<<?=GetMessage("SALE_EXPORT_ROLE")?>><?=GetMessage("SALE_EXPORT_BUYER")?></<?=GetMessage("SALE_EXPORT_ROLE")?>>
-					</<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
-				</<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
-
 				<<?=GetMessage("SALE_EXPORT_TIME")?>><?=$DB->FormatDate($arOrder["DATE_INSERT_FORMAT"], $dateFormat, "HH:MI:SS");?></<?=GetMessage("SALE_EXPORT_TIME")?>>
 				<<?=GetMessage("SALE_EXPORT_COMMENTS")?>><?=htmlspecialcharsbx($arOrder["COMMENTS"])?></<?=GetMessage("SALE_EXPORT_COMMENTS")?>>
 				<?
@@ -694,7 +342,7 @@ class CAllSaleExport
 				if($i != -1)
 					echo "</".GetMessage("SALE_EXPORT_TAXES").">";
 				?>
-				<?if(IntVal($arOrder["DISCOUNT_VALUE"])>0)
+				<?if(DoubleVal($arOrder["DISCOUNT_VALUE"]) > 0)
 				{
 					?>
 					<<?=GetMessage("SALE_EXPORT_DISCOUNTS")?>>
@@ -706,12 +354,51 @@ class CAllSaleExport
 					</<?=GetMessage("SALE_EXPORT_DISCOUNTS")?>>
 					<?
 				}
+
+				$storeBasket = "";
+				if(IntVal($arOrder["STORE_ID"]) > 0 && !empty($arStore[$arOrder["STORE_ID"]]))
+				{
+					?>
+					<<?=GetMessage("SALE_EXPORT_STORIES")?>>
+						<<?=GetMessage("SALE_EXPORT_STORY")?>>
+							<<?=GetMessage("SALE_EXPORT_ID")?>><?=$arStore[$arOrder["STORE_ID"]]["XML_ID"]?></<?=GetMessage("SALE_EXPORT_ID")?>>
+							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($arStore[$arOrder["STORE_ID"]]["TITLE"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+							<<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+								<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($arStore[$arOrder["STORE_ID"]]["ADDRESS"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
+								<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+									<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STREET")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+									<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arStore[$arOrder["STORE_ID"]]["ADDRESS"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+								</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+							<<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
+								<<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+									<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=($bNewVersion ? GetMessage("SALE_EXPORT_WORK_PHONE_NEW") : GetMessage("SALE_EXPORT_WORK_PHONE"))?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+									<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arStore[$arOrder["STORE_ID"]]["PHONE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+								</<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+							</<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
+						</<?=GetMessage("SALE_EXPORT_STORY")?>>
+					</<?=GetMessage("SALE_EXPORT_STORIES")?>>
+					<?
+					/*
+					$storeBasket = "				
+						<".GetMessage("SALE_EXPORT_STORIES").">
+							<".GetMessage("SALE_EXPORT_STORY").">
+								<".GetMessage("SALE_EXPORT_ID").">".$arStore[$arOrder["STORE_ID"]]["XML_ID"]."</".GetMessage("SALE_EXPORT_ID").">
+								<".GetMessage("SALE_EXPORT_ITEM_NAME").">".htmlspecialcharsbx($arStore[$arOrder["STORE_ID"]]["TITLE"])."</".GetMessage("SALE_EXPORT_ITEM_NAME").">
+							</".GetMessage("SALE_EXPORT_STORY").">
+						</".GetMessage("SALE_EXPORT_STORIES").">
+						";
+					*/
+				}
 				?>
 				<<?=GetMessage("SALE_EXPORT_ITEMS")?>>
 				<?
 				$dbBasket = CSaleBasket::GetList(
 						array("NAME" => "ASC"),
-						array("ORDER_ID" => $arOrder["ID"])
+						array("ORDER_ID" => $arOrder["ID"]),
+						false,
+						false,
+						array("ID", "NOTES", "PRODUCT_XML_ID", "CATALOG_XML_ID", "NAME", "PRICE", "QUANTITY", "DISCOUNT_PRICE", "VAT_RATE", "MEASURE_CODE")
 					);
 				$basketSum = 0;
 				$priceType = "";
@@ -727,9 +414,26 @@ class CAllSaleExport
 						<<?=GetMessage("SALE_EXPORT_ID")?>><?=htmlspecialcharsbx($arBasket["PRODUCT_XML_ID"])?></<?=GetMessage("SALE_EXPORT_ID")?>>
 						<<?=GetMessage("SALE_EXPORT_CATALOG_ID")?>><?=htmlspecialcharsbx($arBasket["CATALOG_XML_ID"])?></<?=GetMessage("SALE_EXPORT_CATALOG_ID")?>>
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($arBasket["NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-						<<?=GetMessage("SALE_EXPORT_BASE_UNIT")?> <?=GetMessage("SALE_EXPORT_CODE")?>="796" <?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>="<?=GetMessage("SALE_EXPORT_SHTUKA")?>" <?=GetMessage("SALE_EXPORT_INTERNATIONAL_ABR")?>="<?=GetMessage("SALE_EXPORT_RCE")?>"><?=GetMessage("SALE_EXPORT_SHT")?></<?=GetMessage("SALE_EXPORT_BASE_UNIT")?>>
 						<?
-						if(IntVal($arBasket["DISCOUNT_PRICE"])>0)
+						if($bNewVersion)
+						{
+							if(IntVal($arBasket["MEASURE_CODE"]) <= 0)
+								$arBasket["MEASURE_CODE"] = 796;
+							?>
+							<<?=GetMessage("SALE_EXPORT_UNIT")?>>
+								<<?=GetMessage("SALE_EXPORT_CODE")?>><?=$arBasket["MEASURE_CODE"]?>></<?=GetMessage("SALE_EXPORT_CODE")?>>
+								<<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>><?=htmlspecialcharsbx($arMeasures[$arBasket["MEASURE_CODE"]])?></<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>>
+							</<?=GetMessage("SALE_EXPORT_UNIT")?>>
+							<<?=GetMessage("SALE_EXPORT_KOEF")?>>1</<?=GetMessage("SALE_EXPORT_KOEF")?>>
+							<?
+						}
+						else
+						{
+							?>
+							<<?=GetMessage("SALE_EXPORT_BASE_UNIT")?> <?=GetMessage("SALE_EXPORT_CODE")?>="796" <?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>="<?=GetMessage("SALE_EXPORT_SHTUKA")?>" <?=GetMessage("SALE_EXPORT_INTERNATIONAL_ABR")?>="<?=GetMessage("SALE_EXPORT_RCE")?>"><?=GetMessage("SALE_EXPORT_SHT")?></<?=GetMessage("SALE_EXPORT_BASE_UNIT")?>>
+							<?
+						}
+						if(DoubleVal($arBasket["DISCOUNT_PRICE"]) > 0)
 						{
 							?>
 							<<?=GetMessage("SALE_EXPORT_DISCOUNTS")?>>
@@ -755,7 +459,7 @@ class CAllSaleExport
 								<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=GetMessage("SALE_EXPORT_ITEM")?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 							</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<?
-							$dbProp = CSaleBasket::GetPropsList(Array("SORT" => "ASC", "ID" => "ASC"), Array("BASKET_ID" => $arBasket["ID"], "!CODE" => array("CATALOG.XML_ID", "PRODUCT.XML_ID")));
+							$dbProp = CSaleBasket::GetPropsList(Array("SORT" => "ASC", "ID" => "ASC"), Array("BASKET_ID" => $arBasket["ID"], "!CODE" => array("CATALOG.XML_ID", "PRODUCT.XML_ID")), false, false, array("NAME", "VALUE", "CODE"));
 							while($arProp = $dbProp->Fetch())
 							{
 								?>
@@ -790,6 +494,7 @@ class CAllSaleExport
 							<?
 						}
 						?>
+						<?=$storeBasket?>
 					</<?=GetMessage("SALE_EXPORT_ITEM")?>>
 					<?
 					$basketSum += $arBasket["PRICE"]*$arBasket["QUANTITY"];
@@ -801,7 +506,24 @@ class CAllSaleExport
 					<<?=GetMessage("SALE_EXPORT_ITEM")?>>
 						<<?=GetMessage("SALE_EXPORT_ID")?>>ORDER_DELIVERY</<?=GetMessage("SALE_EXPORT_ID")?>>
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_ORDER_DELIVERY")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-						<<?=GetMessage("SALE_EXPORT_BASE_UNIT")?> <?=GetMessage("SALE_EXPORT_CODE")?>="796" <?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT");?>="<?=GetMessage("SALE_EXPORT_SHTUKA")?>" <?=GetMessage("SALE_EXPORT_INTERNATIONAL_ABR")?>="<?=GetMessage("SALE_EXPORT_RCE")?>"><?=GetMessage("SALE_EXPORT_SHT")?></<?=GetMessage("SALE_EXPORT_BASE_UNIT")?>>
+						<?
+						if($bNewVersion)
+						{
+							?>
+							<<?=GetMessage("SALE_EXPORT_UNIT")?>>
+							<<?=GetMessage("SALE_EXPORT_CODE")?>>796</<?=GetMessage("SALE_EXPORT_CODE")?>>
+							<<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>><?=htmlspecialcharsbx($arMeasures[796])?></<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>>
+							</<?=GetMessage("SALE_EXPORT_UNIT")?>>
+							<<?=GetMessage("SALE_EXPORT_KOEF")?>>1</<?=GetMessage("SALE_EXPORT_KOEF")?>>
+						<?
+						}
+						else
+						{
+							?>
+							<<?=GetMessage("SALE_EXPORT_BASE_UNIT")?> <?=GetMessage("SALE_EXPORT_CODE")?>="796" <?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>="<?=GetMessage("SALE_EXPORT_SHTUKA")?>" <?=GetMessage("SALE_EXPORT_INTERNATIONAL_ABR")?>="<?=GetMessage("SALE_EXPORT_RCE")?>"><?=GetMessage("SALE_EXPORT_SHT")?></<?=GetMessage("SALE_EXPORT_BASE_UNIT")?>>
+						<?
+						}
+						?>
 						<<?=GetMessage("SALE_EXPORT_PRICE_PER_ITEM")?>><?=$arOrder["PRICE_DELIVERY"]?></<?=GetMessage("SALE_EXPORT_PRICE_PER_ITEM")?>>
 						<<?=GetMessage("SALE_EXPORT_QUANTITY")?>>1</<?=GetMessage("SALE_EXPORT_QUANTITY")?>>
 						<<?=GetMessage("SALE_EXPORT_AMOUNT")?>><?=$arOrder["PRICE_DELIVERY"]?></<?=GetMessage("SALE_EXPORT_AMOUNT")?>>
@@ -858,7 +580,7 @@ class CAllSaleExport
 						?>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_NUMBER")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=$arOrder["PAY_VOUCHER_NUM"]?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arOrder["PAY_VOUCHER_NUM"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
@@ -868,6 +590,10 @@ class CAllSaleExport
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_SYSTEM")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
 							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($paySystems[$arOrder["PAY_SYSTEM_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
+						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
+						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_SYSTEM_ID")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arOrder["PAY_SYSTEM_ID"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
@@ -910,7 +636,10 @@ class CAllSaleExport
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_ORDER_STATUS")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
 						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?$arStatus = CSaleStatus::GetLangByID($arOrder["STATUS_ID"]); echo htmlspecialcharsbx("[".$arOrder["STATUS_ID"]."] ".$arStatus["NAME"]);?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 					</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
-
+					<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
+					<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_ORDER_STATUS_ID")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+					<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arOrder["STATUS_ID"]);?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+					</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 					<?if(strlen($arOrder["DATE_CANCELED"])>0)
 					{
 						?>
@@ -965,6 +694,17 @@ class CAllSaleExport
 							}
 						}
 					}
+
+					if(strlen($deliveryAdr) > 0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
+						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_DELIVERY_ADDRESS")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($deliveryAdr)?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
+
+						<?
+					}
 					?>
 				</<?=GetMessage("SALE_EXPORT_PROPERTIES_VALUES")?>>
 			</<?=GetMessage("SALE_EXPORT_DOCUMENT")?>>
@@ -975,11 +715,496 @@ class CAllSaleExport
 				$c = CharsetConverter::ConvertCharset($c, $arCharSets[$arOrder["LID"]], "utf-8");
 				echo $c;
 			}
+
+			$_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"] = $arOrder["ID"];
+			if(time() > $end_time)
+			{
+				break;
+			}
 		}
 		?>
 		</<?=GetMessage("SALE_EXPORT_COM_INFORMATION")?>>
 		<?
 		return $arResultStat;
 	}
+
+	public static function UnZip($file_name, $last_zip_entry = "", $interval = 0)
+	{
+		global $APPLICATION;
+		$start_time = time();
+
+		$io = CBXVirtualIo::GetInstance();
+
+		//Function and securioty checks
+		if(!function_exists("zip_open"))
+			return false;
+		$dir_name = substr($file_name, 0, strrpos($file_name, "/")+1);
+		if(strlen($dir_name) <= strlen($_SERVER["DOCUMENT_ROOT"]))
+			return false;
+
+		$hZip = zip_open($file_name);
+		if(!$hZip)
+			return false;
+		//Skip from last step
+		if($last_zip_entry)
+		{
+			while($entry = zip_read($hZip))
+				if(zip_entry_name($entry) == $last_zip_entry)
+					break;
+		}
+
+		$io = CBXVirtualIo::GetInstance();
+		//Continue unzip
+		while($entry = zip_read($hZip))
+		{
+			$entry_name = zip_entry_name($entry);
+			//Check for directory
+			zip_entry_open($hZip, $entry);
+			if(zip_entry_filesize($entry))
+			{
+
+				$file_name = trim(str_replace("\\", "/", trim($entry_name)), "/");
+				$file_name = $APPLICATION->ConvertCharset($file_name, "cp866", LANG_CHARSET);
+
+				$bBadFile = HasScriptExtension($file_name)
+					|| IsFileUnsafe($file_name)
+					|| !$io->ValidatePathString("/".$file_name)
+				;
+
+				if(!$bBadFile)
+				{
+					$file_name =  $io->GetPhysicalName($dir_name.rel2abs("/", $file_name));
+					CheckDirPath($file_name);
+					$fout = fopen($file_name, "wb");
+					if(!$fout)
+						return false;
+					while($data = zip_entry_read($entry, 102400))
+					{
+						$data_len = function_exists('mb_strlen') ? mb_strlen($data, 'latin1') : strlen($data);
+						$result = fwrite($fout, $data);
+						if($result !== $data_len)
+							return false;
+					}
+				}
+			}
+			zip_entry_close($entry);
+
+			//Jump to next step
+			if($interval > 0 && (time()-$start_time) > ($interval))
+			{
+				zip_close($hZip);
+				return $entry_name;
+			}
+		}
+		zip_close($hZip);
+		return true;
+	}
+
+	public static function ExportContragents($arOrder = array(), $arProp = array(), $agent = array(), &$arResultStat, $bNewVersion = false)
+	{
+		?>
+		<<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
+			<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
+				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>>
+				<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["AGENT_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+				<?
+				$deliveryAdr = $agent["ADDRESS_FULL"];
+				$address = "<".GetMessage("SALE_EXPORT_PRESENTATION").">".htmlspecialcharsbx($agent["ADDRESS_FULL"])."</".GetMessage("SALE_EXPORT_PRESENTATION").">";
+				if(strlen($agent["INDEX"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_POST_CODE")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["INDEX"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["COUNTRY"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+									<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_COUNTRY")."</".GetMessage("SALE_EXPORT_TYPE").">
+									<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["COUNTRY"])."</".GetMessage("SALE_EXPORT_VALUE").">
+								</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["REGION"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_REGION")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["REGION"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["STATE"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_STATE")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["STATE"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["TOWN"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_SMALL_CITY")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["TOWN"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["CITY"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_CITY")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["CITY"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["STREET"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_STREET")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["STREET"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["HOUSE"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_HOUSE")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["HOUSE"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["BUILDING"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_BUILDING")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["BUILDING"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+				if(strlen($agent["FLAT"])>0)
+				{
+					$address .= "<".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">
+								<".GetMessage("SALE_EXPORT_TYPE").">".GetMessage("SALE_EXPORT_FLAT")."</".GetMessage("SALE_EXPORT_TYPE").">
+								<".GetMessage("SALE_EXPORT_VALUE").">".htmlspecialcharsbx($agent["FLAT"])."</".GetMessage("SALE_EXPORT_VALUE").">
+							</".GetMessage("SALE_EXPORT_ADDRESS_FIELD").">";
+				}
+
+				if($agent["IS_FIZ"]=="Y")
+				{
+					$arResultStat["CONTACTS"]++;
+					?>
+					<<?=GetMessage("SALE_EXPORT_FULL_NAME")?>><?=htmlspecialcharsbx($agent["FULL_NAME"])?></<?=GetMessage("SALE_EXPORT_FULL_NAME")?>>
+					<?
+					if(strlen($agent["SURNAME"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_SURNAME")?>><?=htmlspecialcharsbx($agent["SURNAME"])?></<?=GetMessage("SALE_EXPORT_SURNAME")?>><?
+					}
+					if(strlen($agent["NAME"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_NAME")?>><?=htmlspecialcharsbx($agent["NAME"])?></<?=GetMessage("SALE_EXPORT_NAME")?>><?
+					}
+					if(strlen($agent["SECOND_NAME"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_MIDDLE_NAME")?>><?=htmlspecialcharsbx($agent["SECOND_NAME"])?></<?=GetMessage("SALE_EXPORT_MIDDLE_NAME")?>><?
+					}
+					if(strlen($agent["BIRTHDAY"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_BIRTHDAY")?>><?=htmlspecialcharsbx($agent["BIRTHDAY"])?></<?=GetMessage("SALE_EXPORT_BIRTHDAY")?>><?
+					}
+					if(strlen($agent["MALE"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_SEX")?>><?=htmlspecialcharsbx($agent["MALE"])?></<?=GetMessage("SALE_EXPORT_SEX")?>><?
+					}
+					if(strlen($agent["INN"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_INN")?>><?=htmlspecialcharsbx($agent["INN"])?></<?=GetMessage("SALE_EXPORT_INN")?>><?
+					}
+					if(strlen($agent["KPP"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_KPP")?>><?=htmlspecialcharsbx($agent["KPP"])?></<?=GetMessage("SALE_EXPORT_KPP")?>><?
+					}
+					?>
+					<<?=GetMessage("SALE_EXPORT_REGISTRATION_ADDRESS")?>>
+					<?=$address?>
+					</<?=GetMessage("SALE_EXPORT_REGISTRATION_ADDRESS")?>>
+				<?
+				}
+				else
+				{
+					$arResultStat["COMPANIES"]++;
+					?>
+					<<?=GetMessage("SALE_EXPORT_OFICIAL_NAME")?>><?=htmlspecialcharsbx($agent["FULL_NAME"])?></<?=GetMessage("SALE_EXPORT_OFICIAL_NAME")?>>
+					<<?=GetMessage("SALE_EXPORT_UR_ADDRESS")?>>
+					<?=$address?>
+					</<?=GetMessage("SALE_EXPORT_UR_ADDRESS")?>>
+					<?
+					if(strlen($agent["INN"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_INN")?>><?=htmlspecialcharsbx($agent["INN"])?></<?=GetMessage("SALE_EXPORT_INN")?>><?
+					}
+					if(strlen($agent["KPP"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_KPP")?>><?=htmlspecialcharsbx($agent["KPP"])?></<?=GetMessage("SALE_EXPORT_KPP")?>><?
+					}
+					if(strlen($agent["EGRPO"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_EGRPO")?>><?=htmlspecialcharsbx($agent["EGRPO"])?></<?=GetMessage("SALE_EXPORT_EGRPO")?>><?
+					}
+					if(strlen($agent["OKVED"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_OKVED")?>><?=htmlspecialcharsbx($agent["OKVED"])?></<?=GetMessage("SALE_EXPORT_OKVED")?>><?
+					}
+					if(strlen($agent["OKDP"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_OKDP")?>><?=htmlspecialcharsbx($agent["OKDP"])?></<?=GetMessage("SALE_EXPORT_OKDP")?>><?
+					}
+					if(strlen($agent["OKOPF"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_OKOPF")?>><?=htmlspecialcharsbx($agent["OKOPF"])?></<?=GetMessage("SALE_EXPORT_OKOPF")?>><?
+					}
+					if(strlen($agent["OKFC"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_OKFC")?>><?=htmlspecialcharsbx($agent["OKFC"])?></<?=GetMessage("SALE_EXPORT_OKFC")?>><?
+					}
+					if(strlen($agent["OKPO"])>0)
+					{
+						?><<?=GetMessage("SALE_EXPORT_OKPO")?>><?=htmlspecialcharsbx($agent["OKPO"])?></<?=GetMessage("SALE_EXPORT_OKPO")?>><?
+					}
+					if(strlen($agent["ACCOUNT_NUMBER"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNTS")?>>
+						<<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNT")?>>
+						<<?=GetMessage("SALE_EXPORT_ACCOUNT_NUMBER")?>><?=htmlspecialcharsbx($agent["ACCOUNT_NUMBER"])?></<?=GetMessage("SALE_EXPORT_ACCOUNT_NUMBER")?>>
+						<<?=GetMessage("SALE_EXPORT_BANK")?>>
+						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["B_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+						<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($agent["B_ADDRESS_FULL"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
+						<?
+						if(strlen($agent["B_INDEX"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_POST_CODE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_INDEX"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_COUNTRY"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_COUNTRY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_COUNTRY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_REGION"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_REGION")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_REGION"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_STATE"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STATE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_STATE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_TOWN"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_SMALL_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_TOWN"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_CITY"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_CITY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_STREET"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STREET")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_STREET"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_HOUSE"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_HOUSE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_HOUSE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_BUILDING"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_BUILDING")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_BUILDING"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						if(strlen($agent["B_FLAT"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+							<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_FLAT")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["B_FLAT"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>><?
+						}
+						?>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+						<?
+						if(strlen($agent["B_BIK"])>0)
+						{
+							?><<?=GetMessage("SALE_EXPORT_BIC")?>><?=htmlspecialcharsbx($agent["B_BIK"])?></<?=GetMessage("SALE_EXPORT_BIC")?>><?
+						}
+						?>
+						</<?=GetMessage("SALE_EXPORT_BANK")?>>
+						</<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNT")?>>
+						</<?=GetMessage("SALE_EXPORT_MONEY_ACCOUNTS")?>>
+					<?
+					}
+				}
+				if(strlen($agent["F_ADDRESS_FULL"])>0)
+				{
+					$deliveryAdr = $agent["F_ADDRESS_FULL"];
+					?>
+					<<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+					<<?=GetMessage("SALE_EXPORT_PRESENTATION")?>><?=htmlspecialcharsbx($agent["F_ADDRESS_FULL"])?></<?=GetMessage("SALE_EXPORT_PRESENTATION")?>>
+					<?
+					if(strlen($agent["F_INDEX"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_POST_CODE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_INDEX"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_COUNTRY"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_COUNTRY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_COUNTRY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_REGION"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_REGION")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_REGION"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_STATE"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STATE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_STATE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_TOWN"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_SMALL_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_TOWN"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_CITY"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_CITY")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_CITY"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_STREET"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_STREET")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_STREET"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_HOUSE"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_HOUSE")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_HOUSE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_BUILDING"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_BUILDING")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_BUILDING"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					if(strlen($agent["F_FLAT"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=GetMessage("SALE_EXPORT_FLAT")?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["F_FLAT"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_ADDRESS_FIELD")?>>
+					<?
+					}
+					?>
+					</<?=GetMessage("SALE_EXPORT_ADDRESS")?>>
+				<?
+				}
+				if(strlen($agent["PHONE"])>0 || strlen($agent["EMAIL"])>0)
+				{
+					?>
+					<<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
+					<?
+					if(strlen($agent["PHONE"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=($bNewVersion ? GetMessage("SALE_EXPORT_WORK_PHONE_NEW") : GetMessage("SALE_EXPORT_WORK_PHONE"))?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["PHONE"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+					<?
+					}
+					if(strlen($agent["EMAIL"])>0)
+					{
+						?>
+						<<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+						<<?=GetMessage("SALE_EXPORT_TYPE")?>><?=($bNewVersion ? GetMessage("SALE_EXPORT_MAIL_NEW") : GetMessage("SALE_EXPORT_MAIL"))?></<?=GetMessage("SALE_EXPORT_TYPE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($agent["EMAIL"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						</<?=GetMessage("SALE_EXPORT_CONTACT")?>>
+					<?
+					}
+					?>
+					</<?=GetMessage("SALE_EXPORT_CONTACTS")?>>
+				<?
+				}
+				if(strlen($agent["CONTACT_PERSON"])>0)
+				{
+					?>
+					<<?=GetMessage("SALE_EXPORT_REPRESENTATIVES")?>>
+					<<?=GetMessage("SALE_EXPORT_REPRESENTATIVE")?>>
+					<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
+					<<?=GetMessage("SALE_EXPORT_RELATION")?>><?=GetMessage("SALE_EXPORT_CONTACT_PERSON")?></<?=GetMessage("SALE_EXPORT_RELATION")?>>
+					<<?=GetMessage("SALE_EXPORT_ID")?>><?=md5($agent["CONTACT_PERSON"])?></<?=GetMessage("SALE_EXPORT_ID")?>>
+					<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["CONTACT_PERSON"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
+					</<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
+					</<?=GetMessage("SALE_EXPORT_REPRESENTATIVE")?>>
+					</<?=GetMessage("SALE_EXPORT_REPRESENTATIVES")?>>
+				<?
+				}?>
+				<<?=GetMessage("SALE_EXPORT_ROLE")?>><?=GetMessage("SALE_EXPORT_BUYER")?></<?=GetMessage("SALE_EXPORT_ROLE")?>>
+			</<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
+		</<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
+		<?
+		return $deliveryAdr;
+	}
+
 }
 ?>

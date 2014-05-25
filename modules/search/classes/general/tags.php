@@ -1,72 +1,85 @@
 <?
+
+/**
+ * Класс поддержки тегов.</body> </html
+ *
+ *
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchtags/index.php
+ * @author Bitrix
+ */
 class CSearchTags
 {
 	
 	/**
-	 * <p>Получение списка тегов элементов поискового индекса.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $arSelect = array() Массив, содержащий поля для выборки. <br><br> Название поля может
-	 * принимать значение: <ul> <li> <b>NAME</b> - тег;</li> <li> <b>CNT</b> - частота тега,
-	 * количество элементов поискового индекса содержащих этот тег;</li>
-	 * <li> <b>DATE_CHANGE</b> - максимальная дата модификации (в полном формате)
-	 * элементов поискового индекса содержащих этот тег;</li> </ul> Не
-	 * обязательный параметр. По умолчанию равен: <pre class="syntax"> array(<br>
-	 * "NAME",<br> "CNT",<br> )<br></pre>
-	 *
-	 *
-	 *
-	 * @param array $arFilter = array() Массив, содержащий фильтр в виде наборов "название
-	 * поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
-	 * значение: <ul> <li> <b>SITE_ID</b> - массив идентификаторов сайтов;</li> <li>
-	 * <b>TAG</b> - начало тега, будут возвращены все теги начинающиеся с
-	 * этого значения;</li> <li> <b>MODULE_ID</b> - идентификатор модуля;</li> <li>
-	 * <b>PARAM1</b> - первый параметр элемента;</li> <li> <b>PARAM2</b> - второй параметр
-	 * элемента;</li> </ul> Пример: <pre class="syntax"> array(<br> "SITE_ID"=&gt;array("s1"),<br>
-	 * "TAG"=&gt;"We",<br> "MODULE_ID"=&gt;"iblock",<br> )<br></pre>
-	 *
-	 *
-	 *
-	 * @param array $arOrder = array() Массив, содержащий признак сортировки в виде наборов "название
-	 * поля"=&gt;"направление". <br><br> Название поля может принимать
-	 * значение: <ul> <li> <b>NAME</b> - тег;</li> <li> <b>CNT</b> - частота тега, количество
-	 * элементов поискового индекса содержащих этот тег;</li> <li>
-	 * <b>DATE_CHANGE</b> - максимальная дата модификации (в полном формате)
-	 * элементов поискового индекса содержащих этот тег;</li> </ul>
-	 * Направление сортировки может принимать значение: <ul> <li> <b>ASC</b> - по
-	 * возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Не обязательный
-	 * параметр. По умолчанию равен: <pre class="syntax"> array(<br> "NAME"=&gt;"ASC",<br> )<br></pre>
-	 *
-	 *
-	 *
-	 * @param int $limit = 100 Ограничение количества тегов в результатах.
-	 *
-	 *
-	 *
-	 * @return CDBResult <p>Возвращается результат запроса типа <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
-	 * результата методами класса CDBResult становятся доступны поля
-	 * перечисленные в параметре arSelect.</p>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>//подключение модуля поиска<br>if(CModule::IncludeModule('search'))<br>{<br>	$rsTags = CSearchTags::GetList(<br>		array(),<br>		array(<br>			"MODULE_ID" =&gt; "iblock",<br>		),<br>		array(<br>			"CNT" =&gt; "DESC",<br>		),<br>		10<br>	);<br>	while($arTag = $rsTags-&gt;Fetch())<br>		print_r($arTag);<br>}<br>?&gt;<br>
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">Константы модуля
-	 * поиска</a></li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchtags/getlist.php
-	 * @author Bitrix
-	 */
+	* <p>Получение списка тегов элементов поискового индекса.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
+	*
+	*
+	*
+	*
+	* @param array $arSelect = array() Массив, содержащий поля для выборки. <br><br> Название поля может
+	* принимать значение: <ul> <li> <b>NAME</b> - тег;</li> <li> <b>CNT</b> - частота тега,
+	* количество элементов поискового индекса содержащих этот тег;</li>
+	* <li> <b>DATE_CHANGE</b> - максимальная дата модификации (в полном формате)
+	* элементов поискового индекса содержащих этот тег;</li> </ul> Не
+	* обязательный параметр. По умолчанию равен: <pre class="syntax"> array(<br>
+	* "NAME",<br> "CNT",<br> )<br></pre>
+	*
+	*
+	*
+	* @param array $arFilter = array() Массив, содержащий фильтр в виде наборов "название
+	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
+	* значение: <ul> <li> <b>SITE_ID</b> - массив идентификаторов сайтов;</li> <li>
+	* <b>TAG</b> - начало тега, будут возвращены все теги начинающиеся с
+	* этого значения;</li> <li> <b>MODULE_ID</b> - идентификатор модуля;</li> <li>
+	* <b>PARAM1</b> - первый параметр элемента;</li> <li> <b>PARAM2</b> - второй параметр
+	* элемента;</li> </ul> Пример: <pre class="syntax"> array(<br> "SITE_ID"=&gt;array("s1"),<br>
+	* "TAG"=&gt;"We",<br> "MODULE_ID"=&gt;"iblock",<br> )<br></pre>
+	*
+	*
+	*
+	* @param array $arOrder = array() Массив, содержащий признак сортировки в виде наборов "название
+	* поля"=&gt;"направление". <br><br> Название поля может принимать
+	* значение: <ul> <li> <b>NAME</b> - тег;</li> <li> <b>CNT</b> - частота тега, количество
+	* элементов поискового индекса содержащих этот тег;</li> <li>
+	* <b>DATE_CHANGE</b> - максимальная дата модификации (в полном формате)
+	* элементов поискового индекса содержащих этот тег;</li> </ul>
+	* Направление сортировки может принимать значение: <ul> <li> <b>ASC</b> - по
+	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Не обязательный
+	* параметр. По умолчанию равен: <pre class="syntax"> array(<br> "NAME"=&gt;"ASC",<br> )<br></pre>
+	*
+	*
+	*
+	* @param int $limit = 100 Ограничение количества тегов в результатах.
+	*
+	*
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны поля
+	* перечисленные в параметре arSelect.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>//подключение модуля поиска<br>if(CModule::IncludeModule('search'))<br>{<br>	$rsTags = CSearchTags::GetList(<br>		array(),<br>		array(<br>			"MODULE_ID" =&gt; "iblock",<br>		),<br>		array(<br>			"CNT" =&gt; "DESC",<br>		),<br>		10<br>	);<br>	while($arTag = $rsTags-&gt;Fetch())<br>		print_r($arTag);<br>}<br>?&gt;<br>
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">Константы модуля
+	* поиска</a></li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchtags/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arSelect = array(), $arFilter = array(), $arOrder = array(), $limit = 100)
 	{
 		global $USER;

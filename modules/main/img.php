@@ -1,23 +1,22 @@
-<?
-/*
-##############################################
-# Bitrix: SiteManager                        #
-# Copyright (c) 2002 Bitrix                  #
-# http://www.bitrix.ru                       #
-# mailto:admin@bitrix.ru                     #
-##############################################
-*/
+<?php
+/**
+ * Bitrix Framework
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2014 Bitrix
+ */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/save_colors.php");
 
 
 /*******************************************************
-             Converts ISO to UNICODE
+Converts ISO to UNICODE
 ********************************************************/
 
 function iso2uni ($isoline)
 {
-	for ($i=0; $i<strlen($isoline); $i++)
+	$uniline = "";
+	for ($i = 0, $n = strlen($isoline); $i < $n; $i++)
 	{
 		$thischar = substr($isoline,$i,1);
 		$charcode = ord($thischar);
@@ -27,16 +26,23 @@ function iso2uni ($isoline)
 }
 
 /*******************************************************
-              Creates image to draw on
+Creates image to draw on
 ********************************************************/
 
 function CreateImageHandle($width, $height, $background="FFFFFF", $truecolor=true)
 {
 	if($truecolor)
+	{
 		$im = ImageCreateTrueColor($width,$height);
+	}
 	else
+	{
 		$im = ImageCreate($width,$height);
-	if (!$im) die ("Cannot Initialize GD image stream");
+	}
+	if (!$im)
+	{
+		die ("Cannot Initialize GD image stream");
+	}
 	else
 	{
 		$dec = ReColor($background);
@@ -46,7 +52,7 @@ function CreateImageHandle($width, $height, $background="FFFFFF", $truecolor=tru
 }
 
 /******************************************************
-                   Send proper headers for image
+Send proper headers for image
 *******************************************************/
 function ShowImageHeader($ImageHandle)
 {
@@ -65,18 +71,24 @@ function ShowImageHeader($ImageHandle)
 		Header("Content-type: image/jpeg");
 		ImageJpeg($ImageHandle, "", 0.5);
 	}
-	else die("No images support");
+	else
+	{
+		die("No images support");
+	}
 	ImageDestroy ($ImageHandle);
 }
 
 /******************************************************
-              Returns some color
+Returns some color
 *******************************************************/
 
 function GetArrSaveDecColor($arr)
 {
 	$arrSaveDecColor = array();
-	while(list($key,$scolor) = each($arr)) $arrSaveDecColor[$key] = hexdec($scolor);
+	while(list($key, $scolor) = each($arr))
+	{
+		$arrSaveDecColor[$key] = hexdec($scolor);
+	}
 	asort($arrSaveDecColor);
 	return $arrSaveDecColor;
 }
@@ -86,17 +98,24 @@ function GetNextRGB($base_color, $total)
 	global $arrSaveColor;
 
 	$tsc = count($arrSaveColor);
-	if ($total>$tsc) return GetBNextRGB($base_color, $total);
-	elseif (strlen($base_color)<=0) $res = "1288A0";
+	if ($total > $tsc)
+	{
+		return GetBNextRGB($base_color, $total);
+	}
+	elseif (strlen($base_color) <= 0)
+	{
+		$res = "1288A0";
+	}
 	else
 	{
+		$index = 0;
 		$step = round($tsc/$total);
 		$dec = hexdec($base_color);
 		$arrSaveDecColor = GetArrSaveDecColor($arrSaveColor);
 		reset($arrSaveDecColor);
-		while(list($key,$sdcolor) = each($arrSaveDecColor))
+		while(list($key, $sdcolor) = each($arrSaveDecColor))
 		{
-			if ($dec<=$sdcolor)
+			if ($dec <= $sdcolor)
 			{
 				$index = $key;
 				break;
@@ -104,13 +123,14 @@ function GetNextRGB($base_color, $total)
 		}
 		$index = intval($index);
 		$tsc = $tsc-1;
-		if ($index+$step>$tsc)
+		if ($index + $step > $tsc)
 		{
-			$en = $tsc-$index;
-			$rkey = ($index+$step)-$tsc;
-			$res = $arrSaveColor[$st];
+			$rkey = ($index + $step) - $tsc;
 		}
-		else $rkey = $index+$step;
+		else
+		{
+			$rkey = $index + $step;
+		}
 		$res = $arrSaveColor[$rkey];
 	}
 	return $res;
@@ -122,26 +142,37 @@ function GetBNextRGB($base_color, $total, $start_color = "999900", $end_color = 
 	$dec = intval(hexdec($base_color)) + intval($step);
 
 	if ($dec < hexdec($start_color) - $step)
+	{
 		$dec = $start_color;
+	}
 	elseif ($dec > hexdec($end_color) + $step)
+	{
 		$dec = $end_color;
+	}
 	elseif ($dec > hexdec("FFFFFF"))
+	{
 		$dec = "000000";
+	}
 	else
+	{
 		$dec = sprintf("%06X", $dec);
+	}
 
 	return $dec;
 }
 
 /*******************************************************
-                Graph data debug
+Graph data debug
 *******************************************************/
 
 function EchoGraphData($arrayX, $MinX, $MaxX, $arrayY, $MinY, $MaxY, $arrX, $arrY, $die=true)
 {
 	echo "<pre>";
 	echo "--------------------------------------\n";
-	while (list($key, $value) = each($arrX)) echo date("d.m.Y",$value)." = ".$arrY[$key]."\n";
+	while (list($key, $value) = each($arrX))
+	{
+		echo date("d.m.Y",$value)." = ".$arrY[$key]."\n";
+	}
 	echo "--------------------------------------\n";
 	echo "Signs of X axis (arrayX):\n";
 	print_r($arrayX);
@@ -162,11 +193,14 @@ function EchoGraphData($arrayX, $MinX, $MaxX, $arrayY, $MinY, $MaxY, $arrX, $arr
 	print_r($arrY);
 	echo "--------------------------------------\n";
 	echo "</pre>";
-	if ($die) die();
+	if ($die)
+	{
+		die();
+	}
 }
 
 /*******************************************************
-                  Makes proper X axis (date)
+Makes proper X axis (date)
 *******************************************************/
 function GetArrayX($arrX, &$MinX, &$MaxX, $max_grid=15, $min_grid=10)
 {
@@ -175,31 +209,51 @@ function GetArrayX($arrX, &$MinX, &$MaxX, $max_grid=15, $min_grid=10)
 	$MinX = (count($arrX)>0) ? min($arrX) : 0;
 	$MaxX = (count($arrX)>0) ? max($arrX) : 0;
 	$period_days = (($MaxX-$MinX)/86400)+1;
-	if ($period_days>$min_grid) $h = $min_grid;
-	if ($max_grid<$h) $max_grid = $h;
+	if ($period_days>$min_grid)
+	{
+		$h = $min_grid;
+	}
+	if ($max_grid<$h)
+	{
+		$max_grid = $h;
+	}
+	$arrOst = array();
 	for ($i=$max_grid; $i>=$h; $i--)
 	{
 		$ost = $period_days%$i;
 		$arrOst[$i] = $ost;
-		if ($ost==0) break;
+		if ($ost == 0)
+		{
+			break;
+		}
 	}
 	$minOst = min($arrOst);
-	$shiftX = ($period_days/array_search($minOst,$arrOst));
+	$shiftX = ($period_days/array_search($minOst, $arrOst));
 	$shiftX = $shiftX*86400;
 	$unix_date = $MinX;
 	if(preg_match("/(DD|MM)(.*?)(DD|MM)/",FORMAT_DATE,$arMatch))
-		$strFrmt = str_replace(array("DD","MM"),array("d","m"),$arMatch[0]);
+	{
+		$strFrmt = str_replace(array("DD","MM"), array("d","m"), $arMatch[0]);
+	}
 	else
+	{
 		$strFrmt = "d.m";
+	}
+	$prev_date = "";
+	$tmp_arrX = array();
+	$arrayX = array();
 	while ($unix_date < $MaxX+$shiftX)
 	{
 		// если имеем ситуацию с переходом на зимнее время (день увеличивается на 1 час)
-		if ($prev_date==date("d.m.Y",$unix_date)) $unix_date += 3600;
+		if ($prev_date == date("d.m.Y", $unix_date))
+		{
+			$unix_date += 3600;
+		}
 		$date = date($strFrmt, $unix_date);
 		$arrayX[] = $date;
 		$tmp_arrX[] = $unix_date;
 		$unix_date += $shiftX;
-		$prev_date = date("d.m.Y",$unix_date);
+		$prev_date = date("d.m.Y", $unix_date);
 	}
 
 	$MinX = MkDateTime(date("d.m.Y", min($tmp_arrX)),"d.m.Y");
@@ -210,19 +264,25 @@ function GetArrayX($arrX, &$MinX, &$MaxX, $max_grid=15, $min_grid=10)
 
 
 /******************************************************
-            Формируем ось Y (целые числа)
+Формируем ось Y (целые числа)
 *******************************************************/
 function GetArrayY($arrY, &$MinY, &$MaxY, $max_grid=15, $first_null="Y", $integers=false)
 {
 	$arrayY = array();
 	$arrY = array_unique($arrY);
-	if ($first_null=="Y") $arrY[] = 0;
+	if ($first_null=="Y")
+	{
+		$arrY[] = 0;
+	}
 	asort($arrY);
 	$MinY = min($arrY);
 	$MaxY = max($arrY);
 	if ($MinY==$MaxY)
 	{
-		if ($MinY!=0) $arrayY[] = 0;
+		if ($MinY!=0)
+		{
+			$arrayY[] = 0;
+		}
 		$arrayY[] = $MinY;
 		$arrayY[] = $MaxY+1;
 		asort($arrayY);
@@ -233,9 +293,13 @@ function GetArrayY($arrY, &$MinY, &$MaxY, $max_grid=15, $first_null="Y", $intege
 		if($shiftY<=0)
 		{
 			if($integers==false)
+			{
 				$shiftY = round(($MaxY-$MinY)/$max_grid,3);
+			}
 			else
+			{
 				$shiftY = 1;
+			}
 		}
 		$i = $MinY;
 		if ($shiftY>0)
@@ -248,7 +312,10 @@ function GetArrayY($arrY, &$MinY, &$MaxY, $max_grid=15, $first_null="Y", $intege
 		}
 		else
 		{
-			for ($i=$MinY; $i<=$MaxY+$shiftY+$shiftY; $i++) $arrayY[] = $i;
+			for ($i=$MinY; $i<=$MaxY+$shiftY+$shiftY; $i++)
+			{
+				$arrayY[] = $i;
+			}
 		}
 	}
 	$MinY = min($arrayY);
@@ -279,23 +346,23 @@ function ReColor($colorString)
 * $k - array performance font size to pixel format
 * array index == font size
 ******************************************************************************/
-	$k=Array();
-	$k[1]=5;
-	$k[2]=2.7;
-	$k[3]=2.3;
-	$k[4]=2;
-	$k[5]=1.7;
-	$k[6]=1.5;
-	$k[7]=1.3;
-	$k[8]=1.1;
-	$k[9]=1;
-	$k[10]=0.85;
-	$k[11]=0.75;
-	$k[12]=0.7;
-	$k[13]=0.65;
-	$k[14]=0.60;
-	$k[15]=0.55;
-	$k[16]=0.52;
+$k = array();
+$k[1]=5;
+$k[2]=2.7;
+$k[3]=2.3;
+$k[4]=2;
+$k[5]=1.7;
+$k[6]=1.5;
+$k[7]=1.3;
+$k[8]=1.1;
+$k[9]=1;
+$k[10]=0.85;
+$k[11]=0.75;
+$k[12]=0.7;
+$k[13]=0.65;
+$k[14]=0.60;
+$k[15]=0.55;
+$k[16]=0.52;
 
 /******************************************************************************
 	Рисует координатную сетку для графика
@@ -316,15 +383,15 @@ function DrawCoordinatGrid($arrayX, $arrayY, $width, $height, $ImageHandle, $bgC
 {
 	global $k, $xA, $yA, $xPixelLength, $yPixelLength, $APPLICATION;
 
-	if (sizeof($arrayX)<=1 || sizeof($arrayY)<=1)
-		return false;
-
 	$arResult = array();
 
 	$max_len=0;
 
 	$bUseTTFY = is_array($arrTTF_FONT["Y"]) && function_exists("ImageTTFText");
 	$bUseTTFX = is_array($arrTTF_FONT["X"]) && function_exists("ImageTTFText");
+
+	$ttf_font_y = "";
+	$ttf_size_y = $ttf_shift_y = $ttf_base_y = 0;
 
 	if ($bUseTTFY)
 	{
@@ -360,7 +427,9 @@ function DrawCoordinatGrid($arrayX, $arrayY, $width, $height, $ImageHandle, $bgC
 
 	$bForBarDiagram = is_array($arrTTF_FONT) && ($arrTTF_FONT["type"] == "bar");
 	if($bForBarDiagram)
+	{
 		$arResult["XBUCKETS"] = array();
+	}
 
 /*
 
@@ -375,6 +444,9 @@ function DrawCoordinatGrid($arrayX, $arrayY, $width, $height, $ImageHandle, $bgC
 	A                 B
 */
 
+	$ttf_font_x = "";
+	$ttf_size_x = $ttf_shift_x = $ttf_base_x = 0;
+
 	// координаты точки A
 	$xA = $dD+$dlataX;
 	if ($bUseTTFX)
@@ -382,11 +454,16 @@ function DrawCoordinatGrid($arrayX, $arrayY, $width, $height, $ImageHandle, $bgC
 		$ttf_font_x = $_SERVER["DOCUMENT_ROOT"].$arrTTF_FONT["X"]["FONT_PATH"];
 		$ttf_size_x = $arrTTF_FONT["X"]["FONT_SIZE"];
 		$ttf_shift_x = $arrTTF_FONT["X"]["FONT_SHIFT"];
-		$ttf_base_x = 0;
-		if (isset($arrTTF_FONT["X"]["FONT_BASE"])) $ttf_base_x = $arrTTF_FONT["X"]["FONT_BASE"];
+		if (isset($arrTTF_FONT["X"]["FONT_BASE"]))
+		{
+			$ttf_base_x = $arrTTF_FONT["X"]["FONT_BASE"];
+		}
 		$yA = $height-$dD-$ttf_shift_x;
 	}
-	else  $yA = $height-$dD-ImageFontHeight($FontWidth)/2;
+	else
+	{
+		$yA = $height-$dD-ImageFontHeight($FontWidth)/2;
+	}
 
 	// координаты точки C
 	$xC = $xA;
@@ -399,8 +476,8 @@ function DrawCoordinatGrid($arrayX, $arrayY, $width, $height, $ImageHandle, $bgC
 	$GrafWidth = $xB - $xA;		// ширина координатной сетки
 	$GrafHeight = $yA - $yC;	// высота координатной сетки
 
-	$PointsX = sizeof($arrayX)+$bForBarDiagram;	// количество делений по оси X
-	$PointsY = sizeof($arrayY);	// количество делений по оси Y
+	$PointsX = max(sizeof($arrayX)+$bForBarDiagram, 2);	// количество делений по оси X
+	$PointsY = max(sizeof($arrayY), 2);	// количество делений по оси Y
 
 	$dX = $GrafWidth/($PointsX-1);	// шаг сетки по X
 	$dY = $GrafHeight/($PointsY-1);	// шаг сетки по Y
@@ -580,9 +657,12 @@ function Bar_Diagram($ImageHandle, $arData, $MinY, $MaxY, $gridInfo)
 ******************************************************************************/
 function Graf($arrayX, $arrayY, $ImageHandle, $MinX, $MaxX, $MinY, $MaxY, $Color='FF0000', $dashed="N", $thikness=2, $antialiase=true)
 {
-	global $k, $xA, $yA, $xPixelLength, $yPixelLength;
+	global $xA, $yA, $xPixelLength, $yPixelLength;
 
-	if(sizeof($arrayX)!=sizeof($arrayY)) return;
+	if(sizeof($arrayX) != sizeof($arrayY))
+	{
+		return;
+	}
 
 	$arr_Color = ReColor($Color);
 	$color = ImageColorAllocate($ImageHandle, $arr_Color[0], $arr_Color[1], $arr_Color[2]);
@@ -592,19 +672,23 @@ function Graf($arrayX, $arrayY, $ImageHandle, $MinX, $MaxX, $MinY, $MaxY, $Color
 
 	if($antialiase)
 	{
-		$bgcolor=imagecolorallocate($ImageHandle, 255, 255, 255);
-		$fgcolors = imagecolorsforindex($ImageHandle,$color);
-		$bgcolors = imagecolorsforindex($ImageHandle,$bgcolor);
+		$bgcolor = imagecolorallocate($ImageHandle, 255, 255, 255);
+		$fgcolors = imagecolorsforindex($ImageHandle, $color);
+		$bgcolors = imagecolorsforindex($ImageHandle, $bgcolor);
 		for( $i = 0; $i < 100; $i++ )
+		{
 			imagecolorallocate(
 				$ImageHandle,
 				($fgcolors['red'] + $i*$bgcolors['red'])/($i + 1),
 				($fgcolors['green'] + $i*$bgcolors['green'])/($i + 1),
 				($fgcolors['blue'] + $i*$bgcolors['blue'])/($i + 1)
 			);
+		}
 	}
 
-	for($i=0; $i<sizeof($arrayX)-1; $i++)
+	$x1 = $y1 = $x2 = $y2 = 0;
+
+	for($i = 0, $n = sizeof($arrayX)-1; $i < $n; $i++)
 	{
 		if ($xGrafLength>0)
 		{
@@ -625,6 +709,7 @@ function Graf($arrayX, $arrayY, $ImageHandle, $MinX, $MaxX, $MinY, $MaxY, $Color
 
 		if($antialiase)
 		{
+			/** @noinspection PhpUndefinedVariableInspection */
 			_a_draw_line($ImageHandle, $x1, $y1, $x2, $y2, $fgcolors, $dashed, 10, 4);
 			if($thikness>1)
 			{
@@ -647,13 +732,14 @@ function Graf($arrayX, $arrayY, $ImageHandle, $MinX, $MaxX, $MinY, $MaxY, $Color
 				IMG_COLOR_TRANSPARENT,
 				IMG_COLOR_TRANSPARENT,
 				IMG_COLOR_TRANSPARENT
-				);
+			);
 			ImageSetStyle($ImageHandle, $style);
 			ImageLine($ImageHandle, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 		}
 		else
+		{
 			ImageLine($ImageHandle, $x1, $y1, $x2, $y2, $color);
-
+		}
 	}
 }
 
@@ -689,12 +775,12 @@ function Draw_Sector($ImageHandle, $start, $end, $color, $diameter, $centerX, $c
 
 	// найдем координаты точки заливки
 	$diff = intval($end - $start); // угол сектора
-	if ($diff<180)
+	if ($diff < 180)
 	{
 		$x = ($centerX+(($startX + $endX)/2))/2;
 		$y = ($centerY+(($startY + $endY)/2))/2;
 	}
-	elseif ($diff>=180)
+	else
 	{
 		$m_end = $start + $diff/2;
 		$m_X = $centerX + cos(deg2rad($m_end)) * $radius;
@@ -740,7 +826,10 @@ function Circular_Diagram($ImageHandle, $arr, $background_color, $diameter, $cen
 	if(count($arr)>0)
 	{
 		$sum = 0;
-		foreach($arr as $sector) $sum += $sector["COUNTER"];
+		foreach($arr as $sector)
+		{
+			$sum += $sector["COUNTER"];
+		}
 		$degree1=0;
 		$p=0.0;
 		$i=0;
@@ -749,9 +838,13 @@ function Circular_Diagram($ImageHandle, $arr, $background_color, $diameter, $cen
 			$p += $sector["COUNTER"]/$sum*360.0;
 			++$i;
 			if ($i==count($arr))
+			{
 				$degree2 = 360;
+			}
 			else
+			{
 				$degree2 = intval($p);
+			}
 			if($degree2 > $degree1)
 			{
 				$dec = ReColor($sector["COLOR"]);
@@ -767,27 +860,30 @@ function Circular_Diagram($ImageHandle, $arr, $background_color, $diameter, $cen
 		}
 		if(count($arr2)>0)
 		{
-			$h=15;
+			$h = 15;
 			if($antialiase)
-				$h=$h*5;
-			for($i=0;$i<=$h;$i++)
-			foreach($arr2 as $sector)
 			{
-				$degree1 = $sector["DEGREE_1"];
-				$degree2 = $sector["DEGREE_2"];
-				$difference = $degree2 - $degree1;
-				$degree1 -= 180;
-				$degree1 = $degree1<0?360+$degree1:$degree1;
-				$degree2 -= 180;
-				$degree2 = $degree2<0?360+$degree2:$degree2;
-				$color = $i==$h?$sector["IMAGE_COLOR"]:$sector["IMAGE_DARK"];
-				if ($difference==360)
-					imageellipse($ImageHandle, $centerX, $centerY-$i, $diameterX, $diameterY, $color);
-				else
-					imagearc($ImageHandle, $centerX, $centerY-$i, $diameterX, $diameterY, $degree1, $degree2, $color);
+				$h = $h * 5;
+			}
+			for($i = 0; $i <= $h; $i++)
+			{
+				foreach($arr2 as $sector)
+				{
+					$degree1 = $sector["DEGREE_1"];
+					$degree2 = $sector["DEGREE_2"];
+					$difference = $degree2 - $degree1;
+					$degree1 -= 180;
+					$degree1 = $degree1<0?360+$degree1:$degree1;
+					$degree2 -= 180;
+					$degree2 = $degree2<0?360+$degree2:$degree2;
+					$color = $i==$h?$sector["IMAGE_COLOR"]:$sector["IMAGE_DARK"];
+					if ($difference==360)
+						imageellipse($ImageHandle, $centerX, $centerY-$i, $diameterX, $diameterY, $color);
+					else
+						imagearc($ImageHandle, $centerX, $centerY-$i, $diameterX, $diameterY, $degree1, $degree2, $color);
+				}
 			}
 			$i--;
-			$first=true;
 			foreach($arr2 as $sector)
 			{
 				$degree1 = $sector["DEGREE_1"];
@@ -815,6 +911,7 @@ function Circular_Diagram($ImageHandle, $arr, $background_color, $diameter, $cen
 	}
 	if($antialiase)
 	{
+		/** @noinspection PhpUndefinedVariableInspection */
 		imagecopyresampled($ImageHandle_Saved, $ImageHandle, 0, 0, 0, 0, $diameter_saved, $diameter_saved, $diameter, $diameter);
 	}
 }
@@ -847,14 +944,15 @@ function _a_set_pixel($im, $x, $y, $filled, $fgcolors)
 	$red = round($r + ( $fgcolors['red'] - $r ) * $filled);
 	$green = round($g + ( $fgcolors['green'] - $g ) * $filled);
 	$blue = round($b + ( $fgcolors['blue'] - $b ) * $filled);
-       imagesetpixel($im, $x, $y, imagecolorclosest($im, $red, $green, $blue));
-
+	imagesetpixel($im, $x, $y, imagecolorclosest($im, $red, $green, $blue));
 }
+
 function _a_frac($x)
 {
-	$x=doubleval($x);
+	$x = doubleval($x);
 	return $x-floor($x);
 }
+
 function _a_draw_line($im, $x1, $y1, $x2, $y2, $fgcolors, $dashed="N", $dash=5, $white=2)
 {
 	$xd = $x2-$x1;
@@ -1053,5 +1151,3 @@ function _a_draw_ellipse($im, $x1, $y1, $x2, $y2, $fgcolors, $half=false)
 		}
 	}
 }
-
-?>

@@ -71,16 +71,19 @@ class CAllClusterDBNode
 		return $ID;
 	}
 
-	public static function Delete($ID)
+	public static function Delete($ID, $bStopSlave = true)
 	{
 		global $DB, $CACHE_MANAGER;
 		$ID = intval($ID);
 
 		$res = $DB->Query("select ID from b_cluster_dbnode WHERE ID=1 OR MASTER_ID = ".$ID, false, '', array('fixed_connection'=>true));
-		while($ar = $res->Fetch())
+		if ($bStopSlave)
 		{
-			if(!CClusterSlave::Stop($ar["ID"]))
-				return false;
+			while($ar = $res->Fetch())
+			{
+				if(!CClusterSlave::Stop($ar["ID"]))
+					return false;
+			}
 		}
 
 		if($res)
@@ -195,6 +198,7 @@ class CAllClusterDBNode
 				"STATUS",
 				"WEIGHT",
 				"SELECTABLE",
+				"GROUP_ID"
 			);
 
 		if(!is_array($arOrder))
@@ -235,6 +239,7 @@ class CAllClusterDBNode
 				case "STATUS":
 				case "WEIGHT":
 				case "SELECTABLE":
+				case "GROUP_ID":
 					$arQuerySelect[$strColumn] = "n.".$strColumn;
 					break;
 			}
@@ -286,6 +291,12 @@ class CAllClusterDBNode
 				"FIELD_TYPE" => "string",
 				"JOIN" => false,
 			),
+			"NAME" => array(
+				"TABLE_ALIAS" => "n",
+				"FIELD_NAME" => "n.NAME",
+				"FIELD_TYPE" => "string",
+				"JOIN" => false,
+			),
 		);
 		$obQueryWhere->SetFields($arFields);
 
@@ -320,6 +331,48 @@ class CAllClusterDBNode
 		}
 
 		return $DB->Query($strSql, false, '', array('fixed_connection'=>true));
+	}
+
+	static public function getServerList()
+	{
+		global $DB;
+		$result = array();
+		$rsData = $DB->Query("
+			SELECT ID, GROUP_ID, ROLE_ID, DB_HOST
+			FROM b_cluster_dbnode
+			ORDER BY GROUP_ID, ID
+		");
+		while ($arData = $rsData->Fetch())
+		{
+			if ($arData["ROLE_ID"] == "SLAVE" || $arData["ROLE_ID"] == "MASTER")
+				$edit_url = "/bitrix/admin/cluster_slave_edit.php?lang=".LANGUAGE_ID."&group_id=".$arData["GROUP_ID"]."&ID=".$arData["ID"];
+			elseif ($arData["ROLE_ID"] == "MODULE")
+				$edit_url = "/bitrix/admin/cluster_dbnode_edit.php?lang=".LANGUAGE_ID."&ID=".$arData["ID"];
+			else
+				$edit_url = "";
+
+			$host = "";
+			$match = array();
+			if (
+				preg_match("/\\(\\s*HOST\\s*=\\s*([^)]+)\\)/i", $arData["DB_HOST"], $match)
+				|| preg_match("/^([^:]+)(:|)/", $arData["DB_HOST"], $match)
+			)
+			{
+				if ($match[1] !== 'localhost' && $match[1] !== '127.0.0.1')
+					$host = $arData["DB_HOST"];
+			}
+
+			$result[] = array(
+				"ID" => $arData["ID"],
+				"GROUP_ID" => $arData["GROUP_ID"],
+				"SERVER_TYPE" => "database",
+				"ROLE_ID" => $arData["ROLE_ID"],
+				"HOST" => $arData["DB_HOST"],
+				"DEDICATED" => $host == ""? "N": "Y",
+				"EDIT_URL" => $edit_url,
+			);
+		}
+		return $result;
 	}
 
 	public static function GetModules($node_id)

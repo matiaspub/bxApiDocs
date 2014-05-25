@@ -48,7 +48,6 @@ class CCatalogStoreProductAll
 		$strUpdate = $DB->PrepareUpdate("b_catalog_store_product", $arFields);
 		$strSql = "UPDATE b_catalog_store_product SET ".$strUpdate." WHERE ID = ".$id;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
 		foreach(GetModuleEvents("catalog", "OnStoreProductUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 
@@ -91,7 +90,7 @@ class CCatalogStoreProductAll
 		if($arID = $rsProps->Fetch())
 		{
 			$amount = $arID["AMOUNT"] + $amount;
-			return self::Update($arID["ID"], array("AMOUNT" => $amount));
+			return self::Update($arID["ID"], array("AMOUNT" => $amount, "PRODUCT_ID" => $productId, "STORE_ID" => $storeId,));
 		}
 		else
 			return CCatalogStoreProduct::Add(array("PRODUCT_ID" => $productId, "STORE_ID" => $storeId, "AMOUNT" => $amount));

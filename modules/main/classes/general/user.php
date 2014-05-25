@@ -34,158 +34,158 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Функция добавляет нового пользователя. При успешном выполнении возвращает ID нового пользователя, в противном случае - вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. <br><br><b>CUser::Add()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса CUser. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей, в качестве ключей данного массива
-	 * допустимо использовать: <ul> <li> <b>LOGIN</b><font color="red">*</font> - логин (имя
-	 * входа) </li> <li> <b>NAME</b> - имя пользователя </li> <li> <b>LAST_NAME</b> - фамилия
-	 * пользователя </li> <li> <b>SECOND_NAME</b> - отчество пользователя </li> <li>
-	 * <b>EMAIL</b><font color="red">*</font> - E-Mail адрес пользователя </li> <li> <b>PASSWORD</b><font
-	 * color="red">*</font> - пароль пользователя </li> <li> <b>CONFIRM_PASSWORD</b><font
-	 * color="red">*</font> - подтверждение пароля (должно быть равным <b>PASSWORD</b>)
-	 * </li> <li> <b>GROUP_ID</b> - массив ID групп к которым будет приписан
-	 * пользователь </li> <li> <b>ACTIVE</b> - флаг активности пользователя [Y|N] </li>
-	 * <li> <b>LID</b> - ID сайта по умолчанию для уведомлений </li> <li> <b>ADMIN_NOTES</b> -
-	 * заметки администратора </li> <li> <b>XML_ID</b> - ID пользователя для связи с
-	 * внешними источниками (например, ID пользователя в какой-либо
-	 * внешний базе) </li> <li> <b>EXTERNAL_AUTH_ID</b> - код источника [link=89611]внешней
-	 * авторизации[/link] </li> <li> <b>PERSONAL_PROFESSION</b> - наименование профессии </li>
-	 * <li> <b>PERSONAL_WWW</b> - персональная WWW-страница </li> <li> <b>PERSONAL_ICQ</b> - ICQ </li> <li>
-	 * <b>PERSONAL_GENDER</b> - пол ["M" - мужчина; "F" - женщина] </li> <li> <b>PERSONAL_BIRTHDAY</b> -
-	 * дата рождения в формате текущего сайта (или текущего языка для
-	 * административной части) </li> <li> <b>PERSONAL_PHOTO</b> - массив описывающий
-	 * фотографию, допустимы следующие ключи этого массива: <ul> <li> <b>name</b>
-	 * - имя файла </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный
-	 * путь на сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> -
-	 * если значение равно "Y", то изображение будет удалено </li> <li>
-	 * <b>MODULE_ID</b> - идентификатор главного модуля - "main" </li> </ul> </li> <li>
-	 * <b>PERSONAL_PHONE</b> - телефон </li> <li> <b>PERSONAL_FAX</b> - факс </li> <li> <b>PERSONAL_MOBILE</b> -
-	 * мобильный телефон </li> <li> <b>PERSONAL_PAGER</b> - пэйджер </li> <li> <b>PERSONAL_STREET</b> -
-	 * улица, дом </li> <li> <b>PERSONAL_MAILBOX</b> - почтовый ящик </li> <li> <b>PERSONAL_CITY</b> -
-	 * город </li> <li> <b>PERSONAL_STATE</b> - область / край </li> <li> <b>PERSONAL_ZIP</b> - индекс
-	 * </li> <li> <b>PERSONAL_COUNTRY</b> - страна </li> <li> <b>PERSONAL_NOTES</b> - личные заметки </li>
-	 * <li> <b>WORK_COMPANY</b> - наименование компании </li> <li> <b>WORK_DEPARTMENT</b> -
-	 * департамент / отдел </li> <li> <b>WORK_POSITION</b> - должность </li> <li> <b>WORK_WWW</b> -
-	 * WWW-страница компании </li> <li> <b>WORK_PHONE</b> - рабочий телефон </li> <li>
-	 * <b>WORK_FAX</b> - рабочий факс </li> <li> <b>WORK_PAGER</b> - рабочий пэйджер </li> <li>
-	 * <b>WORK_STREET</b> - улица, дом компании </li> <li> <b>WORK_MAILBOX</b> - почтовый ящик
-	 * компании </li> <li> <b>WORK_CITY</b> - город компании </li> <li> <b>WORK_STATE</b> - область
-	 * / край компании </li> <li> <b>WORK_ZIP</b> - индекс компании </li> <li> <b>WORK_COUNTRY</b> -
-	 * страна компании </li> <li> <b>WORK_PROFILE</b> - направления деятельности
-	 * компании </li> <li> <b>WORK_LOGO</b> - массив описывающий логотип компании,
-	 * допустимы следующие ключи этого массива: <ul> <li> <b>name</b> - имя файла
-	 * </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный путь на
-	 * сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> - если
-	 * значение равно "Y", то изображение будет удалено </li> <li> <b>MODULE_ID</b> -
-	 * идентификатор главного модуля - "main" </li> </ul> </li> <li> <b>WORK_NOTES</b> -
-	 * заметки касаемо работы пользователя </li> </ul> <font color="red">*</font> -
-	 * обязательные поля.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // создадим массив описывающий изображение 
-	 * // находящееся в файле на сервере
-	 * $arIMAGE = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
-	 * $arIMAGE["MODULE_ID"] = "main";
-	 * 
-	 * $user = new CUser;
-	 * $arFields = Array(
-	 *   "NAME"              =&gt; "Сергей",
-	 *   "LAST_NAME"         =&gt; "Иванов",
-	 *   "EMAIL"             =&gt; "ivanov@microsoft.com",
-	 *   "LOGIN"             =&gt; "ivan",
-	 *   "LID"               =&gt; "ru",
-	 *   "ACTIVE"            =&gt; "Y",
-	 *   "GROUP_ID"          =&gt; array(1,2),
-	 *   "PASSWORD"          =&gt; "123456",
-	 *   "CONFIRM_PASSWORD"  =&gt; "123456",
-	 *   "PERSONAL_PHOTO"    =&gt; $arIMAGE
-	 * );
-	 * 
-	 * $ID = <b>$user-&gt;Add</b>($arFields);
-	 * if (intval($ID) &gt; 0)
-	 *     echo "Пользователь успешно добавлен.";
-	 * else
-	 *     echo $user-&gt;LAST_ERROR;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php#flds">Поля CUser</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php
-	 * @author Bitrix
-	 */
+	* <p>Функция добавляет нового пользователя. При успешном выполнении возвращает ID нового пользователя, в противном случае - вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. <br><br><b>CUser::Add()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса CUser. </p>
+	*
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей, в качестве ключей данного массива
+	* допустимо использовать: <ul> <li> <b>LOGIN</b><font color="red">*</font> - логин (имя
+	* входа) </li> <li> <b>NAME</b> - имя пользователя </li> <li> <b>LAST_NAME</b> - фамилия
+	* пользователя </li> <li> <b>SECOND_NAME</b> - отчество пользователя </li> <li>
+	* <b>EMAIL</b><font color="red">*</font> - E-Mail адрес пользователя </li> <li> <b>PASSWORD</b><font
+	* color="red">*</font> - пароль пользователя </li> <li> <b>CONFIRM_PASSWORD</b><font
+	* color="red">*</font> - подтверждение пароля (должно быть равным <b>PASSWORD</b>)
+	* </li> <li> <b>GROUP_ID</b> - массив ID групп к которым будет приписан
+	* пользователь </li> <li> <b>ACTIVE</b> - флаг активности пользователя [Y|N] </li>
+	* <li> <b>LID</b> - ID сайта по умолчанию для уведомлений </li> <li> <b>ADMIN_NOTES</b> -
+	* заметки администратора </li> <li> <b>XML_ID</b> - ID пользователя для связи с
+	* внешними источниками (например, ID пользователя в какой-либо
+	* внешний базе) </li> <li> <b>EXTERNAL_AUTH_ID</b> - код источника [link=89611]внешней
+	* авторизации[/link] </li> <li> <b>PERSONAL_PROFESSION</b> - наименование профессии </li>
+	* <li> <b>PERSONAL_WWW</b> - персональная WWW-страница </li> <li> <b>PERSONAL_ICQ</b> - ICQ </li> <li>
+	* <b>PERSONAL_GENDER</b> - пол ["M" - мужчина; "F" - женщина] </li> <li> <b>PERSONAL_BIRTHDAY</b> -
+	* дата рождения в формате текущего сайта (или текущего языка для
+	* административной части) </li> <li> <b>PERSONAL_PHOTO</b> - массив описывающий
+	* фотографию, допустимы следующие ключи этого массива: <ul> <li> <b>name</b>
+	* - имя файла </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный
+	* путь на сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> -
+	* если значение равно "Y", то изображение будет удалено </li> <li>
+	* <b>MODULE_ID</b> - идентификатор главного модуля - "main" </li> </ul> </li> <li>
+	* <b>PERSONAL_PHONE</b> - телефон </li> <li> <b>PERSONAL_FAX</b> - факс </li> <li> <b>PERSONAL_MOBILE</b> -
+	* мобильный телефон </li> <li> <b>PERSONAL_PAGER</b> - пэйджер </li> <li> <b>PERSONAL_STREET</b> -
+	* улица, дом </li> <li> <b>PERSONAL_MAILBOX</b> - почтовый ящик </li> <li> <b>PERSONAL_CITY</b> -
+	* город </li> <li> <b>PERSONAL_STATE</b> - область / край </li> <li> <b>PERSONAL_ZIP</b> - индекс
+	* </li> <li> <b>PERSONAL_COUNTRY</b> - страна </li> <li> <b>PERSONAL_NOTES</b> - личные заметки </li>
+	* <li> <b>WORK_COMPANY</b> - наименование компании </li> <li> <b>WORK_DEPARTMENT</b> -
+	* департамент / отдел </li> <li> <b>WORK_POSITION</b> - должность </li> <li> <b>WORK_WWW</b> -
+	* WWW-страница компании </li> <li> <b>WORK_PHONE</b> - рабочий телефон </li> <li>
+	* <b>WORK_FAX</b> - рабочий факс </li> <li> <b>WORK_PAGER</b> - рабочий пэйджер </li> <li>
+	* <b>WORK_STREET</b> - улица, дом компании </li> <li> <b>WORK_MAILBOX</b> - почтовый ящик
+	* компании </li> <li> <b>WORK_CITY</b> - город компании </li> <li> <b>WORK_STATE</b> - область
+	* / край компании </li> <li> <b>WORK_ZIP</b> - индекс компании </li> <li> <b>WORK_COUNTRY</b> -
+	* страна компании </li> <li> <b>WORK_PROFILE</b> - направления деятельности
+	* компании </li> <li> <b>WORK_LOGO</b> - массив описывающий логотип компании,
+	* допустимы следующие ключи этого массива: <ul> <li> <b>name</b> - имя файла
+	* </li> <li> <b>size</b> - размер файла </li> <li> <b>tmp_name</b> - временный путь на
+	* сервере </li> <li> <b>type</b> - тип загружаемого файла </li> <li> <b>del</b> - если
+	* значение равно "Y", то изображение будет удалено </li> <li> <b>MODULE_ID</b> -
+	* идентификатор главного модуля - "main" </li> </ul> </li> <li> <b>WORK_NOTES</b> -
+	* заметки касаемо работы пользователя </li> </ul> <font color="red">*</font> -
+	* обязательные поля.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // создадим массив описывающий изображение 
+	* // находящееся в файле на сервере
+	* $arIMAGE = CFile::MakeFileArray($_SERVER["DOCUMENT_ROOT"]."/images/photo.gif");
+	* $arIMAGE["MODULE_ID"] = "main";
+	* 
+	* $user = new CUser;
+	* $arFields = Array(
+	*   "NAME"              =&gt; "Сергей",
+	*   "LAST_NAME"         =&gt; "Иванов",
+	*   "EMAIL"             =&gt; "ivanov@microsoft.com",
+	*   "LOGIN"             =&gt; "ivan",
+	*   "LID"               =&gt; "ru",
+	*   "ACTIVE"            =&gt; "Y",
+	*   "GROUP_ID"          =&gt; array(10,11),
+	*   "PASSWORD"          =&gt; "123456",
+	*   "CONFIRM_PASSWORD"  =&gt; "123456",
+	*   "PERSONAL_PHOTO"    =&gt; $arIMAGE
+	* );
+	* 
+	* $ID = <b>$user-&gt;Add</b>($arFields);
+	* if (intval($ID) &gt; 0)
+	*     echo "Пользователь успешно добавлен.";
+	* else
+	*     echo $user-&gt;LAST_ERROR;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php#flds">Поля CUser</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php
+	* @author Bitrix
+	*/
 	abstract public function Add($arFields);
 
 	
 	/**
-	 * <p>Возвращает один из параметров пользователя хранимых в сессии авторизации (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $param_name  Название параметра. Возможны следующие значения: <ul> <li> <b>AUTHORIZED</b> -
-	 * если пользователь авторизован, то "Y" </li> <li> <b>USER_ID</b> - ID
-	 * пользователя </li> <li> <b>LOGIN</b> - логин </li> <li> <b>EMAIL</b> - E-mail </li> <li> <b>NAME</b> -
-	 * полное имя </li> <li> <b>GROUPS</b> - массив групп, которым принадлежит
-	 * пользователь </li> <li> <b>ADMIN</b> - true, если пользователь принадлежит
-	 * группе администраторов </li> <li> <b>PASSWORD_HASH</b> - хэш от пароля
-	 * пользователя (md5) </li> <li> <b>FIRST_NAME</b> - имя пользователя </li> <li>
-	 * <b>LAST_NAME</b> - фамилия пользователя </li> <li> <b>SECOND_NAME</b> - отчество
-	 * пользователя </li> </ul>
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "E-Mail: ".<b>$USER-&gt;GetParam</b>("EMAIL");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php">CUser::IsAdmin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает один из параметров пользователя хранимых в сессии авторизации (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @param string $param_name  Название параметра. Возможны следующие значения: <ul> <li> <b>AUTHORIZED</b> -
+	* если пользователь авторизован, то "Y" </li> <li> <b>USER_ID</b> - ID
+	* пользователя </li> <li> <b>LOGIN</b> - логин </li> <li> <b>EMAIL</b> - E-mail </li> <li> <b>NAME</b> -
+	* полное имя (не только имя пользователя, но и фамилию) </li> <li> <b>GROUPS</b>
+	* - массив групп, которым принадлежит пользователь </li> <li> <b>ADMIN</b> -
+	* true, если пользователь принадлежит группе администраторов </li> <li>
+	* <b>PASSWORD_HASH</b> - хэш от пароля пользователя (md5) </li> <li> <b>FIRST_NAME</b> - имя
+	* пользователя </li> <li> <b>LAST_NAME</b> - фамилия пользователя </li> <li>
+	* <b>SECOND_NAME</b> - отчество пользователя </li> </ul>
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "E-Mail: ".<b>$USER-&gt;GetParam</b>("EMAIL");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php">CUser::IsAdmin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php
+	* @author Bitrix
+	*/
 	public static function GetParam($name)
 	{
 		if(isset($_SESSION["SESS_AUTH"][$name]))
@@ -203,41 +203,41 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Метод устанавливает произвольный параметр пользователя<i> param_name</i> для хранения в сессии авторизации (как правило вызывается для объекта $USER). Получить значение установленного параметра можно методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a>. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $param_name  Произвольный параметр.
-	 *
-	 *
-	 *
-	 * @param mixed $param_value  Значение параметра.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * <b>$USER-&gt;SetParam</b>("IP_LOGIN", $_SERVER['REMOTE_ADDR']);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setparam.php
-	 * @author Bitrix
-	 */
+	* <p>Метод устанавливает произвольный параметр пользователя<i> param_name</i> для хранения в сессии авторизации (как правило вызывается для объекта $USER). Получить значение установленного параметра можно методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a>. </p>
+	*
+	*
+	*
+	*
+	* @param string $name  Произвольный параметр.
+	*
+	*
+	*
+	* @param mixed $value  Значение параметра. </ht
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* <b>$USER-&gt;SetParam</b>("IP_LOGIN", $_SERVER['REMOTE_ADDR']);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setparam.php
+	* @author Bitrix
+	*/
 	public static function SetParam($name, $value)
 	{
 		$_SESSION["SESS_AUTH"][$name] = $value;
@@ -245,42 +245,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает ID текущего авторизованного пользователя (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "[".<b>$USER-&gt;GetID</b>()."] (".$USER-&gt;GetLogin().") ".$USER-&gt;GetFullName();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает ID текущего авторизованного пользователя (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "[".<b>$USER-&gt;GetID</b>()."] (".$USER-&gt;GetLogin().") ".$USER-&gt;GetFullName();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php
+	* @author Bitrix
+	*/
 	public static function GetID()
 	{
 		if(isset($_SESSION["SESS_AUTH"]["USER_ID"]))
@@ -291,42 +291,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает логин текущего авторизованного пользователя (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "[".$USER-&gt;GetID()."] (".<b>$USER-&gt;GetLogin</b>().") ".$USER-&gt;GetFullName();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает логин текущего авторизованного пользователя (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "[".$USER-&gt;GetID()."] (".<b>$USER-&gt;GetLogin</b>().") ".$USER-&gt;GetFullName();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php
+	* @author Bitrix
+	*/
 	public static function GetLogin()
 	{
 		return $_SESSION["SESS_AUTH"]["LOGIN"];
@@ -334,42 +334,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает E-Mail текущего авторизованного пользователя (как правило вызывается с объекта $USER). Данные берутся из сессии.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "Ваш E-Mail: ".<b>$USER-&gt;GetEmail</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает E-Mail текущего авторизованного пользователя (как правило вызывается с объекта $USER). Данные берутся из сессии.</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "Ваш E-Mail: ".<b>$USER-&gt;GetEmail</b>();
+	* ?&gt;</bod
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php
+	* @author Bitrix
+	*/
 	public static function GetEmail()
 	{
 		return $_SESSION["SESS_AUTH"]["EMAIL"];
@@ -377,42 +377,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает имя и фамилию авторизованного пользователя разделенные пробелом (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "[".$USER-&gt;GetID()."] (".$USER-&gt;GetLogin().") ".<b>$USER-&gt;GetFullName</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает имя и фамилию авторизованного пользователя разделенные пробелом (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "[".$USER-&gt;GetID()."] (".$USER-&gt;GetLogin().") ".<b>$USER-&gt;GetFullName</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php
+	* @author Bitrix
+	*/
 	public static function GetFullName()
 	{
 		return $_SESSION["SESS_AUTH"]["NAME"];
@@ -420,42 +420,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает имя авторизованного пользователя (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "[".$USER-&gt;GetID()."] (".$USER-&gt;Login().") ".<b>$USER-&gt;GetFirstName</b>()." ".$USER-&gt;GetLastName();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает имя авторизованного пользователя (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "[".$USER-&gt;GetID()."] (".$USER-&gt;Login().") ".<b>$USER-&gt;GetFirstName</b>()." ".$USER-&gt;GetLastName();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php">CUser::GetLastName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php
+	* @author Bitrix
+	*/
 	public static function GetFirstName()
 	{
 		return $_SESSION["SESS_AUTH"]["FIRST_NAME"];
@@ -463,42 +463,42 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает фамилию авторизованного пользователя (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * echo "[".$USER-&gt;GetID()."] (".$USER-&gt;Login().") ".$USER-&gt;GetFirstName()." ".<b>$USER-&gt;GetLastName</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает фамилию авторизованного пользователя (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* echo "[".$USER-&gt;GetID()."] (".$USER-&gt;Login().") ".$USER-&gt;GetFirstName()." ".<b>$USER-&gt;GetLastName</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getid.php">CUser::GetID</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlogin.php">CUser::GetLogin</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getemail.php">CUser::GetEmail</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfullname.php">CUser::GetFullName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getfirstname.php">CUser::GetFirstName</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlastname.php
+	* @author Bitrix
+	*/
 	public static function GetLastName()
 	{
 		return $_SESSION["SESS_AUTH"]["LAST_NAME"];
@@ -525,37 +525,37 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Метод возвращает ID групп которым принадлежит текущий авторизованный пользователь (как правило вызывается с объекта $USER).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим массив групп текущего пользователя
-	 * global $USER;
-	 * $arGroups = <b>$USER-&gt;GetUserGroupArray</b>();
-	 * echo "&lt;pre&gt;"; print_r($arGroups); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает ID групп которым принадлежит текущий авторизованный пользователь (как правило вызывается с объекта $USER).</p>
+	*
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // получим массив групп текущего пользователя
+	* global $USER;
+	* $arGroups = <b>$USER-&gt;GetUserGroupArray</b>();
+	* echo "&lt;pre&gt;"; print_r($arGroups); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php
+	* @author Bitrix
+	*/
 	public static function GetUserGroupArray()
 	{
 		if(
@@ -571,41 +571,41 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Метод устанавливает привязку текущего пользователя к группам <i>groups</i> (как правило вызывается для объекта $USER). Данные получаются из сессионной переменной, значение которой соответствует привязке пользователя <b>на момент авторизации</b>. Привязка к группам не сохраняется в базе данных и при следующей авторизации теряется. Для сохранения привязки в базе данных воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergroup.php">CUser::SetUserGroup</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param array $groups  Массив со значениями идентификаторов групп пользователей.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // привязка текущего пользователя дополнительно к группе c кодом 5
-	 * global $USER;
-	 * $arGroups = <b>$USER-&gt;GetUserGroupArray</b>();
-	 * $arGroups[] = 5;
-	 * <b>$USER-&gt;SetUserGroupArray</b>($arGroups);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergrouparray.php
-	 * @author Bitrix
-	 */
+	* <p>Метод устанавливает привязку текущего пользователя к группам <i>groups</i> (как правило вызывается для объекта $USER). Данные получаются из сессионной переменной, значение которой соответствует привязке пользователя <b>на момент авторизации</b>. Привязка к группам не сохраняется в базе данных и при следующей авторизации теряется. Для сохранения привязки в базе данных воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergroup.php">CUser::SetUserGroup</a>.</p>
+	*
+	*
+	*
+	*
+	* @param array $groups  Массив со значениями идентификаторов групп пользователей.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // привязка текущего пользователя дополнительно к группе c кодом 5
+	* global $USER;
+	* $arGroups = <b>$USER-&gt;GetUserGroupArray</b>();
+	* $arGroups[] = 5;
+	* <b>$USER-&gt;SetUserGroupArray</b>($arGroups);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergrouparray.php
+	* @author Bitrix
+	*/
 	public static function SetUserGroupArray($arr)
 	{
 		$arr[] = 2;
@@ -616,36 +616,37 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Метод возвращает строку c перечисленными через запятую ID всех групп которым принадлежит текущий авторизованный пользователь (как правило вызывается с объекта $USER). Данные получаются из сессионной переменной, значение которой соответствует привязке пользователя <b>на момент авторизации</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим массив групп текущего пользователя
-	 * global $USER;
-	 * $strGroups = <b>$USER-&gt;GetUserGroupString</b>();
-	 * echo $strGroups; // "1,2,3"
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php
-	 * @author Bitrix
-	 */
+	* <p>Метод возвращает строку c перечисленными через запятую ID всех групп которым принадлежит текущий авторизованный пользователь (как правило вызывается с объекта $USER). Данные получаются из сессионной переменной, значение которой соответствует привязке пользователя <b>на момент авторизации</b>. Если пользователь не авторизован, то будет возвращён идентификатор группы "все пользователи".</p>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // получим массив групп текущего пользователя
+	* global $USER;
+	* $strGroups = <b>$USER-&gt;GetUserGroupString</b>();
+	* echo $strGroups; // "1,2,3"
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php
+	* @author Bitrix
+	*/
 	public function GetUserGroupString()
 	{
 		return $this->GetGroups();
@@ -670,42 +671,43 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Функция проверяет логин и специальный хеш от пароля, и если они корректные, то авторизует пользователя. Если авторизация успешная, то возвращает <b>true</b>, иначе возвращает массив с ошибкой для функции <a href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminmessage/showmessage.php">ShowMessage</a>. Хэш хранится не для пользователя, а для его сессии и не может быть получен средствами API.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @param string $cookie_hash  Специальный хеш от пароля пользователя.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>global $USER;<br>if (!is_object($USER)) $USER = new CUser;<br>$cookie_login = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_LOGIN"};<br>$cookie_md5pass = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_UIDH"};<br><b>$USER-&gt;LoginByHash</b>($cookie_login, $cookie_md5pass);<br>?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">SavePasswordHash</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">GetPasswordHash</a> </li>
-	 * <li>Событие <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserloginbyhash.php">OnBeforeUserLoginByHash</a> </li>
-	 * <li>Событие <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserloginbyhash.php">OnAfterUserLoginByHash</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php
-	 * @author Bitrix
-	 */
+	* <p>Функция проверяет логин и специальный хеш от пароля, и если они корректные, то авторизует пользователя. Если авторизация успешная, то возвращает <b>true</b>, иначе возвращает массив с ошибкой для функции <a href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminmessage/showmessage.php">ShowMessage</a>. Хэш хранится не для пользователя, а для его сессии и не может быть получен средствами API.</p>
+	*
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @param string $hash  Специальный хеш от пароля пользователя.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>global $USER;<br>if (!is_object($USER)) $USER = new CUser;<br>$cookie_login = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_LOGIN"};<br>$cookie_md5pass = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_UIDH"};<br><b>$USER-&gt;LoginByHash</b>($cookie_login, $cookie_md5pass);<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">SavePasswordHash</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">GetPasswordHash</a> </li>
+	* <li>Событие <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserloginbyhash.php">OnBeforeUserLoginByHash</a> </li>
+	* <li>Событие <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserloginbyhash.php">OnAfterUserLoginByHash</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php
+	* @author Bitrix
+	*/
 	public function LoginByHash($login, $hash)
 	{
 		/** @global CMain $APPLICATION */
@@ -772,6 +774,11 @@ abstract class CAllUser extends CDBResult
 						$result_message = array("MESSAGE"=>GetMessage("LOGIN_BLOCK")."<br>", "TYPE"=>"ERROR");
 					}
 					break;
+				}
+				else
+				{
+					//Delete invalid stored auth cookie
+					$APPLICATION->set_cookie("UIDH", "", 0, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y", false, true);
 				}
 			}
 			if(!$bFound)
@@ -1011,45 +1018,48 @@ abstract class CAllUser extends CDBResult
 	 */
 	
 	/**
-	 * <p>Функция непосредственно осуществляет процесс авторизации пользователя. Инициализирует необходимые сессионные переменные и переменные объекта класса CUser. Если авторизация успешна, то возвращает "true", иначе - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $user_id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // пример динамического добавления текущего пользователя в группу 
-	 * // и его дальнейшая переавторизация
-	 * global $USER;
-	 * $arrGroups_new = array(3,4); // в какие группы хотим добавить
-	 * $arrGroups_old = $USER-&gt;GetUserGroupArray(); // получим текущие группы
-	 * $arrGroups = array_unique(array_merge($arrGroups_old, $arrGroups_new)); // объединим два массива и удалим дубли
-	 * $USER-&gt;Update($USER-&gt;GetID(), array("GROUP_ID" =&gt; $arrGroups)); // обновим профайл пользователя в базе
-	 * <b>$USER-&gt;Authorize</b>($USER-&gt;GetID()); // авторизуем
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserauthorize.php">Событие "OnAfterUserAuthorize"</a>
-	 * </li> </ul>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php
-	 * @author Bitrix
-	 */
+	* <p>Функция непосредственно осуществляет процесс авторизации пользователя. Инициализирует необходимые сессионные переменные и переменные объекта класса CUser. Если авторизация успешна, то возвращает "true", иначе - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $user_id  ID пользователя.
+	*
+	*
+	*
+	* @param bool $Save = false Флаг указывающий на необходимость запоминания авторизации
+	* пользователя. Если равен true, то будет сгененрирован случайный
+	* хэш, выставлена кука с его значением и этот хэш будет сохранен в
+	* базе данных для последующей авторизации функцией <a
+	* href="https://dev.1c-bitrix.ru/bitrix/admin/iblock_element_edit.php?WF=Y&amp;ID=89984&amp;type=help&amp;lang=ru&amp;IBLOCK_ID=46&amp;find_section_section=7225">CUser::LoginByHash</a>.
+	*
+	*
+	*
+	* @param bool $Update = true Необязательный. По умолчанию "true".
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>// пример динамического добавления текущего пользователя в группу <br>// и его дальнейшая переавторизация<br>global $USER;<br>$arrGroups_new = array(3,4); // в какие группы хотим добавить<br>$arrGroups_old = $USER-&gt;GetUserGroupArray(); // получим текущие группы<br>$arrGroups = array_unique(array_merge($arrGroups_old, $arrGroups_new)); // объединим два массива и удалим дубли<br>$USER-&gt;Update($USER-&gt;GetID(), array("GROUP_ID" =&gt; $arrGroups)); // обновим профайл пользователя в базе<br><b>$USER-&gt;Authorize</b>($USER-&gt;GetID()); // авторизуем<br>?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a __bxcontainer="90005" __bxtagname="iblockElementId" href="">CUser::Login</a> </li> <li> <a
+	* __bxcontainer="90006" __bxtagname="iblockElementId" href="">CUser::LoginByHash</a> </li> <li> <a __bxcontainer="90004"
+	* __bxtagname="iblockElementId" href="">CUser::IsAuthorized</a> </li> <li> <a __bxcontainer="90096"
+	* __bxtagname="iblockElementId" href="">Событие "OnAfterUserAuthorize"</a> </li> </ul></bod<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php
+	* @author Bitrix
+	*/
 	public function Authorize($id, $bSave = false, $bUpdate = true)
 	{
 		/** @global CMain $APPLICATION */
@@ -1193,6 +1203,8 @@ abstract class CAllUser extends CDBResult
 			if(COption::GetOptionString("main", "event_log_login_success", "N") === "Y")
 				CEventLog::Log("SECURITY", "USER_AUTHORIZE", "main", $arUser["ID"]);
 
+			CHTMLPagesCache::OnUserLogin();
+
 			return true;
 		}
 		return false;
@@ -1214,49 +1226,49 @@ abstract class CAllUser extends CDBResult
 	/** @deprecated */
 	
 	/**
-	 * <p>Возвращает специальный хеш от пароля пользователя который может быть использован в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">LoginByHash</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">SavePasswordHash</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $password_md5  Хеш (MD5) от реального пароля пользователя. Для текущего
-	 * авторизованного пользователя MD5 от реального пароля можно
-	 * получить с помощью функции <nobr><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">$USER-&gt;GetParam("PASSWORD_HASH")</a></nobr>.
-	 * Для произвольного пользователя MD5 от пароля можно получить с
-	 * помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> (поле "PASSWORD").
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * function SetCurrentUserAuthCookie()
-	 * {
-	 *   global $USER;
-	 *   $hash = <b>CUser::GetPasswordHash</b>($USER-&gt;GetParam("PASSWORD_HASH"));
-	 *   $name = COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_UIDH";
-	 *   @setcookie($name, $hash, time()+60*60*24*30*60, "/"); 
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">CUser::SavePasswordHash</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает специальный хеш от пароля пользователя который может быть использован в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">LoginByHash</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">SavePasswordHash</a>.</p>
+	*
+	*
+	*
+	*
+	* @param string $PASSWORD_HASH  Хеш (MD5) от реального пароля пользователя. Для текущего
+	* авторизованного пользователя MD5 от реального пароля можно
+	* получить с помощью функции <nobr><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">$USER-&gt;GetParam("PASSWORD_HASH")</a></nobr>.
+	* Для произвольного пользователя MD5 от пароля можно получить с
+	* помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> (поле "PASSWORD").
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* function SetCurrentUserAuthCookie()
+	* {
+	*   global $USER;
+	*   $hash = <b>CUser::GetPasswordHash</b>($USER-&gt;GetParam("PASSWORD_HASH"));
+	*   $name = COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_UIDH";
+	*   @setcookie($name, $hash, time()+60*60*24*30*60, "/"); 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">CUser::SavePasswordHash</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php
+	* @author Bitrix
+	*/
 	public static function GetPasswordHash($PASSWORD_HASH)
 	{
 		$add = COption::GetOptionString("main", "pwdhashadd", "");
@@ -1272,33 +1284,34 @@ abstract class CAllUser extends CDBResult
 	/** @deprecated */
 	
 	/**
-	 * <p>Сохраняет специальный хеш в куках пользователя в целях дальнейшей автоматической авторизации. Для разных сайтов на базе "Битрикс: Управление сайтом", функция всегда сохраняет свой уникальный хеш от одного и того же пароля. Таким образом достигается невозможность использовать одно и тоже значение для авторизации на различных сайтах.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * if ($USER-&gt;IsAuthorized()) <b>$USER-&gt;SavePasswordHash</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">CUser::GetPasswordHash</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php
-	 * @author Bitrix
-	 */
+	* <p>Сохраняет специальный хеш в куках пользователя в целях дальнейшей автоматической авторизации. Для разных сайтов на базе "Битрикс: Управление сайтом", функция всегда сохраняет свой уникальный хеш от одного и того же пароля. Таким образом достигается невозможность использовать одно и тоже значение для авторизации на различных сайтах.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* if ($USER-&gt;IsAuthorized()) <b>$USER-&gt;SavePasswordHash</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">CUser::GetPasswordHash</a>
+	* </li> </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php
+	* @author Bitrix
+	*/
 	public function SavePasswordHash()
 	{
 		/** @global CMain $APPLICATION */
@@ -1318,77 +1331,79 @@ abstract class CAllUser extends CDBResult
 	 */
 	
 	/**
-	 * <p>Функция проверяет логин и пароль и если они корректные, то авторизует пользователя. Если авторизация успешная, то возвращает "true", иначе если логин и пароль некорректные, то возвращает массив с ошибкой для функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @param string $password  Пароль. Если параметр <i>convert_password_to_md5</i> = "Y", то в данном параметре
-	 * необходимо передавать оригинальный пароль, в противном случае
-	 * необходимо передавать md5 от оригинального пароля.
-	 *
-	 *
-	 *
-	 * @param string $set_auth_cookie = "N" Если значение равно "Y", то авторизация пользователя будет
-	 * сохранена в куках (при следующем заходе посетитель будет
-	 * автоматически авторизован), в противном случае - авторизация не
-	 * будет сохранена в куках. В куках <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">сохраняется</a>
-	 * специальный хеш получаемый с помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">CUser::GetPasswordHash</a>. Затем
-	 * когда посетитель снова приходит на сайт, система его
-	 * автоматически авторизует используя функцию <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a><br>
-	 * Необязательный. По умолчанию "N".
-	 *
-	 *
-	 *
-	 * @param string $convert_password_to_md5 = "Y" Если значение равно "Y", то это означает что <i>password</i> ещё не
-	 * сконвертирован в MD5 (т.е. в параметре <i>password</i> передается реальный
-	 * пароль вводимый пользователем с клавиатуры), если значение равно
-	 * "N", то это означает что <i>password</i> уже сконвертирован в MD5.<br>Для
-	 * текущего авторизованного пользователя MD5 от реального пароля
-	 * можно получить с помощью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">$USER-&gt;GetParam("PASSWORD_HASH")</a>.
-	 * Для произвольного пользователя MD5 от пароля можно получить с
-	 * помомщью функции <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> (поле "PASSWORD").
-	 * <br>Необязательный. По умолчанию "Y".
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * if (!is_object($USER)) $USER = new CUser;
-	 * $arAuthResult = <b>$USER-&gt;Login</b>("admin", "123456", "Y");
-	 * $APPLICATION-&gt;arAuthResult = $arAuthResult;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">CUser::Logout</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogin.php">Событие "OnBeforeUserLogin"</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogin.php">Событие "OnAfterUserLogin"</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php
-	 * @author Bitrix
-	 */
+	* <p>Функция проверяет логин и пароль и если они корректные, то авторизует пользователя. Если авторизация успешная, то возвращает "true", иначе если логин и пароль некорректные, то возвращает массив с ошибкой для функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>. Если было превышено количество попыток подключения метод просто не будет авторизовывать пользователя с ошибкой "Неправильный логин или пароль". </p>
+	*
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @param string $password  Пароль. Если параметр <i>convert_password_to_md5</i> = "Y", то в данном параметре
+	* необходимо передавать оригинальный пароль, в противном случае
+	* необходимо передавать md5 от оригинального пароля.
+	*
+	*
+	*
+	* @param string $remember = "N" Если значение равно "Y", то авторизация пользователя будет
+	* сохранена в куках (при следующем заходе посетитель будет
+	* автоматически авторизован), в противном случае - авторизация не
+	* будет сохранена в куках. В куках <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/savepasswordhash.php">сохраняется</a>
+	* специальный хеш получаемый с помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getpasswordhash.php">CUser::GetPasswordHash</a>. Затем
+	* когда посетитель снова приходит на сайт, система его
+	* автоматически авторизует используя функцию <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a><br>
+	* Необязательный. По умолчанию "N".
+	*
+	*
+	*
+	* @param string $password_original = "Y" Если значение равно "Y", то это означает что <i>password</i> ещё не
+	* сконвертирован в MD5 (т.е. в параметре <i>password</i> передается реальный
+	* пароль вводимый пользователем с клавиатуры), если значение равно
+	* "N", то это означает что <i>password</i> уже сконвертирован в MD5.<br>Для
+	* текущего авторизованного пользователя MD5 от реального пароля
+	* можно получить с помощью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">$USER-&gt;GetParam("PASSWORD_HASH")</a>.
+	* Для произвольного пользователя MD5 от пароля можно получить с
+	* помомщью функции <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> (поле "PASSWORD").
+	* <br>Необязательный. По умолчанию "Y". До версии 4.0.6 назывался
+	* <i>pass2md5</i>.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* if (!is_object($USER)) $USER = new CUser;
+	* $arAuthResult = <b>$USER-&gt;Login</b>("admin", "123456", "Y");
+	* $APPLICATION-&gt;arAuthResult = $arAuthResult;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">CUser::Logout</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogin.php">Событие "OnBeforeUserLogin"</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogin.php">Событие "OnAfterUserLogin"</a>
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php
+	* @author Bitrix
+	*/
 	public function Login($login, $password, $remember="N", $password_original="Y")
 	{
 		/** @global CMain $APPLICATION */
@@ -1493,7 +1508,7 @@ abstract class CAllUser extends CDBResult
 								",.<>/?;:[]{}\\|~!@#\$%^&*()-_+=",
 							));
 							$new_password = $salt.md5($salt.$arParams["PASSWORD"]);
-							$DB->Query("UPDATE b_user SET PASSWORD='".$DB->ForSQL($new_password)."' WHERE ID = ".intval($arUser["ID"]));
+							$DB->Query("UPDATE b_user SET PASSWORD='".$DB->ForSQL($new_password)."', TIMESTAMP_X = TIMESTAMP_X WHERE ID = ".intval($arUser["ID"]));
 						}
 
 						if($arUser["ACTIVE"] == "Y")
@@ -1512,7 +1527,7 @@ abstract class CAllUser extends CDBResult
 					}
 					else
 					{
-						$DB->Query("UPDATE b_user SET LOGIN_ATTEMPTS = ".$usr_login_attempts." WHERE ID = ".intval($arUser["ID"]));
+						$DB->Query("UPDATE b_user SET LOGIN_ATTEMPTS = ".$usr_login_attempts.", TIMESTAMP_X = TIMESTAMP_X WHERE ID = ".intval($arUser["ID"]));
 						$APPLICATION->ThrowException(GetMessage("WRONG_LOGIN"));
 						$result_message = array("MESSAGE"=>GetMessage("WRONG_LOGIN")."<br>", "TYPE"=>"ERROR", "ERROR_TYPE" => "LOGIN");
 					}
@@ -1526,27 +1541,42 @@ abstract class CAllUser extends CDBResult
 		}
 
 		// All except Admin
-		if ($user_id > 1)
+		if ($user_id > 1 && $arParams["CONTROLLER_ADMIN"] !== "Y")
 		{
 			$limitUsersCount = intval(COption::GetOptionInt("main", "PARAM_MAX_USERS", 0));
 			if ($limitUsersCount > 0)
 			{
-				$users_cnt = CUser::GetActiveUsersCount();
-				if ($users_cnt > $limitUsersCount)
+				$by = "ID";
+				$order = "ASC";
+				$arFilter = array(
+					"LAST_LOGIN_1" => ConvertTimeStamp(),
+				);
+				//Intranet users only
+				if (IsModuleInstalled("intranet"))
+					$arFilter["!=UF_DEPARTMENT"] = false;
+
+				$rsUsers = CUser::GetList($by, $order, $arFilter, array(
+					"FIELDS" => array("ID", "LOGIN"),
+				));
+
+				while ( $arUser = $rsUsers->fetch())
 				{
-					$strSql =
-						"SELECT 'x' ".
-						"FROM b_user ".
-						"WHERE ACTIVE = 'Y' ".
-						"	AND ID = ".intval($user_id)." ".
-						"	AND LAST_LOGIN IS NULL ";
-					$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-					if ($result->Fetch())
+					if ($arUser["ID"] == $user_id)
 					{
-						$user_id = 0;
-						$APPLICATION->ThrowException(GetMessage("LIMIT_USERS_COUNT"));
-						$result_message = array("MESSAGE"=>GetMessage("LIMIT_USERS_COUNT")."<br>", "TYPE"=>"ERROR");
+						$limitUsersCount = 1;
+						break;
 					}
+					$limitUsersCount--;
+				}
+
+				if ($limitUsersCount < 0)
+				{
+					$user_id = 0;
+					$APPLICATION->ThrowException(GetMessage("LIMIT_USERS_COUNT"));
+					$result_message = array(
+						"MESSAGE" => GetMessage("LIMIT_USERS_COUNT")."<br>",
+						"TYPE" => "ERROR",
+					);
 				}
 			}
 		}
@@ -1569,60 +1599,60 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Изменяет пароль пользователя, затем вызывает на исполнение функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a>, которая в свою очередь отсылает почтовое сообщение по шаблону типа USER_INFO. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @param string $checkword  Контрольная строка для смены пароля.
-	 *
-	 *
-	 *
-	 * @param string $new_password  Новый пароль.
-	 *
-	 *
-	 *
-	 * @param string $new_password_confirmation  Подтверждение пароля (для успешной смены пароля он должен
-	 * совпадать с <i>new_password</i>).
-	 *
-	 *
-	 *
-	 * @param string $site_id = SITE_ID ID сайта почтового шаблона типа USER_INFO для отсылки уведомления.<br>
-	 * Необязательный. По умолчанию - текущий сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * $arResult = <b>$USER-&gt;ChangePassword</b>("admin", "WRD45GT", "123456", "123456");
-	 * if($arResult["TYPE"] == "OK") echo "Пароль успешно сменен.";
-	 * else ShowMessage($arResult);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php">CUser::SendPassword</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/changepassword.php
-	 * @author Bitrix
-	 */
-	public static function ChangePassword($LOGIN, $CHECKWORD, $PASSWORD, $CONFIRM_PASSWORD, $SITE_ID=false)
+	* <p>Изменяет пароль пользователя, затем вызывает на исполнение функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a>, которая в свою очередь отсылает почтовое сообщение по шаблону типа USER_INFO. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p>
+	*
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @param string $checkword  Контрольная строка для смены пароля.
+	*
+	*
+	*
+	* @param string $password  Новый пароль.
+	*
+	*
+	*
+	* @param string $CONFIRM_PASSWORD  Подтверждение пароля (для успешной смены пароля он должен
+	* совпадать с <i>new_password</i>).
+	*
+	*
+	*
+	* @param string $site_id = SITE_ID ID сайта почтового шаблона типа USER_INFO для отсылки уведомления.<br>
+	* Необязательный. По умолчанию - текущий сайт.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* $arResult = <b>$USER-&gt;ChangePassword</b>("admin", "WRD45GT", "123456", "123456");
+	* if($arResult["TYPE"] == "OK") echo "Пароль успешно сменен.";
+	* else ShowMessage($arResult);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php">CUser::SendPassword</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/changepassword.php
+	* @author Bitrix
+	*/
+	public function ChangePassword($LOGIN, $CHECKWORD, $PASSWORD, $CONFIRM_PASSWORD, $SITE_ID=false)
 	{
 		/** @global CMain $APPLICATION */
 		global $DB, $APPLICATION;
@@ -1656,8 +1686,6 @@ abstract class CAllUser extends CDBResult
 			$strAuthError = "";
 			if(strlen($arParams["LOGIN"])<3)
 				$strAuthError .= GetMessage('MIN_LOGIN')."<br>";
-			if(strlen($arParams["PASSWORD"])<6)
-				$strAuthError .= GetMessage('MIN_PASSWORD1')."<br>";
 			if($arParams["PASSWORD"]<>$arParams["CONFIRM_PASSWORD"])
 				$strAuthError .= GetMessage('WRONG_CONFIRMATION')."<br>";
 
@@ -1679,6 +1707,16 @@ abstract class CAllUser extends CDBResult
 				return array("MESSAGE"=>preg_replace("/#LOGIN#/i", htmlspecialcharsbx($arParams["LOGIN"]), GetMessage("CHECKWORD_INCORRECT"))."<br>", "TYPE"=>"ERROR", "FIELD"=>"CHECKWORD");
 
 			$arPolicy = CUser::GetGroupPolicy($res["ID"]);
+
+			$passwordErrors = $this->CheckPasswordAgainstPolicy($arParams["PASSWORD"], $arPolicy);
+			if (!empty($passwordErrors))
+			{
+				return array(
+					"MESSAGE" => implode("<br>", $passwordErrors)."<br>",
+					"TYPE" => "ERROR"
+				);
+			}
+
 			$site_format = CSite::GetDateFormat();
 			if(mktime()-$arPolicy["CHECKWORD_TIMEOUT"]*60 > MakeTimeStamp($res["CHECKWORD_TIME"], $site_format))
 				return array("MESSAGE"=>preg_replace("/#LOGIN#/i", htmlspecialcharsbx($arParams["LOGIN"]), GetMessage("CHECKWORD_EXPIRE"))."<br>", "TYPE"=>"ERROR", "FIELD"=>"CHECKWORD_EXPIRE");
@@ -1703,52 +1741,86 @@ abstract class CAllUser extends CDBResult
 		return $result_message;
 	}
 
+	public static function CheckPasswordAgainstPolicy($password, $arPolicy)
+	{
+		$errors = array();
+
+		$password_min_length = intval($arPolicy["PASSWORD_LENGTH"]);
+		if($password_min_length <= 0)
+			$password_min_length = 6;
+		if(strlen($password) < $password_min_length)
+			$errors[] = GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_LENGTH", array("#LENGTH#" => $arPolicy["PASSWORD_LENGTH"]));
+
+		if(($arPolicy["PASSWORD_UPPERCASE"] === "Y") && !preg_match("/[A-Z]/", $password))
+			$errors[] = GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_UPPERCASE");
+
+		if(($arPolicy["PASSWORD_LOWERCASE"] === "Y") && !preg_match("/[a-z]/", $password))
+			$errors[] = GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_LOWERCASE");
+
+		if(($arPolicy["PASSWORD_DIGITS"] === "Y") && !preg_match("/[0-9]/", $password))
+			$errors[] = GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_DIGITS");
+
+		if(($arPolicy["PASSWORD_PUNCTUATION"] === "Y") && !preg_match("/[,.<>\\/?;:'\"[\\]\\{\\}\\\\|`~!@#\$%^&*()_+=-]/", $password))
+			$errors[] = GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_PUNCTUATION");
+
+		return $errors;
+	}
+
 	/**
 	 * Sends a profile information to email
 	 */
 	
 	/**
-	 * <p>Отсылает почтовое сообщение с параметрами пользователя по шаблону типа USER_INFO.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $user_id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @param string $site_id  ID сайта почтового шаблона.
-	 *
-	 *
-	 *
-	 * @param string $message  Произвольный текст сообщения (#MESSAGE#).
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $USER_ID = 1;
-	 * // отсылаем почтовое сообщение пользователю с ID=1, 
-	 * // по шаблону привязанному к текущему сайту
-	 * <b>CUser::SendUserInfo</b>($USER_ID, SITE_ID, "Приветствуем Вас как нового пользователя нашего сайта!");
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php">SendPassword</a> </li></ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php
-	 * @author Bitrix
-	 */
+	* <p>Отсылает почтовое сообщение с параметрами пользователя по шаблону типа USER_INFO.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID пользователя.
+	*
+	*
+	*
+	* @param string $site_id  ID сайта почтового шаблона. До версии 3.3.21 назывался <i>lang</i>.
+	*
+	*
+	*
+	* @param string $MSG  Произвольный текст сообщения (#MESSAGE#).
+	*
+	*
+	*
+	* @param bool $Immediate = false По умолчанию <i>false</i>. Если передать <i>true</i>, письмо будет
+	* отправлено сразу, без записи в БД.
+	*
+	*
+	*
+	* @param string $eventName = "USER_INFO" Параметр, в котором передаётся строкой тип отправки событий.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $USER_ID = 1;
+	* // отсылаем почтовое сообщение пользователю с ID=1, 
+	* // по шаблону привязанному к текущему сайту
+	* <b>CUser::SendUserInfo</b>($USER_ID, SITE_ID, "Приветствуем Вас как нового пользователя нашего сайта!");
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php">SendPassword</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php
+	* @author Bitrix
+	*/
 	public static function SendUserInfo($ID, $SITE_ID, $MSG, $bImmediate=false, $eventName="USER_INFO")
 	{
 		global $DB;
@@ -1760,7 +1832,8 @@ abstract class CAllUser extends CDBResult
 		$strSql = "UPDATE b_user SET ".
 			"	CHECKWORD = '".$salt.md5($salt.$checkword)."', ".
 			"	CHECKWORD_TIME = ".$DB->CurrentTimeFunction().", ".
-			"	LID = '".$DB->ForSql($SITE_ID, 2)."' ".
+			"	LID = '".$DB->ForSql($SITE_ID, 2)."', ".
+			"   TIMESTAMP_X = TIMESTAMP_X ".
 			"WHERE ID = '".$ID."'".
 			"	AND (EXTERNAL_AUTH_ID IS NULL OR EXTERNAL_AUTH_ID='') ";
 
@@ -1781,6 +1854,7 @@ abstract class CAllUser extends CDBResult
 				"STATUS"=>($res_array["ACTIVE"]=="Y"?GetMessage("STATUS_ACTIVE"):GetMessage("STATUS_BLOCKED")),
 				"MESSAGE"=>$MSG,
 				"LOGIN"=>$res_array["LOGIN"],
+				"URL_LOGIN"=>urlencode($res_array["LOGIN"]),
 				"CHECKWORD"=>$checkword,
 				"NAME"=>$res_array["NAME"],
 				"LAST_NAME"=>$res_array["LAST_NAME"],
@@ -1806,49 +1880,49 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Отсылает пользователю почтовое сообщение с контрольной строкой для смены пароля. Сообщение отсылается по шаблону типа USER_PASS_REQUEST. Пользователь определяется по логину <i>login</i> или E-Mail адресу - параметр <i>email</i>. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @param string $email  E-Mail адрес пользователя.
-	 *
-	 *
-	 *
-	 * @param string $site_id = SITE_ID ID сайта почтового шаблона типа USER_PASS_REQUEST.<br> Необязательный. По
-	 * умолчанию - текущий сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * $arResult = <b>$USER-&gt;SendPassword</b>($USER-&gt;GetLogin(), $USER-&gt;GetParam("EMAIL"));
-	 * if($arResult["TYPE"] == "OK") echo "Контрольная строка для смены пароля выслана.";
-	 * else echo "Введенные логин (email) не найдены.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/changepassword.php">CUser::ChangePassword</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php
-	 * @author Bitrix
-	 */
+	* <p>Отсылает пользователю почтовое сообщение с контрольной строкой для смены пароля. Сообщение отсылается по шаблону типа USER_PASS_REQUEST. Пользователь определяется по логину <i>login</i> или E-Mail адресу - параметр <i>email</i>. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p>
+	*
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @param string $email  E-Mail адрес пользователя. </htm
+	*
+	*
+	*
+	* @param string $site_id = SITE_ID ID сайта почтового шаблона типа USER_PASS_REQUEST.<br> Необязательный. По
+	* умолчанию - текущий сайт.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* $arResult = <b>$USER-&gt;SendPassword</b>($USER-&gt;GetLogin(), $USER-&gt;GetParam("EMAIL"));
+	* if($arResult["TYPE"] == "OK") echo "Контрольная строка для смены пароля выслана.";
+	* else echo "Введенные логин (email) не найдены.";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/changepassword.php">CUser::ChangePassword</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/sendpassword.php
+	* @author Bitrix
+	*/
 	public static function SendPassword($LOGIN, $EMAIL, $SITE_ID = false)
 	{
 		/** @global CMain $APPLICATION */
@@ -1919,70 +1993,86 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Регистрирует нового пользователя, авторизует его и отсылает письмо по шаблону типа NEW_USER. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p> <p class="note">Функция может использоваться только в публичной части сайта!</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин нового пользователя (не менее 3-х символов).
-	 *
-	 *
-	 *
-	 * @param string $first_name  Имя нового пользователя (может быть пустым).
-	 *
-	 *
-	 *
-	 * @param string $last_name  Фамилия нового пользователя (может быть пустым).
-	 *
-	 *
-	 *
-	 * @param string $password  Пароль (не менее 3-х символов).
-	 *
-	 *
-	 *
-	 * @param string $password_confirmation  Подтверждение пароля (для успешной регистрации должен совпадать
-	 * с <i>password</i>).
-	 *
-	 *
-	 *
-	 * @param string $email  E-Mail нового пользователя (не менее 3-х символов). E-Mail будет проверен
-	 * функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/check_email.php">check_email</a>.
-	 *
-	 *
-	 *
-	 * @param string $site_id = SITE_ID ID сайта почтового шаблона для отсылки уведомлений (NEW_USER, USER_INFO и
-	 * др.).<br> Необязательный. По умолчанию - текущий сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * $arResult = <b>$USER-&gt;Register</b>("admin", "", "", "123456", "123456", "admin@mysite.ru");
-	 * ShowMessage($arResult); // выводим результат в виде сообщения
-	 * echo $USER-&gt;GetID(); // ID нового пользователя
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserregister.php">Событие "OnAfterUserRegister"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserregister.php">Событие
-	 * "OnBeforeUserRegister"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php
-	 * @author Bitrix
-	 */
+	* <p>Регистрирует нового пользователя, авторизует его и отсылает письмо по шаблону типа NEW_USER. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p> <p class="note">Функция может использоваться только в публичной части сайта!</p>
+	*
+	*
+	*
+	*
+	* @param string $USER_LOGIN  Логин нового пользователя (не менее 3-х символов).
+	*
+	*
+	*
+	* @param string $USER_NAME  Имя нового пользователя (может быть пустым).
+	*
+	*
+	*
+	* @param string $USER_LAST_NAME  Фамилия нового пользователя (может быть пустым).
+	*
+	*
+	*
+	* @param string $USER_PASSWORD  Пароль (не менее 3-х символов).
+	*
+	*
+	*
+	* @param string $USER_CONFIRM_PASSWORD  Подтверждение пароля (для успешной регистрации должен совпадать
+	* с <i>password</i>).
+	*
+	*
+	*
+	* @param string $USER_EMAIL  E-Mail нового пользователя (не менее 3-х символов). E-Mail будет проверен
+	* функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/check_email.php">check_email</a>.
+	*
+	*
+	*
+	* @param string $site_id = false ID сайта почтового шаблона для отсылки уведомлений (NEW_USER, USER_INFO и
+	* др.).<br> Необязательный. По умолчанию - "false", что означает текущий
+	* сайт.
+	*
+	*
+	*
+	* @param string $captcha_word = "" Слово для CAPTCHA. Добавляется если в настройках главного модуля
+	* выставлен флаг "Использовать CAPTCHA при регистрации". Если не
+	* заполнено вернет: "Слово для защиты от автоматической
+	* регистрации введено неверно".
+	*
+	*
+	*
+	* @param string $captcha_sid = 0 ID CAPTCHA. Добавляется если в настройках главного модуля выставлен
+	* флаг "Использовать CAPTCHA при регистрации". Если не заполнено
+	* вернет: "Слово для защиты от автоматической регистрации введено
+	* неверно".
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* $arResult = <b>$USER-&gt;Register</b>("admin", "", "", "123456", "123456", "admin@mysite.ru");
+	* ShowMessage($arResult); // выводим результат в виде сообщения
+	* echo $USER-&gt;GetID(); // ID нового пользователя
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserregister.php">Событие "OnAfterUserRegister"</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserregister.php">Событие
+	* "OnBeforeUserRegister"</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php
+	* @author Bitrix
+	*/
 	public function Register($USER_LOGIN, $USER_NAME, $USER_LAST_NAME, $USER_PASSWORD, $USER_CONFIRM_PASSWORD, $USER_EMAIL, $SITE_ID = false, $captcha_word = "", $captcha_sid = 0)
 	{
 		/**
@@ -2126,50 +2216,65 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Создает нового пользователя предварительно сгенерировав случайный логин и пароль. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p> <p class="note">Функция может использоваться только в публичной части сайта!</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $email  E-Mail нового пользователя (не менее 3-х символов). E-Mail будет проверен
-	 * функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/check_email.php">check_email</a>.
-	 *
-	 *
-	 *
-	 * @param string $site_id = SITE_ID ID сайта почтового шаблона для отсылки уведомлений (NEW_USER, USER_INFO и
-	 * др.).<br> Необязательный. По умолчанию - текущий сайт.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * $arResult = <b>$USER-&gt;SimpleRegister</b>("admin@mysite.ru");
-	 * ShowMessage($arResult); // выводим результат в виде сообщения
-	 * echo $USER-&gt;GetID(); // ID нового пользователя
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onafterusersimpleregister.php">Событие
-	 * "OnAfterUserSimpleRegister"</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeusersimpleregister.php">Событие
-	 * "OnBeforeUserSimpleRegister"</a> </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php
-	 * @author Bitrix
-	 */
+	* <p>Создает нового пользователя предварительно сгенерировав случайный логин и пароль. Возвращает массив с сообщением о результате выполнения (массив может быть обработан функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a>).</p> <p class="note">Функция может использоваться только в публичной части сайта!</p>
+	*
+	*
+	*
+	*
+	* @param string $USER_EMAIL  E-Mail нового пользователя (не менее 3-х символов). E-Mail будет проверен
+	* функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/check_email.php">check_email</a>.
+	*
+	*
+	*
+	* @param string $site_id = SITE_ID ID сайта почтового шаблона для отсылки уведомлений (NEW_USER, USER_INFO и
+	* др.).<br> Необязательный. По умолчанию - текущий сайт.
+	*
+	*
+	*
+	* @param string $captcha_word = "" Слово для CAPTCHA. Добавляется если в настройках главного модуля
+	* выставлен флаг "Использовать CAPTCHA при регистрации". Если не
+	* заполнено вернет: "Слово для защиты от автоматической
+	* регистрации введено неверно".
+	*
+	*
+	*
+	* @param string $captcha_sid = 0 ID CAPTCHA. Добавляется если в настройках главного модуля выставлен
+	* флаг "Использовать CAPTCHA при регистрации". Если не заполнено
+	* вернет: "Слово для защиты от автоматической регистрации введено
+	* неверно".
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* $arResult = <b>$USER-&gt;SimpleRegister</b>("admin@mysite.ru");
+	* ShowMessage($arResult); // выводим результат в виде сообщения
+	* echo $USER-&gt;GetID(); // ID нового пользователя
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onafterusersimpleregister.php">Событие
+	* "OnAfterUserSimpleRegister"</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeusersimpleregister.php">Событие
+	* "OnBeforeUserSimpleRegister"</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php
+	* @author Bitrix
+	*/
 	public function SimpleRegister($USER_EMAIL, $SITE_ID = false/*, $captcha_word = "", $captcha_sid = 0*/)
 	{
 		/** @global CMain $APPLICATION */
@@ -2306,36 +2411,36 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Проверяет авторизован ли посетитель сайта (как правило вызывается с объекта $USER). Возвращает "true" если посетитель авторизован, иначе "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * if (<b>$USER-&gt;IsAuthorized</b>()) echo "Вы авторизованы!";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php">CUser::IsAdmin</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет авторизован ли посетитель сайта (как правило вызывается с объекта $USER). Возвращает "true" если посетитель авторизован, иначе "false".</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* if (<b>$USER-&gt;IsAuthorized</b>()) echo "Вы авторизованы!";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php">CUser::IsAdmin</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php
+	* @author Bitrix
+	*/
 	public static function IsAuthorized()
 	{
 		return ($_SESSION["SESS_AUTH"]["AUTHORIZED"]=="Y");
@@ -2343,33 +2448,35 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Проверяет принадлежность текущего авторизованного пользователя группе администраторов (как правило вызывается с объекта $USER). Возращает "true" - если пользователь принадлежит группе администраторов, в противном случае вернет "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * global $USER;
-	 * if (<b>$USER-&gt;IsAdmin</b>()) echo "Вы администратор!";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php
-	 * @author Bitrix
-	 */
+	* <p>Проверяет принадлежность текущего авторизованного пользователя группе администраторов (как правило вызывается с объекта $USER). Возращает "true" - если пользователь принадлежит группе администраторов, в противном случае вернет "false".</p>
+	*
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* global $USER;
+	* if (<b>$USER-&gt;IsAdmin</b>()) echo "Вы администратор!";
+	* ?&gt;
+	* </h
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php">CUser::IsAuthorized</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getparam.php">CUser::GetParam</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isadmin.php
+	* @author Bitrix
+	*/
 	public function IsAdmin()
 	{
 		if ($this->admin === null)
@@ -2410,35 +2517,35 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Заканчивает сеанс авторизации пользователя, при этом удаляются те куки пользователя, которые используются при автоматической авторизации.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * <b>$USER-&gt;Logout</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogout.php">Событие "OnBeforeUserLogout"</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogout.php">Событие "OnAfterUserLogout"</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php
-	 * @author Bitrix
-	 */
+	* <p>Заканчивает сеанс авторизации пользователя, при этом удаляются те куки пользователя, которые используются при автоматической авторизации.</p>
+	*
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* <b>$USER-&gt;Logout</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogout.php">Событие "OnBeforeUserLogout"</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogout.php">Событие "OnAfterUserLogout"</a>
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php
+	* @author Bitrix
+	*/
 	public static function Logout()
 	{
 		/** @global CMain $APPLICATION */
@@ -2486,6 +2593,7 @@ abstract class CAllUser extends CDBResult
 				session_regenerate_id(true);
 
 			$APPLICATION->set_cookie("UIDH", "", 0, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y", false, true);
+			CHTMLPagesCache::OnUserLogout();
 		}
 
 		$arParams["SUCCESS"] = $bOk;
@@ -2498,41 +2606,56 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает массив ID групп, которым принадлежит пользователь с кодом <i>id</i>. <b>GetUserGroup</b> получает данные из записи о пользователях в базе данных.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // получим массив групп пользователя ID=12
-	 * $arGroups = <b>CUser::GetUserGroup</b>(12);
-	 * echo "&lt;pre&gt;"; print_r($arGroups); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
-	 * <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив ID групп, которым принадлежит пользователь с кодом <i>id</i>. <b>GetUserGroup</b> получает данные из записи о пользователях в базе данных.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID пользователя.
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // получим массив групп пользователя ID=12
+	* $arGroups = <b>CUser::GetUserGroup</b>(12);
+	* echo "&lt;pre&gt;"; print_r($arGroups); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* 
+	* Принадлежит ли пользователь группе:
+	* 
+	* // для любого пользователя
+	* echo in_array($group_id, СUser::GetUserGroup($user_id));
+	* 
+	* // для текущего пользователя
+	* echo in_array($group_id, $USER-&gt;GetUserGroupArray());
+	* 
+	* Принадлежит ли пользователь, который состоит во многих группах заданным:
+	* 
+	* &lt;?$arGroupAvalaible = array(1,9,12,13,14,15); // массив групп, которые в которых нужно проверить доступность пользователя
+	* $arGroups = CUser::GetUserGroup($USER-&gt;GetID()); // массив групп, в которых состоит пользователь
+	* $result_intersect = array_intersect($arGroupAvalaible, $arGroups);// далее проверяем, если пользователь вошёл хотя бы в одну из групп, то позволяем ему что-либо делать
+	* if(!empty($result_intersect)):     print "мне разрешено находится на данной странице или просматривать данную часть страницы";endif;&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">Класс CGroup</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouparray.php">CUser::GetUserGroupArray</a> </li>
+	* <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a> </li>
+	* </ul></b<a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php
+	* @author Bitrix
+	*/
 	public static function GetUserGroup($ID)
 	{
 		global $DB;
@@ -2568,7 +2691,7 @@ abstract class CAllUser extends CDBResult
 			and ((UG.DATE_ACTIVE_FROM IS NULL) OR (UG.DATE_ACTIVE_FROM <= ".$DB->CurrentTimeFunction()."))
 			and ((UG.DATE_ACTIVE_TO IS NULL) OR (UG.DATE_ACTIVE_TO >= ".$DB->CurrentTimeFunction()."))
 			UNION SELECT 2, 'everyone', NULL, NULL ".(strtoupper($DB->type) == "ORACLE"? " FROM dual " : "");
-		//echo "<pre>".$strSql."</pre>";
+
 		$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		return $res;
@@ -2576,34 +2699,34 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Функция выводит список групп, в которых состоит пользователь, а также диапазон дат членства пользователя в них. </p>
-	 *
-	 *
-	 *
-	 *
-	 * @param $I $D  ID пользователя
-	 *
-	 *
-	 *
-	 * @return mixed <p>Возвращает массив групп и период пребывания пользователя в
-	 * этой группе:</p><ul> <li> <b>GROUP_ID</b> ID группы</li> <li> <b>DATE_ACTIVE_FROM</b> Дата
-	 * начала активности</li> <li> <b>DATE_ACTIVE_TO</b> Дата окончания активности </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * $res = CUser::GetUserGroupList(1);
-	 * while ($arGroup = $res-&gt;Fetch()){
-	 *    print "&lt;pre&gt;"; print_r($arGroup); print "&lt;/pre&gt;";
-	 * }
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouplist.php
-	 * @author Bitrix
-	 */
+	* <p>Функция выводит список групп, в которых состоит пользователь, а также диапазон дат членства пользователя в них. </p>
+	*
+	*
+	*
+	*
+	* @param $I $D  ID пользователя
+	*
+	*
+	*
+	* @return mixed <p>Возвращает массив групп и период пребывания пользователя в
+	* этой группе:</p> <ul> <li> <b>GROUP_ID</b> ID группы</li> <li> <b>DATE_ACTIVE_FROM</b> Дата
+	* начала активности</li> <li> <b>DATE_ACTIVE_TO</b> Дата окончания активности </li>
+	* </ul> <a name="examples"></a>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $res = CUser::GetUserGroupList(1);
+	* while ($arGroup = $res-&gt;Fetch()){
+	*    print "&lt;pre&gt;"; print_r($arGroup); print "&lt;/pre&gt;";
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergrouplist.php
+	* @author Bitrix
+	*/
 	public static function GetUserGroupList($ID)
 	{
 		global $DB;
@@ -2618,7 +2741,7 @@ abstract class CAllUser extends CDBResult
 			WHERE
 				UG.USER_ID = ".intval($ID)."
 			UNION SELECT 2, NULL, NULL ".(strtoupper($DB->type) == "ORACLE"? " FROM dual " : "");
-		//echo "<pre>".$strSql."</pre>";
+
 		$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		return $res;
@@ -2700,23 +2823,11 @@ abstract class CAllUser extends CDBResult
 					$arPolicy = $this->GetGroupPolicy(array());
 				}
 
-				$password_min_length = intval($arPolicy["PASSWORD_LENGTH"]);
-				if($password_min_length <= 0)
-					$password_min_length = 6;
-				if(strlen($arFields["PASSWORD"]) < $password_min_length)
-					$this->LAST_ERROR .= GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_LENGTH", array("#LENGTH#" => $arPolicy["PASSWORD_LENGTH"]))."<br>";
-
-				if(($arPolicy["PASSWORD_UPPERCASE"] === "Y") && !preg_match("/[A-Z]/", $arFields["PASSWORD"]))
-					$this->LAST_ERROR .= GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_UPPERCASE")."<br>";
-
-				if(($arPolicy["PASSWORD_LOWERCASE"] === "Y") && !preg_match("/[a-z]/", $arFields["PASSWORD"]))
-					$this->LAST_ERROR .= GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_LOWERCASE")."<br>";
-
-				if(($arPolicy["PASSWORD_DIGITS"] === "Y") && !preg_match("/[0-9]/", $arFields["PASSWORD"]))
-					$this->LAST_ERROR .= GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_DIGITS")."<br>";
-
-				if(($arPolicy["PASSWORD_PUNCTUATION"] === "Y") && !preg_match("/[,.<>\\/?;:'\"[\\]\\{\\}\\\\|`~!@#\$%^&*()_+=-]/", $arFields["PASSWORD"]))
-					$this->LAST_ERROR .= GetMessage("MAIN_FUNCTION_REGISTER_PASSWORD_PUNCTUATION")."<br>";
+				$passwordErrors = $this->CheckPasswordAgainstPolicy($arFields["PASSWORD"], $arPolicy);
+				if (!empty($passwordErrors))
+				{
+					$this->LAST_ERROR .= implode("<br>", $passwordErrors)."<br>";
+				}
 			}
 
 			if(is_set($arFields, "EMAIL"))
@@ -2729,9 +2840,19 @@ abstract class CAllUser extends CDBResult
 				{
 					if($ID == false || $arFields["EMAIL"] <> $oldEmail)
 					{
-						$res = CUser::GetList(($b=""), ($o=""), array("=EMAIL" => $arFields["EMAIL"], "EXTERNAL_AUTH_ID"=>''));
-						if($res->Fetch())
-							$this->LAST_ERROR .= GetMessage("USER_WITH_EMAIL_EXIST", array("#EMAIL#" => htmlspecialcharsbx($arFields["EMAIL"])))."<br>";
+						$b = "";
+						$o = "";
+						$res = CUser::GetList($b, $o, array(
+							"=EMAIL" => $arFields["EMAIL"],
+							"EXTERNAL_AUTH_ID"=>''
+						), array(
+							"FIELDS" => array("ID")
+						));
+						while($ar = $res->Fetch())
+						{
+							if (intval($ar["ID"]) !== intval($ID))
+								$this->LAST_ERROR .= GetMessage("USER_WITH_EMAIL_EXIST", array("#EMAIL#" => htmlspecialcharsbx($arFields["EMAIL"])))."<br>";
+						}
 					}
 				}
 			}
@@ -2851,40 +2972,40 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает пользователя по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsUser = <b>CUser::GetByID</b>(23);
-	 * $arUser = $rsUser-&gt;Fetch();
-	 * echo "&lt;pre&gt;"; print_r($arUser); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlist.php">CUser::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbylogin.php">CUser::GetByLogin</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает пользователя по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID пользователя.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsUser = <b>CUser::GetByID</b>(23);
+	* $arUser = $rsUser-&gt;Fetch();
+	* echo "&lt;pre&gt;"; print_r($arUser); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlist.php">CUser::GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbylogin.php">CUser::GetByLogin</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $USER;
@@ -2911,40 +3032,47 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает пользователя по его логину <i>login</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param string $login  Логин пользователя.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $rsUser = <b>CUser::GetByLogin</b>("admin");
-	 * $arUser = $rsUser-&gt;Fetch();
-	 * echo "&lt;pre&gt;"; print_r($arUser); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlist.php">CUser::GetList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbylogin.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает пользователя по его логину <i>login</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Если пользователя с запрошенным логином нет, то возвращается NULL.</p>
+	*
+	*
+	*
+	*
+	* @param string $login  Логин пользователя. </ht
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $rsUser = <b>CUser::GetByLogin</b>("admin");
+	* $arUser = $rsUser-&gt;Fetch();
+	* echo "&lt;pre&gt;"; print_r($arUser); echo "&lt;/pre&gt;";
+	* ?&gt;$UserLogin = "user";
+	* $rsUser = CUser::GetByLogin($UserLogin);
+	* if($arUser = $rsUser-&gt;Fetch())
+	* {
+	*       echo "<pre>"; print_r(); echo "</pre>";
+	* } else {
+	*       echo 'Пользователь с логином "'.$UserLogin.'" не найден!';
+	* }
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getlist.php">CUser::GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbyid.php">CUser::GetByID</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getbylogin.php
+	* @author Bitrix
+	*/
 	public static function GetByLogin($LOGIN)
 	{
 		$rs = CUser::GetList(($by="id"), ($order="asc"), array("LOGIN_EQUAL_EXACT"=>$LOGIN), array("SELECT"=>array("UF_*")));
@@ -2953,56 +3081,64 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Функция изменяет параметры пользователя с идентификатором <i>id</i>. Возвращает "true", если изменение прошло успешно, при возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений полей вида array("поле"=&gt;"значение" [, ...]). В качестве
-	 * полей могут быть использованы все поля CUser, а также GROUP_ID - массив с
-	 * ID групп пользователей, в которые входит этот пользователь.
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $user = new CUser;
-	 * $fields = Array(
-	 *   "NAME"              =&gt; "Сергей",
-	 *   "LAST_NAME"         =&gt; "Иванов",
-	 *   "EMAIL"             =&gt; "ivanov@microsoft.com",
-	 *   "LOGIN"             =&gt; "ivan",
-	 *   "LID"               =&gt; "ru",
-	 *   "ACTIVE"            =&gt; "Y",
-	 *   "GROUP_ID"          =&gt; array(1,2),
-	 *   "PASSWORD"          =&gt; "123456",
-	 *   "CONFIRM_PASSWORD"  =&gt; "123456",
-	 *   );
-	 * <b>$user-&gt;Update</b>($ID, $fields);
-	 * $strError .= $user-&gt;LAST_ERROR;
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет параметры пользователя с идентификатором <i>id</i>. Возвращает "true", если изменение прошло успешно, при возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID пользователя.
+	*
+	*
+	*
+	* @param array $fields  Массив значений полей вида array("поле"=&gt;"значение" [, ...]). В качестве
+	* полей могут быть использованы все поля CUser, а также GROUP_ID - массив с
+	* ID групп пользователей, в которые входит этот пользователь.
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $user = new CUser;
+	* $fields = Array(
+	*   "NAME"              =&gt; "Сергей",
+	*   "LAST_NAME"         =&gt; "Иванов",
+	*   "EMAIL"             =&gt; "ivanov@microsoft.com",
+	*   "LOGIN"             =&gt; "ivan",
+	*   "LID"               =&gt; "ru",
+	*   "ACTIVE"            =&gt; "Y",
+	*   "GROUP_ID"          =&gt; array(1,2),
+	*   "PASSWORD"          =&gt; "123456",
+	*   "CONFIRM_PASSWORD"  =&gt; "123456",
+	*   );
+	* <b>$user-&gt;Update</b>($ID, $fields);
+	* $strError .= $user-&gt;LAST_ERROR;
+	* ?&gt;
+	* Для обновления пользовательского поля, вида "список" (где 11,12,13 - это ID значений списка.):
+	* 
+	* $user = new CUser;
+	* $fields = Array( 
+	* "UF_SHOP" =&gt; array(11,12,13), 
+	* ); 
+	* $user-&gt;Update($ID, $fields);
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
@@ -3181,43 +3317,60 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Метод устанавливает привязку пользователя <i>user_id</i> к группам <i>groups</i>. Привязка к группам сохраняется в базе данных, но не влияет на уже авторизованного посетителя <i>user_id</i>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $user_id  Идентификатор пользователя.
-	 *
-	 *
-	 *
-	 * @param array $groups  Массив со значениями идентификаторов групп пользователей.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * // привязка пользователя с кодом 10 дополнительно к группе c кодом 5
-	 * $arGroups = <b>CUser::GetUserGroup</b>(10);
-	 * $arGroups[] = 5;
-	 * <b>CUser::SetUserGroup</b>(10, $arGroups);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a>
-	 * </li></ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergroup.php
-	 * @author Bitrix
-	 */
+	* <p>Метод устанавливает привязку пользователя <i>user_id</i> к группам <i>groups</i>. Привязка к группам сохраняется в базе данных, но не влияет на уже авторизованного посетителя <i>user_id</i>.</p>
+	*
+	*
+	*
+	*
+	* @param int $user_id  Идентификатор пользователя.
+	*
+	*
+	*
+	* @param array $groups  Массив со значениями идентификаторов групп пользователей.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // привязка пользователя с кодом 10 дополнительно к группе c кодом 5
+	* $arGroups = <b>CUser::GetUserGroup</b>(10);
+	* $arGroups[] = 5;
+	* <b>CUser::SetUserGroup</b>(10, $arGroups);
+	* ?&gt;
+	* 
+	* Если требуется изменить также период активности в группе, массив groups будет иметь вид:
+	* 
+	* $arGroups = array(
+	*   array(
+	*   'GROUP_ID' =&gt; 5,
+	*   'DATE_ACTIVE_FROM'=&gt;'01.02.2009',
+	*   'DATE_ACTIVE_TO'=&gt;'02.02.2009'
+	*   ),
+	*   array(
+	*   'GROUP_ID' =&gt; 6,
+	*   'DATE_ACTIVE_FROM'=&gt;'01.03.2009',
+	*   'DATE_ACTIVE_TO'=&gt;'02.03.2009'
+	*   )
+	* );Добавление группы "одной строкой" (где <code>array(4,5,6)</code> - массив добавляемых групп.):
+	* 
+	* CUser::SetUserGroup($userID, array_merge(CUser::GetUserGroup($userID), array(4,5,6)));
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroup.php">CUser::GetUserGroup</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setusergroup.php
+	* @author Bitrix
+	*/
 	public static function SetUserGroup($USER_ID, $arGroups)
 	{
 		global $DB;
@@ -3248,10 +3401,12 @@ abstract class CAllUser extends CDBResult
 			foreach($arGroups as $group)
 			{
 				if(!is_array($group))
+				{
 					$group = array("GROUP_ID" => $group);
+				}
 
 				$group_id = intval($group["GROUP_ID"]);
-				if($group_id > 0 && !isset($arTmp[$group_id]))
+				if($group_id > 0 && $group_id <> 2 && !isset($arTmp[$group_id]))
 				{
 					$arInsert = $DB->PrepareInsert("b_user_group", $group);
 					$strSql = "
@@ -3271,6 +3426,11 @@ abstract class CAllUser extends CDBResult
 		else
 		{
 			$arGroups = array();
+		}
+
+		foreach (GetModuleEvents("main", "OnAfterSetUserGroup", true) as $arEvent)
+		{
+			ExecuteModuleEventEx($arEvent, array("USER_ID"=>$USER_ID, "GROUPS"=>$arGroups));
 		}
 
 		if($log)
@@ -3300,26 +3460,26 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает количество всех пользователей зарегистрированных на сайте.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return int 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * echo "На сегодняшний день у нас зарегистрировалось пользователей: ".<b>CUser::GetCount</b>();
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getcount.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает количество всех пользователей зарегистрированных на сайте.</p>
+	*
+	*
+	*
+	*
+	* @return int 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* echo "На сегодняшний день у нас зарегистрировалось пользователей: ".<b>CUser::GetCount</b>();
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getcount.php
+	* @author Bitrix
+	*/
 	public static function GetCount()
 	{
 		global $DB;
@@ -3330,39 +3490,40 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Функция удаляет пользователя. Возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID пользователя.
-	 *
-	 *
-	 *
-	 * @return CDBResult 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if (<b>CUser::Delete</b>(5)) echo "Пользователь удален.";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserdelete.php">Событие "OnBeforeUserDelete"</a> </li>
-	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onuserdelete.php">Событие "OnUserDelete"</a> </li>
-	 * </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет пользователя. Возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID пользователя.
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (<b>CUser::Delete</b>(5)) echo "Пользователь удален.";
+	* ?&gt;
+	* </htm
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserdelete.php">Событие "OnBeforeUserDelete"</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onuserdelete.php">Событие "OnUserDelete"</a> </li>
+	* </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		/** @global CMain $APPLICATION */
@@ -3452,33 +3613,33 @@ abstract class CAllUser extends CDBResult
 
 	
 	/**
-	 * <p>Возвращает список всех источников внешней авторизации. Чтобы зарегистрировать свой внешний источник авторизации, необходимо установить обработчик события <a href="http://dev.1c-bitrix.ru/api_help/main/events/onexternalauthlist.php">OnExternalAuthList</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><i>ID</i><i>NAME</i>
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?<br>$rExtAuth = <b>CUser::GetExternalAuthList</b>();<br>if($arExtAuth = $rExtAuth-&gt;GetNext()):<br>    ?&gt;&lt;select name="EXTERNAL_AUTH_ID"&gt;<br>    &lt;option value=""&gt;(внутренняя авторизация)&lt;/option&gt;<br>    &lt;?do{?&gt;<br>        &lt;option value="&lt;?=$arExtAuth['ID']?&gt;"&lt;?<br>            if($str_EXTERNAL_AUTH_ID==$arExtAuth['ID']) echo ' selected';<br>        ?&gt;&gt;&lt;?=$arExtAuth['NAME']?&gt;&lt;/option&gt;<br>    &lt;?}while($arExtAuth = $rExtAuth-&gt;GetNext());?&gt;<br>    &lt;/select&gt;<br>&lt;?endif?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3574" >Внешняя
-	 * авторизация</a></li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onexternalauthlist.php">OnExternalAuthList</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getexternalauthlist.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает список всех источников внешней авторизации. Чтобы зарегистрировать свой внешний источник авторизации, необходимо установить обработчик события <a href="http://dev.1c-bitrix.ru/api_help/main/events/onexternalauthlist.php">OnExternalAuthList</a>.</p>
+	*
+	*
+	*
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><i>ID</i><i>NAME</i>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>$rExtAuth = <b>CUser::GetExternalAuthList</b>();<br>if($arExtAuth = $rExtAuth-&gt;GetNext()):<br>    ?&gt;&lt;select name="EXTERNAL_AUTH_ID"&gt;<br>    &lt;option value=""&gt;(внутренняя авторизация)&lt;/option&gt;<br>    &lt;?do{?&gt;<br>        &lt;option value="&lt;?=$arExtAuth['ID']?&gt;"&lt;?<br>            if($str_EXTERNAL_AUTH_ID==$arExtAuth['ID']) echo ' selected';<br>        ?&gt;&gt;&lt;?=$arExtAuth['NAME']?&gt;&lt;/option&gt;<br>    &lt;?}while($arExtAuth = $rExtAuth-&gt;GetNext());?&gt;<br>    &lt;/select&gt;<br>&lt;?endif?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3574" >Внешняя
+	* авторизация</a></li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onexternalauthlist.php">OnExternalAuthList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li> </ul> <a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getexternalauthlist.php
+	* @author Bitrix
+	*/
 	public static function GetExternalAuthList()
 	{
 		$arAll = array();
@@ -3720,6 +3881,34 @@ abstract class CAllUser extends CDBResult
 	}
 
 
+	
+	/**
+	* <p>Выполнение операций над файлом.</p>
+	*
+	*
+	*
+	*
+	* @param array $op_name  Операция
+	*
+	*
+	*
+	* @param array $arPath  Путь. Массив вида: <pre class="syntax">($arPath = Array($site, $path);)</pre> </ht
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $USER-&gt;CanDoFileOperation('fm_create_new_file', $arPath)
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/candofileoperation.php
+	* @author Bitrix
+	*/
 	public function CanDoFileOperation($op_name,$arPath)
 	{
 		if ($this->IsAdmin())
@@ -3863,20 +4052,36 @@ abstract class CAllUser extends CDBResult
 			return 0;
 	}
 
+	
+	/**
+	* <p>Функция обновляет LAST_ACTIVITY_DATE.</p>
+	*
+	*
+	*
+	*
+	* @param i $d  Идентификатор пользователя, у которого обновляется LAST_ACTIVITY_DATE.
+	*
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/setlastactivitydate.php
+	* @author Bitrix
+	*/
 	public static function SetLastActivityDate($ID)
 	{
 		global $DB;
 
 		$ID = intval($ID);
-		if ($ID <= 0)
-			return;
-
-		$DB->Query("UPDATE b_user SET ".
-			"TIMESTAMP_X = ".(strtoupper($DB->type) == "ORACLE"? "NULL":"TIMESTAMP_X").", ".
-			"LAST_ACTIVITY_DATE = ".$DB->CurrentTimeFunction()." WHERE ID = ".$ID.""
-			, false, "", array("ignore_dml"=>true));
-
-		return true;
+		if ($ID > 0)
+		{
+			$DB->Query("UPDATE b_user SET ".
+				"TIMESTAMP_X = ".(strtoupper($DB->type) == "ORACLE"? "NULL":"TIMESTAMP_X").", ".
+				"LAST_ACTIVITY_DATE = ".$DB->CurrentTimeFunction()." WHERE ID = ".$ID."",
+				false, "", array("ignore_dml"=>true)
+			);
+		}
 	}
 
 	public static function SetLastActivityDateByArray($arUsers)
@@ -4144,12 +4349,12 @@ abstract class CAllUser extends CDBResult
 		$LAST_NAME = trim($arUser['LAST_NAME']);
 		$SECOND_NAME = trim($arUser['SECOND_NAME']);
 
-		if (array_key_exists("EMAIL", $arUser))
+		if (isset($arUser["EMAIL"]))
 			$EMAIL = trim($arUser['EMAIL']);
 		else
 			$EMAIL = '';
 
-		if (array_key_exists("ID", $arUser))
+		if (isset($arUser["ID"]))
 			$ID = intval($arUser['ID']);
 		else
 			$ID = '';
@@ -4252,52 +4457,53 @@ class CAllGroup
 
 	
 	/**
-	 * <p>Функция изменяет группу с кодом <i>id</i>. Возвращает "true" если изменение прошло успешно, при возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID изменяемой записи.
-	 *
-	 *
-	 *
-	 * @param array $fields  Массив значений <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">полей</a> вида
-	 * array("поле"=&gt;"значение" [, ...]).
-	 *
-	 *
-	 *
-	 * @return bool 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $group = new CGroup;
-	 * $arFields = Array(
-	 *   "ACTIVE"       =&gt; "Y",
-	 *   "C_SORT"       =&gt; 100,
-	 *   "NAME"         =&gt; "Имя группы",
-	 *   "DESCRIPTION"  =&gt; "Описание группы",
-	 *   "USER_ID"      =&gt; array(128, 134)
-	 *   );
-	 * <b>$group-&gt;Update</b>($GROUP_ID, $arFields);
-	 * if (strlen($group-&gt;LAST_ERROR)&gt;0) ShowError($group-&gt;LAST_ERROR);
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php">CGroup::Delete</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php
-	 * @author Bitrix
-	 */
+	* <p>Функция изменяет группу с кодом <i>id</i>. Возвращает "true" если изменение прошло успешно, при возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID изменяемой записи. </htm
+	*
+	*
+	*
+	* @param array $fields  Массив значений <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">полей</a> вида
+	* array("поле"=&gt;"значение" [, ...]).
+	*
+	*
+	*
+	* @return bool 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $group = new CGroup;
+	* $arFields = Array(
+	*   "ACTIVE"       =&gt; "Y",
+	*   "C_SORT"       =&gt; 100,
+	*   "NAME"         =&gt; "Имя группы",
+	*   "DESCRIPTION"  =&gt; "Описание группы",
+	*   "USER_ID"      =&gt; array(128, 134)
+	*   );
+	* <b>$group-&gt;Update</b>($GROUP_ID, $arFields);
+	* if (strlen($group-&gt;LAST_ERROR)&gt;0) ShowError($group-&gt;LAST_ERROR);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php">CGroup::Delete</a> </li> </ul></b<a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		/** @global CMain $APPLICATION */
@@ -4447,50 +4653,50 @@ class CAllGroup
 
 	
 	/**
-	 * <p>Функция удаляет группу. При успешном удалении возвращается объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, в противном случае - "false".</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $id  ID группы.
-	 *
-	 *
-	 *
-	 * @return mixed 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * if(IntVal($del_id)&gt;2)
-	 * {
-	 *   $del_id = IntVal($del_id);
-	 *   $group = new CGroup;
-	 *   $DB-&gt;StartTransaction();
-	 *   if(!<b>$group-&gt;Delete</b>($del_id))
-	 *   {
-	 *     $DB-&gt;Rollback();
-	 *     $strError.=GetMessage("DELETE_ERROR");
-	 *   }
-	 *   $DB-&gt;Commit();
-	 * }
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> </li> <li> <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforegroupdelete.php">Событие "OnBeforeGroupDelete"</a>
-	 * </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/ongroupdelete.php">Событие "OnGroupDelete"</a>
-	 * </li> </ul><a name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php
-	 * @author Bitrix
-	 */
+	* <p>Функция удаляет группу. При успешном удалении возвращается объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, в противном случае - "false".</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID группы.</bo
+	*
+	*
+	*
+	* @return mixed 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if(IntVal($del_id)&gt;2)
+	* {
+	*   $del_id = IntVal($del_id);
+	*   $group = new CGroup;
+	*   $DB-&gt;StartTransaction();
+	*   if(!<b>$group-&gt;Delete</b>($del_id))
+	*   {
+	*     $DB-&gt;Rollback();
+	*     $strError.=GetMessage("DELETE_ERROR");
+	*   }
+	*   $DB-&gt;Commit();
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforegroupdelete.php">Событие "OnBeforeGroupDelete"</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/ongroupdelete.php">Событие "OnGroupDelete"</a>
+	* </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		/** @global CMain $APPLICATION */
@@ -4527,38 +4733,38 @@ class CAllGroup
 
 	
 	/**
-	 * <p>Возвращает массив ID всех пользователей группы по ее коду <i>group_id</i>. Проводится проверка на <b>DATE_ACTIVE_FROM</b> и <b>DATE_ACTIVE_TO</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param int $group_id  ID группы.
-	 *
-	 *
-	 *
-	 * @return array 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * $arUsers = <b>CGroup::GetGroupUser</b>(1);
-	 * echo "&lt;pre&gt;"; print_r($arUsers); echo "&lt;/pre&gt;";
-	 * ?&gt;
-	 * </pre>
-	 *
-	 *
-	 *
-	 * <h4>See Also</h4> 
-	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
-	 * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> </ul><a
-	 * name="examples"></a>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/getgroupuser.php
-	 * @author Bitrix
-	 */
+	* <p>Возвращает массив ID всех пользователей группы по ее коду <i>group_id</i>. Проводится проверка на <b>DATE_ACTIVE_FROM</b> и <b>DATE_ACTIVE_TO</b>.</p>
+	*
+	*
+	*
+	*
+	* @param int $id  ID группы.</bo
+	*
+	*
+	*
+	* @return array 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arUsers = <b>CGroup::GetGroupUser</b>(1);
+	* echo "&lt;pre&gt;"; print_r($arUsers); echo "&lt;/pre&gt;";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">Поля CGroup</a> </li> <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Поля CUser</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/getgroupuser.php
+	* @author Bitrix
+	*/
 	public static function GetGroupUser($ID)
 	{
 		global $DB;

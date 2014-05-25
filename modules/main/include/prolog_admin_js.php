@@ -6,7 +6,6 @@ $GLOBALS["BX_STATE"] = "PA";
 
 if(!$GLOBALS['USER']->IsAuthorized())
 {
-	echo "<script>window.location = window.location.href;</script>";
 	die();
 }
 

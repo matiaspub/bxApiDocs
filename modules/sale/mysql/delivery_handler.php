@@ -36,7 +36,7 @@ class CSaleDeliveryHandler extends CAllSaleDeliveryHandler
 
 		foreach ($siteList as $SITE_ID)
 		{
-			$query = "INSERT INTO b_sale_delivery_handler (SELECT '','".$DB->ForSql($SITE_ID)."',ACTIVE,HID,NAME,SORT,DESCRIPTION,HANDLER,SETTINGS,PROFILES,TAX_RATE,LOGOTIP FROM b_sale_delivery_handler WHERE HID='".$DB->ForSql($SID)."' AND LID='')";
+			$query = "INSERT INTO b_sale_delivery_handler (SELECT '','".$DB->ForSql($SITE_ID)."',ACTIVE,HID,NAME,SORT,DESCRIPTION,HANDLER,SETTINGS,PROFILES,TAX_RATE,LOGOTIP, BASE_CURRENCY FROM b_sale_delivery_handler WHERE HID='".$DB->ForSql($SID)."' AND LID='')";
 			$DB->Query($query);
 		}
 		

@@ -1,13 +1,17 @@
 <?php
 namespace Bitrix\Main\Diag;
 
-use \Bitrix\Main;
+use Bitrix\Main;
 
 class ExceptionHandlerFormatter
 {
 	const MAX_CHARS = 30;
 
-	public static function format(\Exception $exception, $htmlMode = false)
+	const SHOW_PARAMETERS = 1;
+
+	const DELIMITER = '----------';
+
+	public static function format(\Exception $exception, $htmlMode = false, $level = 0)
 	{
 		$result = '['.get_class($exception).'] ';
 
@@ -15,6 +19,10 @@ class ExceptionHandlerFormatter
 			$result .= static::severityToString($exception->getSeverity());
 
 		$result .= "\n".static::getMessage($exception)."\n";
+
+		if ($exception instanceof Main\DB\SqlQueryException)
+			$result .= $exception->getQuery()."\n";
+
 		$fileLink = static::getFileLink($exception->getFile(), $exception->getLine());
 		$result .= $fileLink.(empty($fileLink) ? "" : "\n");
 
@@ -32,7 +40,7 @@ class ExceptionHandlerFormatter
 			if (array_key_exists('function', $traceInfo))
 			{
 				$traceLine .= $traceInfo['function'];
-				$traceLine .= static::getArguments($traceInfo['args']);
+				$traceLine .= static::getArguments($traceInfo['args'], $level);
 			}
 
 			if ($htmlMode)
@@ -48,6 +56,8 @@ class ExceptionHandlerFormatter
 
 		if ($htmlMode)
 			$result = '<pre>'.$result.'</pre>';
+		else
+			$result .= static::DELIMITER;
 
 		return $result;
 	}
@@ -133,21 +143,26 @@ class ExceptionHandlerFormatter
 		}
 	}
 
-	protected static function getArguments($args)
+	protected static function getArguments($args, $level)
 	{
 		if (!is_null($args))
 		{
 			$argsTmp = array();
 			foreach ($args as $arg)
-				$argsTmp[] = static::convertArgumentToString($arg);
+				$argsTmp[] = static::convertArgumentToString($arg, $level);
 
 			return '(' . implode(', ', $argsTmp) . ')';
 		}
 		return '()';
 	}
 
-	protected static function convertArgumentToString($arg)
+	protected static function convertArgumentToString($arg, $level)
 	{
+		if (($level & static::SHOW_PARAMETERS) === 0)
+		{
+			return gettype($arg);
+		}
+
 		$result = null;
 		switch (gettype($arg))
 		{

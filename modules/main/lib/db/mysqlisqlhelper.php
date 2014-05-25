@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main;
+use Bitrix\Main\Type;
+
 class MysqliSqlHelper extends SqlHelper
 {
 
@@ -84,25 +87,12 @@ class MysqliSqlHelper extends SqlHelper
 		return "LENGTH(".$field.")";
 	}
 
-	static public function getDatetimeToDbFunction(\Bitrix\Main\Type\DateTime $value, $type = \Bitrix\Main\Type\DateTime::DATE_WITH_TIME)
+	static public function getCharToDateFunction($value)
 	{
-		$customOffset = $value->getValue()->getOffset();
-
-		$serverTime = new \Bitrix\Main\Type\DateTime();
-		$serverOffset = $serverTime->getValue()->getOffset();
-
-		$diff = $customOffset - $serverOffset;
-		$valueTmp = clone $value;
-
-		$valueTmp->getValue()->sub(new \DateInterval(sprintf("PT%sS", $diff)));
-
-		$format = ($type == \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME ? "Y-m-d" : "Y-m-d H:i:s");
-		$date = "'".$valueTmp->format($format)."'";
-
-		return $date;
+		return "'".$value."'";
 	}
 
-	static public function getDateTimeFromDbFunction($fieldName)
+	static public function getDateToCharFunction($fieldName)
 	{
 		return $fieldName;
 	}
@@ -166,11 +156,6 @@ class MysqliSqlHelper extends SqlHelper
 		}
 	}
 
-	static public function getToCharFunction($expr, $length = 0)
-	{
-		return $expr;
-	}
-
 	public function prepareInsert($tableName, $arFields)
 	{
 		$strInsert1 = "";
@@ -216,15 +201,36 @@ class MysqliSqlHelper extends SqlHelper
 		{
 			case "datetime":
 				if (empty($value))
+				{
 					$result = "NULL";
+				}
+				elseif($value instanceof Type\Date)
+				{
+					if($value instanceof Type\DateTime)
+					{
+						$value = clone($value);
+						$value->setDefaultTimeZone();
+					}
+					$result = $this->getCharToDateFunction($value->format("Y-m-d H:i:s"));
+				}
 				else
-					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITH_TIME);
+				{
+					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
+				}
 				break;
 			case "date":
 				if (empty($value))
+				{
 					$result = "NULL";
+				}
+				elseif($value instanceof Type\Date)
+				{
+					$result = $this->getCharToDateFunction($value->format("Y-m-d"));
+				}
 				else
-					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME);
+				{
+					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
+				}
 				break;
 			case "int":
 				$result = "'".intval($value)."'";

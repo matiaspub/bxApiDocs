@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Main\Diag;
 
-use \Bitrix\Main;
+use Bitrix\Main;
 
 Main\Localization\Loc::loadMessages(__FILE__);
 

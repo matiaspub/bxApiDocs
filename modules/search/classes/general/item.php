@@ -147,7 +147,7 @@ class CSearchItem extends CDBResult
 					"JOIN" => true,
 				),
 			));
-			$strWhere = $obQueryWhere->GetQuery($arFilter);
+			$sqlWhere = $obQueryWhere->GetQuery($arFilter);
 		}
 
 		$strSql = "SELECT
@@ -155,7 +155,7 @@ class CSearchItem extends CDBResult
 			FROM
 				b_search_content ".$strSearchContentAlias."
 				INNER JOIN b_search_content_site scsite on scsite.SEARCH_CONTENT_ID = ".$strSearchContentAlias.".ID
-			".($strWhere? "WHERE ".$strWhere: "")."
+			".($sqlWhere? "WHERE ".$sqlWhere: "")."
 			".(!empty($sqlOrder)? "ORDER BY ".implode(", ", $sqlOrder): "")."
 		";
 
@@ -166,7 +166,6 @@ class CSearchItem extends CDBResult
 
 	function Fetch()
 	{
-		global $DB;
 		static $arSite = array();
 
 		$r = parent::Fetch();

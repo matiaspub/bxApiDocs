@@ -38,6 +38,8 @@ class CBitrixComponentTemplate
 
 	var $__bInited = false;
 	private $__view = array();
+	private $frames = array();
+	private $frameMode = false;
 
 	public function CBitrixComponentTemplate()
 	{
@@ -51,25 +53,27 @@ class CBitrixComponentTemplate
 	/***********  GET  ***************/
 	
 	/**
-	 * <p> Метод возвращает имя шаблона компонента. </p> <a name="examples"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // В коде компонента
-	 * $template = &amp; $this-&gt;GetTemplate();
-	 * $templateName = $template-&gt;GetName();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getname.php
-	 * @author Bitrix
-	 */
+	* <p> Метод возвращает имя шаблона компонента. </p> <a name="examples"></a>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // В коде компонента
+	* $template = &amp; $this-&gt;GetTemplate();
+	* $templateName = $template-&gt;GetName();
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getname.php
+	* @author Bitrix
+	*/
 	public function GetName()
 	{
 		if (!$this->__bInited)
@@ -88,25 +92,28 @@ class CBitrixComponentTemplate
 
 	
 	/**
-	 * <p> Метод возвращает путь к файлу шаблона относительно корня сайта. </p> <a name="examples"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // В коде компонента
-	 * $template = &amp; $this-&gt;GetTemplate();
-	 * $templateFile = $template-&gt;GetFile();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfile.php
-	 * @author Bitrix
-	 */
+	* <p> Метод возвращает путь к файлу шаблона относительно корня сайта. </p> <a name="examples"></a>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // В коде компонента
+	* $template = &amp; $this-&gt;GetTemplate();
+	* $templateFile = $template-&gt;GetFile();
+	* 
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfile.php
+	* @author Bitrix
+	*/
 	public function GetFile()
 	{
 		if (!$this->__bInited)
@@ -117,25 +124,28 @@ class CBitrixComponentTemplate
 
 	
 	/**
-	 * <p> Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. </p> <a name="examples"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // В коде компонента
-	 * $template = &amp; $this-&gt;GetTemplate();
-	 * $templateFolder = $template-&gt;GetFolder();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfolder.php
-	 * @author Bitrix
-	 */
+	* <p> Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. </p> <a name="examples"></a>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // В коде компонента
+	* $template = &amp; $this-&gt;GetTemplate();
+	* $templateFolder = $template-&gt;GetFolder();
+	* 
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfolder.php
+	* @author Bitrix
+	*/
 	public function GetFolder()
 	{
 		if (!$this->__bInited)
@@ -146,25 +156,27 @@ class CBitrixComponentTemplate
 
 	
 	/**
-	 * <p> Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. </p> <a name="examples"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @return string 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * // В коде компонента
-	 * $template = &amp; $this-&gt;GetTemplate();
-	 * $siteTemplate = $template-&gt;GetSiteTemplate();
-	 * </pre>
-	 *
-	 *
-	 * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getsitetemplate.php
-	 * @author Bitrix
-	 */
+	* <p> Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. </p> <a name="examples"></a>
+	*
+	*
+	*
+	*
+	* @return string 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // В коде компонента
+	* $template = &amp; $this-&gt;GetTemplate();
+	* $siteTemplate = $template-&gt;GetSiteTemplate();
+	* </h
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getsitetemplate.php
+	* @author Bitrix
+	*/
 	public function GetSiteTemplate()
 	{
 		if (!$this->__bInited)
@@ -201,6 +213,16 @@ class CBitrixComponentTemplate
 				$arReturn["additionalJS"] = $this->__folder."/script.js";
 		}
 
+		if (!empty($this->frames))
+		{
+			$arReturn["frames"] = array();
+			/** @var \Bitrix\Main\Page\FrameHelper $frame */
+			foreach($this->frames as $frame)
+			{
+				$arReturn["frames"][] = $frame->getCachedData();
+			}
+		}
+
 		return $arReturn;
 	}
 
@@ -228,6 +250,14 @@ class CBitrixComponentTemplate
 				//Check if parent component exists and plug js it to it's "collection"
 				if($this->__component && $this->__component->__parent)
 					$this->__component->__parent->addChildJS($this->__folder."/script.js");
+			}
+
+			if (array_key_exists("frames", $arData) && is_array($arData["frames"]))
+			{
+				foreach($arData["frames"] as $frameState)
+				{
+					\Bitrix\Main\Page\FrameHelper::applyCachedData($frameState);
+				}
 			}
 		}
 	}
@@ -525,7 +555,8 @@ class CBitrixComponentTemplate
 	}
 
 	/***********  INCLUDE  ***************/
-	public function __IncludePHPTemplate(&$arResult, &$arParams, $parentTemplateFolder = "")
+	public function __IncludePHPTemplate(/** @noinspection PhpUnusedParameterInspection */
+		&$arResult, &$arParams, $parentTemplateFolder = "")
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB;
@@ -534,13 +565,16 @@ class CBitrixComponentTemplate
 			return false;
 
 		// these vars are used in the template file
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$templateName = $this->__name;
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$templateFile = $this->__file;
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$templateFolder = $this->__folder;
-
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$componentPath = $this->__component->GetPath();
 
-		$component = & $this->__component;
+		$component = &$this->__component;
 
 		if ($this->__fileAlt <> '')
 		{
@@ -551,6 +585,32 @@ class CBitrixComponentTemplate
 		$templateData = false;
 
 		include($_SERVER["DOCUMENT_ROOT"].$this->__file);
+
+		/** @var \Bitrix\Main\Page\FrameHelper $frame */
+		foreach($this->frames as $frame)
+		{
+			if ($frame->isStarted() && !$frame->isEnded())
+				$frame->end();
+		}
+
+		if (!$this->frameMode)
+		{
+			$staticHtmlCache = \Bitrix\Main\Data\StaticHtmlCache::getInstance();
+			$staticHtmlCache->markNonCacheable();
+			if (
+				defined("BX_COMPOSITE_DEBUG")
+				&& defined("USE_HTML_STATIC_CACHE")
+				&& USE_HTML_STATIC_CACHE == true
+			)
+			{
+				AddMessage2Log(
+					"Template: ".$this->__file."\n".
+					"Request URI: ".$_SERVER["REQUEST_URI"]."\n".
+					"Script: ".(isset($_SERVER["REAL_FILE_PATH"]) ? $_SERVER["REAL_FILE_PATH"] : $_SERVER["SCRIPT_NAME"]),
+					"composite"
+				);
+			}
+		}
 
 		$component_epilog = $this->__folder."/component_epilog.php";
 		if(file_exists($_SERVER["DOCUMENT_ROOT"].$component_epilog))
@@ -621,14 +681,14 @@ class CBitrixComponentTemplate
 		return $result;
 	}
 
-	function __IncludeLangFile($path)
+	public static function __IncludeLangFile($path)
 	{
+		global $MESS;
 		static $messCache = array();
+
 		if (!isset($messCache[$path]))
 			$messCache[$path] = __IncludeLang($path, true);
 
-		global $MESS;
-		//$MESS = $messCache[$path] + $MESS; //  T_O_O   S_L_O_O_O_O_W
 		foreach($messCache[$path] as $key => $value)
 			$MESS[$key] = $value;
 
@@ -649,8 +709,9 @@ class CBitrixComponentTemplate
 			if ($relativePath == "")
 				$relativePath = bx_basename($this->__file);
 
-			if ($lang != "en" && $lang != "ru")
-				$arLangMessages = $this->__IncludeLangFile($absPath.LangSubst($lang)."/".$relativePath);
+			$langSubst = LangSubst($lang);
+			if ($lang <> $langSubst)
+				$arLangMessages = $this->__IncludeLangFile($absPath.$langSubst."/".$relativePath);
 
 			$arLangMessages = $this->__IncludeLangFile($absPath.$lang."/".$relativePath) + $arLangMessages;
 		}
@@ -658,7 +719,8 @@ class CBitrixComponentTemplate
 		return $arLangMessages;
 	}
 
-	public function __IncludeMutatorFile(&$arResult, &$arParams)
+	public function __IncludeMutatorFile(/** @noinspection PhpUnusedParameterInspection */
+		&$arResult, &$arParams)
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $APPLICATION, $USER, $DB;
@@ -815,5 +877,55 @@ class CBitrixComponentTemplate
 	public function AddDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
 	{
 		$this->__component->addEditButton(array('AddDeleteAction', $entryId, $deleteLink, $deleteTitle, $arParams));
+	}
+
+	/**
+	 * Function returns next pseudo random value.
+	 *
+	 * @param int $length
+	 * @return string
+	 *
+	 * @see \Bitrix\Main\Type\RandomSequence::randString
+	 */
+	public function randString($length = 6)
+	{
+		return $this->__component->randString($length);
+	}
+
+	/**
+	 * Marks a template as capable of composite mode.
+	 *
+	 * @param bool $mode
+	 * @return void
+	 *
+	 */
+	public function setFrameMode($mode)
+	{
+		$this->frameMode = ($mode === true);
+	}
+
+	/**
+	 * Returns new frame helper object to work with composite frame.
+	 *
+	 *
+	 * <code>
+	 * $frame = $this->createFrame()->begin("");
+	 * echo "10@".(time()+15);
+	 * $frame->end();
+	 * </code>
+	 * @see Bitrix\Main\Page\FrameHelper
+	 *
+	 * @param string $id
+	 * @param bool $autoContainer
+	 * @return Bitrix\Main\Page\FrameHelper
+	 */
+	public function createFrame($id = null, $autoContainer = true)
+	{
+		$this->frameMode = true;
+		if ($id === null)
+			$id = $this->randString();
+		$frame = new Bitrix\Main\Page\FrameHelper($id, $autoContainer);
+		array_unshift($this->frames, $frame);
+		return $frame;
 	}
 }
