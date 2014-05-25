@@ -41,10 +41,7 @@ CModule::AddAutoloadClasses(
 		"CSecurityTaintCheckingTest" => "classes/general/tests/taint_checking.php",
 		"CSecurityUserTest" => "classes/general/tests/user.php",
 		"CSecurityRequirementsException" => "classes/general/requirements_exception.php",
-<<<<<<< HEAD
 		"CSecurityJsonHelper" => "classes/general/json.php",
-=======
->>>>>>> FETCH_HEAD
 	)
 );
 

@@ -1146,11 +1146,7 @@ class Query
 				{
 					$field_type = 'double';
 				}
-<<<<<<< HEAD
 				elseif ($field_type == 'enum' || $field_type == 'text')
-=======
-				elseif ($field_type == 'enum')
->>>>>>> FETCH_HEAD
 				{
 					$field_type = 'string';
 				}

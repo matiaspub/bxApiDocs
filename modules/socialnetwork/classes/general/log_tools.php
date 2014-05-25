@@ -1921,11 +1921,8 @@ class CSocNetLogTools
 					$parserLog = new forumTextParser(LANGUAGE_ID);
 
 				$parserLog->arUserfields = $arFields["UF"];
-<<<<<<< HEAD
 				$parserLog->pathToUser = $arParams["PATH_TO_USER"];
-=======
->>>>>>> FETCH_HEAD
-				
+
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
 			}
 			else
@@ -4315,7 +4312,6 @@ class CSocNetLogTools
 									
 									$messageUrl .= "MID=" . $messageID;
 
-<<<<<<< HEAD
 									$MESSAGE_SITE = $arFields['TEXT_MESSAGE'];
 
 									if (strlen($MESSAGE_SITE) >= 100)
@@ -4361,12 +4357,6 @@ class CSocNetLogTools
 											break;
 										}
 									}
-=======
-									$MESSAGE_SITE = $message_notify;
-
-									$dot = strlen($MESSAGE_SITE)>=100? '...': '';
-									$MESSAGE_SITE = substr($MESSAGE_SITE, 0, 99) . $dot;
->>>>>>> FETCH_HEAD
 
 									$arMessageFields = array(
 										"TO_USER_ID" => $recipientUserID,
@@ -5023,11 +5013,7 @@ class CSocNetLogTools
 			{
 				$serverName = htmlspecialcharsEx($arSite["SERVER_NAME"]);
 				$arSiteData[$arSite["ID"]] = array(
-<<<<<<< HEAD
 					"GROUPS_PATH" => COption::GetOptionString("socialnetwork", "workgroups_page", $arSite["DIR"]."workgroups/", $arSite["ID"]),
-=======
-					"GROUPS_PATH" => COption::GetOptionString("socialnetwork", "workgroup_page", $arSite["DIR"]."workgroups/", $arSite["ID"]),
->>>>>>> FETCH_HEAD
 					"USER_PATH" => COption::GetOptionString("socialnetwork", "user_page", $arSite["DIR"]."company/personal/", $arSite["ID"]),
 					"SERVER_NAME" => (
 						strlen($serverName) > 0

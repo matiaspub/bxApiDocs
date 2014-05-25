@@ -1592,19 +1592,6 @@ class CAllDBResult
 		return array();
 	}
 
-<<<<<<< HEAD
-=======
-	/**
-	 * @abstract
-	 * @return array
-	 */
-	protected function FetchInternal()
-	{
-		return array();
-	}
-
-	
->>>>>>> FETCH_HEAD
 	/**
 	 * @abstract
 	 * @return array

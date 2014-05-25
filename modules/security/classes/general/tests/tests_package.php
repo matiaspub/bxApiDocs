@@ -25,12 +25,8 @@ class CSecurityTestsPackage
 	protected static $slowLocalTests = array(
 		"CSecurityFilePermissionsTest",
 		"CSecurityTaintCheckingTest",
-<<<<<<< HEAD
 		"CSecurityUserTest",
 		"CSecuritySiteConfigurationTest"
-=======
-		"CSecurityUserTest"
->>>>>>> FETCH_HEAD
 	);
 
 	protected static $remoteTests = array(

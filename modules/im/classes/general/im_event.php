@@ -56,7 +56,6 @@ class CIMEvent
 					$CCTP->MaxStringLen = 200;
 					$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 					$arComment["MESSAGE"] = $CCTP->convertText($arFIELDS_FORMATTED["EVENT_FORMATTED"]["MESSAGE"]);
-<<<<<<< HEAD
 				}
 
 				$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), htmlspecialcharsback($arComment["MESSAGE"])));
@@ -122,11 +121,6 @@ class CIMEvent
 					if (strlen($SiteServerName) > 0)
 						$arParams['ENTITY_LINK'] = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName.$arParams['ENTITY_LINK'];
 				}				
-=======
-				}
-
-				$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), $arComment["MESSAGE"]));
->>>>>>> FETCH_HEAD
 
 				$arMessageFields = array(
 					"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,

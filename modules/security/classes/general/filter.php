@@ -358,11 +358,7 @@ class CSecurityFilter
 			"ACTIVE_FROM" => ConvertTimeStamp(false, "FULL"),
 			"ACTIVE_TO" => ConvertTimeStamp(time()+COption::getOptionInt("security", "filter_duration")*60, "FULL"),
 			"INCL_IPS" => array($ip),
-<<<<<<< HEAD
 			"INCL_MASKS" => array("/*"),
-=======
-			"INCL_MASKS" => array("*"),
->>>>>>> FETCH_HEAD
 		));
 		CTimeZone::Enable();
 

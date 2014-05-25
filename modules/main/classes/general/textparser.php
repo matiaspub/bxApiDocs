@@ -1065,20 +1065,14 @@ class CTextParser
 		return $pref.($this->parser_nofollow == "Y" ? '<noindex>' : '').'<a href="'.$url.'" target="'.$this->link_target.'"'.($this->parser_nofollow == "Y" ? ' rel="nofollow"' : '').'>'.$text.'</a>'.($this->parser_nofollow == "Y" ? '</noindex>' : '').$end;
 	}
 
-<<<<<<< HEAD
 public 	function pre_convert_anchor_tag($url, $text = "")
 	{
 		$c = count($this->defended_urls);
 		$tag = "<\x18#".$c.">";
-=======
-	public function pre_convert_anchor_tag($url, $text = "")
-	{
->>>>>>> FETCH_HEAD
 		if(strlen($text) > 0)
 		{
 			$word_separator = str_replace(array("\\]", "\\[", "?"), "", $this->word_separator);
 			$text = preg_replace(
-<<<<<<< HEAD
 				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
 				"[nomodify]\\1[/nomodify]", $text
 			);
@@ -1100,18 +1094,6 @@ public 	function post_convert_anchor_tag($str)
 	}
 
 public static 	function TextParserConvertVideo($arParams)
-=======
-				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((http|https|news|ftp|aim|mailto|file):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
-				"[nomodify]\\1[/nomodify]", $text
-			);
-			return "[url=".$url."]".$text."[/url]";
-		}
-		
-		return "[url][nomodify]".$url."[/nomodify][/url]";
-	}
-
-	public static function TextParserConvertVideo($arParams)
->>>>>>> FETCH_HEAD
 	{
 		global $APPLICATION;
 

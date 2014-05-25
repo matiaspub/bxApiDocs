@@ -198,14 +198,6 @@ class MssqlConnection extends Connection
 		$this->query('EXEC sp_rename '.$this->getSqlHelper()->quote($currentName).', '.$this->getSqlHelper()->quote($newName));
 	}
 
-<<<<<<< HEAD
-=======
-	public function dropColumn($tableName, $columnName)
-	{
-		$this->query('ALTER TABLE '.$this->getSqlHelper()->quote($tableName).' DROP COLUMN '.$this->getSqlHelper()->quote($columnName));
-	}
-
->>>>>>> FETCH_HEAD
 	/*********************************************************
 	 * Transaction
 	 *********************************************************/

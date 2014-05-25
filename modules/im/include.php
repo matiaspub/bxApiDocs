@@ -1,11 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-<<<<<<< HEAD
 // define("IM_REVISION", 30);
-=======
-// define("IM_REVISION", 21);
->>>>>>> FETCH_HEAD
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");

@@ -18,19 +18,11 @@ else if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_R
 
 		$pullConfig = Array();
 
-<<<<<<< HEAD
 		if (defined('BX_PULL_SKIP_LS'))
 			$pullConfig['LOCAL_STORAGE'] = 'N';
 
 		if (IsModuleInstalled('bitrix24'))
 			$pullConfig['BITRIX24'] = 'Y';
-=======
-	$pullChannel = CPullChannel::Get($GLOBALS['USER']->GetId());
-	if (is_array($pullChannel))
-	{
-		$pullWebSocketStatus = false;
-		$pullNginxStatus = CPullOptions::GetNginxStatus();
->>>>>>> FETCH_HEAD
 
 		$pullChannel = CPullChannel::Get($GLOBALS['USER']->GetId());
 		if (is_array($pullChannel))
@@ -76,26 +68,7 @@ else if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_R
 			);
 		}
 
-<<<<<<< HEAD
 		$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
-=======
-		if (defined('BX_PULL_MOBILE'))
-		{
-			$pullConfig['MOBILE'] = 'Y';
-			$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels, true): CPullOptions::GetListenUrl($pullChannels, true)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
-		}
-		else
-			$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
-
-		$pullConfig = $pullConfig+Array(
-			'CHANNEL_ID' => implode('/', $pullChannels),
-			'LAST_ID' => $pullChannel['LAST_ID'],
-			'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
-			'PATH' => $pullPath,
-			'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
-			'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
-		);
->>>>>>> FETCH_HEAD
 	}
 }
 ?>

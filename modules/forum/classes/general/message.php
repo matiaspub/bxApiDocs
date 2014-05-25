@@ -1700,15 +1700,10 @@ class _CMessageDBResult extends CDBResult
 				$arUF = array_intersect_key($res, $this->arUserFields);
 				if (empty($arUF))
 					$this->checkUserFields = false;
-<<<<<<< HEAD
 				else
 				{
 					foreach($arUF as $k => $v)
 					{
-=======
-				else {
-					foreach($arUF as $k => $v) {
->>>>>>> FETCH_HEAD
 						$res[$k] = $this->arUserFields[$k];
 						$res[$k]["VALUE"] = $v;
 					}

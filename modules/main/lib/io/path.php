@@ -13,16 +13,12 @@ class Path
 	const DIRECTORY_SEPARATOR_ALT = '\\';
 	const PATH_SEPARATOR = PATH_SEPARATOR;
 
-<<<<<<< HEAD
 	const INVALID_FILENAME_CHARS = "\\/:*?\"'<>|~#";
 
 	protected static $physicalEncoding = "";
 	protected static $logicalEncoding = "";
 
 	protected static $directoryIndex = null;
-=======
-	const INVALID_FILENAME_CHARS = "\\\\/:*?\"\\'<>|~";
->>>>>>> FETCH_HEAD
 
 	protected static $physicalEncoding = "";
 	protected static $logicalEncoding = "";

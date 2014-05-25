@@ -297,7 +297,6 @@ class CAllMailBox
 		{
 			CMailError::SetError('B_MAIL_ERR_LOGIN', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
 			$arMsg[] = array('id' => 'LOGIN', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
-<<<<<<< HEAD
 		}
 
 		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap')) && is_set($arFields, 'PASSWORD') && strlen($arFields['PASSWORD']) < 1)
@@ -325,35 +324,6 @@ class CAllMailBox
 		}
 		elseif (strtolower($arFields['SERVER_TYPE']) == 'smtp')
 		{
-=======
-		}
-
-		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap')) && is_set($arFields, 'PASSWORD') && strlen($arFields['PASSWORD']) < 1)
-		{
-			CMailError::SetError('B_MAIL_ERR_PASSWORD', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_PASSWORD').'"');
-			$arMsg[] = array('id' => 'PASSWORD', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_PASSWORD').'"');
-		}
-
-		if (strtolower($arFields['SERVER_TYPE']) == 'imap' && is_set($arFields, 'LINK') && strlen($arFields['LINK']) < 1)
-		{
-			CMailError::SetError('B_MAIL_ERR_LINK', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LINK').'"');
-			$arMsg[] = array('id' => 'LINK', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LINK').'"');
-		}
-
-		if (strtolower($arFields['SERVER_TYPE']) == 'imap' && is_set($arFields, 'USER_ID') && strlen($arFields['USER_ID']) < 1)
-		{
-			CMailError::SetError('B_MAIL_ERR_USER_ID', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
-			$arMsg[] = array('id' => 'USER_ID', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
-		}
-
-		if (is_set($arFields, 'SERVER') && strlen($arFields['SERVER']) < 1)
-		{
-			CMailError::SetError('B_MAIL_ERR_SERVER_NAME', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
-			$arMsg[] = array('id' => 'SERVER', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
-		}
-		elseif (strtolower($arFields['SERVER_TYPE']) == 'smtp')
-		{
->>>>>>> FETCH_HEAD
 			$dbres = CMailBox::GetList(array(), array('ACTIVE' => 'Y', 'SERVER_TYPE' => 'smtp', 'SERVER' => $arFields['SERVER'], 'PORT' => $arFields['PORT']));
 			while($arres = $dbres->Fetch())
 			{
@@ -438,7 +408,6 @@ class CAllMailBox
 			$arFields["PASSWORD"]=CMailUtil::Crypt($arFields["PASSWORD"]);
 
 		if ($arFields['ACTIVE'] == 'Y' && $arFields['USER_ID'] != 0)
-<<<<<<< HEAD
 		{
 			CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $arFields['LID']);
 
@@ -446,10 +415,6 @@ class CAllMailBox
 			CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$arFields['LID'], false, $arFields['USER_ID']);
 		}
 
-=======
-			CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $arFields['LID']);
-
->>>>>>> FETCH_HEAD
 		$ID = CDatabase::Add("b_mail_mailbox", $arFields);
 
 		if(intval($arFields["PERIOD_CHECK"])>0 && $arFields["SERVER_TYPE"]=="pop3")
@@ -491,7 +456,6 @@ class CAllMailBox
 		$db_mbox = CMailbox::GetList(array('ID' => $ID));
 		if (($mbox = $db_mbox->fetch()) !== false)
 		{
-<<<<<<< HEAD
 			$userChanged = isset($arFields['USER_ID']) && $mbox['USER_ID'] != $arFields['USER_ID'];
 			$siteChanged = isset($arFields['LID']) && $mbox['LID'] != $arFields['LID'];
 
@@ -520,15 +484,6 @@ class CAllMailBox
 					CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $arFields['LID']);
 
 				if ($userChanged)
-=======
-			if ($mbox['USER_ID'] != 0 || isset($arFields['USER_ID']) && $arFields['USER_ID'] != 0)
-			{
-				CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $mbox['LID']);
-				if (isset($arFields['LID']) && $mbox['LID'] != $arFields['LID'])
-					CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $arFields['LID']);
-
-				if (isset($arFields['USER_ID']) && $mbox['USER_ID'] != $arFields['USER_ID'])
->>>>>>> FETCH_HEAD
 				{
 					CUserCounter::Clear($arFields['USER_ID'], 'mail_unseen', $mbox['LID']);
 					if (isset($arFields['LID']) && $mbox['LID'] != $arFields['LID'])
@@ -581,7 +536,6 @@ class CAllMailBox
 
 		$db_mbox = CMailbox::GetList(array('ID' => $ID, 'ACTIVE' => 'Y', '!USER_ID' => 0));
 		if ($mbox = $db_mbox->fetch())
-<<<<<<< HEAD
 		{
 			CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $mbox['LID']);
 
@@ -589,10 +543,6 @@ class CAllMailBox
 			CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$mbox['LID'], false, $mbox['USER_ID']);
 		}
 
-=======
-			CUserCounter::Clear($mbox['USER_ID'], 'mail_unseen', $mbox['LID']);
-
->>>>>>> FETCH_HEAD
 		CAgent::RemoveAgent("CMailbox::CheckMailAgent(".$ID.");", "mail");
 
 		$strSql = "DELETE FROM b_mail_message_uid WHERE MAILBOX_ID=".$ID;

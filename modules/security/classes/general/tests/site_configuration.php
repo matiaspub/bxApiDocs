@@ -68,12 +68,9 @@ class CSecuritySiteConfigurationTest
 			getScriptFileExt()
 		);
 
-<<<<<<< HEAD
 		return empty($missingExtensions);
 	}
 
-=======
->>>>>>> FETCH_HEAD
 	protected function checkSecurityLevel()
 	{
 		if(!CSecurityFilter::IsActive())

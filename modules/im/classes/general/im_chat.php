@@ -302,7 +302,6 @@ class CIMChat
 					'id' => $arRes["CHAT_ID"],
 					'name' => $arRes["CHAT_TITLE"],
 					'owner' => $arRes["CHAT_OWNER_ID"],
-<<<<<<< HEAD
 					'avatar' => $avatar,
 					'call' => trim($arRes["CHAT_CALL_TYPE"]),
 					'call_number' => trim($arRes["CHAT_CALL_NUMBER"]),
@@ -310,10 +309,6 @@ class CIMChat
 					'call_entity_id' => trim($arRes["ENTITY_ID"]),
 					'type' => trim($arRes["CHAT_TYPE"]),
 					'style' => strlen($arRes["ENTITY_TYPE"])>0? 'call': (trim($arRes["CHAT_TYPE"]) == IM_MESSAGE_PRIVATE? 'private': 'group'),
-=======
-					'call' => trim($arRes["CHAT_CALL_TYPE"]),
-					'type' => trim($arRes["CHAT_TYPE"]),
->>>>>>> FETCH_HEAD
 				);
 			}
 			$arUserInChat[$arRes["CHAT_ID"]][] = $arRes["RELATION_USER_ID"];
@@ -654,7 +649,6 @@ class CIMChat
 
 		if (!$skipUserAdd)
 		{
-<<<<<<< HEAD
 			if (count($arUserId) <= 2)
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER"), "MIN_USER");
@@ -693,16 +687,6 @@ class CIMChat
 					return false;
 				}
 			}
-=======
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MIN_USER"), "MIN_USER");
-			return false;
-		}
-
-		if (count($arUserId) > 100)
-		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_ERROR_MAX_USER", Array('#COUNT#' => 100)), "MAX_USER");
-			return false;
->>>>>>> FETCH_HEAD
 		}
 
 		if (!IsModuleInstalled('intranet') && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
