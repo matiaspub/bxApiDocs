@@ -936,7 +936,7 @@ public static 		function GetSID()
 			return $this->sid;
 		}
 
-		fupublic static nction GetCodeCrypt()
+		public static function GetCodeCrypt()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return $this->sid;

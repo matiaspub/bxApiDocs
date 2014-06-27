@@ -3747,7 +3747,7 @@ public static 	function EraseOldFolders($iCnt = 1)
 	}
 
 	/** Запускает updater модуля **/
-public static 	function RunUpdaterScript($path, &$strError, $from_dir, $moduleID)
+    public static 	function RunUpdaterScript($path, &$strError, $from_dir, $moduleID)
 	{
 		global $DBType, $DB, $APPLICATION, $USER;
 
@@ -3789,7 +3789,7 @@ public static 	function RunUpdaterScript($path, &$strError, $from_dir, $moduleID
 
 
 	/** Получение лицензионного ключа текущего клиента **/
-public static 	function GetLicenseKey()
+    public static 	function GetLicenseKey()
 	{
 		if(defined("LICENSE_KEY"))
 			return LICENSE_KEY;
@@ -3803,13 +3803,13 @@ public static 	function GetLicenseKey()
 		return $GLOBALS["CACHE4UPDATESYS_LICENSE_KEY"];
 	}
 
-	fupublic static nction getmicrotime()
+	public static function getmicrotime()
 	{
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
 	}
 
-	fupublic static nction InsertSpaces($sText, $iMaxChar=80)
+	public static function InsertSpaces($sText, $iMaxChar=80)
 	{
 		$iMaxChar = IntVal($iMaxChar);
 		if ($iMaxChar>0 && strlen($sText)>$iMaxChar)
@@ -3817,7 +3817,7 @@ public static 	function GetLicenseKey()
 		return $sText;
 	}
 
-public static 	function CheckEMail($email)
+    public static 	function CheckEMail($email)
 	{
 		$email = trim($email);
 		if (strlen($email)<=0)
@@ -3829,7 +3829,7 @@ public static 	function CheckEMail($email)
 		return false;
 	}
 
-public static 	function GetDateFormat($strDBFormat = false)
+    public static	function GetDateFormat($strDBFormat = false)
 	{
 		if ($strDBFormat===false)
 			$strDBFormat = FORMAT_DATE;

@@ -199,7 +199,7 @@ public static 	function skipMask($abs_path)
 		}
 	}
 
-	fupublic static nction GetArcName($prefix = '')
+	public static function GetArcName($prefix = '')
 	{
 		$arc_name = DOCUMENT_ROOT.BX_ROOT."/backup/".date("Ymd_His");
 

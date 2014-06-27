@@ -387,7 +387,7 @@ public static 	function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL,
 
 	// true - если пользователь имеет доступ к контракту
 	// false - в противном случае
-	fupublic static nction IsOwner($CONTRACT_ID, $USER_ID=false)
+	public static function IsOwner($CONTRACT_ID, $USER_ID=false)
 	{
 		$CONTRACT_ID = intval($CONTRACT_ID);
 		if ($CONTRACT_ID<=0) return false;
@@ -4366,7 +4366,7 @@ public static 	function ReplaceURL($text, $arBanner)
 		return $strReturn;
 	}
 
-	fupublic static nction FixShowAll()
+	public static function FixShowAll()
 	{
 		global $DB, $CACHE_ADVERTISING, $arrADV_VIEWED_BANNERS, $APPLICATION;
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: FixShowAll<br>Line: ";

@@ -709,7 +709,7 @@ public static 	function SplitTicket($arParam)
 					Группа функций по работе со спамом
 	*****************************************************************/
 
-	fupublic static nction MarkMessageAsSpam($messageID, $exactly="Y", $checkRights="Y")
+	public static function MarkMessageAsSpam($messageID, $exactly="Y", $checkRights="Y")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: MarkMessageAsSpam<br>Line: ";
 		global $DB, $USER;
@@ -2349,7 +2349,7 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 		
 	}
 	
-	fupublic static nction Set_getResponsibleUser($v, $f, &$arFields)
+	public static function Set_getResponsibleUser($v, $f, &$arFields)
 	{
 		global $DB;
 		$err_mess = (CAllTicket::err_mess()) . "<br>Function: Set_getResponsibleUser<br>Line: ";

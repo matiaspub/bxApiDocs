@@ -754,7 +754,7 @@ public static 	function FindComponent($component_name, $filesrc, $src_line)
 		return $arComponent;
 	}
 
-	fupublic static nction getPhpChunks($filesrc, $limit = false)
+	public static function getPhpChunks($filesrc, $limit = false)
 	{
 		$chunks = array();
 		$chunk = '';
